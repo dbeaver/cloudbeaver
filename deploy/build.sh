@@ -46,6 +46,6 @@ cd ../deploy
 
 echo "Copy static content"
 
-cp -rp ../webapp/packages/dbeaver/dist cloudbeaver/web
+cp -rp ../webapp/packages/dbeaver/dist/* cloudbeaver/web
 
 echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."
