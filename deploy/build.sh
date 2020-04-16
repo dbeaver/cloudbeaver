@@ -8,22 +8,22 @@ mkdir ./cloudbeaver/conf
 mkdir ./cloudbeaver/workspace
 mkdir ./cloudbeaver/web
 
-rm -rf build
-mkdir build
-cd build
-
 echo "Build dbeaver application"
 
-git clone https://github.com/dbeaver/dbeaver.git
+cd ../..
+if [[ -f dbeaver ]]
+then
+  git clone https://github.com/dbeaver/dbeaver.git
+fi
 cd dbeaver
+git pull
 mvn clean install
-cd ..
+cd ../cloudbeaver/deploy
 
 echo "Build cloudbeaver server"
 
-cd ../../server
+cd ../server
 mvn clean package
-
 cd ../deploy
 
 echo "Copy server packages"
