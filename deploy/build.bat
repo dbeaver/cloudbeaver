@@ -6,23 +6,19 @@ mkdir cloudbeaver\conf
 mkdir cloudbeaver\workspace
 mkdir cloudbeaver\web
 
-IF EXIST build rmdir /S /Q build
-mkdir build
-cd build
-
 echo "Build dbeaver application"
 
-rem git clone --single-branch --branch release_7_0_1 https://github.com/dbeaver/dbeaver.git
-git clone https://github.com/dbeaver/dbeaver.git
+cd ../..
+IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 cd dbeaver
+git pull
 call mvn clean install
-cd ..
+cd ../cloudbeaver/deploy
 
 echo "Build cloudbeaver server"
 
-cd ..\..\server
+cd ..\server
 call mvn clean package
-
 cd ..\deploy
 
 echo "Copy server packages"
