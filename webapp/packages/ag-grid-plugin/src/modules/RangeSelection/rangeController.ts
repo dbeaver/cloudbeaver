@@ -72,12 +72,16 @@ export class RangeController implements IRangeController {
     private lastSelectedCell?: CellPosition
     private isDragging = false;
     private isDraggingMultiple = false;
+    private lastFocus: CellPosition | null = null
     private startDraggingCell: CellPosition | null = null
     private endDraggingCell: CellPosition | null = null
     private temporaryRange: TemporarySelectionRange | null = null
     private selection?: TableSelection
+    private gridPanel!: GridPanel;
 
-    registerGridComp(gridPanel: GridPanel): void { }
+    registerGridComp(gridPanel: GridPanel): void {
+      this.gridPanel = gridPanel;
+    }
 
     @PostConstruct
     private init(): void {
@@ -152,6 +156,7 @@ export class RangeController implements IRangeController {
       shadowElement.select();
       document.execCommand('copy');
       document.body.removeChild(shadowElement);
+      this.restoreFocus();
     }
 
     private selectColumn(event: IAgColumnClickEvent) {
@@ -169,6 +174,7 @@ export class RangeController implements IRangeController {
       } else {
         this.selection.selectRange(0, lastRowId, [event.columnIndex], event.isMultiple);
       }
+      this.restoreFocus();
       this.dispatchChangedEvent(false, true);
     }
 
@@ -193,6 +199,7 @@ export class RangeController implements IRangeController {
         return;
       }
       this.lastSelectedCell = cell;
+      this.lastFocus = cell;
       if (!this.gridOptionsWrapper.isEnableRangeSelection()
         || cell.column.getColDef().field === INDEX_COLUMN_DEF.field) {
         return;
@@ -239,6 +246,7 @@ export class RangeController implements IRangeController {
       );
       this.dispatchChangedEvent(false, true);
       this.lastSelectedCell = position;
+      this.lastFocus = position;
     }
 
     getCellRanges(): CellRange[] {
@@ -371,6 +379,23 @@ export class RangeController implements IRangeController {
       this.isDraggingMultiple = false;
       this.startDraggingCell = null;
       this.endDraggingCell = null;
+    }
+
+    private restoreFocus() {
+      const scroll = this.gridPanel.getVScrollPosition();
+      const nodes = this.gridApi.getRenderedNodes();
+      const isFocusRendered = nodes.some(node => node.rowIndex === this.lastFocus?.rowIndex);
+
+      if (this.lastFocus && isFocusRendered) {
+        this.gridApi.setFocusedCell(this.lastFocus.rowIndex, this.lastFocus.column);
+      } else {
+        const node = nodes.find(node => node.isPixelInRange(scroll.top));
+        const columns = this.columnController.getAllDisplayedColumns();
+
+        if (nodes.length > 0 && columns.length > 0) {
+          this.gridApi.setFocusedCell((node || nodes[0]).rowIndex, columns[0]);
+        }
+      }
     }
 
     private updateDraggingSelection(isExtends: boolean) {
