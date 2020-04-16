@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+    <extension point="org.jkiss.dbeaver.dataSourceStorage">
+        <storage id="sample" name="Sample configuration storage" description="Preconfigured sample connection set" class="io.cloudbeaver.connect.provider.sample.SampleDataSourceConfigurationStorage">
+
+        </storage>
+    </extension>
+
+</plugin>

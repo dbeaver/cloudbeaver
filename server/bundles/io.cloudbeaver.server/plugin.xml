@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+    <extension-point id="io.cloudbeaver.service" name="Web services" schema="schema/io.cloudbeaver.service.exsd"/>
+    <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
+
+    <extension point="org.eclipse.core.runtime.applications" id="standalone" name="Cloudbeaver Web Application">
+        <application visible="true">
+            <run class="io.cloudbeaver.server.CloudbeaverApplication"/>
+        </application>
+    </extension>
+
+    <extension point="org.eclipse.core.runtime.products" id="product">
+        <product application="io.cloudbeaver.server.standalone" description="Cloudbeaver Web UI Application" name="Cloudbeaver Web Server">
+            <property name="appName" value="Cloudbeaver Web Server"/>
+        </product>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.application">
+        <application id="cloudbeaver-server" name="Cloudbeaver Web Server" description="Cloudbeaver Web UI"/>
+    </extension>
+
+    <extension point="org.eclipse.core.runtime.adapters">
+        <factory adaptableType="org.jkiss.dbeaver.runtime.DBWorkbench" class="io.cloudbeaver.server.WebPlatformAdapterFactory">
+            <adapter type="org.jkiss.dbeaver.model.app.DBPPlatform"/>
+            <adapter type="org.jkiss.dbeaver.runtime.ui.DBPPlatformUI"/>
+        </factory>
+    </extension>
+
+    <!-- Needed to instantiate connections thru navigator model -->
+    <extension point="org.jkiss.dbeaver.service">
+        <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>
+    </extension>
+
+</plugin>

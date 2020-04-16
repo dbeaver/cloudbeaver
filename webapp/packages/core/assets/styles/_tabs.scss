@@ -1,0 +1,116 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin theme-tabs($query: mdc-feature-all()) {
+  $feat-structure: mdc-feature-create-target($query, structure);
+
+  tabs-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  tabs {
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 auto;
+    overflow: auto;
+  }
+
+  tab-panels {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  tab-fill {
+    flex: 1;
+  }
+
+  Tab {
+    composes: theme-typography--body2 from global;
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    text-align: left;
+    align-items: center;
+    outline: none;
+    font-weight: normal;
+    cursor: pointer;
+
+    height: 48px;
+    padding: 0 24px 0 12px;
+    border-top: solid 2px transparent;
+
+    &:global([aria-selected]) {
+      font-weight: 500;
+      cursor: auto;
+      border-top-color: $color-negative;
+
+      &:before {
+        display: none;
+      }
+    }
+
+    &:not(:global([aria-selected='true'])) {
+      background-color: transparent !important;
+    }
+  }
+
+  tab-icon {
+    height: 22px;
+    padding-right: 8px;
+
+    & StaticImage,
+    & img {
+      width: 22px;
+    }
+
+    & placeholder {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  tab-title placeholder {
+    width: 80px;
+    height: 16px;
+  }
+
+  tab-action:before {
+    content: "";
+    display: block;
+    left: -2px;
+    top: -2px;
+    height: 12px;
+    width: 12px;
+    position: absolute;
+    cursor: pointer;
+  }
+
+  tab-action {
+    height: 8px;
+    width: 8px;
+    align-self: flex-start;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+
+    & Icon {
+      display: block;
+    }
+  }
+
+  TabPanel {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    outline: none;
+  }
+}

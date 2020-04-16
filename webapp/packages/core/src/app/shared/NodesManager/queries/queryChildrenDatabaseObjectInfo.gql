@@ -1,0 +1,20 @@
+query queryChildrenDatabaseObjectInfo(
+  $nodePath: ID!
+  $filter: ObjectPropertyFilter
+) {
+  childrenDatabaseObjectInfo: navNodeChildren(parentPath: $nodePath) {
+    id
+    object {
+      features
+      properties(filter: $filter) {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+      }
+    }
+  }
+}

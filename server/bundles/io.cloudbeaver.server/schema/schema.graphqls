@@ -1,0 +1,531 @@
+# Any object (JSON)
+scalar Object
+# Date/Time
+scalar DateTime
+
+####################################################
+# General stuff
+####################################################
+
+# Async types
+
+union AsyncTaskResult = SQLExecuteInfo
+
+type AsyncTaskInfo {
+    id: String!
+    name: String
+    running: Boolean!
+
+    status: String
+    error: ServerError
+
+    result: SQLExecuteInfo
+}
+
+# Various server errors descriptor
+
+type ServerError {
+    message: String
+    errorCode: String
+    stackTrace: String
+    causedBy: ServerError
+}
+
+type ServerMessage {
+    time: String
+    message: String
+}
+
+# Languages supported by server
+
+type ServerLanguage {
+    isoCode: String!
+    displayName: String
+    nativeName: String
+}
+
+type WebServiceConfig {
+    id: String!
+    name: String!
+    description: String!
+    bundleVersion: String!
+}
+
+type ServerConfig {
+    name: String
+    version: String
+    supportsPredefinedConnections: Boolean
+    supportsProvidedConnections: Boolean
+    supportsCustomConnections: Boolean
+    supportsConnectionBrowser: Boolean
+    supportsWorkspaces: Boolean
+    supportedLanguages: [ ServerLanguage ]
+    services: [ WebServiceConfig ]
+}
+
+type SessionInfo {
+    id: ID!
+
+    createTime: String
+    lastAccessTime: String
+    locale: String
+
+    serverMessages: [ ServerMessage ]
+    connections: [ ConnectionInfo ]
+}
+
+####################################################
+# Drivers and connections
+####################################################
+
+type DriverInfo {
+    id: ID!
+    name: String
+    description: String
+    icon: String
+    iconBig: String
+
+    # Driver provider ID
+    providerId: ID
+    # Driver Java class name
+    driverClassName: String
+    defaultPort: String
+    sampleURL: String
+    driverInfoURL: String
+    driverPropertiesURL: String
+    embedded: Boolean
+    anonymousAccess: Boolean
+    allowsEmptyPassword: Boolean
+    licenseRequired: Boolean
+    license: String
+    custom: Boolean
+    # Driver score for ordering, biggest first
+    promotedScore: Int
+
+    connectionProperties: Object
+    defaultConnectionProperties: Object
+    # Driver properties.
+    # Note: it is expensive property and it may produce database server roundtrips.
+    # Call it only when you really need it.
+    driverProperties: [DriverPropertyInfo]
+    driverParameters: Object
+}
+
+type DriverPropertyInfo {
+    id: ID!
+    displayName: String
+    description: String
+    category: String
+    dataType: String
+    defaultValue: Object
+    validValues: [ Object ]
+}
+
+# Data source info is a description of some remote database. Doesn't include user credentials
+type DataSourceInfo {
+    id: ID!
+    driverId: ID!
+    name: String!
+    description: String
+
+    host: String
+    server: String
+    port: String
+    url: String
+    properties: String
+}
+
+# Configuration of particular connection. Used for new connection create. Includes auth info
+input ConnectionConfig {
+    name: String
+    description: String
+
+    # ID of predefined datasource
+    dataSourceId: ID
+
+    # Custom connection parameters (all optional)
+
+    # Driver ID
+    driverId: ID
+    # Host
+    host: String
+    # Port
+    port: String
+    # Databae name
+    databaseName: String
+    # Databae name
+    url: String
+    # Properties
+    properties: Object
+
+    # User credentials
+
+    userName: String
+    userPassword: String
+}
+
+# Connection instance
+type ConnectionInfo {
+    id: ID!
+    driverId: ID!
+
+    name: String!
+    description: String
+    properties: String
+
+    connected: Boolean!
+    provided: Boolean!
+    connectTime: String
+    connectionError: ServerError
+    serverVersion: String
+    clientVersion: String
+
+    # Supported features (provided etc)
+    features: [ String! ]
+}
+
+####################################################
+# Nodes, objects and properties
+####################################################
+
+type ObjectDescriptor {
+    id: Int
+    displayName: String
+    fullName: String
+    uniqueName: String
+    description: String
+    value: String
+}
+
+type ObjectPropertyInfo {
+    # ID
+    id: String
+    # Human readable name
+    displayName: String
+    # Property description
+    description: String
+    # Property category (may be used if object has a lot of properties)
+    category: String
+    # Property data type (int, String, etc)
+    dataType: String
+
+    # Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables)
+    value: Object
+
+    # List of values this property can take. Makes sense only for enumerable properties
+    validValues: [ Object ]
+    # Supported features (system, hidden, inherited, foreign, expensive, etc)
+    features: [ String! ]
+}
+
+input ObjectPropertyFilter {
+    ids: [String]
+    features: [String]
+    categories: [String]
+    dataTypes: [String]
+}
+
+type DatabaseObjectInfo {
+    # Object name
+    name: String
+    # Description - optional
+    description: String
+    # Object type. Java class name in most cases
+    type: String
+
+    # Read object properties.
+    # Optional parameter 'ids' filters properties by id. null means all properties.
+    # Note: property value reading may take a lot of time so don't read all property values always
+    # Examine property meta (features in particular) before reading them
+    properties(filter: ObjectPropertyFilter): [ ObjectPropertyInfo ]
+
+    # Optional properties
+
+    ordinalPosition: Int
+    fullyQualifiedName: String
+    overloadedName: String
+    uniqueName: String
+    state: String
+
+    # Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog
+    features: [ String ]
+
+    # Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition
+    editors: [ String ]
+}
+
+type NavigatorNodeInfo {
+    # Node ID - generally a full path to the node from root of tree
+    id: ID!
+    # Node human readable name
+    name: String
+    # Node icon path
+    icon: String
+    # Node description
+    description: String
+    # Node type
+    nodeType: String
+    # Can this property have child nodes?
+    hasChildren: Boolean
+
+    # Associated object. Maybe null for non-database objects
+    object: DatabaseObjectInfo
+
+    # Supported features: item, container, leaf
+    features: [ String ]
+
+    folder: Boolean
+    inline: Boolean
+    navigable: Boolean
+}
+
+####################################################
+# SQL helpers
+####################################################
+
+type SQLDialectInfo {
+    name: String
+
+    dataTypes: [ String ]
+    functions: [ String ]
+    reservedWords: [ String ]
+    quoteStrings: [ [ String ] ]
+    singleLineComments: [ String ]
+    multiLineComments: [ [ String ] ]
+
+    catalogSeparator: String
+    structSeparator: String
+    scriptDelimiter: String
+
+}
+
+type SQLCompletionProposal {
+    displayString: String
+    type: String
+    score: Int
+
+    replacementString: String
+    replacementOffset: Int
+    replacementLength: Int
+    cursorPosition: Int
+
+    icon: String
+    nodePath: String
+}
+
+####################################################
+# Data read / SQL execution
+####################################################
+
+# SQL context must be created for each SQL editor
+type SQLContextInfo {
+
+    id: ID!
+    defaultCatalog: String
+    defaultSchema: String
+
+}
+
+type DatabaseStructContainers {
+
+    catalogList: [ DatabaseObjectInfo! ]!
+    schemaList: [ DatabaseObjectInfo! ]!
+
+}
+
+input SQLDataFilterConstraint {
+    attribute: String!
+    orderPosition: Int
+    orderAsc: Boolean
+
+    criteria: String
+    operator: String
+    value: Object
+}
+
+input SQLDataFilter {
+
+    offset: Int
+    limit: Int
+
+    constraints: [ SQLDataFilterConstraint ]
+    where: String
+}
+
+type SQLResultColumn {
+    position: Int
+    name: String
+    label: String
+    icon: String
+    entityName: String
+
+    dataKind: String
+    typeName: String
+    fullTypeName: String
+    maxLength: Int
+    scale: Int
+    precision: Int
+}
+
+type SQLResultSet {
+    id: ID!
+    columns: [ SQLResultColumn ]
+    rows: [ [ Object ] ]
+    # server always returns hasMoreData = false
+    hasMoreData: Boolean
+}
+
+type SQLQueryResults {
+    title: String
+    updateRowCount: Int
+    sourceQuery: String
+
+    resultSet: SQLResultSet
+}
+
+type SQLExecuteInfo {
+
+    statusMessage: String
+    duration: Int
+    results: [ SQLQueryResults! ]
+}
+
+type LogEntry {
+    time: DateTime
+    type: String!
+    message: String
+    stackTrace: String
+}
+
+####################################################
+# Main API
+####################################################
+
+type Query {
+    # Returns server config
+    serverConfig: ServerConfig
+
+    # Returns session state ( initialize if not )
+    sessionState: SessionInfo
+
+    # Get driver info
+    driverList( id: ID ): [ DriverInfo! ]
+
+    # Get list of predefined data sources
+    dataSourceList: [ DataSourceInfo! ]
+
+    # Return connection state
+    connectionState( id: ID! ): ConnectionInfo
+
+    readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]
+
+    # Get child nodes
+    navNodeChildren(
+        parentPath: ID!,
+        offset: Int,
+        limit: Int,
+        onlyFolders: Boolean): [ NavigatorNodeInfo! ]
+
+    navNodeInfo( nodePath: ID! ): NavigatorNodeInfo
+
+    navRefreshNode( nodePath: ID! ): Boolean
+
+    navGetStructContainers( connectionId: ID!, catalog: ID ): DatabaseStructContainers!
+
+    sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
+
+    sqlListContexts( connectionId: ID! ): [ SQLContextInfo ]
+
+    sqlCompletionProposals(
+        connectionId: ID!,
+        contextId: ID!,
+        query: String!,
+        position: Int!,
+        maxResults: Int
+    ): [ SQLCompletionProposal ]
+
+}
+
+type Mutation {
+    # Initialize session
+    openSession: SessionInfo
+
+    # Destroy session
+    closeSession: Boolean
+
+    # Refreshes session on server and returns its state
+    touchSession: Boolean
+
+    # Refreshes session on server and returns its state
+    changeSessionLanguage(locale: String): Boolean
+
+    # Create new connection
+    createConnection( config: ConnectionConfig! ): ConnectionInfo
+
+    # Test connection configuration. Returns remote server version
+    testConnection( config: ConnectionConfig! ): ConnectionInfo
+
+    # Connect to database
+    openConnection( config: ConnectionConfig! ): ConnectionInfo
+
+    # Disconnect from database
+    closeConnection( id: ID! ): Boolean!
+
+    sqlContextCreate( connectionId: ID!, defaultCatalog: String, defaultSchema: String ): SQLContextInfo!
+
+    sqlContextSetDefaults( connectionId: ID!, contextId: ID!, defaultCatalog: ID, defaultSchema: ID ): Boolean!
+
+    sqlContextDestroy( connectionId: ID!, contextId: ID! ): Boolean!
+
+    sqlExecuteQuery(
+        connectionId: ID!,
+        contextId: ID!,
+        sql: String!,
+        filter: SQLDataFilter
+    ): SQLExecuteInfo
+
+    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
+
+    readDataFromContainer(
+        connectionId: ID!,
+        contextId: ID!,
+        containerNodePath: ID!,
+        filter: SQLDataFilter
+    ): SQLExecuteInfo
+
+    updateResultsData(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updateRow: [ Object ]!,
+        # Map<Int,Object>
+        updateValues: Object
+    ): SQLExecuteInfo
+
+    ### Async API
+
+    # Returns SQLExecuteInfo
+    asyncSqlExecuteQuery(
+        connectionId: ID!,
+        contextId: ID!,
+        sql: String!,
+        filter: SQLDataFilter
+    ): AsyncTaskInfo!
+
+    #### Generic async functions
+
+    asyncTaskCancel(id: String!): Boolean
+
+    asyncTaskStatus(id: String!): AsyncTaskInfo!
+
+}
+
+####################################################
+# Schema
+####################################################
+
+schema {
+    query: Query
+    mutation: Mutation
+}

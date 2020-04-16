@@ -1,0 +1,42 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.war
+*.nar
+*.ear
+*.rar
+
+# editor files
+.vscode
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# web
+/sources/web/node_modules/
+dist/
+
+## IDEA configs
+
+*.iml
+/idea/
+.idea/
+
+## Eclipse configs
+
+.project
+.classpath
+.settings/
+
+deploy/cloudbeaver
+server/**/target

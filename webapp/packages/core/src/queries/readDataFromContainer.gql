@@ -1,0 +1,39 @@
+
+mutation readDataFromContainer(
+    $connectionId: ID!
+    $contextId: ID!
+    $containerNodePath: ID!
+    $filter: SQLDataFilter
+) {
+    readDataFromContainer(
+        connectionId: $connectionId
+        contextId: $contextId
+        containerNodePath: $containerNodePath
+        filter: $filter
+    ) {
+        duration
+        statusMessage
+        results {
+            updateRowCount
+            sourceQuery
+            title
+            resultSet {
+                id
+                columns {
+                    dataKind
+                    entityName
+                    fullTypeName
+                    icon
+                    label
+                    maxLength
+                    name
+                    position
+                    precision
+                    scale
+                    typeName
+                }
+                rows
+            }
+        }
+    }
+}

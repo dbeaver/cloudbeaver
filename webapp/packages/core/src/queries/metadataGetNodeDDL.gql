@@ -1,0 +1,3 @@
+query metadataGetNodeDDL( $nodeId: ID! ) {
+    metadataGetNodeDDL( nodeId: $nodeId )
+}

@@ -1,0 +1,14 @@
+query readSessionLog(
+    $maxEntries: Int!
+    $clearEntries: Boolean!
+) {
+    log: readSessionLog(
+        maxEntries: $maxEntries
+        clearEntries: $clearEntries
+    ) {
+        time
+        type
+        message
+        stackTrace
+    }
+}

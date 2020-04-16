@@ -1,0 +1,8 @@
+# Metadata queries
+
+extend type Query {
+
+    # Get child nodes
+    metadataGetNodeDDL(nodeId: ID!, options: Object): String
+
+}

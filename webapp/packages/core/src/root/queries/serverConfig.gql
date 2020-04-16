@@ -1,0 +1,10 @@
+query serverConfig {
+  serverConfig {
+    name
+    version
+    supportedLanguages {
+      isoCode
+      nativeName
+    }
+  }
+}

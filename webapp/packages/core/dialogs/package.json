@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/dialogs",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/dialogs",
+  "module": "../dist/dialogs",
+  "types": "../dist/types/dialogs"
+}

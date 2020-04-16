@@ -1,0 +1,24 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import "@material/typography/mixins";
+
+@mixin typography-core-styles($query: mdc-feature-all()) {
+
+  .theme-typography {
+    @include mdc-typography-base($query: $query);
+  }
+
+  @each $style in map-keys($mdc-typography-styles) {
+    .theme-typography--#{$style} {
+      @include mdc-typography($style, $query: $query);
+    }
+  }
+}
+
+@include typography-core-styles;

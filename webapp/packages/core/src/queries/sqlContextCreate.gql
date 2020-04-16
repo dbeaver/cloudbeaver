@@ -1,0 +1,15 @@
+mutation sqlContextCreate(
+    $connectionId: ID!
+    $defaultCatalog: String
+    $defaultSchema: String
+) {
+    context: sqlContextCreate(
+        connectionId: $connectionId
+        defaultCatalog: $defaultCatalog
+        defaultSchema: $defaultSchema
+    ) {
+        id
+        defaultCatalog
+        defaultSchema
+    }
+}

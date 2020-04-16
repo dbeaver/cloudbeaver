@@ -1,0 +1,52 @@
+{
+  "name": "@dbeaver/core",
+  "version": "0.1.0",
+  "buildVersion": "0.13.0",
+  "description": "",
+  "module": "dist/index.js",
+  "types": "dist/types",
+  "scripts": {
+    "build-plugin": "npm run clean-dist && webpack -p --config=configs/webpack/exp.js",
+    "rollup": "npm run clean-dist && rollup --config configs/rollup.config.js",
+    "clean-dist": "rimraf dist/*",
+    "build:analyze": "echo \"no analyze specified\" && exit 0",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "prettify": "prettier --write **/*.ts **/*.tsx",
+    "gql:gen": "graphql-codegen",
+    "gql:gen:dev": "graphql-codegen --watch"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "go-di": "^1.5.2",
+    "graphql-request": "^1.8.2",
+    "inversify": "^5.0.1",
+    "react-sanitized-html": "^2.0.0",
+    "reflect-metadata": "^0.1.13",
+    "sanitize-html": "^1.22.1",
+    "uuid": "^3.4.0"
+  },
+  "peerDependencies": {
+    "go-split": "^1.3.2",
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1",
+    "mobx": "^5.15.0",
+    "mobx-react": "^6.1.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "reakit": "^1.0.0-beta.11",
+    "reshadow": "0.0.1-alpha.73",
+    "rxjs": "^6.5.4"
+  },
+  "devDependencies": {
+    "@material/button": "^4.0.0",
+    "@material/elevation": "^4.0.0",
+    "@material/ripple": "^4.0.0",
+    "@material/radio": "^4.0.0",
+    "@material/theme": "^4.0.0",
+    "@material/typography": "^4.0.0",
+    "@types/uuid": "^3.4.7",
+    "graphql-request": "^1.8.2"
+  },
+  "dbeaverPlugins": []
+}

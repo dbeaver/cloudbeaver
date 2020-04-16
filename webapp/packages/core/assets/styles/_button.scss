@@ -1,0 +1,62 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin button-core-styles() {
+  $mdc-button-disabled-container-fill-color: #cccccc;
+  $mdc-button-density-scale: -2;
+  $query: mdc-feature-all();
+  @include mdc-button-core-styles;
+  @include mdc-button-theme-baseline;
+
+  .theme-button {
+    composes: mdc-button;
+    height: 28px;
+  }
+  .theme-button_ripple {
+    composes: mdc-button__ripple;
+  }
+  .theme-button_raised {
+    composes: mdc-button--raised;
+  }
+  .theme-button_unelevated {
+    composes: mdc-button--unelevated;
+  }
+  .theme-button_outlined {
+    composes: mdc-button--outlined;
+  }
+  .theme-button_secondary {
+    @include mdc-button-ink-color(secondary, $query);
+    @include mdc-states($color: secondary, $query: $query, $ripple-target: $mdc-button-ripple-target);
+
+    &.theme-button_outlined {
+      @include mdc-button-outline-color(secondary, $query);
+    }
+
+    &.theme-button_raised,
+    &.theme-button_unelevated {
+      @include mdc-button-container-fill-color(secondary, $query);
+      @include mdc-button-ink-color(on-secondary, $query);
+      @include mdc-states($color: on-secondary, $query: $query, $ripple-target: $mdc-button-ripple-target);
+    }
+  }
+  .theme-button_background {
+    @include mdc-button-ink-color(background, $query);
+    @include mdc-states($color: background, $query: $query, $ripple-target: $mdc-button-ripple-target);
+
+    &.theme-button_outlined {
+      @include mdc-button-outline-color(background, $query);
+    }
+
+    &.theme-button_raised,
+    &.theme-button_unelevated {
+      @include mdc-button-container-fill-color(background, $query);
+      @include mdc-button-ink-color(on-secondary, $query);
+      @include mdc-states($color: on-secondary, $query: $query, $ripple-target: $mdc-button-ripple-target);
+    }
+  }
+}

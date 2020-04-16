@@ -1,0 +1,10 @@
+query sessionState {
+  sessionState {
+    connections {
+      id
+      name,
+      driverId
+    }
+    locale
+  }
+}

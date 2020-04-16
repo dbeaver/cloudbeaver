@@ -1,0 +1,33 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin placeholder {
+  placeholder {
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+    background: #f0f0f0;
+    border-radius: 3px;
+    margin: 2px;
+    animation: wave 1.5s linear infinite;
+  }
+
+  @keyframes wave {
+    0% {
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+}

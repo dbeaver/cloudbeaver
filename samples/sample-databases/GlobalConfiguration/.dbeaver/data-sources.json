@@ -1,0 +1,19 @@
+{
+	"folders": {},
+	"connections": {
+		"sqlite_xerial-sample-database": {
+			"provider": "generic",
+			"driver": "sqlite_jdbc",
+			"name": "SQLite - Chinook (Sample)",
+			"save-password": true,
+			"navigator-show-only-entities": false,
+			"navigator-hide-folders": false,
+			"read-only": false,
+			"configuration": {
+				"database": "${project.path}/db/Chinook.db",
+				"type": "dev",
+				"auth-model": "native"
+			}
+		}
+	}
+}

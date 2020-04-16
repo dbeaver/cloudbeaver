@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+        id="io.cloudbeaver.server.feature"
+        label="%featureName"
+        version="7.0.3.qualifier"
+        provider-name="%providerName"
+        plugin="io.cloudbeaver.server">
+
+    <description>
+        %description
+    </description>
+
+    <copyright>
+        %copyright
+    </copyright>
+
+    <license url="%licenseURL">
+        %license
+    </license>
+
+    <requires>
+        <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.core.expressions" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.launcher" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.simpleconfigurator" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.common" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.ds" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.event" version="0.0.0" match="greaterOrEqual"/>
+    </requires>
+
+    <includes id="org.jkiss.dbeaver.runtime.feature" version="0.0.0"/>
+    <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
+
+    <plugin id="io.cloudbeaver.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.metadata" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
+    <!-- Extra plugins -->
+    <plugin id="org.jkiss.dbeaver.net.ssh" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
+    <!-- 3rd party deps -->
+    <plugin id="javax.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.eclipse.jetty.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.eclipse.jetty.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.eclipse.jetty.util" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="com.google.gson" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.jkiss.bundle.graphql.java" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
+</feature>

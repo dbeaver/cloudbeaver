@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.driver" name="Web drivers"/>
+      </appInfo>
+      <documentation>
+         DBeaver data source provider
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="driver"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="driver">
+      <annotation>
+         <documentation>
+            Web service description
+         </documentation>
+      </annotation>
+   </element>
+
+
+</schema>

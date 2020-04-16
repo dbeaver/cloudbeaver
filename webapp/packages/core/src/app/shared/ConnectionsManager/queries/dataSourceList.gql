@@ -1,0 +1,8 @@
+query dataSourceList {
+  dataSourceList {
+    id
+    name
+    driverId
+    description
+  }
+}

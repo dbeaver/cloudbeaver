@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/localization",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/localization",
+  "module": "../dist/localization",
+  "types": "../dist/types/localization"
+}

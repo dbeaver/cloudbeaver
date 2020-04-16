@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/root",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/root",
+  "module": "../dist/root",
+  "types": "../dist/types/root"
+}

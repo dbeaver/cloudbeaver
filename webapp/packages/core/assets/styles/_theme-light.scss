@@ -1,0 +1,21 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+$mdc-theme-primary: #2a7cb4; // main menu background
+$mdc-theme-on-primary: #ffffff; // main text color
+$mdc-theme-secondary: #f1f1f1;
+$mdc-theme-on-secondary: #6d6d6d;
+$mdc-theme-surface: #ffffff;
+$mdc-theme-on-surface: #6d6d6d;
+$mdc-theme-background: #dedede;
+
+$color-positive: #01cca3;
+$color-negative: #fd1d48;
+$input-border-color: #dedede;
+
+@import 'mixins';

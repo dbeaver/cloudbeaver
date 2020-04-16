@@ -1,0 +1,36 @@
+{
+  "name": "@dbeaver/sql-editor",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types",
+  "scripts": {
+    "build-plugin": "npm run clean-dist && webpack -p --config=configs/webpack/exp.js",
+    "clean-dist": "rimraf dist/*",
+    "rollup": "npm run clean-dist && rollup --config ../../configs/rollup.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "codemirror": "^5.50.2",
+    "react-codemirror2": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^0.0.82"
+  },
+  "peerDependencies": {
+    "@dbeaver/core": "^0.1.0",
+    "@dbeaver/data-viewer-plugin": "^0.1.0",
+    "go-di": "^1.5.2",
+    "graphql": "^14.5.8",
+    "graphql-request": "^1.8.2",
+    "graphql-tag": "^2.10.1",
+    "mobx": "^5.15.0",
+    "mobx-react": "^6.1.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "reakit": "^1.0.0-beta.11",
+    "reshadow": "0.0.1-alpha.73",
+    "rxjs": "^6.5.4"
+  }
+}

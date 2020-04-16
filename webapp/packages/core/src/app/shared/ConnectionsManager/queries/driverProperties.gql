@@ -1,0 +1,14 @@
+query driverProperties($driverId: ID!) {
+  driver: driverList(id: $driverId) {
+    driverProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      defaultValue
+      validValues
+    }
+    driverParameters
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/eventsLog",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/eventsLog",
+  "module": "../dist/eventsLog",
+  "types": "../dist/types/eventsLog"
+}

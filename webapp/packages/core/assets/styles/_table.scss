@@ -1,0 +1,56 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin table($query: mdc-feature-all()) {
+  table {
+    min-width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  tr {
+    outline: none;
+    border-bottom: 1px solid;
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  tbody tr:hover {
+    @include stripes-background($mdc-theme-secondary);
+  }
+
+  tbody tr:focus {
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  tbody tr[use|isSelected] {
+    @include stripes-background($mdc-theme-secondary);
+    @include mdc-theme-prop(border-color, $color-positive, false);
+  }
+
+  th {
+    white-space: nowrap;
+    padding: 16px;
+    height: 36px;
+    padding-top: unset;
+    padding-bottom: unset;
+    border-right: 1px solid;
+    @include mdc-theme-prop(border-color, background, false);
+    text-transform: uppercase;
+    text-align: left;
+    text-decoration: none !important;
+  }
+
+  th:last-child {
+    border-right: none;
+  }
+
+  td {
+    height: 24px;
+    padding: 0 16px;
+  }
+}

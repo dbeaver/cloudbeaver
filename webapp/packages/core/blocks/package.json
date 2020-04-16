@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/blocks",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/blocks",
+  "module": "../dist/blocks",
+  "types": "../dist/types/blocks"
+}

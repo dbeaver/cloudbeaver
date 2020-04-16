@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/utils",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/utils",
+  "module": ".../dist/utils",
+  "types": "../dist/types/utils"
+}

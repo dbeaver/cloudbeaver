@@ -1,0 +1,5 @@
+mutation testConnection($config: ConnectionConfig!) {
+  testConnection(config: $config) {
+    id
+  }
+}

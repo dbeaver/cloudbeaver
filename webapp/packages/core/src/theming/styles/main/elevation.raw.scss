@@ -1,0 +1,32 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import '@material/elevation/mixins';
+
+@mixin elevation-core-styles($query: mdc-feature-all()) {
+  $feat-animation: mdc-feature-create-target($query, animation);
+  $feat-structure: mdc-feature-create-target($query, structure);
+
+  @for $z-value from 0 through 24 {
+    .theme-elevation-z#{$z-value} {
+      @include mdc-elevation($z-value, $query: $query);
+    }
+  }
+
+  .theme-elevation-transition {
+    @include mdc-feature-targets($feat-animation) {
+      transition: mdc-elevation-transition-value();
+    }
+
+    @include mdc-feature-targets($feat-structure) {
+      will-change: $mdc-elevation-property;
+    }
+  }
+}
+
+@include elevation-core-styles;

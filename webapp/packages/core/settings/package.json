@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/settings",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/settings",
+  "module": "../dist/settings",
+  "types": "../dist/types/settings"
+}

@@ -1,0 +1,20 @@
+schema:
+  - ../../../server/bundles/io.cloudbeaver.server/schema/schema.graphqls
+  - ../../../server/bundles/io.cloudbeaver.service.metadata/schema/service.metadata.graphqls
+documents: ./src/**/*.gql
+generates:
+  src/sdk/sdk.ts:
+    plugins:
+      - add: '/* eslint-disable */'
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+    config:
+      skipTypename: true
+      maybeValue: T
+      scalars:
+        Object: any
+        DateTime: any
+hooks:
+  afterAllFileWrite:
+    - prettier --write --config ../../.prettierrc.js

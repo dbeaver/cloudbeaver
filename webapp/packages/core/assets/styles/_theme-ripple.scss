@@ -1,0 +1,118 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin theme-ripple-color($query, $color) {
+  .theme-ripple {
+    @include mdc-states($color, $query: $query);
+
+    &.theme-ripple-selectable {
+      &:global([aria-selected]) {
+        &::before {
+          opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
+        }
+      }
+    }
+  }
+
+  &.theme-ripple {
+    @include mdc-states($color, $query: $query);
+
+    &.theme-ripple-selectable {
+      &:global([aria-selected]) {
+        &::before {
+          opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
+        }
+      }
+    }
+  }
+}
+
+@mixin theme-ripple($query: mdc-feature-all()) {
+  $feat-structure: mdc-feature-create-target($query, structure);
+  @include mdc-ripple-common($query);
+
+  .theme-ripple {
+    position: relative;
+
+    &::before {
+      @include mdc-ripple-surface($query);
+      @include mdc-ripple-radius-bounded($query: $query);
+
+      @include mdc-feature-targets($feat-structure) {
+        position: absolute;
+        content: '';
+        opacity: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    }
+
+    &.theme-ripple-background {
+      @include mdc-theme-prop(background-color, background, false);
+      @include mdc-theme-prop(color, text-hint-on-light, false);
+
+      &.theme-ripple-selectable {
+        &:hover {
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+        }
+        
+        &:global([aria-selected]) {
+          @include mdc-theme-prop(background-color, surface, false);
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+
+          &::before {
+            opacity: 0 !important;
+          }
+        }
+      }
+    }
+
+    &.theme-ripple-secondary {
+      @include mdc-theme-prop(background-color, secondary, false);
+      @include mdc-theme-prop(color, text-hint-on-light, false);
+
+      &.theme-ripple-selectable {
+        &:hover {
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+        }
+        
+        &:global([aria-selected]) {
+          @include mdc-theme-prop(background-color, surface, false);
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+
+          &::before {
+            opacity: 0 !important;
+          }
+        }
+      }
+    }
+
+    &.theme-ripple-surface {
+      @include mdc-theme-prop(background-color, surface, false);
+      @include mdc-theme-prop(color, text-hint-on-light, false);
+
+      &.theme-ripple-selectable {
+        &:hover {
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+        }
+        
+        &:global([aria-selected]) {
+          @include mdc-theme-prop(background-color, surface, false);
+          @include mdc-theme-prop(color, text-primary-on-light, false);
+
+          &::before {
+            opacity: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}

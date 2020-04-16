@@ -1,0 +1,64 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin colors($query: mdc-feature-all()) {
+  $feat-color: mdc-feature-create-target($query, color);
+
+  @each $style in map-keys($mdc-theme-property-values) {
+    @if $style != "background" and $style != "surface" and $style != "on-surface" {
+      .theme-text-#{$style} {
+        @include theme-ripple-color($query, $style);
+
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(color, $style, true);
+        }
+
+        :global(svg),
+        & > :global(svg) {
+          @include mdc-feature-targets($feat-color) {
+            @include mdc-theme-prop(fill, $style, true);
+          }
+        }
+      }
+    } @else {
+      .theme-text-#{$style} {
+        @include theme-ripple-color($query, $style);
+
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(color, $style);
+        }
+
+        :global(svg),
+        & > :global(svg) {
+          @include mdc-feature-targets($feat-color) {
+            @include mdc-theme-prop(fill, $style);
+          }
+        }
+      }
+      .theme-background-#{$style} {
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(background-color, $style);
+        }
+      }
+    }
+    .theme-border-color-#{$style} {
+      @include mdc-feature-targets($feat-color) {
+        @include mdc-theme-prop(border-color, $style, true);
+      }
+    }
+  }
+
+  // CSS rules for using primary and secondary (plus light/dark variants) as background colors.
+  @each $style in ("primary", "secondary") {
+    .theme-background-#{$style} {
+      @include mdc-feature-targets($feat-color) {
+        @include mdc-theme-prop(background-color, $style, true);
+      }
+    }
+  }
+}

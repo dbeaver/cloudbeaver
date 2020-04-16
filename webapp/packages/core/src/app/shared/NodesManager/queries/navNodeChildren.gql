@@ -1,0 +1,16 @@
+query navNodeChildren($parentPath: ID!) {
+  navNodeChildren(parentPath: $parentPath) {
+    id
+    name
+    hasChildren
+    nodeType
+    icon
+    folder
+    inline
+    navigable
+    features
+    object {
+      features
+    }
+  }
+}

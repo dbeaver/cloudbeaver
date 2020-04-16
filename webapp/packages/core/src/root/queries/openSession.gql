@@ -1,0 +1,10 @@
+mutation openSession {
+  session: openSession {
+    connections {
+      id
+      name,
+      driverId
+    }
+    locale
+  }
+}

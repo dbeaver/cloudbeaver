@@ -1,0 +1,8 @@
+mutation createConnection($config: ConnectionConfig!) {
+  createConnection(config: $config) {
+    id
+    name
+    driverId
+    connected
+  }
+}

@@ -1,0 +1,16 @@
+query querySqlDialectInfo( $connectionId: ID! ) {
+    dialect: sqlDialectInfo( connectionId: $connectionId ) {
+      name
+
+      dataTypes
+      functions
+      reservedWords
+      quoteStrings
+      singleLineComments
+      multiLineComments
+
+      catalogSeparator
+      structSeparator
+      scriptDelimiter
+    }
+}

@@ -1,0 +1,13 @@
+query driverList {
+  driverList {
+    id
+    name
+    icon
+    description
+    defaultPort
+    sampleURL
+    embedded
+    anonymousAccess
+    promotedScore
+  }
+}

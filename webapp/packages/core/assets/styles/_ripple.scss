@@ -1,0 +1,31 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin ripple-core-styles($query: mdc-feature-all()) {
+  $feat-structure: mdc-feature-create-target($query, structure);
+
+  .theme-ripple-surface {
+    @include mdc-ripple-surface($query: $query);
+    @include mdc-states($query: $query);
+    @include mdc-ripple-radius-bounded($query: $query);
+
+    @include mdc-feature-targets($feat-structure) {
+      position: relative;
+      outline: none;
+      overflow: hidden;
+    }
+
+    &--primary {
+      @include mdc-states(primary, $query: $query);
+    }
+
+    &--accent {
+      @include mdc-states(secondary, $query: $query);
+    }
+  }
+}

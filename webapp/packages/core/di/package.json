@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/di",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/di",
+  "module": "../dist/di",
+  "types": "../dist/types/di"
+}

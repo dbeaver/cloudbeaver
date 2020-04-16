@@ -1,0 +1,41 @@
+mutation asyncTaskStatus(
+    $taskId: String!
+) {
+    result: asyncTaskStatus(
+        id: $taskId
+    ) {
+        id
+        running
+        result {
+            duration
+            statusMessage
+            results {
+                updateRowCount
+                sourceQuery
+                title
+                resultSet {
+                    id
+                    columns {
+                        dataKind
+                        entityName
+                        fullTypeName
+                        icon
+                        label
+                        maxLength
+                        name
+                        position
+                        precision
+                        scale
+                        typeName
+                    }
+                    rows
+                }
+            }
+        }
+        error {
+            message
+            errorCode
+            stackTrace
+        }
+    }
+}

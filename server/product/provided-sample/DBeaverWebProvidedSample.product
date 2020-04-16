@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="Cloudbeaver Provided Sample" uid="io.cloudbeaver.provided.sample.product" id="io.cloudbeaver.provided.sample.product" application="io.cloudbeaver.server.standalone" version="7.0.1.qualifier" useFeatures="true" includeLaunchers="false">
+
+   <configIni use="default">
+   </configIni>
+
+   <features>
+      <feature id="io.cloudbeaver.server.feature"/>
+      <feature id="io.cloudbeaver.sample.feature"/>
+      <feature id="io.cloudbeaver.ce.drivers.feature"/>
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+   </configurations>
+
+</product>

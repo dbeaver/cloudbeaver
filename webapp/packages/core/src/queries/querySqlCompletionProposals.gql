@@ -1,0 +1,25 @@
+query querySqlCompletionProposals(
+    $connectionId: ID!
+    $contextId: ID!
+    $position: Int!
+    $query: String!
+    $maxResults: Int
+) {
+    sqlCompletionProposals(
+        connectionId: $connectionId
+        contextId: $contextId
+        maxResults: $maxResults
+        position: $position
+        query: $query
+    ) {
+        cursorPosition
+        displayString
+        icon
+        nodePath
+        replacementLength
+        replacementOffset
+        replacementString
+        score
+        type
+    }
+}

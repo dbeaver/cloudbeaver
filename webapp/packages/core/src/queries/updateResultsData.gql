@@ -1,0 +1,26 @@
+mutation updateResultsData(
+    $connectionId: ID!
+    $contextId: ID!
+    $resultsId: ID!
+    $sourceRowValues: [ Object ]!
+    $values: Object
+) {
+    result: updateResultsData(
+        connectionId: $connectionId
+        contextId: $contextId
+
+        resultsId: $resultsId
+        updateRow: $sourceRowValues
+
+        updateValues: $values
+    ) {
+        duration
+        results {
+            updateRowCount
+            resultSet {
+                id
+                rows
+            }
+        }
+    }
+}

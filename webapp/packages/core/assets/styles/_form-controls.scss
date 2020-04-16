@@ -1,0 +1,60 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin form-controls() {
+  input {
+    @include mdc-theme-prop(color, on-secondary, false);
+    @include mdc-theme-prop(background-color, secondary, false);
+    box-sizing: border-box;
+    padding: 0 4px;
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid;
+    border-radius: 3px;
+    @include mdc-theme-prop(border-color, background, false);
+
+    &:global([type="checkbox"]) {
+      height: 26px;
+      width: 14px;
+    }
+
+    &:global([disabled]),
+    &:global([readonly]) {
+      opacity: 0.8;
+    }
+
+    &[use|mod=surface] {
+      @include mdc-theme-prop(color, on-surface, false);
+      @include mdc-theme-prop(background-color, surface, false);
+    }
+  }
+
+  label {
+    display: block;
+    box-sizing: border-box;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+
+    &:global([title]) {
+      text-decoration: none;
+    }
+  }
+
+  textarea {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 3px;
+    border: solid 1px $input-border-color;
+    @include mdc-theme-prop(color, on-surface, false);
+    @include mdc-theme-prop(background-color, surface, false);
+  }
+}

@@ -1,0 +1,38 @@
+mutation executeSqlQuery(
+    $connectionId: ID!
+    $contextId: ID!
+    $query: String!
+    $filter: SQLDataFilter
+) {
+    result: sqlExecuteQuery(
+        connectionId: $connectionId
+        contextId: $contextId
+        sql: $query
+        filter: $filter
+    ) {
+        duration
+        statusMessage
+        results {
+            updateRowCount
+            sourceQuery
+            title
+            resultSet {
+                id
+                columns {
+                    dataKind
+                    entityName
+                    fullTypeName
+                    icon
+                    label
+                    maxLength
+                    name
+                    position
+                    precision
+                    scale
+                    typeName
+                }
+                rows
+            }
+        }
+    }
+}
