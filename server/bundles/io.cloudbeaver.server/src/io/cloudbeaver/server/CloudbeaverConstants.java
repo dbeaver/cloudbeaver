@@ -57,4 +57,5 @@ public class CloudbeaverConstants {
     // Default max idle time (10 minutes)
     public static final long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;
 
+    public static final String ENV_CB_HOME = "CLOUDBEAVER_HOME";
 }

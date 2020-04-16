@@ -145,7 +145,8 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
 
         DBPApplication application = DBWorkbench.getPlatform().getApplication();
 
-        log.debug("\tContent root: " + contentRoot);
+        log.debug("\tContent root: " + new File(contentRoot).getAbsolutePath());
+        log.debug("\tDrivers storage: " + new File(driversLocation).getAbsolutePath());
         //log.debug("\tDrivers root: " + driversLocation);
         log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tBase port: " + serverPort);
@@ -183,17 +184,32 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
     }
 
     private void parseConfiguration(Properties props) {
+        String homeFolder = System.getenv(CloudbeaverConstants.ENV_CB_HOME);
+        if (CommonUtils.isEmpty(homeFolder)) {
+            homeFolder = System.getProperty("user.dir");
+        }
+        if (CommonUtils.isEmpty(homeFolder)) {
+            homeFolder = ".";
+        }
+
         serverPort = CommonUtils.toInt(getConfigParameter(props, CloudbeaverConstants.PARAM_SERVER_PORT, String.valueOf(CloudbeaverConstants.DEFAULT_SERVER_PORT)));
         serverName = getConfigParameter(props, CloudbeaverConstants.PARAM_SERVER_NAME, CloudbeaverConstants.DEFAULT_SERVER_NAME);
-        contentRoot = getConfigParameter(props, CloudbeaverConstants.PARAM_CONTENT_ROOT, CloudbeaverConstants.DEFAULT_CONTENT_ROOT);
+        contentRoot = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_CONTENT_ROOT, CloudbeaverConstants.DEFAULT_CONTENT_ROOT), homeFolder);
         rootURI = getConfigParameter(props, CloudbeaverConstants.PARAM_ROOT_URI, CloudbeaverConstants.DEFAULT_ROOT_URI);
         servicesURI = getConfigParameter(props, CloudbeaverConstants.PARAM_SERVICES_URI, CloudbeaverConstants.DEFAULT_SERVICES_URI);
-        driversLocation = getConfigParameter(props, CloudbeaverConstants.PARAM_DRIVERS_LOCATION, CloudbeaverConstants.DEFAULT_DRIVERS_LOCATION);
-        workspaceLocation = getConfigParameter(props, CloudbeaverConstants.PARAM_WORKSPACE_LOCATION, CloudbeaverConstants.DEFAULT_WORKSPACE_LOCATION);
+        driversLocation = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_DRIVERS_LOCATION, CloudbeaverConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
+        workspaceLocation = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_WORKSPACE_LOCATION, CloudbeaverConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
 
         maxSessionIdleTime = getConfigParameter(props, CloudbeaverConstants.PARAM_SESSION_EXPIRE_PERIOD, CloudbeaverConstants.MAX_SESSION_IDLE_TIME);
 
         develMode = CommonUtils.toBoolean(getConfigParameter(props, CloudbeaverConstants.PARAM_DEVEL_MODE, "false"));
+    }
+
+    private String getRelativePath(String path, String curDir) {
+        if (path.startsWith("/") || path.length() > 2 && path.charAt(1) == ':') {
+            return path;
+        }
+        return new File(curDir, path).getAbsolutePath();
     }
 
     @NotNull
