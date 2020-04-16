@@ -11,7 +11,7 @@ mkdir ./cloudbeaver/web
 echo "Build dbeaver application"
 
 cd ../..
-if [[ -f dbeaver ]]
+if [[ ! -f dbeaver ]]
 then
   git clone https://github.com/dbeaver/dbeaver.git
 fi
