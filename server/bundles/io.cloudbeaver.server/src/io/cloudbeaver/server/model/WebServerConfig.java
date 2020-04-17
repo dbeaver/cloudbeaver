@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.model;
 
+import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -25,6 +26,7 @@ import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web server configuration
@@ -114,6 +116,11 @@ public class WebServerConfig {
             services.add(new WebServiceConfig(wsd));
         }
         return services.toArray(new WebServiceConfig[0]);
+    }
+
+    @RuntimeAction
+    public Map<String, Object> getProductConfiguration() {
+        return CloudbeaverPlatform.getInstance().getApplication().getProductConfiguration();
     }
 
 }

@@ -39,6 +39,7 @@ public class CloudbeaverConstants {
     public static final String PARAM_SERVICES_URI = "ServiceURI";
     public static final String PARAM_DRIVERS_LOCATION = "DriversLocation";
     public static final String PARAM_WORKSPACE_LOCATION = "WorkspaceLocation";
+    public static final String PARAM_PRODUCT_CONFIGURATION = "ProductConfiguration";
 
     public static final String PARAM_SESSION_EXPIRE_PERIOD = "ExpireSessionAfterPeriod";
 
@@ -53,6 +54,7 @@ public class CloudbeaverConstants {
     public static final String DEFAULT_DEPLOY_LOCATION = "/opt/cloudbeaver";
     public static final String DEFAULT_DRIVERS_LOCATION = DEFAULT_DEPLOY_LOCATION + "/drivers";
     public static final String DEFAULT_WORKSPACE_LOCATION = DEFAULT_DEPLOY_LOCATION + "/workspace";
+    public static final String DEFAULT_PRODUCT_CONFIGURATION = "conf/product.js";
 
     // Default max idle time (10 minutes)
     public static final long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.server.jetty.CloudbeaverJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -24,6 +25,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -32,11 +34,11 @@ import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -56,6 +58,8 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
 
     private String workspaceLocation = CloudbeaverConstants.DEFAULT_WORKSPACE_LOCATION;
     private String driversLocation = CloudbeaverConstants.DEFAULT_DRIVERS_LOCATION;
+
+    private Map<String, Object> productConfiguration = new HashMap<>();
 
     private long maxSessionIdleTime = CloudbeaverConstants.MAX_SESSION_IDLE_TIME;
 
@@ -99,6 +103,10 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
      */
     public static CloudbeaverApplication getInstance() {
         return (CloudbeaverApplication) BaseApplicationImpl.getInstance();
+    }
+
+    public Map<String, Object> getProductConfiguration() {
+        return productConfiguration;
     }
 
     @Override
@@ -169,14 +177,14 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
 
         File configFile = new File(configPath);
         if (!configFile.exists()) {
-            log.debug("Configuration file " + configPath + " doesn't exist. Use defaults.");
+            log.error("Configuration file " + configFile.getAbsolutePath() + " doesn't exist. Use defaults.");
         } else {
             Properties props = new Properties();
             try (InputStream is = new FileInputStream(configFile)) {
                 props.load(is);
                 parseConfiguration(props);
             } catch (IOException e) {
-                log.debug("Error reading config file", e);
+                log.error("Error reading config file", e);
             }
         }
         // Set default preferences
@@ -203,6 +211,25 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
         maxSessionIdleTime = getConfigParameter(props, CloudbeaverConstants.PARAM_SESSION_EXPIRE_PERIOD, CloudbeaverConstants.MAX_SESSION_IDLE_TIME);
 
         develMode = CommonUtils.toBoolean(getConfigParameter(props, CloudbeaverConstants.PARAM_DEVEL_MODE, "false"));
+
+        String productConfigPath = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_PRODUCT_CONFIGURATION, CloudbeaverConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+        if (!CommonUtils.isEmpty(productConfigPath)) {
+            File productConfigFile = new File(productConfigPath);
+            if (!productConfigFile.exists()) {
+                log.error("Product configuration file not found (" + productConfigFile.getAbsolutePath() + "'");
+            } else {
+                log.debug("Load product configuration from '" + productConfigFile.getAbsolutePath() + "'");
+                try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile), StandardCharsets.UTF_8)) {
+
+                    GsonBuilder gsonBuilder = new GsonBuilder().setLenient();
+                    //gsonBuilder.registerTypeAdapter(Object.class, new JSONBestNumberObjectDeserializer());
+
+                    productConfiguration = JSONUtils.parseMap(gsonBuilder.create(), reader);
+                } catch (Exception e) {
+                    log.error("Error reading product configuration", e);
+                }
+            }
+        }
     }
 
     private String getRelativePath(String path, String curDir) {

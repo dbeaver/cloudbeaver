@@ -61,6 +61,7 @@ type ServerConfig {
     supportsWorkspaces: Boolean
     supportedLanguages: [ ServerLanguage ]
     services: [ WebServiceConfig ]
+    productConfiguration: Object!
 }
 
 type SessionInfo {
