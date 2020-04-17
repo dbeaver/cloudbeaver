@@ -17,7 +17,7 @@ then
 fi
 cd dbeaver
 git pull
-mvn clean install
+mvn clean install -Dheadless-platform
 cd ../cloudbeaver/deploy
 
 echo "Build cloudbeaver server"
