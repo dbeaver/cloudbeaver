@@ -31,7 +31,7 @@ echo "Copy server packages"
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
 cp -p ./scripts/run-server.sh ./cloudbeaver
 mkdir ./cloudbeaver/workspace/GlobalConfiguration
-cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace/GlobalConfiguration
+cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace
 cp ../samples/sample-databases/cloudbeaver-sample.conf cloudbeaver/conf/cloudbeaver.conf
 
 echo "Build static content"
