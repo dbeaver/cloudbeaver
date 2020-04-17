@@ -29,7 +29,7 @@ export const TopNavBar = observer(function TopNavBar() {
   return styled(useStyles(topNavBarStyles))(
     <header>
       <logo as="div" title={title}>
-        <Icon name="logo" viewBox="0 0 84 30" />
+        <Icon name="logo" viewBox="0 0 361 73" />
       </logo>
       <MainMenu />
       <ConnectionSelector/>
