@@ -1,3 +1,5 @@
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
+
 # Cloudbeaver
 Cloud Database Manager
 
