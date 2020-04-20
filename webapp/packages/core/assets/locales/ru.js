@@ -33,9 +33,11 @@ module.exports = {
   ui_stepper_back: 'Назад',
   ui_processing_loading: 'Загрузка...',
   ui_processing_cancel: 'Отменить...',
+  ui_processing_retry: 'Повторить',
   ui_error_message: 'Ошибка:',
   ui_errors_details: 'Информация',
   ui_search: 'Поиск...',
+  ui_data_saving_error: 'Ошибка при сохранении изменений',
 
   app_root_session_expired_title: 'Сесстия истекла',
   app_root_session_expired_message: 'Сессия истекла. Хотите перезагрузить страницу?',

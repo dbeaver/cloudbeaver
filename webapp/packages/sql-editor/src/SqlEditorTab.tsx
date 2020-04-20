@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -18,10 +16,6 @@ import { useStyles } from '@dbeaver/core/theming';
 import { SqlEditor } from './SqlEditor';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 
-type SqlEditorTabProps = PropsWithChildren<{
-  tabId: string;
-  handlerId: string;
-}>
 
 const viewerStyles = css`
   Pane {
@@ -33,7 +27,12 @@ const viewerStyles = css`
   }
 `;
 
-export const SqlEditorTab = observer(function SqlEditorTab({ tabId }: SqlEditorTabProps) {
+type SqlEditorTabProps = {
+  tabId: string;
+  handlerId: string;
+}
+
+export function SqlEditorTab({ tabId }: SqlEditorTabProps) {
   return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
     <Split split="horizontal" sticky={30}>
       <Pane>
@@ -45,4 +44,4 @@ export const SqlEditorTab = observer(function SqlEditorTab({ tabId }: SqlEditorT
       </Pane>
     </Split>
   );
-});
+}

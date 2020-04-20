@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
@@ -15,7 +16,6 @@ import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { getValue } from '../tools';
-
 
 const itemStyles = css`
     icon {
@@ -48,7 +48,7 @@ type ItemProps = {
   onClick: (objectId: string, isMultiple: boolean) => void;
 }
 
-export function Item({
+export const Item = observer(function Item({
   objectId, columns, isSelected, onClick,
 }: ItemProps) {
   const nodesManagerService = useService(NodesManagerService);
@@ -56,7 +56,8 @@ export function Item({
   const databaseObjectInfo = useDatabaseObjectInfo(objectId);
   const handleOpen = useCallback(() => nodesManagerService.navToNode(objectId), [objectId]);
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLTableRowElement>) => onClick(objectId, e.ctrlKey), [objectId, onClick]
+    (e: React.MouseEvent<HTMLTableRowElement>) => onClick(objectId, e.ctrlKey),
+    [objectId, onClick]
   );
 
   if (!object || !databaseObjectInfo?.properties) {
@@ -86,8 +87,8 @@ export function Item({
         </icon>
       </td>
       {databaseObjectInfo.properties.map(property => (
-        <td key={property.id}>{getValue(property.value as any)}</td>
+        <td key={property.id}>{getValue(property.value)}</td>
       ))}
     </tr>
   );
-}
+});

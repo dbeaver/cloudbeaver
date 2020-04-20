@@ -7,9 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  HTMLAttributes,
-} from 'react';
 import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@dbeaver/core/theming';
@@ -32,7 +29,7 @@ const styles = composes(
   `,
 );
 
-type VerticalTabPanelProps = HTMLAttributes<HTMLDivElement> & {
+type VerticalTabPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   tab: ITab;
 }
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { appContext } from './AppContext';
 import { IServiceConstructor } from './IApp';
@@ -14,10 +14,10 @@ import { ValueToken } from './InjectionToken';
 
 export function useService<T>(ctor: IServiceConstructor<T>): T {
   const app = useContext(appContext);
-  return app.getServiceByClass(ctor);
+  return useMemo(() => app.getServiceByClass(ctor), [app, ctor]);
 }
 
 export function useServiceByToken<T>(token: ValueToken<T>): T {
   const app = useContext(appContext);
-  return app.getServiceByToken(token);
+  return useMemo(() => app.getServiceByToken(token), [app, token]);
 }

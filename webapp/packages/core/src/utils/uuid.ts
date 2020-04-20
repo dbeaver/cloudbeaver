@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { V4Options } from 'uuid/interfaces';
-import uuidv4 from 'uuid/v4';
 
 export function uuid(options?: V4Options): string {
   return uuidv4(options);

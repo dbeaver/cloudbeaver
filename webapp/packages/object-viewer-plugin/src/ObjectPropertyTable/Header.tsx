@@ -11,6 +11,13 @@ import styled, { css } from 'reshadow';
 import { ObjectPropertyInfo } from '@dbeaver/core/sdk';
 import { useStyles } from '@dbeaver/core/theming';
 
+const styles = css`
+  th:first-child {
+    width:16px;
+    border-right: none;
+  }
+`;
+
 type HeaderProps = {
   properties: Pick<
     ObjectPropertyInfo,
@@ -26,12 +33,7 @@ type HeaderProps = {
 
 export function Header({ properties }: HeaderProps) {
 
-  return styled(useStyles(css`
-    th:first-child {
-      width:16px;
-      border-right: none;
-    }
-  `))(
+  return styled(useStyles(styles))(
     <tr>
       <th></th>
       {properties.map(property => (

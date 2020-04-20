@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 
 import { useController } from '@dbeaver/core/di';
 import { DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
-import { useLocale } from '@dbeaver/core/localization';
+import { useTranslate } from '@dbeaver/core/localization';
 
 import { ConnectionFormDialog } from './ConnectionFormDialog/ConnectionFormDialog';
 import { CustomConnectionController, ConnectionStep } from './CustomConnectionController';
@@ -19,7 +19,7 @@ import { DriverSelectorDialog } from './DriverSelectorDialog/DriverSelectorDialo
 export const CustomConnectionDialog: DialogComponent<null, null> = observer(
   function CustomConnectionDialog(props: DialogComponentProps<null, null>) {
     const controller = useController(CustomConnectionController);
-    let title = useLocale('basicConnection_connectionDialog_newConnection');
+    let title = useTranslate('basicConnection_connectionDialog_newConnection');
 
     if (controller.step === ConnectionStep.Connection && controller.driver?.name) {
       title = controller.driver.name;

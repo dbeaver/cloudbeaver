@@ -12,7 +12,7 @@ import styled from 'reshadow';
 
 import { useClipboard, Button, SanitizedHTML } from '@dbeaver/core/blocks';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
-import { useLocale } from '@dbeaver/core/localization';
+import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { ErrorModel, IErrorInfo } from './ErrorModel';
@@ -45,7 +45,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       [props.payload]
     );
 
-    const title = useLocale('core_eventsLog_dbeaverErrorDetails');
+    const title = useTranslate('core_eventsLog_dbeaverErrorDetails');
 
     const [copy] = useClipboard();
     const copyHandler = useCallback(

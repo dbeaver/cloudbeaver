@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer, Observer } from 'mobx-react';
-import React, { ButtonHTMLAttributes, Ref, useCallback } from 'react';
+import { observer, useObserver } from 'mobx-react';
+import {
+  forwardRef, Ref, useCallback
+} from 'react';
 import {
   MenuDisclosure,
   Menu, MenuItem, MenuStateReturn, useMenuState,
@@ -17,7 +19,7 @@ import styled, { use } from 'reshadow';
 import { useStyles, Style } from '@dbeaver/core/theming';
 
 import {
-  IMenuItem, IMenuPanel, MenuTriggerProps, MenuMod
+  IMenuItem, IMenuPanel, MenuTriggerProps
 } from '../IMenuPanel';
 import { MenuPanelItem } from './MenuPanelItem';
 import { menuPanelStyles } from './menuPanelStyles';
@@ -25,13 +27,12 @@ import { menuPanelStyles } from './menuPanelStyles';
 /**
  * MenuTrigger
  */
-export const MenuTrigger = observer(function MenuTrigger({
+export function MenuTrigger({
   panel,
   children,
   style = [],
   ...props
 }: MenuTriggerProps) {
-
   const menu = useMenuState();
 
   return styled(useStyles(menuPanelStyles, ...style))(
@@ -42,7 +43,7 @@ export const MenuTrigger = observer(function MenuTrigger({
       <MenuPanel panel={panel} menu={menu} style={style}/>
     </>
   );
-});
+}
 
 
 /**
@@ -74,7 +75,7 @@ const MenuPanel = observer(function MenuPanel({
  * MenuPanelElement
  */
 
-type MenuPanelElementProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
+type MenuPanelElementProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
   item: IMenuItem;
   menu: MenuStateReturn; // from reakit useMenuState
   style?: Style[];
@@ -123,31 +124,28 @@ const MenuPanelElement = observer(function MenuPanelElement({
  * MenuInnerTrigger
  */
 
-type MenuInnerTriggerProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
+type MenuInnerTriggerProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
   menuItem: IMenuItem;
   style?: Style[];
 }
 
-export const MenuInnerTrigger = React.forwardRef(function MenuInnerTrigger(
+export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
   props: MenuInnerTriggerProps,
   ref: Ref<HTMLButtonElement>
 ) {
 
   const {
-    menuItem, style = [], ...other
+    menuItem, style = [], ...rest
   } = props;
   const menu = useMenuState();
+  const panel = useObserver(() => menuItem.panel);
 
-  return (
-    <Observer>
-      {() => styled(useStyles(menuPanelStyles, ...style))(
-        <>
-          <MenuDisclosure ref={ref} {...menu} {...other}>
-            <MenuPanelItem menuItem={menuItem} style={style}/>
-          </MenuDisclosure>
-          <MenuPanel panel={menuItem.panel!} menu={menu} style={style}/>
-        </>
-      )}
-    </Observer>
+  return styled(useStyles(menuPanelStyles, ...style))(
+    <>
+      <MenuDisclosure ref={ref} {...menu} {...rest}>
+        <MenuPanelItem menuItem={menuItem} style={style}/>
+      </MenuDisclosure>
+      <MenuPanel panel={panel!} menu={menu} style={style}/>
+    </>
   );
 });

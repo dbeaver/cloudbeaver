@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { useCallback, Children, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   useMenuState,
   Menu,
@@ -64,7 +63,7 @@ type DriverPropertyValueSelectorProps = React.PropsWithChildren<{
   onSwitch(state: boolean): void;
 }>
 
-export const DriverPropertyValueSelector = observer(function DriverPropertyValueSelector({
+export function DriverPropertyValueSelector({
   propertyName,
   values,
   children,
@@ -95,4 +94,4 @@ export const DriverPropertyValueSelector = observer(function DriverPropertyValue
       </Portal>
     </>
   );
-});
+}

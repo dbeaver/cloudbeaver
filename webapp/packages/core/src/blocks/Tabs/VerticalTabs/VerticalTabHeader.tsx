@@ -7,9 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  HTMLAttributes,
-} from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { composes, useStyles } from '@dbeaver/core/theming';
@@ -50,10 +47,10 @@ const styles = composes(
       background: transparent;
       color: inherit;
   
-      &:global([aria-selected]):before {
+      &:global([aria-selected=true]):before {
         display: block;
       }
-      &:not(:global([aria-selected])) {
+      &:not(:global([aria-selected=true])) {
         cursor: pointer;
         font-weight: normal;
       }
@@ -61,7 +58,7 @@ const styles = composes(
   `
 );
 
-type VerticalTabHeaderProps = HTMLAttributes<HTMLDivElement> & {
+type VerticalTabHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   tab: ITab;
 }
 

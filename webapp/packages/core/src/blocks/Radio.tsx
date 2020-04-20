@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { InputHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@dbeaver/core/theming';
@@ -52,11 +50,11 @@ const radioMod = {
   ),
 };
 
-type RadioProps = InputHTMLAttributes<HTMLInputElement> & {
+type RadioProps = React.InputHTMLAttributes<HTMLInputElement> & {
   mod?: (keyof typeof radioMod)[];
 }
 
-export const Radio = observer(function Radio({
+export function Radio({
   mod,
   id,
   className,
@@ -76,4 +74,4 @@ export const Radio = observer(function Radio({
       <label htmlFor={id}>{children}</label>
     </field>
   );
-});
+}

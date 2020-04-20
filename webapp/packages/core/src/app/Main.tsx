@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -43,7 +42,7 @@ const mainStyles = composes(
   `
 );
 
-export const Main = observer(function Main() {
+export function Main() {
   return styled(useStyles(mainStyles, splitStyles))(
     <space as="main">
       <Split sticky={30}>
@@ -57,4 +56,4 @@ export const Main = observer(function Main() {
       </Split>
     </space>
   );
-});
+}

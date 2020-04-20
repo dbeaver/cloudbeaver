@@ -54,7 +54,7 @@ type NestedDialogType = {
   visible: boolean;
 }
 
-const NestedDialog = (props: NestedDialogType) => {
+function NestedDialog(props: NestedDialogType) {
   const dialogState = useDialogState();
   const styles = useStyles(dialogStyles);
   dialogState.visible = props.visible;
@@ -77,4 +77,4 @@ const NestedDialog = (props: NestedDialogType) => {
       />
     </Dialog>
   );
-};
+}

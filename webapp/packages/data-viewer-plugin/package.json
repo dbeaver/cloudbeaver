@@ -22,12 +22,12 @@
     "graphql": "^14.5.8",
     "graphql-request": "^1.8.2",
     "graphql-tag": "^2.10.1",
-    "mobx": "^5.15.0",
-    "mobx-react": "^6.1.4",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
+    "mobx": "^5.15.4",
+    "mobx-react": "^6.2.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "reakit": "^1.0.0-beta.11",
-    "reshadow": "0.0.1-alpha.73",
-    "rxjs": "^6.5.4"
+    "reshadow": "0.0.1-alpha.75",
+    "rxjs": "^6.5.5"
   }
 }

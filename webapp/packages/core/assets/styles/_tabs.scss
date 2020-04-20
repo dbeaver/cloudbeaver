@@ -48,7 +48,7 @@
     padding: 0 24px 0 12px;
     border-top: solid 2px transparent;
 
-    &:global([aria-selected]) {
+    &:global([aria-selected=true]) {
       font-weight: 500;
       cursor: auto;
       border-top-color: $color-negative;
@@ -58,7 +58,7 @@
       }
     }
 
-    &:not(:global([aria-selected='true'])) {
+    &:not(:global([aria-selected=true])) {
       background-color: transparent !important;
     }
   }

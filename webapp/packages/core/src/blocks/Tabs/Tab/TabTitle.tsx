@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
@@ -16,13 +15,10 @@ type TabTitleProps = {
   className?: string;
 }
 
-export const TabTitle = observer(function TabTitle({
-  title,
-  className,
-}: TabTitleProps) {
+export function TabTitle({ title, className }: TabTitleProps) {
   return styled(useStyles())(
     <tab-title as="div" className={className}>
       {title || <placeholder as="div" />}
     </tab-title>
   );
-});
+}

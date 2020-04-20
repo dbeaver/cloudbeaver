@@ -46,7 +46,7 @@ export const navigationNodeStyles = composes(
         outline: none;
         
         &:hover > portal, 
-        &[aria-selected] > portal {
+        &[aria-selected=true] > portal {
           visibility: visible;
         }
 
