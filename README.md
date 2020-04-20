@@ -4,10 +4,6 @@
 Cloud Database Manager.  
 Cloudbeaver is a web server which provides rich web interface. Server itself is a Java application, web part is written on TypeScript and React.  
 
-## Test server
-
-[TBD]
-
 ## Build cloudbeaver
 
 Cloudbeaver is multi-platform server side application.
@@ -37,4 +33,9 @@ cd cloudbeaver
 ```
 By default server listens port `8978` (you can change it in conf/cloudbeaver.conf). So just navigate to http://localhost:8978.
 You can configure nginx, Apache or any other web server in front of it.
+
+## Test server
+
+You can see live demo of Cloudbeaver here:
+[TBD]
 
