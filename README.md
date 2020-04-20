@@ -1,7 +1,8 @@
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
 
 # Cloudbeaver
-Cloud Database Manager
+Cloud Database Manager.  
+Cloudbeaver is a web server which provides rich web interface. Server itself is a Java application, web part is written on TypeScript and React.  
 
 ### Build cloudbeaver
 
