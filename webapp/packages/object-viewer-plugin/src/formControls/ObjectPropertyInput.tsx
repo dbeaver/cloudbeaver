@@ -54,7 +54,7 @@ export const ObjectPropertyInput = observer(function ObjectPropertyInput({ objec
       <input-wrapper as="div">
         <input
           type={matchType(objectProperty.dataType)}
-          value={getValue(objectProperty.value as any)}
+          value={getValue(objectProperty.value)}
           {...additionalProps(objectProperty)}
           readOnly={true}
         />
