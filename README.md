@@ -1,8 +1,9 @@
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
 
-# Cloudbeaver
-Cloud Database Manager.  
+# Cloudbeaver Community
+Cloud Database Manager - Community Edition.  
 Cloudbeaver is a web server which provides rich web interface. Server itself is a Java application, web part is written on TypeScript and React.  
+It is free to use and open-source (licensed under Apache 2 license).  
 See out [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.  
 
 ## Build cloudbeaver
