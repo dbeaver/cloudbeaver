@@ -3,6 +3,7 @@
 # Cloudbeaver
 Cloud Database Manager.  
 Cloudbeaver is a web server which provides rich web interface. Server itself is a Java application, web part is written on TypeScript and React.  
+See out [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.  
 
 ## Build cloudbeaver
 
