@@ -1,4 +1,4 @@
-# Cloudbeaver Community
+# CloudBeaver Community
 
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" width="250"/>
 
