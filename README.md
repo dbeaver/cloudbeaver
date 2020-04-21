@@ -30,6 +30,7 @@ You can configure nginx, Apache or any other web servers in front of it.
 
 ## Test server
 
-You can see live demo of CloudBeaver here:
-[TBD]
+You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io  
+
+[Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
