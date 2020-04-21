@@ -10,7 +10,7 @@
 			"navigator-hide-folders": false,
 			"read-only": false,
 			"configuration": {
-				"database": "${project.path}/db/Chinook.db",
+				"database": "${project.path}/db/Chinook.sqlitedb",
 				"type": "dev",
 				"auth-model": "native"
 			}

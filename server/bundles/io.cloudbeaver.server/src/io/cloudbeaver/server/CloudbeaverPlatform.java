@@ -149,9 +149,6 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
         this.qmLogWriter = new QMLogFileWriter();
         this.queryManager.registerMetaListener(qmLogWriter);
 
-        // Init default network settings
-        installProxySelector();
-
         this.certificateStorage = new DefaultCertificateStorage(
             new File(WebPlatformActivator.getInstance().getStateLocation().toFile(), "security"));
 
