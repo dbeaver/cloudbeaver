@@ -14,20 +14,6 @@ It can run on Linux, Windows and MacOS X.
 
 [Detailed instructions](https://github.com/dbeaver/cloudbeaver/wiki/Build-and-deploy)
 
-### Build and deploy
-
-After all required packages are installed:
-
-```sh
-git clone https://github.com/dbeaver/cloudbeaver.git
-cd cloudbeaver/deploy
-./build.sh
-cd cloudbeaver
-./run-server.sh
-```
-By default server listens port `8978` (you can change it in conf/cloudbeaver.conf). So just navigate to http://localhost:8978.
-You can configure nginx, Apache or any other web servers in front of it.
-
 ## Test server
 
 You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io  
