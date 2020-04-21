@@ -33,8 +33,9 @@ export const topNavBarStyles = composes(
       width: 250px;
 
       & Icon {
-        height: 32px;
+        height: 24px;
         width: auto;
+        margin-bottom: 2px;
       }
     }
   `

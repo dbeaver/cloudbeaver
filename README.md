@@ -1,31 +1,35 @@
-# Cloudbeaver
-Cloud Database Manager
+# Cloudbeaver Community
 
-### Build cloudbeaver
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" width="250"/>
+
+Cloud Database Manager - Community Edition.  
+Cloudbeaver is a web server which provides rich web interface. Server itself is a Java application, web part is written on TypeScript and React.  
+It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
+See out [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.  
+
+## Build cloudbeaver
 
 Cloudbeaver is multi-platform server side application.
 It can run on Linux, Windows and MacOS X.
 
-#### Prerequisites
+[Detailed instructions](https://github.com/dbeaver/cloudbeaver/wiki/Build-and-deploy)
 
-- Java 8, 9, 10, 11 or 12
-- Apache Maven
-- Node.js
-- Yarn
+### Build and deploy
 
-#### Build and deploy
+After all required packages are installed:
 
-- cd deploy
-- ./build.sh
-
-Final artifacts are in `deploy/cloudbeaver`.
-You can copy this folder to any other location.
-
-#### Running server
-
-- cd cloudbeaver
-- run-server
-
-By default server listens port `8978` (you can change it in conf/cloudbeaver.conf).
+```sh
+git clone https://github.com/dbeaver/cloudbeaver.git
+cd cloudbeaver/deploy
+./build.sh
+cd cloudbeaver
+./run-server.sh
+```
+By default server listens port `8978` (you can change it in conf/cloudbeaver.conf). So just navigate to http://localhost:8978.
 You can configure nginx, Apache or any other web server in front of it.
+
+## Test server
+
+You can see live demo of Cloudbeaver here:
+[TBD]
 
