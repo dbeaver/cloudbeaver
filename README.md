@@ -1,4 +1,4 @@
-<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" width="250"/>
 
 # Cloudbeaver Community
 Cloud Database Manager - Community Edition.  
