@@ -27,6 +27,7 @@
 *.pdf   binary
 *.jar   binary
 *.dll   binary
+*.sqlitedb    binary
 
 
 # public/assets/**/* binary
