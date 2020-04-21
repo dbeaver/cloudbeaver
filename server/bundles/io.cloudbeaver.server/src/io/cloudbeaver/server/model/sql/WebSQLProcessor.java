@@ -399,12 +399,14 @@ public class WebSQLProcessor {
             // ignore
         }
         WebStructContainers structContainers = new WebStructContainers();
-        for (DBSObject node : reader.getObjectList()) {
-            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
-                continue;
+        if (!CommonUtils.isEmpty(reader.getObjectList())) {
+            for (DBSObject node : reader.getObjectList()) {
+                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+                    continue;
+                }
+                List<WebDatabaseObjectInfo> objectInfos = node instanceof DBSCatalog ? structContainers.getCatalogList() : structContainers.getSchemaList();
+                objectInfos.add(new WebDatabaseObjectInfo(webSession, node));
             }
-            List<WebDatabaseObjectInfo> objectInfos = node instanceof DBSCatalog ? structContainers.getCatalogList() : structContainers.getSchemaList();
-            objectInfos.add(new WebDatabaseObjectInfo(webSession, node));
         }
         return structContainers;
     }
