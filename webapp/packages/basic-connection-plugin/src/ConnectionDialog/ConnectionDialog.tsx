@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { ErrorMessage, SubmittingForm, Loader } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
-import { useLocale, useTranslate } from '@dbeaver/core/localization';
+import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { Connection } from './Connection';
@@ -43,7 +43,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(
   function ConnectionDialog(props: DialogComponentProps<null, null>) {
     const controller = useController(ConnectionController, props.rejectDialog);
     const translate = useTranslate();
-    let title = useLocale('basicConnection_connectionDialog_newConnection');
+    let title = translate('basicConnection_connectionDialog_newConnection');
 
     if (controller.step === ConnectionStep.Connection && controller.dbSource?.name) {
       title = controller.dbSource.name;

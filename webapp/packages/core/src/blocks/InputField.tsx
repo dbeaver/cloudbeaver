@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '../theming';
@@ -42,7 +41,7 @@ type InputFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChan
   onChange?(value: string): any;
 }
 
-export const InputField = observer(function InputField({
+export function InputField({
   children,
   className,
   mod,
@@ -56,4 +55,4 @@ export const InputField = observer(function InputField({
       <input onChange={e => onChange(e.target.value)} {...rest} {...use({ mod })} />
     </field>
   );
-});
+}

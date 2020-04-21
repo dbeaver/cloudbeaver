@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useState, useEffect } from 'react';
 import styled, { use } from 'reshadow';
 
+import { Translate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
-import { useTranslate } from '../../localization/useLocale';
 import { Button } from '../Button';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
@@ -36,42 +35,45 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
-export const Loader = observer(
-  function Loader({
-    loading = true, cancelDisabled, overlay, secondary, small, className, onCancel,
-  }: LoaderProps) {
-    const translate = useTranslate();
-    const [isVisible, setVisible] = useState(loading);
-    const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
+export function Loader({
+  cancelDisabled,
+  overlay,
+  secondary,
+  small,
+  className,
+  loading = true,
+  onCancel,
+}: LoaderProps) {
+  const [isVisible, setVisible] = useState(loading);
+  const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
 
-    useEffect(() => {
-      if (!loading) {
-        setVisible(loading);
-        return;
-      }
-
-      const id = setTimeout(() => {
-        setVisible(loading);
-      }, 500);
-      return () => clearTimeout(id);
-    }, [loading]);
-
-    if (!isVisible) {
-      return null;
+  useEffect(() => {
+    if (!loading) {
+      setVisible(loading);
+      return;
     }
 
-    return styled(useStyles(loaderStyles, ...(overlay ? [overlayStyles] : [])))(
-      <loader as="div" className={className} {...use({ small })}>
-        <icon as="div"><img src={spinnerURL}/></icon>
-        <message as="div">{translate('ui_processing_loading')}</message>
-        {onCancel && (
-          <actions as='div'>
-            <Button type="button" mod={['unelevated']}
-              disabled={cancelDisabled}
-              onClick={onCancel}>{translate('ui_processing_cancel')}</Button>
-          </actions>
-        )}
-      </loader>
-    );
+    const id = setTimeout(() => {
+      setVisible(loading);
+    }, 500);
+    return () => clearTimeout(id);
+  }, [loading]);
+
+  if (!isVisible) {
+    return null;
   }
-);
+
+  return styled(useStyles(loaderStyles, ...(overlay ? [overlayStyles] : [])))(
+    <loader as="div" className={className} {...use({ small })}>
+      <icon as="div"><img src={spinnerURL}/></icon>
+      <message as="div"><Translate token='ui_processing_loading' /></message>
+      {onCancel && (
+        <actions as='div'>
+          <Button type="button" mod={['unelevated']}
+            disabled={cancelDisabled}
+            onClick={onCancel}><Translate token='ui_processing_cancel' /></Button>
+        </actions>
+      )}
+    </loader>
+  );
+}

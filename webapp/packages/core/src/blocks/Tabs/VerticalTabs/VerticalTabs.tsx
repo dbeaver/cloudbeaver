@@ -7,9 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  DOMAttributes,
-} from 'react';
 import { TabList, useTabState } from 'reakit/Tab';
 import styled, { css } from 'reshadow';
 
@@ -44,7 +41,7 @@ const tabStyles = composes(
   `
 );
 
-type VerticalTabsProps = DOMAttributes<HTMLDivElement> & {
+type VerticalTabsProps = React.DOMAttributes<HTMLDivElement> & {
   tabContainer: ITabContainer;
 };
 

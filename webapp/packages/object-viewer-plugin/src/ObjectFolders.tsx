@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import {
-  PropsWithChildren,
-} from 'react';
 import styled, { css } from 'reshadow';
 
 import { VerticalTabs } from '@dbeaver/core/blocks';
@@ -26,11 +22,11 @@ const styles = css`
   }
 `;
 
-type ObjectFoldersProps = PropsWithChildren<{
+type ObjectFoldersProps = {
   objectId: string;
-}>
+}
 
-export const ObjectFolders = observer(function ObjectFolders({ objectId }: ObjectFoldersProps) {
+export function ObjectFolders({ objectId }: ObjectFoldersProps) {
   const controller = useController(ObjectFoldersController, objectId);
 
   return styled(useStyles(styles))(
@@ -38,4 +34,4 @@ export const ObjectFolders = observer(function ObjectFolders({ objectId }: Objec
       <VerticalTabs tabContainer={controller.getTabContainer()}/>
     </folders>
   );
-});
+}

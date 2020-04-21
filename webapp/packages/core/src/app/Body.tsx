@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { DialogsPortal } from '@dbeaver/core/dialogs';
@@ -24,7 +23,7 @@ const bodyStyles = css`
     }
 `;
 
-export const Body = observer(function Body() {
+export function Body() {
   useTheme();
 
   return styled(useStyles(bodyStyles))(
@@ -35,4 +34,4 @@ export const Body = observer(function Body() {
       <Notifications />
     </container>
   );
-});
+}

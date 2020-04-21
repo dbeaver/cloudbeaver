@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import { Button as ReakitButton } from 'reakit/Button';
 import styled, { use } from 'reshadow';
@@ -27,7 +26,7 @@ type SnackbarProps = {
   onShowDetails?: () => void;
 }
 
-export const Snackbar = observer(function Snackbar(props: SnackbarProps) {
+export function Snackbar(props: SnackbarProps) {
   const styles = useStyles(snackbarStyles);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -56,18 +55,10 @@ export const Snackbar = observer(function Snackbar(props: SnackbarProps) {
   }, []);
 
   return styled(styles)(
-    <notification
-      as="div"
-      {...use({
-        mounted,
-        closing,
-      })}
-    >
+    <notification as="div" {...use({ mounted, closing })} >
       <notification-header as="div">
         {type && <NotificationMark type={type} />}
-        <message as="div">
-          {text}
-        </message>
+        <message as="div">{text}</message>
         {!closeAfter && onClose && (
           <ReakitButton onClick={onClose}>
             <Icon name="cross" viewBox="0 0 16 16" />
@@ -90,4 +81,4 @@ export const Snackbar = observer(function Snackbar(props: SnackbarProps) {
       </notification-body>
     </notification>
   );
-});
+}

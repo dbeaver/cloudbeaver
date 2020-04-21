@@ -6,35 +6,32 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IReactComponent, observer } from 'mobx-react';
-import React, { memo, PropsWithChildren } from 'react';
+import { observer } from 'mobx-react';
+import React, { PropsWithChildren } from 'react';
 
 import { useChildren } from '../../../shared/useChildren';
 
 type NavigationNodeChildrenProps = PropsWithChildren<{
   parentId: string;
-  component: IReactComponent<{id: string}>;
+  component: React.ElementType<{id: string}>;
 }>
 
-export const NavigationNodeChildren = memo(
-  observer(function NavigationNodeChildren({
-    parentId,
-    component,
-  }: NavigationNodeChildrenProps) {
-    const nodeChildren = useChildren(parentId);
+export const NavigationNodeChildren = observer(function NavigationNodeChildren({
+  parentId,
+  component,
+}: NavigationNodeChildrenProps) {
+  const nodeChildren = useChildren(parentId);
 
-    if (!nodeChildren?.isLoaded) {
-      return null;
-    }
+  if (!nodeChildren?.isLoaded) {
+    return null;
+  }
 
-    const NavigationNodeChild = component;
-    return (
-      <>
-        {nodeChildren.children.map(id => (
-          <NavigationNodeChild id={id} key={id} />
-        ))}
-      </>
-    );
-  }),
-  (prev, next) => prev.parentId === next.parentId
-);
+  const NavigationNodeChild = component;
+  return (
+    <>
+      {nodeChildren.children.map(id => (
+        <NavigationNodeChild id={id} key={id} />
+      ))}
+    </>
+  );
+});

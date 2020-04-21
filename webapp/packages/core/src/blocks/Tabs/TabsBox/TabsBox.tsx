@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import {
   useMemo, PropsWithChildren, ReactNode, useEffect,
 } from 'react';
@@ -24,7 +23,7 @@ type TabsBoxProps = PropsWithChildren<{
   style?: Style[];
 }>
 
-export const TabsBox = observer(function TabsBox({
+export function TabsBox({
   currentTabId,
   tabs,
   children,
@@ -54,4 +53,4 @@ export const TabsBox = observer(function TabsBox({
       </tabs-box>
     </TabsContext.Provider>
   );
-});
+}

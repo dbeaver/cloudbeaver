@@ -6,21 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { useCallback, ChangeEvent, PropsWithChildren } from 'react';
+import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Icon } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
-
-
-type TableFooterProps = PropsWithChildren<{
-  chunkSize: number;
-  requestStatusMessage: string;
-  queryDuration: number;
-  onRefresh: () => void;
-  onDataChange: (value: number) => void;
-}>
 
 const tableFooterStyles = composes(
   css`
@@ -73,7 +63,15 @@ const tableFooterStyles = composes(
   `
 );
 
-export const TableFooter = observer(function TableFooter({
+type TableFooterProps = {
+  chunkSize: number;
+  requestStatusMessage: string;
+  queryDuration: number;
+  onRefresh: () => void;
+  onDataChange: (value: number) => void;
+}
+
+export function TableFooter({
   chunkSize,
   requestStatusMessage,
   queryDuration,
@@ -81,7 +79,7 @@ export const TableFooter = observer(function TableFooter({
   onDataChange,
 }: TableFooterProps) {
   const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => onDataChange(parseInt(e.target.value, 10)),
+    (e: React.ChangeEvent<HTMLInputElement>) => onDataChange(parseInt(e.target.value, 10)),
     [onDataChange]
   );
 
@@ -102,4 +100,4 @@ export const TableFooter = observer(function TableFooter({
       )}
     </table-footer>
   );
-});
+}

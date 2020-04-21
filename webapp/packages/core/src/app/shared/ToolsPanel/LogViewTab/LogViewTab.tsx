@@ -53,7 +53,6 @@ export const LogViewTab = observer(function LogViewTab() {
   if (!controller.isActive) {
     return null;
   }
-  console.log(styles.type);
 
   return styled(useStyles(styles))(
     <wrapper as="div">

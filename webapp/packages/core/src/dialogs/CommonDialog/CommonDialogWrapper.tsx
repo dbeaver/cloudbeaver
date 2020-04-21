@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ReactNode } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Icon } from '@dbeaver/core/blocks';
@@ -19,7 +18,7 @@ export type CommonDialogWrapperProps = {
   noBodyPadding?: boolean;
   footer?: JSX.Element | boolean;
   header?: JSX.Element | boolean;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 const style = composes(
@@ -89,10 +88,16 @@ const style = composes(
 `
 );
 
-export const CommonDialogWrapper = (
-  props: CommonDialogWrapperProps
-) => {
-  const { title, onReject, children } = props;
+export function CommonDialogWrapper({
+  title,
+  header,
+  footer,
+  noBodyPadding,
+  className,
+  onReject,
+  children,
+}: CommonDialogWrapperProps) {
+
   return styled(useStyles(style))(
     <dialog>
       <header>
@@ -102,12 +107,12 @@ export const CommonDialogWrapper = (
             <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
           </reject>
         </header-title>
-        {props.header}
+        {header}
       </header>
-      <dialog-body as="div" className={props.className} {...use({ noPadding: props.noBodyPadding })}>{children}</dialog-body>
+      <dialog-body as="div" className={className} {...use({ noPadding: noBodyPadding })}>{children}</dialog-body>
       <footer>
-        {props.footer}
+        {footer}
       </footer>
     </dialog>
   );
-};
+}

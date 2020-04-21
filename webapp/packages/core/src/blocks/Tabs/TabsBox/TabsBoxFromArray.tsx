@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import { JSXElementConstructor } from 'react';
 import styled from 'reshadow';
 
 import { useStyles, Style } from '@dbeaver/core/theming';
@@ -23,8 +22,8 @@ export interface TabElementProps {
 type TabsBoxControllerProps ={
   currentTabId: string;
   tabIdList: string[];
-  tab: JSXElementConstructor<TabElementProps>;
-  panel: JSXElementConstructor<TabElementProps>;
+  tab: React.ElementType<TabElementProps>;
+  panel: React.ElementType<TabElementProps>;
   hideTabs?: boolean;
   onOpen: (tabId: string) => void;
   onClose?: (tabId: string) => void;

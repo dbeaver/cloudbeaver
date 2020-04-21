@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useContext, useCallback, PropsWithChildren } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled from 'reshadow';
@@ -23,7 +22,7 @@ type TabProps = PropsWithChildren<{
   onClose?: (tabId: string) => void;
 }>
 
-export const Tab = observer(function Tab({
+export function Tab({
   tabId,
   onOpen,
   onClose,
@@ -63,4 +62,4 @@ export const Tab = observer(function Tab({
       )}
     </BaseTab>
   );
-});
+}

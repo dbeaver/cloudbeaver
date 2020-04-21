@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import {
   MouseEvent, KeyboardEvent, useCallback, PropsWithChildren,
 } from 'react';
@@ -16,7 +15,6 @@ import { Icon, StaticImage, Loader } from '@dbeaver/core/blocks';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { navigationNodeStyles } from './navigationNodeStyles';
-import { Placeholder } from './Placeholder/Placeholder';
 
 type NodeProps = PropsWithChildren<{
   id: string;
@@ -27,7 +25,6 @@ type NodeProps = PropsWithChildren<{
   isSelected: boolean;
   portal?: JSX.Element;
   isExpandable?: boolean;
-  placeholder?: JSX.Element;
   onExpand?: (id: string) => void;
   onDoubleClick?: (id: string) => void;
   onClick?: (id: string, isMultiple?: boolean) => void;
@@ -39,7 +36,7 @@ const KEYCODE = {
   DOWN: 40,
 };
 
-export const NavigationNode = observer(function NavigationNode(
+export function NavigationNode(
   props: NodeProps
 ) {
   const {
@@ -52,7 +49,6 @@ export const NavigationNode = observer(function NavigationNode(
     isSelected,
     portal,
     isExpandable,
-    placeholder,
     onExpand,
     onDoubleClick,
     onClick,
@@ -117,14 +113,12 @@ export const NavigationNode = observer(function NavigationNode(
             {!isLoaded && isExpanded && <Loader small />}
             {(isLoaded || !isExpanded) && <Icon name="arrow" viewBox="0 0 16 16" />}
           </arrow>
-          <icon as="div">
-            <StaticImage icon={icon} />
-          </icon>
+          <icon as="div"><StaticImage icon={icon} /></icon>
           <name as="div">{title}</name>
           <portal as="div">{portal}</portal>
         </control>
       </node>
-      <nested as="div">{children || placeholder || <Placeholder />}</nested>
+      <nested as="div">{children}</nested>
     </>
   );
-});
+}

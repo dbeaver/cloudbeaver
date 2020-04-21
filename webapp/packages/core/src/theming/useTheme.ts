@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useObserver } from 'mobx-react';
 import { useEffect } from 'react';
 
 import { useService } from '@dbeaver/core/di';
@@ -17,7 +18,7 @@ import { ThemeService } from './ThemeService';
  */
 export function useTheme() {
   const themeService = useService(ThemeService);
-  const className = themeService.currentTheme.className;
+  const className = useObserver(() => themeService.currentTheme.className);
 
   useEffect(() => {
     document.body.classList.add(className);

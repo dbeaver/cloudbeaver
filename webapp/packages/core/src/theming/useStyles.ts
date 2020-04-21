@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useObserver } from 'mobx-react';
 import { useMemo, useState } from 'react';
 import { create } from 'reshadow';
 
@@ -19,7 +20,7 @@ export type ThemeSelector = (theme: string) => Promise<ClassCollection | Compose
 export type Style = ClassCollection | Composes | ThemeSelector
 
 /**
- * Must be observed from mobx
+ * Changes styles depending on theme
  *
  * @param componentStyles styles array
  */
@@ -31,7 +32,7 @@ export function useStyles(
 
   const [loadedStyles, setLoadedStyles] = useState<Array<ClassCollection | Composes>>([]);
   const themeService = useService(ThemeService);
-  const currentThemeId = themeService.currentThemeId;
+  const currentThemeId = useObserver(() => themeService.currentThemeId);
 
   useMemo(() => {
     Promise

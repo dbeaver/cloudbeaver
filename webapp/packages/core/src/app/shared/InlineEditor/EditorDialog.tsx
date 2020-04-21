@@ -14,7 +14,7 @@ import styled, { css } from 'reshadow';
 
 import { Button } from '@dbeaver/core/blocks';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
-import { useLocale, useTranslate } from '@dbeaver/core/localization';
+import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 const styles = css`

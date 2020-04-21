@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@dbeaver/core/theming';
@@ -34,7 +32,7 @@ const TextPlaceholderStyles = composes(
   `
 );
 
-export const TextPlaceholder = observer(function TextPlaceholder(props: PropsWithChildren<{}>) {
+export function TextPlaceholder(props: React.PropsWithChildren<{}>) {
   return styled(useStyles(TextPlaceholderStyles))(
     <div>
       <span>
@@ -42,4 +40,4 @@ export const TextPlaceholder = observer(function TextPlaceholder(props: PropsWit
       </span>
     </div>
   );
-});
+}

@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@dbeaver/core/blocks';
-import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
@@ -30,17 +30,12 @@ const styles = css`
   }
 `;
 
-export const SessionExpiredDialog: DialogComponent<null, null> = observer(function SessionExpiredDialog(
-  props: DialogComponentProps<null, null>
-) {
-
+export const SessionExpiredDialog: DialogComponent<null, null> = observer(function SessionExpiredDialog({
+  rejectDialog,
+}) {
   const translate = useTranslate();
   const title = translate('app_root_session_expired_title');
-
-  const reload = useCallback(
-    () => window.location.reload(),
-    []
-  );
+  const reload = useCallback(() => window.location.reload(), []);
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -56,7 +51,7 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
           </Button>
         </controls>
       )}
-      onReject={props.rejectDialog}
+      onReject={rejectDialog}
     >
       <dialog-content as="div">
         <div>{translate('app_root_session_expired_message')}</div>

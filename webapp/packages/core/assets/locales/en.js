@@ -34,9 +34,11 @@ module.exports = {
   ui_stepper_back: 'Back',
   ui_processing_loading: 'Loading...',
   ui_processing_cancel: 'Cancel',
+  ui_processing_retry: 'Retry',
   ui_error_message: 'Error:',
   ui_errors_details: 'Details',
   ui_search: 'Search...',
+  ui_data_saving_error: 'Error when saving changes',
 
   app_root_session_expired_title: 'Session expired',
   app_root_session_expired_message: 'Session has been expired. Do you want to reload?',

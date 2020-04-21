@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
 
 import { NavigationNode } from './NavigationNode/NavigationNode';
 import { NavigationNodeChildren } from './NavigationNodeChildren/NavigationNodeChildren';
 import { TreeNodeMenu } from './TreeNodeMenu/TreeNodeMenu';
 import { useNavigationTree } from './useNavigationTree';
 
-type NavigationTreeNodeProps = PropsWithChildren<{
+type NavigationTreeNodeProps = {
   id: string;
-}>
+}
 
 export const NavigationTreeNode = observer(function NavigationTreeNodeFn({
   id,

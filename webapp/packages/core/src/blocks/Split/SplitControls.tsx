@@ -7,7 +7,6 @@
  */
 
 import { SplitContext } from 'go-split';
-import { observer } from 'mobx-react';
 import {
   useCallback, useContext, useState, useEffect,
 } from 'react';
@@ -17,7 +16,7 @@ import { useStyles } from '@dbeaver/core/theming';
 
 import { buttonStyles } from './splitButtonStyles';
 
-export const SplitControls = observer(function SplitControls() {
+export function SplitControls() {
   const {
     split, mode, isResizing, setMode, setSize, isMainSecond, getMainSize,
   } = useContext(SplitContext);
@@ -84,4 +83,4 @@ export const SplitControls = observer(function SplitControls() {
       )}
     </container>
   );
-});
+}

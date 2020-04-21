@@ -11,7 +11,8 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, SanitizedHTML } from '@dbeaver/core/blocks';
-import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@dbeaver/core/dialogs';
+import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 const styles = css`
@@ -41,27 +42,30 @@ export type ErrorDialogPayload = {
   onShowDetails?: () => void;
 }
 
-export const ErrorDialog: DialogComponent<ErrorDialogPayload, boolean> = observer(
-  function ErrorDialog({
-    rejectDialog, resolveDialog, payload,
-  }: DialogComponentProps<ErrorDialogPayload, boolean>) {
-    const handleRetry = useCallback(() => resolveDialog(true), [resolveDialog]);
+export const ErrorDialog: DialogComponent<ErrorDialogPayload, boolean> = observer(function ErrorDialog({
+  rejectDialog, resolveDialog, payload,
+}) {
+  const handleRetry = useCallback(() => resolveDialog(true), [resolveDialog]);
+  const translate = useTranslate();
 
-    return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={'Error when saving changes'}
-        onReject={rejectDialog}
-        footer={(
-          <controls as="div">
-            {payload.onShowDetails && <Button type="button" mod={['outlined']} onClick={payload.onShowDetails}>Details</Button>}
-            <fill as="div"/>
-            <Button type="button" mod={['outlined']} onClick={rejectDialog}>Cancel</Button>
-            <Button type="button" mod={['unelevated']} onClick={handleRetry}>Retry</Button>
-          </controls>
-        )}
-      >
-        <message as="div"><SanitizedHTML html={payload.message}/></message>
-      </CommonDialogWrapper>
-    );
-  }
-);
+  return styled(useStyles(styles))(
+    <CommonDialogWrapper
+      title={translate('ui_data_saving_error')}
+      onReject={rejectDialog}
+      footer={(
+        <controls as="div">
+          {payload.onShowDetails && (
+            <Button type="button" mod={['outlined']} onClick={payload.onShowDetails}>
+              {translate('ui_errors_details')}
+            </Button>
+          )}
+          <fill as="div"/>
+          <Button type="button" mod={['outlined']} onClick={rejectDialog}>{translate('ui_processing_cancel')}</Button>
+          <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
+        </controls>
+      )}
+    >
+      <message as="div"><SanitizedHTML html={payload.message}/></message>
+    </CommonDialogWrapper>
+  );
+});
