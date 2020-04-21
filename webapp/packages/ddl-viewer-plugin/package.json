@@ -2,14 +2,14 @@
   "name": "@dbeaver/ddl-viewer-plugin",
   "version": "0.1.0",
   "description": "DDL Viewer Plugin",
+  "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
     "build-plugin": "npm run clean-dist && webpack -p --config=../../configs/webpack/build-plugin.js",
     "clean-dist": "rimraf dist/*",
-    "tsc": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
   },
-  "license": "Apache-2.0",
   "peerDependencies": {
     "@dbeaver/core": "^0.1.0",
     "@dbeaver/object-viewer-plugin": "^0.1.0",

@@ -1,30 +1,29 @@
 {
   "name": "@dbeaver/dbeaver",
   "version": "0.1.0",
-  "buildVersion": "0.13.0",
   "description": "",
+  "license": "Apache-2.0",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server --progress --config=configs/webpack/dev.js --port=3100",
-    "dev-exp": "webpack-dev-server --progress --config=configs/webpack/dev-exp.js --port=3100",
     "build": "npm run clean-dist && webpack -p --config=configs/webpack/prod.js --mode=production",
     "build-exp": "npm run clean-dist && webpack -p --config=configs/webpack/exp.js --mode=development",
-    "clean-dist": "rimraf dist/*",
     "build:analyze": "echo \"no analyze specified\" && exit 0",
+    "clean-dist": "rimraf dist/*",
+    "dev": "webpack-dev-server --progress --config=configs/webpack/dev.js --port=3100",
+    "dev-exp": "webpack-dev-server --progress --config=configs/webpack/dev-exp.js --port=3100",
+    "gql:gen": "graphql-codegen",
+    "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "prettify": "prettier --write **/*.ts **/*.tsx",
-    "gql:gen": "graphql-codegen",
-    "gql:gen:dev": "graphql-codegen --watch"
+    "prettify": "prettier --write **/*.ts **/*.tsx"
   },
-  "license": "Apache-2.0",
   "dependencies": {
     "@ag-grid-community/all-modules": "^23.0.2",
     "@ag-grid-enterprise/all-modules": "^23.0.2",
     "@dbeaver/ag-grid-plugin": "^0.1.0",
     "@dbeaver/basic-connection-plugin": "^0.1.0",
-    "@dbeaver/custom-connection-plugin": "^0.1.0",
     "@dbeaver/core": "^0.1.0",
+    "@dbeaver/custom-connection-plugin": "^0.1.0",
     "@dbeaver/data-viewer-plugin": "^0.1.0",
     "@dbeaver/ddl-viewer-plugin": "^0.1.0",
     "@dbeaver/object-viewer-plugin": "^0.1.0",
@@ -55,5 +54,6 @@
     "reshadow": "0.0.1-alpha.75",
     "rxjs": "^6.5.5"
   },
+  "buildVersion": "0.13.0",
   "dbeaverPlugins": []
 }
