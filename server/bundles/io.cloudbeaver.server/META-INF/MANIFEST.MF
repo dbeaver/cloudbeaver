@@ -24,7 +24,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jetty.server,
  org.eclipse.jetty.servlet,
  org.eclipse.jetty.util,
- com.google.gson,
+ com.google.gson;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.api,
