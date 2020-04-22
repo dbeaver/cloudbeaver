@@ -37,9 +37,5 @@ export function additionalProps(property: ObjectPropertyInfo) {
 }
 
 export function filterProperty(property: ObjectPropertyInfo) {
-  if (property.value === null) {
-    return false;
-  }
-
   return true;
 }
