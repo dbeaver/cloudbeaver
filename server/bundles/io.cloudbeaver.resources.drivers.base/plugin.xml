@@ -44,7 +44,7 @@
         <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
-        <bundle id="drivers.firebird" label="FireBird drivers"/>
+        <bundle id="drivers.firebird" label="Firebird drivers"/>
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
     </extension>
 
