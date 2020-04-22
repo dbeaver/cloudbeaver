@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.*;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
@@ -274,6 +275,12 @@ public class WebSession {
         dsConfig.setUserPassword(config.getUserPassword());
         newDataSource.setName(config.getName());
         newDataSource.setDescription(config.getDescription());
+
+        // Set default navigator settings
+        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
+        navSettings.setShowSystemObjects(false);
+        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
+
         return newDataSource;
     }
 
