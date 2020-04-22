@@ -20,6 +20,9 @@ type AsyncTaskInfo {
     error: ServerError
 
     result: SQLExecuteInfo
+    # Task result.
+    # Can be some kind of identifier to obtain real result using another API function
+    taskResult: Object
 }
 
 # Various server errors descriptor

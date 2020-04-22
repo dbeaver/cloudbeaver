@@ -16,13 +16,16 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.api.DBWModel;
 import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.api.DBWServiceServlet;
+import io.cloudbeaver.api.DBWUtils;
 import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.model.session.WebSession;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -33,37 +36,42 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServ
 
     private static final String DT_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
 
+    private WebDataTransferManager dtManager;
+
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
         return WebServiceUtils.loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
     }
 
     @Override
-    public void bindWiring(DBWModel model) throws DBWebException {
-        model.getQueryType().dataFetcher("data.dtGetAvailableStreamFormats", env -> {
-            return null;
+    public void bindWiring(DBWModel model) {
+        dtManager = new WebDataTransferManager(model);
+        model.getQueryType()
+            .dataFetcher("dataTransferAvailableStreamProcessors",
+                env -> dtManager.getAvailableStreamProcessors(getWebSession(model, env)))
+            .dataFetcher("dataTransferExportDataFromContainer", env -> dtManager.dataTransferExportDataFromContainer(
+                getWebSession(model, env),
+                env.getArgument("connectionId"),
+                env.getArgument("containerNodePath"),
+                env.getArgument("parameters")
+            ))
+            .dataFetcher("dataTransferExportDataFromResults", env -> dtManager.dataTransferExportDataFromResults(
+                getWebSession(model, env),
+                env.getArgument("connectionId"),
+                env.getArgument("contextId"),
+                env.getArgument("resultsId"),
+                env.getArgument("parameters")
+            ))
+            .dataFetcher("dataTransferRemoveDataFile", env -> dtManager.dataTransferRemoveDataFile(
+                getWebSession(model, env),
+                env.getArgument("dataFileId")
+            ))
+        ;
 
-/*
-            WebSession webSession = model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
-            WebNavigatorNodeInfo node = webSession.getNavigatorNodeInfo(env.getArgument("nodeId"));
-            DBNNode dbNode = node.getNode();
-            if (dbNode instanceof DBNDatabaseNode) {
-                DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
-                if (object instanceof DBPScriptObject) {
-                    Map<String, Object> options = env.getArgument("options");
-                    if (options == null) {
-                        options = new LinkedHashMap<>();
-                    }
-                    return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
-                } else {
-                    throw new DBWebException("Object '" + node.getId() + "' doesn't support DDL");
-                }
-            } else {
-                throw new DBWebException("Node '" + node.getId() + "' is not database node");
-            }
-*/
-        });
+    }
 
+    private WebSession getWebSession(DBWModel model, DataFetchingEnvironment env) throws DBWebException {
+        return model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
     }
 
     @Override

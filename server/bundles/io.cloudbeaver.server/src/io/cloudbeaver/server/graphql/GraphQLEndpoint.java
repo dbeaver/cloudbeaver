@@ -234,7 +234,9 @@ public class GraphQLEndpoint extends HttpServlet {
 //                    apiCall += " (" + variables + ")";
 //                }
 //            }
-            log.debug("API > " + apiCall);
+            if (apiCall != null) {
+                log.debug("API > " + apiCall);
+            }
         }
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = graphQL.execute(executionInput);

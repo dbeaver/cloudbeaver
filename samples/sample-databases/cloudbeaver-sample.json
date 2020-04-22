@@ -1,20 +1,7 @@
 {
   // Server configuration
-  "server": {
-    "serverName": "Cloudbeaver Sample Server",
-    "port": 8978,
-    "workspaceLocation": "workspace",
-    "contentRoot": "web",
-    "driversLocation": "drivers",
-    "develMode": false
-  },
-
-  "ui": {
-    "plugins": {
-      "logView": {
-        "logRefreshInterval": 3,
-        "logBatchSize": 1000
-      }
-    }
+  "logView": {
+    "logRefreshInterval": 3,
+    "logBatchSize": 1000
   }
 }

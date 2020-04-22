@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.commands,
  org.eclipse.core.resources,
  io.cloudbeaver.server,
+ org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.model.sql
 Bundle-Localization: OSGI-INF/l10n/bundle

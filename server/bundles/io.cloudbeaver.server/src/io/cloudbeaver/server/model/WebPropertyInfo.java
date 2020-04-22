@@ -44,6 +44,11 @@ public class WebPropertyInfo {
         this.propertySource = propertySource;
     }
 
+    public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property) {
+        this.session = session;
+        this.property = property;
+    }
+
     ///////////////////////////////////
     // General properties
     ///////////////////////////////////
@@ -94,14 +99,15 @@ public class WebPropertyInfo {
 
     @Property
     public Object getValue() throws DBException {
-        Object value = propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
+        Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         return value == null ? null : makePropertyValue(value);
     }
 
     @Property
     public Object[] getValidValues() {
         if (property instanceof IPropertyValueListProvider) {
-            Object[] possibleValues = ((IPropertyValueListProvider) property).getPossibleValues(propertySource.getEditableValue());
+            Object[] possibleValues = ((IPropertyValueListProvider) property).getPossibleValues(
+                propertySource == null ? null : propertySource.getEditableValue());
             if (possibleValues != null) {
                 Object[] validValues = new Object[possibleValues.length];
                 for (int i = 0; i < possibleValues.length; i++) {

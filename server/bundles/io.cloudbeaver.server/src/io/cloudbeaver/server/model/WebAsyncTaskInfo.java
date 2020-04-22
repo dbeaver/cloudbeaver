@@ -61,6 +61,10 @@ public class WebAsyncTaskInfo {
         this.running = running;
     }
 
+    public Object getTaskResult() {
+        return result;
+    }
+
     public Object getResult() {
         return result;
     }
