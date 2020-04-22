@@ -238,7 +238,15 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-
+        {
+            String apiCall = operationName;
+//            if (!CommonUtils.isEmpty(apiCall)) {
+//                if (variables != null) {
+//                    apiCall += " (" + variables + ")";
+//                }
+//            }
+            log.debug("API > " + apiCall);
+        }
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = graphQL.execute(executionInput);
 

@@ -73,7 +73,7 @@ class GraphQLModel implements DBWModel {
 
             .dataFetcher("sessionState", env -> sessionManager.getWebSession(getServletRequest(env)))
 
-            .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(getServletRequest(env)).readLog(
+            .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(getServletRequest(env), false, true).readLog(
                 env.getArgument("maxEntries"),
                 env.getArgument("clearEntries")))
 
@@ -102,7 +102,7 @@ class GraphQLModel implements DBWModel {
         ;
 
         mutationType
-            .dataFetcher("openSession", env -> sessionManager.openSession(getServletRequest(env), false))
+            .dataFetcher("openSession", env -> sessionManager.getWebSession(getServletRequest(env), false))
             .dataFetcher("closeSession", env -> sessionManager.closeSession(getServletRequest(env)))
             .dataFetcher("touchSession", env -> sessionManager.touchSession(getServletRequest(env)))
             .dataFetcher("changeSessionLanguage", env -> {

@@ -49,9 +49,9 @@ public class WebSessionManager {
     public WebSessionManager() {
     }
 
-    public WebSession openSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         HttpSession session = getOrCreateHttpSession(request);
-        return getWebSession(session, errorOnNoFound);
+        return getWebSession(session, true, errorOnNoFound);
     }
 
     public boolean closeSession(@NotNull HttpServletRequest request) {
@@ -71,13 +71,13 @@ public class WebSessionManager {
     }
 
     public boolean touchSession(@NotNull HttpServletRequest request) throws DBWebException {
-        WebSession webSession = openSession(request, false);
+        WebSession webSession = getWebSession(request, false);
         webSession.updateInfo(request.getSession());
         return true;
     }
 
     public WebSession getWebSession(@NotNull HttpServletRequest request) throws DBWebException {
-        return openSession(request, true);
+        return getWebSession(request, true);
     }
 
     private HttpSession getOrCreateHttpSession(@NotNull HttpServletRequest request) {
@@ -89,7 +89,11 @@ public class WebSessionManager {
         return session;
     }
 
-    public WebSession getWebSession(HttpSession httpSession, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(HttpServletRequest request, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+        return getWebSession(getOrCreateHttpSession(request), updateInfo, errorOnNoFound);
+    }
+
+    public WebSession getWebSession(HttpSession httpSession, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
         String sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
@@ -104,7 +108,9 @@ public class WebSessionManager {
 
                 log.debug("> New web session '" + webSession.getId() + "'");
             } else {
-                webSession.updateInfo(httpSession);
+                if (updateInfo) {
+                    webSession.updateInfo(httpSession);
+                }
             }
         }
         return  webSession;
