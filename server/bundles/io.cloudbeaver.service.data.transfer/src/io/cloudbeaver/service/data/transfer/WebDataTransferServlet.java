@@ -69,7 +69,10 @@ public class WebDataTransferServlet extends HttpServlet {
                 IOUtils.copyStream(is, response.getOutputStream());
             }
 
-            dtConfig.removeTask(taskInfo);
+            // TODO: cleanup export files ASAP?
+            if (false) {
+                dtConfig.removeTask(taskInfo);
+            }
 
             //response.ok(HttpServletResponse.SC_BAD_REQUEST, "Not implemented");
         } catch (Exception e) {
