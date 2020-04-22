@@ -1,8 +1,35 @@
 # Data transfer queries
 
+type DataTransferProcessorInfo {
+    id: String!
+    name: String
+    description: String
+    appFileExtension: String
+    appName: String
+    order: Int!
+    icon: String
+    properties: [ ObjectPropertyInfo ]
+    isBinary: Boolean
+    isHTML: Boolean
+}
+
+
 extend type Query {
 
-    # Available transfer formats
-    dtGetAvailableStreamFormats: [ String ]
+    # Available transfer processors
+    dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo ]
+
+    asyncDataTransferExportDataFromContainer(
+        connectionId: ID!,
+        contextId: ID!,
+        containerNodePath: ID!,
+        filter: SQLDataFilter
+    ): AsyncTaskInfo!
+
+    asyncDataTransferExportDataFromResults(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!
+    ): AsyncTaskInfo!
 
 }

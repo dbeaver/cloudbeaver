@@ -74,6 +74,23 @@ public class WebServiceRegistry {
         return webServices;
     }
 
+    public <T extends DBWService> List<T> getWebServices(Class<T> theType) {
+        List<T> result = new ArrayList<>();
+        for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
+            DBWService instance;
+            try {
+                instance = wsd.getInstance();
+            } catch (Exception e) {
+                log.error(e);
+                continue;
+            }
+            if (theType.isInstance(instance)) {
+                result.add(theType.cast(instance));
+            }
+        }
+        return result;
+    }
+
     public DBWService[] getWebServiceInstances() {
         return webServiceInstances;
     }

@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver;
 
+import graphql.schema.idl.SchemaParser;
+import graphql.schema.idl.TypeDefinitionRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -26,7 +28,10 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * Various constants
@@ -74,4 +79,18 @@ public class WebServiceUtils {
     public static InputStream openStaticResource(String path) {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
+
+    public static TypeDefinitionRegistry loadSchemaDefinition(Class theClass, String schemaPath) throws DBWebException {
+        try (InputStream schemaStream = theClass.getClassLoader().getResourceAsStream(schemaPath)) {
+            if (schemaStream == null) {
+                throw new IOException("Schema file '" + schemaPath + "' not found");
+            }
+            try (Reader schemaReader = new InputStreamReader(schemaStream)) {
+                return new SchemaParser().parse(schemaReader);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading core schema", e);
+        }
+    }
+
 }

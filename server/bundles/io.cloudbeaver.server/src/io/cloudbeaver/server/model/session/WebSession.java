@@ -74,6 +74,7 @@ public class WebSession {
     private final List<WebServerMessage> progressMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
+    private final Map<String, Object> attributes = new HashMap<>();
 
     private DBNModel navigatorModel;
     private DBNProjectDatabases databases;
@@ -502,6 +503,39 @@ public class WebSession {
                 }
             }
             return messages;
+        }
+    }
+
+    ///////////////////////////////////////////////////////
+    // Attributes
+
+    public Map<String, Object> getAttributes() {
+        synchronized (attributes) {
+            return new HashMap<>(attributes);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getAttribute(String name) {
+        synchronized (attributes) {
+            return (T) attributes.get(name);
+        }
+    }
+
+    public <T> T getAttribute(String name, DBRCreator<T, T> creator) {
+        synchronized (attributes) {
+            T value = (T) attributes.get(name);
+            if (value == null) {
+                value = creator.createObject(null);
+                attributes.put(name, value);
+            }
+            return value;
+        }
+    }
+
+    public void setAttribute(String name, Object value) {
+        synchronized (attributes) {
+            attributes.put(name, value);
         }
     }
 

@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.service.metadata;
 
-import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.api.DBWModel;
 import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.api.DBWUtils;
@@ -29,10 +29,6 @@ import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,13 +41,7 @@ public class WebServiceMetadata implements DBWServiceGraphQL {
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        try (InputStream schemaStream = getClass().getClassLoader().getResourceAsStream(METADATA_SCHEMA_FILE_NAME)) {
-            try (Reader schemaReader = new InputStreamReader(schemaStream)) {
-                return new SchemaParser().parse(schemaReader);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading core schema", e);
-        }
+        return WebServiceUtils.loadSchemaDefinition(getClass(), METADATA_SCHEMA_FILE_NAME);
     }
 
     @Override

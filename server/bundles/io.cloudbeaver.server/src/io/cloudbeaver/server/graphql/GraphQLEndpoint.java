@@ -32,10 +32,8 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.api.DBWService;
 import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;
@@ -93,24 +91,15 @@ public class GraphQLEndpoint extends HttpServlet {
             throw new RuntimeException("Error reading core schema", e);
         }
 
-        for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
-            DBWService instance;
+        for (DBWServiceGraphQL wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceGraphQL.class)) {
             try {
-                instance = wsd.getInstance();
-            } catch (Exception e) {
-                log.error(e);
-                continue;
-            }
-            if (instance instanceof DBWServiceGraphQL) {
-                try {
-                    TypeDefinitionRegistry typeDefinition = ((DBWServiceGraphQL) instance).getTypeDefinition();
-                    if (typeDefinition != null) {
-                        log.debug("Adding web service '" + wsd.getId() + "' GQL schema");
-                        parsedSchema.merge(typeDefinition);
-                    }
-                } catch (DBWebException e) {
-                    log.warn("Error obtaining web service '" + wsd.getId() + "' type definitions", e);
+                TypeDefinitionRegistry typeDefinition = wsd.getTypeDefinition();
+                if (typeDefinition != null) {
+                    log.debug("Adding web service '" + wsd.getClass().getSimpleName() + "' GQL schema");
+                    parsedSchema.merge(typeDefinition);
                 }
+            } catch (DBWebException e) {
+                log.warn("Error obtaining web service type definitions", e);
             }
         }
 

@@ -116,6 +116,13 @@ public class WebSessionManager {
         return  webSession;
     }
 
+    public WebSession tryGetWebSession(HttpSession httpSession) {
+        String sessionId = httpSession.getId();
+        synchronized (sessionMap) {
+            return sessionMap.get(sessionId);
+        }
+    }
+
     public WebConnectionInfo openConnection(HttpServletRequest servletRequest, Map<String, Object> config) throws DBWebException {
         return getWebSession(servletRequest).openConnectionFromTemplate(new WebConnectionConfig(config));
     }

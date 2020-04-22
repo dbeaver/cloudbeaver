@@ -16,33 +16,26 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
-import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.api.DBWModel;
 import io.cloudbeaver.api.DBWServiceGraphQL;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import io.cloudbeaver.api.DBWServiceServlet;
+import io.cloudbeaver.server.CloudbeaverApplication;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * Web service implementation
  */
-public class WebServiceDataTransfer implements DBWServiceGraphQL {
+public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServlet {
 
-    private static final String METADATA_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
+    private static final String DT_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        try (InputStream schemaStream = getClass().getClassLoader().getResourceAsStream(METADATA_SCHEMA_FILE_NAME)) {
-            try (Reader schemaReader = new InputStreamReader(schemaStream)) {
-                return new SchemaParser().parse(schemaReader);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading core schema", e);
-        }
+        return WebServiceUtils.loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
     }
 
     @Override
@@ -71,5 +64,11 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL {
 */
         });
 
+    }
+
+    @Override
+    public void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler) {
+        ServletHolder servletHolder = new ServletHolder("dataTransfer", new WebDataTransferServlet(application));
+        servletContextHandler.addServlet(servletHolder, application.getServicesURI() + "data/*");
     }
 }
