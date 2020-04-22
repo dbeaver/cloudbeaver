@@ -13,20 +13,23 @@ import { composes } from '@dbeaver/core/theming';
 export const InlineEditorStyles = composes(
   css`
   editor-actions {
-    composes: theme-background-surface theme-text-on-surface from global;
+    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   }
 
   editor-action {
     composes: theme-ripple from global;
   }
+
+  input {
+    composes: theme-text-text-primary-on-light from global;
+  }
   `,
   css`
   editor {
     position: relative;
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
     border: solid 1px #01cca3;
   }
 
@@ -37,10 +40,12 @@ export const InlineEditorStyles = composes(
     & input {
       color: inherit;
       background: inherit;
+      letter-spacing: inherit;
+      outline: none;
       border: none;
-      font-size: 13px;
+      padding-left: 11px; /* because of left border */
+      padding-right: 12px;
       line-height: 24px;
-      font-weight: 700;
       width: 100%;
       height: 100%;
     }
@@ -50,12 +55,14 @@ export const InlineEditorStyles = composes(
     position: absolute;
     top: -1px;
     left: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-direction: row;
 
-    border: solid 1px #01cca3;
-    border-left-color: #dedede;
+    border: solid 1px;
+    border-top-color:  #01cca3 !important;
+    border-right-color: #01cca3 !important;
+    border-bottom-color: #01cca3 !important;
   }
 
   editor-actions[|position=bottom],
@@ -75,8 +82,9 @@ export const InlineEditorStyles = composes(
   }
 
   editor-action {
+    box-sizing: border-box;
     display: flex;
-    width: 27px;
+    width: 24px;
     padding: 5px;
     cursor: pointer;
 

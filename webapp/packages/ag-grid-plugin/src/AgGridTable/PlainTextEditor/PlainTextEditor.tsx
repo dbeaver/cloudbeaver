@@ -24,7 +24,7 @@ const styles = css`
     position: absolute;
     left: 0;
     top: -1px;
-    bottom: -1px;
+    bottom: 0;
     width: 100%;
   }
 `;

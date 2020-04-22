@@ -12,17 +12,16 @@ import { observer, Observer } from 'mobx-react';
 import { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
-import '../styles/base.raw.scss'; // it leads to encapsulation of ag-gris style in main.css
 import { ComplexLoader, Loader } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { RangeSelectionModule } from '../modules/RangeSelection/rangeSelectionModule';
+import { agGridStyles } from '../styles/styles';
 import { AgGridTableController } from './AgGridTableController';
 import { IAgGridModel } from './IAgGridModel';
 import { LoadingCell } from './LoadingCell';
 import { PlainTextEditor } from './PlainTextEditor/PlainTextEditor';
-import { agGridStyles } from './styles';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 
 export type AgGridTableProps = PropsWithChildren<
