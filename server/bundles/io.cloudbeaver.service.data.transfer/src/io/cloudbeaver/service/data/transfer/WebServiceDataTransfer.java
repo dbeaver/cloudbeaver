@@ -21,20 +21,11 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.api.DBWModel;
 import io.cloudbeaver.api.DBWServiceGraphQL;
-import io.cloudbeaver.api.DBWUtils;
-import io.cloudbeaver.server.model.WebNavigatorNodeInfo;
-import io.cloudbeaver.server.model.session.WebSession;
-import org.jkiss.dbeaver.model.DBPScriptObject;
-import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Web service implementation
@@ -56,7 +47,10 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL {
 
     @Override
     public void bindWiring(DBWModel model) throws DBWebException {
-        model.getQueryType().dataFetcher("data.transferGetNodeDDL", env -> {
+        model.getQueryType().dataFetcher("data.dtGetAvailableStreamFormats", env -> {
+            return null;
+
+/*
             WebSession webSession = model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
             WebNavigatorNodeInfo node = webSession.getNavigatorNodeInfo(env.getArgument("nodeId"));
             DBNNode dbNode = node.getNode();
@@ -74,6 +68,7 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL {
             } else {
                 throw new DBWebException("Node '" + node.getId() + "' is not database node");
             }
+*/
         });
 
     }
