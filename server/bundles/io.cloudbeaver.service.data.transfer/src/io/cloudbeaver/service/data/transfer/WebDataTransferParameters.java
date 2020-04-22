@@ -1,6 +1,7 @@
 package io.cloudbeaver.service.data.transfer;
 
 import io.cloudbeaver.server.model.sql.WebSQLDataFilter;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Map;
 
@@ -10,6 +11,16 @@ public class WebDataTransferParameters {
     private Map<String, Object> settings;
     private Map<String, Object> processorProperties;
     private WebSQLDataFilter filter;
+
+    public WebDataTransferParameters() {
+    }
+
+    public WebDataTransferParameters(Map<String, Object> params) {
+        this.processorId = JSONUtils.getString(params, "processorId");
+        this.settings = JSONUtils.getObject(params, "settings");
+        this.processorProperties = JSONUtils.getObject(params, "processorProperties");
+        this.filter = new WebSQLDataFilter(JSONUtils.getObject(params, "filter"));
+    }
 
     public String getProcessorId() {
         return processorId;

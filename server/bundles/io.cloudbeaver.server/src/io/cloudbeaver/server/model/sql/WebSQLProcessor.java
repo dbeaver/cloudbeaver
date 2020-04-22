@@ -79,7 +79,7 @@ public class WebSQLProcessor {
         return connection;
     }
 
-    WebSession getWebSession() {
+    public WebSession getWebSession() {
         return webSession;
     }
 
@@ -328,7 +328,7 @@ public class WebSQLProcessor {
     }
 
     @NotNull
-    private <T> T getDataContainerByNodePath(DBRProgressMonitor monitor, @NotNull String containerPath, Class<T> type) throws DBException {
+    public <T> T getDataContainerByNodePath(DBRProgressMonitor monitor, @NotNull String containerPath, Class<T> type) throws DBException {
         DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, containerPath);
         if (node == null) {
             throw new DBWebException("Container node '" + containerPath + "' not found");

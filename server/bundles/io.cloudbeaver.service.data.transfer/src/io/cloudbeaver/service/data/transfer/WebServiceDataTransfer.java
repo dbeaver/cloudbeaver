@@ -38,6 +38,11 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServ
 
     private WebDataTransferManager dtManager;
 
+    public WebServiceDataTransfer() {
+        dtManager = new WebDataTransferManager();
+
+    }
+
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
         return WebServiceUtils.loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
@@ -45,25 +50,21 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServ
 
     @Override
     public void bindWiring(DBWModel model) {
-        dtManager = new WebDataTransferManager(model);
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
                 env -> dtManager.getAvailableStreamProcessors(getWebSession(model, env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> dtManager.dataTransferExportDataFromContainer(
-                getWebSession(model, env),
-                env.getArgument("connectionId"),
+                DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("containerNodePath"),
-                env.getArgument("parameters")
+                new WebDataTransferParameters(env.getArgument("parameters"))
             ))
             .dataFetcher("dataTransferExportDataFromResults", env -> dtManager.dataTransferExportDataFromResults(
-                getWebSession(model, env),
-                env.getArgument("connectionId"),
-                env.getArgument("contextId"),
+                DBWUtils.getSQLContext(model.getSessionManager(), env),
                 env.getArgument("resultsId"),
-                env.getArgument("parameters")
+                new WebDataTransferParameters(env.getArgument("parameters"))
             ))
             .dataFetcher("dataTransferRemoveDataFile", env -> dtManager.dataTransferRemoveDataFile(
-                getWebSession(model, env),
+                DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("dataFileId")
             ))
         ;
@@ -76,7 +77,8 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServ
 
     @Override
     public void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler) {
-        ServletHolder servletHolder = new ServletHolder("dataTransfer", new WebDataTransferServlet(application));
-        servletContextHandler.addServlet(servletHolder, application.getServicesURI() + "data/*");
+        servletContextHandler.addServlet(
+            new ServletHolder("dataTransfer", new WebDataTransferServlet(application, dtManager)),
+            application.getServicesURI() + "data/*");
     }
 }

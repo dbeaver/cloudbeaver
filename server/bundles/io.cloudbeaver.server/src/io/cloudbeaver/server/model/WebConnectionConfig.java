@@ -18,7 +18,6 @@ package io.cloudbeaver.server.model;
 
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class WebConnectionConfig {
     }
 
     public WebConnectionConfig(Map<String, Object> params) {
-        dataSourceId = CommonUtils.toString(params.get("dataSourceId"));
+        dataSourceId = JSONUtils.getString(params, "dataSourceId");
 
         driverId = JSONUtils.getString(params, "driverId");
         host = JSONUtils.getString(params, "host");

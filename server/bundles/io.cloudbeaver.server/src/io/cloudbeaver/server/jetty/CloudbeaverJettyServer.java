@@ -13,6 +13,7 @@ import org.eclipse.jetty.server.session.FileSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -39,9 +40,9 @@ public class CloudbeaverJettyServer {
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 servletContextHandler.setResourceBase(application.getContentRoot());
                 servletContextHandler.setContextPath(application.getRootURI());
-                servletContextHandler.addServlet(CloudbeaverStaticServlet.class, application.getRootURI());
-                servletContextHandler.addServlet(CloudbeaverImageServlet.class, application.getServicesURI() + "images/*");
-                servletContextHandler.addServlet(GraphQLEndpoint.class, application.getServicesURI() + "gql/*");
+                servletContextHandler.addServlet(new ServletHolder("static", new CloudbeaverStaticServlet()), application.getRootURI());
+                servletContextHandler.addServlet(new ServletHolder("images", new CloudbeaverImageServlet()), application.getServicesURI() + "images/*");
+                servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CloudbeaverServerContextListener());
 
                 // Add extensions from services

@@ -21,7 +21,7 @@ input DataTransferParameters {
     #   - openNewConnection: opens new database connection for data transfer task
     settings: Object
     # Processor properties. See DataTransferProcessorInfo.properties
-    processorProperties: Object
+    processorProperties: Object!
     # Data filter settings
     filter: SQLDataFilter
 }

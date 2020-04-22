@@ -4,9 +4,7 @@ import io.cloudbeaver.server.model.WebPropertyInfo;
 import io.cloudbeaver.server.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +22,7 @@ public class WebDataTransferStreamProcessor {
 
     @Property
     public String getId() {
-        return processor.getId();
+        return processor.getFullId();
     }
 
     @Property
@@ -39,8 +37,7 @@ public class WebDataTransferStreamProcessor {
 
     @Property
     public String getFileExtension() {
-        DBPPropertyDescriptor extProperty = processor.getProperty("extension");
-        return extProperty == null ? getAppFileExtension() : CommonUtils.toString(extProperty.getDefaultValue(), null);
+        return WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
     @Property

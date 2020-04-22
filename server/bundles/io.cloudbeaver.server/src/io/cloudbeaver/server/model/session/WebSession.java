@@ -49,6 +49,7 @@ import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * Web session.
@@ -75,6 +76,7 @@ public class WebSession {
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
+    private final Map<String, Function<Object,Object>> attributeDisposers = new HashMap<>();
 
     private DBNModel navigatorModel;
     private DBNProjectDatabases databases;
@@ -318,6 +320,16 @@ public class WebSession {
 
     void close() {
         try {
+            // Clear attributes
+            synchronized (attributes) {
+                for (Map.Entry<String, Function<Object,Object>> attrDisposer : attributeDisposers.entrySet()) {
+                    Object attrValue = attributes.get(attrDisposer.getKey());
+                    attrDisposer.getValue().apply(attrValue);
+                }
+                attributeDisposers.clear();
+                attributes.clear();
+            }
+
             List<WebConnectionInfo> conCopy;
             synchronized (this.connections) {
                 conCopy = new ArrayList<>(this.connections);
@@ -522,12 +534,17 @@ public class WebSession {
         }
     }
 
-    public <T> T getAttribute(String name, DBRCreator<T, T> creator) {
+    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
         synchronized (attributes) {
             T value = (T) attributes.get(name);
             if (value == null) {
-                value = creator.createObject(null);
-                attributes.put(name, value);
+                value = creator.apply(null);
+                if (value != null) {
+                    attributes.put(name, value);
+                    if (disposer != null) {
+                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
+                    }
+                }
             }
             return value;
         }

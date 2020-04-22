@@ -49,13 +49,9 @@ import org.jkiss.dbeaver.runtime.qm.QMControllerImpl;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.StandardConstants;
 import org.osgi.framework.Bundle;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +65,7 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
 
     private static final Log log = Log.getLog(CloudbeaverPlatform.class);
 
-    private static final String TEMP_PROJECT_NAME = "cloudbeaver-temp";
+    public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     static CloudbeaverPlatform instance;
 
@@ -285,30 +281,18 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
-            try {
-                final java.nio.file.Path tempDirectory = Files.createTempDirectory(TEMP_PROJECT_NAME);
-                tempFolder = tempDirectory.toFile();
-            } catch (IOException e) {
-                final String sysTempFolder = System.getProperty(StandardConstants.ENV_TMP_DIR);
-                if (!CommonUtils.isEmpty(sysTempFolder)) {
-                    tempFolder = new File(sysTempFolder, TEMP_PROJECT_NAME);
-                    if (!tempFolder.mkdirs()) {
-                        final String sysUserFolder = System.getProperty(StandardConstants.ENV_USER_HOME);
-                        if (!CommonUtils.isEmpty(sysUserFolder)) {
-                            tempFolder = new File(sysUserFolder, TEMP_PROJECT_NAME);
-                            if (!tempFolder.mkdirs()) {
-                                tempFolder = new File(TEMP_PROJECT_NAME);
-                            }
-                        }
-
-                    }
-                }
-            }
+            tempFolder = new File(workspace.getAbsolutePath(), WORK_DATA_FOLDER_NAME);
         }
         if (!tempFolder.exists() && !tempFolder.mkdirs()) {
             log.error("Can't create temp directory!");
         }
-        return tempFolder;
+        File folder = new File(tempFolder, name);
+        if (folder.exists()) {
+            if (!folder.mkdirs()) {
+                log.error("Error creating temp folder '" + folder.getAbsolutePath() + "'");
+            }
+        }
+        return folder;
     }
 
     @NotNull
