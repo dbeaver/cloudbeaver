@@ -6,35 +6,50 @@
  * you may not use this file except in compliance with the License.
  */
 
-/* changes the default icon color*/
-/* $icon-color: #03a9f4; */
-
-/* changes the selected checkbox check mark color*/
-/* $accent-color: #03a9f4; */
-
-$hover-color: cornsilk;
-$background-color: transparent;
-
-/* $ag-range-selected-color-1: rgb(250, 235, 215);
-$ag-range-selected-color-2: darken($ag-range-selected-color-1, 10%);
-$ag-range-selected-color-3: darken($ag-range-selected-color-1, 20%);
-$ag-range-selected-color-4: darken($ag-range-selected-color-1, 30%); */
-
 @import "ag-grid-community/src/styles/ag-grid.scss";
-@import "ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham.scss";
+@import "ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham-mixin.scss";
+@import "ag-grid-community/src/styles/webfont/agGridAlpineFont.scss";
+
+:local(.__ag-grid-theme) {
+  composes: ag-theme-balham from global;
+}
 
 .ag-theme-balham {
+  @include ag-theme-balham();
+
+  font-family: inherit;
+
+  .ag-header,
+  .ag-root-wrapper,
+  .ag-row {
+    background-color: transparent;
+  }
+  .ag-header {
+    height: 28px;
+    min-height: 28px;
+  }
+  .ag-root-wrapper {
+    border: none;
+    border-radius: initial;
+  }
+  .ag-row {
+    height: 24px;
+  }
+  .ag-cell {
+    line-height: 22px;
+  }
+  .ag-center-cols-container {
+    min-width: 100%;
+  }
   .ag-react-container {
     position: relative;
     display: flex;
     width: 100%;
     height: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
   }
 
   .ag-cell.ag-cell-inline-editing {
     overflow: visible;
-    height: 27px;
+    height: 24px;
   }
 }

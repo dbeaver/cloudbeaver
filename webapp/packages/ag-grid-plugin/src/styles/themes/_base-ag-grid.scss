@@ -1,0 +1,62 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import "@dbeaver/core/assets/styles/branding";
+
+@mixin base-ag-grid() {
+  .ag-theme-balham {
+    .ag-header {
+      border-bottom: 1px solid;
+      @include mdc-theme-prop(color, on-surface, false);
+      @include mdc-theme-prop(border-color, background, false);
+    }
+    .ag-header-row {
+      @include mdc-theme-prop(color, on-surface, false);
+    }
+
+    .ag-row {
+      border-top: none;
+      border-bottom: solid 1px;
+      @include mdc-theme-prop(color, on-surface, false);
+      @include mdc-theme-prop(border-color, background, false);
+    }
+
+    .ag-row-selected {
+      border-color: #03a9f4;
+      background-color: transparent;
+      @include stripes-background($mdc-theme-secondary);
+    }
+
+    .ag-cell-range-selected-1 {
+      background-color: rgba(0, 145, 234, 0.3);
+    }
+
+    .ag-row-hover {
+      background-color: transparent;
+      @include stripes-background($mdc-theme-secondary);
+      border-color: $color-positive;
+    }
+
+    .ag-cell.ag-cell-inline-editing {
+      border: 0 !important;
+      border-radius: 0;
+      @include mdc-theme-prop(background-color, surface, false);
+    }
+
+    .ag-header-cell::after,
+    .ag-header-group-cell::after {
+      height: 100%;
+      top: 0;
+      @include mdc-theme-prop(background-color, background, false);
+    }
+    .ag-cell.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell),
+    .ag-pinned-left-header {
+      @include mdc-theme-prop(border-right-color, background, false);
+    }
+  }
+}

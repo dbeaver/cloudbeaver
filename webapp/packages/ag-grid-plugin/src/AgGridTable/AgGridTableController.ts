@@ -54,7 +54,8 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private readonly gridOptions: GridOptions = {
     defaultColDef: defaultColumnDef,
 
-    rowHeight: 28,
+    rowHeight: 24,
+    headerHeight: 28,
     rowModelType: 'infinite',
     cacheBlockSize: undefined, // to be set during init phase
 
@@ -235,7 +236,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private cloneRows(rows: AgGridRow[]): AgGridRow[] {
-    return rows.map(row => [...row]);
+    return rows.map(row => [...row].map(v => (v === null ? '' : v))); // TODO: temporary fix dbeaver-corp/dbeaver-web#663
   }
 }
 

@@ -15,9 +15,9 @@ import { useService } from '@dbeaver/core/di';
 import { ThemeService } from './ThemeService';
 import { applyComposes, ClassCollection, Composes } from './themeUtils';
 
-export type ThemeSelector = (theme: string) => Promise<ClassCollection | Composes>
-
-export type Style = ClassCollection | Composes | ThemeSelector
+export type BaseStyles = ClassCollection | Composes
+export type ThemeSelector = (theme: string) => Promise<BaseStyles | BaseStyles[]>
+export type Style = BaseStyles | ThemeSelector
 
 /**
  * Changes styles depending on theme
@@ -30,7 +30,7 @@ export function useStyles(
 
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
-  const [loadedStyles, setLoadedStyles] = useState<Array<ClassCollection | Composes>>([]);
+  const [loadedStyles, setLoadedStyles] = useState<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
 
@@ -41,7 +41,7 @@ export function useStyles(
           style => ((typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId))
         )
       )
-      .then(setLoadedStyles);
+      .then(styles => setLoadedStyles(styles.flat()));
   }, [currentThemeId]);
 
   const styles = useMemo(() => {

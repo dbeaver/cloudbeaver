@@ -25,6 +25,11 @@
           }
         }
       }
+      .theme-border-color-#{$style} {
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(border-color, $style, true);
+        }
+      }
     } @else {
       .theme-text-#{$style} {
         @include theme-ripple-color($query, $style);
@@ -45,10 +50,10 @@
           @include mdc-theme-prop(background-color, $style);
         }
       }
-    }
-    .theme-border-color-#{$style} {
-      @include mdc-feature-targets($feat-color) {
-        @include mdc-theme-prop(border-color, $style, true);
+      .theme-border-color-#{$style} {
+        @include mdc-feature-targets($feat-color) {
+          @include mdc-theme-prop(border-color, $style);
+        }
       }
     }
   }

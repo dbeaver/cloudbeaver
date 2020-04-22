@@ -67,6 +67,7 @@ export function configBuilder(options = defaultBuilderOptions) {
         firstPlugin: require('reshadow/postcss'),
         plugins: [
           require('postcss-preset-env')({ stage: 0 }),
+          require('postcss-discard-comments'),
           // todo move 'reshadow/postcss' to custom loader to run it before postcss-loader
           // require('reshadow/postcss'),
         ]
