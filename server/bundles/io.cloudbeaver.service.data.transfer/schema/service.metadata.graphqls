@@ -1,0 +1,8 @@
+# Data transfer queries
+
+extend type Query {
+
+    # Available transfer formats
+    dtGetAvailableStreamFormats: [ String ]
+
+}
