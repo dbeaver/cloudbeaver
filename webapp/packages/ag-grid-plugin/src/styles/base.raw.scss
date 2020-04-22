@@ -12,7 +12,6 @@
 
 :local(.__ag-grid-theme) {
   composes: ag-theme-balham from global;
-  // height: 100%;
 }
 
 .ag-theme-balham {
@@ -40,7 +39,7 @@
     line-height: 22px;
   }
   .ag-center-cols-container {
-    position: initial;
+    min-width: 100%;
   }
   .ag-react-container {
     position: relative;
