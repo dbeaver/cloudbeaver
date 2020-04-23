@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  io.cloudbeaver.server,
  org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.model,
- org.jkiss.dbeaver.model.sql
+ org.jkiss.dbeaver.model.sql,
+ org.jkiss.dbeaver.registry
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.data.transfer
