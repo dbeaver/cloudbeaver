@@ -14,11 +14,10 @@
         <groupId>org.jkiss.dbeaver</groupId>
         <artifactId>dbeaver</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../../dbeaver/</relativePath>
     </parent>
 
     <properties>
-        <dbeaver-product>Cloudbeaver</dbeaver-product>
+        <dbeaver-product>CloudBeaver</dbeaver-product>
     </properties>
 
     <modules>
