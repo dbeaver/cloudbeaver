@@ -12,14 +12,14 @@ cd ../..
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 cd dbeaver
 git pull
-call mvn clean install -Dheadless-platform
 cd ../cloudbeaver/deploy
 
 echo "Build cloudbeaver server"
 
-cd ..\server
-call mvn clean package
-cd ..\deploy
+cd ..\server\product\aggregate
+call mvn clean package -Dheadless-platform
+
+cd ..\..\..\deploy
 
 echo "Copy server packages"
 

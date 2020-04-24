@@ -8,7 +8,7 @@ mkdir ./cloudbeaver/conf
 mkdir ./cloudbeaver/workspace
 mkdir ./cloudbeaver/web
 
-echo "Build dbeaver application"
+echo "Pull dbeaver platform"
 
 cd ../..
 if [[ ! -f dbeaver ]]
@@ -17,14 +17,13 @@ then
 fi
 cd dbeaver
 git pull
-mvn clean install -Dheadless-platform
 cd ../cloudbeaver/deploy
 
-echo "Build cloudbeaver server"
+echo "Build CloudBeaver server"
 
-cd ../server
-mvn clean package
-cd ../deploy
+cd ../server/product/aggregate
+call mvn clean package -Dheadless-platform
+cd ../../../deploy
 
 echo "Copy server packages"
 
