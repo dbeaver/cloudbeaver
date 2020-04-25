@@ -8,3 +8,7 @@ RUN apk add maven bash git
 COPY ./ ./
 
 RUN cd deploy && ./build.sh
+
+EXPOSE 8978
+
+CMD cd deploy/cloudbeaver && ./run-server.sh
