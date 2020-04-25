@@ -22,7 +22,7 @@ cd ../cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-call mvn clean package -Dheadless-platform
+mvn clean package -Dheadless-platform
 cd ../../../deploy
 
 echo "Copy server packages"
