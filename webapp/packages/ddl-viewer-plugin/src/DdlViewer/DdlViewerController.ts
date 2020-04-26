@@ -55,7 +55,7 @@ export class DdlViewerController implements IInitializableController, IDestructi
   }
 
   private async loadDialect(nodeId: string): Promise<void> {
-    const { connectionId } = this.nodesManagerService.getConnectionCatalogSchema(nodeId);
+    const { connectionId } = this.nodesManagerService.getNodeContainerInfo(nodeId);
     if (!connectionId) {
       return;
     }

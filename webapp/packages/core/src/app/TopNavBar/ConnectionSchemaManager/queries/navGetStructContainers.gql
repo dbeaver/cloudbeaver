@@ -4,11 +4,13 @@ query navGetStructContainers($connectionId: ID!, $catalogId: ID) {
         name
         description
         type
+        features
     }
     schemaList {
         name
         description
         type
+        features
     }
   }
 }

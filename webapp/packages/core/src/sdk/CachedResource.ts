@@ -8,14 +8,15 @@
 
 import { observable } from 'mobx';
 
-export type Loader<TData, TArgs extends any[]> = (current: TData, ...args: TArgs) => Promise<TData>
+export type Loader<TData, TArgs extends any[]> = (current: TData, update: boolean, ...args: TArgs) => Promise<TData>
 
 export class CachedResource<TData, TArgs extends any[] = []> {
   @observable data: TData;
 
   @observable private loaded = false;
   @observable private loading = false;
-  private promise: Promise<TData> | null = null;
+  private refreshPromise: Promise<TData> | null = null;
+  private singleElementPromise: Promise<TData> | null = null;
   private loader: Loader<TData, TArgs>;
 
   constructor(defaultValue: TData, loader: Loader<TData, TArgs>) {
@@ -32,36 +33,64 @@ export class CachedResource<TData, TArgs extends any[] = []> {
   }
 
   async refresh(...args: TArgs): Promise<TData> {
-    if (this.promise) {
-      return this.promise;
-    }
-    this.promise = this.loadingTask(...args);
-    try {
-      await this.promise;
-    } finally {
-      this.promise = null;
+    if (args.length > 0) {
+      await this.loadSingle(true, args);
+    } else {
+      await this.loadAll(true, args);
     }
     return this.data;
   }
 
   async load(...args: TArgs): Promise<TData> {
     if (!this.loaded) {
-      await this.refresh(...args);
+      if (args.length > 0) {
+        await this.loadSingle(false, args);
+      } else {
+        await this.loadAll(false, args);
+      }
     }
     return this.data;
   }
 
-  private async loadingTask(...args: TArgs): Promise<TData> {
-    this.loaded = false;
+  private async loadAll(update: boolean, args: TArgs) {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+    this.refreshPromise = this.loadingTask(update, args);
+    try {
+      await this.refreshPromise;
+    } finally {
+      this.refreshPromise = null;
+    }
+  }
+
+  private async loadSingle(update: boolean, args: TArgs) {
+    if (this.singleElementPromise) {
+      return this.singleElementPromise;
+    }
+    this.singleElementPromise = this.loadingTask(update, args);
+    try {
+      await this.singleElementPromise;
+    } finally {
+      this.singleElementPromise = null;
+    }
+  }
+
+  private async loadingTask(update: boolean, args: TArgs): Promise<TData> {
+    if (args.length === 0) {
+      this.loaded = false;
+    }
     this.loading = true;
 
     try {
-      this.data = await this.loader(this.data, ...args);
+      this.data = await this.loader(this.data, update, ...args);
     } finally {
       this.loading = false;
     }
 
-    this.loaded = true;
+    if (args.length === 0) {
+      this.loaded = true;
+    }
     return this.data;
   }
 }

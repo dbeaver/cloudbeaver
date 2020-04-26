@@ -8,7 +8,7 @@
 
 import { computed, observable } from 'mobx';
 
-import { EDeferredState } from '@dbeaver/core/src/utils';
+import { EDeferredState } from '@dbeaver/core/utils';
 
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 

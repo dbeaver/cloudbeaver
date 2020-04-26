@@ -11,7 +11,7 @@ import { PluginManifest } from '@dbeaver/core/di';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorService } from './SqlEditor/SqlEditorService';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap';
-import { SqlEditorManagerService } from './SqlEditorManagerService';
+import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 import { SqlResultService } from './SqlResultTabs/SqlResultService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
@@ -23,11 +23,11 @@ export const sqlEditorPluginManifest: PluginManifest = {
 
   providers: [
     SqlDialectInfoService,
-    SqlEditorManagerService,
+    SqlEditorTabService,
     SqlResultTabsService,
     SqlResultService,
-    SqlEditorTabService,
     SqlEditorService,
+    SqlEditorNavigatorService,
   ],
 
   initialize(services): void {

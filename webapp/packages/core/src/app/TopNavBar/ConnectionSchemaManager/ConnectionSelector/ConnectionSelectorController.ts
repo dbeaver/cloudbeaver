@@ -8,109 +8,138 @@
 
 import { computed } from 'mobx';
 
-import { ISchema } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@dbeaver/core/dialogs';
 
+import { ConnectionsManagerService, Connection } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
+import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { concatSchemaAndCatalog } from '../../../shared/NodesManager/NodesManagerService';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
 
 @injectable()
 export class ConnectionSelectorController {
 
   connectionMenu: IMenuItem;
-  schemaOrCatalogMenu: IMenuItem;
+  objectContainerMenu: IMenuItem;
 
-  get isSelectorVisible() {
-    return this.connectionSelectorService.isSelectorVisible;
-  }
-  get isSchemaSelectorVisible() {
-    return this.connectionSelectorService.isSelectorVisible && Boolean(this.currentSchemaTitle);
-  }
-
-  @computed get schemaSelectionDisabled(): boolean {
-    return !this.connectionSelectorService.isTabStateChangeable
-      || this.getSchemaOrCatalogItems().length === 0;
-  }
-
-  @computed private get currentSchemaTitle(): string {
-    const currentTabState = this.connectionSelectorService.currentTabState;
-    if (!currentTabState) {
-      return '';
+  @computed get currentConnection(): Connection | undefined {
+    if (!this.connectionSelectorService.currentConnectionId) {
+      return;
     }
-    if (currentTabState.schemaId && currentTabState.catalogId) {
-      return `${currentTabState.schemaId}@${currentTabState.catalogId}`;
-    }
-    return currentTabState.schemaId || currentTabState.catalogId || '';
+
+    return this.connectionsManagerService.getConnectionById(
+      this.connectionSelectorService.currentConnectionId
+    );
   }
 
-  @computed private get currentSchemaIcon(): string {
-    const currentTabState = this.connectionSelectorService.currentTabState;
-    if (currentTabState && currentTabState.schemaId) {
-      // TODO move such kind of icon paths to a set of constants
+  @computed get currentConnectionIcon(): string | undefined {
+    if (!this.currentConnection) {
+      return;
+    }
+    const driverIcon = this.connectionsManagerService.dbDrivers.data.get(this.currentConnection.driverId)?.icon;
+    return driverIcon;
+  }
+
+  get isConnectionSelectorVisible() {
+    return !!this.connectionSelectorService.currentConnectionId;
+  }
+  get isObjectContainerSelectorVisible() {
+    return !!this.connectionSelectorService.currentObjectCatalogId
+      || !!this.connectionSelectorService.currentObjectSchemaId;
+  }
+
+  @computed get objectContainerSelectionDisabled(): boolean {
+    return !this.connectionSelectorService.isConnectionChangeable
+      || this.getObjectContainerItems().length === 0;
+  }
+
+  private get currentObjectContainerTitle(): string | undefined {
+    return concatSchemaAndCatalog(
+      this.connectionSelectorService.currentObjectCatalogId,
+      this.connectionSelectorService.currentObjectSchemaId
+    );
+  }
+
+  @computed private get currentObjectContainerIcon(): string {
+    if (this.connectionSelectorService.currentObjectSchema?.features?.includes(EObjectFeature.schema)) {
+    // TODO move such kind of icon paths to a set of constants
       return 'schema_system';
     }
-    if (currentTabState && currentTabState.catalogId) {
+    if (this.connectionSelectorService.currentObjectCatalog?.features?.includes(EObjectFeature.catalog)) {
       return 'database';
     }
-    return '';
+    return 'database';
   }
 
-  constructor(private connectionSelectorService: ConnectionSchemaManagerService) {
+  constructor(private connectionSelectorService: ConnectionSchemaManagerService,
+    private connectionsManagerService: ConnectionsManagerService) {
 
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
-      isDisabled: () => this.connectionSelectorService.connectionSelectionDisabled,
-      titleGetter: () => this.connectionSelectorService?.currentConnection?.name,
-      iconGetter: () => this.connectionSelectorService?.currentConnection?.icon,
+      isDisabled: () => !this.connectionSelectorService.isConnectionChangeable,
+      titleGetter: () => this.currentConnection?.name,
+      iconGetter: () => this.currentConnectionIcon,
       panel: new ComputedMenuPanelModel({
         id: 'connectionsDropdownPanel',
         menuItemsGetter: () => this.getConnectionItems(),
       }),
     });
 
-    this.schemaOrCatalogMenu = new ComputedMenuItemModel({
+    this.objectContainerMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
-      isDisabled: () => this.schemaSelectionDisabled,
-      titleGetter: () => this.currentSchemaTitle,
-      iconGetter: () => this.currentSchemaIcon,
+      isDisabled: () => this.objectContainerSelectionDisabled,
+      titleGetter: () => this.currentObjectContainerTitle,
+      iconGetter: () => this.currentObjectContainerIcon,
       panel: new ComputedMenuPanelModel({
         id: 'connectionsDropdownPanel',
-        menuItemsGetter: () => this.getSchemaOrCatalogItems(),
+        menuItemsGetter: () => this.getObjectContainerItems(),
       }),
     });
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return this.connectionSelectorService.connectionsList.map((item) => {
+    return this.connectionsManagerService.connections.map((item) => {
       const menuItem: IMenuItem = {
         id: item.id,
         title: item.name || item.id,
-        onClick: () => this.connectionSelectorService.onSelectConnection(item),
+        onClick: () => this.connectionSelectorService.selectConnection(item.id),
       };
       return menuItem;
     });
   }
 
-  private getSchemaOrCatalogItems(): IMenuItem[] {
-    return this.connectionSelectorService.schemaList.length
-      ? this.listToMenuItems(this.connectionSelectorService.schemaList, true)
-      : this.listToMenuItems(this.connectionSelectorService.catalogsList, false);
-  }
+  private getObjectContainerItems(): IMenuItem[] {
+    if (!this.connectionSelectorService.objectContainerList) {
+      return [];
+    }
+    return this.connectionSelectorService.objectContainerList
+      .filter(item => !!item.name)
+      .map((item) => {
+        if (item.features?.includes(EObjectFeature.catalog)) {
+          const title = concatSchemaAndCatalog(item.name, this.connectionSelectorService.currentObjectSchemaId);
+          const handler = item.features?.includes(EObjectFeature.catalog)
+            ? () => this.connectionSelectorService.selectCatalog(item.name!)
+            : () => this.connectionSelectorService.selectSchema(item.name!);
 
-  private listToMenuItems(list: ISchema[], isSchema: boolean): IMenuItem[] {
-    return list.map((item) => {
-      const menuItem: IMenuItem = {
-        id: item.id,
-        title: item.id,
-        onClick: () => {
-          if (isSchema) {
-            this.connectionSelectorService.onSelectSchema(item.id);
-          } else {
-            this.connectionSelectorService.onSelectCatalog(item.id);
-          }
-        },
-      };
-      return menuItem;
-    });
+          const menuItem: IMenuItem = {
+            id: item.name!,
+            title,
+            onClick: handler,
+          };
+          return menuItem;
+        }
+
+        const title = concatSchemaAndCatalog(this.connectionSelectorService.currentObjectCatalogId, item.name);
+        const handler = item.features?.includes(EObjectFeature.catalog)
+          ? () => this.connectionSelectorService.selectCatalog(item.name!)
+          : () => this.connectionSelectorService.selectSchema(item.name!);
+
+        const menuItem: IMenuItem = {
+          id: item.name!,
+          title,
+          onClick: handler,
+        };
+        return menuItem;
+      });
   }
 }

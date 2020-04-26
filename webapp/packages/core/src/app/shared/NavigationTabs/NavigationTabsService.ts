@@ -16,7 +16,7 @@ import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { LocalStorageSaveService } from '@dbeaver/core/settings';
 
-import { Tab, TabHandlerState } from './Tab';
+import { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
 import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
 
@@ -31,16 +31,12 @@ const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 @injectable()
 export class NavigationTabsService {
   @observable handlers = new Map<string, TabHandler>();
-  @observable tabsMap = new Map<string, Tab>();
+  @observable tabsMap = new Map<string, ITab>();
   @observable state: TabsState = {
     tabs: [],
     history: [],
     currentId: '',
   };
-
-  @computed get sortedHandlerList(): string[] {
-    return Array.from(this.handlers.keys()).sort((a, b) => this.compareHandlers(a, b));
-  }
 
   @computed get currentTabId(): string {
     return this.state.currentId;
@@ -50,29 +46,24 @@ export class NavigationTabsService {
     return this.state.tabs;
   }
 
-  onTabActivate = new Subject<Tab>();
+  onTabSelect = new Subject<ITab>();
+  onTabClose = new Subject<ITab>();
 
   constructor(private notificationService: NotificationService,
               private autoSaveService: LocalStorageSaveService) {
     this.autoSaveService.withAutoSave(
       this.tabsMap,
       `${NAVIGATION_TABS_BASE_KEY}_tab_map`,
-      (json): IKeyValueMap<Tab> => {
-        const map: IKeyValueMap<Tab> = {};
-        for (const [key, value] of Object.entries(json as IKeyValueMap<Tab>)) {
+      (json): IKeyValueMap<ITab> => {
+        const map: IKeyValueMap<ITab> = {};
+        for (const [key, value] of Object.entries(json as IKeyValueMap<ITab>)) {
           if (
-            typeof value.nodeId === 'string'
+            typeof value.id === 'string'
             && typeof value.handlerId === 'string'
-            && typeof value.handlerState === 'object'
-            && !Array.isArray(value.handlerState) // temporary for old sessions, can be removed later
             && (!value.name || typeof value.name === 'string')
             && (!value.icon || typeof value.icon === 'string')
           ) {
-            const handlerStateMap = observable.map(value.handlerState);
-            if (Array.from(handlerStateMap.values()).every(v => typeof v.handlerId === 'string')) {
-              value.handlerState = handlerStateMap;
-              map[key] = new Tab(value);
-            }
+            map[key] = value;
           }
         }
         return map;
@@ -82,12 +73,12 @@ export class NavigationTabsService {
     this.autoSaveService.withAutoSave(this.state, NAVIGATION_TABS_BASE_KEY);
   }
 
-  @action openTab(tab: Tab, isSelected?: boolean) {
-    this.tabsMap.set(tab.nodeId, tab);
-    this.state.tabs.push(tab.nodeId);
+  @action openTab(tab: ITab, isSelected?: boolean) {
+    this.tabsMap.set(tab.id, tab);
+    this.state.tabs.push(tab.id);
 
     if (isSelected) {
-      this.selectTab(tab.nodeId);
+      this.selectTab(tab.id);
     }
   }
 
@@ -98,6 +89,7 @@ export class NavigationTabsService {
     }
 
     if (this.state.currentId !== tabId) {
+      this.state.history = this.state.history.filter(id => id !== tabId);
       this.state.history.unshift(tabId);
       this.state.currentId = tabId;
     }
@@ -106,41 +98,36 @@ export class NavigationTabsService {
       this.callHandlerCallback(tab, handler => handler.onSelect);
     }
 
-    this.onTabActivate.next(this.getTab(tabId));
+    this.onTabSelect.next(tab);
   }
 
-  @action closeTab(tabId: string, skipHandlers?: boolean) {
+  @action async closeTab(tabId: string, skipHandlers?: boolean) {
     const tab = this.tabsMap.get(tabId);
     if (tab && !skipHandlers) {
-      this.callHandlerCallback(tab, handler => handler.onClose);
+      await this.callHandlerCallback(tab, handler => handler.onClose);
     }
 
+    this.onTabClose.next(tab);
     this.state.history = this.state.history.filter(id => id !== tabId);
+    this.tabsMap.delete(tabId);
+    this.state.tabs = this.state.tabs.filter(id => id !== tabId);
     if (this.state.currentId === tabId) {
       this.selectTab(this.state.history[0] || '', skipHandlers);
     }
-    this.tabsMap.delete(tabId);
-    this.state.tabs = this.state.tabs.filter(id => id !== tabId);
   }
 
-  @action registerTabHandler(options: TabHandlerOptions) {
-    this.handlers.set(options.key, new TabHandler(options));
+  @action registerTabHandler<TState>(
+    options: TabHandlerOptions<TState>,
+  ): TabHandler<TState> {
+    const tabHandler = new TabHandler(options);
+    this.handlers.set(options.key, tabHandler);
+    return tabHandler;
   }
 
-  @action selectHandler(handlerId: string) {
-    const tab = this.tabsMap.get(this.state.currentId);
-    if (!tab || tab.handlerId === handlerId) {
-      return;
-    }
-
-    tab.selectHandler(handlerId);
-    this.callHandlerCallback(tab, handler => handler.onSelect);
-  }
-
-  @action updateHandlerState<T>(tabId: string, state: TabHandlerState<T>) {
+  @action updateHandlerState<T>(tabId: string, state: T) {
     const tab = this.tabsMap.get(tabId);
     if (tab) {
-      tab.updateHandlerState(state);
+      tab.handlerState = state;
     }
   }
 
@@ -148,18 +135,39 @@ export class NavigationTabsService {
     return this.handlers.get(handlerId);
   }
 
-  getHandlerState<T>(tabId: string, handlerId: string): T | undefined {
+  getHandlerState<T>(tabId: string): T | undefined {
     const tab = this.tabsMap.get(tabId);
 
     if (!tab) {
       return;
     }
 
-    return tab.getHandlerState<T>(handlerId);
+    return tab.handlerState;
   }
 
-  getTab(tabId: string): Tab | undefined {
+  getTab(tabId: string): ITab | undefined {
     return this.tabsMap.get(tabId);
+  }
+
+  findTab<S extends ITab>(predicate: (tab: ITab) => tab is S): S | null;
+  findTab(predicate: (tab: ITab) => boolean): ITab | null;
+  findTab(predicate: (tab: ITab) => boolean): ITab | null {
+    for (const tab of this.tabsMap.values()) {
+      if (predicate(tab)) {
+        return tab;
+      }
+    }
+    return null;
+  }
+
+  findTabs(predicate: (tab: ITab) => boolean): Generator<ITab>;
+  findTabs<S>(predicate: (tab: ITab) => tab is ITab<S>): Generator<ITab<S>>;
+  * findTabs(predicate: (tab: ITab) => boolean): Generator<ITab> {
+    for (const tab of this.tabsMap.values()) {
+      if (predicate(tab)) {
+        yield tab;
+      }
+    }
   }
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
@@ -180,7 +188,7 @@ export class NavigationTabsService {
     await Promise.all(restoreTasks);
 
     if (removedTabs.length > 0) {
-      this.notificationService.logError({ title: 'Some tabs cannot be load properly' });
+      this.notificationService.logError({ title: 'Some tabs cannot be restored properly', isSilent: true });
     }
 
     for (const tabId of removedTabs) {
@@ -194,48 +202,31 @@ export class NavigationTabsService {
 
   navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this)
 
-  private async callHandlerCallback(tab: Tab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
-    for (const handlerState of tab.handlerState.values()) {
-      const handler = this.handlers.get(handlerState.handlerId);
-      if (handler) {
-        const callback = selector(handler);
-        if (callback) {
-          callback.call(handler, tab.nodeId, tab.handlerId);
-        }
-      }
+  private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
+    const handler = this.handlers.get(tab.handlerId);
+    if (!handler) {
+      return;
+    }
+    const callback = selector(handler);
+    if (callback) {
+      await callback.call(handler, tab);
     }
   }
 
-  private async restoreTab(tab: Tab, removedTabs: string[]): Promise<void> {
+  private async restoreTab(tab: ITab, removedTabs: string[]): Promise<void> {
     let restoreFail = false;
     try {
-      for (const handlerState of tab.handlerState.values()) {
-        const handler = this.handlers.get(handlerState.handlerId);
+      const handler = this.handlers.get(tab.handlerId);
 
-        if (!handler) {
-          restoreFail = true;
-          break;
-        }
-
-        if (handler.onRestore && !await handler.onRestore(tab.nodeId, tab.handlerId)) {
-          restoreFail = true;
-          break;
-        }
+      if (!handler || (handler.onRestore && !await handler.onRestore(tab))) {
+        restoreFail = true;
       }
     } catch {
       restoreFail = true;
     }
 
     if (restoreFail) {
-      removedTabs.push(tab.nodeId);
+      removedTabs.push(tab.id);
     }
-  }
-
-  private compareHandlers(a: string, b: string) {
-    return this.getHandlerOrder(a) - this.getHandlerOrder(b);
-  }
-
-  private getHandlerOrder(handlerId: string) {
-    return this.handlers.get(handlerId)?.order || Number.MAX_SAFE_INTEGER;
   }
 }

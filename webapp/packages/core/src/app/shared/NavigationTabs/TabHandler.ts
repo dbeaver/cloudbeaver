@@ -6,60 +6,58 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { IExtension } from '../../../extensions';
+import { Style } from '../../../theming';
+import { ITab } from './ITab';
 
-export type TabHandlerComponent = React.FunctionComponent<{
-  tabId: string;
-  handlerId: string;
-}>
+export type TabHandlerTabProps<T = any> = {
+  tab: ITab<T>;
+  handler: TabHandler<T>;
+  onSelect(tabId: string): void;
+  onClose?(tabId: string): void;
+  style: Style[];
+}
+export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>
 
-export type TabHandlerEvent = (tabId: string, handlerId: string) => void
-export type TabRestoreEvent = (
-  tabId: string,
-  handlerId: string,
-) => Promise<boolean> | boolean
+export type TabHandlerPanelProps<T = any> = {
+  tab: ITab<T>;
+  handler: TabHandler<T>;
+}
+export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandlerPanelProps<T>>
 
-export type TabHandlerFilter = (nodeId: string) => boolean
+export type TabHandlerEvent<T = any> = (tab: ITab<T>) => Promise<void> | void
+export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean
 
-export type TabHandlerOptions = {
+export type TabHandlerOptions<TState = any> = {
   key: string;
-  name: string;
-  icon: string;
   navigatorId: string;
-  order: number;
   priority: number;
-  getTabHandlerComponent: () => TabHandlerComponent;
-  /** Executed in Tab rendering pipeline */
-  isActive?: TabHandlerFilter;
-  onSelect?: TabHandlerEvent;
-  onClose?: TabHandlerEvent;
-  onRestore?: TabRestoreEvent;
+  getTabComponent(): TabHandlerTabComponent<TState>;
+  getPanelComponent(): TabHandlerPanelComponent<TState>;
+  onSelect?: TabHandlerEvent<TState>;
+  onClose?: TabHandlerEvent<TState>;
+  onRestore?: TabRestoreEvent<TState>;
+  extensions?: IExtension<ITab<TState>>[];
 }
 
-export class TabHandler {
-  @observable key: string
-  @observable name: string
-  @observable icon: string
-  @observable navigatorId: string
-  @observable order: number
-  @observable priority: number
-  @observable getHandler: () => TabHandlerComponent
-  @observable isActive: TabHandlerFilter
-  @observable onSelect?: TabHandlerEvent
-  @observable onClose?: TabHandlerEvent
-  @observable onRestore?: TabRestoreEvent
+export class TabHandler<TState = any> {
+  key: string
+  navigatorId: string
+  getTabComponent: () => TabHandlerTabComponent<TState>;
+  getPanelComponent: () => TabHandlerPanelComponent<TState>;
+  onSelect?: TabHandlerEvent<TState>
+  onClose?: TabHandlerEvent<TState>
+  onRestore?: TabRestoreEvent<TState>
+  extensions?: IExtension<ITab<TState>>[];
 
-  constructor(options: TabHandlerOptions) {
+  constructor(options: TabHandlerOptions<TState>) {
     this.key = options.key;
-    this.name = options.name;
-    this.icon = options.icon;
     this.navigatorId = options.navigatorId;
-    this.order = options.order;
-    this.priority = options.priority;
-    this.getHandler = options.getTabHandlerComponent;
-    this.isActive = options.isActive || (() => true);
+    this.getTabComponent = options.getTabComponent;
+    this.getPanelComponent = options.getPanelComponent;
     this.onSelect = options.onSelect;
     this.onClose = options.onClose;
     this.onRestore = options.onRestore;
+    this.extensions = options.extensions;
   }
 }

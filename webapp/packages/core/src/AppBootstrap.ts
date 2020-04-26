@@ -10,7 +10,7 @@ import {
   ConnectionDialogsService,
   ConnectionsManagerService,
   NodesManagerService,
-  NavigationTabsService, NavigationTreeContextMenuService, LogViewerMenuService,
+  NavigationTabsService, NavigationTreeContextMenuService, LogViewerMenuService, ConnectionSchemaManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ExceptionsCatcherService } from '@dbeaver/core/eventsLog';
@@ -34,7 +34,8 @@ export class AppBootstrap {
               private logViewerMenuService: LogViewerMenuService,
               private navigationTreeContextMenuService: NavigationTreeContextMenuService,
               private nodesManagerService: NodesManagerService,
-              private navigationTabsService: NavigationTabsService) {
+              private navigationTabsService: NavigationTabsService,
+              private connectionSchemaManagerService: ConnectionSchemaManagerService) {
   }
 
   async init() {
@@ -43,6 +44,7 @@ export class AppBootstrap {
     await this.sessionService.init();
     await this.themeService.init();
 
+    this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
     this.connectionDialogService.registerMenuItems();
     this.logViewerMenuService.registerMenuItems();

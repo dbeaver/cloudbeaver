@@ -1,11 +1,3 @@
-/*
- * cloudbeaver - Cloud Database Manager
- * Copyright (C) 2020 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-
 /* eslint-disable */
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql";
@@ -142,6 +134,7 @@ export type DriverInfo = {
   licenseRequired?: Maybe<Scalars["Boolean"]>;
   license?: Maybe<Scalars["String"]>;
   custom?: Maybe<Scalars["Boolean"]>;
+  /** Driver score for ordering, biggest first */
   promotedScore?: Maybe<Scalars["Int"]>;
   connectionProperties?: Maybe<Scalars["Object"]>;
   defaultConnectionProperties?: Maybe<Scalars["Object"]>;
@@ -427,6 +420,7 @@ export type ServerConfig = {
   supportsWorkspaces?: Maybe<Scalars["Boolean"]>;
   supportedLanguages?: Maybe<Array<Maybe<ServerLanguage>>>;
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
+  productConfiguration: Scalars["Object"];
 };
 
 export type ServerError = {
@@ -554,10 +548,10 @@ export type NavGetStructContainersQueryVariables = {
 export type NavGetStructContainersQuery = {
   navGetStructContainers: {
     catalogList: Array<
-      Pick<DatabaseObjectInfo, "name" | "description" | "type">
+      Pick<DatabaseObjectInfo, "name" | "description" | "type" | "features">
     >;
     schemaList: Array<
-      Pick<DatabaseObjectInfo, "name" | "description" | "type">
+      Pick<DatabaseObjectInfo, "name" | "description" | "type" | "features">
     >;
   };
 };
@@ -1143,11 +1137,13 @@ export const NavGetStructContainersDocument = gql`
         name
         description
         type
+        features
       }
       schemaList {
         name
         description
         type
+        features
       }
     }
   }

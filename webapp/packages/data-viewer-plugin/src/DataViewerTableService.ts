@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionsManagerService, IConnectionCatalogSchema } from '@dbeaver/core/app';
+import { ConnectionsManagerService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { GraphQLService } from '@dbeaver/core/sdk';
@@ -15,8 +15,12 @@ import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
 import { IRequestDataResult, ITableViewerModelInit, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
-interface ISqlContextParams extends IConnectionCatalogSchema {
+interface ISqlContextParams {
   contextId: string;
+  connectionId: string;
+  objectCatalogId?: string;
+  objectSchemaId?: string;
+
 }
 
 export interface IDataViewerTableModel {
@@ -64,14 +68,22 @@ export class DataViewerTableService {
     return new TableViewerModel(callbacks, this.commonDialogService);
   }
 
-  private async createSqlContext(connectionCatalogSchema: IConnectionCatalogSchema): Promise<ISqlContextParams> {
+  private async createSqlContext(
+    connectionId: string,
+    defaultCatalog?: string,
+    defaultSchema?: string
+  ): Promise<ISqlContextParams> {
 
-    const response = await this.graphQLService.gql.sqlContextCreate(connectionCatalogSchema);
+    const response = await this.graphQLService.gql.sqlContextCreate({
+      connectionId,
+      defaultCatalog,
+      defaultSchema,
+    });
     return {
       contextId: response.context.id,
-      connectionId: connectionCatalogSchema.connectionId,
-      catalogId: response.context.defaultCatalog || null,
-      schemaId: response.context.defaultSchema || null,
+      connectionId,
+      objectCatalogId: response.context.defaultCatalog,
+      objectSchemaId: response.context.defaultSchema,
     };
   }
 
@@ -112,11 +124,7 @@ export class DataViewerTableService {
     if (!data.sqlContextParams) {
 
       // it is first data request
-      const sqlContextParams: ISqlContextParams = await this.createSqlContext({
-        connectionId: data.connectionId,
-        catalogId: null,
-        schemaId: null,
-      });
+      const sqlContextParams: ISqlContextParams = await this.createSqlContext(data.connectionId);
       data.sqlContextParams = sqlContextParams;
     }
 

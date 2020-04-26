@@ -8,12 +8,12 @@
 
 import { useService } from '@dbeaver/core/di';
 
-import { ObjectViewerService } from './ObjectViewerService';
+import { ObjectViewerTabService } from './ObjectViewerTabService';
 
 export function useObjectFolder(objectId: string, folderId: string) {
-  const objectViewerService = useService(ObjectViewerService);
+  const objectViewerTabService = useService(ObjectViewerTabService);
 
-  const isLoading = objectViewerService.isTabLoading(`${objectId}_${folderId}`);
+  const isLoading = objectViewerTabService.isTabLoading(`${objectId}_${folderId}`);
 
   return { isLoading };
 }

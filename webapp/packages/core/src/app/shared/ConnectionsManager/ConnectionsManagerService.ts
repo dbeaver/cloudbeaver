@@ -18,9 +18,9 @@ import {
   GraphQLService,
   NavGetStructContainersQuery,
   CachedResource,
+  DatabaseObjectInfo,
 } from '@dbeaver/core/sdk';
 
-import { NavigationTabsService } from '../NavigationTabs/NavigationTabsService';
 import { NodesManagerService } from '../NodesManager/NodesManagerService';
 
 export type DBDriver = Pick<
@@ -37,21 +37,14 @@ export type DBDriver = Pick<
 >
 export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>
 export type Connection = Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId'>
-
-export interface ISchema {
-  id: string;
-}
-
-export interface ICatalogsAndSchemas {
-  catalogs: ISchema[];
-  schemas: ISchema[];
-}
+export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>
 
 @injectable()
 export class ConnectionsManagerService {
 
   @observable private connectionsMap: Map<string, Connection> = new Map();
-  private dbDrivers = new CachedResource(new Map(), this.refreshDriversAsync.bind(this));
+  dbDrivers = new CachedResource(new Map(), this.refreshDriversAsync.bind(this));
+  connectionObjectContainers = new CachedResource(new Map(), this.refreshObjectContainersAsync.bind(this));
 
   @computed get connections(): Connection[] {
     return Array.from(this.connectionsMap.values());
@@ -61,7 +54,6 @@ export class ConnectionsManagerService {
   onCloseConnection = new Subject<string>();
 
   constructor(private graphQLService: GraphQLService,
-              private navigationTabsService: NavigationTabsService,
               private nodesManagerService: NodesManagerService,
               private sessionService: SessionService) {
   }
@@ -84,6 +76,20 @@ export class ConnectionsManagerService {
     return this.connectionsMap.get(connectionId);
   }
 
+  getObjectContainerById(
+    connectionId: string,
+    objectCatalogId: string,
+    objectSchemaId?: string
+  ): ObjectContainer | undefined {
+    const objectContainers = this.connectionObjectContainers.data.get(connectionId);
+    if (!objectContainers) {
+      return;
+    }
+    return objectContainers.find(
+      objectContainer => objectContainer.name === objectSchemaId || objectContainer.name === objectCatalogId
+    );
+  }
+
   hasAnyConnection(): boolean {
     return Boolean(this.connections.length);
   }
@@ -96,9 +102,9 @@ export class ConnectionsManagerService {
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    await this.graphQLService.gql.closeConnection({ id });
+    await this.nodesManagerService.closeConnection(id);
     this.onCloseConnection.next(id);
-    this.closeConnectionTabs(id);
+    await this.graphQLService.gql.closeConnection({ id });
     this.connectionsMap.delete(id);
 
     if (!skipNodesRefresh) {
@@ -106,30 +112,29 @@ export class ConnectionsManagerService {
     }
   }
 
-  async getCatalogsAndSchemas(connectionId: string, catalogId?: string): Promise<ICatalogsAndSchemas> {
-    const schemas = await this.loadSchemasAndCatalogs(connectionId, catalogId);
-    const catalogAndSchemas: ICatalogsAndSchemas = {
-      schemas: schemas.navGetStructContainers
-        .schemaList.map(s => ({
-          id: s.name || '',
-        })),
-      catalogs: schemas.navGetStructContainers
-        .catalogList.map(s => ({
-          id: s.name || '',
-        })),
-    };
-    return catalogAndSchemas;
-  }
-
-  async loadConnectionDriver(driverId: string): Promise<DBDriver | null> {
-    const drivers = await this.graphQLService.gql.getDriverById({ driverId });
-    return drivers.driverList[0] || null;
+  async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
+    const data = await this.connectionObjectContainers.load(connectionId, catalogId);
+    return data.get(connectionId)!;
   }
 
   async restoreConnections() {
     for (const connection of this.sessionService.getConnections()) {
       this.restoreConnection(connection);
     }
+  }
+
+  private async refreshObjectContainersAsync(
+    data: Map<string, ObjectContainer[]>,
+    refresh: boolean,
+    connectionId: string,
+    catalogId?: string,
+  ): Promise<Map<string, ObjectContainer[]>> {
+    if (refresh || !data.has(connectionId)) {
+      const { navGetStructContainers } = await this.loadSchemasAndCatalogs(connectionId, catalogId);
+      data.set(connectionId, [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList]);
+    }
+
+    return data;
   }
 
   private async refreshDriversAsync(data: Map<string, DBDriver>): Promise<Map<string, DBDriver>> {
@@ -142,14 +147,6 @@ export class ConnectionsManagerService {
     }
 
     return data;
-  }
-
-  private closeConnectionTabs(id: string) {
-    // todo must be called from navigation service
-    const activeTabs = this.navigationTabsService.tabIdList.filter(tabId => tabId.includes(id));
-    for (const tabId of activeTabs) {
-      this.navigationTabsService.closeTab(tabId); // here must be async, like when we want to show prompt 'save before close'
-    }
   }
 
   /**

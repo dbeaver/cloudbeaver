@@ -52,10 +52,10 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
   const SchemaOrCatalogMenu = TopMenuItem;
 
   return styled(useStyles(style))(
-    <connection-selector as="div" {...use({ isVisible: controller.isSelectorVisible })}>
+    <connection-selector as="div" {...use({ isVisible: controller.isConnectionSelectorVisible })}>
       <ConnectionMenu menuItem={controller.connectionMenu} style={[menuStyles, connectionMenu]}/>
-      {controller.isSchemaSelectorVisible && (
-        <SchemaOrCatalogMenu menuItem={controller.schemaOrCatalogMenu} style={[menuStyles]}/>
+      {controller.isObjectContainerSelectorVisible && (
+        <SchemaOrCatalogMenu menuItem={controller.objectContainerMenu} style={[menuStyles]}/>
       )}
     </connection-selector>
   );

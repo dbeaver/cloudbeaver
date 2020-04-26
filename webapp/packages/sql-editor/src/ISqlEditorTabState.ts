@@ -6,13 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IConnectionCatalogSchema, ITabHasConnectionChangeBehavior } from '@dbeaver/core/app';
 
 import { SqlExecutionState } from './SqlExecutionState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
-export interface ISqlContextParams extends IConnectionCatalogSchema {
+export interface ISqlContextParams {
   contextId: string;
+  connectionId: string;
+  objectCatalogId?: string;
+  objectSchemaId?: string;
 }
 
 export interface ISqlQueryParams extends ISqlContextParams {
@@ -38,10 +40,9 @@ export interface IResultsTabState {
   panelParams: ISqlResultPanelParams;
 }
 
-export interface ISqlEditorTabState extends ITabHasConnectionChangeBehavior {
+export interface ISqlEditorTabState extends ISqlContextParams {
   order: number;
   query: string;
-  contextId: string;
   currentResultTabId?: string;
   sqlExecutionState: SqlExecutionState;
   resultTabs: IResultsTabState[];

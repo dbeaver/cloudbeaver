@@ -44,7 +44,6 @@ export function TabsBox({
         {tabs && (
           <tabs as="div">
             {tabs}
-            <tab-fill as="div" />
           </tabs>
         )}
         <tab-panels as="div">
