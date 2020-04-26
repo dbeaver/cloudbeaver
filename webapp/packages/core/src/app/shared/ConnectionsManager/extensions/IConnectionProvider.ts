@@ -11,7 +11,7 @@ import { createExtension, isExtension, IExtension } from '../../../../extensions
 const connectionProviderSymbol = Symbol('@extension/ConnectionProvider');
 
 export interface IConnectionProvider<T = never> {
-  (context: T): string;
+  (context: T): string | undefined;
 }
 
 export function connectionProvider<T>(provider: IConnectionProvider<T>) {

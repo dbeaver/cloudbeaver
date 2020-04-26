@@ -113,7 +113,7 @@ export class NodesManagerService {
 
     const { objectInfo } = await this.graphQLService.gql.queryDatabaseObjectInfo({
       nodeId,
-      filter: { features: ['viewable', 'editPossible'] },
+      // filter: { features: ['viewable', 'editPossible'] },
     });
 
     const info = { ...objectInfo.object, id: objectInfo.id };
@@ -142,7 +142,7 @@ export class NodesManagerService {
       childrenDatabaseObjectInfo,
     } = await this.graphQLService.gql.queryChildrenDatabaseObjectInfo({
       nodePath: nodeId,
-      filter: { features: ['viewable', 'editPossible'] }, // filter properties for view
+      // filter: { features: ['viewable', 'editPossible'] }, // filter properties for view
     });
 
     const children = childrenDatabaseObjectInfo.map(children => ({

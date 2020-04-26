@@ -81,7 +81,12 @@ export class DataViewerTabService {
     }
   }
 
-  private handleTabSelect(tab: ITab<IObjectViewerTabState>) {
+  private async handleTabSelect(tab: ITab<IObjectViewerTabState>) {
+    const objectInfo = await this.nodesManagerService.loadDatabaseObjectInfo(tab.handlerState.objectId);
+
+    if (!this.nodesManagerService.isNodeHasData(objectInfo)) {
+      return;
+    }
     this.dataViewerTableService.createTableModelIfNotExists(tab.handlerState.objectId);
   }
 

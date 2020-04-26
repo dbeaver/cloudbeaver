@@ -66,11 +66,11 @@ export class ObjectViewerTabService {
     const nodeInfo = this.nodesManagerService
       .getNodeContainerInfo(context.handlerState.objectId);
 
-    if (nodeInfo.connectionId) {
-      // connection node id differs from connection id
-      return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
+    if (!nodeInfo.connectionId) {
+      return;
     }
-    return '';
+    // connection node id differs from connection id
+    return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
   }
 
   getDBObjectCatalog(context: ITab<IObjectViewerTabState>) {
@@ -78,19 +78,19 @@ export class ObjectViewerTabService {
       .getNodeContainerInfo(context.handlerState.objectId);
 
     if (nodeInfo.catalogId) {
-      return nodeInfo.catalogId;
+      return;
     }
-    return '';
+    return nodeInfo.catalogId;
   }
 
   getDBObjectSchema(context: ITab<IObjectViewerTabState>) {
     const nodeInfo = this.nodesManagerService
       .getNodeContainerInfo(context.handlerState.objectId);
 
-    if (nodeInfo.schemaId) {
-      return nodeInfo.schemaId;
+    if (!nodeInfo.schemaId) {
+      return;
     }
-    return '';
+    return nodeInfo.schemaId;
   }
 
   registerTabHandler() {
