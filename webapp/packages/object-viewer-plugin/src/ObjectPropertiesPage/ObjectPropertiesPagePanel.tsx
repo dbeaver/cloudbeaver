@@ -13,6 +13,7 @@ import { useChildren } from '@dbeaver/core/app';
 import { Loader } from '@dbeaver/core/blocks';
 import { useStyles, composes } from '@dbeaver/core/theming';
 
+import { ObjectPagePanelProps } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
 
 const viewerStyles = composes(
@@ -31,14 +32,10 @@ const viewerStyles = composes(
   `
 );
 
-type ObjectViewerProps = {
-  objectId: string;
-}
-
-export const ObjectViewer = observer(function ObjectViewer({
-  objectId,
-}: ObjectViewerProps) {
-  const children = useChildren(objectId);
+export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPagePanel({
+  tab,
+}: ObjectPagePanelProps) {
+  const children = useChildren(tab.handlerState.objectId);
 
   if (!children?.isLoaded) {
     return <Loader />;
@@ -46,7 +43,7 @@ export const ObjectViewer = observer(function ObjectViewer({
 
   return styled(useStyles(viewerStyles))(
     <wrapper as="div">
-      <ObjectFolders objectId={objectId} />
+      <ObjectFolders tab={tab} />
     </wrapper>
   );
 });

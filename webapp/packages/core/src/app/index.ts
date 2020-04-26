@@ -4,8 +4,15 @@ export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerServic
 export * from './TopNavBar/SettingsMenu/SettingsMenuService';
 export * from './shared/ConnectionsManager/ConnectionsManagerService';
 export * from './shared/ConnectionsManager/ConnectionDialogsService';
+export * from './shared/ConnectionsManager/extensions/IConnectionProvider';
+export * from './shared/ConnectionsManager/extensions/IConnectionSetter';
+export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
+export * from './shared/NodesManager/extensions/IObjectCatalogSetter';
+export * from './shared/NodesManager/extensions/IObjectSchemaProvider';
+export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
 export * from './shared/Navigation/NavigationService';
 export * from './shared/NavigationTabs/NavigationTabsService';
+export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/NodesManager/NodesManagerService';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
@@ -13,7 +20,7 @@ export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
 
 // Models
-export * from './shared/NavigationTabs/Tab';
+export * from './shared/NavigationTabs/ITab';
 export * from './shared/NavigationTabs/TabHandler';
 export * from './shared/Navigation/NavigationContext';
 export * from './shared/TabEntity/TabEntity';
@@ -23,7 +30,6 @@ export * from './shared/TabEntity/TabEntity';
 // hooks
 export * from './shared/useChildren';
 export * from './shared/NavigationTabs/NavigationTabsBar/Tabs/useTab';
-export * from './shared/NavigationTabs/useTabHandlerState';
 export * from './shared/NodesManager/useDatabaseObjectInfo';
 export * from './shared/NodesManager/useNode';
 export * from './shared/InlineEditor/InlineEditor';
@@ -33,7 +39,6 @@ export * from './Body';
 export * from './Notifications/NotificationsItem/ErrorDetailsDialog/ErrorDetailsDialog';
 
 // Interfaces
-export * from './TopNavBar/ConnectionSchemaManager/IConnectionCatalogSchema';
 export * from './shared/Navigation';
 export * from './shared/NodesManager/ENodeFeature';
 export * from './shared/NodesManager/EObjectFeature';

@@ -9,11 +9,10 @@
 import { autorun } from 'mobx';
 import { IReactionDisposer } from 'mobx/lib/internal';
 
-import {
-  NavigationTabsService, Tab,
-} from '@dbeaver/core/app';
+import { ITab } from '@dbeaver/core/app';
 import { IDestructibleController, IInitializableController, injectable } from '@dbeaver/core/di';
 
+import { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectFoldersService } from './ObjectFoldersService';
 import { ObjectFoldersTabContainer } from './ObjectFoldersTabsContainer/ObjectFoldersTabContainer';
 
@@ -22,39 +21,29 @@ import { ObjectFoldersTabContainer } from './ObjectFoldersTabsContainer/ObjectFo
 export class ObjectFoldersController implements IInitializableController, IDestructibleController {
 
   private tabContainer!: ObjectFoldersTabContainer;
-  private objectId!: string;
-
-  private navigationTab!: Tab
-
+  private navigationTab!: ITab<IObjectViewerTabState>
   private disposer!: IReactionDisposer;
 
-  constructor(private navigationTabsService: NavigationTabsService,
-              private objectFoldersService: ObjectFoldersService) {
-  }
+  constructor(private objectFoldersService: ObjectFoldersService) { }
 
   getTabContainer() {
     return this.tabContainer;
   }
 
-  init(objectId: string): void {
-    const navigationTab = this.navigationTabsService.getTab(objectId);
-    if (!navigationTab) {
-      throw new Error(`Tab ${objectId} not found`);
-    }
-    this.navigationTab = navigationTab;
+  init(tab: ITab<IObjectViewerTabState>): void {
+    this.navigationTab = tab;
 
-    this.objectId = objectId;
-    this.tabContainer = this.objectFoldersService.createTabsContainer(objectId);
+    this.tabContainer = this.objectFoldersService.createTabsContainer(tab.handlerState.objectId);
 
     this.disposer = autorun(() => {
-      const currentTabId = this.navigationTab.getHandlerState<string>(this.navigationTab.handlerId) || null;
-      this.activateTab(currentTabId);
+      const currentFolderId = tab.handlerState.folderId || null;
+      this.activateTab(currentFolderId);
     });
   }
 
-  activateTab(tabId: string | null) {
+  activateTab(folderId: string | null) {
     try {
-      this.tabContainer.activateTab(tabId);
+      this.tabContainer.activateTab(folderId);
     } catch {
       // no tab with tabId
       this.activateFirstTab();
@@ -68,6 +57,6 @@ export class ObjectFoldersController implements IInitializableController, IDestr
 
   destruct(): void {
     this.disposer();
-    this.objectFoldersService.destroyTabContainer(this.objectId);
+    this.objectFoldersService.destroyTabContainer(this.navigationTab.handlerState.objectId);
   }
 }

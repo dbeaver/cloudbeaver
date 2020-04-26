@@ -6,20 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EObjectFeature, NavigationTabsService, NodesManagerService } from '@dbeaver/core/app';
+import {
+  EObjectFeature, NodesManagerService, IContextProvider, INodeNavigationData
+} from '@dbeaver/core/app';
 import { ITab } from '@dbeaver/core/blocks';
 import { injectable } from '@dbeaver/core/di';
+import { NotificationService } from '@dbeaver/core/eventsLog';
+import { ObjectViewerTabService } from '@dbeaver/object-viewer-plugin';
 
 import { ddlViewer } from './DdlViewer/DdlViewer';
 import { DdlViewerService } from './DdlViewerService';
 
+const ddlViewerTabId = 'ddl-viewer';
 
 @injectable()
 export class DdlViewerTabService {
 
   constructor(private nodesManagerService: NodesManagerService,
-              private navigationTabsService: NavigationTabsService,
+              private objectViewerTabService: ObjectViewerTabService,
+              private notificationService: NotificationService,
               private ddlViewerService: DdlViewerService) {
+    this.nodesManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
   buildTab(nodeId: string): ITab | null {
@@ -29,7 +36,7 @@ export class DdlViewerTabService {
       return null;
     }
     const ddlTab: ITab = {
-      tabId: 'ddl-viewer',
+      tabId: ddlViewerTabId,
       title: 'DDL',
       icon: 'sql-text',
       onActivate: () => this.activateDDLTab(nodeId),
@@ -38,17 +45,19 @@ export class DdlViewerTabService {
     return ddlTab;
   }
 
-  private activateDDLTab(nodeId: string) {
-    const navigationTab = this.navigationTabsService.getTab(nodeId);
+  private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+    try {
+      const tabContext = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
-    if (!navigationTab) {
-      throw new Error(`Tab ${nodeId} not found`);
+      if (tabContext.nodeInfo.folderId === ddlViewerTabId) {
+        this.ddlViewerService.loadDdlMetadata(tabContext.nodeInfo.nodeId);
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Error in Object Viewer while processing action with ddl-viewer');
     }
-    // todo this must be refactored
-    navigationTab.updateHandlerState({
-      handlerId: navigationTab.handlerId,
-      state: 'ddl-viewer',
-    });
-    this.ddlViewerService.loadDdlMetadata(nodeId);
+  }
+
+  private activateDDLTab(nodeId: string) {
+    this.nodesManagerService.navToNode(nodeId, ddlViewerTabId);
   }
 }

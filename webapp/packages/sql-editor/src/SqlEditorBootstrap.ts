@@ -16,7 +16,7 @@ import {
 import { injectable } from '@dbeaver/core/di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@dbeaver/core/dialogs';
 
-import { SqlEditorManagerService } from './SqlEditorManagerService';
+import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 
 @injectable()
@@ -25,7 +25,7 @@ export class SqlEditorBootstrap {
               private contextMenuService: ContextMenuService,
               private connectionsManagerService: ConnectionsManagerService,
               private sqlEditorTabService: SqlEditorTabService,
-              private sqlEditorManagerService: SqlEditorManagerService) {}
+              private sqlEditorNavigatorService: SqlEditorNavigatorService) {}
 
   async bootstrap() {
     this.sqlEditorTabService.registerTabHandler();
@@ -35,7 +35,7 @@ export class SqlEditorBootstrap {
         id: 'sql-editor',
         title: 'SQL',
         order: 2,
-        onClick: () => this.sqlEditorManagerService.openNewEditor(),
+        onClick: () => this.sqlEditorNavigatorService.openNewEditor(),
         isDisabled: () => !this.connectionsManagerService.hasAnyConnection(),
       }
     );
@@ -51,7 +51,7 @@ export class SqlEditorBootstrap {
       onClick: (context: IMenuContext<NodeWithParent>) => {
         const node = context.data;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-        this.sqlEditorManagerService.openNewEditor(connectionId);
+        this.sqlEditorNavigatorService.openNewEditor(connectionId);
       },
     };
     this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), openSqlEditor);

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ThemeSelector } from '@dbeaver/core/src/theming';
+import { ThemeSelector } from '@dbeaver/core/theming';
 
 export const agGridStyles: ThemeSelector = async (theme) => {
   const baseStyles = await import('./base.raw.scss');

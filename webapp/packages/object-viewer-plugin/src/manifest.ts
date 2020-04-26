@@ -8,24 +8,26 @@
 
 import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
-import { ObjectFoldersService } from './ObjectFoldersService';
-import { ObjectFoldersTabService } from './ObjectFoldersTab/ObjectFoldersTabService';
-import { ObjectInfoTabService } from './ObjectInfoTab/ObjectInfoTabService';
+import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
+import { ObjectFoldersService } from './ObjectPropertiesPage/ObjectFoldersService';
+import { ObjectFoldersTabService } from './ObjectPropertiesPage/ObjectFoldersTab/ObjectFoldersTabService';
+import { ObjectInfoTabService } from './ObjectPropertiesPage/ObjectInfoTab/ObjectInfoTabService';
+import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
+import { VirtualFolderTabService } from './ObjectPropertiesPage/VirtualFolderTab/VirtualFolderTabService';
 import { ObjectViewerBootstrap } from './ObjectViewerBootstrap';
-import { ObjectViewerService } from './ObjectViewerService';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
-import { VirtualFolderTabService } from './VirtualFolderTab/VirtualFolderTabService';
 
 export const manifest: PluginManifest = {
   info: { name: 'Object Viewer Plugin' },
 
   providers: [
-    ObjectViewerService,
+    ObjectPropertiesPageService,
     ObjectFoldersService,
     ObjectViewerTabService,
     ObjectInfoTabService,
     ObjectFoldersTabService,
     VirtualFolderTabService,
+    DBObjectPageService,
   ],
 
   async initialize(injector: IServiceInjector) {

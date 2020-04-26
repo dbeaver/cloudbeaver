@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
 
-import { additionalProps, getValue, matchType } from '../tools';
+import { additionalProps, getValue, matchType } from '../helpers';
 import { ObjectPropertyProps } from './ObjectPropertyProps';
 
 const styles = css`

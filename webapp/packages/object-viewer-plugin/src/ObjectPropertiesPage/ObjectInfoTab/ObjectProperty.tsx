@@ -14,7 +14,7 @@ import {
   ObjectPropertyInput,
   ObjectPropertyProps,
 } from '../formControls';
-import { filterProperty, matchType } from '../tools';
+import { filterProperty, matchType } from '../helpers';
 
 const propertyStyles = css`
   property {

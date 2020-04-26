@@ -27,8 +27,8 @@ export class SqlResultTabsService {
 
     const sqlQueryParams: ISqlQueryParams = {
       connectionId: editorState.connectionId,
-      catalogId: editorState.catalogId,
-      schemaId: editorState.schemaId,
+      objectCatalogId: editorState.objectCatalogId,
+      objectSchemaId: editorState.objectSchemaId,
       contextId: editorState.contextId,
       query,
     };

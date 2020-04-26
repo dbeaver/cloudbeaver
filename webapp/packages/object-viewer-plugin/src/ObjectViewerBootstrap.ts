@@ -8,14 +8,19 @@
 
 import { injectable } from '@dbeaver/core/di';
 
+import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
 
 @injectable()
 export class ObjectViewerBootstrap {
 
-  constructor(private objectViewerTabService: ObjectViewerTabService) { }
+  constructor(
+    private objectViewerTabService: ObjectViewerTabService,
+    private objectPropertiesPageService: ObjectPropertiesPageService
+  ) { }
 
   bootstrap() {
     this.objectViewerTabService.registerTabHandler();
+    this.objectPropertiesPageService.registerDBObjectPage();
   }
 }

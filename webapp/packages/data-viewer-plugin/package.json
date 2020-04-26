@@ -13,6 +13,7 @@
   },
   "peerDependencies": {
     "@dbeaver/ag-grid-plugin": "^0.1.0",
+    "@dbeaver/object-viewer-plugin": "^0.1.0",
     "@dbeaver/core": "^0.1.0",
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",

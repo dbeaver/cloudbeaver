@@ -12,14 +12,13 @@ import CodeMirror, {
 import { computed } from 'mobx';
 import { IControlledCodeMirror } from 'react-codemirror2';
 
-import { Tab } from '@dbeaver/core/app';
+import { ITab } from '@dbeaver/core/app';
 import { IInitializableController, injectable } from '@dbeaver/core/di';
 import { SqlDialectInfo } from '@dbeaver/core/sdk';
 
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
-import { SqlEditorManagerService } from '../SqlEditorManagerService';
-import { sqlEditorTabHandlerKey } from '../sqlEditorTabHandlerKey';
+import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 import { SqlEditorService } from './SqlEditorService';
 
 // allows to bypass rollup-commonjs error " 'showHint' is not exported by codemirror.js "
@@ -29,24 +28,19 @@ const showHint = CodeMirror.showHint;
 export class SqlEditorController implements IInitializableController {
 
   @computed get dialect(): SqlDialectInfo | undefined {
-    const state = this.tab.getHandlerState<ISqlEditorTabState>(sqlEditorTabHandlerKey);
-    if (!state) {
-      return;
-    }
-    return this.sqlDialectInfoService.getDialectInfo(state.connectionId);
+    return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.connectionId);
   }
 
   @computed get isActionsDisabled(): boolean {
-    const state = this.tab.getHandlerState<ISqlEditorTabState>(sqlEditorTabHandlerKey)!;
-    return state.sqlExecutionState.isSqlExecuting;
+    return this.tab.handlerState.sqlExecutionState.isSqlExecuting;
   }
 
   handleExecute = () => {
-    this.sqlEditorManager.executeEditorQuery(this.editorId, this.getExecutingQuery());
+    this.sqlResultTabsService.executeEditorQuery(this.tab.handlerState, this.getExecutingQuery(), false);
   }
 
   handleExecuteNewTab = () => {
-    this.sqlEditorManager.executeEditorQuery(this.editorId, this.getExecutingQuery(), true);
+    this.sqlResultTabsService.executeEditorQuery(this.tab.handlerState, this.getExecutingQuery(), true);
   }
 
   readonly options: EditorConfiguration = {
@@ -84,28 +78,24 @@ export class SqlEditorController implements IInitializableController {
   }
 
   @computed get value() {
-    const state = this.tab.getHandlerState<ISqlEditorTabState>(sqlEditorTabHandlerKey)!;
-    return state.query;
+    return this.tab.handlerState.query;
   }
 
-  private tab!: Tab;
-  private editorId!: string;
+  private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
 
-  constructor(private sqlEditorManager: SqlEditorManagerService,
+  constructor(private sqlResultTabsService: SqlResultTabsService,
               private sqlDialectInfoService: SqlDialectInfoService,
               private sqlEditorService: SqlEditorService) {
   }
 
-  init(tab: Tab) {
+  init(tab: ITab<ISqlEditorTabState>) {
     this.tab = tab;
-    this.editorId = tab.nodeId;
   }
 
   private getExecutingQuery(): string {
     if (!this.editor) {
-      const state = this.tab.getHandlerState<ISqlEditorTabState>(sqlEditorTabHandlerKey)!;
-      return state.query;
+      return this.tab.handlerState.query;
     }
 
     if (this.editor.somethingSelected()) {
@@ -140,7 +130,12 @@ export class SqlEditorController implements IInitializableController {
       const [from, to] = getWordRange(editor, cursor);
 
       this.sqlEditorService
-        .getAutocomplete(this.editorId, cursorPosition)
+        .getAutocomplete(
+          this.tab.handlerState.connectionId,
+          this.tab.handlerState.contextId,
+          this.tab.handlerState.query,
+          cursorPosition
+        )
         .then((proposals) => {
           if (!proposals) {
             return;
@@ -196,8 +191,7 @@ export class SqlEditorController implements IInitializableController {
   }
 
   private handleQueryChange(editor: Editor, data: EditorChange, query: string) {
-    const state = this.tab.getHandlerState<ISqlEditorTabState>(sqlEditorTabHandlerKey)!;
-    state.query = query;
+    this.tab.handlerState.query = query;
   }
 }
 

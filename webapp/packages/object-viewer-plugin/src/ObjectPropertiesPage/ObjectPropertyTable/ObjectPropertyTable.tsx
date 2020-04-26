@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { useChildren } from '@dbeaver/core/app';
 import { Loader } from '@dbeaver/core/blocks';
 
-import { useObjectFolder } from '../useObjectFolder';
+import { useObjectFolder } from '../../useObjectFolder';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
 
 const styles = css`

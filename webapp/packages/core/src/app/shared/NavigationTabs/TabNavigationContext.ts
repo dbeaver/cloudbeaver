@@ -6,15 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
+import { uuid } from '@dbeaver/core/utils';
+
+import { ITab, ITabOptions } from './ITab';
 import { NavigationTabsService } from './NavigationTabsService';
-import { Tab, TabOptions } from './Tab';
-import { TabHandlerOptions } from './TabHandler';
 
 export interface ITabNavigationContext {
   readonly isNewlyCreated: boolean;
   readonly handlerPriority: number;
-  trySwitchHandler(handler: TabHandlerOptions): void;
-  openNewTab(options: TabOptions): Tab;
+  readonly tab: ITab | null;
+  openNewTab<T = any>(options: ITabOptions<T>): ITab<T>;
+  registerTab(tab: ITab): void;
 }
 
 export class TabNavigationContext implements ITabNavigationContext {
@@ -24,22 +28,26 @@ export class TabNavigationContext implements ITabNavigationContext {
   get handlerPriority() {
     return this._handlerPriority;
   }
+  get tab() {
+    return this._tab;
+  }
   private _isNewlyCreated = false;
   private _handlerPriority = 0;
+  private _tab: ITab | null = null;
 
   constructor(private navigationTabsService: NavigationTabsService) { }
 
-  trySwitchHandler(handler: TabHandlerOptions) {
-    if (this.handlerPriority < handler.priority) {
-      this._handlerPriority = handler.priority;
-      this.navigationTabsService.selectHandler(handler.key);
-    }
+  openNewTab<T = any>(options: ITabOptions<T>): ITab<T> {
+    this._tab = observable({
+      id: uuid(),
+      ...options,
+    });
+    this._isNewlyCreated = true;
+    this.navigationTabsService.openTab(this._tab, true);
+    return this._tab;
   }
 
-  openNewTab(options: TabOptions) {
-    const newTab = new Tab(options);
-    this._isNewlyCreated = true;
-    this.navigationTabsService.openTab(newTab, true);
-    return newTab;
+  registerTab(tab: ITab) {
+    this._tab = tab;
   }
 }

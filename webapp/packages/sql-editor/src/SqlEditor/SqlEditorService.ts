@@ -9,25 +9,23 @@
 import { injectable } from '@dbeaver/core/di';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@dbeaver/core/sdk';
 
-import { SqlEditorManagerService } from '../SqlEditorManagerService';
-
 @injectable()
 export class SqlEditorService {
 
-  constructor(private sqlEditorManagerService: SqlEditorManagerService,
-              private gql: GraphQLService) {
+  constructor(private gql: GraphQLService) {
   }
 
-  async getAutocomplete(tabId: string, cursor: number): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
-    const state = this.sqlEditorManagerService.getHandlerState(tabId);
-    if (!state) {
-      return null;
-    }
+  async getAutocomplete(
+    connectionId: string,
+    contextId: string,
+    query: string,
+    cursor: number
+  ): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
 
     const result = await this.gql.gql.querySqlCompletionProposals({
-      connectionId: state.connectionId,
-      contextId: state.contextId,
-      query: state.query,
+      connectionId,
+      contextId,
+      query,
       position: cursor,
     });
 

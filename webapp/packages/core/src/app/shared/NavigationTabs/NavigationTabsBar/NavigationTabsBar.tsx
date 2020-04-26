@@ -8,15 +8,17 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { TabsBoxFromArray, TextPlaceholder } from '@dbeaver/core/blocks';
+import {
+  TextPlaceholder, TabsBox, TabPanel
+} from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
-import { composes } from '@dbeaver/core/theming';
+import { composes, useStyles } from '@dbeaver/core/theming';
 
 import { NavigationTabsService } from '../NavigationTabsService';
-import { TabContent } from './Tabs/TabContent';
-import { TabData } from './Tabs/TabData';
+import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
+import { TabHandlerTab } from './Tabs/TabHandlerTab';
 
 const styles = composes(
   css`
@@ -28,6 +30,7 @@ const styles = composes(
     }
   `
 );
+const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const navigation = useService(NavigationTabsService);
@@ -42,15 +45,19 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
     );
   }
 
-  return (
-    <TabsBoxFromArray
+  return styled(useStyles(styles))(
+    <TabsBox
       currentTabId={navigation.currentTabId}
-      tabIdList={navigation.tabIdList}
-      tab={TabContent}
-      panel={TabData}
-      onOpen={handleSelect}
-      onClose={handleClose}
-      style={[styles]}
-    />
+      tabs={navigation.tabIdList.map(tabId => (
+        <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} style={stylesArray}/>
+      ))}
+      style={stylesArray}
+    >
+      {navigation.tabIdList.map(tabId => (
+        <TabPanel key={tabId} tabId={tabId}>
+          <TabHandlerPanel tabId={tabId} />
+        </TabPanel>
+      ))}
+    </TabsBox>
   );
 });

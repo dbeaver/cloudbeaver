@@ -15,7 +15,7 @@ import { StaticImage } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
-import { getValue } from '../tools';
+import { getValue } from '../helpers';
 
 const itemStyles = css`
     icon {

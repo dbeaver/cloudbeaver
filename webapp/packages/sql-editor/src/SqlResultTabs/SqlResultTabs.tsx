@@ -10,16 +10,15 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useTabHandlerState } from '@dbeaver/core/app';
+import { ITab as TabClass } from '@dbeaver/core/app';
 import {
-  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader,
+  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader
 } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { useStyles, composes } from '@dbeaver/core/theming';
 
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlEditorManagerService } from '../SqlEditorManagerService';
-import { sqlEditorTabHandlerKey } from '../sqlEditorTabHandlerKey';
+import { SqlEditorNavigatorService } from '../SqlEditorNavigatorService';
 import { SqlResultPanel } from './SqlResultPanel/SqlResultPanel';
 
 const styles = composes(
@@ -45,48 +44,47 @@ const styles = composes(
 );
 
 type SqlDataResultProps = {
-  tabId: string;
+  tab: TabClass<ISqlEditorTabState>;
 }
 
-export const SqlResultTabs = observer(function SqlDataResult({ tabId: editorId }: SqlDataResultProps) {
-  const sqlEditorManager = useService(SqlEditorManagerService);
-  const handlerState = useTabHandlerState<ISqlEditorTabState>(editorId, sqlEditorTabHandlerKey);
+export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataResultProps) {
+  const navigatorService = useService(SqlEditorNavigatorService);
   const handleOpen = useCallback(
-    (resultId: string) => sqlEditorManager.openEditorResult(editorId, resultId),
-    [editorId]
+    (resultId: string) => navigatorService.openEditorResult(tab.id, resultId),
+    []
   );
   const handleClose = useCallback(
-    (resultId: string) => sqlEditorManager.closeEditorResult(editorId, resultId),
-    [editorId]
+    (resultId: string) => navigatorService.closeEditorResult(tab.id, resultId),
+    []
   );
 
-  if (!handlerState?.resultTabs.length) {
+  if (!tab.handlerState.resultTabs.length) {
     return <TextPlaceholder>Execute query with Ctrl+Enter to see results</TextPlaceholder>;
   }
 
-  const currentId = handlerState.currentResultTabId || '';
+  const currentId = tab.handlerState.currentResultTabId || '';
 
   return styled(useStyles(styles))(
     <wrapper as="div">
       <TabsBox
         currentTabId={currentId}
-        tabs={handlerState?.resultTabs.map(result => (
+        tabs={tab.handlerState.resultTabs.map(result => (
           <Tab key={result.resultTabId} tabId={result.resultTabId} onOpen={handleOpen} onClose={handleClose}>
             <TabTitle title={result.name}/>
           </Tab>
         ))}
         style={[styles]}
       >
-        {handlerState?.resultTabs.map(result => (
+        {tab.handlerState.resultTabs.map(result => (
           <TabPanel key={result.resultTabId} tabId={result.resultTabId}>
             <SqlResultPanel panelInit={result.panelParams}/>
           </TabPanel>
         ))}
       </TabsBox>
       <Loader
-        loading={handlerState.sqlExecutionState.isSqlExecuting}
-        cancelDisabled={!handlerState.sqlExecutionState.canCancel}
-        onCancel={handlerState.sqlExecutionState.cancelSQlExecuting}
+        loading={tab.handlerState.sqlExecutionState.isSqlExecuting}
+        cancelDisabled={!tab.handlerState.sqlExecutionState.canCancel}
+        onCancel={tab.handlerState.sqlExecutionState.cancelSQlExecuting}
         overlay
       />
     </wrapper>

@@ -6,19 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropsWithChildren } from 'react';
+import { ObjectPagePanelProps } from '@dbeaver/object-viewer-plugin';
 
 import { TableViewer } from '../TableViewer/TableViewer';
 
+export const DataViewerPanel = function DataViewerPanel({
+  tab,
+}: ObjectPagePanelProps) {
 
-type DataViewerProps = PropsWithChildren<{
-  tabId: string;
-  handlerId: string;
-}>
-
-export const DataViewer = function DataViewer({
-  tabId,
-}: DataViewerProps) {
-
-  return <TableViewer tableId={tabId}/>;
+  return <TableViewer tableId={tab.handlerState.objectId}/>;
 };

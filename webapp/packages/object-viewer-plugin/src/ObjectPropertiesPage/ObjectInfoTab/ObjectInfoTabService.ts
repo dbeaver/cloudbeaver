@@ -7,7 +7,7 @@
  */
 
 import { TabEntity } from '@dbeaver/core/app';
-import { injectable } from '@dbeaver/core/src/di';
+import { injectable } from '@dbeaver/core/di';
 
 import { ObjectInfoTabModel } from './ObjectInfoTabModel';
 

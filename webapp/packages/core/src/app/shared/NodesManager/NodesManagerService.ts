@@ -7,53 +7,75 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { NotificationService } from '@dbeaver/core/eventsLog';
 import { DatabaseObjectInfo, GraphQLService } from '@dbeaver/core/sdk';
 
-import { IConnectionCatalogSchema } from '../../TopNavBar/ConnectionSchemaManager/IConnectionCatalogSchema';
 import { INavigator } from '../Navigation/INavigator';
 import { IContextProvider } from '../Navigation/NavigationContext';
 import { NavigationService } from '../Navigation/NavigationService';
-import { NavigationTabsService } from '../NavigationTabs/NavigationTabsService';
 import { ENodeFeature } from './ENodeFeature';
 import { EObjectFeature } from './EObjectFeature';
 import { NodesStore } from './NodesStore';
 import { DatabaseObjectInfoWithId, NodeChildren, NodeWithParent } from './NodeWithParent';
 
+export enum NavigationType {
+  open,
+  closeConnection
+}
+
+export interface INodeContainerInfo {
+  connectionId?: string;
+  catalogId?: string;
+  schemaId?: string;
+}
+
 export interface INodeNavigationContext {
+  type: NavigationType;
   nodeId: string;
-  childrenId: string;
+  folderId: string;
   name?: string;
   icon?: string;
 }
 
 export interface INodeNavigationData {
+  type: NavigationType;
   nodeId: string;
+  folderId?: string;
 }
 
 const ROOT_NODE_PATH = '/';
 
+// TODO: should be renamed to DBObjectManagerService
 @injectable()
 export class NodesManagerService {
   readonly navigator!: INavigator<INodeNavigationData>;
   private nodesStore = new NodesStore();
 
   constructor(private graphQLService: GraphQLService,
-              private navigationService: NavigationService,
-              private navigationTabsService: NavigationTabsService,
-              private notificationService: NotificationService) {
+              private navigationService: NavigationService) {
 
     this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
       data => data.nodeId,
       this.navigateHandler.bind(this),
       {
+        type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
       }
     );
   }
 
-  navToNode(nodeId: string) {
-    this.navigator.navigateTo({ nodeId });
+  async closeConnection(nodeId: string) {
+    await this.navigator.navigateTo({
+      type: NavigationType.closeConnection,
+      nodeId,
+    });
+  }
+
+  async navToNode(nodeId: string, folderId?: string) {
+    await this.navigator.navigateTo({
+      type: NavigationType.open,
+      nodeId,
+      folderId,
+    });
   }
 
   getDatabaseObjectInfo(nodeId: string): DatabaseObjectInfoWithId | undefined {
@@ -133,12 +155,21 @@ export class NodesManagerService {
   }
 
   async loadNodeInfo(nodeId: string): Promise<NodeWithParent> {
-    const node = this.nodesStore.getNode(nodeId);
+    let node = this.nodesStore.getNode(nodeId);
     if (node) {
+      if (node.parentId !== ROOT_NODE_PATH) {
+        await this.loadNodeInfo(node.parentId);
+      }
       return node;
     }
 
-    return this.updateNodeInfo(nodeId);
+    node = await this.updateNodeInfo(nodeId);
+
+    if (node.parentId !== ROOT_NODE_PATH) {
+      await this.loadNodeInfo(node.parentId);
+    }
+
+    return node;
   }
 
   async loadChildren(parentId = ROOT_NODE_PATH): Promise<string[]> {
@@ -179,11 +210,11 @@ export class NodesManagerService {
     return this.nodesStore.getNode(node.parentId);
   }
 
-  getConnectionCatalogSchema(nodeId: string): Partial<IConnectionCatalogSchema> {
-    const initial: Partial<IConnectionCatalogSchema> = {};
+  getNodeContainerInfo(nodeId: string): INodeContainerInfo {
+    const initial: INodeContainerInfo = {};
 
-    const scanParents = (res: Partial<IConnectionCatalogSchema>,
-                         nodeId?: string): Partial<IConnectionCatalogSchema> => {
+    const scanParents = (res: INodeContainerInfo,
+                         nodeId?: string): INodeContainerInfo => {
       if (!nodeId) {
         return res;
       }
@@ -194,11 +225,11 @@ export class NodesManagerService {
       if (node?.object?.features?.includes(EObjectFeature.dataSource)) {
         res.connectionId = node.id;
       }
-      if (node?.object?.features?.includes(EObjectFeature.schema)) {
-        res.schemaId = node.name || null; // note that schemaId is node name
-      }
       if (node?.object?.features?.includes(EObjectFeature.catalog)) {
-        res.catalogId = node.name || null; // note that catalogId is node name
+        res.catalogId = node.name; // note that catalogId is node name
+      }
+      if (node?.object?.features?.includes(EObjectFeature.schema)) {
+        res.schemaId = node.name; // note that schemaId is node name
       }
       return scanParents(res, node.parentId);
     };
@@ -215,41 +246,40 @@ export class NodesManagerService {
     data: INodeNavigationData
   ): Promise<INodeNavigationContext> => {
     let nodeId = data.nodeId;
-    let childrenId = '';
-    const node = await this.loadNodeInfo(nodeId);
-    let name = node.name;
-    let icon = node.icon;
+    let folderId = '';
+    let name: string | undefined;
+    let icon: string | undefined;
 
-    if (node.folder) {
-      const parent = await this.loadNodeInfo(node.parentId);
-      childrenId = nodeId;
-      if (parent && !parent.folder) {
-        nodeId = parent.id;
-        name = parent.name;
-        icon = parent.icon;
+    if (isDatabaseObject(nodeId) && data.type !== NavigationType.closeConnection) {
+      const node = await this.loadNodeInfo(nodeId);
+      name = node.name;
+      icon = node.icon;
+
+      if (node.folder) {
+        const parent = await this.loadNodeInfo(node.parentId);
+        folderId = nodeId;
+        if (parent && !parent.folder) {
+          nodeId = parent.id;
+          name = parent.name;
+          icon = parent.icon;
+        }
+      }
+
+      if (data.folderId) {
+        folderId = data.folderId;
       }
     }
 
     return {
+      type: data.type,
       nodeId,
-      childrenId,
+      folderId,
       name,
       icon,
     };
   }
 
   async navigateHandler(contexts: IContextProvider<INodeNavigationData>) {
-    try {
-      const nodeInfo = await contexts.getContext(this.navigationNodeContext);
-      const tab = this.navigationTabsService.getTab(nodeInfo.nodeId);
-
-      if (tab) {
-        tab.name = nodeInfo.name;
-        tab.icon = nodeInfo.icon;
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t perform action with database object');
-    }
   }
 
   isNodeHasData(info?: string | DatabaseObjectInfo) {
@@ -264,5 +294,12 @@ export class NodesManagerService {
     return info.features.includes(ENodeFeature.dataContainer)
       || info.features.includes(ENodeFeature.container);
   }
+}
 
+export function isDatabaseObject(objectId: string) {
+  return /^database:\/\//.test(objectId);
+}
+
+export function concatSchemaAndCatalog(catalogId?: string, schemaId?: string) {
+  return `${schemaId || ''}${schemaId && catalogId ? '@' : ''}${catalogId || ''}`;
 }

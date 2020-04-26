@@ -6,42 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import {
-  splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles,
-} from '@dbeaver/core/blocks';
+import { TabHandlerTabProps, ConnectionsManagerService } from '@dbeaver/core/app';
+import { TabIcon, Tab, TabTitle } from '@dbeaver/core/blocks';
+import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
-import { SqlEditor } from './SqlEditor';
-import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
+import { ISqlEditorTabState } from './ISqlEditorTabState';
 
+export function SqlEditorTab({
+  tab, handler, onSelect, onClose, style,
+}: TabHandlerTabProps<ISqlEditorTabState>) {
+  const connectionsManagerService = useService(ConnectionsManagerService);
+  const connection = connectionsManagerService.getConnectionById(tab.handlerState.connectionId);
+  const name = `sql-${tab.handlerState.order}${connection ? ` (${connection.name})` : ''}`;
 
-const viewerStyles = css`
-  Pane {
-    composes: theme-typography--body2 from global;
-    display: flex;
-  }
-  SqlEditor {
-    composes: theme-typography--body1 from global;
-  }
-`;
-
-type SqlEditorTabProps = {
-  tabId: string;
-  handlerId: string;
-}
-
-export function SqlEditorTab({ tabId }: SqlEditorTabProps) {
-  return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
-    <Split split="horizontal" sticky={30}>
-      <Pane>
-        <SqlEditor tabId={tabId}/>
-      </Pane>
-      <ResizerControls />
-      <Pane main={true}>
-        <SqlResultTabs tabId={tabId}/>
-      </Pane>
-    </Split>
+  return styled(useStyles(...style))(
+    <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >
+      <TabIcon icon='/icons/sql_script.png' />
+      <TabTitle title={name} />
+    </Tab>
   );
 }
