@@ -20,7 +20,6 @@ export const agGridStyles: ThemeSelector = async (theme) => {
       styles = await import('./themes/light.scss');
       break;
   }
-  console.log(baseStyles.default, styles.default);
 
   return [baseStyles.default, styles.default];
 };
