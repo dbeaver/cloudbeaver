@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/extensions",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/extensions",
+  "module": "../dist/extensions",
+  "types": "../dist/types/extensions"
+}
