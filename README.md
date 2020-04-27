@@ -16,7 +16,7 @@ It can run on Linux, Windows and MacOS X.
 
 [Detailed instructions](https://github.com/dbeaver/cloudbeaver/wiki/Build-and-deploy)
 
-## Test server
+## Demo server
 
 You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io  
 
