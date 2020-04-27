@@ -1,0 +1,8 @@
+query connectionState($id: ID!) {
+  connection: connectionState(id: $id) {
+    id
+    name
+    driverId
+    connected
+  }
+}

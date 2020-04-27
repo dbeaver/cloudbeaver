@@ -12,9 +12,9 @@ import styled, { css } from 'reshadow';
 import {
   Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles,
 } from '@dbeaver/core/blocks';
+import { useController } from '@dbeaver/core/di';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
-import { useController } from '../di';
 import { NavigationTabsBar } from './shared/NavigationTabs/NavigationTabsBar';
 import { LogViewTab } from './shared/ToolsPanel/LogViewTab/LogViewTab';
 import { LogViewTabController } from './shared/ToolsPanel/LogViewTab/LogViewTabController';

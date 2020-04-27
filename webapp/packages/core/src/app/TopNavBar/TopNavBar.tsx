@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { Icon } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
-import { SessionService } from '@dbeaver/core/root';
+import { ServerService } from '@dbeaver/core/root';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
@@ -23,8 +23,8 @@ import { topNavBarStyles } from './topNavBarStyles';
 declare const version: string; // declared in webpack DefinePlugin // todo move to enviroment?
 
 export const TopNavBar = observer(function TopNavBar() {
-  const sessionService = useService(SessionService);
-  const title = `Frontend: ${version}\nBackend: ${sessionService.version}`;
+  const serverService = useService(ServerService);
+  const title = `Frontend: ${version}\nBackend: ${serverService.config.data?.version}`;
 
   return styled(useStyles(topNavBarStyles))(
     <header>

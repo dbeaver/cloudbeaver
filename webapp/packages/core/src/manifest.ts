@@ -14,13 +14,19 @@ import {
   SettingsMenuService, LogViewerService, LogViewerMenuService,
 } from '@dbeaver/core/app';
 import { PluginManifest } from '@dbeaver/core/di';
-import { CommonDialogService, ContextMenuService } from '@dbeaver/core/dialogs';
+import { CommonDialogService, ContextMenuService, SessionExpireService } from '@dbeaver/core/dialogs';
 import { NotificationService, ExceptionsCatcherService } from '@dbeaver/core/eventsLog';
 import { LocalizationService } from '@dbeaver/core/localization';
-import { SessionService } from '@dbeaver/core/root';
+import { PluginManagerService } from '@dbeaver/core/plugin';
+import { ProductManagerService, ProductSettingsService } from '@dbeaver/core/product';
+import {
+  SessionService, ServerService, SessionSettingsService, ServerSettingsService
+} from '@dbeaver/core/root';
 import { EnvironmentService, GraphQLService } from '@dbeaver/core/sdk';
 import { LocalStorageSaveService, SettingsService } from '@dbeaver/core/settings';
 import { ThemeService } from '@dbeaver/core/theming';
+
+import { CoreSettingsService } from './CoreSettingsService';
 
 export const coreManifest: PluginManifest = {
   info: {
@@ -29,7 +35,14 @@ export const coreManifest: PluginManifest = {
   depends: [],
 
   providers: [
+    ProductSettingsService,
+    ProductManagerService,
+    PluginManagerService,
+    ServerSettingsService,
+    SessionSettingsService,
+    CoreSettingsService,
     CommonDialogService,
+    SessionExpireService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,
     ConnectionsManagerService,
@@ -52,6 +65,7 @@ export const coreManifest: PluginManifest = {
     SettingsMenuService,
     SettingsService,
     ThemeService,
+    ServerService,
   ],
 
   async initialize(services) {

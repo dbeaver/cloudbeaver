@@ -11,9 +11,11 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@dbeaver/core/blocks';
-import { CommonDialogWrapper, DialogComponent } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
+
+import { DialogComponent } from '../CommonDialog/CommonDialogService';
+import { CommonDialogWrapper } from '../CommonDialog/CommonDialogWrapper';
 
 const styles = css`
   dialog-content {

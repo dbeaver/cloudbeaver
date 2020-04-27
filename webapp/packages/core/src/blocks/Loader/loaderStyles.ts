@@ -8,7 +8,7 @@
 
 import { css } from 'reshadow';
 
-import { composes } from '../../theming/themeUtils';
+import { composes } from '@dbeaver/core/theming';
 
 export const loaderStyles = css`
   loader {

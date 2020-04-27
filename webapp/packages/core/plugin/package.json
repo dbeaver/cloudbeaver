@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/plugin",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/plugin",
+  "module": "../dist/plugin",
+  "types": "../dist/types/plugin"
+}

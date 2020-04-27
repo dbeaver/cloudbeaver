@@ -14,6 +14,7 @@ import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GraphQLService, ServerLanguage } from '@dbeaver/core/sdk';
 import { SettingsService } from '@dbeaver/core/settings';
 
+import { SessionService, ServerService } from '../root';
 import { Locale } from './Locale';
 import { TLocalizationToken } from './TLocalizationToken';
 
@@ -37,6 +38,8 @@ export class LocalizationService {
   private localeMap: Map<string, Locale> = new Map();
 
   constructor(private notificationService: NotificationService,
+              private sessionService: SessionService,
+              private serverService: ServerService,
               private graphQLService: GraphQLService,
               private settingsService: SettingsService) {
 
@@ -78,13 +81,19 @@ export class LocalizationService {
     return locale && locale[token];
   }
 
-  async init(sessionLanguage: string | undefined, supportedLanguages: ServerLanguageShort[]) {
-    this.supportedLanguages = supportedLanguages;
+  async init() {
+    const session = await this.sessionService.session.load();
+    const config = await this.serverService.config.load();
+
+    if (!session || !config) {
+      return;
+    }
+
+    this.supportedLanguages = config.supportedLanguages;
 
     this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
-    if (sessionLanguage) {
-      this.setCurrentLocale(sessionLanguage); // session language wins
-    }
+    this.setCurrentLocale(session.locale); // session language wins
+
     await this.setLocale(this.getCurrentLanguage());
   }
 

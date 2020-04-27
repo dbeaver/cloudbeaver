@@ -10,13 +10,12 @@ import { computed, observable } from 'mobx';
 import { Subject } from 'rxjs';
 
 import { injectable } from '@dbeaver/core/di';
-import { ConnectionShortInfo, SessionService } from '@dbeaver/core/root';
+import { SessionService } from '@dbeaver/core/root';
 import {
   ConnectionInfo,
   DataSourceInfo,
   DriverInfo,
   GraphQLService,
-  NavGetStructContainersQuery,
   CachedResource,
   DatabaseObjectInfo,
 } from '@dbeaver/core/sdk';
@@ -118,9 +117,16 @@ export class ConnectionsManagerService {
   }
 
   async restoreConnections() {
-    for (const connection of this.sessionService.getConnections()) {
-      this.restoreConnection(connection);
+    const config = await this.sessionService.session.load();
+    if (!config) {
+      return;
     }
+
+    // TODO: connections must be string[]
+    for (const connection of config.connections) {
+      await this.restoreConnection(connection);
+    }
+    await this.nodesManagerService.updateRootChildren();
   }
 
   private async refreshObjectContainersAsync(
@@ -130,7 +136,10 @@ export class ConnectionsManagerService {
     catalogId?: string,
   ): Promise<Map<string, ObjectContainer[]>> {
     if (refresh || !data.has(connectionId)) {
-      const { navGetStructContainers } = await this.loadSchemasAndCatalogs(connectionId, catalogId);
+      const { navGetStructContainers } = await this.graphQLService.gql.navGetStructContainers({
+        connectionId,
+        catalogId,
+      });
       data.set(connectionId, [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList]);
     }
 
@@ -149,18 +158,10 @@ export class ConnectionsManagerService {
     return data;
   }
 
-  /**
-   * Note that this request returns either schemaList or catalogList. You never got both lists together
-   */
-  private async loadSchemasAndCatalogs(connectionId: string, catalogId?: string): Promise<NavGetStructContainersQuery> {
-    return this.graphQLService.gql.navGetStructContainers({ connectionId, catalogId });
-  }
+  private async restoreConnection(connection: Connection) {
+    // TODO: Must be loaded based on connection id
+    // const { connection } = await this.graphQLService.gql.connectionState({ id });
 
-  private restoreConnection(connectionInfo: ConnectionShortInfo) {
-    const connection: Connection = {
-      ...connectionInfo,
-      connected: true,
-    };
     this.connectionsMap.set(connection.id, connection);
     this.onOpenConnection.next(connection);
   }

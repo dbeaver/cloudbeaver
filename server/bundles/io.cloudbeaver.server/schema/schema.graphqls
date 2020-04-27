@@ -55,14 +55,14 @@ type WebServiceConfig {
 }
 
 type ServerConfig {
-    name: String
-    version: String
+    name: String!
+    version: String!
     supportsPredefinedConnections: Boolean
     supportsProvidedConnections: Boolean
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
-    supportedLanguages: [ ServerLanguage ]
+    supportedLanguages: [ ServerLanguage ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
 }
@@ -70,12 +70,12 @@ type ServerConfig {
 type SessionInfo {
     id: ID!
 
-    createTime: String
-    lastAccessTime: String
-    locale: String
+    createTime: String!
+    lastAccessTime: String!
+    locale: String!
 
     serverMessages: [ ServerMessage ]
-    connections: [ ConnectionInfo ]
+    connections: [ ConnectionInfo ]!
 }
 
 ####################################################

@@ -11,15 +11,10 @@ import { action, observable } from 'mobx';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GraphQLService } from '@dbeaver/core/sdk';
-import { SettingsService } from '@dbeaver/core/settings';
 import { uuid } from '@dbeaver/core/utils';
 
+import { CoreSettingsService } from '../../../../CoreSettingsService';
 import { ILogEntry } from './ILogEntry';
-
-const REFRESH_INTERVAL = 3000;
-const REFRESH_INTERVAL_TOKEN = 'core.app.logViewer.refreshInterval';
-const MAX_LOG_ENTRIES = 1000;
-const MAX_LOG_ENTRIES_TOKEN = 'core.app.logViewer.maxLogEntries';
 
 @injectable()
 export class LogViewerService {
@@ -28,11 +23,9 @@ export class LogViewerService {
 
   @observable private log: ILogEntry[] = [];
   private interval: any = null;
-  private refreshInterval = this.settingsService.getProperty(REFRESH_INTERVAL_TOKEN, REFRESH_INTERVAL);
-  private maxLogEntries = this.settingsService.getProperty(MAX_LOG_ENTRIES_TOKEN, MAX_LOG_ENTRIES);
 
   constructor(private graphQLService: GraphQLService,
-              private settingsService: SettingsService,
+              private coreSettingsService: CoreSettingsService,
               private notificationService: NotificationService) {
   }
 
@@ -55,9 +48,10 @@ export class LogViewerService {
       return;
     }
     await this.updateLog();
+    const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshInterval');
     this.interval = setInterval(() => {
       this.updateLog();
-    }, this.refreshInterval);
+    }, refreshInterval);
   }
 
   stopLog() {
@@ -84,14 +78,16 @@ export class LogViewerService {
   @action
   addNewEntries(entries: ILogEntry[]) {
     this.log.unshift(...entries.reverse());
-    if (this.log.length > this.maxLogEntries) {
-      this.log.splice(this.maxLogEntries, this.log.length - this.maxLogEntries);
+    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
+    if (this.log.length > maxLogEntries) {
+      this.log.splice(maxLogEntries, this.log.length - maxLogEntries);
     }
   }
 
   async loadLog(): Promise<ILogEntry[]> {
+    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
     const { log } = await this.graphQLService.gql.readSessionLog({
-      maxEntries: this.maxLogEntries,
+      maxEntries: maxLogEntries,
       clearEntries: true,
     });
     const entries: ILogEntry[] = (log || []).map(item => ({

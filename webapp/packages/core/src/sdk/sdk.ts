@@ -24,6 +24,11 @@ export type AsyncTaskInfo = {
   status?: Maybe<Scalars["String"]>;
   error?: Maybe<ServerError>;
   result?: Maybe<SqlExecuteInfo>;
+  /**
+   * Task result.
+   * Can be some kind of identifier to obtain real result using another API function
+   */
+  taskResult?: Maybe<Scalars["Object"]>;
 };
 
 export type AsyncTaskResult = SqlExecuteInfo;
@@ -411,14 +416,14 @@ export type QueryMetadataGetNodeDdlArgs = {
 };
 
 export type ServerConfig = {
-  name?: Maybe<Scalars["String"]>;
-  version?: Maybe<Scalars["String"]>;
+  name: Scalars["String"];
+  version: Scalars["String"];
   supportsPredefinedConnections?: Maybe<Scalars["Boolean"]>;
   supportsProvidedConnections?: Maybe<Scalars["Boolean"]>;
   supportsCustomConnections?: Maybe<Scalars["Boolean"]>;
   supportsConnectionBrowser?: Maybe<Scalars["Boolean"]>;
   supportsWorkspaces?: Maybe<Scalars["Boolean"]>;
-  supportedLanguages?: Maybe<Array<Maybe<ServerLanguage>>>;
+  supportedLanguages: Array<Maybe<ServerLanguage>>;
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
   productConfiguration: Scalars["Object"];
 };
@@ -443,11 +448,11 @@ export type ServerMessage = {
 
 export type SessionInfo = {
   id: Scalars["ID"];
-  createTime?: Maybe<Scalars["String"]>;
-  lastAccessTime?: Maybe<Scalars["String"]>;
-  locale?: Maybe<Scalars["String"]>;
+  createTime: Scalars["String"];
+  lastAccessTime: Scalars["String"];
+  locale: Scalars["String"];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
-  connections?: Maybe<Array<Maybe<ConnectionInfo>>>;
+  connections: Array<Maybe<ConnectionInfo>>;
 };
 
 export type SqlCompletionProposal = {
@@ -561,6 +566,16 @@ export type CloseConnectionMutationVariables = {
 };
 
 export type CloseConnectionMutation = Pick<Mutation, "closeConnection">;
+
+export type ConnectionStateQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type ConnectionStateQuery = {
+  connection: Maybe<
+    Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">
+  >;
+};
 
 export type CreateConnectionMutationVariables = {
   config: ConnectionConfig;
@@ -1094,9 +1109,9 @@ export type OpenSessionMutationVariables = {};
 
 export type OpenSessionMutation = {
   session: Maybe<
-    Pick<SessionInfo, "locale"> & {
-      connections: Maybe<
-        Array<Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId">>>
+    Pick<SessionInfo, "id" | "createTime" | "lastAccessTime" | "locale"> & {
+      connections: Array<
+        Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
       >;
     }
   >;
@@ -1106,9 +1121,19 @@ export type ServerConfigQueryVariables = {};
 
 export type ServerConfigQuery = {
   serverConfig: Maybe<
-    Pick<ServerConfig, "name" | "version"> & {
-      supportedLanguages: Maybe<
-        Array<Maybe<Pick<ServerLanguage, "isoCode" | "nativeName">>>
+    Pick<
+      ServerConfig,
+      | "name"
+      | "version"
+      | "productConfiguration"
+      | "supportsPredefinedConnections"
+      | "supportsProvidedConnections"
+      | "supportsCustomConnections"
+      | "supportsConnectionBrowser"
+      | "supportsWorkspaces"
+    > & {
+      supportedLanguages: Array<
+        Maybe<Pick<ServerLanguage, "isoCode" | "displayName" | "nativeName">>
       >;
     }
   >;
@@ -1118,9 +1143,9 @@ export type SessionStateQueryVariables = {};
 
 export type SessionStateQuery = {
   sessionState: Maybe<
-    Pick<SessionInfo, "locale"> & {
-      connections: Maybe<
-        Array<Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId">>>
+    Pick<SessionInfo, "id" | "createTime" | "lastAccessTime" | "locale"> & {
+      connections: Array<
+        Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
       >;
     }
   >;
@@ -1151,6 +1176,16 @@ export const NavGetStructContainersDocument = gql`
 export const CloseConnectionDocument = gql`
   mutation closeConnection($id: ID!) {
     closeConnection(id: $id)
+  }
+`;
+export const ConnectionStateDocument = gql`
+  query connectionState($id: ID!) {
+    connection: connectionState(id: $id) {
+      id
+      name
+      driverId
+      connected
+    }
   }
 `;
 export const CreateConnectionDocument = gql`
@@ -1618,12 +1653,16 @@ export const UpdateResultsDataDocument = gql`
 export const OpenSessionDocument = gql`
   mutation openSession {
     session: openSession {
+      id
+      createTime
+      lastAccessTime
+      locale
       connections {
         id
         name
         driverId
+        connected
       }
-      locale
     }
   }
 `;
@@ -1632,22 +1671,34 @@ export const ServerConfigDocument = gql`
     serverConfig {
       name
       version
+      productConfiguration
+      supportsPredefinedConnections
+      supportsProvidedConnections
+      supportsCustomConnections
+      supportsConnectionBrowser
+      supportsWorkspaces
       supportedLanguages {
         isoCode
+        displayName
         nativeName
       }
+      productConfiguration
     }
   }
 `;
 export const SessionStateDocument = gql`
   query sessionState {
     sessionState {
+      id
+      createTime
+      lastAccessTime
+      locale
       connections {
         id
         name
         driverId
+        connected
       }
-      locale
     }
   }
 `;
@@ -1671,6 +1722,14 @@ export function getSdk(client: GraphQLClient) {
     ): Promise<CloseConnectionMutation> {
       return client.request<CloseConnectionMutation>(
         print(CloseConnectionDocument),
+        variables,
+      );
+    },
+    connectionState(
+      variables: ConnectionStateQueryVariables,
+    ): Promise<ConnectionStateQuery> {
+      return client.request<ConnectionStateQuery>(
+        print(ConnectionStateDocument),
         variables,
       );
     },

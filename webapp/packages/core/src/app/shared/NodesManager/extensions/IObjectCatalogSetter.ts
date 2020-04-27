@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createExtension, isExtension, IExtension } from '../../../../extensions';
+import { createExtension, isExtension, IExtension } from '@dbeaver/core/extensions';
 
 const objectCatalogSetterSymbol = Symbol('@extension/ObjectCatalogSetter');
 
