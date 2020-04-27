@@ -2,9 +2,17 @@ query serverConfig {
   serverConfig {
     name
     version
+    productConfiguration
+    supportsPredefinedConnections
+    supportsProvidedConnections
+    supportsCustomConnections
+    supportsConnectionBrowser
+    supportsWorkspaces
     supportedLanguages {
       isoCode
+      displayName
       nativeName
     }
+    productConfiguration
   }
 }

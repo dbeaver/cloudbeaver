@@ -1,10 +1,14 @@
 mutation openSession {
   session: openSession {
+    id
+    createTime
+    lastAccessTime
+    locale
     connections {
       id
-      name,
+      name
       driverId
+      connected
     }
-    locale
   }
 }

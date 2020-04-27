@@ -14,8 +14,10 @@ import {
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ExceptionsCatcherService } from '@dbeaver/core/eventsLog';
-import { SessionService } from '@dbeaver/core/root';
 import { ThemeService } from '@dbeaver/core/theming';
+
+import { SessionExpireService } from './dialogs';
+import { LocalizationService } from './localization';
 
 /**
  * AppBootstrap.init() will be executed between first and second phase of App initialization,
@@ -27,11 +29,12 @@ import { ThemeService } from '@dbeaver/core/theming';
 export class AppBootstrap {
 
   constructor(private exceptionsCatcherService: ExceptionsCatcherService,
-              private sessionService: SessionService,
+              private localizationService: LocalizationService,
               private themeService: ThemeService,
               private connectionDialogService: ConnectionDialogsService,
               private connectionsManager: ConnectionsManagerService,
               private logViewerMenuService: LogViewerMenuService,
+              private sessionExpireService: SessionExpireService,
               private navigationTreeContextMenuService: NavigationTreeContextMenuService,
               private nodesManagerService: NodesManagerService,
               private navigationTabsService: NavigationTabsService,
@@ -40,8 +43,9 @@ export class AppBootstrap {
 
   async init() {
     this.exceptionsCatcherService.subscribe();
+    this.sessionExpireService.subscribe();
 
-    await this.sessionService.init();
+    await this.localizationService.init();
     await this.themeService.init();
 
     this.connectionSchemaManagerService.registerCallbacks();
