@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExtension } from '../../../extensions';
-import { Style } from '../../../theming';
+import { IExtension } from '@dbeaver/core/extensions';
+import { Style } from '@dbeaver/core/theming';
+
 import { ITab } from './ITab';
 
 export type TabHandlerTabProps<T = any> = {

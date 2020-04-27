@@ -10,10 +10,9 @@ import { Subject } from 'rxjs';
 
 import { injectable } from '@dbeaver/core/di';
 import {
-  GQLError, GraphQLService,
+  GQLError, GraphQLService, EServerErrorCode
 } from '@dbeaver/core/sdk';
 
-import { EServerErrorCode } from '../../sdk/EServerErrorCode';
 import { CommonDialogService } from '../CommonDialog/CommonDialogService';
 import { SessionExpiredDialog } from './SessionExpiredDialog';
 

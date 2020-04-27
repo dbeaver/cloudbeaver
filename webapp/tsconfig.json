@@ -16,7 +16,10 @@
       "@dbeaver/core/sdk": ["packages/core/src/sdk"],
       "@dbeaver/core/settings": ["packages/core/src/settings"],
       "@dbeaver/core/theming": ["packages/core/src/theming"],
-      "@dbeaver/core/utils": ["packages/core/src/utils"]
+      "@dbeaver/core/utils": ["packages/core/src/utils"],
+      "@dbeaver/core/extensions": ["packages/core/src/extensions"],
+      "@dbeaver/core/plugin": ["packages/core/src/plugin"],
+      "@dbeaver/core/product": ["packages/core/src/product"]
     }
   }
 }

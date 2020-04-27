@@ -9,8 +9,7 @@
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
 import { TLocalizationToken } from '@dbeaver/core/localization';
-
-import { Style } from '../../theming/useStyles';
+import { Style } from '@dbeaver/core/theming';
 
 export type MenuMod = 'primary' | 'surface' | 'secondary';
 

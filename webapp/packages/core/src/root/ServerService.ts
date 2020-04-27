@@ -8,12 +8,21 @@
 
 import { injectable } from '@dbeaver/core/di';
 import { GraphQLService, ServerConfig, CachedResource } from '@dbeaver/core/sdk';
+import { parseJSONFlat } from '@dbeaver/core/utils';
+
+import { ServerSettingsService } from './ServerSettingsService';
+import { SessionService } from './SessionService';
 
 @injectable()
 export class ServerService {
-  config = new CachedResource(undefined, this.refreshConfigAsync.bind(this));
+  readonly config = new CachedResource(undefined, this.refreshConfigAsync.bind(this));
+  readonly settings = new ServerSettingsService(this.sessionService.settings);
 
-  constructor(private graphQLService: GraphQLService) {
+  private lastConfig: any = null
+  constructor(
+    private graphQLService: GraphQLService,
+    private sessionService: SessionService,
+  ) {
   }
 
   private async refreshConfigAsync(data: ServerConfig | undefined): Promise<ServerConfig> {
@@ -23,6 +32,15 @@ export class ServerService {
 
     const { serverConfig } = await this.graphQLService.gql.serverConfig();
 
+    if (serverConfig.productConfiguration !== this.lastConfig) {
+      this.lastConfig = serverConfig.productConfiguration;
+      this.settings.clear();
+      parseJSONFlat(
+        serverConfig.productConfiguration,
+        this.settings.setSelfValue.bind(this.settings),
+        undefined
+      );
+    }
     return serverConfig;
   }
 }

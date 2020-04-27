@@ -11,6 +11,7 @@ import {
   ConnectionInfo, GraphQLService, SessionInfo, CachedResource,
 } from '@dbeaver/core/sdk';
 
+import { SessionSettingsService } from './SessionSettingsService';
 
 export type SessionState = Pick<SessionInfo, 'id' | 'createTime' | 'lastAccessTime' | 'locale'> & {
   connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId'>>;
@@ -18,7 +19,8 @@ export type SessionState = Pick<SessionInfo, 'id' | 'createTime' | 'lastAccessTi
 
 @injectable()
 export class SessionService {
-  session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this));
+  readonly session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this));
+  readonly settings = new SessionSettingsService('session_settings');
 
   constructor(private graphQLService: GraphQLService) {}
 

@@ -46,6 +46,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       "@dbeaver/core/settings": path.resolve(__dirname, "../../../core/src/settings"),
       "@dbeaver/core/theming": path.resolve(__dirname, "../../../core/src/theming"),
       "@dbeaver/core/utils": path.resolve(__dirname, "../../../core/src/utils"),
+      "@dbeaver/core/extensions": path.resolve(__dirname, "../../../core/src/extensions"),
+      "@dbeaver/core/product": path.resolve(__dirname, "../../../core/src/product"),
+      "@dbeaver/core/plugin": path.resolve(__dirname, "../../../core/src/plugin"),
 
       // rewrite imports for unnecessary work in `web/src/libs/sdk.ts`
       'graphql-tag': path.join(__dirname, '../../fix-gql.js'),

@@ -8,7 +8,7 @@
 
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '../theming';
+import { useStyles } from '@dbeaver/core/theming';
 
 const styles = css`
   label {

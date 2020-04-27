@@ -14,6 +14,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         dialogs: "./dialogs/index.ts",
         eventsLog: "./eventsLog/index.ts",
         localization: "./localization/index.ts",
+        extensions: "./extensions/index.ts",
+        plugin: "./plugin/index.ts",
+        product: "./product/index.ts",
         // queries dir - ignore
         root: "./root/index.ts",
         sdk: "./sdk/index.ts",

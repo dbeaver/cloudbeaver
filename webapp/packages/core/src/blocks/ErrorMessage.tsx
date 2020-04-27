@@ -9,8 +9,9 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { useTranslate } from '../localization';
-import { useStyles, composes } from '../theming';
+import { useTranslate } from '@dbeaver/core/localization';
+import { useStyles, composes } from '@dbeaver/core/theming';
+
 import { Button } from './Button';
 
 
