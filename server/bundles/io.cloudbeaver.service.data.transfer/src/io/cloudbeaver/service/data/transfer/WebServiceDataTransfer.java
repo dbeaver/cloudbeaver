@@ -19,11 +19,7 @@ package io.cloudbeaver.service.data.transfer;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.api.DBWModel;
-import io.cloudbeaver.api.DBWServiceGraphQL;
-import io.cloudbeaver.api.DBWServiceServlet;
-import io.cloudbeaver.api.DBWUtils;
+import io.cloudbeaver.api.*;
 import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.server.model.session.WebSession;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -32,7 +28,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 /**
  * Web service implementation
  */
-public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServlet {
+public class WebServiceDataTransfer extends WebServiceBase implements DBWServiceServlet {
 
     private static final String DT_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
 
@@ -45,7 +41,7 @@ public class WebServiceDataTransfer implements DBWServiceGraphQL, DBWServiceServ
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return WebServiceUtils.loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
+        return loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
     }
 
     @Override

@@ -8,16 +8,6 @@ Bundle-Release-Date: 20200504
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.expressions,
- org.apache.commons.logging,
- org.eclipse.core.commands,
- org.eclipse.core.resources,
- io.cloudbeaver.server,
- com.google.gson,
- javax.servlet,
- org.jkiss.bundle.graphql.java,
- org.jkiss.dbeaver.model,
- org.jkiss.dbeaver.model.sql
+Require-Bundle: io.cloudbeaver.server
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.metadata

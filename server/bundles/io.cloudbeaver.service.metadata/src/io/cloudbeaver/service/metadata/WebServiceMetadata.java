@@ -18,10 +18,9 @@ package io.cloudbeaver.service.metadata;
 
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.api.DBWModel;
-import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.api.DBWUtils;
+import io.cloudbeaver.api.WebServiceBase;
 import io.cloudbeaver.server.model.WebNavigatorNodeInfo;
 import io.cloudbeaver.server.model.session.WebSession;
 import org.jkiss.dbeaver.model.DBPScriptObject;
@@ -35,13 +34,13 @@ import java.util.Map;
 /**
  * Web service implementation
  */
-public class WebServiceMetadata implements DBWServiceGraphQL {
+public class WebServiceMetadata extends WebServiceBase {
 
-    private static final String METADATA_SCHEMA_FILE_NAME = "schema/service.metadata.graphqls";
+    private static final String SCHEMA_FILE_NAME = "schema/service.metadata.graphqls";
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return WebServiceUtils.loadSchemaDefinition(getClass(), METADATA_SCHEMA_FILE_NAME);
+        return loadSchemaDefinition(getClass(), SCHEMA_FILE_NAME);
     }
 
     @Override

@@ -412,6 +412,9 @@ type Query {
     # Returns session state ( initialize if not )
     sessionState: SessionInfo
 
+    # Session permissions
+    sessionPermissions: [ID]!
+
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]
 

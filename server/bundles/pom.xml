@@ -14,6 +14,8 @@
 
     <modules>
         <module>io.cloudbeaver.server</module>
+        <module>io.cloudbeaver.service.admin</module>
+        <module>io.cloudbeaver.service.auth</module>
         <module>io.cloudbeaver.service.metadata</module>
         <module>io.cloudbeaver.service.data.transfer</module>
 

@@ -1,0 +1,41 @@
+type AuthCredentialInfo {
+    id: ID!
+    label: String!
+    description: String
+    protected: Boolean
+    editable: Boolean
+    possibleValues: [String]!
+    order: Int
+}
+
+type AuthModelInfo {
+    id: ID!
+    label: String!
+    icon: ID
+    description: String
+
+    isDefault: Boolean
+
+    crdentialsInfo: [AuthCredentialInfo]!
+}
+
+type UserAuthInfo {
+    userName: String!
+
+    loginTime: DateTime
+
+    # Optional login message
+    message: String
+}
+
+extend type Query {
+
+    authLogin(model: ID!, credentials: Object!): UserAuthInfo
+
+    authLogout: Boolean
+
+    sessionUser: UserAuthInfo
+
+    authModels: [AuthModelInfo]!
+
+}
