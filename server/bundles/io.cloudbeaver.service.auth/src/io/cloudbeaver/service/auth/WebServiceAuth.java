@@ -14,39 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.metadata;
+package io.cloudbeaver.service.auth;
 
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.api.DBWModel;
 import io.cloudbeaver.api.DBWServiceGraphQL;
-import io.cloudbeaver.api.DBWUtils;
-import io.cloudbeaver.server.model.WebNavigatorNodeInfo;
-import io.cloudbeaver.server.model.session.WebSession;
-import org.jkiss.dbeaver.model.DBPScriptObject;
-import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import io.cloudbeaver.api.WebServiceBase;
 
 /**
  * Web service implementation
  */
-public class WebServiceAuth implements DBWServiceGraphQL {
+public class WebServiceAuth extends WebServiceBase {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.auth.graphqls";
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return WebServiceUtils.loadSchemaDefinition(getClass(), SCHEMA_FILE_NAME);
+        return loadSchemaDefinition(getClass(), SCHEMA_FILE_NAME);
     }
 
     @Override
     public void bindWiring(DBWModel model) throws DBWebException {
-        model.getQueryType().dataFetcher("login", env -> {
+        model.getQueryType().dataFetcher("authLogin", env -> {
+            Object context = env.getContext();
             throw new DBWebException("Not implemented");
         });
 

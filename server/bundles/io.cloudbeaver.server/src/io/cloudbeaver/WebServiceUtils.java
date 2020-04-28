@@ -80,17 +80,4 @@ public class WebServiceUtils {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
 
-    public static TypeDefinitionRegistry loadSchemaDefinition(Class theClass, String schemaPath) throws DBWebException {
-        try (InputStream schemaStream = theClass.getClassLoader().getResourceAsStream(schemaPath)) {
-            if (schemaStream == null) {
-                throw new IOException("Schema file '" + schemaPath + "' not found");
-            }
-            try (Reader schemaReader = new InputStreamReader(schemaStream)) {
-                return new SchemaParser().parse(schemaReader);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading core schema", e);
-        }
-    }
-
 }

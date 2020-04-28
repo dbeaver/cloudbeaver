@@ -9,11 +9,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.WebPlatformActivator
 Bundle-ClassPath: .
-Require-Bundle: org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.expressions,
- org.apache.commons.logging,
- org.eclipse.core.commands,
- org.eclipse.core.resources,
+ org.eclipse.core.resources;visibility:=reexport,
  org.apache.commons.jexl,
  org.jkiss.utils;visibility:=reexport,
  org.jkiss.dbeaver.model;visibility:=reexport,

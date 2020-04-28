@@ -1,35 +1,3 @@
-
-type UserInfo {
-    userName: ID!
-}
-
-type RoleInfo {
-    roleName: ID!
-
-    permissions: [ID]!
-}
-
-type PermissionInfo {
-    id: ID!
-
-    label: [String]
-    description: [String]
-}
-
-type Admin {
-    users: [UserInfo]
-    roles: [RoleInfo]
-    permissions: [PermissionInfo]
-
-    createUser(userName: ID!): UserInfo!
-    deleteUser(userName: ID!): Boolean
-
-    setUserAuthCredentials(userName: ID!, model: ID!, credentials: Object): Boolean
-
-    grantUserRole(user: ID!, role: ID!): Boolean
-    revokeUserRole(user: ID!, role: ID!): Boolean
-}
-
 type AuthCredentialInfo {
     id: ID!
     label: String!
@@ -62,9 +30,9 @@ type UserAuthInfo {
 
 extend type Query {
 
-    login(model: ID!, credentials: Object!): UserAuthInfo
+    authLogin(model: ID!, credentials: Object!): UserAuthInfo
 
-    logout: Boolean
+    authLogout: Boolean
 
     sessionUser: UserAuthInfo
 
