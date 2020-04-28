@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: io.cloudbeaver.service.data.transfer;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-SymbolicName: io.cloudbeaver.service.auth;singleton:=true
+Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20200504
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
@@ -14,8 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.commands,
  org.eclipse.core.resources,
  io.cloudbeaver.server,
- org.jkiss.dbeaver.data.transfer,
- org.jkiss.dbeaver.model.sql,
- org.jkiss.dbeaver.registry
+ org.jkiss.dbeaver.model,
+ org.jkiss.dbeaver.model.sql
 Bundle-Localization: OSGI-INF/l10n/bundle
-Automatic-Module-Name: io.cloudbeaver.service.data.transfer
+Automatic-Module-Name: io.cloudbeaver.service.auth

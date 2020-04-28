@@ -1,0 +1,73 @@
+
+type UserInfo {
+    userName: ID!
+}
+
+type RoleInfo {
+    roleName: ID!
+
+    permissions: [ID]!
+}
+
+type PermissionInfo {
+    id: ID!
+
+    label: [String]
+    description: [String]
+}
+
+type Admin {
+    users: [UserInfo]
+    roles: [RoleInfo]
+    permissions: [PermissionInfo]
+
+    createUser(userName: ID!): UserInfo!
+    deleteUser(userName: ID!): Boolean
+
+    setUserAuthCredentials(userName: ID!, model: ID!, credentials: Object): Boolean
+
+    grantUserRole(user: ID!, role: ID!): Boolean
+    revokeUserRole(user: ID!, role: ID!): Boolean
+}
+
+type AuthCredentialInfo {
+    id: ID!
+    label: String!
+    description: String
+    protected: Boolean
+    editable: Boolean
+    possibleValues: [String]!
+    order: Int
+}
+
+type AuthModelInfo {
+    id: ID!
+    label: String!
+    icon: ID
+    description: String
+
+    isDefault: Boolean
+
+    crdentialsInfo: [AuthCredentialInfo]!
+}
+
+type UserAuthInfo {
+    userName: String!
+
+    loginTime: DateTime
+
+    # Optional login message
+    message: String
+}
+
+extend type Query {
+
+    login(model: ID!, credentials: Object!): UserAuthInfo
+
+    logout: Boolean
+
+    sessionUser: UserAuthInfo
+
+    authModels: [AuthModelInfo]!
+
+}
