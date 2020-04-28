@@ -19,7 +19,10 @@ package io.cloudbeaver.service.data.transfer;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.api.*;
+import io.cloudbeaver.api.DBWModel;
+import io.cloudbeaver.api.DBWServiceServlet;
+import io.cloudbeaver.api.DBWUtils;
+import io.cloudbeaver.api.WebServiceBase;
 import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.server.model.session.WebSession;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -28,15 +31,12 @@ import org.eclipse.jetty.servlet.ServletHolder;
 /**
  * Web service implementation
  */
-public class WebServiceDataTransfer extends WebServiceBase implements DBWServiceServlet {
+public class WebServiceDataTransfer extends WebServiceBase<WebDataTransferAPI> implements DBWServiceServlet {
 
     private static final String DT_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
 
-    private WebDataTransferManager dtManager;
-
     public WebServiceDataTransfer() {
-        dtManager = new WebDataTransferManager();
-
+        super(WebDataTransferAPI.class, new WebDataTransferImpl());
     }
 
     @Override
@@ -46,20 +46,21 @@ public class WebServiceDataTransfer extends WebServiceBase implements DBWService
 
     @Override
     public void bindWiring(DBWModel model) {
+
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
-                env -> dtManager.getAvailableStreamProcessors(getWebSession(model, env)))
-            .dataFetcher("dataTransferExportDataFromContainer", env -> dtManager.dataTransferExportDataFromContainer(
+                env -> getAPI(env).getAvailableStreamProcessors(getWebSession(model, env)))
+            .dataFetcher("dataTransferExportDataFromContainer", env -> getAPI(env).dataTransferExportDataFromContainer(
                 DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("containerNodePath"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
-            .dataFetcher("dataTransferExportDataFromResults", env -> dtManager.dataTransferExportDataFromResults(
+            .dataFetcher("dataTransferExportDataFromResults", env -> getAPI(env).dataTransferExportDataFromResults(
                 DBWUtils.getSQLContext(model.getSessionManager(), env),
                 env.getArgument("resultsId"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
-            .dataFetcher("dataTransferRemoveDataFile", env -> dtManager.dataTransferRemoveDataFile(
+            .dataFetcher("dataTransferRemoveDataFile", env -> getAPI(env).dataTransferRemoveDataFile(
                 DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("dataFileId")
             ))
@@ -74,7 +75,7 @@ public class WebServiceDataTransfer extends WebServiceBase implements DBWService
     @Override
     public void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler) {
         servletContextHandler.addServlet(
-            new ServletHolder("dataTransfer", new WebDataTransferServlet(application, dtManager)),
+            new ServletHolder("dataTransfer", new WebDataTransferServlet(application, getServiceImpl())),
             application.getServicesURI() + "data/*");
     }
 }

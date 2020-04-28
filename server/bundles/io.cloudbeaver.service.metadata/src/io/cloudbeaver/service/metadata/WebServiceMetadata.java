@@ -23,20 +23,19 @@ import io.cloudbeaver.api.DBWUtils;
 import io.cloudbeaver.api.WebServiceBase;
 import io.cloudbeaver.server.model.WebNavigatorNodeInfo;
 import io.cloudbeaver.server.model.session.WebSession;
-import org.jkiss.dbeaver.model.DBPScriptObject;
-import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.struct.DBSObject;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Web service implementation
  */
-public class WebServiceMetadata extends WebServiceBase {
+public class WebServiceMetadata extends WebServiceBase<WebMetadataAPI> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.metadata.graphqls";
+
+    public WebServiceMetadata() {
+        super(WebMetadataAPI.class, new WebMetadataImpl());
+    }
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
@@ -48,21 +47,9 @@ public class WebServiceMetadata extends WebServiceBase {
         model.getQueryType().dataFetcher("metadataGetNodeDDL", env -> {
             WebSession webSession = model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
             WebNavigatorNodeInfo node = webSession.getNavigatorNodeInfo(env.getArgument("nodeId"));
-            DBNNode dbNode = node.getNode();
-            if (dbNode instanceof DBNDatabaseNode) {
-                DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
-                if (object instanceof DBPScriptObject) {
-                    Map<String, Object> options = env.getArgument("options");
-                    if (options == null) {
-                        options = new LinkedHashMap<>();
-                    }
-                    return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
-                } else {
-                    throw new DBWebException("Object '" + node.getId() + "' doesn't support DDL");
-                }
-            } else {
-                throw new DBWebException("Node '" + node.getId() + "' is not database node");
-            }
+            Map<String, Object> options = env.getArgument("options");
+
+            return getAPI(env).getNodeDDL(webSession, node, options);
         });
 
     }

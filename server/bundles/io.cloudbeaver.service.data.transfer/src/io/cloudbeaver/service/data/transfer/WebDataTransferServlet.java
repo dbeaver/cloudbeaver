@@ -24,9 +24,9 @@ public class WebDataTransferServlet extends HttpServlet {
     private static final Log log = Log.getLog(WebDataTransferServlet.class);
 
     private final CloudbeaverApplication application;
-    private final WebDataTransferManager dtManager;
+    private final WebDataTransferAPI dtManager;
 
-    public WebDataTransferServlet(CloudbeaverApplication application, WebDataTransferManager dtManager) {
+    public WebDataTransferServlet(CloudbeaverApplication application, WebDataTransferAPI dtManager) {
         this.application = application;
         this.dtManager = dtManager;
     }

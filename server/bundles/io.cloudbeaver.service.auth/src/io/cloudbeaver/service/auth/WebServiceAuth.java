@@ -19,15 +19,20 @@ package io.cloudbeaver.service.auth;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.api.DBWModel;
+import io.cloudbeaver.api.DBWServiceAPI;
 import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.api.WebServiceBase;
 
 /**
  * Web service implementation
  */
-public class WebServiceAuth extends WebServiceBase {
+public class WebServiceAuth extends WebServiceBase<WebAuthAPI> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.auth.graphqls";
+
+    public WebServiceAuth() {
+        super(WebAuthAPI.class, new WebAuthImpl());
+    }
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {

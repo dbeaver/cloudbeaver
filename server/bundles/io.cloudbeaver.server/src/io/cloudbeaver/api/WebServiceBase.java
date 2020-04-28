@@ -25,14 +25,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * Web service implementation
  */
-public abstract class WebServiceBase implements DBWServiceGraphQL {
+public abstract class WebServiceBase<API_TYPE extends DBWServiceAPI> implements DBWServiceGraphQL {
 
-    protected void checkPermission(DBWModel model, DataFetchingEnvironment env, String permission) {
+    private final Class<API_TYPE> apiInterface;
+    private API_TYPE serviceImpl;
 
+
+    public WebServiceBase(Class<API_TYPE> apiInterface, API_TYPE impl) {
+        this.apiInterface = apiInterface;
+        this.serviceImpl = impl;
+    }
+
+    protected API_TYPE getServiceImpl() {
+        return serviceImpl;
+    }
+
+    /**
+     * Creates proxy for permission checks and other general API calls validation/logging.
+     */
+    protected  API_TYPE getAPI(DataFetchingEnvironment env) {
+        Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl));
+        return apiInterface.cast(proxyImpl);
     }
 
     public static TypeDefinitionRegistry loadSchemaDefinition(Class theClass, String schemaPath) throws DBWebException {
@@ -45,6 +65,19 @@ public abstract class WebServiceBase implements DBWServiceGraphQL {
             }
         } catch (IOException e) {
             throw new RuntimeException("Error reading core schema", e);
+        }
+    }
+
+    private class ServiceInvocationHandler implements InvocationHandler {
+        private final API_TYPE impl;
+
+        ServiceInvocationHandler(API_TYPE impl) {
+            this.impl = impl;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(impl, args);
         }
     }
 }

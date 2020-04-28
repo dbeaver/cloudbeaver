@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.model.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.api.WebAction;
 import io.cloudbeaver.server.model.WebAsyncTaskInfo;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
@@ -29,7 +30,6 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
-import org.jkiss.dbeaver.model.meta.RuntimeAction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -154,7 +154,7 @@ public class WebSQLContextInfo {
         }
     }
 
-    @RuntimeAction
+    @WebAction
     public String getDefaultSchema() {
         if (defaultSchema == null) {
             DBCExecutionContext defaultContext = DBUtils.getDefaultContext(

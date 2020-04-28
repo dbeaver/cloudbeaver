@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.server.model;
 
+import io.cloudbeaver.api.WebAction;
 import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.meta.RuntimeAction;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 
@@ -99,7 +99,7 @@ public class WebServerConfig {
         this.supportsWorkspaces = supportsWorkspaces;
     }
 
-    @RuntimeAction
+    @WebAction
     public WebServerLanguage[] getSupportedLanguages() {
         List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];
@@ -109,7 +109,7 @@ public class WebServerConfig {
         return webLangs;
     }
 
-    @RuntimeAction
+    @WebAction
     public WebServiceConfig[] getServices() {
         List<WebServiceConfig> services = new ArrayList<>();
         for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
@@ -118,7 +118,7 @@ public class WebServerConfig {
         return services.toArray(new WebServiceConfig[0]);
     }
 
-    @RuntimeAction
+    @WebAction
     public Map<String, Object> getProductConfiguration() {
         return CloudbeaverPlatform.getInstance().getApplication().getProductConfiguration();
     }

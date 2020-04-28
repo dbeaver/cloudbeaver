@@ -25,7 +25,6 @@ import io.cloudbeaver.server.model.sql.WebSQLProcessor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.meta.RuntimeAction;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
@@ -53,13 +52,13 @@ import java.util.stream.Collectors;
 /**
  * Web service implementation
  */
-public class WebDataTransferManager {
+public class WebDataTransferImpl implements WebDataTransferAPI {
 
-    private static final Log log = Log.getLog(WebDataTransferManager.class);
+    private static final Log log = Log.getLog(WebDataTransferImpl.class);
 
     private final File dataExportFolder;
 
-    public WebDataTransferManager() {
+    public WebDataTransferImpl() {
         dataExportFolder = CloudbeaverPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "data-transfer");
 
         ContentUtils.deleteFileRecursive(dataExportFolder);
@@ -72,7 +71,7 @@ public class WebDataTransferManager {
         return dataExportFolder;
     }
 
-    @RuntimeAction
+    @Override
     public List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(WebSession session) {
         List<DataTransferProcessorDescriptor> processors = DataTransferRegistry.getInstance().getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class);
         if (CommonUtils.isEmpty(processors)) {
@@ -82,7 +81,7 @@ public class WebDataTransferManager {
         return processors.stream().map(x -> new WebDataTransferStreamProcessor(session, x)).collect(Collectors.toList());
     }
 
-    @RuntimeAction
+    @Override
     public WebAsyncTaskInfo dataTransferExportDataFromContainer(
         WebSQLProcessor sqlProcessor,
         String containerNodePath,
@@ -130,7 +129,7 @@ public class WebDataTransferManager {
         return sqlProcessor.getWebSession().getId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
-    @RuntimeAction
+    @Override
     public WebAsyncTaskInfo dataTransferExportDataFromResults(
         WebSQLContextInfo sqlContextInfo,
         String resultsId,
@@ -138,7 +137,7 @@ public class WebDataTransferManager {
         throw new DBWebException("Not supported");
     }
 
-    @RuntimeAction
+    @Override
     public Boolean dataTransferRemoveDataFile(WebSQLProcessor sqlProcessor, String dataFileId) {
         return true;
     }

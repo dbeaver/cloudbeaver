@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.model.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.api.WebAction;
 import io.cloudbeaver.server.model.WebConnectionInfo;
 import io.cloudbeaver.server.model.WebDatabaseObjectInfo;
 import io.cloudbeaver.server.model.session.WebSession;
@@ -30,7 +31,6 @@ import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
-import org.jkiss.dbeaver.model.meta.RuntimeAction;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -95,7 +95,7 @@ public class WebSQLProcessor {
         return DBUtils.getDefaultContext(dataContainer, false);
     }
 
-    @RuntimeAction
+    @WebAction
     @NotNull
     public WebSQLDialectInfo getDialectInfo() throws DBWebException {
         DBPDataSource dataSource = connection.getDataSourceContainer().getDataSource();
@@ -137,7 +137,7 @@ public class WebSQLProcessor {
         }
     }
 
-    @RuntimeAction
+    @WebAction
     @NotNull
     public WebSQLExecuteInfo executeQuery(WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
         return processQuery(webSession.getProgressMonitor(), contextInfo, sql, filter);
@@ -192,7 +192,7 @@ public class WebSQLProcessor {
         return executeInfo;
     }
 
-    @RuntimeAction
+    @WebAction
     @NotNull
     public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter) throws DBWebException {
         try {
@@ -246,7 +246,7 @@ public class WebSQLProcessor {
         return executeInfo;
     }
 
-    @RuntimeAction
+    @WebAction
     public WebSQLExecuteInfo updateResultsData(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,

@@ -20,6 +20,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.api.DBWModel;
+import io.cloudbeaver.api.DBWServiceAPI;
 import io.cloudbeaver.api.DBWServiceGraphQL;
 import io.cloudbeaver.api.WebServiceBase;
 import org.osgi.framework.AdminPermission;
@@ -27,9 +28,13 @@ import org.osgi.framework.AdminPermission;
 /**
  * Web service implementation
  */
-public class WebServiceAdmin extends WebServiceBase {
+public class WebServiceAdmin extends WebServiceBase<WebAdminAPI> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
+
+    public WebServiceAdmin() {
+        super(WebAdminAPI.class, new WebAdminImpl());
+    }
 
     @Override
     public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
@@ -39,7 +44,6 @@ public class WebServiceAdmin extends WebServiceBase {
     @Override
     public void bindWiring(DBWModel model) throws DBWebException {
         model.getQueryType().dataFetcher("listUsers", env -> {
-            checkPermission(model, env, AdminPermissions.PERMISSION_ADMIN);
             throw new DBWebException("Not implemented");
         });
 
