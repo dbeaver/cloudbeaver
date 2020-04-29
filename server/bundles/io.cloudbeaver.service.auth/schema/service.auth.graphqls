@@ -1,11 +1,17 @@
+enum AuthCredentialEncryption {
+    none,
+    plain,
+    hash
+}
+
 type AuthCredentialInfo {
     id: ID!
     label: String!
     description: String
-    protected: Boolean
+
     editable: Boolean
     possibleValues: [String]!
-    order: Int
+    encryption: AuthCredentialEncryption
 }
 
 type AuthProviderInfo {

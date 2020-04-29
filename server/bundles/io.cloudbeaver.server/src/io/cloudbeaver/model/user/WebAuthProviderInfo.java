@@ -17,19 +17,18 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.server.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.server.registry.WebPermissionDescriptor;
 import org.jkiss.dbeaver.Log;
 
 /**
  * Web user.
  */
-public class WebAuthProvider {
+public class WebAuthProviderInfo {
 
-    private static final Log log = Log.getLog(WebAuthProvider.class);
+    private static final Log log = Log.getLog(WebAuthProviderInfo.class);
 
     private final WebAuthProviderDescriptor descriptor;
 
-    public WebAuthProvider(WebAuthProviderDescriptor descriptor) {
+    public WebAuthProviderInfo(WebAuthProviderDescriptor descriptor) {
         this.descriptor = descriptor;
     }
 

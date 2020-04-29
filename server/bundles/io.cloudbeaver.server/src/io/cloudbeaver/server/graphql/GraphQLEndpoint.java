@@ -32,9 +32,9 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;
 
@@ -47,9 +47,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class GraphQLEndpoint extends HttpServlet {
 
@@ -91,17 +94,19 @@ public class GraphQLEndpoint extends HttpServlet {
             throw new RuntimeException("Error reading core schema", e);
         }
 
+        List<String> addedBindings = new ArrayList<>();
         for (DBWServiceBindingGraphQL wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingGraphQL.class)) {
             try {
                 TypeDefinitionRegistry typeDefinition = wsd.getTypeDefinition();
                 if (typeDefinition != null) {
-                    log.debug("Adding web service '" + wsd.getClass().getSimpleName() + "' GQL schema");
+                    addedBindings.add(wsd.getClass().getSimpleName());
                     parsedSchema.merge(typeDefinition);
                 }
             } catch (DBWebException e) {
                 log.warn("Error obtaining web service type definitions", e);
             }
         }
+        log.debug("Schema extensions loaded: " + String.join(",", addedBindings));
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         GraphQLBindingContext wiring = new GraphQLBindingContext();

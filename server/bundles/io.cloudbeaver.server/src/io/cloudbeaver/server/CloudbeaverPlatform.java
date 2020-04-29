@@ -287,7 +287,7 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
             log.error("Can't create temp directory!");
         }
         File folder = new File(tempFolder, name);
-        if (folder.exists()) {
+        if (!folder.exists()) {
             if (!folder.mkdirs()) {
                 log.error("Error creating temp folder '" + folder.getAbsolutePath() + "'");
             }
