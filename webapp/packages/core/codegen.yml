@@ -1,7 +1,10 @@
 schema:
   - ../../../server/bundles/io.cloudbeaver.server/schema/schema.graphqls
+  - ../../../server/bundles/io.cloudbeaver.server/schema/service.sql.graphqls
+  - ../../../server/bundles/io.cloudbeaver.server/schema/service.navigator.graphqls
   - ../../../server/bundles/io.cloudbeaver.service.metadata/schema/service.metadata.graphqls
-documents: ./src/**/*.gql
+documents: 
+  - ./src/**/*.gql
 generates:
   src/sdk/sdk.ts:
     plugins:
