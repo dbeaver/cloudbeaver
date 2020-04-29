@@ -30,12 +30,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
     private static final String SCHEMA_FILE_NAME = "schema/service.auth.graphqls";
 
     public WebServiceBindingAuth() {
-        super(DBWServiceAuth.class, new WebServiceAuthImpl());
-    }
-
-    @Override
-    public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return loadSchemaDefinition(getClass(), SCHEMA_FILE_NAME);
+        super(DBWServiceAuth.class, new WebServiceAuthImpl(), SCHEMA_FILE_NAME);
     }
 
     @Override

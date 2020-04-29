@@ -258,31 +258,6 @@ type DatabaseObjectInfo {
     editors: [ String ]
 }
 
-type NavigatorNodeInfo {
-    # Node ID - generally a full path to the node from root of tree
-    id: ID!
-    # Node human readable name
-    name: String
-    # Node icon path
-    icon: String
-    # Node description
-    description: String
-    # Node type
-    nodeType: String
-    # Can this property have child nodes?
-    hasChildren: Boolean
-
-    # Associated object. Maybe null for non-database objects
-    object: DatabaseObjectInfo
-
-    # Supported features: item, container, leaf
-    features: [ String ]
-
-    folder: Boolean
-    inline: Boolean
-    navigable: Boolean
-}
-
 ####################################################
 # SQL helpers
 ####################################################
@@ -425,19 +400,6 @@ type Query {
     connectionState( id: ID! ): ConnectionInfo
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]
-
-    # Get child nodes
-    navNodeChildren(
-        parentPath: ID!,
-        offset: Int,
-        limit: Int,
-        onlyFolders: Boolean): [ NavigatorNodeInfo! ]
-
-    navNodeInfo( nodePath: ID! ): NavigatorNodeInfo
-
-    navRefreshNode( nodePath: ID! ): Boolean
-
-    navGetStructContainers( connectionId: ID!, catalog: ID ): DatabaseStructContainers!
 
     sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
 

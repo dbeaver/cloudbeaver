@@ -77,18 +77,6 @@ class GraphQLBindingContext implements DBWBindingContext {
                 env.getArgument("maxEntries"),
                 env.getArgument("clearEntries")))
 
-            .dataFetcher("navNodeChildren", env -> sessionManager.getWebSession(getServletRequest(env)).getNavigatorNodeChildren(
-                env.getArgument("parentPath"), env.getArgument("offset"), env.getArgument("limit"), env.getArgument("onlyFolders")))
-            .dataFetcher("navNodeInfo", env -> sessionManager.getWebSession(getServletRequest(env)).getNavigatorNodeInfo(
-                env.getArgument("nodePath")))
-            .dataFetcher("navRefreshNode", env -> sessionManager.getWebSession(getServletRequest(env)).refreshNavigatorNode(
-                env.getArgument("nodePath")
-            ))
-
-            .dataFetcher("navGetStructContainers", env -> DBWUtils.getSQLProcessor(sessionManager, env).getStructContainers(
-                env.getArgument("catalog")
-            ))
-
             .dataFetcher("sqlDialectInfo", env ->
                 DBWUtils.getSQLProcessor(sessionManager, env).getDialectInfo()
             )

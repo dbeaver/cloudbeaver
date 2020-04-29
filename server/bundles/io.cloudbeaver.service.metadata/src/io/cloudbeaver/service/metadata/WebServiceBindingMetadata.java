@@ -16,14 +16,12 @@
  */
 package io.cloudbeaver.service.metadata;
 
-import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.service.DBWBindingContext;
-import io.cloudbeaver.DBWUtils;
-import io.cloudbeaver.service.WebServiceBindingBase;
-import io.cloudbeaver.model.WebNavigatorNodeInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWBindingContext;
+import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.metadata.impl.WebServiceMetadata;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 
 import java.util.Map;
 
@@ -35,22 +33,19 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
     private static final String SCHEMA_FILE_NAME = "schema/service.metadata.graphqls";
 
     public WebServiceBindingMetadata() {
-        super(DBWServiceMetadata.class, new WebServiceMetadata());
-    }
-
-    @Override
-    public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return loadSchemaDefinition(getClass(), SCHEMA_FILE_NAME);
+        super(DBWServiceMetadata.class, new WebServiceMetadata(), SCHEMA_FILE_NAME);
     }
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType().dataFetcher("metadataGetNodeDDL", env -> {
-            WebSession webSession = model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
-            WebNavigatorNodeInfo node = webSession.getNavigatorNodeInfo(env.getArgument("nodeId"));
+            WebSession webSession = getWebSession(model, env);
+
+            String nodePath = env.getArgument("nodeId");
+            DBNNode node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
             Map<String, Object> options = env.getArgument("options");
 
-            return getAPI(env).getNodeDDL(webSession, node, options);
+            return getService(env).getNodeDDL(webSession, node, options);
         });
 
     }

@@ -16,18 +16,14 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.idl.TypeDefinitionRegistry;
-import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DBWUtils;
+import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
-import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.service.WebServiceBindingBase;
-import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
+import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -36,15 +32,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
  */
 public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServiceDataTransfer> implements DBWServiceBindingServlet {
 
-    private static final String DT_SCHEMA_FILE_NAME = "schema/service.data.transfer.graphqls";
-
     public WebServiceBindingDataTransfer() {
-        super(DBWServiceDataTransfer.class, new WebServiceDataTransfer());
-    }
-
-    @Override
-    public TypeDefinitionRegistry getTypeDefinition() throws DBWebException {
-        return loadSchemaDefinition(getClass(), DT_SCHEMA_FILE_NAME);
+        super(DBWServiceDataTransfer.class, new WebServiceDataTransfer(), "schema/service.data.transfer.graphqls");
     }
 
     @Override
@@ -52,27 +41,23 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
 
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
-                env -> getAPI(env).getAvailableStreamProcessors(getWebSession(model, env)))
-            .dataFetcher("dataTransferExportDataFromContainer", env -> getAPI(env).dataTransferExportDataFromContainer(
+                env -> getService(env).getAvailableStreamProcessors(getWebSession(model, env)))
+            .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
                 DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("containerNodePath"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
-            .dataFetcher("dataTransferExportDataFromResults", env -> getAPI(env).dataTransferExportDataFromResults(
+            .dataFetcher("dataTransferExportDataFromResults", env -> getService(env).dataTransferExportDataFromResults(
                 DBWUtils.getSQLContext(model.getSessionManager(), env),
                 env.getArgument("resultsId"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
-            .dataFetcher("dataTransferRemoveDataFile", env -> getAPI(env).dataTransferRemoveDataFile(
+            .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
                 DBWUtils.getSQLProcessor(model.getSessionManager(), env),
                 env.getArgument("dataFileId")
             ))
         ;
 
-    }
-
-    private WebSession getWebSession(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        return model.getSessionManager().getWebSession(DBWUtils.getServletRequest(env));
     }
 
     @Override

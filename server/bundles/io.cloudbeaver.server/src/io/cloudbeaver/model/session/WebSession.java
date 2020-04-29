@@ -60,8 +60,6 @@ public class WebSession {
 
     private static final Log log = Log.getLog(WebSession.class);
 
-    public static final List<WebNavigatorNodeInfo> EMPTY_NODE_LIST = Collections.emptyList();
-
     private static final String ATTR_LOCALE = "locale";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
@@ -139,6 +137,10 @@ public class WebSession {
 
     public DBNModel getNavigatorModel() {
         return navigatorModel;
+    }
+
+    public DBNProjectDatabases getDatabases() {
+        return databases;
     }
 
     /**
@@ -356,63 +358,6 @@ public class WebSession {
             this.databases = null;
         } catch (Throwable e) {
             log.error(e);
-        }
-    }
-
-    public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
-        try {
-            DBRProgressMonitor monitor = getProgressMonitor();
-
-            DBNNode parentNode = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) ? databases : navigatorModel.getNodeByPath(monitor, parentPath);
-            if (parentNode == null) {
-                throw new DBWebException("Node '" + parentPath + "' not found");
-            }
-            if (!parentNode.hasChildren(true)) {
-                return EMPTY_NODE_LIST;
-            }
-            DBNNode[] nodeChildren = parentNode.getChildren(monitor);
-            if (nodeChildren == null) {
-                return EMPTY_NODE_LIST;
-            }
-            List<WebNavigatorNodeInfo> result = new ArrayList<>();
-            for (DBNNode node : nodeChildren) {
-                if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
-                    result.add(new WebNavigatorNodeInfo(this, node));
-                }
-            }
-            return  result;
-        } catch (DBException e) {
-            throw new DBWebException("Error getting navigator nodes", e);
-        }
-    }
-
-    @NotNull
-    public WebNavigatorNodeInfo getNavigatorNodeInfo(String nodePath) throws DBWebException {
-        try {
-            DBRProgressMonitor monitor = getProgressMonitor();
-
-            DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
-            if (node == null) {
-                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
-            }
-            return new WebNavigatorNodeInfo(this, node);
-        } catch (DBException e) {
-            throw new DBWebException("Error getting navigator node '"  + nodePath + "'", e);
-        }
-    }
-
-    public boolean refreshNavigatorNode(String nodePath) throws DBWebException {
-        try {
-            DBRProgressMonitor monitor = getProgressMonitor();
-
-            DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
-            if (node == null) {
-                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
-            }
-            node.refreshNode(monitor, this);
-            return true;
-        } catch (DBException e) {
-            throw new DBWebException("Error refreshing navigator node '"  + nodePath + "'", e);
         }
     }
 

@@ -34,4 +34,8 @@
         <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>
     </extension>
 
+    <extension point="io.cloudbeaver.service">
+        <service id="navigator" label="Database navigator" description="Database navigator services" class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator"/>
+    </extension>
+
 </plugin>

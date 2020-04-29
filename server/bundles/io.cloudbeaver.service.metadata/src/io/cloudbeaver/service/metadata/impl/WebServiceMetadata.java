@@ -36,8 +36,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
 
 
     @Override
-    public String getNodeDDL(WebSession webSession, WebNavigatorNodeInfo node, Map<String, Object> options) throws DBWebException {
-        DBNNode dbNode = node.getNode();
+    public String getNodeDDL(WebSession webSession, DBNNode dbNode, Map<String, Object> options) throws DBWebException {
         if (dbNode instanceof DBNDatabaseNode) {
             DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
             if (object instanceof DBPScriptObject) {
@@ -50,10 +49,10 @@ public class WebServiceMetadata implements DBWServiceMetadata {
                     throw new DBWebException("Error extracting DDL", e);
                 }
             } else {
-                throw new DBWebException("Object '" + node.getId() + "' doesn't support DDL");
+                throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
             }
         } else {
-            throw new DBWebException("Node '" + node.getId() + "' is not database node");
+            throw new DBWebException("Node '" + dbNode.getNodeItemPath() + "' is not database node");
         }
     }
 }
