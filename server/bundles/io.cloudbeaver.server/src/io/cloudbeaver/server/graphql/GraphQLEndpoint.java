@@ -32,7 +32,7 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.api.DBWServiceGraphQL;
+import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.Log;
@@ -91,7 +91,7 @@ public class GraphQLEndpoint extends HttpServlet {
             throw new RuntimeException("Error reading core schema", e);
         }
 
-        for (DBWServiceGraphQL wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceGraphQL.class)) {
+        for (DBWServiceBindingGraphQL wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingGraphQL.class)) {
             try {
                 TypeDefinitionRegistry typeDefinition = wsd.getTypeDefinition();
                 if (typeDefinition != null) {
@@ -104,7 +104,7 @@ public class GraphQLEndpoint extends HttpServlet {
         }
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();
-        GraphQLModel wiring = new GraphQLModel();
+        GraphQLBindingContext wiring = new GraphQLBindingContext();
         return schemaGenerator.makeExecutableSchema(parsedSchema, wiring.buildRuntimeWiring());
     }
 

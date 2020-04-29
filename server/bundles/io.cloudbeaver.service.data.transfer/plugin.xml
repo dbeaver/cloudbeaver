@@ -4,7 +4,7 @@
 <plugin>
 
     <extension point="io.cloudbeaver.service">
-        <service id="data.transfer" label="Data transfer support" description="Data transfer services" class="io.cloudbeaver.service.data.transfer.WebServiceDataTransfer">
+        <service id="data.transfer" label="Data transfer support" description="Data transfer services" class="io.cloudbeaver.service.data.transfer.WebServiceBindingDataTransfer">
 
         </service>
     </extension>

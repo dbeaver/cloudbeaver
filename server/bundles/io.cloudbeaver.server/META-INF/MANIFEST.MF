@@ -27,10 +27,12 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.api,
  io.cloudbeaver.server,
- io.cloudbeaver.server.model,
- io.cloudbeaver.server.model.resources,
- io.cloudbeaver.server.model.session,
- io.cloudbeaver.server.model.sql
+ io.cloudbeaver.model,
+ io.cloudbeaver.model.resources,
+ io.cloudbeaver.model.session,
+ io.cloudbeaver.service,
+ io.cloudbeaver.service.navigator,
+ io.cloudbeaver.service.sql
 Import-Package: org.slf4j
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.server

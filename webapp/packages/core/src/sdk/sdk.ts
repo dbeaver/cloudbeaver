@@ -31,8 +31,6 @@ export type AsyncTaskInfo = {
   taskResult?: Maybe<Scalars["Object"]>;
 };
 
-export type AsyncTaskResult = SqlExecuteInfo;
-
 /** Configuration of particular connection. Used for new connection create. Includes auth info */
 export type ConnectionConfig = {
   name?: Maybe<Scalars["String"]>;
@@ -186,6 +184,8 @@ export type Mutation = {
   openConnection?: Maybe<ConnectionInfo>;
   /** Disconnect from database */
   closeConnection: Scalars["Boolean"];
+  asyncTaskCancel?: Maybe<Scalars["Boolean"]>;
+  asyncTaskStatus: AsyncTaskInfo;
   sqlContextCreate: SqlContextInfo;
   sqlContextSetDefaults: Scalars["Boolean"];
   sqlContextDestroy: Scalars["Boolean"];
@@ -195,8 +195,6 @@ export type Mutation = {
   updateResultsData?: Maybe<SqlExecuteInfo>;
   /** Returns SQLExecuteInfo */
   asyncSqlExecuteQuery: AsyncTaskInfo;
-  asyncTaskCancel?: Maybe<Scalars["Boolean"]>;
-  asyncTaskStatus: AsyncTaskInfo;
 };
 
 export type MutationChangeSessionLanguageArgs = {
@@ -217,6 +215,14 @@ export type MutationOpenConnectionArgs = {
 
 export type MutationCloseConnectionArgs = {
   id: Scalars["ID"];
+};
+
+export type MutationAsyncTaskCancelArgs = {
+  id: Scalars["String"];
+};
+
+export type MutationAsyncTaskStatusArgs = {
+  id: Scalars["String"];
 };
 
 export type MutationSqlContextCreateArgs = {
@@ -270,14 +276,6 @@ export type MutationAsyncSqlExecuteQueryArgs = {
   contextId: Scalars["ID"];
   sql: Scalars["String"];
   filter?: Maybe<SqlDataFilter>;
-};
-
-export type MutationAsyncTaskCancelArgs = {
-  id: Scalars["String"];
-};
-
-export type MutationAsyncTaskStatusArgs = {
-  id: Scalars["String"];
 };
 
 export type NavigatorNodeInfo = {
@@ -342,6 +340,8 @@ export type Query = {
   serverConfig?: Maybe<ServerConfig>;
   /** Returns session state ( initialize if not ) */
   sessionState?: Maybe<SessionInfo>;
+  /** Session permissions */
+  sessionPermissions: Array<Maybe<Scalars["ID"]>>;
   /** Get driver info */
   driverList?: Maybe<Array<DriverInfo>>;
   /** Get list of predefined data sources */

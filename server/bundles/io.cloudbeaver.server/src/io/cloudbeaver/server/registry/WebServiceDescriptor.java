@@ -17,7 +17,7 @@
 
 package io.cloudbeaver.server.registry;
 
-import io.cloudbeaver.api.DBWService;
+import io.cloudbeaver.service.DBWServiceBinding;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.AbstractContextDescriptor;
@@ -34,7 +34,7 @@ public class WebServiceDescriptor extends AbstractContextDescriptor {
     private final String description;
     private final ObjectType implClass;
 
-    private DBWService instance;
+    private DBWServiceBinding instance;
 
     public WebServiceDescriptor(IConfigurationElement config)
     {
@@ -57,11 +57,11 @@ public class WebServiceDescriptor extends AbstractContextDescriptor {
         return description;
     }
 
-    public DBWService getInstance()
+    public DBWServiceBinding getInstance()
         throws DBException
     {
         if (instance == null) {
-            instance = implClass.createInstance(DBWService.class);
+            instance = implClass.createInstance(DBWServiceBinding.class);
         }
         return instance;
     }
