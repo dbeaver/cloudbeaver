@@ -1,6 +1,6 @@
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.api.DBWServiceServlet;
+import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.server.CloudbeaverApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
@@ -46,7 +46,7 @@ public class CloudbeaverJettyServer {
                 servletContextHandler.addEventListener(new CloudbeaverServerContextListener());
 
                 // Add extensions from services
-                for (DBWServiceServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceServlet.class)) {
+                for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
                     wsd.addServlets(application, servletContextHandler);
                 }
 

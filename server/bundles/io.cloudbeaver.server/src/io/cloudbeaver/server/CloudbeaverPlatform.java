@@ -19,9 +19,9 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.model.WebDataSourceConfig;
-import io.cloudbeaver.server.model.WebServerConfig;
-import io.cloudbeaver.server.model.session.WebSessionManager;
+import io.cloudbeaver.model.WebDataSourceConfig;
+import io.cloudbeaver.model.WebServerConfig;
+import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.server.registry.WebDriverRegistry;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;

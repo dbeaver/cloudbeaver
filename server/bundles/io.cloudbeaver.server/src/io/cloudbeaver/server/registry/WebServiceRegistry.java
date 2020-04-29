@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.registry;
 
-import io.cloudbeaver.api.DBWService;
+import io.cloudbeaver.service.DBWServiceBinding;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -42,7 +42,7 @@ public class WebServiceRegistry {
     }
 
     private final List<WebServiceDescriptor> webServices = new ArrayList<>();
-    private DBWService[] webServiceInstances;
+    private DBWServiceBinding[] webServiceInstances;
 
     private WebServiceRegistry() {
     }
@@ -58,26 +58,26 @@ public class WebServiceRegistry {
                 }
             }
         }
-        List<DBWService> instances = new ArrayList<>();
+        List<DBWServiceBinding> instances = new ArrayList<>();
         for (WebServiceDescriptor wsd : webServices) {
             try {
-                DBWService instance = wsd.getInstance();
+                DBWServiceBinding instance = wsd.getInstance();
                 instances.add(instance);
             } catch (Exception e) {
                 log.error("Error instantiating web service '" + wsd.getId() + "'", e);
             }
         }
-        webServiceInstances = instances.toArray(new DBWService[0]);
+        webServiceInstances = instances.toArray(new DBWServiceBinding[0]);
     }
 
     public List<WebServiceDescriptor> getWebServices() {
         return webServices;
     }
 
-    public <T extends DBWService> List<T> getWebServices(Class<T> theType) {
+    public <T extends DBWServiceBinding> List<T> getWebServices(Class<T> theType) {
         List<T> result = new ArrayList<>();
         for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
-            DBWService instance;
+            DBWServiceBinding instance;
             try {
                 instance = wsd.getInstance();
             } catch (Exception e) {
@@ -91,7 +91,7 @@ public class WebServiceRegistry {
         return result;
     }
 
-    public DBWService[] getWebServiceInstances() {
+    public DBWServiceBinding[] getWebServiceInstances() {
         return webServiceInstances;
     }
 }

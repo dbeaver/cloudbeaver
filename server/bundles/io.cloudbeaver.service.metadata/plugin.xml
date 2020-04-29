@@ -4,7 +4,7 @@
 <plugin>
 
     <extension point="io.cloudbeaver.service">
-        <service id="metadata" label="Metadata management " description="Metadata management  services" class="io.cloudbeaver.service.metadata.WebServiceMetadata">
+        <service id="metadata" label="Metadata management " description="Metadata management  services" class="io.cloudbeaver.service.metadata.WebServiceBindingMetadata">
 
         </service>
     </extension>
