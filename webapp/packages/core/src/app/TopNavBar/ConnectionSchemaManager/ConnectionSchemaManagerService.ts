@@ -201,12 +201,21 @@ export class ConnectionSchemaManagerService {
   }
 
   private async loadConnection(connectionId: string, catalogId?: string) {
-
     try {
       await this.connectionsManagerService.dbDrivers.load();
-      await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
     } catch (exception) {
-      this.notificationService.logException(exception, `Can't load connection: ${connectionId}`);
+      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
+    }
+
+    if (this.changeCatalogId || this.changeSchemaId) {
+      try {
+        await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
+      } catch (exception) {
+        this.notificationService.logException(
+          exception,
+          `Can't load objectContainers for ${connectionId}@${catalogId}`,
+        );
+      }
     }
   }
 }
