@@ -14,9 +14,10 @@ import { StaticImage } from './StaticImage';
 export type IconOrImageProps = {
   icon: string;
   className?: string;
+  viewBox?: string;
 };
 
-export const IconOrImage = function IconOrImage({ icon, className }: IconOrImageProps) {
+export const IconOrImage = function IconOrImage({ icon, className, viewBox }: IconOrImageProps) {
 
   const isStaticIcon = useMemo(
     () => icon && icon.startsWith('platform:'),
@@ -27,5 +28,5 @@ export const IconOrImage = function IconOrImage({ icon, className }: IconOrImage
     return <StaticImage icon={icon} className={className}/>;
   }
 
-  return <Icon name={icon} className={className} viewBox="0 0 32 32" />;
+  return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} />;
 };
