@@ -16,12 +16,9 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.CloudbeaverConstants;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.sql.WebSQLProcessor;
-import org.jkiss.dbeaver.DBException;
+import io.cloudbeaver.server.CloudbeaverConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -34,7 +31,6 @@ public class WebConnectionInfo {
     private final WebSession session;
     private DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
-    private WebSQLProcessor sqlProcessor;
 
     private String connectTime;
     private String serverVersion;
@@ -43,6 +39,10 @@ public class WebConnectionInfo {
     public WebConnectionInfo(WebSession session, DBPDataSourceContainer ds) {
         this.session = session;
         this.dataSourceContainer = ds;
+    }
+
+    public WebSession getSession() {
+        return session;
     }
 
     public DBPDataSourceContainer getDataSourceContainer() {
@@ -122,17 +122,4 @@ public class WebConnectionInfo {
         this.clientVersion = clientVersion;
     }
 
-    public WebSQLProcessor getSQLProcessor() throws DBWebException {
-        if (getDataSource() == null) {
-            try {
-                dataSourceContainer.connect(session.getProgressMonitor(), true, false);
-            } catch (DBException e) {
-                throw new DBWebException("Error connecting to database", e);
-            }
-        }
-        if (sqlProcessor == null) {
-            sqlProcessor = new WebSQLProcessor(session, this);
-        }
-        return sqlProcessor;
-    }
 }

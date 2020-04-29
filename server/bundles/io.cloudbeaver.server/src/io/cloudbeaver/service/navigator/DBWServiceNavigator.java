@@ -19,7 +19,7 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.WebNavigatorNodeInfo;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 
 import java.util.List;
@@ -38,4 +38,6 @@ public interface DBWServiceNavigator extends DBWService {
     @WebAction
     boolean refreshNavigatorNode(WebSession session, String nodePath) throws DBWebException;
 
+    @WebAction
+    WebStructContainers getStructContainers(WebConnectionInfo connectionInfo, String catalog) throws DBWebException;
 }

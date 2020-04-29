@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.sql;
+package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebDatabaseObjectInfo;
+import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.navigator.WebStructContainers;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -385,30 +386,6 @@ public class WebSQLProcessor {
             rowCount++;
         }
         dataReceiver.fetchEnd(session, dbResult);
-    }
-
-    public WebStructContainers getStructContainers(String catalog) throws DBWebException {
-        DBPDataSource dataSource = connection.getDataSource();
-        ContextDefaultObjectsReader reader = new ContextDefaultObjectsReader(dataSource, getExecutionContext());
-        reader.setReadNodes(false);
-        try {
-            reader.run(webSession.getProgressMonitor());
-        } catch (InvocationTargetException e) {
-            throw new DBWebException("Error reading context defaults", e.getTargetException());
-        } catch (InterruptedException e) {
-            // ignore
-        }
-        WebStructContainers structContainers = new WebStructContainers();
-        if (!CommonUtils.isEmpty(reader.getObjectList())) {
-            for (DBSObject node : reader.getObjectList()) {
-                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
-                    continue;
-                }
-                List<WebDatabaseObjectInfo> objectInfos = node instanceof DBSCatalog ? structContainers.getCatalogList() : structContainers.getSchemaList();
-                objectInfos.add(new WebDatabaseObjectInfo(webSession, node));
-            }
-        }
-        return structContainers;
     }
 
     ///////////////////////////////////////////////////////

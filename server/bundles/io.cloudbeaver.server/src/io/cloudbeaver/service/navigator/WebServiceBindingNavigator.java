@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.service.navigator;
 
-import io.cloudbeaver.DBWUtils;
+import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.navigator.impl.WebServiceNavigator;
+import io.cloudbeaver.service.sql.WebServiceBindingSQL;
+
+import java.util.Map;
 
 /**
  * Web service implementation
@@ -47,9 +50,18 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 getWebSession(model, env),
                 env.getArgument("nodePath")
             ))
-            .dataFetcher("navGetStructContainers", env -> DBWUtils.getSQLProcessor(model.getSessionManager(), env).getStructContainers(
+            .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
+                getWebConnection(model, env),
                 env.getArgument("catalog")
             ));
+
+        model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")
+            .dataFetcher("properties", env -> {
+                Map<String, Object> filterProps = env.getArgument("filter");
+                WebPropertyFilter filter = filterProps == null ? null : new WebPropertyFilter(filterProps);
+                return ((WebDatabaseObjectInfo)env.getSource()).filterProperties(filter);
+            })
+        );
     }
 
 }

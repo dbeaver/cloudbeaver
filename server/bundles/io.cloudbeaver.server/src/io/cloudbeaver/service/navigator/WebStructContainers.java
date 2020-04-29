@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.sql;
+package io.cloudbeaver.service.navigator;
 
-import io.cloudbeaver.model.WebDatabaseObjectInfo;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;

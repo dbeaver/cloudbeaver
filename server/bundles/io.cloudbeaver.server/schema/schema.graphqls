@@ -9,8 +9,6 @@ scalar DateTime
 
 # Async types
 
-union AsyncTaskResult = SQLExecuteInfo
-
 type AsyncTaskInfo {
     id: String!
     name: String
@@ -188,110 +186,6 @@ type ConnectionInfo {
     features: [ String! ]
 }
 
-####################################################
-# SQL helpers
-####################################################
-
-type SQLDialectInfo {
-    name: String
-
-    dataTypes: [ String ]
-    functions: [ String ]
-    reservedWords: [ String ]
-    quoteStrings: [ [ String ] ]
-    singleLineComments: [ String ]
-    multiLineComments: [ [ String ] ]
-
-    catalogSeparator: String
-    structSeparator: String
-    scriptDelimiter: String
-
-}
-
-type SQLCompletionProposal {
-    displayString: String
-    type: String
-    score: Int
-
-    replacementString: String
-    replacementOffset: Int
-    replacementLength: Int
-    cursorPosition: Int
-
-    icon: String
-    nodePath: String
-}
-
-####################################################
-# Data read / SQL execution
-####################################################
-
-# SQL context must be created for each SQL editor
-type SQLContextInfo {
-
-    id: ID!
-    defaultCatalog: String
-    defaultSchema: String
-
-}
-
-input SQLDataFilterConstraint {
-    attribute: String!
-    orderPosition: Int
-    orderAsc: Boolean
-
-    criteria: String
-    operator: String
-    value: Object
-}
-
-input SQLDataFilter {
-
-    offset: Int
-    limit: Int
-
-    constraints: [ SQLDataFilterConstraint ]
-    where: String
-}
-
-type SQLResultColumn {
-    position: Int
-    name: String
-    label: String
-    icon: String
-    entityName: String
-
-    dataKind: String
-    typeName: String
-    fullTypeName: String
-    maxLength: Int
-    scale: Int
-    precision: Int
-}
-
-type SQLResultSet {
-    id: ID!
-    columns: [ SQLResultColumn ]
-    rows: [ [ Object ] ]
-    # server always returns hasMoreData = false
-    hasMoreData: Boolean
-}
-
-type SQLQueryResults {
-    title: String
-    updateRowCount: Int
-    sourceQuery: String
-
-    resultSet: SQLResultSet
-}
-
-type SQLExecuteInfo {
-
-    statusMessage: String
-    duration: Int
-    results: [ SQLQueryResults! ]
-}
-
 type LogEntry {
     time: DateTime
     type: String!
@@ -324,18 +218,6 @@ type Query {
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]
 
-    sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
-
-    sqlListContexts( connectionId: ID! ): [ SQLContextInfo ]
-
-    sqlCompletionProposals(
-        connectionId: ID!,
-        contextId: ID!,
-        query: String!,
-        position: Int!,
-        maxResults: Int
-    ): [ SQLCompletionProposal ]
-
 }
 
 type Mutation {
@@ -362,48 +244,6 @@ type Mutation {
 
     # Disconnect from database
     closeConnection( id: ID! ): Boolean!
-
-    sqlContextCreate( connectionId: ID!, defaultCatalog: String, defaultSchema: String ): SQLContextInfo!
-
-    sqlContextSetDefaults( connectionId: ID!, contextId: ID!, defaultCatalog: ID, defaultSchema: ID ): Boolean!
-
-    sqlContextDestroy( connectionId: ID!, contextId: ID! ): Boolean!
-
-    sqlExecuteQuery(
-        connectionId: ID!,
-        contextId: ID!,
-        sql: String!,
-        filter: SQLDataFilter
-    ): SQLExecuteInfo
-
-    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
-
-    readDataFromContainer(
-        connectionId: ID!,
-        contextId: ID!,
-        containerNodePath: ID!,
-        filter: SQLDataFilter
-    ): SQLExecuteInfo
-
-    updateResultsData(
-        connectionId: ID!,
-        contextId: ID!,
-        resultsId: ID!,
-
-        updateRow: [ Object ]!,
-        # Map<Int,Object>
-        updateValues: Object
-    ): SQLExecuteInfo
-
-    ### Async API
-
-    # Returns SQLExecuteInfo
-    asyncSqlExecuteQuery(
-        connectionId: ID!,
-        contextId: ID!,
-        sql: String!,
-        filter: SQLDataFilter
-    ): AsyncTaskInfo!
 
     #### Generic async functions
 

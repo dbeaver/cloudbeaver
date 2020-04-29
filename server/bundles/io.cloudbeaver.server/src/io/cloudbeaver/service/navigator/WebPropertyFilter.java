@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model;
+package io.cloudbeaver.service.navigator;
 
 import java.util.List;
 import java.util.Map;

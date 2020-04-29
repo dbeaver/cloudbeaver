@@ -14,22 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.metadata;
+package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-
-import java.util.Map;
 
 /**
  * Web service API
  */
-public interface DBWServiceMetadata extends DBWService {
+public interface DBWServiceSQL extends DBWService {
 
-    @WebAction
-    String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
 
 }

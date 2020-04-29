@@ -21,8 +21,8 @@ import io.cloudbeaver.DBWService;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.sql.WebSQLContextInfo;
-import io.cloudbeaver.model.sql.WebSQLProcessor;
+import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
 

@@ -22,6 +22,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,12 +79,16 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
     }
 
-    protected HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
+    protected static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
         return DBWUtils.getServletRequest(env);
     }
 
-    protected WebSession getWebSession(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
+    protected static WebSession getWebSession(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
         return model.getSessionManager().getWebSession(getServletRequest(env));
+    }
+
+    protected static WebConnectionInfo getWebConnection(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
+        return getWebSession(model, env).getWebConnectionInfo(env.getArgument("connectionId"));
     }
 
     private class ServiceInvocationHandler implements InvocationHandler {

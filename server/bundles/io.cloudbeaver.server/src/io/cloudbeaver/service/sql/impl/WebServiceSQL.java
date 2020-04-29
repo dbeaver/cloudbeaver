@@ -14,33 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.sql;
+package io.cloudbeaver.service.sql.impl;
 
-import org.jkiss.dbeaver.model.meta.Property;
+
+import io.cloudbeaver.service.sql.DBWServiceSQL;
 
 /**
- * Web SQL query results.
+ * Web service implementation
  */
-public class WebSQLQueryResults {
+public class WebServiceSQL implements DBWServiceSQL {
 
-    private Integer updateRowCount;
-    private WebSQLQueryResultSet resultSet;
-
-    @Property
-    public Integer getUpdateRowCount() {
-        return updateRowCount;
-    }
-
-    public void setUpdateRowCount(int updateRowCount) {
-        this.updateRowCount = updateRowCount;
-    }
-
-    @Property
-    public WebSQLQueryResultSet getResultSet() {
-        return resultSet;
-    }
-
-    public void setResultSet(WebSQLQueryResultSet resultSet) {
-        this.resultSet = resultSet;
-    }
 }

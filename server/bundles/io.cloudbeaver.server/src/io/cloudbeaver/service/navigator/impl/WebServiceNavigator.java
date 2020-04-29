@@ -18,16 +18,26 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebNavigatorNodeInfo;
+import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
+import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
+import io.cloudbeaver.service.navigator.WebStructContainers;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
 import org.jkiss.dbeaver.model.navigator.DBNContainer;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.utils.CommonUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -98,5 +108,32 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
     }
 
+    @Override
+    public WebStructContainers getStructContainers(WebConnectionInfo connection, String catalog) throws DBWebException {
+
+        DBPDataSource dataSource = connection.getDataSource();
+        DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
+
+        ContextDefaultObjectsReader reader = new ContextDefaultObjectsReader(dataSource, executionContext);
+        reader.setReadNodes(false);
+        try {
+            reader.run(connection.getSession().getProgressMonitor());
+        } catch (InvocationTargetException e) {
+            throw new DBWebException("Error reading context defaults", e.getTargetException());
+        } catch (InterruptedException e) {
+            // ignore
+        }
+        WebStructContainers structContainers = new WebStructContainers();
+        if (!CommonUtils.isEmpty(reader.getObjectList())) {
+            for (DBSObject node : reader.getObjectList()) {
+                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+                    continue;
+                }
+                List<WebDatabaseObjectInfo> objectInfos = node instanceof DBSCatalog ? structContainers.getCatalogList() : structContainers.getSchemaList();
+                objectInfos.add(new WebDatabaseObjectInfo(connection.getSession(), node));
+            }
+        }
+        return structContainers;
+    }
 
 }

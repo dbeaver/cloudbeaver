@@ -18,10 +18,9 @@ package io.cloudbeaver;
 
 import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.model.sql.WebSQLContextInfo;
-import io.cloudbeaver.model.sql.WebSQLProcessor;
+import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLProcessor;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,20 +28,6 @@ import javax.servlet.http.HttpServletRequest;
  * Web utils
  */
 public class DBWUtils {
-
-    public static WebSQLProcessor getSQLProcessor(WebSessionManager sessionManager, DataFetchingEnvironment env) throws DBWebException {
-        return sessionManager.getWebSession(getServletRequest(env)).getSQLProcessor(env.getArgument("connectionId"));
-    }
-
-    public static WebSQLContextInfo getSQLContext(WebSessionManager sessionManager, DataFetchingEnvironment env) throws DBWebException {
-        WebSQLProcessor processor = getSQLProcessor(sessionManager, env);
-        String contextId = env.getArgument("contextId");
-        WebSQLContextInfo context = processor.getContext(contextId);
-        if (context == null) {
-            throw new DBWebException("SQL context '" + contextId + "' not found");
-        }
-        return context;
-    }
 
     public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
         GraphQLContext context = env.getContext();

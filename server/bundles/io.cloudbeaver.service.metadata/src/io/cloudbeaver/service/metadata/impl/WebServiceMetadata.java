@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.metadata.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebNavigatorNodeInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.metadata.DBWServiceMetadata;
 import org.jkiss.dbeaver.DBException;

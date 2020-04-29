@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.sql;
+package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.server.CloudbeaverConstants;
 import org.jkiss.dbeaver.Log;

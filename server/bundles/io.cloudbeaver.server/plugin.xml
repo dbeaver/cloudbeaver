@@ -36,6 +36,7 @@
 
     <extension point="io.cloudbeaver.service">
         <service id="navigator" label="Database navigator" description="Database navigator services" class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator"/>
+        <service id="sql" label="SQL processing" description="SQL processing and data read services" class="io.cloudbeaver.service.sql.WebServiceBindingSQL"/>
     </extension>
 
 </plugin>

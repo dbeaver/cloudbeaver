@@ -10,12 +10,11 @@ import io.cloudbeaver.service.DBWServiceBinding;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.server.CloudbeaverPlatform;
-import io.cloudbeaver.model.WebDatabaseObjectInfo;
-import io.cloudbeaver.model.WebPropertyFilter;
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.model.sql.WebSQLDataFilter;
+import io.cloudbeaver.service.sql.WebSQLDataFilter;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
@@ -29,6 +28,7 @@ class GraphQLBindingContext implements DBWBindingContext {
     private TypeRuntimeWiring.Builder queryType;
     private TypeRuntimeWiring.Builder mutationType;
     private WebSessionManager sessionManager;
+    private RuntimeWiring.Builder runtimeWiring;
 
     GraphQLBindingContext() {
     }
@@ -41,6 +41,11 @@ class GraphQLBindingContext implements DBWBindingContext {
     @Override
     public WebSessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    @Override
+    public RuntimeWiring.Builder getRuntimeWiring() {
+        return runtimeWiring;
     }
 
     @Override
@@ -58,8 +63,8 @@ class GraphQLBindingContext implements DBWBindingContext {
         CloudbeaverPlatform webServiceMain = getPlatform();
         sessionManager = webServiceMain.getSessionManager();
 
-        RuntimeWiring.Builder builder = RuntimeWiring.newRuntimeWiring();
-        builder
+        runtimeWiring = RuntimeWiring.newRuntimeWiring();
+        runtimeWiring
             .scalar(ExtendedScalars.DateTime)
             .scalar(ExtendedScalars.Object);
         queryType = TypeRuntimeWiring.newTypeWiring("Query");
@@ -76,17 +81,6 @@ class GraphQLBindingContext implements DBWBindingContext {
             .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(getServletRequest(env), false, true).readLog(
                 env.getArgument("maxEntries"),
                 env.getArgument("clearEntries")))
-
-            .dataFetcher("sqlDialectInfo", env ->
-                DBWUtils.getSQLProcessor(sessionManager, env).getDialectInfo()
-            )
-            .dataFetcher("sqlCompletionProposals", env ->
-                DBWUtils.getSQLContext(sessionManager, env).getCompletionProposals(
-                    env.getArgument("query"),
-                    env.getArgument("position"),
-                    env.getArgument("maxResults")
-                )
-            )
         ;
 
         mutationType
@@ -103,33 +97,6 @@ class GraphQLBindingContext implements DBWBindingContext {
             .dataFetcher("testConnection", env -> sessionManager.testConnection(getServletRequest(env), env.getArgument("config")))
             .dataFetcher("closeConnection", env -> sessionManager.closeConnection(getServletRequest(env), env.getArgument("id")))
 
-            .dataFetcher("sqlContextCreate", env -> DBWUtils.getSQLProcessor(sessionManager, env).createContext(env.getArgument("defaultCatalog"), env.getArgument("defaultSchema")))
-            .dataFetcher("sqlContextDestroy", env -> { DBWUtils.getSQLContext(sessionManager, env).destroy(); return true; } )
-            .dataFetcher("sqlContextSetDefaults", env -> { DBWUtils.getSQLContext(sessionManager, env).setDefaults(env.getArgument("defaultCatalog"), env.getArgument("defaultSchema")); return true; })
-
-            .dataFetcher("sqlExecuteQuery", env ->
-                DBWUtils.getSQLContext(sessionManager, env).executeQuery(
-                    env.getArgument("sql"), getDataFilter(env)
-            ))
-            .dataFetcher("sqlResultClose", env ->
-                DBWUtils.getSQLContext(sessionManager, env).closeResult(env.getArgument("resultId")))
-
-            .dataFetcher("readDataFromContainer", env ->
-                DBWUtils.getSQLProcessor(sessionManager, env).readDataFromContainer(
-                    DBWUtils.getSQLContext(sessionManager, env),
-                    env.getArgument("containerNodePath"), getDataFilter(env)
-                ))
-            .dataFetcher("updateResultsData", env ->
-                DBWUtils.getSQLProcessor(sessionManager, env).updateResultsData(
-                    DBWUtils.getSQLContext(sessionManager, env),
-                    env.getArgument("resultsId"),
-                    env.getArgument("updateRow"),
-                    env.getArgument("updateValues")
-                ))
-            .dataFetcher("asyncSqlExecuteQuery", env ->
-                DBWUtils.getSQLContext(sessionManager, env).asyncExecuteQuery(
-                    env.getArgument("sql"), getDataFilter(env)
-                ))
             .dataFetcher("asyncTaskStatus", env ->
                 sessionManager.getWebSession(getServletRequest(env)).asyncTaskStatus(
                     env.getArgument("id"))
@@ -158,34 +125,19 @@ class GraphQLBindingContext implements DBWBindingContext {
             }
         }
 
-        builder.type(queryType);
-        builder.type(mutationType);
+        runtimeWiring.type(queryType);
+        runtimeWiring.type(mutationType);
 
-        builder.type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")
-                .dataFetcher("properties", env -> {
-                    Map<String, Object> filterProps = env.getArgument("filter");
-                    WebPropertyFilter filter = filterProps == null ? null : new WebPropertyFilter(filterProps);
-                    return ((WebDatabaseObjectInfo)env.getSource()).filterProperties(filter);
-                })
-            );
-        builder.type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(env -> {
+        runtimeWiring.type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(env -> {
                 return env.getObject();
             })
         );
 
-        return builder.build();
+        return runtimeWiring.build();
     }
 
     private HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
         return DBWUtils.getServletRequest(env);
-    }
-
-    ///////////////////////////////////////
-    // Helpers
-
-    private static WebSQLDataFilter getDataFilter(DataFetchingEnvironment env) {
-        Map<String, Object> filterProps = env.getArgument("filter");
-        return filterProps == null ? null : new WebSQLDataFilter(filterProps);
     }
 
 

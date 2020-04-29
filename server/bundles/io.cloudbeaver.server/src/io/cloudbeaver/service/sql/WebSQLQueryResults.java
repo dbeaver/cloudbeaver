@@ -14,22 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.metadata;
+package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.DBWService;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-
-import java.util.Map;
+import org.jkiss.dbeaver.model.meta.Property;
 
 /**
- * Web service API
+ * Web SQL query results.
  */
-public interface DBWServiceMetadata extends DBWService {
+public class WebSQLQueryResults {
 
-    @WebAction
-    String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
+    private Integer updateRowCount;
+    private WebSQLQueryResultSet resultSet;
 
+    @Property
+    public Integer getUpdateRowCount() {
+        return updateRowCount;
+    }
+
+    public void setUpdateRowCount(int updateRowCount) {
+        this.updateRowCount = updateRowCount;
+    }
+
+    @Property
+    public WebSQLQueryResultSet getResultSet() {
+        return resultSet;
+    }
+
+    public void setResultSet(WebSQLQueryResultSet resultSet) {
+        this.resultSet = resultSet;
+    }
 }

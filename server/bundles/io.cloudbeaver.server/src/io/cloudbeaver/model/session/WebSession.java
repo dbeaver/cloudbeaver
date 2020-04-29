@@ -21,7 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CloudbeaverConstants;
 import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.model.*;
-import io.cloudbeaver.model.sql.WebSQLProcessor;
+import io.cloudbeaver.service.sql.WebSQLProcessor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -311,7 +311,7 @@ public class WebSession {
     }
 
     @NotNull
-    private WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
+    public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
         WebConnectionInfo connectionInfo = null;
         synchronized (connections) {
             for (WebConnectionInfo ci : connections) {
@@ -363,10 +363,6 @@ public class WebSession {
 
     public DBRProgressMonitor getProgressMonitor() {
         return progressMonitor;
-    }
-
-    public WebSQLProcessor getSQLProcessor(String connectionId) throws DBWebException {
-        return getWebConnectionInfo(connectionId).getSQLProcessor();
     }
 
     public List<WebDatabaseDriverConfig> getDriverList(@Nullable String driverId) {

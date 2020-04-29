@@ -1,6 +1,6 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
-import io.cloudbeaver.model.sql.WebSQLDataFilter;
+import io.cloudbeaver.service.sql.WebSQLDataFilter;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Map;
