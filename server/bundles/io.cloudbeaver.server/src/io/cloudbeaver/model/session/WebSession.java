@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CloudbeaverConstants;
 import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.model.*;
@@ -68,6 +69,7 @@ public class WebSession {
     private long createTime;
     private long lastAccessTime;
 
+    private WebUser user;
     private String locale;
 
     private final List<WebConnectionInfo> connections = new ArrayList<>();
@@ -124,6 +126,14 @@ public class WebSession {
 
     public long getLastAccessTimeMillis() {
         return lastAccessTime;
+    }
+
+    public WebUser getUser() {
+        return user;
+    }
+
+    public void setUser(WebUser user) {
+        this.user = user;
     }
 
     @NotNull

@@ -23,13 +23,16 @@ import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WebServiceRegistry {
 
     private static final Log log = Log.getLog(WebServiceRegistry.class);
 
     private static final String TAG_SERVICE = "service"; //$NON-NLS-1$
+    private static final String TAG_AUTH_MODEL = "authProvider"; //$NON-NLS-1$
 
     private static WebServiceRegistry instance = null;
 
@@ -44,6 +47,8 @@ public class WebServiceRegistry {
     private final List<WebServiceDescriptor> webServices = new ArrayList<>();
     private DBWServiceBinding[] webServiceInstances;
 
+    private final Map<String, WebAuthProviderDescriptor> authProviders = new LinkedHashMap<>();
+
     private WebServiceRegistry() {
     }
 
@@ -55,6 +60,9 @@ public class WebServiceRegistry {
                 if (TAG_SERVICE.equals(ext.getName())) {
                     this.webServices.add(
                         new WebServiceDescriptor(ext));
+                } else if (TAG_AUTH_MODEL.equals(ext.getName())) {
+                    WebAuthProviderDescriptor providerDescriptor = new WebAuthProviderDescriptor(ext);
+                    this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
                 }
             }
         }
@@ -94,4 +102,13 @@ public class WebServiceRegistry {
     public DBWServiceBinding[] getWebServiceInstances() {
         return webServiceInstances;
     }
+
+    public List<WebAuthProviderDescriptor> getAuthProviders() {
+        return new ArrayList<>(authProviders.values());
+    }
+
+    public WebAuthProviderDescriptor getAuthProvider(String id) {
+        return authProviders.get(id);
+    }
+
 }

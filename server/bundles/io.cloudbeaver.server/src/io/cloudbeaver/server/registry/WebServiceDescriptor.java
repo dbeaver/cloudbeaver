@@ -22,6 +22,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.AbstractContextDescriptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * WebServiceDescriptor
  */
@@ -35,6 +38,7 @@ public class WebServiceDescriptor extends AbstractContextDescriptor {
     private final ObjectType implClass;
 
     private DBWServiceBinding instance;
+    private final List<WebPermissionDescriptor> permissions = new ArrayList<>();
 
     public WebServiceDescriptor(IConfigurationElement config)
     {
@@ -43,6 +47,10 @@ public class WebServiceDescriptor extends AbstractContextDescriptor {
         this.label = config.getAttribute("label");
         this.description = config.getAttribute("description");
         this.implClass = new ObjectType(config.getAttribute("class"));
+
+        for (IConfigurationElement pc : config.getChildren("permission")) {
+            permissions.add(new WebPermissionDescriptor(this, pc));
+        }
     }
 
     public String getId() {
@@ -55,6 +63,10 @@ public class WebServiceDescriptor extends AbstractContextDescriptor {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<WebPermissionDescriptor> getPermissions() {
+        return permissions;
     }
 
     public DBWServiceBinding getInstance()

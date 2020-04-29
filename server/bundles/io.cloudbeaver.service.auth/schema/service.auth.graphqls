@@ -8,7 +8,7 @@ type AuthCredentialInfo {
     order: Int
 }
 
-type AuthModelInfo {
+type AuthProviderInfo {
     id: ID!
     label: String!
     icon: ID
@@ -30,12 +30,12 @@ type UserAuthInfo {
 
 extend type Query {
 
-    authLogin(model: ID!, credentials: Object!): UserAuthInfo
+    authLogin(provider: ID!, credentials: Object!): UserAuthInfo
 
     authLogout: Boolean
 
     sessionUser: UserAuthInfo
 
-    authModels: [AuthModelInfo]!
+    authModels: [AuthProviderInfo]!
 
 }
