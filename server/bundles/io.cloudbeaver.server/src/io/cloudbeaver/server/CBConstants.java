@@ -32,21 +32,21 @@ public class CBConstants {
 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 
-    public static final String PARAM_SERVER_PORT = "ServerPort";
-    public static final String PARAM_SERVER_NAME = "ServerName";
-    public static final String PARAM_CONTENT_ROOT = "ContentRoot";
-    public static final String PARAM_ROOT_URI = "RootURI";
-    public static final String PARAM_SERVICES_URI = "ServiceURI";
-    public static final String PARAM_DRIVERS_LOCATION = "DriversLocation";
-    public static final String PARAM_WORKSPACE_LOCATION = "WorkspaceLocation";
-    public static final String PARAM_PRODUCT_CONFIGURATION = "ProductConfiguration";
+    public static final String PARAM_SERVER_PORT = "serverPort";
+    public static final String PARAM_SERVER_NAME = "serverName";
+    public static final String PARAM_CONTENT_ROOT = "contentRoot";
+    public static final String PARAM_ROOT_URI = "rootURI";
+    public static final String PARAM_SERVICES_URI = "serviceURI";
+    public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
+    public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
+    public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
 
-    public static final String PARAM_SESSION_EXPIRE_PERIOD = "ExpireSessionAfterPeriod";
+    public static final String PARAM_SESSION_EXPIRE_PERIOD = "expireSessionAfterPeriod";
 
-    public static final String PARAM_DEVEL_MODE = "DevelMode";
+    public static final String PARAM_DEVEL_MODE = "develMode";
 
     public static final int DEFAULT_SERVER_PORT = 8080;
-    public static final String DEFAULT_SERVER_NAME = "Cloudbeaver Web Server";
+    public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";
     public static final String DEFAULT_CONTENT_ROOT = "/var/www/cloudbeaver";
     public static final String DEFAULT_ROOT_URI = "/";
     public static final String DEFAULT_SERVICES_URI = "/dbeaver/";

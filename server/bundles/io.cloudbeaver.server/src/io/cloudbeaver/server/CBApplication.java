@@ -21,7 +21,6 @@ import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.app.DBPApplication;
@@ -39,7 +38,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * This class controls all aspects of the application's execution
@@ -49,6 +47,10 @@ public class CBApplication extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CBApplication.class);
 
     public static final String APPLICATION_PLUGIN_ID = "io.cloudbeaver.server";
+
+    public static CBApplication getInstance() {
+        return (CBApplication) BaseApplicationImpl.getInstance();
+    }
 
     private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverName = CBConstants.DEFAULT_SERVER_NAME;
@@ -60,6 +62,7 @@ public class CBApplication extends BaseApplicationImpl {
     private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
 
     private Map<String, Object> productConfiguration = new HashMap<>();
+    private Map<String, Object> appConfiguration = new HashMap<>();
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -96,13 +99,8 @@ public class CBApplication extends BaseApplicationImpl {
         return maxSessionIdleTime;
     }
 
-    /**
-     * Gets singleton instance of DBeaver application
-     *
-     * @return application or null if application wasn't started or was stopped.
-     */
-    public static CBApplication getInstance() {
-        return (CBApplication) BaseApplicationImpl.getInstance();
+    public Map<String, Object> getAppConfiguration() {
+        return appConfiguration;
     }
 
     public Map<String, Object> getProductConfiguration() {
@@ -125,7 +123,11 @@ public class CBApplication extends BaseApplicationImpl {
                 break;
             }
         }
-        loadConfiguration(configPath);
+        try {
+            loadConfiguration(configPath);
+        } catch (Exception e) {
+            log.error("Error parsing configuration", e);
+        }
 
         final Runtime runtime = Runtime.getRuntime();
 
@@ -179,19 +181,13 @@ public class CBApplication extends BaseApplicationImpl {
         if (!configFile.exists()) {
             log.error("Configuration file " + configFile.getAbsolutePath() + " doesn't exist. Use defaults.");
         } else {
-            Properties props = new Properties();
-            try (InputStream is = new FileInputStream(configFile)) {
-                props.load(is);
-                parseConfiguration(props);
-            } catch (IOException e) {
-                log.error("Error reading config file", e);
-            }
+            parseConfiguration(configFile);
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
     }
 
-    private void parseConfiguration(Properties props) {
+    private void parseConfiguration(File configFile) {
         String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = System.getProperty("user.dir");
@@ -199,20 +195,37 @@ public class CBApplication extends BaseApplicationImpl {
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = ".";
         }
+        String productConfigPath = null;
 
-        serverPort = CommonUtils.toInt(getConfigParameter(props, CBConstants.PARAM_SERVER_PORT, String.valueOf(CBConstants.DEFAULT_SERVER_PORT)));
-        serverName = getConfigParameter(props, CBConstants.PARAM_SERVER_NAME, CBConstants.DEFAULT_SERVER_NAME);
-        contentRoot = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_CONTENT_ROOT, CBConstants.DEFAULT_CONTENT_ROOT), homeFolder);
-        rootURI = getConfigParameter(props, CBConstants.PARAM_ROOT_URI, CBConstants.DEFAULT_ROOT_URI);
-        servicesURI = getConfigParameter(props, CBConstants.PARAM_SERVICES_URI, CBConstants.DEFAULT_SERVICES_URI);
-        driversLocation = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_DRIVERS_LOCATION, CBConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
-        workspaceLocation = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_WORKSPACE_LOCATION, CBConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
+        GsonBuilder gsonBuilder = new GsonBuilder().setLenient();
 
-        maxSessionIdleTime = getConfigParameter(props, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, CBConstants.MAX_SESSION_IDLE_TIME);
+        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+            Map<String, Object> configProps = JSONUtils.parseMap(gsonBuilder.create(), reader);
 
-        develMode = CommonUtils.toBoolean(getConfigParameter(props, CBConstants.PARAM_DEVEL_MODE, "false"));
+            Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
+            serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, CBConstants.DEFAULT_SERVER_PORT);
+            serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, CBConstants.DEFAULT_SERVER_NAME);
+            contentRoot = this.getRelativePath(
+                JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, CBConstants.DEFAULT_CONTENT_ROOT), homeFolder);
+            rootURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, CBConstants.DEFAULT_ROOT_URI);
+            servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, CBConstants.DEFAULT_SERVICES_URI);
+            driversLocation = this.getRelativePath(
+                JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, CBConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
+            workspaceLocation = this.getRelativePath(
+                JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, CBConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
 
-        String productConfigPath = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+            maxSessionIdleTime = JSONUtils.getLong(serverConfig, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, CBConstants.MAX_SESSION_IDLE_TIME);
+
+            develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, false);
+
+            productConfigPath = this.getRelativePath(
+                JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+
+            appConfiguration = JSONUtils.getObject(configProps, "app");
+        } catch (IOException e) {
+            log.error("Error parsing server configuration", e);
+        }
+
         if (!CommonUtils.isEmpty(productConfigPath)) {
             File productConfigFile = new File(productConfigPath);
             if (!productConfigFile.exists()) {
@@ -221,7 +234,6 @@ public class CBApplication extends BaseApplicationImpl {
                 log.debug("Load product configuration from '" + productConfigFile.getAbsolutePath() + "'");
                 try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile), StandardCharsets.UTF_8)) {
 
-                    GsonBuilder gsonBuilder = new GsonBuilder().setLenient();
                     //gsonBuilder.registerTypeAdapter(Object.class, new JSONBestNumberObjectDeserializer());
 
                     productConfiguration = JSONUtils.parseMap(gsonBuilder.create(), reader);
@@ -237,23 +249,6 @@ public class CBApplication extends BaseApplicationImpl {
             return path;
         }
         return new File(curDir, path).getAbsolutePath();
-    }
-
-    @NotNull
-    private String getConfigParameter(@NotNull Properties props, @NotNull String paramName, @NotNull String defValue) {
-        String property = props.getProperty(paramName);
-        if (property == null) {
-            property = defValue;
-        }
-        return property;
-    }
-
-    private long getConfigParameter(@NotNull Properties props, @NotNull String paramName, long defValue) {
-        String property = props.getProperty(paramName);
-        if (property == null) {
-            return defValue;
-        }
-        return CommonUtils.toLong(property, defValue);
     }
 
     private void runWebServer() {
