@@ -13,7 +13,7 @@ echo "Pull dbeaver platform"
 cd ../..
 if [[ ! -f dbeaver ]]
 then
-  git clone https://github.com/dbeaver/dbeaver.git
+  git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 fi
 cd dbeaver
 git pull
