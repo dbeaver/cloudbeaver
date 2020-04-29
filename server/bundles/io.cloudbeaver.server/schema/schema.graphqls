@@ -189,76 +189,6 @@ type ConnectionInfo {
 }
 
 ####################################################
-# Nodes, objects and properties
-####################################################
-
-type ObjectDescriptor {
-    id: Int
-    displayName: String
-    fullName: String
-    uniqueName: String
-    description: String
-    value: String
-}
-
-type ObjectPropertyInfo {
-    # ID
-    id: String
-    # Human readable name
-    displayName: String
-    # Property description
-    description: String
-    # Property category (may be used if object has a lot of properties)
-    category: String
-    # Property data type (int, String, etc)
-    dataType: String
-
-    # Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables)
-    value: Object
-
-    # List of values this property can take. Makes sense only for enumerable properties
-    validValues: [ Object ]
-    # Supported features (system, hidden, inherited, foreign, expensive, etc)
-    features: [ String! ]
-}
-
-input ObjectPropertyFilter {
-    ids: [String]
-    features: [String]
-    categories: [String]
-    dataTypes: [String]
-}
-
-type DatabaseObjectInfo {
-    # Object name
-    name: String
-    # Description - optional
-    description: String
-    # Object type. Java class name in most cases
-    type: String
-
-    # Read object properties.
-    # Optional parameter 'ids' filters properties by id. null means all properties.
-    # Note: property value reading may take a lot of time so don't read all property values always
-    # Examine property meta (features in particular) before reading them
-    properties(filter: ObjectPropertyFilter): [ ObjectPropertyInfo ]
-
-    # Optional properties
-
-    ordinalPosition: Int
-    fullyQualifiedName: String
-    overloadedName: String
-    uniqueName: String
-    state: String
-
-    # Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog
-    features: [ String ]
-
-    # Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition
-    editors: [ String ]
-}
-
-####################################################
 # SQL helpers
 ####################################################
 
@@ -302,13 +232,6 @@ type SQLContextInfo {
     id: ID!
     defaultCatalog: String
     defaultSchema: String
-
-}
-
-type DatabaseStructContainers {
-
-    catalogList: [ DatabaseObjectInfo! ]!
-    schemaList: [ DatabaseObjectInfo! ]!
 
 }
 
