@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class CloudbeaverImageServlet extends HttpServlet {
+public class CBImageServlet extends HttpServlet {
 
-    private static final Log log = Log.getLog(CloudbeaverImageServlet.class);
+    private static final Log log = Log.getLog(CBImageServlet.class);
 
-    public CloudbeaverImageServlet() {
+    public CBImageServlet() {
 
     }
 

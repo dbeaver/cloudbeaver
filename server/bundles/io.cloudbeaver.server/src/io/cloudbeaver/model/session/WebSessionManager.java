@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import org.jkiss.code.NotNull;
@@ -140,7 +140,7 @@ public class WebSessionManager {
     }
 
     public void expireIdleSessions() {
-        long maxSessionIdleTime = DBWorkbench.getPlatform(CloudbeaverPlatform.class).getApplication().getMaxSessionIdleTime();
+        long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
 
         List<WebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {

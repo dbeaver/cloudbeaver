@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.server.CloudbeaverConstants;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -39,7 +39,7 @@ public class WebSQLUtils {
 
     public static Object makeWebCellValue(DBRProgressMonitor monitor, DBSTypedObject type, Object cellValue) throws DBCException {
         if (cellValue instanceof Date) {
-            return CloudbeaverConstants.ISO_DATE_FORMAT.format(cellValue);
+            return CBConstants.ISO_DATE_FORMAT.format(cellValue);
         }
         if (cellValue instanceof DBDValue) {
             DBDValue dbValue = (DBDValue) cellValue;

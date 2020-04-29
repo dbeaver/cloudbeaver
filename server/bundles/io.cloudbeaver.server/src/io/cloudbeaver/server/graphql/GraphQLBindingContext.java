@@ -5,21 +5,18 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBinding;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.DBWUtils;
-import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.service.sql.WebSQLDataFilter;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
-import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 class GraphQLBindingContext implements DBWBindingContext {
 
@@ -34,8 +31,8 @@ class GraphQLBindingContext implements DBWBindingContext {
     }
 
     @Override
-    public CloudbeaverPlatform getPlatform() {
-        return DBWorkbench.getPlatform(CloudbeaverPlatform.class);
+    public CBPlatform getPlatform() {
+        return DBWorkbench.getPlatform(CBPlatform.class);
     }
 
     @Override
@@ -60,7 +57,7 @@ class GraphQLBindingContext implements DBWBindingContext {
 
     RuntimeWiring buildRuntimeWiring() {
 
-        CloudbeaverPlatform webServiceMain = getPlatform();
+        CBPlatform webServiceMain = getPlatform();
         sessionManager = webServiceMain.getSessionManager();
 
         runtimeWiring = RuntimeWiring.newRuntimeWiring();

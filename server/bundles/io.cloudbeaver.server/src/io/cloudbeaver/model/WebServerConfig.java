@@ -17,7 +17,7 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebAction;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -120,7 +120,7 @@ public class WebServerConfig {
 
     @WebAction
     public Map<String, Object> getProductConfiguration() {
-        return CloudbeaverPlatform.getInstance().getApplication().getProductConfiguration();
+        return CBPlatform.getInstance().getApplication().getProductConfiguration();
     }
 
 }

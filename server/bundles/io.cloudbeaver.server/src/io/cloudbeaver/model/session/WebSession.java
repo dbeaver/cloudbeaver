@@ -19,10 +19,9 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.server.CloudbeaverConstants;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.model.*;
-import io.cloudbeaver.service.sql.WebSQLProcessor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -116,12 +115,12 @@ public class WebSession {
 
     @Property
     public String getCreateTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(createTime);
+        return CBConstants.ISO_DATE_FORMAT.format(createTime);
     }
 
     @Property
     public String getLastAccessTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+        return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
     public long getLastAccessTimeMillis() {
@@ -377,7 +376,7 @@ public class WebSession {
 
     public List<WebDatabaseDriverConfig> getDriverList(@Nullable String driverId) {
         List<WebDatabaseDriverConfig> result = new ArrayList<>();
-        for (DBPDriver driver : CloudbeaverPlatform.getInstance().getApplicableDrivers()) {
+        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(WebServiceUtils.makeDriverFullId(driver))) {
                 result.add(new WebDatabaseDriverConfig(this, driver));
             }

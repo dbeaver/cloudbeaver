@@ -6,9 +6,9 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import javax.servlet.annotation.WebServlet;
 
 @WebServlet(urlPatterns = "/")
-public class CloudbeaverStaticServlet extends DefaultServlet {
+public class CBStaticServlet extends DefaultServlet {
 
-    public CloudbeaverStaticServlet() {
+    public CBStaticServlet() {
 //        super(makeResourceService());
         super();
     }

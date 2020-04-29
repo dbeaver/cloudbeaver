@@ -97,8 +97,8 @@ public class WebPlatformActivator extends Plugin {
     private void shutdownPlatform() {
         try {
             // Dispose core
-            if (CloudbeaverPlatform.instance != null) {
-                CloudbeaverPlatform.instance.dispose();
+            if (CBPlatform.instance != null) {
+                CBPlatform.instance.dispose();
             }
         } catch (Throwable e) {
             e.printStackTrace();

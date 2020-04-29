@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
-import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -61,7 +61,7 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
     }
 
     @Override
-    public void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler) {
+    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
         servletContextHandler.addServlet(
             new ServletHolder("dataTransfer", new WebDataTransferServlet(application, getServiceImpl())),
             application.getServicesURI() + "data/*");

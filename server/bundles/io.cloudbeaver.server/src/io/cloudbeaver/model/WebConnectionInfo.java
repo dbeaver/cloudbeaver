@@ -18,7 +18,7 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CloudbeaverConstants;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -90,7 +90,7 @@ public class WebConnectionInfo {
 
     @Property
     public String getConnectTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
+        return CBConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
     }
 
     @Property

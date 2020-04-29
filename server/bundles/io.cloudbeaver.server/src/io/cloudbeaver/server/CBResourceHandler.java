@@ -31,9 +31,9 @@ import java.util.List;
 /**
  * Default resource handler
  */
-public class CloudbeaverResourceHandler implements DBPResourceHandler {
+public class CBResourceHandler implements DBPResourceHandler {
 
-    public static final CloudbeaverResourceHandler INSTANCE = new CloudbeaverResourceHandler();
+    public static final CBResourceHandler INSTANCE = new CBResourceHandler();
 
     @Override
     public int getFeatures(IResource resource) {

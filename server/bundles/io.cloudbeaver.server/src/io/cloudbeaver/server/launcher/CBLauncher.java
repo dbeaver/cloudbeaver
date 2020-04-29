@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class CloudbeaverLauncher {
+public class CBLauncher {
 
     public static DBPPlatform instantiatePlatform() throws Exception {
         Map<String, String> props = new HashMap<>();

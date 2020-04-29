@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 /**
  * Various constants
  */
-public class CloudbeaverConstants {
+public class CBConstants {
 
     public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
 

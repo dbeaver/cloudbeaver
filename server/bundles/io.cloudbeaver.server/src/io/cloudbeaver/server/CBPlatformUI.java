@@ -16,26 +16,13 @@
  */
 package io.cloudbeaver.server;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
+import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 
 /**
- * Web workspace.
- *
- * Basically just a wrapper around Eclipse workspace.
+ * The activator class controls the plug-in life cycle
  */
-public class CloudbeaverWorkspace extends BaseWorkspaceImpl {
+public class CBPlatformUI extends ConsoleUserInterface {
 
-    public CloudbeaverWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
-        super(platform, eclipseWorkspace);
-    }
-
-    @NotNull
-    @Override
-    public String getWorkspaceId() {
-        return "web-workspace";
-    }
+    public static final CBPlatformUI INSTANCE = new CBPlatformUI();
 
 }

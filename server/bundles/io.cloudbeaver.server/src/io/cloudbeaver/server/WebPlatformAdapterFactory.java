@@ -31,9 +31,9 @@ public class WebPlatformAdapterFactory implements IAdapterFactory {
     public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
         if (adaptableObject instanceof DBWorkbench) {
             if (adapterType == DBPPlatform.class) {
-                return adapterType.cast(CloudbeaverPlatform.getInstance());
+                return adapterType.cast(CBPlatform.getInstance());
             } else if (adapterType == DBPPlatformUI.class) {
-                return adapterType.cast(CloudbeaverPlatformUI.INSTANCE);
+                return adapterType.cast(CBPlatformUI.INSTANCE);
             }
         }
         return null;

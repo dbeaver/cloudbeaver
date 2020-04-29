@@ -32,7 +32,7 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import org.jkiss.dbeaver.Log;
@@ -52,7 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class GraphQLEndpoint extends HttpServlet {
 
@@ -119,7 +118,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
-        if (CloudbeaverApplication.getInstance().isDevelMode()) {
+        if (CBApplication.getInstance().isDevelMode()) {
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
@@ -200,7 +199,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path == null) {
             path = request.getServletPath();
         }
-        boolean develMode = CloudbeaverApplication.getInstance().isDevelMode();
+        boolean develMode = CBApplication.getInstance().isDevelMode();
 
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);

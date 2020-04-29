@@ -16,13 +16,13 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.CBApplication;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.SessionCookieConfig;
 
-public class CloudbeaverServerContextListener implements ServletContextListener {
+public class CBServerContextListener implements ServletContextListener {
 
     public static final String DBEAVER_SESSION_COOKIE_NAME = "DBEAVER_SESSION_ID";
 
@@ -33,7 +33,7 @@ public class CloudbeaverServerContextListener implements ServletContextListener 
         //scf.setDomain(domain);
         //scf.setHttpOnly(httpOnly);
         //scf.setMaxAge(maxAge);
-        scf.setPath(CloudbeaverApplication.getInstance().getRootURI());
+        scf.setPath(CBApplication.getInstance().getRootURI());
         //scf.setSecure(isSecure);
         scf.setName(DBEAVER_SESSION_COOKIE_NAME);
     }

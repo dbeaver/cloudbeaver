@@ -1,7 +1,7 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.service.DBWServiceBindingServlet;
-import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -22,16 +22,16 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import java.io.File;
 import java.util.Arrays;
 
-public class CloudbeaverJettyServer {
+public class CBJettyServer {
 
-    private static final Log log = Log.getLog(CloudbeaverJettyServer.class);
+    private static final Log log = Log.getLog(CBJettyServer.class);
     private static final String SESSION_CACHE_DIR = ".http-sessions";
 
-    public CloudbeaverJettyServer() {
+    public CBJettyServer() {
     }
 
     public void runServer() {
-        CloudbeaverApplication application = CloudbeaverApplication.getInstance();
+        CBApplication application = CBApplication.getInstance();
         try {
             Server server = new Server(application.getServerPort());
 
@@ -40,10 +40,10 @@ public class CloudbeaverJettyServer {
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 servletContextHandler.setResourceBase(application.getContentRoot());
                 servletContextHandler.setContextPath(application.getRootURI());
-                servletContextHandler.addServlet(new ServletHolder("static", new CloudbeaverStaticServlet()), application.getRootURI());
-                servletContextHandler.addServlet(new ServletHolder("images", new CloudbeaverImageServlet()), application.getServicesURI() + "images/*");
+                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), application.getRootURI());
+                servletContextHandler.addServlet(new ServletHolder("images", new CBImageServlet()), application.getServicesURI() + "images/*");
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
-                servletContextHandler.addEventListener(new CloudbeaverServerContextListener());
+                servletContextHandler.addEventListener(new CBServerContextListener());
 
                 // Add extensions from services
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {

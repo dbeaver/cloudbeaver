@@ -56,46 +56,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CloudbeaverPlatform
+ * CBPlatform
  */
-public class CloudbeaverPlatform extends BasePlatformImpl {
+public class CBPlatform extends BasePlatformImpl {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
 
-    private static final Log log = Log.getLog(CloudbeaverPlatform.class);
+    private static final Log log = Log.getLog(CBPlatform.class);
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
-    static CloudbeaverPlatform instance;
+    static CBPlatform instance;
 
     @Nullable
-    private static CloudbeaverApplication application = null;
+    private static CBApplication application = null;
 
     private File tempFolder;
 
     private QMControllerImpl queryManager;
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
-    private CloudbeaverWorkspace workspace;
+    private CBWorkspace workspace;
 
     private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
 
-    public static CloudbeaverPlatform getInstance() {
+    public static CBPlatform getInstance() {
         if (instance == null) {
-            synchronized (CloudbeaverPlatform.class) {
+            synchronized (CBPlatform.class) {
                 if (instance == null) {
                     // Initialize DBeaver Core
-                    CloudbeaverPlatform.createInstance();
+                    CBPlatform.createInstance();
                 }
             }
         }
         return instance;
     }
 
-    private static CloudbeaverPlatform createInstance() {
+    private static CBPlatform createInstance() {
         log.debug("Initializing product: " + GeneralUtils.getProductTitle());
         if (Platform.getProduct() != null) {
             Bundle definingBundle = Platform.getProduct().getDefiningBundle();
@@ -107,12 +107,12 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
         }
 
         try {
-            instance = new CloudbeaverPlatform();
+            instance = new CBPlatform();
             instance.initialize();
             return instance;
         } catch (Throwable e) {
-            log.error("Error initializing CloudbeaverPlatform", e);
-            throw new IllegalStateException("Error initializing CloudbeaverPlatform", e);
+            log.error("Error initializing CBPlatform", e);
+            throw new IllegalStateException("Error initializing CBPlatform", e);
         }
     }
 
@@ -120,11 +120,11 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
         return WebPlatformActivator.getInstance().getPreferences();
     }
 
-    private CloudbeaverPlatform() {
+    private CBPlatform() {
     }
 
-    public static void setApplication(CloudbeaverApplication application) {
-        CloudbeaverPlatform.application = application;
+    public static void setApplication(CBApplication application) {
+        CBPlatform.application = application;
     }
 
     @Override
@@ -136,7 +136,7 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new CloudbeaverWorkspace(this, ResourcesPlugin.getWorkspace());
+        this.workspace = new CBWorkspace(this, ResourcesPlugin.getWorkspace());
         this.workspace.initializeProjects();
 
         QMUtils.initApplication(this);
@@ -213,8 +213,8 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
             tempFolder = null;
         }
 
-        CloudbeaverPlatform.application = null;
-        CloudbeaverPlatform.instance = null;
+        CBPlatform.application = null;
+        CBPlatform.instance = null;
         System.gc();
         log.debug("Shutdown completed in " + (System.currentTimeMillis() - startTime) + "ms");
     }
@@ -228,12 +228,12 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
     @NotNull
     @Override
     public DBPResourceHandler getDefaultResourceHandler() {
-        return CloudbeaverResourceHandler.INSTANCE;
+        return CBResourceHandler.INSTANCE;
     }
 
     @NotNull
     @Override
-    public CloudbeaverApplication getApplication() {
+    public CBApplication getApplication() {
         return application;
     }
 
@@ -308,7 +308,7 @@ public class CloudbeaverPlatform extends BasePlatformImpl {
 
     public WebServerConfig getServerConfig() {
         WebServerConfig config = new WebServerConfig(
-            CloudbeaverApplication.getInstance().getServerName(),
+            CBApplication.getInstance().getServerName(),
             GeneralUtils.getProductVersion().toString()
         );
         config.setSupportsPredefinedConnections(true);

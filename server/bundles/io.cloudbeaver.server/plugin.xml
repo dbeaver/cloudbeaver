@@ -8,7 +8,7 @@
 
     <extension point="org.eclipse.core.runtime.applications" id="standalone" name="Cloudbeaver Web Application">
         <application visible="true">
-            <run class="io.cloudbeaver.server.CloudbeaverApplication"/>
+            <run class="io.cloudbeaver.server.CBApplication"/>
         </application>
     </extension>
 

@@ -1,8 +1,8 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import org.jkiss.dbeaver.Log;
@@ -24,10 +24,10 @@ public class WebDataTransferServlet extends HttpServlet {
 
     private static final Log log = Log.getLog(WebDataTransferServlet.class);
 
-    private final CloudbeaverApplication application;
+    private final CBApplication application;
     private final DBWServiceDataTransfer dtManager;
 
-    public WebDataTransferServlet(CloudbeaverApplication application, DBWServiceDataTransfer dtManager) {
+    public WebDataTransferServlet(CBApplication application, DBWServiceDataTransfer dtManager) {
         this.application = application;
         this.dtManager = dtManager;
     }
@@ -40,7 +40,7 @@ public class WebDataTransferServlet extends HttpServlet {
         }
 
         try {
-            WebSession webSession = CloudbeaverPlatform.getInstance().getSessionManager().tryGetWebSession(request.getSession());
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().tryGetWebSession(request.getSession());
             if (webSession == null) {
                 throw new DBWebException("No active session");
             }

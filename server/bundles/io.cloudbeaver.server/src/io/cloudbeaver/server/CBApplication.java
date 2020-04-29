@@ -17,7 +17,7 @@
 package io.cloudbeaver.server;
 
 import com.google.gson.GsonBuilder;
-import io.cloudbeaver.server.jetty.CloudbeaverJettyServer;
+import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -44,28 +44,28 @@ import java.util.Properties;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CloudbeaverApplication extends BaseApplicationImpl {
+public class CBApplication extends BaseApplicationImpl {
 
-    private static final Log log = Log.getLog(CloudbeaverApplication.class);
+    private static final Log log = Log.getLog(CBApplication.class);
 
     public static final String APPLICATION_PLUGIN_ID = "io.cloudbeaver.server";
 
-    private int serverPort = CloudbeaverConstants.DEFAULT_SERVER_PORT;
-    private String serverName = CloudbeaverConstants.DEFAULT_SERVER_NAME;
-    private String contentRoot = CloudbeaverConstants.DEFAULT_CONTENT_ROOT;
-    private String rootURI = CloudbeaverConstants.DEFAULT_ROOT_URI;
-    private String servicesURI = CloudbeaverConstants.DEFAULT_SERVICES_URI;
+    private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
+    private String serverName = CBConstants.DEFAULT_SERVER_NAME;
+    private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
+    private String rootURI = CBConstants.DEFAULT_ROOT_URI;
+    private String servicesURI = CBConstants.DEFAULT_SERVICES_URI;
 
-    private String workspaceLocation = CloudbeaverConstants.DEFAULT_WORKSPACE_LOCATION;
-    private String driversLocation = CloudbeaverConstants.DEFAULT_DRIVERS_LOCATION;
+    private String workspaceLocation = CBConstants.DEFAULT_WORKSPACE_LOCATION;
+    private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
 
     private Map<String, Object> productConfiguration = new HashMap<>();
 
-    private long maxSessionIdleTime = CloudbeaverConstants.MAX_SESSION_IDLE_TIME;
+    private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
     private boolean develMode = false;
 
-    public CloudbeaverApplication() {
+    public CBApplication() {
     }
 
     public int getServerPort() {
@@ -101,8 +101,8 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
      *
      * @return application or null if application wasn't started or was stopped.
      */
-    public static CloudbeaverApplication getInstance() {
-        return (CloudbeaverApplication) BaseApplicationImpl.getInstance();
+    public static CBApplication getInstance() {
+        return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
     public Map<String, Object> getProductConfiguration() {
@@ -116,11 +116,11 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
 
     @Override
     public Object start(IApplicationContext context) {
-        String configPath = CloudbeaverConstants.DEFAULT_CONFIG_FILE_PATH;
+        String configPath = CBConstants.DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(CloudbeaverConstants.CLI_PARAM_WEB_CONFIG) & args.length > i + 1) {
+            if (args[i].equals(CBConstants.CLI_PARAM_WEB_CONFIG) & args.length > i + 1) {
                 configPath = args[i + 1];
                 break;
             }
@@ -142,7 +142,7 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
             log.debug("Error setting workspace location to " + workspaceLocation, e);
         }
 
-        CloudbeaverPlatform.setApplication(this);
+        CBPlatform.setApplication(this);
 
         log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
         log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
@@ -192,7 +192,7 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
     }
 
     private void parseConfiguration(Properties props) {
-        String homeFolder = System.getenv(CloudbeaverConstants.ENV_CB_HOME);
+        String homeFolder = System.getenv(CBConstants.ENV_CB_HOME);
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = System.getProperty("user.dir");
         }
@@ -200,19 +200,19 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
             homeFolder = ".";
         }
 
-        serverPort = CommonUtils.toInt(getConfigParameter(props, CloudbeaverConstants.PARAM_SERVER_PORT, String.valueOf(CloudbeaverConstants.DEFAULT_SERVER_PORT)));
-        serverName = getConfigParameter(props, CloudbeaverConstants.PARAM_SERVER_NAME, CloudbeaverConstants.DEFAULT_SERVER_NAME);
-        contentRoot = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_CONTENT_ROOT, CloudbeaverConstants.DEFAULT_CONTENT_ROOT), homeFolder);
-        rootURI = getConfigParameter(props, CloudbeaverConstants.PARAM_ROOT_URI, CloudbeaverConstants.DEFAULT_ROOT_URI);
-        servicesURI = getConfigParameter(props, CloudbeaverConstants.PARAM_SERVICES_URI, CloudbeaverConstants.DEFAULT_SERVICES_URI);
-        driversLocation = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_DRIVERS_LOCATION, CloudbeaverConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
-        workspaceLocation = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_WORKSPACE_LOCATION, CloudbeaverConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
+        serverPort = CommonUtils.toInt(getConfigParameter(props, CBConstants.PARAM_SERVER_PORT, String.valueOf(CBConstants.DEFAULT_SERVER_PORT)));
+        serverName = getConfigParameter(props, CBConstants.PARAM_SERVER_NAME, CBConstants.DEFAULT_SERVER_NAME);
+        contentRoot = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_CONTENT_ROOT, CBConstants.DEFAULT_CONTENT_ROOT), homeFolder);
+        rootURI = getConfigParameter(props, CBConstants.PARAM_ROOT_URI, CBConstants.DEFAULT_ROOT_URI);
+        servicesURI = getConfigParameter(props, CBConstants.PARAM_SERVICES_URI, CBConstants.DEFAULT_SERVICES_URI);
+        driversLocation = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_DRIVERS_LOCATION, CBConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
+        workspaceLocation = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_WORKSPACE_LOCATION, CBConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
 
-        maxSessionIdleTime = getConfigParameter(props, CloudbeaverConstants.PARAM_SESSION_EXPIRE_PERIOD, CloudbeaverConstants.MAX_SESSION_IDLE_TIME);
+        maxSessionIdleTime = getConfigParameter(props, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, CBConstants.MAX_SESSION_IDLE_TIME);
 
-        develMode = CommonUtils.toBoolean(getConfigParameter(props, CloudbeaverConstants.PARAM_DEVEL_MODE, "false"));
+        develMode = CommonUtils.toBoolean(getConfigParameter(props, CBConstants.PARAM_DEVEL_MODE, "false"));
 
-        String productConfigPath = this.getRelativePath(getConfigParameter(props, CloudbeaverConstants.PARAM_PRODUCT_CONFIGURATION, CloudbeaverConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
+        String productConfigPath = this.getRelativePath(getConfigParameter(props, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
         if (!CommonUtils.isEmpty(productConfigPath)) {
             File productConfigFile = new File(productConfigPath);
             if (!productConfigFile.exists()) {
@@ -258,7 +258,7 @@ public class CloudbeaverApplication extends BaseApplicationImpl {
 
     private void runWebServer() {
         log.debug("Starting Jetty server (" + serverPort + ") ");
-        new CloudbeaverJettyServer().runServer();
+        new CBJettyServer().runServer();
     }
 
 
