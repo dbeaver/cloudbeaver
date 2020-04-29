@@ -9,7 +9,7 @@ mkdir cloudbeaver\web
 echo "Build dbeaver application"
 
 cd ../..
-IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
+IF NOT EXIST dbeaver git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 cd dbeaver
 git pull
 cd ../cloudbeaver/deploy
