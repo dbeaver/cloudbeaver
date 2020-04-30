@@ -34,12 +34,15 @@ public class WebDataTransferServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String dataFileId = request.getPathInfo();
-        while (dataFileId.startsWith("/")) {
-            dataFileId = dataFileId.substring(1);
-        }
-
         try {
+            String dataFileId = request.getPathInfo();
+            if (CommonUtils.isEmpty(dataFileId)) {
+                throw new DBWebException("Data ID not specified");
+            }
+            while (dataFileId.startsWith("/")) {
+                dataFileId = dataFileId.substring(1);
+            }
+
             WebSession webSession = CBPlatform.getInstance().getSessionManager().tryGetWebSession(request.getSession());
             if (webSession == null) {
                 throw new DBWebException("No active session");
