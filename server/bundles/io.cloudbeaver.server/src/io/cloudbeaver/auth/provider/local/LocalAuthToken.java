@@ -14,13 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.registry;
+package io.cloudbeaver.auth.provider.local;
+
+import io.cloudbeaver.DBWAuthProvider;
 
 /**
- * Auth provider property encryption
+ * Auth provider
  */
-public enum WebAuthProviderPropertyEncryption {
-    none,   // Non-secure property
-    plain,  // Secure property, value passed to provided as-is
-    hash    // Secure property, value passed as MD5 hash
+public class LocalAuthToken {
+
+    private final String userId;
+
+    public LocalAuthToken(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
 }

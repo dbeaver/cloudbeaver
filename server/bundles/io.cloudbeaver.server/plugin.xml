@@ -46,10 +46,10 @@
             <premission id="sql.execute" label="SQL execute"/>
         </service>
 
-        <authProvider id="local" label="Local" description="Local name/password based authentication">
+        <authProvider id="local" label="Local" description="Local name/password based authentication" class="io.cloudbeaver.auth.provider.local.LocalAuthProvider">
             <propertyGroup label="General">
-                <property id="name" label="User name" type="string" description="User name"/>
-                <property id="password" label="User password" type="string" description="User password"/>
+                <property id="name" label="User name" type="string" description="User name" admin="true" user="true"/>
+                <property id="password" label="User password" type="string" description="User password" admin="true" user="true"/>
             </propertyGroup>
 
         </authProvider>

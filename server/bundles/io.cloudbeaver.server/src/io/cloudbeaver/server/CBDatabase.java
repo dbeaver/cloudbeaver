@@ -16,6 +16,10 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.DBWServerController;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
 import org.apache.commons.dbcp2.DriverConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
@@ -25,6 +29,8 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
@@ -38,29 +44,42 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Database management
  */
 public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
-    public static final String SCHEMA_SQL_PATH = "db/cb-schema.sql";
+
+    public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
+    private static final String CURRENT_SCHEMA_VERSION = "1.beta";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
-    private PoolingDataSource<PoolableConnection> cdDataSource;
+    private PoolingDataSource<PoolableConnection> cbDataSource;
 
-    public CBDatabase(CBApplication application, CBDatabaseConfig databaseConfiguration) {
+    CBDatabase(CBApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
 
-    public PoolingDataSource<PoolableConnection> getConnectionPool() {
-        return cdDataSource;
+    public static CBDatabase getInstance() {
+        return CBPlatform.getInstance().getApplication().getDatabase();
     }
 
-    void connect() throws DBException {
+    public Connection openConnection() throws SQLException {
+        return cbDataSource.getConnection();
+    }
+
+    public PoolingDataSource<PoolableConnection> getConnectionPool() {
+        return cbDataSource;
+    }
+
+    void initialize() throws DBException {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("Database driver not specified");
         }
@@ -95,9 +114,9 @@ public class CBDatabase {
         config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
         GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
         pcf.setPool(connectionPool);
-        cdDataSource = new PoolingDataSource<>(connectionPool);
+        cbDataSource = new PoolingDataSource<>(connectionPool);
 
-        try (Connection connection = cdDataSource.getConnection()) {
+        try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("Connected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
         } catch (SQLException e) {
@@ -108,47 +127,142 @@ public class CBDatabase {
     }
 
     private void checkDatabaseStructure() throws DBException {
-        try (Connection connection = cdDataSource.getConnection()) {
-            boolean schemaExists = false;
+        try (Connection connection = cbDataSource.getConnection()) {
+            connection.setAutoCommit(true);
+            String currentSchemaVersion;
             try (Statement dbStat = connection.createStatement()) {
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_SERVER")) {
-                    schemaExists = true;
+                    if (dbResult.next()) {
+                        currentSchemaVersion = dbResult.getString("SCHEMA_VERSION");
+                    } else {
+                        currentSchemaVersion = "0.beta";
+                    }
                 } catch (SQLException e) {
-                    schemaExists = false;
+                    currentSchemaVersion = null;
                 }
             }
-            if (!schemaExists) {
-                createDatabaseSchema(connection);
+
+            if (currentSchemaVersion == null) {
+                createDatabaseSchema(connection, true);
+            } else {
+                if (currentSchemaVersion.equals(CURRENT_SCHEMA_VERSION)) {
+                    // no changes
+                } else if (currentSchemaVersion.endsWith(".beta")) {
+                    // Different beta schema version - recreate schema
+                    createDatabaseSchema(connection, false);
+                    createDatabaseSchema(connection, true);
+                }
             }
         } catch (SQLException e) {
             throw new DBException("Error initializing schema", e);
         }
     }
 
-    private void createDatabaseSchema(Connection connection) throws DBException {
+    private void createDatabaseSchema(Connection connection, boolean create) throws DBException {
         log.debug("Create database schema");
-        InputStream ddlStream = getClass().getClassLoader().getResourceAsStream(SCHEMA_SQL_PATH);
+        InputStream ddlStream = getClass().getClassLoader().getResourceAsStream(SCHEMA_CREATE_SQL_PATH);
         if (ddlStream == null) {
-            throw new DBException("Can't find schema file " + SCHEMA_SQL_PATH);
+            throw new DBException("Can't find schema file " + SCHEMA_CREATE_SQL_PATH);
         }
         try {
+            connection.setAutoCommit(false);
+
+            Pattern ctPattern = Pattern.compile("CREATE TABLE ([\\w_]+)\\s*\\(");
             ByteArrayOutputStream ddlBuffer = new ByteArrayOutputStream();
             IOUtils.copyStream(ddlStream, ddlBuffer);
             String ddl = new String(ddlBuffer.toByteArray(), StandardCharsets.UTF_8);
+            List<String> extraQueries = new ArrayList<>();
             for (String line : ddl.split(";")) {
                 line = line.trim();
                 if (line.isEmpty()) {
+                    continue;
+                }
+                if (!create) {
+                    Matcher matcher = ctPattern.matcher(line);
+                    if (matcher.find()) {
+                        extraQueries.add("DROP TABLE " + matcher.group(1));
+                    }
                     continue;
                 }
                 try (Statement dbStat = connection.createStatement()) {
                     dbStat.execute(line);
                 }
             }
+            if (!extraQueries.isEmpty()) {
+                for (String query : extraQueries) {
+                    try (Statement dbStat = connection.createStatement()) {
+                        dbStat.execute(query);
+                    }
+                }
+            }
+            if (create) {
+                // Create server info
+                try (PreparedStatement dbStat = connection.prepareStatement("INSERT INTO CB_SERVER(SERVER_NAME,SERVER_VERSION,SCHEMA_VERSION) VALUES(?,?,?)")) {
+                    dbStat.setString(1, CommonUtils.truncateString(GeneralUtils.getProductName(), 100));
+                    dbStat.setString(2, CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 10));
+                    dbStat.setString(3, CURRENT_SCHEMA_VERSION);
+                    dbStat.execute();
+                }
+                fillInitialData();
+            }
+
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (Exception e) {
-            throw new DBException("Error processing schema DDL", e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.error(e);
+            }
+            throw new DBException("Error creating database schema", e);
         } finally {
             ContentUtils.close(ddlStream);
         }
     }
 
+    private void fillInitialData() throws DBCException {
+        // Fill initial data
+        DBWServerController serverController = application.getServerController();
+        CBDatabaseConfig.InitialData initialData = databaseConfiguration.getInitialData();
+
+        WebUser adminUser = null;
+        if (!CommonUtils.isEmpty(initialData.getAdminName())) {
+            // Create admin user
+            adminUser = new WebUser(initialData.getAdminName());
+            serverController.createUser(adminUser);
+            Map<String, Object> credentials = new LinkedHashMap<>();
+            credentials.put(LocalAuthProvider.CRED_PASSWORD, initialData.getAdminPassword());
+            serverController.setUserCredentials(adminUser.getUserId(), LocalAuthProvider.PROVIDER_ID, credentials);
+        }
+
+        if (!CommonUtils.isEmpty(initialData.getRoles())) {
+            // Create roles
+            for (WebRole role : initialData.getRoles()) {
+                serverController.createRole(role);
+                if (adminUser != null) {
+                    serverController.setRolePermissions(role.getId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
+                }
+            }
+        }
+
+        if (adminUser != null) {
+            // Grant all roles
+            WebRole[] allRoles = serverController.readAllRoles();
+            serverController.setUserRoles(
+                adminUser.getUserId(),
+                Arrays.stream(allRoles).map(WebRole::getId).toArray(String[]::new),
+                adminUser.getUserId());
+        }
+    }
+
+    void shutdown() {
+        log.debug("Shutdown database");
+        if (cbDataSource != null) {
+            try {
+                cbDataSource.close();
+            } catch (SQLException e) {
+                log.error(e);
+            }
+        }
+    }
 }

@@ -27,8 +27,9 @@ public interface DBWAuthProvider<AUTH_SESSION> {
 
     AUTH_SESSION openSession(
         String userName,
-        Map<String, Object> credentials, // Saved user credentials
-        Map<String, Object> authParameters // Passed auth parameters (e.g. password)
+        Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        Map<String, Object> userCredentials, // Saved user credentials (e.g. associated 3rd party provider user name or realm)
+        Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException;
 
     void closeSession(AUTH_SESSION session) throws DBException;

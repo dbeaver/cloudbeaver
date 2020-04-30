@@ -27,14 +27,26 @@ import org.jkiss.utils.CommonUtils;
 public class WebAuthProviderPropertyDescriptor extends PropertyDescriptor {
 
     private WebAuthProviderPropertyEncryption encryption;
+    private boolean admin; // Parameter value can be configured in admin panel
+    private boolean user; // Parameter can be passed by end-user from UI
 
     public WebAuthProviderPropertyDescriptor(String category, IConfigurationElement config) {
         super(category, config);
 
         this.encryption = CommonUtils.valueOf(WebAuthProviderPropertyEncryption.class, config.getAttribute("encryption"), WebAuthProviderPropertyEncryption.none);
+        this.admin = CommonUtils.getBoolean(config.getAttribute("admin"), false);
+        this.user = CommonUtils.getBoolean(config.getAttribute("user"), false);
     }
 
     public WebAuthProviderPropertyEncryption getEncryption() {
         return encryption;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public boolean isUser() {
+        return user;
     }
 }

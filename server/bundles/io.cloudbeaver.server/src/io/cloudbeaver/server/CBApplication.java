@@ -18,7 +18,7 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import io.cloudbeaver.DBWServerController;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -68,6 +68,7 @@ public class CBApplication extends BaseApplicationImpl {
     private CBAppConfig appConfiguration;
     private CBDatabaseConfig databaseConfiguration;
     private CBDatabase database;
+    private CBServerController serverController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -112,9 +113,17 @@ public class CBApplication extends BaseApplicationImpl {
         return productConfiguration;
     }
 
+    public DBWServerController getServerController() {
+        return serverController;
+    }
+
     @Override
     public boolean isHeadlessMode() {
         return true;
+    }
+
+    CBDatabase getDatabase() {
+        return database;
     }
 
     @Override
@@ -180,6 +189,16 @@ public class CBApplication extends BaseApplicationImpl {
             log.error("Error initializing database", e);
             return null;
         }
+
+        Thread shutdownThread = new Thread(() -> {
+            try {
+                database.shutdown();
+            } catch (Exception e) {
+                log.error(e);
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
+
         runWebServer();
 
         log.debug("Shutdown");
@@ -190,7 +209,9 @@ public class CBApplication extends BaseApplicationImpl {
     private void initializeDatabase() throws DBException {
         database = new CBDatabase(this, databaseConfiguration);
 
-        database.connect();
+        serverController = new CBServerController(database);
+
+        database.initialize();
     }
 
     private void loadConfiguration(String configPath) {

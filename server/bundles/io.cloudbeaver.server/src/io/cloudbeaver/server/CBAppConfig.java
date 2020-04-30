@@ -20,22 +20,20 @@ package io.cloudbeaver.server;
  * Database configuration
  */
 public class CBAppConfig {
-    private boolean anonymousAccessAllowed = true;
+    private boolean anonymousAccessEnabled = true;
+    private boolean authenticationEnabled = true;
     private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
 
-    public boolean isAnonymousAccessAllowed() {
-        return anonymousAccessAllowed;
+    public boolean isAuthenticationEnabled() {
+        return authenticationEnabled;
     }
 
-    public void setAnonymousAccessAllowed(boolean anonymousAccessAllowed) {
-        this.anonymousAccessAllowed = anonymousAccessAllowed;
+    public boolean isAnonymousAccessEnabled() {
+        return anonymousAccessEnabled;
     }
 
     public String getAnonymousUserRole() {
         return anonymousUserRole;
     }
 
-    public void setAnonymousUserRole(String anonymousUserRole) {
-        this.anonymousUserRole = anonymousUserRole;
-    }
 }

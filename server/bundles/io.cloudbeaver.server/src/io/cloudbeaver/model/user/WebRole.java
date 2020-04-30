@@ -30,7 +30,7 @@ public class WebRole {
     private static final Log log = Log.getLog(WebRole.class);
 
     private String id;
-    private String label;
+    private String name;
     private String icon;
     private String description;
 
@@ -40,8 +40,8 @@ public class WebRole {
         return id;
     }
 
-    public String getLabel() {
-        return label;
+    public String getName() {
+        return name;
     }
 
     public String getIcon() {

@@ -19,7 +19,6 @@ package io.cloudbeaver.model.user;
 import org.jkiss.dbeaver.Log;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Web user.
@@ -28,7 +27,7 @@ public class WebUser {
 
     private static final Log log = Log.getLog(WebUser.class);
 
-    private String userName;
+    private String userId;
 
     private Map<String, Object> metaParameters = new LinkedHashMap<>();
     private Map<String, Object> configurationParameters = new LinkedHashMap<>();
@@ -38,12 +37,16 @@ public class WebUser {
     private String activeAuthModel;
     private Map<String, Map<String, Object>> authCredentials = new HashMap<>();
 
-    public String[] getGrantedRoles() {
-        return roles.stream().map(WebRole::getId).toArray(String[]::new);
+    public WebUser(String userId) {
+        this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserId() {
+        return userId;
+    }
+
+    public String[] getGrantedRoles() {
+        return roles.stream().map(WebRole::getId).toArray(String[]::new);
     }
 
     public Map<String, Object> getMetaParameters() {
@@ -60,6 +63,6 @@ public class WebUser {
 
     @Override
     public String toString() {
-        return userName;
+        return userId;
     }
 }
