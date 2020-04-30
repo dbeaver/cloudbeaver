@@ -16,21 +16,28 @@
  */
 package io.cloudbeaver.server;
 
+import org.apache.commons.dbcp2.DriverConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.SQLException;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.util.Properties;
 
 /**
@@ -38,14 +45,19 @@ import java.util.Properties;
  */
 public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
+    public static final String SCHEMA_SQL_PATH = "db/cb-schema.sql";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
-    private Connection connection;
+    private PoolingDataSource<PoolableConnection> cdDataSource;
 
     public CBDatabase(CBApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
+    }
+
+    public PoolingDataSource<PoolableConnection> getConnectionPool() {
+        return cdDataSource;
     }
 
     void connect() throws DBException {
@@ -71,23 +83,72 @@ public class CBDatabase {
                 dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, databaseConfiguration.getPassword());
             }
         }
-        try {
-            connection = driverInstance.connect(dbURL, dbProperties);
-        } catch (SQLException e) {
-            throw new DBException("Error connecting to '" + dbURL + "'", e);
-        }
 
-        try {
+        // Create connection pool with custom connection factory
+        DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
+        PoolableConnectionFactory pcf = new PoolableConnectionFactory(conFactory, null);
+        pcf.setValidationQuery(databaseConfiguration.getPool().getValidationQuery());
+
+        GenericObjectPoolConfig<PoolableConnection> config = new GenericObjectPoolConfig<>();
+        config.setMinIdle(databaseConfiguration.getPool().getMinIdleConnections());
+        config.setMaxIdle(databaseConfiguration.getPool().getMaxIdleConnections());
+        config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
+        GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
+        pcf.setPool(connectionPool);
+        cdDataSource = new PoolingDataSource<>(connectionPool);
+
+        try (Connection connection = cdDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("Connected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
         } catch (SQLException e) {
-            throw new DBException("Error getting database metadata", e);
+            throw new DBException("Error connecting to '" + dbURL + "'", e);
         }
 
         checkDatabaseStructure();
     }
 
-    private void checkDatabaseStructure() {
-
+    private void checkDatabaseStructure() throws DBException {
+        try (Connection connection = cdDataSource.getConnection()) {
+            boolean schemaExists = false;
+            try (Statement dbStat = connection.createStatement()) {
+                try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_SERVER")) {
+                    schemaExists = true;
+                } catch (SQLException e) {
+                    schemaExists = false;
+                }
+            }
+            if (!schemaExists) {
+                createDatabaseSchema(connection);
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error initializing schema", e);
+        }
     }
+
+    private void createDatabaseSchema(Connection connection) throws DBException {
+        log.debug("Create database schema");
+        InputStream ddlStream = getClass().getClassLoader().getResourceAsStream(SCHEMA_SQL_PATH);
+        if (ddlStream == null) {
+            throw new DBException("Can't find schema file " + SCHEMA_SQL_PATH);
+        }
+        try {
+            ByteArrayOutputStream ddlBuffer = new ByteArrayOutputStream();
+            IOUtils.copyStream(ddlStream, ddlBuffer);
+            String ddl = new String(ddlBuffer.toByteArray(), StandardCharsets.UTF_8);
+            for (String line : ddl.split(";")) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+                try (Statement dbStat = connection.createStatement()) {
+                    dbStat.execute(line);
+                }
+            }
+        } catch (Exception e) {
+            throw new DBException("Error processing schema DDL", e);
+        } finally {
+            ContentUtils.close(ddlStream);
+        }
+    }
+
 }
