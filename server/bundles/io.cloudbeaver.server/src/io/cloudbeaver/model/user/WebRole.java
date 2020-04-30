@@ -40,20 +40,44 @@ public class WebRole {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getIcon() {
         return icon;
     }
 
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Set<String> getPermissions() {
-        return Collections.unmodifiableSet(permissions);
+        return permissions;
+    }
+
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    public void addPermission(String permission) {
+        this.permissions.add(permission);
     }
 
     @Override
