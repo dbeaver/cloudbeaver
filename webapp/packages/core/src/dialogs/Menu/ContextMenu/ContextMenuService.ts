@@ -32,7 +32,7 @@ export class ContextMenuService {
     this.contextMenu.addMenuItem(panelId, menuItem);
   }
 
-  createContextMenu<T>(context: IMenuContext<T>): IMenuPanel {
-    return this.contextMenu.constructMenuWithContext(ContextMenuService.rootPanelId, context);
+  createContextMenu<T>(context: IMenuContext<T>, panelId?: string): IMenuPanel {
+    return this.contextMenu.constructMenuWithContext(panelId || ContextMenuService.rootPanelId, context);
   }
 }

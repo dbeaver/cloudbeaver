@@ -17,9 +17,9 @@ import { PromiseCancelledError } from '@dbeaver/core/utils';
 import {
   fetchingSettings,
   IRequestDataResult,
-  ITableViewerModelInit, RowDiff,
-  TableViewerModel,
+  RowDiff,
   TableViewerStorageService,
+  TableViewerModel,
 } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
@@ -69,10 +69,14 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
 
       } else {
         this.state = EPanelState.TABLE_RESULT;
-        this.panelInit.resultId = dataSet.resultSet.id;
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
-        this.createTableModel(initialState, panelInit.sqlExecutionState);
+        this.createTableModel(
+          initialState,
+          panelInit.sqlQueryParams.connectionId,
+          dataSet.resultSet.id,
+          panelInit.sqlExecutionState
+        );
       }
 
     } catch (exception) {
@@ -109,7 +113,7 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
 
   destruct() {
     if (this.state === EPanelState.TABLE_RESULT) {
-      this.tableViewerStorageService.removeTableModel(this.getTableId());
+      this.tableViewerStorageService.remove(this.getTableId());
     }
   }
 
@@ -123,20 +127,29 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
     }
   }
 
-  private createTableModel(initialState: IRequestDataResult, sqlExecutingState: SqlExecutionState): void {
-    const callbacks: ITableViewerModelInit = {
+  private createTableModel(
+    initialState: IRequestDataResult,
+    connectionId: string,
+    resultId: string,
+    sqlExecutingState: SqlExecutionState
+  ) {
+    return this.tableViewerStorageService.create({
+      tableId: this.getTableId(),
+      connectionId,
+      resultId,
       initialState,
       requestDataAsync: this.requestDataAsync.bind(this, sqlExecutingState),
       noLoaderWhileRequestingDataAsync: true,
       saveChanges: this.saveChanges.bind(this),
-    };
-    const table = new TableViewerModel(callbacks, this.commonDialogService);
-    this.tableViewerStorageService.addTableModel(this.getTableId(), table);
+    });
   }
 
-  private async requestDataAsync(sqlExecutingState: SqlExecutionState,
-                                 rowOffset: number,
-                                 count: number): Promise<IRequestDataResult> {
+  private async requestDataAsync(
+    sqlExecutingState: SqlExecutionState,
+    model: TableViewerModel,
+    rowOffset: number,
+    count: number,
+  ): Promise<IRequestDataResult> {
 
     const queryExecutionProcess = this.sqlResultService.asyncSqlQuery(this.panelInit.sqlQueryParams, rowOffset, count);
     sqlExecutingState.setCurrentlyExecutingQuery(queryExecutionProcess);
@@ -147,14 +160,16 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
      * Note that each data fetching overwrites resultId
      */
     const dataSet = response.results![this.panelInit.indexInResultSet]!.resultSet!;
-    this.panelInit.resultId = dataSet.id;
+    model.resultId = dataSet.id;
     return dataResults;
   }
 
-  async saveChanges(diffs: RowDiff[]): Promise<IRequestDataResult> {
+  async saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult> {
+    if (!model.resultId) {
+      throw new Error('resultId must be provided before saving changes');
+    }
 
-    const resultId = this.panelInit.resultId!; // must be set after first data request;
-    const response = await this.sqlResultService.saveChanges(this.panelInit.sqlQueryParams, resultId, diffs);
+    const response = await this.sqlResultService.saveChanges(this.panelInit.sqlQueryParams, model.resultId, diffs);
 
     return this.sqlResultService.sqlExecuteInfoToData(response, this.panelInit.indexInResultSet);
   }

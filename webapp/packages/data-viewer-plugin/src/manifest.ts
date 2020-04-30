@@ -11,6 +11,7 @@ import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
+import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 export const manifest: PluginManifest = {
@@ -22,6 +23,7 @@ export const manifest: PluginManifest = {
     DataViewerTabService,
     DataViewerTableService,
     TableViewerStorageService,
+    TableFooterMenuService,
   ],
 
   async initialize(services: IServiceInjector) {

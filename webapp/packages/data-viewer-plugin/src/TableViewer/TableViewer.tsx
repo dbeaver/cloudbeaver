@@ -14,7 +14,7 @@ import { Loader } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 
 import { TableFooter } from './TableFooter/TableFooter';
-import { TableGrid } from './TableGrid/TableGrid';
+import { TableGrid } from './TableGrid';
 import { TableViewerStorageService } from './TableViewerStorageService';
 
 const viewerStyles = css`
@@ -37,7 +37,7 @@ export const TableViewer = observer(function TableViewer({
 }: TableViewerProps) {
 
   const tableViewerStorageService = useService(TableViewerStorageService);
-  const tableViewerModel = tableViewerStorageService.getTableModel(tableId);
+  const tableViewerModel = tableViewerStorageService.get(tableId);
 
   if (!tableViewerModel) {
     return <Loader />;
@@ -46,13 +46,7 @@ export const TableViewer = observer(function TableViewer({
   return styled(viewerStyles)(
     <table-viewer as="div" className={className}>
       <TableGrid model={tableViewerModel} />
-      <TableFooter
-        chunkSize={tableViewerModel.getChunkSize()}
-        requestStatusMessage={tableViewerModel.requestStatusMessage}
-        queryDuration={tableViewerModel.queryDuration}
-        onRefresh={tableViewerModel.handleRefresh}
-        onDataChange={tableViewerModel.setChunkSize}
-      />
+      <TableFooter model={tableViewerModel} />
       <Loader loading={tableViewerModel.isLoaderVisible} overlay/>
     </table-viewer>
   );

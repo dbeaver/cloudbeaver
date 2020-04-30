@@ -7,23 +7,17 @@
  */
 
 
+import { IExecutionContext } from '@dbeaver/data-viewer-plugin';
+
 import { SqlExecutionState } from './SqlExecutionState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
-export interface ISqlContextParams {
-  contextId: string;
-  connectionId: string;
-  objectCatalogId?: string;
-  objectSchemaId?: string;
-}
-
-export interface ISqlQueryParams extends ISqlContextParams {
+export interface ISqlQueryParams extends IExecutionContext {
   query: string;
 }
 
 export interface ISqlResultPanelParams {
   resultTabId: string; // to store tableView in tableViewStore
-  resultId: string | null; // returns from the server, new id returns after each data fetch
   indexInResultSet: number;
   sqlQueryParams: ISqlQueryParams;
   sqlExecutionState: SqlExecutionState;
@@ -40,7 +34,7 @@ export interface IResultsTabState {
   panelParams: ISqlResultPanelParams;
 }
 
-export interface ISqlEditorTabState extends ISqlContextParams {
+export interface ISqlEditorTabState extends IExecutionContext {
   order: number;
   query: string;
   currentResultTabId?: string;

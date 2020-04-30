@@ -14,5 +14,5 @@ export const DataViewerPanel = function DataViewerPanel({
   tab,
 }: ObjectPagePanelProps) {
 
-  return <TableViewer tableId={tab.handlerState.objectId}/>;
+  return <TableViewer tableId={tab.id}/>;
 };

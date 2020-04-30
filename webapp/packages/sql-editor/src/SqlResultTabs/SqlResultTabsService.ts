@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { isPromiseCancelledError, PromiseCancelledError, uuid } from '@dbeaver/core/utils';
+import { isPromiseCancelledError, uuid } from '@dbeaver/core/utils';
 import { fetchingSettings } from '@dbeaver/data-viewer-plugin';
 
 import {
@@ -38,10 +38,9 @@ export class SqlResultTabsService {
 
     editorState.sqlExecutionState.setCurrentlyExecutingQuery(queryExecutionProcess);
 
-    function createTabPanelParams(resultId: string | null, indexInResultSet: number): ISqlResultPanelParams {
+    function createTabPanelParams(indexInResultSet: number): ISqlResultPanelParams {
       const params: ISqlResultPanelParams = {
         resultTabId: uuid(),
-        resultId,
         indexInResultSet,
         sqlQueryParams,
         firstDataPortion: queryExecutionProcess,
@@ -50,7 +49,7 @@ export class SqlResultTabsService {
       return params;
     }
 
-    const firstTabPanelParams = createTabPanelParams(null, 0);
+    const firstTabPanelParams = createTabPanelParams(0);
     const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
     const groupToReplace = inNewTab ? undefined : currentTab?.groupId;
 
@@ -75,7 +74,7 @@ export class SqlResultTabsService {
       if (data.results && data.results?.length > 1) {
         // ignore first dataset, it was already added
         for (let i = 1; i < data.results.length; i++) {
-          const tabPanelParams = createTabPanelParams(data.results[i].resultSet?.id || null, i);
+          const tabPanelParams = createTabPanelParams(i);
           this.addTabToGroup(editorState.resultTabs, tabPanelParams, newGroupId);
         }
       }

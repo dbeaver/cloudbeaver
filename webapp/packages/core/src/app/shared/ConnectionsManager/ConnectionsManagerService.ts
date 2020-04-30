@@ -42,8 +42,8 @@ export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 
 export class ConnectionsManagerService {
 
   @observable private connectionsMap: Map<string, Connection> = new Map();
-  dbDrivers = new CachedResource(new Map(), this.refreshDriversAsync.bind(this));
-  connectionObjectContainers = new CachedResource(new Map(), this.refreshObjectContainersAsync.bind(this));
+  readonly dbDrivers = new CachedResource(new Map(), this.refreshDriversAsync.bind(this));
+  readonly connectionObjectContainers = new CachedResource(new Map(), this.refreshObjectContainersAsync.bind(this));
 
   @computed get connections(): Connection[] {
     return Array.from(this.connectionsMap.values());
