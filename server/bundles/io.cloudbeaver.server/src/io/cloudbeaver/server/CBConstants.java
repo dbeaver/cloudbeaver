@@ -60,4 +60,6 @@ public class CBConstants {
     public static final long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;
 
     public static final String ENV_CB_HOME = "CLOUDBEAVER_HOME";
+
+    public static final String DEFAUL_APP_ANONYMOUS_ROLE_NAME = "user";
 }

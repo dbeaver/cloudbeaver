@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.server;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.app.DBPApplication;
@@ -62,7 +65,9 @@ public class CBApplication extends BaseApplicationImpl {
     private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
 
     private Map<String, Object> productConfiguration = new HashMap<>();
-    private Map<String, Object> appConfiguration = new HashMap<>();
+    private CBAppConfig appConfiguration;
+    private CBDatabaseConfig databaseConfiguration;
+    private CBDatabase database;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -99,7 +104,7 @@ public class CBApplication extends BaseApplicationImpl {
         return maxSessionIdleTime;
     }
 
-    public Map<String, Object> getAppConfiguration() {
+    public CBAppConfig getAppConfiguration() {
         return appConfiguration;
     }
 
@@ -127,6 +132,7 @@ public class CBApplication extends BaseApplicationImpl {
             loadConfiguration(configPath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
+            return null;
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -141,7 +147,8 @@ public class CBApplication extends BaseApplicationImpl {
                 instanceLoc.set(wsLocationURL, true);
             }
         } catch (Exception e) {
-            log.debug("Error setting workspace location to " + workspaceLocation, e);
+            log.error("Error setting workspace location to " + workspaceLocation, e);
+            return null;
         }
 
         CBPlatform.setApplication(this);
@@ -167,11 +174,23 @@ public class CBApplication extends BaseApplicationImpl {
             log.debug("\tProduction mode");
         }
 
+        try {
+            initializeDatabase();
+        } catch (Exception e) {
+            log.error("Error initializing database", e);
+            return null;
+        }
         runWebServer();
 
         log.debug("Shutdown");
 
         return null;
+    }
+
+    private void initializeDatabase() throws DBException {
+        database = new CBDatabase(this, databaseConfiguration);
+
+        database.connect();
     }
 
     private void loadConfiguration(String configPath) {
@@ -197,10 +216,10 @@ public class CBApplication extends BaseApplicationImpl {
         }
         String productConfigPath = null;
 
-        GsonBuilder gsonBuilder = new GsonBuilder().setLenient();
+        Gson gson = new GsonBuilder().setLenient().create();
 
         try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-            Map<String, Object> configProps = JSONUtils.parseMap(gsonBuilder.create(), reader);
+            Map<String, Object> configProps = JSONUtils.parseMap(gson, reader);
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, CBConstants.DEFAULT_SERVER_PORT);
@@ -218,10 +237,14 @@ public class CBApplication extends BaseApplicationImpl {
 
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, false);
 
+            appConfiguration = gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(configProps, "app")), CBAppConfig.class);
+
+            databaseConfiguration = gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
+
             productConfigPath = this.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
-
-            appConfiguration = JSONUtils.getObject(configProps, "app");
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
         }
@@ -236,7 +259,7 @@ public class CBApplication extends BaseApplicationImpl {
 
                     //gsonBuilder.registerTypeAdapter(Object.class, new JSONBestNumberObjectDeserializer());
 
-                    productConfiguration = JSONUtils.parseMap(gsonBuilder.create(), reader);
+                    productConfiguration = JSONUtils.parseMap(gson, reader);
                 } catch (Exception e) {
                     log.error("Error reading product configuration", e);
                 }
