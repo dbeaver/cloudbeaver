@@ -87,7 +87,7 @@ public class CBPlatform extends BasePlatformImpl {
         if (instance == null) {
             synchronized (CBPlatform.class) {
                 if (instance == null) {
-                    // Initialize DBeaver Core
+                    // Initialize CB platform
                     CBPlatform.createInstance();
                 }
             }

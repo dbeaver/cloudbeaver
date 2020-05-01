@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.user.WebUser;
@@ -69,10 +70,12 @@ public class WebSession {
     private final String id;
     private final long createTime;
     private long lastAccessTime;
+    private boolean persisted;
 
     private WebUser user;
     private Set<String> sessionPermissions = null;
     private String locale;
+    private boolean cacheExpired;
 
     private final List<WebConnectionInfo> connections = new ArrayList<>();
     private final List<WebServerMessage> progressMessages = new ArrayList<>();
@@ -88,8 +91,8 @@ public class WebSession {
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
-
-        this.updateInfo(httpSession);
+        this.lastAccessTime = this.createTime;
+        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
 
         DBPPlatform platform = DBWorkbench.getPlatform();
         this.navigatorModel = new DBNModel(platform, false);
@@ -99,6 +102,15 @@ public class WebSession {
         DBNProject projectNode = this.navigatorModel.getRoot().getProjectNode(project);
         this.databases = projectNode.getDatabases();
         this.locale = Locale.getDefault().getLanguage();
+
+        if (!httpSession.isNew()) {
+            try {
+                // Check persistent state
+                this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
+            } catch (Exception e) {
+                log.error("Error checking session state,", e);
+            }
+        }
 
         // Add all provided datasources to the session
         synchronized (connections) {
@@ -126,8 +138,18 @@ public class WebSession {
         return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    public synchronized long getLastAccessTimeMillis() {
+    synchronized long getLastAccessTimeMillis() {
         return lastAccessTime;
+    }
+
+    // Clear cache when
+    @Property
+    public boolean isCacheExpired() {
+        return cacheExpired;
+    }
+
+    public void setCacheExpired(boolean cacheExpired) {
+        this.cacheExpired = cacheExpired;
     }
 
     public synchronized WebUser getUser() {
@@ -157,9 +179,9 @@ public class WebSession {
     private void refreshSessionAuth() throws DBCException {
         CBApplication application = CBPlatform.getInstance().getApplication();
         if (this.user == null) {
-            sessionPermissions = application.getServerController().getRolePermissions(application.getAppConfiguration().getAnonymousUserRole());
+            sessionPermissions = application.getSecurityController().getRolePermissions(application.getAppConfiguration().getAnonymousUserRole());
         } else {
-            sessionPermissions = application.getServerController().getUserPermissions(this.user.getUserId());
+            sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
         }
     }
 
@@ -192,9 +214,24 @@ public class WebSession {
         }
     }
 
-    public void updateInfo(HttpSession httpSession) {
+    synchronized void updateInfo(HttpSession httpSession) {
         this.lastAccessTime = System.currentTimeMillis();
-        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
+        this.cacheExpired = false;
+        if (!httpSession.isNew()) {
+            try {
+                // Persist session
+                if (!this.persisted) {
+                    // Create new record
+                    DBWSecurityController.getInstance().createSession(this);
+                    this.persisted = true;
+                } else {
+                    // Update record
+                    DBWSecurityController.getInstance().updateSession(this);
+                }
+            } catch (Exception e) {
+                log.error("Error persisting web session", e);
+            }
+        }
     }
 
     @Association

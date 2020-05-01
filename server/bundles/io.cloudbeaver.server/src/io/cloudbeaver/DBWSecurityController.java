@@ -16,9 +16,11 @@
  */
 package io.cloudbeaver;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.exec.DBCException;
 
 import java.util.Map;
@@ -27,13 +29,19 @@ import java.util.Set;
 /**
  * Admin interface
  */
-public interface DBWServerController {
+public interface DBWSecurityController {
+
+    ///////////////////////////////////////////
+    // Users
 
     void createUser(WebUser user) throws DBCException;
 
     void deleteUser(String userId) throws DBCException;
 
     void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException;
+
+    ///////////////////////////////////////////
+    // Credentials
 
     /**
      * Sets user redentials for specified provider
@@ -51,15 +59,38 @@ public interface DBWServerController {
      */
     Map<String, Object> getUserCredentials(String userId, WebAuthProviderDescriptor authProvider) throws DBCException;
 
+    ///////////////////////////////////////////
+    // Roles
+
     WebRole[] readAllRoles() throws DBCException;
 
     void createRole(WebRole role) throws DBCException;
 
     void deleteRole(String roleId) throws DBCException;
 
+    ///////////////////////////////////////////
+    // Permissions
+
     void setRolePermissions(String roleId, String[] permissionIds, String grantorId) throws DBCException;
 
     Set<String> getRolePermissions(String roleId) throws DBCException;
 
     Set<String> getUserPermissions(String userId) throws DBCException;
+
+    ///////////////////////////////////////////
+    // Sessions
+
+    boolean isSessionPersisted(String id) throws DBCException;
+
+    void createSession(WebSession session) throws DBCException;
+
+    void updateSession(WebSession session) throws DBCException;
+
+    ///////////////////////////////////////////
+    // Utils
+
+    static DBWSecurityController getInstance() {
+        return CBPlatform.getInstance().getApplication().getSecurityController();
+    }
+
 }

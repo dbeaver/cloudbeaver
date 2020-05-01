@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWServerController;
+import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -222,7 +222,7 @@ public class CBDatabase {
 
     private void fillInitialData() throws DBCException {
         // Fill initial data
-        DBWServerController serverController = application.getServerController();
+        DBWSecurityController serverController = application.getSecurityController();
         CBDatabaseConfig.InitialData initialData = databaseConfiguration.getInitialData();
 
         WebUser adminUser = null;

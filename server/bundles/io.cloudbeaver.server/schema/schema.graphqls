@@ -72,6 +72,8 @@ type SessionInfo {
     lastAccessTime: String!
     locale: String!
 
+    cacheExpired: Boolean!
+
     serverMessages: [ ServerMessage ]
     connections: [ ConnectionInfo ]!
 }

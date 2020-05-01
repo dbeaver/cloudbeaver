@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
-import io.cloudbeaver.DBWServerController;
+import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -46,7 +46,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
-        DBWServerController serverController = CBPlatform.getInstance().getApplication().getServerController();
+        DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
         try {
             String userId = serverController.findUserByCredentials(authProvider, authParameters);
             if (userId == null) {

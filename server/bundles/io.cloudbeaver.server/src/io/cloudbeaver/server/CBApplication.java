@@ -18,7 +18,7 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.cloudbeaver.DBWServerController;
+import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -68,7 +68,7 @@ public class CBApplication extends BaseApplicationImpl {
     private CBAppConfig appConfiguration;
     private CBDatabaseConfig databaseConfiguration;
     private CBDatabase database;
-    private CBServerController serverController;
+    private CBSecurityController securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -113,8 +113,8 @@ public class CBApplication extends BaseApplicationImpl {
         return productConfiguration;
     }
 
-    public DBWServerController getServerController() {
-        return serverController;
+    public DBWSecurityController getSecurityController() {
+        return securityController;
     }
 
     @Override
@@ -209,7 +209,7 @@ public class CBApplication extends BaseApplicationImpl {
     private void initializeDatabase() throws DBException {
         database = new CBDatabase(this, databaseConfiguration);
 
-        serverController = new CBServerController(database);
+        securityController = new CBSecurityController(database);
 
         database.initialize();
     }

@@ -16,7 +16,8 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWServerController;
+import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -35,15 +36,18 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-class CBServerController implements DBWServerController {
+class CBSecurityController implements DBWSecurityController {
 
-    private static final Log log = Log.getLog(CBServerController.class);
+    private static final Log log = Log.getLog(CBSecurityController.class);
 
     private final CBDatabase database;
 
-    CBServerController(CBDatabase database) {
+    CBSecurityController(CBDatabase database) {
         this.database = database;
     }
+
+    ///////////////////////////////////////////
+    // Users
 
     @Override
     public void createUser(WebUser user) throws DBCException {
@@ -87,6 +91,9 @@ class CBServerController implements DBWServerController {
             throw new DBCException("Error saving user roles in database", e);
         }
     }
+
+    ///////////////////////////////////////////
+    // Credentials
 
     @Override
     public void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException {
@@ -204,6 +211,9 @@ class CBServerController implements DBWServerController {
         }
     }
 
+    ///////////////////////////////////////////
+    // Roles
+
     @Override
     public WebRole[] readAllRoles() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -256,6 +266,9 @@ class CBServerController implements DBWServerController {
             throw new DBCException("Error deleting role from database", e);
         }
     }
+
+    ///////////////////////////////////////////
+    // Permissions
 
     @Override
     public void setRolePermissions(String roleId, String[] permissionIds, String grantorId) throws DBCException {
@@ -312,6 +325,71 @@ class CBServerController implements DBWServerController {
             return permissions;
         } catch (SQLException e) {
             throw new DBCException("Error saving role in database", e);
+        }
+    }
+
+    ///////////////////////////////////////////
+    // Sessions
+
+    @Override
+    public boolean isSessionPersisted(String id) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT 1 FROM CB_SESSION WHERE SESSION_ID=?")) {
+                dbStat.setString(1, id);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new DBCException("Error reading session state", e);
+        }
+    }
+
+    @Override
+    public void createSession(WebSession session) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME) VALUES(?,?,?,?)")) {
+                dbStat.setString(1, session.getId());
+                WebUser user = session.getUser();
+                if (user == null) {
+                    dbStat.setNull(2, Types.VARCHAR);
+                } else {
+                    dbStat.setString(2, user.getUserId());
+                }
+                Timestamp currentTS = new Timestamp(System.currentTimeMillis());
+                dbStat.setTimestamp(3, currentTS);
+                dbStat.setTimestamp(4, currentTS);
+                dbStat.execute();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error creating session in database", e);
+        }
+    }
+
+    @Override
+    public void updateSession(WebSession session) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=? WHERE SESSION_ID=?")) {
+                WebUser user = session.getUser();
+                if (user == null) {
+                    dbStat.setNull(1, Types.VARCHAR);
+                } else {
+                    dbStat.setString(1, user.getUserId());
+                }
+                dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                dbStat.setString(3, session.getId());
+                if (dbStat.executeUpdate() == 0) {
+                    throw new DBCException("Session not exists in database");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error updating session in database", e);
         }
     }
 }

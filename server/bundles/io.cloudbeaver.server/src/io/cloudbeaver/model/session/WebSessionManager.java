@@ -23,6 +23,7 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -89,14 +90,21 @@ public class WebSessionManager {
                 webSession = new WebSession(httpSession);
                 sessionMap.put(sessionId, webSession);
 
-                if (!httpSession.isNew() && errorOnNoFound) {
-                    throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                if (!httpSession.isNew()) {
+                    webSession.setCacheExpired(true);
+                    if (errorOnNoFound) {
+                        throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                    }
                 }
 
                 log.debug("> New web session '" + webSession.getId() + "'");
             } else {
                 if (updateInfo) {
-                    webSession.updateInfo(httpSession);
+                    // Update only once per request
+                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
+                        webSession.updateInfo(httpSession);
+                        request.setAttribute("sessionUpdated", true);
+                    }
                 }
             }
         }
