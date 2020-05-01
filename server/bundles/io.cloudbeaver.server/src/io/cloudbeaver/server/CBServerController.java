@@ -19,21 +19,19 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.DBWServerController;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.model.DBConstants;
+import io.cloudbeaver.server.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.server.registry.WebAuthProviderPropertyDescriptor;
+import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Server controller
@@ -42,7 +40,7 @@ class CBServerController implements DBWServerController {
 
     private final CBDatabase database;
 
-    public CBServerController(CBDatabase database) {
+    CBServerController(CBDatabase database) {
         this.database = database;
     }
 
@@ -91,15 +89,34 @@ class CBServerController implements DBWServerController {
 
     @Override
     public void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException {
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(authProviderId);
+        if (authProvider == null) {
+            throw new DBCException("Invalid auth provider '" + authProviderId + "'");
+        }
+        List<String[]> transformedCredentials;
+        try {
+            transformedCredentials = credentials.entrySet().stream().map(cred -> {
+                String propertyName = cred.getKey();
+                WebAuthProviderPropertyDescriptor property = authProvider.getProperty(propertyName);
+                if (property == null) {
+                    throw new IllegalArgumentException("Invalid auth provider '" + authProviderId + "' property '" + propertyName + "'");
+                }
+                String encodedValue = CommonUtils.toString(cred.getValue());
+                encodedValue = property.getEncryption().encrypt(userId, encodedValue);
+                return new String[] {propertyName, encodedValue };
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new DBCException("Error passing properties to provider", e);
+        }
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?", userId, authProviderId);
             if (!CommonUtils.isEmpty(credentials)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")) {
-                    for (Map.Entry<String, Object> cred : credentials.entrySet()) {
+                    for (String[] cred : transformedCredentials) {
                         dbStat.setString(1, userId);
                         dbStat.setString(2, authProviderId);
-                        dbStat.setString(3, cred.getKey());
-                        dbStat.setString(4, CommonUtils.toString(cred.getValue()));
+                        dbStat.setString(3, cred[0]);
+                        dbStat.setString(4, cred[1]);
                         dbStat.execute();
                     }
                 }

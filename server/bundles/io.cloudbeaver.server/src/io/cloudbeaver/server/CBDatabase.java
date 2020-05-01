@@ -230,8 +230,14 @@ public class CBDatabase {
             // Create admin user
             adminUser = new WebUser(initialData.getAdminName());
             serverController.createUser(adminUser);
+
+            String userPassword = initialData.getAdminPassword();
+
+            // This is how client password will be transmitted from client
+            String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), userPassword);
+
             Map<String, Object> credentials = new LinkedHashMap<>();
-            credentials.put(LocalAuthProvider.CRED_PASSWORD, initialData.getAdminPassword());
+            credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
             serverController.setUserCredentials(adminUser.getUserId(), LocalAuthProvider.PROVIDER_ID, credentials);
         }
 

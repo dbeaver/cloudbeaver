@@ -21,6 +21,7 @@ import io.cloudbeaver.server.CBDatabase;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.utils.SecurityUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -54,8 +55,12 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
 
     }
 
-    public static String makePasswordHash(String password) {
-        return password;
+    public static String makeClientPasswordHash(String userName, String password) {
+        return SecurityUtils.makeDigest(userName, password);
+    }
+
+    public static String makeServerPasswordHash(String userName, String password) {
+        return SecurityUtils.makeDigest(userName, password);
     }
 
 }

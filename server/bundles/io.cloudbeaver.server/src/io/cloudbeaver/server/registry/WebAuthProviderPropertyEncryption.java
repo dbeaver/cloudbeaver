@@ -16,11 +16,33 @@
  */
 package io.cloudbeaver.server.registry;
 
+import org.jkiss.utils.SecurityUtils;
+
 /**
  * Auth provider property encryption
  */
 public enum WebAuthProviderPropertyEncryption {
-    none,   // Non-secure property
-    plain,  // Secure property, value passed to provided as-is
-    hash    // Secure property, value passed as MD5 hash
+    // Non-secure property
+    none {
+        @Override
+        public String encrypt(String salt, String value) {
+            return value;
+        }
+    },
+    // Secure property, value passed to provided as-is
+    plain {
+        @Override
+        public String encrypt(String salt, String value) {
+            return value;
+        }
+    },
+    // Secure property, value passed as MD5 hash
+    hash {
+        @Override
+        public String encrypt(String salt, String value) {
+            return SecurityUtils.makeDigest(salt, value);
+        }
+    };
+
+    public abstract String encrypt(String salt, String value);
 }

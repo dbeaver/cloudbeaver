@@ -62,4 +62,5 @@ public class CBConstants {
     public static final String ENV_CB_HOME = "CLOUDBEAVER_HOME";
 
     public static final String DEFAUL_APP_ANONYMOUS_ROLE_NAME = "user";
+
 }

@@ -27,7 +27,9 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Auth service descriptor
@@ -38,7 +40,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     private ObjectType implType;
     private DBWAuthProvider instance;
-    private final List<DBPPropertyDescriptor> properties = new ArrayList<>();
+    private final Map<String, WebAuthProviderPropertyDescriptor> properties = new LinkedHashMap<>();
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -49,7 +51,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
             String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
             IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
             for (IConfigurationElement prop : propElements) {
-                properties.add(new WebAuthProviderPropertyDescriptor(category, prop));
+                WebAuthProviderPropertyDescriptor propertyDescriptor = new WebAuthProviderPropertyDescriptor(category, prop);
+                properties.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
             }
         }
     }
@@ -69,6 +72,14 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public String getIcon() {
         return cfg.getAttribute("icon");
+    }
+
+    public List<DBPPropertyDescriptor> getProperties() {
+        return new ArrayList<>(properties.values());
+    }
+
+    public WebAuthProviderPropertyDescriptor getProperty(String id) {
+        return properties.get(id);
     }
 
     @NotNull
