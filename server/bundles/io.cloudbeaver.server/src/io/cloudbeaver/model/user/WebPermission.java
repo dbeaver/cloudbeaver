@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
-import io.cloudbeaver.server.registry.WebPermissionDescriptor;
+import io.cloudbeaver.registry.WebPermissionDescriptor;
 import org.jkiss.dbeaver.Log;
 
 /**

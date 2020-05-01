@@ -26,9 +26,9 @@ type AuthProviderInfo {
 }
 
 type UserAuthInfo {
-    userName: String!
-
-    loginTime: DateTime
+    userId: String!
+    authProvider: String!
+    loginTime: DateTime!
 
     # Optional login message
     message: String

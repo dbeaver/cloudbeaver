@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.registry;
+package io.cloudbeaver.registry;
 
 import io.cloudbeaver.DBWAuthProvider;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -22,7 +22,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -74,7 +73,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return cfg.getAttribute("icon");
     }
 
-    public List<DBPPropertyDescriptor> getProperties() {
+    public List<WebAuthProviderPropertyDescriptor> getProperties() {
         return new ArrayList<>(properties.values());
     }
 

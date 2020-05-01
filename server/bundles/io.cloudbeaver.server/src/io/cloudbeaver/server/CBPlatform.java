@@ -22,7 +22,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebDataSourceConfig;
 import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.server.registry.WebDriverRegistry;
+import io.cloudbeaver.registry.WebDriverRegistry;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;

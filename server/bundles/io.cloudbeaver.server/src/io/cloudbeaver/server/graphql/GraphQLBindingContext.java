@@ -1,8 +1,6 @@
 package io.cloudbeaver.server.graphql;
 
-import graphql.GraphQLContext;
 import graphql.scalars.ExtendedScalars;
-import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
@@ -11,8 +9,8 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBinding;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.server.registry.WebServiceDescriptor;
-import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.WebServiceDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 

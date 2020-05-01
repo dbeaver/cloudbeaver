@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 
 import java.util.Map;
@@ -33,7 +34,21 @@ public interface DBWServerController {
 
     void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException;
 
-    void setUserCredentials(String userId, String authProviderId, Map<String, Object> credentials) throws DBCException;
+    /**
+     * Sets user redentials for specified provider
+     */
+    void setUserCredentials(String userId, WebAuthProviderDescriptor authProvider, Map<String, Object> credentials) throws DBCException;
+
+    /**
+     * Find user with matching credentials.
+     * It doesn't check credentials like passwords, just searches user id by identifying credentials.
+     */
+    String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
+
+    /**
+     * Get user credentials for specified provider
+     */
+    Map<String, Object> getUserCredentials(String userId, WebAuthProviderDescriptor authProvider) throws DBCException;
 
     WebRole[] readAllRoles() throws DBCException;
 

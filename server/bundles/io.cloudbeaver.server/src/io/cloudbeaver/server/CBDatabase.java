@@ -20,6 +20,8 @@ import io.cloudbeaver.DBWServerController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.apache.commons.dbcp2.DriverConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
@@ -29,7 +31,6 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
@@ -47,7 +48,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Database management
@@ -237,8 +237,13 @@ public class CBDatabase {
             String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), userPassword);
 
             Map<String, Object> credentials = new LinkedHashMap<>();
+            credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
             credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
-            serverController.setUserCredentials(adminUser.getUserId(), LocalAuthProvider.PROVIDER_ID, credentials);
+
+            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
+            if (authProvider != null) {
+                serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
+            }
         }
 
         if (!CommonUtils.isEmpty(initialData.getRoles())) {

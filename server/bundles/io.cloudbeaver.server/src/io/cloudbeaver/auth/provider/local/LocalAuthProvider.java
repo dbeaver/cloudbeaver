@@ -17,7 +17,7 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.DBWAuthProvider;
-import io.cloudbeaver.server.registry.WebAuthProviderPropertyEncryption;
+import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -30,10 +30,12 @@ import java.util.Map;
 public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
 
     public static final String PROVIDER_ID = "local";
+    public static final String CRED_USER = "user";
     public static final String CRED_PASSWORD = "password";
 
     @Override
-    public LocalAuthToken openSession(String userName, Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
+    public LocalAuthToken openSession(Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
+        String userName = CommonUtils.toString(authParameters.get(CRED_USER), null);
         String storedPasswordHash = CommonUtils.toString(userCredentials.get(CRED_PASSWORD), null);
         if (CommonUtils.isEmpty(storedPasswordHash)) {
             throw new DBException("User has no password (login restricted)");

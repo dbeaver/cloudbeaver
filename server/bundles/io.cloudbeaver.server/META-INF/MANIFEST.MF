@@ -30,6 +30,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
  io.cloudbeaver.model.resources,
  io.cloudbeaver.model.session,
+ io.cloudbeaver.registry,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.cloudbeaver.server.registry;
+package io.cloudbeaver.registry;
 
 import io.cloudbeaver.service.DBWServiceBinding;
 import org.eclipse.core.runtime.IConfigurationElement;

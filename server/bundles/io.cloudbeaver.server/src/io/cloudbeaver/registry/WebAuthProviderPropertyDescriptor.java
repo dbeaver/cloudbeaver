@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.registry;
+package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
@@ -27,6 +27,7 @@ import org.jkiss.utils.CommonUtils;
 public class WebAuthProviderPropertyDescriptor extends PropertyDescriptor {
 
     private WebAuthProviderPropertyEncryption encryption;
+    private boolean identifying; // Identifying parameter. Will be used during auth for user search by credentials
     private boolean admin; // Parameter value can be configured in admin panel
     private boolean user; // Parameter can be passed by end-user from UI
 
@@ -34,12 +35,17 @@ public class WebAuthProviderPropertyDescriptor extends PropertyDescriptor {
         super(category, config);
 
         this.encryption = CommonUtils.valueOf(WebAuthProviderPropertyEncryption.class, config.getAttribute("encryption"), WebAuthProviderPropertyEncryption.none);
+        this.identifying = CommonUtils.getBoolean(config.getAttribute("identifying"), false);
         this.admin = CommonUtils.getBoolean(config.getAttribute("admin"), false);
         this.user = CommonUtils.getBoolean(config.getAttribute("user"), false);
     }
 
     public WebAuthProviderPropertyEncryption getEncryption() {
         return encryption;
+    }
+
+    public boolean isIdentifying() {
+        return identifying;
     }
 
     public boolean isAdmin() {

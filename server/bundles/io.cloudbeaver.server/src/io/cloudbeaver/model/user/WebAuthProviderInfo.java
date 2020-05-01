@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
-import io.cloudbeaver.server.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.Log;
 
 /**

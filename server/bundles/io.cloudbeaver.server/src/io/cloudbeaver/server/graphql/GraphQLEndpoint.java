@@ -34,7 +34,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;

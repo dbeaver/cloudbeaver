@@ -18,8 +18,8 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.registry.WebServiceDescriptor;
-import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.WebServiceDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;

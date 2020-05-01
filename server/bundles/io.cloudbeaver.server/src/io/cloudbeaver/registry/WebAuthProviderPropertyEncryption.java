@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.registry;
+package io.cloudbeaver.registry;
 
 import org.jkiss.utils.SecurityUtils;
 

@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public interface DBWServiceAuth extends DBWService {
 
-    String authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException;
+    WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException;
 
     void authLogout(WebSession webSession) throws DBWebException;
 

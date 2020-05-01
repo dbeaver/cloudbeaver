@@ -3,7 +3,7 @@ package io.cloudbeaver.server.jetty;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
-import io.cloudbeaver.server.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
