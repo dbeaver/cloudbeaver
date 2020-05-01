@@ -19,12 +19,13 @@ package io.cloudbeaver.service;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
@@ -94,12 +95,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        return getBindingContext(env).getSessionManager().getWebSession(
+        return CBPlatform.getInstance().getSessionManager().getWebSession(
             getServletRequest(env));
     }
 
     protected static WebSession findWebSession(DataFetchingEnvironment env) {
-        return getBindingContext(env).getSessionManager().findWebSession(
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
             getServletRequest(env));
     }
 

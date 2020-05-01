@@ -35,6 +35,9 @@
     </extension>
 
     <extension point="io.cloudbeaver.service">
+        <service id="core" label="Core service" description="Core services" class="io.cloudbeaver.service.core.WebServiceBindingCore">
+            
+        </service>
         <service id="navigator" label="Database navigator" description="Database navigator services" class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator">
             <premission id="navigate" label="Navigate over database metadata"/>
         </service>

@@ -14,22 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service;
+package io.cloudbeaver.service.core;
 
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.TypeRuntimeWiring;
-import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.model.session.WebSessionManager;
+import io.cloudbeaver.DBWService;
 
 /**
- * Web service implementation
+ * Web service API
  */
-public interface DBWBindingContext {
-
-    RuntimeWiring.Builder getRuntimeWiring();
-
-    TypeRuntimeWiring.Builder getQueryType();
-
-    TypeRuntimeWiring.Builder getMutationType();
+public interface DBWServiceCore extends DBWService {
 
 }
