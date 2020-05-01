@@ -22,6 +22,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.exec.DBCException;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Admin interface
@@ -58,4 +59,7 @@ public interface DBWServerController {
 
     void setRolePermissions(String roleId, String[] permissionIds, String grantorId) throws DBCException;
 
+    Set<String> getRolePermissions(String roleId) throws DBCException;
+
+    Set<String> getUserPermissions(String userId) throws DBCException;
 }

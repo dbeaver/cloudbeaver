@@ -69,6 +69,7 @@ class GraphQLBindingContext implements DBWBindingContext {
             .dataFetcher("driverList", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).getDriverList(env.getArgument("id")))
             .dataFetcher("dataSourceList", env -> webServiceMain.getGlobalDataSources())
 
+            .dataFetcher("sessionPermissions", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).getSessionPermissions())
             .dataFetcher("sessionState", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)))
 
             .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false, true).readLog(

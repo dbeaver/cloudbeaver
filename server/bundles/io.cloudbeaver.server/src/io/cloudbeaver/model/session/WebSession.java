@@ -19,6 +19,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.model.*;
@@ -34,6 +35,7 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
@@ -69,6 +71,7 @@ public class WebSession {
     private long lastAccessTime;
 
     private WebUser user;
+    private Set<String> sessionPermissions = null;
     private String locale;
 
     private final List<WebConnectionInfo> connections = new ArrayList<>();
@@ -131,8 +134,30 @@ public class WebSession {
         return user;
     }
 
+    public Set<String> getSessionPermissions() {
+        return sessionPermissions;
+    }
+
     public void setUser(WebUser user) {
+        if (CommonUtils.equalObjects(this.user, user)) {
+            return;
+        }
         this.user = user;
+
+        try {
+            refreshSessionAuth();
+        } catch (DBCException e) {
+            log.error(e);
+        }
+    }
+
+    private void refreshSessionAuth() throws DBCException {
+        CBApplication application = CBPlatform.getInstance().getApplication();
+        if (this.user == null) {
+            sessionPermissions = application.getServerController().getRolePermissions(application.getAppConfiguration().getAnonymousUserRole());
+        } else {
+            sessionPermissions = application.getServerController().getUserPermissions(this.user.getUserId());
+        }
     }
 
     @NotNull

@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth.impl;
 import io.cloudbeaver.DBWServerController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBPlatform;
@@ -64,6 +65,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authInfo.setAuthToken(authToken);
             authInfo.setMessage("Logged using " + authProvider.getLabel() + " provider");
 
+            WebUser user = new WebUser(userId);
+            webSession.setUser(user);
+
             return authInfo;
         } catch (DBException e) {
             throw new DBWebException("User authentication failed", e);
@@ -72,6 +76,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public void authLogout(WebSession webSession) throws DBWebException {
-
+        if (webSession.getUser() == null) {
+            throw new DBWebException("Not logged in");
+        }
+        webSession.setUser(null);
     }
 }

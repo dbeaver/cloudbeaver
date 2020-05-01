@@ -22,6 +22,6 @@ package io.cloudbeaver;
  */
 public @interface WebAction {
 
-    String[] requirePermissions() default {};
+    String[] requirePermissions() default { DBWConstants.PERMISSION_PUBLIC };
 
 }

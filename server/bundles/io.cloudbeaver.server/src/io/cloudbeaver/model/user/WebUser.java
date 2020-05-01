@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
 import java.util.*;
@@ -27,7 +28,8 @@ public class WebUser {
 
     private static final Log log = Log.getLog(WebUser.class);
 
-    private String userId;
+    @NotNull
+    private final String userId;
 
     private Map<String, Object> metaParameters = new LinkedHashMap<>();
     private Map<String, Object> configurationParameters = new LinkedHashMap<>();
@@ -37,10 +39,11 @@ public class WebUser {
     private String activeAuthModel;
     private Map<String, Map<String, Object>> authCredentials = new HashMap<>();
 
-    public WebUser(String userId) {
+    public WebUser(@NotNull String userId) {
         this.userId = userId;
     }
 
+    @NotNull
     public String getUserId() {
         return userId;
     }
@@ -59,6 +62,16 @@ public class WebUser {
 
     public Set<WebRole> getRoles() {
         return Collections.unmodifiableSet(roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return userId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof WebUser && ((WebUser) obj).userId.equals(this.userId);
     }
 
     @Override

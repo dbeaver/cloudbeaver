@@ -29,9 +29,7 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -279,4 +277,41 @@ class CBServerController implements DBWServerController {
         }
     }
 
+    @Override
+    public Set<String> getRolePermissions(String roleId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            Set<String> permissions = new HashSet<>();
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_ROLE_PERMISSIONS WHERE ROLE_ID=?")) {
+                dbStat.setString(1, roleId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        permissions.add(dbResult.getString(1));
+                    }
+                }
+            }
+            return permissions;
+        } catch (SQLException e) {
+            throw new DBCException("Error saving role in database", e);
+        }
+    }
+
+    @Override
+    public Set<String> getUserPermissions(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            Set<String> permissions = new HashSet<>();
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT PERMISSION_ID FROM CB_ROLE_PERMISSIONS RP,CB_USER_ROLE UR\n" +
+                    "WHERE RP.ROLE_ID=UR.ROLE_ID AND UR.USER_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        permissions.add(dbResult.getString(1));
+                    }
+                }
+            }
+            return permissions;
+        } catch (SQLException e) {
+            throw new DBCException("Error saving role in database", e);
+        }
+    }
 }
