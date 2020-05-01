@@ -17,11 +17,146 @@
 package io.cloudbeaver.service.sql.impl;
 
 
-import io.cloudbeaver.service.sql.DBWServiceSQL;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.service.sql.*;
+import org.eclipse.jface.text.Document;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
+import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLScriptElement;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
+import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
+import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Web service implementation
  */
 public class WebServiceSQL implements DBWServiceSQL {
+
+    @Override
+    @NotNull
+    public WebSQLDialectInfo getDialectInfo(@NotNull WebSQLProcessor processor) throws DBWebException {
+        DBPDataSource dataSource = processor.getConnection().getDataSourceContainer().getDataSource();
+        SQLDialect dialect = SQLUtils.getDialectFromDataSource(dataSource);
+        return new WebSQLDialectInfo(dataSource, dialect);
+    }
+
+    @NotNull
+    public WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException {
+        try {
+            DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
+            Document document = new Document();
+            document.set(query);
+            SQLScriptElement activeQuery = new SQLQuery(dataSource, query);
+            SQLCompletionRequest request = new SQLCompletionRequest(
+                new WebSQLCompletionContext(sqlContext),
+                document,
+                position == null ? 0 : position,
+                activeQuery,
+                false
+            );
+            SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
+            analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
+            List<SQLCompletionProposalBase> proposals = analyzer.getProposals();
+            if (maxResults == null) maxResults = 200;
+            if (proposals.size() > maxResults) {
+                proposals = proposals.subList(0, maxResults);
+            }
+
+            WebSQLCompletionProposal[] result = new WebSQLCompletionProposal[proposals.size()];
+            for (int i = 0; i < proposals.size(); i++) {
+                result[i] = new WebSQLCompletionProposal(proposals.get(i));
+            }
+            return result;
+        } catch (DBException e) {
+            throw new DBWebException("Error processing SQL proposals", e);
+        }
+    }
+
+    @Override
+    public WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) {
+        return processor.createContext(defaultCatalog, defaultSchema);
+    }
+
+    @Override
+    public void destroyContext(@NotNull WebSQLContextInfo sqlContext) {
+        sqlContext.getProcessor().destroyContext(sqlContext);
+    }
+
+    @Override
+    public void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException {
+        sqlContext.setDefaults(catalogName, schemaName);
+    }
+
+    @WebAction
+    @NotNull
+    public WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
+        return sqlContext.getProcessor().processQuery(
+            sqlContext.getProcessor().getWebSession().getProgressMonitor(),
+            sqlContext,
+            sql,
+            filter);
+    }
+
+    @Override
+    public Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException {
+        if (!sqlContext.closeResult(resultId)) {
+            throw new DBWebException("Invalid result ID " + resultId);
+        }
+        return true;
+    }
+
+    @Override
+    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter) throws DBException {
+        try {
+            DBRProgressMonitor monitor = contextInfo.getProcessor().getWebSession().getProgressMonitor();
+
+            DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(monitor, containerPath, DBSDataContainer.class);
+
+            if (filter == null) {
+                // Use default filter
+                filter = new WebSQLDataFilter();
+            }
+
+            return contextInfo.getProcessor().readDataFromContainer(contextInfo, monitor, dataContainer, filter);
+        } catch (DBException e) {
+            if (e instanceof DBWebException) throw (DBWebException) e;
+            throw new DBWebException("Error reading data from '"  + containerPath + "'", e);
+        }
+    }
+
+    @Override
+    public WebSQLExecuteInfo updateResultsData(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues) throws DBWebException {
+        return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues);
+    }
+
+    @NotNull
+    public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException {
+        DBRRunnableWithResult<WebSQLExecuteInfo> runnable = new DBRRunnableWithResult<WebSQLExecuteInfo>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                try {
+                    result = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL execute", runnable);
+    }
+
 
 }
