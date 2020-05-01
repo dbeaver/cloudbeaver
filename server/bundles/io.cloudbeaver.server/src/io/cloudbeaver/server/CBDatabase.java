@@ -56,7 +56,7 @@ public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
-    private static final String CURRENT_SCHEMA_VERSION = "1.beta";
+    private static final String CURRENT_SCHEMA_VERSION = "2.beta";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
@@ -159,7 +159,11 @@ public class CBDatabase {
     }
 
     private void createDatabaseSchema(Connection connection, boolean create) throws DBException {
-        log.debug("Create database schema");
+        if (create) {
+            log.debug("Create database schema");
+        } else {
+            log.debug("Cleanup old database schema");
+        }
         InputStream ddlStream = getClass().getClassLoader().getResourceAsStream(SCHEMA_CREATE_SQL_PATH);
         if (ddlStream == null) {
             throw new DBException("Can't find schema file " + SCHEMA_CREATE_SQL_PATH);
@@ -171,7 +175,7 @@ public class CBDatabase {
             ByteArrayOutputStream ddlBuffer = new ByteArrayOutputStream();
             IOUtils.copyStream(ddlStream, ddlBuffer);
             String ddl = new String(ddlBuffer.toByteArray(), StandardCharsets.UTF_8);
-            List<String> extraQueries = new ArrayList<>();
+            List<String> dropQueries = new ArrayList<>();
             for (String line : ddl.split(";")) {
                 line = line.trim();
                 if (line.isEmpty()) {
@@ -180,7 +184,7 @@ public class CBDatabase {
                 if (!create) {
                     Matcher matcher = ctPattern.matcher(line);
                     if (matcher.find()) {
-                        extraQueries.add("DROP TABLE " + matcher.group(1));
+                        dropQueries.add("DROP TABLE " + matcher.group(1));
                     }
                     continue;
                 }
@@ -188,10 +192,14 @@ public class CBDatabase {
                     dbStat.execute(line);
                 }
             }
-            if (!extraQueries.isEmpty()) {
-                for (String query : extraQueries) {
+            if (!dropQueries.isEmpty()) {
+                for (String query : dropQueries) {
                     try (Statement dbStat = connection.createStatement()) {
                         dbStat.execute(query);
+                    }
+                    catch (SQLException e) {
+                        // Ignore error
+                        log.debug(e.getMessage());
                     }
                 }
             }
