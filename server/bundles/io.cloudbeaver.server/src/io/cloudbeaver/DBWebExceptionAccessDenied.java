@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.cloudbeaver;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Object association annotation
+ * The activator class controls the plug-in life cycle
  */
-@Target(value = {ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface WebAction {
+public class DBWebExceptionAccessDenied extends DBWebException {
 
-    String[] requirePermissions() default { DBWConstants.PERMISSION_PUBLIC };
+    public static final String ERROR_CODE_ACCESS_DENIED = "accessDenied";
 
+    public DBWebExceptionAccessDenied(String message) {
+        super(message, ERROR_CODE_ACCESS_DENIED);
+    }
+
+    public DBWebExceptionAccessDenied(String message, Throwable cause) {
+        super(message, ERROR_CODE_ACCESS_DENIED, cause);
+
+    }
 }

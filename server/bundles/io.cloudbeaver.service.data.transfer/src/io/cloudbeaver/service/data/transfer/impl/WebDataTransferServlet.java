@@ -43,7 +43,7 @@ public class WebDataTransferServlet extends HttpServlet {
                 dataFileId = dataFileId.substring(1);
             }
 
-            WebSession webSession = CBPlatform.getInstance().getSessionManager().tryGetWebSession(request.getSession());
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().findWebSession(request);
             if (webSession == null) {
                 throw new DBWebException("No active session");
             }

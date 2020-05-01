@@ -57,6 +57,11 @@ public class DBWebException extends DBException implements GraphQLError {
         super(makeMessage(message, cause), cause);
     }
 
+    public DBWebException(String message, String errorCode, Throwable cause) {
+        this(message, cause);
+        this.webErrorCode = errorCode;
+    }
+
     public DBWebException(Throwable cause, DBPDataSource dataSource) {
         super(cause, dataSource);
     }

@@ -21,9 +21,13 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebExceptionAccessDenied;
+import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -34,6 +38,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Set;
 
 /**
  * Web service implementation
@@ -63,7 +68,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
      * Creates proxy for permission checks and other general API calls validation/logging.
      */
     protected  API_TYPE getService(DataFetchingEnvironment env) {
-        Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl));
+        Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl, env));
         return apiInterface.cast(proxyImpl);
     }
 
@@ -89,7 +94,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        return getBindingContext(env).getSessionManager().getWebSession(getServletRequest(env));
+        return getBindingContext(env).getSessionManager().getWebSession(
+            getServletRequest(env));
+    }
+
+    protected static WebSession findWebSession(DataFetchingEnvironment env) {
+        return getBindingContext(env).getSessionManager().findWebSession(
+            getServletRequest(env));
     }
 
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
@@ -98,18 +109,50 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
     private class ServiceInvocationHandler implements InvocationHandler {
         private final API_TYPE impl;
+        private final DataFetchingEnvironment env;
 
-        ServiceInvocationHandler(API_TYPE impl) {
+        ServiceInvocationHandler(API_TYPE impl, DataFetchingEnvironment env) {
             this.impl = impl;
+            this.env = env;
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             try {
+                WebAction webAction = method.getAnnotation(WebAction.class);
+                if (webAction != null) {
+                    checkPermissions(webAction);
+                }
                 return method.invoke(impl, args);
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         }
+
+        private void checkPermissions(WebAction webAction) throws DBWebExceptionAccessDenied {
+            String[] reqPermissions = webAction.requirePermissions();
+            if (reqPermissions.length == 0) {
+                return;
+            }
+            WebSession session = findWebSession(env);
+            if (session == null) {
+                throw new DBWebExceptionAccessDenied("Anonymous access restricted");
+            }
+            Set<String> sessionPermissions;
+            try {
+                sessionPermissions = session.getSessionPermissions();
+            } catch (DBCException e) {
+                throw new DBWebExceptionAccessDenied("Can't retrieve session permissions", e);
+            }
+            if (CommonUtils.isEmpty(sessionPermissions)) {
+                throw new DBWebExceptionAccessDenied("Anonymous access restricted");
+            }
+            for (String rp : reqPermissions) {
+                if (!sessionPermissions.contains(rp)) {
+                    throw new DBWebExceptionAccessDenied("Access denied");
+                }
+            }
+        }
+
     }
 }

@@ -66,8 +66,8 @@ public class WebSession {
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
-    private String id;
-    private long createTime;
+    private final String id;
+    private final long createTime;
     private long lastAccessTime;
 
     private WebUser user;
@@ -122,23 +122,26 @@ public class WebSession {
     }
 
     @Property
-    public String getLastAccessTime() {
+    public synchronized String getLastAccessTime() {
         return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    public long getLastAccessTimeMillis() {
+    public synchronized long getLastAccessTimeMillis() {
         return lastAccessTime;
     }
 
-    public WebUser getUser() {
+    public synchronized WebUser getUser() {
         return user;
     }
 
-    public Set<String> getSessionPermissions() {
+    public synchronized Set<String> getSessionPermissions() throws DBCException {
+        if (sessionPermissions == null) {
+            refreshSessionAuth();
+        }
         return sessionPermissions;
     }
 
-    public void setUser(WebUser user) {
+    public synchronized void setUser(WebUser user) {
         if (CommonUtils.equalObjects(this.user, user)) {
             return;
         }

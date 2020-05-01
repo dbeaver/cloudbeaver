@@ -17,9 +17,9 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -49,11 +49,6 @@ public class WebSessionManager {
     public WebSessionManager() {
     }
 
-    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
-        HttpSession session = getOrCreateHttpSession(request);
-        return getWebSession(session, true, errorOnNoFound);
-    }
-
     public boolean closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
@@ -80,20 +75,12 @@ public class WebSessionManager {
         return getWebSession(request, true);
     }
 
-    private HttpSession getOrCreateHttpSession(@NotNull HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session == null) {
-            session = request.getSession(true);
-            log.debug("New session: " + session.getId());
-        }
-        return session;
+    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+        return getWebSession(request, true, errorOnNoFound);
     }
 
     public WebSession getWebSession(HttpServletRequest request, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(getOrCreateHttpSession(request), updateInfo, errorOnNoFound);
-    }
-
-    public WebSession getWebSession(HttpSession httpSession, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+        HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
@@ -113,11 +100,11 @@ public class WebSessionManager {
                 }
             }
         }
-        return  webSession;
+        return webSession;
     }
 
-    public WebSession tryGetWebSession(HttpSession httpSession) {
-        String sessionId = httpSession.getId();
+    public WebSession findWebSession(HttpServletRequest request) {
+        String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
             return sessionMap.get(sessionId);
         }
