@@ -16,11 +16,13 @@
  */
 package io.cloudbeaver.service.auth;
 
-import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.server.registry.WebServiceRegistry;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
+
+import java.util.Date;
 
 /**
  * Web service implementation
@@ -35,10 +37,28 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("authLogin", env -> {
-            Object context = env.getContext();
-            throw new DBWebException("Not implemented");
-        });
+        model.getQueryType()
+            .dataFetcher("authLogin", env -> {
+                String userId = getService(env).authLogin(
+                    getWebSession(env),
+                    env.getArgument("providerId"),
+                    env.getArgument("credentials"));
+                WebAuthInfo authInfo = new WebAuthInfo();
+                authInfo.setUserName(userId);
+                authInfo.setLoginTime(new Date());
+                authInfo.setMessage("User logged in");
+                return authInfo;
+            })
+            .dataFetcher("authLogout", env -> {
+                getService(env).authLogout(getWebSession(env));
+                return true;
+            })
+            .dataFetcher("sessionUser", env -> {
+                Object context = env.getContext();
+                throw new DBWebException("Not implemented");
+            })
+            .dataFetcher("authProviders", env -> WebServiceRegistry.getInstance().getAuthProviders())
+        ;
 
     }
 }

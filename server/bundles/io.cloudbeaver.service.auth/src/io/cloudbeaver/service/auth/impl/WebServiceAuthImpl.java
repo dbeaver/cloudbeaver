@@ -16,7 +16,11 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
+
+import java.util.Map;
 
 /**
  * Web service implementation
@@ -24,4 +28,13 @@ import io.cloudbeaver.service.auth.DBWServiceAuth;
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
 
+    @Override
+    public String authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException {
+        return null;
+    }
+
+    @Override
+    public void authLogout(WebSession webSession) throws DBWebException {
+
+    }
 }

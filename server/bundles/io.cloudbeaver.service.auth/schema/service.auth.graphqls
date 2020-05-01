@@ -42,6 +42,6 @@ extend type Query {
 
     sessionUser: UserAuthInfo
 
-    authModels: [AuthProviderInfo]!
+    authProviders: [AuthProviderInfo]!
 
 }

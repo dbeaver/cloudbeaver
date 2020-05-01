@@ -17,14 +17,11 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.DBWAuthProvider;
-import io.cloudbeaver.server.CBDatabase;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.registry.WebAuthProviderPropertyEncryption;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -37,10 +34,17 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
 
     @Override
     public LocalAuthToken openSession(String userName, Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
-        try (Connection dbCon = CBDatabase.getInstance().openConnection()) {
-
-        } catch (SQLException e) {
-            throw new DBCException("Error authenticating user", e);
+        String storedPasswordHash = CommonUtils.toString(userCredentials.get(CRED_PASSWORD), null);
+        if (CommonUtils.isEmpty(storedPasswordHash)) {
+            throw new DBException("User has no password (login restricted)");
+        }
+        String clientPassword = CommonUtils.toString(authParameters.get(CRED_PASSWORD), null);
+        if (CommonUtils.isEmpty(clientPassword)) {
+            throw new DBException("No user password provided");
+        }
+        String clientPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, clientPassword);
+        if (!storedPasswordHash.equals(clientPasswordHash)) {
+            throw new DBException("Invalid user name or password");
         }
         return new LocalAuthToken(userName);
     }
@@ -56,10 +60,6 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
     }
 
     public static String makeClientPasswordHash(String userName, String password) {
-        return SecurityUtils.makeDigest(userName, password);
-    }
-
-    public static String makeServerPasswordHash(String userName, String password) {
         return SecurityUtils.makeDigest(userName, password);
     }
 

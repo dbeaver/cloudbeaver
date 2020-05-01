@@ -19,11 +19,11 @@ package io.cloudbeaver.service;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -81,15 +81,19 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
-        return DBWUtils.getServletRequest(env);
+        return GraphQLEndpoint.getServletRequest(env);
     }
 
-    protected static WebSession getWebSession(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        return model.getSessionManager().getWebSession(getServletRequest(env));
+    protected static DBWBindingContext getBindingContext(DataFetchingEnvironment env) {
+        return GraphQLEndpoint.getBindingContext(env);
     }
 
-    protected static WebConnectionInfo getWebConnection(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        return getWebSession(model, env).getWebConnectionInfo(env.getArgument("connectionId"));
+    protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
+        return getBindingContext(env).getSessionManager().getWebSession(getServletRequest(env));
+    }
+
+    protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
+        return getWebSession(env).getWebConnectionInfo(env.getArgument("connectionId"));
     }
 
     private class ServiceInvocationHandler implements InvocationHandler {

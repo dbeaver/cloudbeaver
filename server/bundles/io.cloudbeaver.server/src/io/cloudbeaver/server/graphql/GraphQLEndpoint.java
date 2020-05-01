@@ -26,6 +26,7 @@ import graphql.execution.instrumentation.parameters.InstrumentationExecutionPara
 import graphql.execution.instrumentation.parameters.InstrumentationFieldFetchParameters;
 import graphql.language.SourceLocation;
 import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -69,6 +70,7 @@ public class GraphQLEndpoint extends HttpServlet {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+    private GraphQLBindingContext bindingContext;
 
     public GraphQLEndpoint() {
         GraphQLSchema schema = buildSchema();
@@ -108,8 +110,8 @@ public class GraphQLEndpoint extends HttpServlet {
         log.debug("Schema extensions loaded: " + String.join(",", addedBindings));
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();
-        GraphQLBindingContext wiring = new GraphQLBindingContext();
-        return schemaGenerator.makeExecutableSchema(parsedSchema, wiring.buildRuntimeWiring());
+        bindingContext = new GraphQLBindingContext();
+        return schemaGenerator.makeExecutableSchema(parsedSchema, bindingContext.buildRuntimeWiring());
     }
 
     @Override
@@ -221,6 +223,7 @@ public class GraphQLEndpoint extends HttpServlet {
         GraphQLContext context = new GraphQLContext.Builder()
             .of("request", request)
             .of("response", response)
+            .of("bindingContext", bindingContext)
             .build();
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .context(context)
@@ -294,4 +297,20 @@ public class GraphQLEndpoint extends HttpServlet {
             });
         }
     }
+
+
+    public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
+        GraphQLContext context = env.getContext();
+        HttpServletRequest request = context.get("request");
+        if (request == null) {
+            throw new IllegalStateException("Null request");
+        }
+        return request;
+    }
+
+    public static GraphQLBindingContext getBindingContext(DataFetchingEnvironment env) {
+        GraphQLContext context = env.getContext();
+        return context.get("bindingContext");
+    }
+
 }

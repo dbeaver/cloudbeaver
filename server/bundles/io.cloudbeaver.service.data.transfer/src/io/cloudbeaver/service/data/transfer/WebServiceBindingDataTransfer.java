@@ -41,7 +41,7 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
 
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
-                env -> getService(env).getAvailableStreamProcessors(getWebSession(model, env)))
+                env -> getService(env).getAvailableStreamProcessors(getWebSession(env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
                 WebServiceBindingSQL.getSQLProcessor(model, env),
                 env.getArgument("containerNodePath"),

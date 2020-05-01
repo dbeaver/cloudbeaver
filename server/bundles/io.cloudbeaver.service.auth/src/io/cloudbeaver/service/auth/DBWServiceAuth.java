@@ -17,11 +17,18 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.session.WebSession;
+
+import java.util.Map;
 
 /**
  * Web service API
  */
 public interface DBWServiceAuth extends DBWService {
 
+    String authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException;
+
+    void authLogout(WebSession webSession) throws DBWebException;
 
 }

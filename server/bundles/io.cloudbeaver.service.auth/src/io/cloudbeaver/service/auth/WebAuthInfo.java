@@ -14,27 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver;
+package io.cloudbeaver.service.auth;
 
-import graphql.GraphQLContext;
-import graphql.schema.DataFetchingEnvironment;
-import io.cloudbeaver.model.session.WebSessionManager;
-import io.cloudbeaver.service.sql.WebSQLContextInfo;
-import io.cloudbeaver.service.sql.WebSQLProcessor;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
- * Web utils
+ * WebAuthInfo
  */
-public class DBWUtils {
+public class WebAuthInfo {
 
-    public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
-        GraphQLContext context = env.getContext();
-        HttpServletRequest request = context.get("request");
-        if (request == null) {
-            throw new IllegalStateException("Null request");
-        }
-        return request;
+    private String userName;
+    private Date loginTime;
+    private String message;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Date getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(Date loginTime) {
+        this.loginTime = loginTime;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

@@ -1,5 +1,6 @@
 package io.cloudbeaver.server.graphql;
 
+import graphql.GraphQLContext;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.RuntimeWiring;
@@ -9,14 +10,11 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBinding;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
-import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.server.registry.WebServiceDescriptor;
 import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-
-import javax.servlet.http.HttpServletRequest;
 
 class GraphQLBindingContext implements DBWBindingContext {
 
@@ -70,36 +68,36 @@ class GraphQLBindingContext implements DBWBindingContext {
         queryType
             .dataFetcher("serverConfig", env -> webServiceMain.getServerConfig())
 
-            .dataFetcher("driverList", env -> sessionManager.getWebSession(getServletRequest(env)).getDriverList(env.getArgument("id")))
+            .dataFetcher("driverList", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).getDriverList(env.getArgument("id")))
             .dataFetcher("dataSourceList", env -> webServiceMain.getGlobalDataSources())
 
-            .dataFetcher("sessionState", env -> sessionManager.getWebSession(getServletRequest(env)))
+            .dataFetcher("sessionState", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)))
 
-            .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(getServletRequest(env), false, true).readLog(
+            .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false, true).readLog(
                 env.getArgument("maxEntries"),
                 env.getArgument("clearEntries")))
         ;
 
         mutationType
-            .dataFetcher("openSession", env -> sessionManager.getWebSession(getServletRequest(env), false))
-            .dataFetcher("closeSession", env -> sessionManager.closeSession(getServletRequest(env)))
-            .dataFetcher("touchSession", env -> sessionManager.touchSession(getServletRequest(env)))
+            .dataFetcher("openSession", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false))
+            .dataFetcher("closeSession", env -> sessionManager.closeSession(GraphQLEndpoint.getServletRequest(env)))
+            .dataFetcher("touchSession", env -> sessionManager.touchSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("changeSessionLanguage", env -> {
-                sessionManager.getWebSession(getServletRequest(env)).setLocale(env.getArgument("locale"));
+                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).setLocale(env.getArgument("locale"));
                 return true;
             })
 
-            .dataFetcher("openConnection", env -> sessionManager.openConnection(getServletRequest(env), env.getArgument("config")))
-            .dataFetcher("createConnection", env -> sessionManager.createConnection(getServletRequest(env), env.getArgument("config")))
-            .dataFetcher("testConnection", env -> sessionManager.testConnection(getServletRequest(env), env.getArgument("config")))
-            .dataFetcher("closeConnection", env -> sessionManager.closeConnection(getServletRequest(env), env.getArgument("id")))
+            .dataFetcher("openConnection", env -> sessionManager.openConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("config")))
+            .dataFetcher("createConnection", env -> sessionManager.createConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("config")))
+            .dataFetcher("testConnection", env -> sessionManager.testConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("config")))
+            .dataFetcher("closeConnection", env -> sessionManager.closeConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("id")))
 
             .dataFetcher("asyncTaskStatus", env ->
-                sessionManager.getWebSession(getServletRequest(env)).asyncTaskStatus(
+                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).asyncTaskStatus(
                     env.getArgument("id"))
             )
             .dataFetcher("asyncTaskCancel", env ->
-                sessionManager.getWebSession(getServletRequest(env)).asyncTaskCancel(
+                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).asyncTaskCancel(
                     env.getArgument("id"))
             )
         ;
@@ -131,10 +129,6 @@ class GraphQLBindingContext implements DBWBindingContext {
         );
 
         return runtimeWiring.build();
-    }
-
-    private HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
-        return DBWUtils.getServletRequest(env);
     }
 
 

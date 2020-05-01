@@ -17,11 +17,9 @@
 package io.cloudbeaver.service.sql;
 
 import graphql.schema.DataFetchingEnvironment;
-import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
@@ -88,7 +86,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
     }
 
     public static WebSQLProcessor getSQLProcessor(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        WebConnectionInfo connectionInfo = getWebConnection(model, env);
+        WebConnectionInfo connectionInfo = getWebConnection(env);
         return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo);
     }
 
