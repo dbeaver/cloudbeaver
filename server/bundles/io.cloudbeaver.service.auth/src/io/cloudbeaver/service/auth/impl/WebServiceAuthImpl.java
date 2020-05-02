@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
+import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
@@ -48,10 +50,22 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
         try {
+            Map<String, Object> providerConfig = Collections.emptyMap();
+
+            DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
+            if (authProviderInstance instanceof DBWAuthProviderExternal<?>) {
+                Map<String, Object> externalCredentials = ((DBWAuthProviderExternal<?>) authProviderInstance).readExternalCredentials(providerConfig,
+                    authParameters);
+                if (externalCredentials != null) {
+                    authParameters.putAll(externalCredentials);
+                }
+            }
+
             String userId = serverController.getUserByCredentials(authProvider, authParameters);
             Map<String, Object> userCredentials = serverController.getUserCredentials(userId, authProvider);
-            Object authToken = authProvider.getInstance().openSession(
-                Collections.emptyMap(),
+
+            Object authToken = authProviderInstance.openSession(
+                providerConfig,
                 userCredentials,
                 authParameters);
             WebAuthInfo authInfo = new WebAuthInfo();
