@@ -48,11 +48,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
         try {
-            String userId = serverController.findUserByCredentials(authProvider, authParameters);
-            if (userId == null) {
-                // User doesn't exist. We can create new user automatically if auth provider supports this
-                throw new DBWebException("Invalid user credentials");
-            }
+            String userId = serverController.getUserByCredentials(authProvider, authParameters);
             Map<String, Object> userCredentials = serverController.getUserCredentials(userId, authProvider);
             Object authToken = authProvider.getInstance().openSession(
                 Collections.emptyMap(),

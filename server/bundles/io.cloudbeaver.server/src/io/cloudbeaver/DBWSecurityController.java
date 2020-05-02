@@ -21,6 +21,7 @@ import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.exec.DBCException;
 
 import java.util.Map;
@@ -52,7 +53,8 @@ public interface DBWSecurityController {
      * Find user with matching credentials.
      * It doesn't check credentials like passwords, just searches user id by identifying credentials.
      */
-    String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
+    @NotNull
+    String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException;
 
     /**
      * Get user credentials for specified provider

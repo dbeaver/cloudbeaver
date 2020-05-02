@@ -17,12 +17,14 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -40,6 +42,9 @@ class CBSecurityController implements DBWSecurityController {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
+    public static final String CHAR_BOOL_TRUE = "Y";
+    public static final String CHAR_BOOL_FALSE = "N";
+
     private final CBDatabase database;
 
     CBSecurityController(CBDatabase database) {
@@ -54,7 +59,7 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
                 dbStat.setString(1, user.getUserId());
-                dbStat.setString(2, "Y");
+                dbStat.setString(2, CHAR_BOOL_TRUE);
                 dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                 dbStat.execute();
             }
@@ -130,8 +135,9 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
-    public String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    public String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         for (WebAuthProviderPropertyDescriptor prop : authProvider.getProperties()) {
             if (prop.isIdentifying()) {
@@ -150,35 +156,49 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException("No identifying credentials in provider '" + authProvider.getId() + "'");
         }
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT UC.USER_ID FROM CB_USER_CREDENTIALS UC\n");
+        sql.append("SELECT U.USER_ID,U.IS_ACTIVE FROM CB_USER U,CB_USER_CREDENTIALS UC\n");
+        for (int joinNum = 0; joinNum < identCredentials.size() - 1; joinNum++) {
+            sql.append(",CB_USER_CREDENTIALS UC").append(joinNum + 2);
+        }
+        sql.append("WHERE U.USER_ID=UC.USER_ID AND UC.PROVIDER_ID=? AND UC.CRED_ID=? AND UC.CRED_VALUE=?");
         for (int joinNum = 0; joinNum < identCredentials.size() - 1; joinNum++) {
             String joinAlias = "UC" + (joinNum + 2);
-            sql.append(",CB_USER_CREDENTIALS ").append(joinAlias).append(" ON ")
+            sql.append(" AND ")
                 .append(joinAlias).append(".USER_ID=UC.USER_ID")
                 .append(joinAlias).append(".PROVIDER_ID=UC.PROVIDER_ID AND ")
                 .append(joinAlias).append("CRED_ID=? AND ")
                 .append(joinAlias).append("CRED_VALUE=?");
         }
-        sql.append("WHERE UC.CRED_ID=? AND UC.CRED_VALUE=? AND UC.PROVIDER_ID=?");
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(sql.toString())) {
-                int param = 1;
+                dbStat.setString(1, authProvider.getId());
+                int param = 2;
                 for (Map.Entry<String, Object> credEntry : identCredentials.entrySet()) {
                     dbStat.setString(param++, credEntry.getKey());
                     dbStat.setString(param++, CommonUtils.toString(credEntry.getValue()));
                 }
-                dbStat.setString(param, authProvider.getId());
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     String userId = null;
+                    boolean isActive = false;
                     while (dbResult.next()) {
                         String credUserId = dbResult.getString(1);
+                        isActive = CHAR_BOOL_TRUE.equals(dbResult.getString(2));
                         if (userId == null) {
                             userId = credUserId;
                         } else if (!userId.equals(credUserId)) {
                             log.error("Multiple users associated with the same credentials! " + credUserId + ", " + userId);
                         }
                     }
+
+                    if (userId == null) {
+                        // User doesn't exist. We can create new user automatically if auth provider supports this
+                        throw new DBCException("Invalid user credentials");
+                    }
+                    if (!isActive) {
+                        throw new DBCException("User account is locked");
+                    }
+
                     return userId;
                 }
             }
