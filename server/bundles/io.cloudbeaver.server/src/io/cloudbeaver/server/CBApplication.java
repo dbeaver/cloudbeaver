@@ -207,6 +207,9 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     private void initializeDatabase() throws DBException {
+        if (databaseConfiguration == null) {
+            throw new DBException("Database configuration missing");
+        }
         database = new CBDatabase(this, databaseConfiguration);
 
         securityController = new CBSecurityController(database);
