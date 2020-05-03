@@ -144,7 +144,7 @@ export const ConnectionFormDialog = observer(
           <BaseTabPanel {...tab} stopId='driver_properties'>
             <DriverProperties
               driver={driver}
-              properties={controller.config.properties}
+              state={controller.config.properties}
               isSelected={tab.selectedId === 'driver_properties'}
             />
           </BaseTabPanel>
