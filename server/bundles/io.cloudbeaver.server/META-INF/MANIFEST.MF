@@ -23,13 +23,15 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.jetty.servlet;visibility:=reexport,
  org.eclipse.jetty.util;visibility:=reexport,
  com.google.gson;visibility:=reexport,
- org.jkiss.bundle.graphql.java;visibility:=reexport
+ org.jkiss.bundle.graphql.java;visibility:=reexport,
+ org.jkiss.bundle.apache.dbcp
 Export-Package: io.cloudbeaver,
- io.cloudbeaver.api,
  io.cloudbeaver.server,
  io.cloudbeaver.model,
  io.cloudbeaver.model.resources,
  io.cloudbeaver.model.session,
+ io.cloudbeaver.model.user,
+ io.cloudbeaver.registry,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql

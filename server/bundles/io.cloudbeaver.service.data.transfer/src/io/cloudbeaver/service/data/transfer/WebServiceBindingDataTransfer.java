@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
-import io.cloudbeaver.server.CloudbeaverApplication;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -41,19 +41,19 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
 
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
-                env -> getService(env).getAvailableStreamProcessors(getWebSession(model, env)))
+                env -> getService(env).getAvailableStreamProcessors(getWebSession(env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
-                WebServiceBindingSQL.getSQLProcessor(model, env),
+                WebServiceBindingSQL.getSQLProcessor(env),
                 env.getArgument("containerNodePath"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
             .dataFetcher("dataTransferExportDataFromResults", env -> getService(env).dataTransferExportDataFromResults(
-                WebServiceBindingSQL.getSQLContext(model, env),
+                WebServiceBindingSQL.getSQLContext(env),
                 env.getArgument("resultsId"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
             .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
-                WebServiceBindingSQL.getSQLProcessor(model, env),
+                WebServiceBindingSQL.getSQLProcessor(env),
                 env.getArgument("dataFileId")
             ))
         ;
@@ -61,7 +61,7 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
     }
 
     @Override
-    public void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler) {
+    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
         servletContextHandler.addServlet(
             new ServletHolder("dataTransfer", new WebDataTransferServlet(application, getServiceImpl())),
             application.getServicesURI() + "data/*");

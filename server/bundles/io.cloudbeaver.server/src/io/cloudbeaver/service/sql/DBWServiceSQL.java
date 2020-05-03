@@ -17,11 +17,55 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Web service API
+ * DBWServiceSQL
  */
 public interface DBWServiceSQL extends DBWService {
 
+    @WebAction
+    WebSQLDialectInfo getDialectInfo(@NotNull WebSQLProcessor processor) throws DBWebException;
 
+    @WebAction
+    WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException;
+
+    @WebAction
+    WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema);
+
+    @WebAction
+    void destroyContext(@NotNull WebSQLContextInfo sqlContext);
+
+    @WebAction
+    void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException;
+
+    @WebAction
+    @NotNull
+    WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException;
+
+    @WebAction
+    Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
+
+    @WebAction
+    WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter) throws DBException;
+
+    @WebAction
+    WebSQLExecuteInfo updateResultsData(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull List<Object> updateRow,
+        @NotNull Map<String, Object> updateValues) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException;
 }

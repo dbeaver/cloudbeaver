@@ -27,9 +27,9 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 class WebSessionMonitorJob extends AbstractJob {
     private static final int MONITOR_INTERVAL = 10000; // once per 10 seconds
 
-    private final CloudbeaverPlatform platform;
+    private final CBPlatform platform;
 
-    WebSessionMonitorJob(CloudbeaverPlatform platform) {
+    WebSessionMonitorJob(CBPlatform platform) {
         super("Web session monitor");
         setUser(false);
         setSystem(true);

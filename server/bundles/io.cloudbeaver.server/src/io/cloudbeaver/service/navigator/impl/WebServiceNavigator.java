@@ -72,7 +72,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
             return  result;
         } catch (DBException e) {
-            throw new DBWebException("Error getting navigator nodes", e);
+            throw new DBWebException(e, null);
         }
     }
 

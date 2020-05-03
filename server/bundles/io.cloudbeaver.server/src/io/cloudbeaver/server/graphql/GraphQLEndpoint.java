@@ -26,15 +26,16 @@ import graphql.execution.instrumentation.parameters.InstrumentationExecutionPara
 import graphql.execution.instrumentation.parameters.InstrumentationFieldFetchParameters;
 import graphql.language.SourceLocation;
 import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
-import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.server.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;
 
@@ -47,7 +48,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,6 +70,7 @@ public class GraphQLEndpoint extends HttpServlet {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+    private GraphQLBindingContext bindingContext;
 
     public GraphQLEndpoint() {
         GraphQLSchema schema = buildSchema();
@@ -91,21 +95,23 @@ public class GraphQLEndpoint extends HttpServlet {
             throw new RuntimeException("Error reading core schema", e);
         }
 
+        List<String> addedBindings = new ArrayList<>();
         for (DBWServiceBindingGraphQL wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingGraphQL.class)) {
             try {
                 TypeDefinitionRegistry typeDefinition = wsd.getTypeDefinition();
                 if (typeDefinition != null) {
-                    log.debug("Adding web service '" + wsd.getClass().getSimpleName() + "' GQL schema");
+                    addedBindings.add(wsd.getClass().getSimpleName());
                     parsedSchema.merge(typeDefinition);
                 }
             } catch (DBWebException e) {
                 log.warn("Error obtaining web service type definitions", e);
             }
         }
+        log.debug("Schema extensions loaded: " + String.join(",", addedBindings));
 
         SchemaGenerator schemaGenerator = new SchemaGenerator();
-        GraphQLBindingContext wiring = new GraphQLBindingContext();
-        return schemaGenerator.makeExecutableSchema(parsedSchema, wiring.buildRuntimeWiring());
+        bindingContext = new GraphQLBindingContext();
+        return schemaGenerator.makeExecutableSchema(parsedSchema, bindingContext.buildRuntimeWiring());
     }
 
     @Override
@@ -114,7 +120,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
-        if (CloudbeaverApplication.getInstance().isDevelMode()) {
+        if (CBApplication.getInstance().isDevelMode()) {
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
@@ -195,7 +201,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path == null) {
             path = request.getServletPath();
         }
-        boolean develMode = CloudbeaverApplication.getInstance().isDevelMode();
+        boolean develMode = CBApplication.getInstance().isDevelMode();
 
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);
@@ -217,6 +223,7 @@ public class GraphQLEndpoint extends HttpServlet {
         GraphQLContext context = new GraphQLContext.Builder()
             .of("request", request)
             .of("response", response)
+            .of("bindingContext", bindingContext)
             .build();
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .context(context)
@@ -290,4 +297,20 @@ public class GraphQLEndpoint extends HttpServlet {
             });
         }
     }
+
+
+    public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
+        GraphQLContext context = env.getContext();
+        HttpServletRequest request = context.get("request");
+        if (request == null) {
+            throw new IllegalStateException("Null request");
+        }
+        return request;
+    }
+
+    public static GraphQLBindingContext getBindingContext(DataFetchingEnvironment env) {
+        GraphQLContext context = env.getContext();
+        return context.get("bindingContext");
+    }
+
 }

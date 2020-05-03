@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.server.CloudbeaverConstants;
+import io.cloudbeaver.server.CBConstants;
 
 /**
  * Web server message
@@ -46,7 +46,7 @@ public class WebServerMessage {
     }
 
     public String getTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(time);
+        return CBConstants.ISO_DATE_FORMAT.format(time);
     }
 
     public String getMessage() {

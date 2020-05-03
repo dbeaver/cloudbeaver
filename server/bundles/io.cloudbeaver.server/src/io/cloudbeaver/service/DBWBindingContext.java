@@ -18,17 +18,13 @@ package io.cloudbeaver.service;
 
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.TypeRuntimeWiring;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.model.session.WebSessionManager;
 
 /**
  * Web service implementation
  */
 public interface DBWBindingContext {
-
-    CloudbeaverPlatform getPlatform();
-
-    WebSessionManager getSessionManager();
 
     RuntimeWiring.Builder getRuntimeWiring();
 

@@ -1,14 +1,23 @@
-type AuthCredentialInfo {
-    id: ID!
-    label: String!
-    description: String
-    protected: Boolean
-    editable: Boolean
-    possibleValues: [String]!
-    order: Int
+enum AuthCredentialEncryption {
+    none,
+    plain,
+    hash
 }
 
-type AuthModelInfo {
+type AuthCredentialInfo {
+    id: ID!
+    displayName: String!
+    description: String
+
+    editable: Boolean
+    identifying: Boolean
+    admin: Boolean
+    user: Boolean
+    possibleValues: [String]!
+    encryption: AuthCredentialEncryption
+}
+
+type AuthProviderInfo {
     id: ID!
     label: String!
     icon: ID
@@ -16,13 +25,13 @@ type AuthModelInfo {
 
     isDefault: Boolean
 
-    crdentialsInfo: [AuthCredentialInfo]!
+    properties: [AuthCredentialInfo]!
 }
 
 type UserAuthInfo {
-    userName: String!
-
-    loginTime: DateTime
+    userId: String!
+    authProvider: String!
+    loginTime: DateTime!
 
     # Optional login message
     message: String
@@ -30,12 +39,12 @@ type UserAuthInfo {
 
 extend type Query {
 
-    authLogin(model: ID!, credentials: Object!): UserAuthInfo
+    authLogin(provider: ID!, credentials: Object!): UserAuthInfo
 
     authLogout: Boolean
 
     sessionUser: UserAuthInfo
 
-    authModels: [AuthModelInfo]!
+    authProviders: [AuthProviderInfo]!
 
 }

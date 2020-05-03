@@ -39,7 +39,7 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType().dataFetcher("metadataGetNodeDDL", env -> {
-            WebSession webSession = getWebSession(model, env);
+            WebSession webSession = getWebSession(env);
 
             String nodePath = env.getArgument("nodeId");
             DBNNode node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);

@@ -17,12 +17,13 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CloudbeaverPlatform;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -47,11 +48,6 @@ public class WebSessionManager {
     private final Map<String, WebSession> sessionMap = new HashMap<>();
 
     public WebSessionManager() {
-    }
-
-    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
-        HttpSession session = getOrCreateHttpSession(request);
-        return getWebSession(session, true, errorOnNoFound);
     }
 
     public boolean closeSession(@NotNull HttpServletRequest request) {
@@ -80,20 +76,12 @@ public class WebSessionManager {
         return getWebSession(request, true);
     }
 
-    private HttpSession getOrCreateHttpSession(@NotNull HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session == null) {
-            session = request.getSession(true);
-            log.debug("New session: " + session.getId());
-        }
-        return session;
+    public WebSession getWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+        return getWebSession(request, true, errorOnNoFound);
     }
 
     public WebSession getWebSession(HttpServletRequest request, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(getOrCreateHttpSession(request), updateInfo, errorOnNoFound);
-    }
-
-    public WebSession getWebSession(HttpSession httpSession, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+        HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
@@ -102,22 +90,29 @@ public class WebSessionManager {
                 webSession = new WebSession(httpSession);
                 sessionMap.put(sessionId, webSession);
 
-                if (!httpSession.isNew() && errorOnNoFound) {
-                    throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                if (!httpSession.isNew()) {
+                    webSession.setCacheExpired(true);
+                    if (errorOnNoFound) {
+                        throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                    }
                 }
 
                 log.debug("> New web session '" + webSession.getId() + "'");
             } else {
                 if (updateInfo) {
-                    webSession.updateInfo(httpSession);
+                    // Update only once per request
+                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
+                        webSession.updateInfo(httpSession);
+                        request.setAttribute("sessionUpdated", true);
+                    }
                 }
             }
         }
-        return  webSession;
+        return webSession;
     }
 
-    public WebSession tryGetWebSession(HttpSession httpSession) {
-        String sessionId = httpSession.getId();
+    public WebSession findWebSession(HttpServletRequest request) {
+        String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
             return sessionMap.get(sessionId);
         }
@@ -140,7 +135,7 @@ public class WebSessionManager {
     }
 
     public void expireIdleSessions() {
-        long maxSessionIdleTime = DBWorkbench.getPlatform(CloudbeaverPlatform.class).getApplication().getMaxSessionIdleTime();
+        long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
 
         List<WebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {

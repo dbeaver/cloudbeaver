@@ -1,8 +1,8 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import org.jkiss.dbeaver.Log;
@@ -24,23 +24,26 @@ public class WebDataTransferServlet extends HttpServlet {
 
     private static final Log log = Log.getLog(WebDataTransferServlet.class);
 
-    private final CloudbeaverApplication application;
+    private final CBApplication application;
     private final DBWServiceDataTransfer dtManager;
 
-    public WebDataTransferServlet(CloudbeaverApplication application, DBWServiceDataTransfer dtManager) {
+    public WebDataTransferServlet(CBApplication application, DBWServiceDataTransfer dtManager) {
         this.application = application;
         this.dtManager = dtManager;
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String dataFileId = request.getPathInfo();
-        while (dataFileId.startsWith("/")) {
-            dataFileId = dataFileId.substring(1);
-        }
-
         try {
-            WebSession webSession = CloudbeaverPlatform.getInstance().getSessionManager().tryGetWebSession(request.getSession());
+            String dataFileId = request.getPathInfo();
+            if (CommonUtils.isEmpty(dataFileId)) {
+                throw new DBWebException("Data ID not specified");
+            }
+            while (dataFileId.startsWith("/")) {
+                dataFileId = dataFileId.substring(1);
+            }
+
+            WebSession webSession = CBPlatform.getInstance().getSessionManager().findWebSession(request);
             if (webSession == null) {
                 throw new DBWebException("No active session");
             }

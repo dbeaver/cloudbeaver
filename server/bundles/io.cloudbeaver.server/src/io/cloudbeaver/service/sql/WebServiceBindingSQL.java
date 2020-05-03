@@ -17,11 +17,9 @@
 package io.cloudbeaver.service.sql;
 
 import graphql.schema.DataFetchingEnvironment;
-import io.cloudbeaver.DBWUtils;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
@@ -43,10 +41,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("sqlDialectInfo", env ->
-                getSQLProcessor(model, env).getDialectInfo()
+                getService(env).getDialectInfo(getSQLProcessor(env))
             )
             .dataFetcher("sqlCompletionProposals", env ->
-                getSQLContext(model, env).getCompletionProposals(
+                getService(env).getCompletionProposals(
+                    getSQLContext(env),
                     env.getArgument("query"),
                     env.getArgument("position"),
                     env.getArgument("maxResults")
@@ -54,46 +53,62 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
             );
 
         model.getMutationType()
-            .dataFetcher("sqlContextCreate", env -> getSQLProcessor(model, env).createContext(env.getArgument("defaultCatalog"), env.getArgument("defaultSchema")))
-            .dataFetcher("sqlContextDestroy", env -> { getSQLContext(model, env).destroy(); return true; } )
-            .dataFetcher("sqlContextSetDefaults", env -> { getSQLContext(model, env).setDefaults(env.getArgument("defaultCatalog"), env.getArgument("defaultSchema")); return true; })
+            .dataFetcher("sqlContextCreate", env -> getService(env).createContext(
+                getSQLProcessor(env),
+                env.getArgument("defaultCatalog"),
+                env.getArgument("defaultSchema")))
+            .dataFetcher("sqlContextDestroy", env -> { getService(env).destroyContext(getSQLContext(env)); return true; } )
+            .dataFetcher("sqlContextSetDefaults", env -> {
+                getService(env).setContextDefaults(
+                    getSQLContext(env),
+                    env.getArgument("defaultCatalog"),
+                    env.getArgument("defaultSchema"));
+                    return true;
+            })
 
             .dataFetcher("sqlExecuteQuery", env ->
-                getSQLContext(model, env).executeQuery(
-                    env.getArgument("sql"), getDataFilter(env)
+                getService(env).executeQuery(
+                    getSQLContext(env),
+                    env.getArgument("sql"),
+                    getDataFilter(env)
                 ))
             .dataFetcher("sqlResultClose", env ->
-                getSQLContext(model, env).closeResult(env.getArgument("resultId")))
+                getService(env).closeResult(
+                    getSQLContext(env),
+                    env.getArgument("resultId")))
 
             .dataFetcher("readDataFromContainer", env ->
-                getSQLProcessor(model, env).readDataFromContainer(
-                    getSQLContext(model, env),
-                    env.getArgument("containerNodePath"), getDataFilter(env)
+                getService(env).readDataFromContainer(
+                    getSQLContext(env),
+                    env.getArgument("containerNodePath"),
+                    getDataFilter(env)
                 ))
             .dataFetcher("updateResultsData", env ->
-                getSQLProcessor(model, env).updateResultsData(
-                    getSQLContext(model, env),
+                getService(env).updateResultsData(
+                    getSQLContext(env),
                     env.getArgument("resultsId"),
                     env.getArgument("updateRow"),
                     env.getArgument("updateValues")
                 ))
             .dataFetcher("asyncSqlExecuteQuery", env ->
-                getSQLContext(model, env).asyncExecuteQuery(
-                    env.getArgument("sql"), getDataFilter(env)
+                getService(env).asyncExecuteQuery(
+                    getSQLContext(env),
+                    env.getArgument("sql"),
+                    getDataFilter(env)
                 ));
     }
 
     public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {
-        return webSession.getAttribute("sqlConfiguration", cfg -> new WebSQLConfiguration(), cfg -> null);
+        return webSession.getAttribute("sqlConfiguration", cfg -> new WebSQLConfiguration(), WebSQLConfiguration::dispose);
     }
 
-    public static WebSQLProcessor getSQLProcessor(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        WebConnectionInfo connectionInfo = getWebConnection(model, env);
+    public static WebSQLProcessor getSQLProcessor(DataFetchingEnvironment env) throws DBWebException {
+        WebConnectionInfo connectionInfo = getWebConnection(env);
         return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo);
     }
 
-    public static WebSQLContextInfo getSQLContext(DBWBindingContext model, DataFetchingEnvironment env) throws DBWebException {
-        WebSQLProcessor processor = getSQLProcessor(model, env);
+    public static WebSQLContextInfo getSQLContext(DataFetchingEnvironment env) throws DBWebException {
+        WebSQLProcessor processor = getSQLProcessor(env);
         String contextId = env.getArgument("contextId");
         WebSQLContextInfo context = processor.getContext(contextId);
         if (context == null) {
@@ -113,12 +128,22 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     throw new DBWebException("Error connecting to database", e);
                 }
             }
-            WebSQLProcessor processor = processors.get(connectionInfo);
-            if (processor == null) {
-                processor = new WebSQLProcessor(connectionInfo.getSession(), connectionInfo);
-                processors.put(connectionInfo, processor);
+            synchronized (processors) {
+                WebSQLProcessor processor = processors.get(connectionInfo);
+                if (processor == null) {
+                    processor = new WebSQLProcessor(connectionInfo.getSession(), connectionInfo);
+                    processors.put(connectionInfo, processor);
+                }
+                return processor;
             }
-            return processor;
+        }
+
+        public WebSQLConfiguration dispose() {
+            synchronized (processors) {
+                processors.forEach((connectionInfo, processor) -> processor.dispose());
+                processors.clear();
+            }
+            return this;
         }
     }
 

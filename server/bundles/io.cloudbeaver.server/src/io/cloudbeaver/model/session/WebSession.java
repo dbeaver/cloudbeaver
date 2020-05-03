@@ -16,12 +16,14 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.CloudbeaverConstants;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.model.*;
-import io.cloudbeaver.service.sql.WebSQLProcessor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -34,6 +36,7 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
@@ -64,11 +67,15 @@ public class WebSession {
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
-    private String id;
-    private long createTime;
+    private final String id;
+    private final long createTime;
     private long lastAccessTime;
+    private boolean persisted;
 
+    private WebUser user;
+    private Set<String> sessionPermissions = null;
     private String locale;
+    private boolean cacheExpired;
 
     private final List<WebConnectionInfo> connections = new ArrayList<>();
     private final List<WebServerMessage> progressMessages = new ArrayList<>();
@@ -84,8 +91,8 @@ public class WebSession {
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
-
-        this.updateInfo(httpSession);
+        this.lastAccessTime = this.createTime;
+        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
 
         DBPPlatform platform = DBWorkbench.getPlatform();
         this.navigatorModel = new DBNModel(platform, false);
@@ -95,6 +102,15 @@ public class WebSession {
         DBNProject projectNode = this.navigatorModel.getRoot().getProjectNode(project);
         this.databases = projectNode.getDatabases();
         this.locale = Locale.getDefault().getLanguage();
+
+        if (!httpSession.isNew()) {
+            try {
+                // Check persistent state
+                this.persisted = DBWSecurityController.getInstance().isSessionPersisted(this.id);
+            } catch (Exception e) {
+                log.error("Error checking session state,", e);
+            }
+        }
 
         // Add all provided datasources to the session
         synchronized (connections) {
@@ -114,16 +130,59 @@ public class WebSession {
 
     @Property
     public String getCreateTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(createTime);
+        return CBConstants.ISO_DATE_FORMAT.format(createTime);
     }
 
     @Property
-    public String getLastAccessTime() {
-        return CloudbeaverConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+    public synchronized String getLastAccessTime() {
+        return CBConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    public long getLastAccessTimeMillis() {
+    synchronized long getLastAccessTimeMillis() {
         return lastAccessTime;
+    }
+
+    // Clear cache when
+    @Property
+    public boolean isCacheExpired() {
+        return cacheExpired;
+    }
+
+    public void setCacheExpired(boolean cacheExpired) {
+        this.cacheExpired = cacheExpired;
+    }
+
+    public synchronized WebUser getUser() {
+        return user;
+    }
+
+    public synchronized Set<String> getSessionPermissions() throws DBCException {
+        if (sessionPermissions == null) {
+            refreshSessionAuth();
+        }
+        return sessionPermissions;
+    }
+
+    public synchronized void setUser(WebUser user) {
+        if (CommonUtils.equalObjects(this.user, user)) {
+            return;
+        }
+        this.user = user;
+
+        try {
+            refreshSessionAuth();
+        } catch (DBCException e) {
+            log.error(e);
+        }
+    }
+
+    private void refreshSessionAuth() throws DBCException {
+        CBApplication application = CBPlatform.getInstance().getApplication();
+        if (this.user == null) {
+            sessionPermissions = application.getSecurityController().getRolePermissions(application.getAppConfiguration().getAnonymousUserRole());
+        } else {
+            sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
+        }
     }
 
     @NotNull
@@ -155,9 +214,24 @@ public class WebSession {
         }
     }
 
-    public void updateInfo(HttpSession httpSession) {
+    synchronized void updateInfo(HttpSession httpSession) {
         this.lastAccessTime = System.currentTimeMillis();
-        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
+        this.cacheExpired = false;
+        if (!httpSession.isNew()) {
+            try {
+                // Persist session
+                if (!this.persisted) {
+                    // Create new record
+                    DBWSecurityController.getInstance().createSession(this);
+                    this.persisted = true;
+                } else {
+                    // Update record
+                    DBWSecurityController.getInstance().updateSession(this);
+                }
+            } catch (Exception e) {
+                log.error("Error persisting web session", e);
+            }
+        }
     }
 
     @Association
@@ -367,7 +441,7 @@ public class WebSession {
 
     public List<WebDatabaseDriverConfig> getDriverList(@Nullable String driverId) {
         List<WebDatabaseDriverConfig> result = new ArrayList<>();
-        for (DBPDriver driver : CloudbeaverPlatform.getInstance().getApplicableDrivers()) {
+        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(WebServiceUtils.makeDriverFullId(driver))) {
                 result.add(new WebDatabaseDriverConfig(this, driver));
             }

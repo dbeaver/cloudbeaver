@@ -16,8 +16,7 @@
  */
 package io.cloudbeaver.service;
 
-import io.cloudbeaver.server.CloudbeaverApplication;
-import io.cloudbeaver.service.DBWServiceBinding;
+import io.cloudbeaver.server.CBApplication;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 /**
@@ -25,5 +24,5 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
  */
 public interface DBWServiceBindingServlet extends DBWServiceBinding {
 
-    void addServlets(CloudbeaverApplication application, ServletContextHandler servletContextHandler);
+    void addServlets(CBApplication application, ServletContextHandler servletContextHandler);
 }

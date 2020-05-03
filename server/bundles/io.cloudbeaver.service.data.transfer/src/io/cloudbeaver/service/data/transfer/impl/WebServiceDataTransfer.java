@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CloudbeaverPlatform;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -60,7 +60,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     private final File dataExportFolder;
 
     public WebServiceDataTransfer() {
-        dataExportFolder = CloudbeaverPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "data-transfer");
+        dataExportFolder = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "data-transfer");
 
         ContentUtils.deleteFileRecursive(dataExportFolder);
         if (!dataExportFolder.mkdirs()) {

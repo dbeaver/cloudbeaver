@@ -19,30 +19,23 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.navigator.WebStructContainers;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
-import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
-import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -68,12 +61,19 @@ public class WebSQLProcessor {
 
     private AtomicInteger contextId = new AtomicInteger();
 
-    public WebSQLProcessor(@NotNull  WebSession webSession, @NotNull WebConnectionInfo connection) {
+    WebSQLProcessor(@NotNull  WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
 
         syntaxManager = new SQLSyntaxManager();
         syntaxManager.init(connection.getDataSource());
+    }
+
+    void dispose() {
+        synchronized (contexts) {
+            contexts.forEach((s, context) -> context.dispose());
+            contexts.clear();
+        }
     }
 
     public WebConnectionInfo getConnection() {
@@ -94,14 +94,6 @@ public class WebSQLProcessor {
 
     private DBCExecutionContext getExecutionContext(@NotNull DBSDataContainer dataContainer) {
         return DBUtils.getDefaultContext(dataContainer, false);
-    }
-
-    @WebAction
-    @NotNull
-    public WebSQLDialectInfo getDialectInfo() throws DBWebException {
-        DBPDataSource dataSource = connection.getDataSourceContainer().getDataSource();
-        SQLDialect dialect = SQLUtils.getDialectFromDataSource(dataSource);
-        return new WebSQLDialectInfo(dataSource, dialect);
     }
 
     @NotNull
@@ -128,24 +120,15 @@ public class WebSQLProcessor {
         }
     }
 
-    public void destroyContext(@NotNull String contextId) {
-        WebSQLContextInfo contextInfo;
+    public void destroyContext(@NotNull WebSQLContextInfo context) {
+        context.dispose();
         synchronized (contexts) {
-            contextInfo = contexts.get(contextId);
-        }
-        if (contextInfo != null) {
-            contextInfo.destroy();
+            contexts.remove(context.getId());
         }
     }
 
-    @WebAction
     @NotNull
-    public WebSQLExecuteInfo executeQuery(WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
-        return processQuery(webSession.getProgressMonitor(), contextInfo, sql, filter);
-    }
-
-    @NotNull
-    WebSQLExecuteInfo processQuery(DBRProgressMonitor monitor, WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
+    public WebSQLExecuteInfo processQuery(DBRProgressMonitor monitor, WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -193,28 +176,8 @@ public class WebSQLProcessor {
         return executeInfo;
     }
 
-    @WebAction
     @NotNull
-    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter) throws DBWebException {
-        try {
-            DBRProgressMonitor monitor = webSession.getProgressMonitor();
-
-            DBSDataContainer dataContainer = getDataContainerByNodePath(monitor, containerPath, DBSDataContainer.class);
-
-            if (filter == null) {
-                // Use default filter
-                filter = new WebSQLDataFilter();
-            }
-
-            return readDataFromContainer(contextInfo, monitor, dataContainer, filter);
-        } catch (DBException e) {
-            if (e instanceof DBWebException) throw (DBWebException) e;
-            throw new DBWebException("Error reading data from '"  + containerPath + "'", e);
-        }
-    }
-
-    @NotNull
-    private WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull DBRProgressMonitor monitor, @NotNull DBSDataContainer dataContainer, @NotNull WebSQLDataFilter filter) throws DBException {
+    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull DBRProgressMonitor monitor, @NotNull DBSDataContainer dataContainer, @NotNull WebSQLDataFilter filter) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 

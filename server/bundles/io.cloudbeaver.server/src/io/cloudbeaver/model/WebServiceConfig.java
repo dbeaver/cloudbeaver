@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.server.registry.WebServiceDescriptor;
+import io.cloudbeaver.registry.WebServiceDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 
 /**

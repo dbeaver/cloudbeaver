@@ -17,11 +17,18 @@
 
 package io.cloudbeaver;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Object association annotation
  */
+@Target(value = {ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface WebAction {
 
-    String[] requirePermissions() default {};
+    String[] requirePermissions() default { DBWConstants.PERMISSION_PUBLIC };
 
 }

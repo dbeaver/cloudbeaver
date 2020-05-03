@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.navigator.impl.WebServiceNavigator;
-import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 
 import java.util.Map;
 
@@ -38,20 +37,20 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("navNodeChildren", env -> getService(env).getNavigatorNodeChildren(
-                getWebSession(model, env),
+                getWebSession(env),
                 env.getArgument("parentPath"),
                 env.getArgument("offset"),
                 env.getArgument("limit"),
                 env.getArgument("onlyFolders")))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
-                getWebSession(model, env),
+                getWebSession(env),
                 env.getArgument("nodePath")))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
-                getWebSession(model, env),
+                getWebSession(env),
                 env.getArgument("nodePath")
             ))
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
-                getWebConnection(model, env),
+                getWebConnection(env),
                 env.getArgument("catalog")
             ));
 

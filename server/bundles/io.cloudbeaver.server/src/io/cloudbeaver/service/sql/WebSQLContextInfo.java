@@ -170,11 +170,6 @@ public class WebSQLContextInfo {
     }
 
     @NotNull
-    public WebSQLExecuteInfo executeQuery(@NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException {
-        return processor.executeQuery(this, sql, filter);
-    }
-
-    @NotNull
     public WebSQLResultsInfo saveResult(@NotNull DBSDataContainer dataContainer, @NotNull DBDAttributeBinding[] attributes) {
         WebSQLResultsInfo resultInfo = new WebSQLResultsInfo(
             dataContainer,
@@ -194,61 +189,14 @@ public class WebSQLContextInfo {
         return resultsInfo;
     }
 
-    @NotNull
-    public Boolean closeResult(@NotNull String resultId) {
+    public boolean closeResult(@NotNull String resultId) {
         return resultInfoMap.remove(resultId) != null;
-    }
-
-    public @NotNull WebSQLCompletionProposal[] getCompletionProposals(@NotNull String query, Integer position, Integer maxResults) throws DBWebException {
-        try {
-            DBPDataSource dataSource = processor.getConnection().getDataSourceContainer().getDataSource();
-            Document document = new Document();
-            document.set(query);
-            SQLScriptElement activeQuery = new SQLQuery(dataSource, query);
-            SQLCompletionRequest request = new SQLCompletionRequest(
-                new WebSQLCompletionContext(this),
-                document,
-                position == null ? 0 : position,
-                activeQuery,
-                false
-            );
-            SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
-            analyzer.runAnalyzer(processor.getWebSession().getProgressMonitor());
-            List<SQLCompletionProposalBase> proposals = analyzer.getProposals();
-            if (maxResults == null) maxResults = 200;
-            if (proposals.size() > maxResults) {
-                proposals = proposals.subList(0, maxResults);
-            }
-
-            WebSQLCompletionProposal[] result = new WebSQLCompletionProposal[proposals.size()];
-            for (int i = 0; i < proposals.size(); i++) {
-                result[i] = new WebSQLCompletionProposal(proposals.get(i));
-            }
-            return result;
-        } catch (DBException e) {
-            throw new DBWebException("Error processing SQL proposals", e);
-        }
     }
 
     ///////////////////////////////////////////////////////
     // Async model
 
-    @NotNull
-    public WebAsyncTaskInfo asyncExecuteQuery(@NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException {
-        DBRRunnableWithResult<WebSQLExecuteInfo> runnable = new DBRRunnableWithResult<WebSQLExecuteInfo>() {
-            @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                try {
-                    result = processor.processQuery(monitor, WebSQLContextInfo.this, sql, filter);
-                } catch (Throwable e) {
-                    throw new InvocationTargetException(e);
-                }
-            }
-        };
-        return processor.getWebSession().createAndRunAsyncTask("SQL execute", runnable);
-    }
-
-    public void destroy() {
+    void dispose() {
         resultInfoMap.clear();
     }
 
