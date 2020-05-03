@@ -34,6 +34,7 @@ export interface ITableViewerModelOptions {
   containerNodePath?: string;
   resultId?: string | null; // will be filled after fist data fetch
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
+  sourceName?: string;
   initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
   requestDataAsync(model: TableViewerModel, rowOffset: number, count: number): Promise<IRequestDataResult>;
@@ -54,6 +55,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
   containerNodePath?: string;
   resultId: string | null;
   executionContext: IExecutionContext | null;
+  sourceName?: string;
   initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
   requestDataAsync: (model: TableViewerModel, rowOffset: number, count: number) => Promise<IRequestDataResult>;
@@ -108,6 +110,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.containerNodePath = options.containerNodePath;
     this.resultId = options.resultId || null;
     this.executionContext = options.executionContext || null;
+    this.sourceName = options.sourceName;
     this.initialState = options.initialState;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
     this.requestDataAsync = options.requestDataAsync;

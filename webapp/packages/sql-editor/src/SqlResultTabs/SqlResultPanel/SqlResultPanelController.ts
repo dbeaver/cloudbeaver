@@ -35,7 +35,7 @@ export enum EPanelState {
 
 @injectable()
 export class SqlResultPanelController
-implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleController {
+implements IInitializableController, IDestructibleController {
 
   @observable state: EPanelState = EPanelState.PENDING;
   @observable executionResult = '';
@@ -72,6 +72,7 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
         this.createTableModel(
+          panelInit.sqlQueryParams.query,
           initialState,
           panelInit.sqlQueryParams.connectionId,
           dataSet.resultSet.id,
@@ -128,6 +129,7 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
   }
 
   private createTableModel(
+    sourceName: string,
     initialState: IRequestDataResult,
     connectionId: string,
     resultId: string,
@@ -137,6 +139,7 @@ implements IInitializableController<[ISqlResultPanelParams]>, IDestructibleContr
       tableId: this.getTableId(),
       connectionId,
       resultId,
+      sourceName,
       initialState,
       requestDataAsync: this.requestDataAsync.bind(this, sqlExecutingState),
       noLoaderWhileRequestingDataAsync: true,

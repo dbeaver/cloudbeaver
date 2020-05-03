@@ -11,4 +11,5 @@ export interface IExportContext {
   contextId?: string;
   containerNodePath?: string;
   resultId?: string | null;
+  sourceName?: string;
 }
