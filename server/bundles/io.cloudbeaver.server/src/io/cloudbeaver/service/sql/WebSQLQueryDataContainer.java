@@ -19,26 +19,38 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPContextProvider;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLScriptContext;
+import org.jkiss.dbeaver.model.sql.data.SQLQueryDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+
+import java.io.PrintWriter;
 
 /**
  * Web SQL query data container.
  */
-public class WebSQLQueryDataContainer implements DBSDataContainer {
+public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextProvider {
 
     private static final Log log = Log.getLog(WebSQLQueryDataContainer.class);
 
     private DBPDataSource dataSource;
     private String query;
+    private DBSDataContainer queryDataContainer;
 
     public WebSQLQueryDataContainer(DBPDataSource dataSource, String query) {
         this.dataSource = dataSource;
         this.query = query;
+
+        SQLScriptContext scriptContext = new SQLScriptContext(null,
+            this, null, new PrintWriter(System.err, true), null);
+        queryDataContainer = new SQLQueryDataContainer(this, new SQLQuery(dataSource, query), scriptContext, log);
     }
 
     @Nullable
@@ -78,11 +90,18 @@ public class WebSQLQueryDataContainer implements DBSDataContainer {
     @NotNull
     @Override
     public DBCStatistics readData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @NotNull DBDDataReceiver dataReceiver, @Nullable DBDDataFilter dataFilter, long firstRow, long maxRows, long flags, int fetchSize) throws DBCException {
-        throw new DBCFeatureNotSupportedException();
+        return queryDataContainer.readData(source, session, dataReceiver, dataFilter, firstRow, maxRows, flags, fetchSize);
     }
 
     @Override
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
-        throw new DBCFeatureNotSupportedException();
+        return queryDataContainer.countData(source, session, dataFilter, flags);
     }
+
+    @Nullable
+    @Override
+    public DBCExecutionContext getExecutionContext() {
+        return DBUtils.getDefaultContext(dataSource, false);
+    }
+
 }
