@@ -23,6 +23,8 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
+import io.cloudbeaver.service.sql.WebSQLQueryDataContainer;
+import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -87,7 +89,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         WebSQLProcessor sqlProcessor,
         String containerNodePath,
         WebDataTransferParameters parameters) throws DBWebException {
-        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
 
         DBSDataContainer dataContainer;
         try {
@@ -96,6 +97,32 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             throw new DBWebException("Invalid node path: " + containerNodePath, e);
         }
 
+        return asyncExportFromDataContainer(sqlProcessor, parameters, dataContainer);
+    }
+
+    @NotNull
+    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
+        return sqlProcessor.getWebSession().getId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
+    }
+
+    @Override
+    public WebAsyncTaskInfo dataTransferExportDataFromResults(
+        WebSQLContextInfo sqlContext,
+        String resultsId,
+        WebDataTransferParameters parameters) throws DBWebException {
+
+        WebSQLResultsInfo results = sqlContext.getResults(resultsId);
+
+        return asyncExportFromDataContainer(sqlContext.getProcessor(), parameters, results.getDataContainer());
+    }
+
+    @Override
+    public Boolean dataTransferRemoveDataFile(WebSQLProcessor sqlProcessor, String dataFileId) {
+        return true;
+    }
+
+    private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer) {
+        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         DBRRunnableWithResult<String> runnable = new DBRRunnableWithResult<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -123,24 +150,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             }
         };
         return sqlProcessor.getWebSession().createAndRunAsyncTask("Data export", runnable);
-    }
-
-    @NotNull
-    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
-        return sqlProcessor.getWebSession().getId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
-    }
-
-    @Override
-    public WebAsyncTaskInfo dataTransferExportDataFromResults(
-        WebSQLContextInfo sqlContextInfo,
-        String resultsId,
-        WebDataTransferParameters parameters) throws DBWebException {
-        throw new DBWebException("Not supported");
-    }
-
-    @Override
-    public Boolean dataTransferRemoveDataFile(WebSQLProcessor sqlProcessor, String dataFileId) {
-        return true;
     }
 
     private void exportData(
