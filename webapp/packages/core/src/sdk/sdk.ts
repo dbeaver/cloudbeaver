@@ -117,6 +117,34 @@ export type DataSourceInfo = {
   properties?: Maybe<Scalars["String"]>;
 };
 
+export type DataTransferParameters = {
+  /** Processor ID */
+  processorId: Scalars["ID"];
+  /**
+   * General settings:
+   *   - openNewConnection: opens new database connection for data transfer task
+   */
+  settings?: Maybe<Scalars["Object"]>;
+  /** Processor properties. See DataTransferProcessorInfo.properties */
+  processorProperties: Scalars["Object"];
+  /** Data filter settings */
+  filter?: Maybe<SqlDataFilter>;
+};
+
+export type DataTransferProcessorInfo = {
+  id: Scalars["ID"];
+  name?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  fileExtension?: Maybe<Scalars["String"]>;
+  appFileExtension?: Maybe<Scalars["String"]>;
+  appName?: Maybe<Scalars["String"]>;
+  order: Scalars["Int"];
+  icon?: Maybe<Scalars["String"]>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  isBinary?: Maybe<Scalars["Boolean"]>;
+  isHTML?: Maybe<Scalars["Boolean"]>;
+};
+
 export type DriverInfo = {
   id: Scalars["ID"];
   name?: Maybe<Scalars["String"]>;
@@ -357,6 +385,13 @@ export type Query = {
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
+  /** Available transfer processors */
+  dataTransferAvailableStreamProcessors?: Maybe<
+    Array<Maybe<DataTransferProcessorInfo>>
+  >;
+  dataTransferExportDataFromContainer: AsyncTaskInfo;
+  dataTransferExportDataFromResults: AsyncTaskInfo;
+  dataTransferRemoveDataFile?: Maybe<Scalars["Boolean"]>;
   /** Get child nodes */
   metadataGetNodeDDL?: Maybe<Scalars["String"]>;
 };
@@ -410,6 +445,23 @@ export type QuerySqlCompletionProposalsArgs = {
   maxResults?: Maybe<Scalars["Int"]>;
 };
 
+export type QueryDataTransferExportDataFromContainerArgs = {
+  connectionId: Scalars["ID"];
+  containerNodePath: Scalars["ID"];
+  parameters: DataTransferParameters;
+};
+
+export type QueryDataTransferExportDataFromResultsArgs = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
+  resultsId: Scalars["ID"];
+  parameters: DataTransferParameters;
+};
+
+export type QueryDataTransferRemoveDataFileArgs = {
+  dataFileId: Scalars["String"];
+};
+
 export type QueryMetadataGetNodeDdlArgs = {
   nodeId: Scalars["ID"];
   options?: Maybe<Scalars["Object"]>;
@@ -451,6 +503,7 @@ export type SessionInfo = {
   createTime: Scalars["String"];
   lastAccessTime: Scalars["String"];
   locale: Scalars["String"];
+  cacheExpired: Scalars["Boolean"];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
   connections: Array<Maybe<ConnectionInfo>>;
 };
@@ -799,6 +852,81 @@ export type ChangeSessionLanguageMutation = Pick<
   "changeSessionLanguage"
 >;
 
+export type ExportDataFromContainerQueryVariables = {
+  connectionId: Scalars["ID"];
+  containerNodePath: Scalars["ID"];
+  parameters: DataTransferParameters;
+};
+
+export type ExportDataFromContainerQuery = {
+  taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
+    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+  };
+};
+
+export type ExportDataFromResultsQueryVariables = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
+  resultsId: Scalars["ID"];
+  parameters: DataTransferParameters;
+};
+
+export type ExportDataFromResultsQuery = {
+  taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
+    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+  };
+};
+
+export type GetDataTransferProcessorsQueryVariables = {};
+
+export type GetDataTransferProcessorsQuery = {
+  processors: Maybe<
+    Array<
+      Maybe<
+        Pick<
+          DataTransferProcessorInfo,
+          | "id"
+          | "name"
+          | "description"
+          | "fileExtension"
+          | "appFileExtension"
+          | "appName"
+          | "order"
+          | "icon"
+          | "isBinary"
+          | "isHTML"
+        > & {
+          properties: Maybe<
+            Array<
+              Maybe<
+                Pick<
+                  ObjectPropertyInfo,
+                  | "id"
+                  | "displayName"
+                  | "description"
+                  | "category"
+                  | "dataType"
+                  | "value"
+                  | "validValues"
+                  | "features"
+                >
+              >
+            >
+          >;
+        }
+      >
+    >
+  >;
+};
+
+export type RemoveDataTransferFileQueryVariables = {
+  dataFileId: Scalars["String"];
+};
+
+export type RemoveDataTransferFileQuery = {
+  result: Query["dataTransferRemoveDataFile"];
+};
+
 export type AsyncSqlExecuteQueryMutationVariables = {
   connectionId: Scalars["ID"];
   contextId: Scalars["ID"];
@@ -807,7 +935,7 @@ export type AsyncSqlExecuteQueryMutationVariables = {
 };
 
 export type AsyncSqlExecuteQueryMutation = {
-  result: Pick<AsyncTaskInfo, "id" | "running"> & {
+  taskInfo: Pick<AsyncTaskInfo, "id" | "running"> & {
     result: Maybe<
       Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
         results: Maybe<
@@ -860,7 +988,7 @@ export type AsyncTaskStatusMutationVariables = {
 };
 
 export type AsyncTaskStatusMutation = {
-  result: Pick<AsyncTaskInfo, "id" | "running"> & {
+  taskInfo: Pick<AsyncTaskInfo, "id" | "running"> & {
     result: Maybe<
       Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
         results: Maybe<
@@ -1357,6 +1485,83 @@ export const ChangeSessionLanguageDocument = gql`
     changeSessionLanguage(locale: $locale)
   }
 `;
+export const ExportDataFromContainerDocument = gql`
+  query exportDataFromContainer(
+    $connectionId: ID!
+    $containerNodePath: ID!
+    $parameters: DataTransferParameters!
+  ) {
+    taskInfo: dataTransferExportDataFromContainer(
+      connectionId: $connectionId
+      containerNodePath: $containerNodePath
+      parameters: $parameters
+    ) {
+      id
+      running
+      taskResult
+      error {
+        message
+        errorCode
+        stackTrace
+      }
+    }
+  }
+`;
+export const ExportDataFromResultsDocument = gql`
+  query exportDataFromResults(
+    $connectionId: ID!
+    $contextId: ID!
+    $resultsId: ID!
+    $parameters: DataTransferParameters!
+  ) {
+    taskInfo: dataTransferExportDataFromResults(
+      connectionId: $connectionId
+      contextId: $contextId
+      resultsId: $resultsId
+      parameters: $parameters
+    ) {
+      id
+      running
+      taskResult
+      error {
+        message
+        errorCode
+        stackTrace
+      }
+    }
+  }
+`;
+export const GetDataTransferProcessorsDocument = gql`
+  query getDataTransferProcessors {
+    processors: dataTransferAvailableStreamProcessors {
+      id
+      name
+      description
+      fileExtension
+      appFileExtension
+      appName
+      order
+      icon
+      properties {
+        id
+        displayName
+        description
+        category
+        dataType
+        value
+        validValues
+        features
+      }
+      isBinary
+      isHTML
+    }
+  }
+`;
+export const RemoveDataTransferFileDocument = gql`
+  query removeDataTransferFile($dataFileId: String!) {
+    result: dataTransferRemoveDataFile(dataFileId: $dataFileId)
+  }
+`;
 export const AsyncSqlExecuteQueryDocument = gql`
   mutation asyncSqlExecuteQuery(
     $connectionId: ID!
@@ -1364,7 +1569,7 @@ export const AsyncSqlExecuteQueryDocument = gql`
     $query: String!
     $filter: SQLDataFilter
   ) {
-    result: asyncSqlExecuteQuery(
+    taskInfo: asyncSqlExecuteQuery(
       connectionId: $connectionId
       contextId: $contextId
       sql: $query
@@ -1413,7 +1618,7 @@ export const AsyncTaskCancelDocument = gql`
 `;
 export const AsyncTaskStatusDocument = gql`
   mutation asyncTaskStatus($taskId: String!) {
-    result: asyncTaskStatus(id: $taskId) {
+    taskInfo: asyncTaskStatus(id: $taskId) {
       id
       running
       result {
@@ -1832,6 +2037,38 @@ export function getSdk(client: GraphQLClient) {
     ): Promise<ChangeSessionLanguageMutation> {
       return client.request<ChangeSessionLanguageMutation>(
         print(ChangeSessionLanguageDocument),
+        variables,
+      );
+    },
+    exportDataFromContainer(
+      variables: ExportDataFromContainerQueryVariables,
+    ): Promise<ExportDataFromContainerQuery> {
+      return client.request<ExportDataFromContainerQuery>(
+        print(ExportDataFromContainerDocument),
+        variables,
+      );
+    },
+    exportDataFromResults(
+      variables: ExportDataFromResultsQueryVariables,
+    ): Promise<ExportDataFromResultsQuery> {
+      return client.request<ExportDataFromResultsQuery>(
+        print(ExportDataFromResultsDocument),
+        variables,
+      );
+    },
+    getDataTransferProcessors(
+      variables?: GetDataTransferProcessorsQueryVariables,
+    ): Promise<GetDataTransferProcessorsQuery> {
+      return client.request<GetDataTransferProcessorsQuery>(
+        print(GetDataTransferProcessorsDocument),
+        variables,
+      );
+    },
+    removeDataTransferFile(
+      variables: RemoveDataTransferFileQueryVariables,
+    ): Promise<RemoveDataTransferFileQuery> {
+      return client.request<RemoveDataTransferFileQuery>(
+        print(RemoveDataTransferFileDocument),
         variables,
       );
     },
