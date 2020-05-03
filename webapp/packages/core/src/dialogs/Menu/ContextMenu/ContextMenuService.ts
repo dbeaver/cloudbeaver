@@ -28,6 +28,10 @@ export class ContextMenuService {
     return ContextMenuService.rootPanelId;
   }
 
+  addPanel(panelId: string) {
+    this.contextMenu.addRootPanel(panelId);
+  }
+
   addMenuItem<T>(panelId: string, menuItem: IContextMenuItem<T>) {
     this.contextMenu.addMenuItem(panelId, menuItem);
   }

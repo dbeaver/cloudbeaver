@@ -19,7 +19,9 @@ export class TableFooterMenuService {
   static nodeContextType = 'NodeWithParent';
   private tableFooterMenuToken = 'tableFooterMenu';
 
-  constructor(private contextMenuService: ContextMenuService) {}
+  constructor(private contextMenuService: ContextMenuService) {
+    this.contextMenuService.addPanel(this.tableFooterMenuToken);
+  }
 
   constructMenuWithContext(model: TableViewerModel): IMenuItem[] {
     const context: IMenuContext<TableViewerModel> = {

@@ -71,13 +71,13 @@ export class DataViewerTableService {
       throw new Error('It is expected that resultId was set after first fetch');
     }
 
-    if (!data.sqlContextParams) {
+    if (!data.executionContext) {
       throw new Error('It is expected that data.sqlContextParams was set after first fetch');
     }
 
     const response = await this.graphQLService.gql.updateResultsData({
-      connectionId: data.sqlContextParams.connectionId,
-      contextId: data.sqlContextParams.contextId,
+      connectionId: data.executionContext.connectionId,
+      contextId: data.executionContext.contextId,
       resultsId: data.resultId,
       sourceRowValues: firstRow.source,
       values: firstRow.values,
@@ -103,16 +103,16 @@ export class DataViewerTableService {
     if (!data.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
     }
-    if (!data.sqlContextParams) {
+    if (!data.executionContext) {
 
       // it is first data request
-      const sqlContextParams: IExecutionContext = await this.createExecutionContext(data.connectionId);
-      data.sqlContextParams = sqlContextParams;
+      const executionContext: IExecutionContext = await this.createExecutionContext(data.connectionId);
+      data.executionContext = executionContext;
     }
 
     const { readDataFromContainer } = await this.graphQLService.gql.readDataFromContainer({
-      connectionId: data.sqlContextParams.connectionId,
-      contextId: data.sqlContextParams.contextId,
+      connectionId: data.executionContext.connectionId,
+      contextId: data.executionContext.contextId,
       containerNodePath: data.containerNodePath,
       filter: {
         offset: rowOffset,

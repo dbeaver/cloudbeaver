@@ -1,7 +1,7 @@
 mutation asyncTaskStatus(
     $taskId: String!
 ) {
-    result: asyncTaskStatus(
+    taskInfo: asyncTaskStatus(
         id: $taskId
     ) {
         id

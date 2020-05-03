@@ -57,6 +57,8 @@ export class Deferred<T> {
     return this.rejectionReason;
   }
 
+  cancel() {}
+
   @action
   protected toResolved(value: T): void {
     this.state = EDeferredState.RESOLVED;
