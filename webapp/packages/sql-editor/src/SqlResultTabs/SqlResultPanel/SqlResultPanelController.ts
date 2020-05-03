@@ -20,6 +20,7 @@ import {
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
+  IExecutionContext,
 } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
@@ -66,13 +67,13 @@ implements IInitializableController, IDestructibleController {
       if (!dataSet.resultSet) {
         this.state = EPanelState.MESSAGE_RESULT;
         this.executionResult = `Query executed: ${response.statusMessage || ''} (${response.duration} ms)`;
-
       } else {
         this.state = EPanelState.TABLE_RESULT;
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
         this.createTableModel(
           panelInit.sqlQueryParams.query,
+          panelInit.sqlQueryParams,
           initialState,
           panelInit.sqlQueryParams.connectionId,
           dataSet.resultSet.id,
@@ -130,6 +131,7 @@ implements IInitializableController, IDestructibleController {
 
   private createTableModel(
     sourceName: string,
+    executionContext: IExecutionContext,
     initialState: IRequestDataResult,
     connectionId: string,
     resultId: string,
@@ -138,6 +140,7 @@ implements IInitializableController, IDestructibleController {
     return this.tableViewerStorageService.create({
       tableId: this.getTableId(),
       connectionId,
+      executionContext,
       resultId,
       sourceName,
       initialState,

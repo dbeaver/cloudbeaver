@@ -27,6 +27,11 @@ module.exports = {
   customConnection_test: 'Проверить',
   customConnection_create: 'Создать',
 
+  data_transfer_dialog_title: 'Экспорт данных',
+  data_transfer_dialog_export: 'Экспортировать',
+  data_transfer_dialog_exporting_object: 'Экспортировать:',
+  data_transfer_dialog_configuration_title: 'Настройка экспорта',
+
   ui_stepper_back: 'Назад',
   ui_processing_loading: 'Загрузка...',
   ui_processing_cancel: 'Отменить',

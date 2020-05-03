@@ -28,6 +28,11 @@ module.exports = {
   customConnection_test: 'Test Connection',
   customConnection_create: 'Create',
 
+  data_transfer_dialog_title: 'Export data',
+  data_transfer_dialog_export: 'Export',
+  data_transfer_dialog_exporting_object: 'Exporting:',
+  data_transfer_dialog_configuration_title: 'Export configuration',
+
   ui_stepper_back: 'Back',
   ui_processing_loading: 'Loading...',
   ui_processing_cancel: 'Cancel',
