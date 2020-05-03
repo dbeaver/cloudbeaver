@@ -28,6 +28,7 @@
     "@dbeaver/ddl-viewer-plugin": "^0.1.0",
     "@dbeaver/object-viewer-plugin": "^0.1.0",
     "@dbeaver/sql-editor": "^0.1.0",
+    "@dbeaver/data-export-plugin": "^0.1.0",
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",
     "@material/ripple": "^4.0.0",

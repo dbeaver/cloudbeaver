@@ -15,8 +15,8 @@ import styled, { css, use } from 'reshadow';
 import { ShadowInput, Icon } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
-import { DriverPropertyInfoWithStaticId } from './DriverPropertiesController';
 import { DriverPropertyValueSelector } from './DriverPropertyValueSelector';
+import { IProperty } from './IProperty';
 
 const styles = composes(
   css`
@@ -104,8 +104,8 @@ const styles = composes(
   `
 );
 
-type DriverPropertyProps = {
-  property: DriverPropertyInfoWithStaticId;
+type PropertyItemProps = {
+  property: IProperty;
   value?: string;
   onNameChange(staticId: string, newId: string): void;
   onValueChange(staticId: string, value: string): void;
@@ -113,24 +113,24 @@ type DriverPropertyProps = {
   error?: boolean;
 }
 
-export const DriverProperty = observer(function DriverProperty({
+export const PropertyItem = observer(function PropertyItem({
   property,
   value,
   onNameChange,
   onValueChange,
   onRemove,
   error,
-}: DriverPropertyProps) {
-  const isEditable = !property.displayName;
+}: PropertyItemProps) {
+  const isEditable = property.name !== property.id;
   const edited = value !== undefined && value !== property.defaultValue;
   const [focus, setFocus] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const handleNameChange = useCallback((value: string) => onNameChange(property.staticId, value), [property.staticId]);
+  const handleNameChange = useCallback((value: string) => onNameChange(property.id, value), [property]);
   const handleValueChange = useCallback(
-    (value: string) => onValueChange(property.staticId, value),
-    [property.staticId]
+    (value: string) => onValueChange(property.id, value),
+    [property]
   );
-  const handleRemove = useCallback(() => onRemove(property.staticId), [property.staticId]);
+  const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useEffect(() => {
     if (nameInputRef.current && isEditable) {
@@ -149,7 +149,7 @@ export const DriverProperty = observer(function DriverProperty({
           readOnly={!isEditable}
           autoComplete='none'
         >
-          {property.displayName || property.id}
+          {property.name || property.id}
         </ShadowInput>
       </property-name>
       <property-value as='div'>

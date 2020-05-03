@@ -3,13 +3,9 @@ scalar Object
 # Date/Time
 scalar DateTime
 
-type Query {
+type Query
 
-}
-
-type Mutation {
-
-}
+type Mutation
 
 schema {
     query: Query

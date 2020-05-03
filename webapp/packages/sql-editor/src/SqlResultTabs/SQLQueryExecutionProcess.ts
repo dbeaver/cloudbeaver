@@ -105,7 +105,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   private async executeQueryAsync(sqlQueryParams: ISqlQueryParams,
                                   rowOffset: number,
                                   count: number): Promise<AsyncTaskInfo> {
-    const response = await this.graphQLService.gql.asyncSqlExecuteQuery({
+    const { taskInfo } = await this.graphQLService.gql.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       query: sqlQueryParams.query,
@@ -115,12 +115,12 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
         limit: count,
       },
     });
-    return response.result;
+    return taskInfo;
   }
 
   private async getQueryStatusAsync(taskId: string): Promise<AsyncTaskInfo> {
-    const response = await this.graphQLService.gql.asyncTaskStatus({ taskId });
-    return response.result;
+    const { taskInfo } = await this.graphQLService.gql.asyncTaskStatus({ taskId });
+    return taskInfo;
   }
 
   private async cancelQueryAsync(taskId: string): Promise<void> {

@@ -1,0 +1,20 @@
+query exportDataFromContainer(
+  $connectionId: ID!,
+  $containerNodePath: ID!,
+  $parameters: DataTransferParameters!
+) {
+  taskInfo: dataTransferExportDataFromContainer(
+    connectionId: $connectionId
+    containerNodePath: $containerNodePath
+    parameters: $parameters
+  ) {
+    id
+    running
+    taskResult
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+  }
+}

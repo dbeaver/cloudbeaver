@@ -36,6 +36,19 @@
     <path fill-rule="evenodd" d="M15.597 0L8 7.596.404 0 0 .403 7.596 8 0 15.595.404 16 8 8.404 15.597 16l.403-.405L8.404 8 16 .403z"/>
   </symbol>
 
+  <symbol id="export" viewBox="0 0 32 32">
+    <g id="export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Page-1" transform="translate(3.000000, 2.000000)" fill="#338ECC">
+            <polygon id="Fill-1" points="12.7422 -0.0003 5.4502 7.2927 9.6172 7.2927 9.6172 20.4797 15.8672 20.4797 15.8672 7.2927 20.0342 7.2927"></polygon>
+            <polygon id="Fill-2" points="3.641 28.6602 21.844 28.6602 21.844 25.0192 3.641 25.0192"></polygon>
+            <polygon id="Fill-3" points="0 25.0192 3.641 25.0192 3.641 18.7792 0 18.7792"></polygon>
+            <polygon id="Fill-4" points="0 28.6602 3.641 28.6602 3.641 25.0192 0 25.0192"></polygon>
+            <polygon id="Fill-5" points="21.844 25.0192 25.485 25.0192 25.485 18.7792 21.844 18.7792"></polygon>
+            <polygon id="Fill-6" points="21.844 28.6602 25.485 28.6602 25.485 25.0192 21.844 25.0192"></polygon>
+        </g>
+    </g>
+  </symbol>
+
   <symbol id="angle" viewBox="0 0 15 8">
     <path class="icon-fill" fill-rule="evenodd" d="M14.5.954l-.875-.88L7.5 6.238 1.375 0 .5.88 7.5 8z"/>
   </symbol>

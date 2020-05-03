@@ -23,7 +23,6 @@ export class SqlResultService {
   constructor(private graphQLService: GraphQLService,
               private notificationService: NotificationService) { }
 
-
   /**
    * @deprecated use asyncSqlQuery
    */

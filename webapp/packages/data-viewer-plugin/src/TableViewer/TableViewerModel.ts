@@ -12,7 +12,9 @@ import { IAgGridModel, IRequestedData } from '@dbeaver/ag-grid-plugin';
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { GQLError } from '@dbeaver/core/sdk';
+import { uuid } from '@dbeaver/core/utils';
 
+import { IExecutionContext } from '../IExecutionContext';
 import { ErrorDialog } from './ErrorDialog';
 import { RowDiff } from './TableDataModel/EditedRow';
 import { TableColumn } from './TableDataModel/TableColumn';
@@ -26,6 +28,19 @@ export const fetchingSettings = {
   fetchDefault: 200,
 };
 
+export interface ITableViewerModelOptions {
+  tableId?: string;
+  connectionId: string;
+  containerNodePath?: string;
+  resultId?: string | null; // will be filled after fist data fetch
+  executionContext?: IExecutionContext | null; // will be filled before fist data fetch
+  sourceName?: string;
+  initialState?: IRequestDataResult;
+  noLoaderWhileRequestingDataAsync?: boolean;
+  requestDataAsync(model: TableViewerModel, rowOffset: number, count: number): Promise<IRequestDataResult>;
+  saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult>;
+}
+
 export interface IRequestDataResult {
   rows: TableRow[];
   columns: TableColumn[];
@@ -34,14 +49,17 @@ export interface IRequestDataResult {
   statusMessage: string;
 }
 
-export interface ITableViewerModelInit {
+export class TableViewerModel implements ITableViewerModelOptions {
+  tableId: string;
+  connectionId: string;
+  containerNodePath?: string;
+  resultId: string | null;
+  executionContext: IExecutionContext | null;
+  sourceName?: string;
   initialState?: IRequestDataResult;
-  requestDataAsync(rowOffset: number, count: number): Promise<IRequestDataResult>;
   noLoaderWhileRequestingDataAsync?: boolean;
-  saveChanges(diffs: RowDiff[]): Promise<IRequestDataResult>;
-}
-
-export class TableViewerModel {
+  requestDataAsync: (model: TableViewerModel, rowOffset: number, count: number) => Promise<IRequestDataResult>;
+  saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   agGridModel: IAgGridModel = {
     initialRows: [],
@@ -84,16 +102,21 @@ export class TableViewerModel {
   private tableEditor = new TableEditor(this.tableDataModel);
 
   constructor(
-    private init: ITableViewerModelInit,
+    options: ITableViewerModelOptions,
     private commonDialogService: CommonDialogService
   ) {
-    if (init.initialState) {
-      this.insertRows(0, init.initialState.rows, !init.initialState.isFullyLoaded);
-      this.tableDataModel.overWrite(init.initialState.columns);
-      this.updateInfo(init.initialState.statusMessage, init.initialState.duration);
-      this.agGridModel.initialRows = this.tableDataModel.getRows();
-      this.agGridModel.initialColumns = this.tableDataModel.getColumns();
-    }
+    this.tableId = options.tableId || uuid();
+    this.connectionId = options.connectionId;
+    this.containerNodePath = options.containerNodePath;
+    this.resultId = options.resultId || null;
+    this.executionContext = options.executionContext || null;
+    this.sourceName = options.sourceName;
+    this.initialState = options.initialState;
+    this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
+    this.requestDataAsync = options.requestDataAsync;
+    this.saveChanges = options.saveChanges;
+
+    this.init();
   }
 
   cancelFetch = () => {
@@ -102,6 +125,16 @@ export class TableViewerModel {
   onShowDetails = () => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
+    }
+  }
+
+  private init() {
+    if (this.initialState) {
+      this.insertRows(0, this.initialState.rows, !this.initialState.isFullyLoaded);
+      this.tableDataModel.overWrite(this.initialState.columns);
+      this.updateInfo(this.initialState.statusMessage, this.initialState.duration);
+      this.agGridModel.initialRows = this.tableDataModel.getRows();
+      this.agGridModel.initialColumns = this.tableDataModel.getColumns();
     }
   }
 
@@ -120,10 +153,10 @@ export class TableViewerModel {
       return data;
     }
 
-    this._isLoaderVisible = !this.init.noLoaderWhileRequestingDataAsync;
+    this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
 
     try {
-      const response = await this.init.requestDataAsync(rowOffset, count);
+      const response = await this.requestDataAsync(this, rowOffset, count);
 
       this.insertRows(rowOffset, response.rows, !response.isFullyLoaded);
       if (!this.tableDataModel.getColumns().length) {
@@ -234,7 +267,7 @@ export class TableViewerModel {
     this._isLoaderVisible = true;
 
     try {
-      const data = await this.init.saveChanges(diffs);
+      const data = await this.saveChanges(this, diffs);
 
       const someRows = this.zipDiffAndResults(diffs, data.rows);
       this.tableEditor.cancelChanges();

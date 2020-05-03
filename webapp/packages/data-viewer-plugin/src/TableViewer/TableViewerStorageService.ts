@@ -9,26 +9,33 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
+import { CommonDialogService } from '@dbeaver/core/dialogs';
 
-import { TableViewerModel } from './TableViewerModel';
+import { TableViewerModel, ITableViewerModelOptions } from './TableViewerModel';
 
-// todo this service must be removed. Store TableViewerModel directly where it is required
 @injectable()
 export class TableViewerStorageService {
   @observable private tableModelMap: Map<string, TableViewerModel> = new Map();
 
-  hasTableModel(tableId: string): boolean {
+  constructor(private commonDialogService: CommonDialogService) {}
+
+  has(tableId: string): boolean {
     return this.tableModelMap.has(tableId);
   }
-  getTableModel(tableId: string) {
+  get(tableId: string) {
     return this.tableModelMap.get(tableId);
   }
 
-  addTableModel(tableId: string, tableModel: TableViewerModel) {
-    this.tableModelMap.set(tableId, tableModel);
+  create(
+    options: ITableViewerModelOptions,
+  ): TableViewerModel {
+
+    const tableModel = new TableViewerModel(options, this.commonDialogService);
+    this.tableModelMap.set(tableModel.tableId, tableModel);
+    return tableModel;
   }
 
-  removeTableModel(tableId: string) {
+  remove(tableId: string) {
     this.tableModelMap.delete(tableId);
   }
 }

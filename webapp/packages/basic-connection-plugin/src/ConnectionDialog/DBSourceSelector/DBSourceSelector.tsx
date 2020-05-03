@@ -8,51 +8,11 @@
 
 import { observer } from 'mobx-react';
 import { useState, useMemo } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { DBDriver, DBSource } from '@dbeaver/core/app';
-import { StaticImage } from '@dbeaver/core/blocks';
-import { useTranslate } from '@dbeaver/core/localization';
-import { useStyles, composes } from '@dbeaver/core/theming';
+import { ItemList, ItemListSearch } from '@dbeaver/core/blocks';
 
 import { DBSourceItem } from './DBSourceItem';
-
-const styles = composes(
-  css`
-    list-item {
-      composes: theme-ripple theme-background-surface theme-border-color-secondary from global;
-    }
-    list-search {
-      composes: theme-background-secondary from global;
-    }
-  `,
-  css`
-    list {
-      box-sizing: border-box;
-      border-collapse: collapse;
-    }
-    list-item {
-      border-bottom: 1px solid;
-    }
-    list-search {
-      position: sticky;
-      top: 0;
-      padding: 8px 24px;
-      z-index: 1;
-
-      & input {
-        padding: 4px 24px;
-        padding-left: 32px;
-      }
-
-      & StaticImage {
-        position: absolute;
-        top: 15px;
-        left: 32px;
-      }
-    }
-  `
-);
 
 type DBSourceSelectorProps = {
   dbSources: DBSource[];
@@ -68,7 +28,6 @@ export const DBSourceSelector = observer(function DBSourceSelector({
   onSelect,
 }: DBSourceSelectorProps) {
   const [search, setSearch] = useState('');
-  const translate = useTranslate();
   const filteredDBSources = useMemo(() => {
     if (!search) {
       return dbSources;
@@ -76,26 +35,17 @@ export const DBSourceSelector = observer(function DBSourceSelector({
     return dbSources.filter(source => source.name.toUpperCase().includes(search.toUpperCase()));
   }, [search, dbSources]);
 
-  return styled(useStyles(styles))(
-    <list as="div" className={className}>
-      <list-search as="div">
-        <StaticImage icon='/icons/search.svg' />
-        <input
-          name='search'
-          placeholder={translate('ui_search')}
-          onChange={event => setSearch(event.target.value)}
-          {...use({ mod: 'surface' })}
-        />
-      </list-search>
+  return (
+    <ItemList className={className}>
+      <ItemListSearch onSearch={setSearch} />
       {filteredDBSources.map(dbSource => (
-        <list-item as="div" key={dbSource.id}>
-          <DBSourceItem
-            dbSource={dbSource}
-            dbDriver={dbDrivers.get(dbSource.driverId)}
-            onSelect={onSelect}
-          />
-        </list-item>
+        <DBSourceItem
+          key={dbSource.id}
+          dbSource={dbSource}
+          dbDriver={dbDrivers.get(dbSource.driverId)}
+          onSelect={onSelect}
+        />
       ))}
-    </list>
+    </ItemList>
   );
 });

@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { AgGridTable } from '@dbeaver/ag-grid-plugin';
 import { Button } from '@dbeaver/core/blocks';
 
-import { TableViewerModel } from '../TableViewerModel';
+import { TableViewerModel } from './TableViewerModel';
 
 type TableGridProps = PropsWithChildren<{
   model: TableViewerModel;

@@ -12,6 +12,7 @@ import {
   IContextProvider,
   ITab,
   NavigationType,
+  NodeManagerUtils,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
@@ -87,7 +88,23 @@ export class DataViewerTabService {
     if (!this.nodesManagerService.isNodeHasData(objectInfo)) {
       return;
     }
-    this.dataViewerTableService.createTableModelIfNotExists(tab.handlerState.objectId);
+
+    if (this.dataViewerTableService.has(tab.id)) {
+      return;
+    }
+
+    const nodeInfo = this.nodesManagerService
+      .getNodeContainerInfo(tab.handlerState.objectId);
+
+    if (!nodeInfo.connectionId) {
+      return;
+    }
+
+    this.dataViewerTableService.create(
+      tab.id,
+      NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId),
+      tab.handlerState.objectId
+    );
   }
 
   private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {

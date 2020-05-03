@@ -6,8 +6,11 @@ export default manifest;
 export * from './TableViewer/TableViewerStorageService';
 
 export * from './TableViewer/TableViewer';
+export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 export * from './TableViewer/TableViewerModel';
 
 export * from './TableViewer/TableDataModel/TableColumn';
 export * from './TableViewer/TableDataModel/TableRow';
 export * from './TableViewer/TableDataModel/EditedRow';
+
+export * from './IExecutionContext';

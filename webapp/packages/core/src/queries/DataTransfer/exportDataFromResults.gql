@@ -1,0 +1,22 @@
+query exportDataFromResults(
+  $connectionId: ID!,
+  $contextId: ID!,
+  $resultsId: ID!,
+  $parameters: DataTransferParameters!
+) {
+  taskInfo: dataTransferExportDataFromResults(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    parameters: $parameters
+  ) {
+    id
+    running
+    taskResult
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+  }
+}

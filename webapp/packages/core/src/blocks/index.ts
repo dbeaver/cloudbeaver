@@ -15,3 +15,5 @@ export * from './TextPlaceholder';
 export * from './useClipboard';
 export * from './SubmittingForm';
 export * from './SanitizedHTML/SanitizedHTML';
+export * from './ItemList';
+export * from './PropertiesTable';

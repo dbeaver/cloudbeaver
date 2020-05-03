@@ -6,11 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Icon } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
+
+import { TableViewerModel } from '../TableViewerModel';
+import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(
   css`
@@ -18,7 +22,7 @@ const tableFooterStyles = composes(
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
     button {
-      composes: theme-text-primary from global;
+      composes: theme-text-primary theme-ripple from global;
     }
   `,
   css`
@@ -51,53 +55,51 @@ const tableFooterStyles = composes(
       font-size: 13px;
       line-height: 24px;
     }
-    time placeholder {
-      height: 16px;
-      width: 150px;
+    reload,
+    reload button {
+      height: 100%;
     }
     reload,
     count,
-    time {
+    TableFooterMenu {
       margin-left: 16px;
+    }
+    time {
+      composes: theme-typography--caption from global;
+      margin-left: auto;
+      margin-right: 16px;
     }
   `
 );
 
 type TableFooterProps = {
-  chunkSize: number;
-  requestStatusMessage: string;
-  queryDuration: number;
-  onRefresh: () => void;
-  onDataChange: (value: number) => void;
+  model: TableViewerModel;
 }
 
-export function TableFooter({
-  chunkSize,
-  requestStatusMessage,
-  queryDuration,
-  onRefresh,
-  onDataChange,
+export const TableFooter = observer(function TableFooter({
+  model,
 }: TableFooterProps) {
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => onDataChange(parseInt(e.target.value, 10)),
-    [onDataChange]
+    (e: React.ChangeEvent<HTMLInputElement>) => model.setChunkSize(parseInt(e.target.value, 10)),
+    [model]
   );
 
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <button type="button" onClick={onRefresh}>
+        <button type="button" onClick={model.handleRefresh}>
           <Icon name="reload" />
         </button>
       </reload>
       <count as="div">
-        <input type="number" value={chunkSize} onBlur={handleChange} {...use({ mod: 'surface' })} />
+        <input type="number" value={model.getChunkSize()} onBlur={handleChange} {...use({ mod: 'surface' })} />
       </count>
-      {requestStatusMessage.length > 0 && (
+      <TableFooterMenu model={model}/>
+      {model.requestStatusMessage.length > 0 && (
         <time>
-          {requestStatusMessage} - {queryDuration}ms
+          {model.requestStatusMessage} - {model.queryDuration}ms
         </time>
       )}
     </table-footer>
   );
-}
+});

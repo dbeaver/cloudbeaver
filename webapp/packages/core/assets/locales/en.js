@@ -17,9 +17,6 @@ module.exports = {
   customConnection_connectionType_url: 'URL',
   customConnection_options: 'Options',
   customConnection_properties: 'Driver Properties',
-  customConnection_properties_name: 'Name',
-  customConnection_properties_value: 'Value',
-  customConnection_properties_add: 'Add',
   customConnection_custom_host: 'Host',
   customConnection_custom_obligatory: '(obligatory)',
   customConnection_custom_port: 'Port',
@@ -31,6 +28,11 @@ module.exports = {
   customConnection_test: 'Test Connection',
   customConnection_create: 'Create',
 
+  data_transfer_dialog_title: 'Export data',
+  data_transfer_dialog_export: 'Export',
+  data_transfer_dialog_exporting_object: 'Exporting:',
+  data_transfer_dialog_configuration_title: 'Export configuration',
+
   ui_stepper_back: 'Back',
   ui_processing_loading: 'Loading...',
   ui_processing_cancel: 'Cancel',
@@ -39,6 +41,9 @@ module.exports = {
   ui_errors_details: 'Details',
   ui_search: 'Search...',
   ui_data_saving_error: 'Error when saving changes',
+  block_properties_table_name: 'Name',
+  block_properties_table_value: 'Value',
+  block_properties_table_add: 'Add',
 
   app_root_session_expired_title: 'Session expired',
   app_root_session_expired_message: 'Session has been expired. Do you want to reload?',

@@ -21,8 +21,9 @@ import {
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GraphQLService } from '@dbeaver/core/sdk';
+import { IExecutionContext } from '@dbeaver/data-viewer-plugin';
 
-import { ISqlEditorTabState, ISqlContextParams } from './ISqlEditorTabState';
+import { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorTab } from './SqlEditorTab';
@@ -174,7 +175,7 @@ export class SqlEditorTabService {
     connectionId: string,
     defaultCatalog?: string,
     defaultSchema?: string
-  ): Promise<ISqlContextParams> {
+  ): Promise<IExecutionContext> {
 
     const response = await this.gql.gql.sqlContextCreate({
       connectionId,

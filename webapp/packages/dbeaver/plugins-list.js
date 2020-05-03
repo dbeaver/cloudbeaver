@@ -10,4 +10,5 @@ module.exports = [
   "@dbeaver/object-viewer-plugin",
   "@dbeaver/sql-editor",
   "@dbeaver/ddl-viewer-plugin",
+  "@dbeaver/data-export-plugin",
 ];
