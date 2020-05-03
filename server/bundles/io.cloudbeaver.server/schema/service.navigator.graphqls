@@ -26,6 +26,8 @@ type ObjectPropertyInfo {
 
     # List of values this property can take. Makes sense only for enumerable properties
     validValues: [ Object ]
+    # Default property value
+    defaultValue: Object
     # Supported features (system, hidden, inherited, foreign, expensive, etc)
     features: [ String! ]
 }
