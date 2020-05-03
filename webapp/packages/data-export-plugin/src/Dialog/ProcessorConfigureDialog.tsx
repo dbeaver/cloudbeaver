@@ -24,6 +24,9 @@ const styles = css`
   PropertiesTable {
     flex: 1;
   }
+  message {
+    margin: auto;
+  }
 `;
 
 type ProcessorSelectDialogProps = {
@@ -62,7 +65,7 @@ export const ProcessorConfigureDialog = observer(
         }
         onReject={onClose}
       >
-        {isExporting && <Loader />}
+        {isExporting && <message as="div">We prepare your file for export. Please wait...</message>}
         {!isExporting && (
           <PropertiesTable
             properties={properties}

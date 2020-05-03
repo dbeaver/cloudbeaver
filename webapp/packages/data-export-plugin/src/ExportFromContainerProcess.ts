@@ -47,7 +47,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
       }
     } catch (e) {
       this.onError(e);
-      return;
+      throw e;
     }
 
     this.statusUpdateProcess();
@@ -80,7 +80,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
       }
       // run the first check immediately because usually the query execution is fast
       try {
-        const { taskInfo } = await this.graphQLService.gql.asyncTaskStatus({ taskId: this.taskId });
+        const { taskInfo } = await this.graphQLService.gql.asyncExportTaskStatus({ taskId: this.taskId });
         this.applyResult(taskInfo);
         if (this.isFinished) {
           return;

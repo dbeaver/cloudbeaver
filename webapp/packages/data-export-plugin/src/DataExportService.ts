@@ -72,6 +72,7 @@ export class DataExportService {
     const taskId = await process.start(connectionId, containerNodePath, parameters);
     if (taskId) {
       this.exportProcesses.set(taskId, process);
+      // this.notificationService.logInfo({ title: 'We prepare your file for export. Please wait' });
       await process.promise;
       window.open(this.download(taskId), '_blank');
       return taskId;

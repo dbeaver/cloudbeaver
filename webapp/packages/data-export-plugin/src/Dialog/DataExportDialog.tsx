@@ -18,7 +18,7 @@ import { ProcessorSelectDialog } from './ProcessorSelectDialog';
 
 export const DataExportDialog: DialogComponent<IExportContext, null> = observer(
   function DataExportDialog(props) {
-    const controller = useController(DataExportController, props.payload);
+    const controller = useController(DataExportController, props.payload, props.rejectDialog);
 
     if (controller.step === DataExportStep.Configure && controller.processor) {
       return (
@@ -26,7 +26,7 @@ export const DataExportDialog: DialogComponent<IExportContext, null> = observer(
           processor={controller.processor}
           properties={controller.properties}
           processorProperties={controller.processorProperties}
-          isExporting={false}
+          isExporting={controller.isExporting}
           onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
           onClose={props.rejectDialog}
           onExport={controller.export}
