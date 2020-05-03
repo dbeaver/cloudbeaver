@@ -1,0 +1,16 @@
+mutation asyncExportTaskStatus(
+    $taskId: String!
+) {
+    taskInfo: asyncTaskStatus(
+        id: $taskId
+    ) {
+        id
+        running
+        taskResult
+        error {
+            message
+            errorCode
+            stackTrace
+        }
+    }
+}

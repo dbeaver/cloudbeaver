@@ -25,8 +25,9 @@ export enum DataExportStep {
 export class DataExportController implements IInitializableController {
   @observable step = DataExportStep.DataTransferProcessor
   get isLoading() {
-    return !this.dataExportService.processors.isLoaded();
+    return this.dataExportService.processors.isLoading();
   }
+  @observable isExporting = false
   @observable processor: DataTransferProcessorInfo | null = null
 
   @computed get processors(): DataTransferProcessorInfo[] {
@@ -41,41 +42,52 @@ export class DataExportController implements IInitializableController {
   @observable properties: IProperty[] = []
 
   private context!: IExportContext;
+  private close!: () => void;
 
   constructor(
     private dataExportService: DataExportService,
     private notificationService: NotificationService
   ) { }
 
-  init(context: IExportContext) {
+  init(context: IExportContext, close: () => void) {
     this.context = context;
+    this.close = close;
     this.loadProcessors();
   }
 
-  export = () => {
-    if (!this.processor) {
+  export = async () => {
+    if (!this.processor || this.isExporting) {
       return;
     }
+    this.isExporting = true;
 
-    if (this.context.containerNodePath) {
-      this.dataExportService.exportFromContainer(
-        this.context.connectionId,
-        this.context.containerNodePath,
-        {
-          processorId: this.processor.id,
-          processorProperties: this.processorProperties,
-        }
-      );
-    } else if (this.context.contextId && this.context.resultId) {
-      this.dataExportService.exportFromResults(
-        this.context.connectionId,
-        this.context.contextId,
-        this.context.resultId,
-        {
-          processorId: this.processor.id,
-          processorProperties: this.processorProperties,
-        }
-      );
+    try {
+      if (this.context.containerNodePath) {
+        await this.dataExportService.exportFromContainer(
+          this.context.connectionId,
+          this.context.containerNodePath,
+          {
+            processorId: this.processor.id,
+            processorProperties: this.processorProperties,
+          }
+        );
+      } else if (this.context.contextId && this.context.resultId) {
+        await this.dataExportService.exportFromResults(
+          this.context.connectionId,
+          this.context.contextId,
+          this.context.resultId,
+          {
+            processorId: this.processor.id,
+            processorProperties: this.processorProperties,
+          }
+        );
+      }
+      this.close();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t export');
+    } finally {
+      this.isExporting = false;
+      close();
     }
   }
 

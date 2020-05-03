@@ -36,13 +36,6 @@ export class DataExportMenuService {
   }
 
   private exportData(context: IMenuContext<TableViewerModel>) {
-    console.log({
-      connectionId: context.data.connectionId,
-      contextId: context.data.executionContext?.contextId,
-      containerNodePath: context.data.containerNodePath,
-      resultId: context.data.resultId,
-      sourceName: context.data.sourceName,
-    });
     this.commonDialogService.open(DataExportDialog, {
       connectionId: context.data.connectionId,
       contextId: context.data.executionContext?.contextId,

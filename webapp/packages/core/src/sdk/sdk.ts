@@ -852,6 +852,16 @@ export type ChangeSessionLanguageMutation = Pick<
   "changeSessionLanguage"
 >;
 
+export type AsyncExportTaskStatusMutationVariables = {
+  taskId: Scalars["String"];
+};
+
+export type AsyncExportTaskStatusMutation = {
+  taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
+    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+  };
+};
+
 export type ExportDataFromContainerQueryVariables = {
   connectionId: Scalars["ID"];
   containerNodePath: Scalars["ID"];
@@ -1485,6 +1495,20 @@ export const ChangeSessionLanguageDocument = gql`
     changeSessionLanguage(locale: $locale)
   }
 `;
+export const AsyncExportTaskStatusDocument = gql`
+  mutation asyncExportTaskStatus($taskId: String!) {
+    taskInfo: asyncTaskStatus(id: $taskId) {
+      id
+      running
+      taskResult
+      error {
+        message
+        errorCode
+        stackTrace
+      }
+    }
+  }
+`;
 export const ExportDataFromContainerDocument = gql`
   query exportDataFromContainer(
     $connectionId: ID!
@@ -2037,6 +2061,14 @@ export function getSdk(client: GraphQLClient) {
     ): Promise<ChangeSessionLanguageMutation> {
       return client.request<ChangeSessionLanguageMutation>(
         print(ChangeSessionLanguageDocument),
+        variables,
+      );
+    },
+    asyncExportTaskStatus(
+      variables: AsyncExportTaskStatusMutationVariables,
+    ): Promise<AsyncExportTaskStatusMutation> {
+      return client.request<AsyncExportTaskStatusMutation>(
+        print(AsyncExportTaskStatusDocument),
         variables,
       );
     },
