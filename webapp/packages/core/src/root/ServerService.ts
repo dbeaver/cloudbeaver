@@ -15,7 +15,7 @@ import { SessionService } from './SessionService';
 
 @injectable()
 export class ServerService {
-  readonly config = new CachedResource(undefined, this.refreshConfigAsync.bind(this));
+  readonly config = new CachedResource(undefined, this.refreshConfigAsync.bind(this), data => !!data);
   readonly settings = new ServerSettingsService(this.sessionService.settings);
 
   private lastConfig: any = null
@@ -26,10 +26,6 @@ export class ServerService {
   }
 
   private async refreshConfigAsync(data: ServerConfig | undefined): Promise<ServerConfig> {
-    if (data) {
-      return data;
-    }
-
     const { serverConfig } = await this.graphQLService.gql.serverConfig();
 
     if (serverConfig.productConfiguration !== this.lastConfig) {

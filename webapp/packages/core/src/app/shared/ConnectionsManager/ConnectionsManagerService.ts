@@ -38,12 +38,25 @@ export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'descri
 export type Connection = Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId'>
 export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>
 
+type DBDriversMetadata = {
+  loaded: boolean;
+}
+
 @injectable()
 export class ConnectionsManagerService {
 
   @observable private connectionsMap: Map<string, Connection> = new Map();
-  readonly dbDrivers = new CachedResource(new Map(), this.refreshDriversAsync.bind(this));
-  readonly connectionObjectContainers = new CachedResource(new Map(), this.refreshObjectContainersAsync.bind(this));
+  readonly dbDrivers = new CachedResource(
+    new Map(),
+    this.refreshDriversAsync.bind(this),
+    (_, { loaded }) => loaded,
+    { loaded: false }
+  );
+  readonly connectionObjectContainers = new CachedResource(
+    new Map(),
+    this.refreshObjectContainersAsync.bind(this),
+    this.isObjectContainersLoaded.bind(this)
+  );
 
   @computed get connections(): Connection[] {
     return Array.from(this.connectionsMap.values());
@@ -129,24 +142,36 @@ export class ConnectionsManagerService {
     await this.nodesManagerService.updateRootChildren();
   }
 
+  private isObjectContainersLoaded(
+    data: Map<string, ObjectContainer[]>,
+    metadata: {},
+    connectionId: string,
+    catalogId?: string,
+  ) {
+    return data.has(connectionId);
+  }
+
   private async refreshObjectContainersAsync(
     data: Map<string, ObjectContainer[]>,
-    refresh: boolean,
+    metadata: {},
+    update: boolean,
     connectionId: string,
     catalogId?: string,
   ): Promise<Map<string, ObjectContainer[]>> {
-    if (refresh || !data.has(connectionId)) {
-      const { navGetStructContainers } = await this.graphQLService.gql.navGetStructContainers({
-        connectionId,
-        catalogId,
-      });
-      data.set(connectionId, [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList]);
-    }
+    const { navGetStructContainers } = await this.graphQLService.gql.navGetStructContainers({
+      connectionId,
+      catalogId,
+    });
+    data.set(connectionId, [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList]);
 
     return data;
   }
 
-  private async refreshDriversAsync(data: Map<string, DBDriver>): Promise<Map<string, DBDriver>> {
+  private async refreshDriversAsync(
+    data: Map<string, DBDriver>,
+    metadata: DBDriversMetadata,
+    update: boolean
+  ): Promise<Map<string, DBDriver>> {
     const { driverList } = await this.graphQLService.gql.driverList();
 
     data.clear();
@@ -154,7 +179,7 @@ export class ConnectionsManagerService {
     for (const driver of driverList) {
       data.set(driver.id, driver);
     }
-
+    metadata.loaded = true;
     return data;
   }
 

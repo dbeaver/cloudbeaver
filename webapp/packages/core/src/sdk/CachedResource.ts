@@ -8,24 +8,42 @@
 
 import { observable } from 'mobx';
 
-export type Loader<TData, TArgs extends any[]> = (current: TData, update: boolean, ...args: TArgs) => Promise<TData>
+export type Loader<TData, TMetadata = {}, TArgs extends any[] = []> = (
+  current: TData,
+  metadata: TMetadata,
+  update: boolean,
+  ...args: TArgs
+) => Promise<TData>
 
-export class CachedResource<TData, TArgs extends any[] = []> {
+export type IsLoaded<TData, TMetadata = {}, TArgs extends any[] = []> = (
+  current: TData,
+  metadata: TMetadata,
+  ...args: TArgs
+) => boolean
+
+export class CachedResource<TData, TMetadata = {}, TArgs extends any[] = []> {
   @observable data: TData;
 
-  @observable private loaded = false;
   @observable private loading = false;
-  private refreshPromise: Promise<TData> | null = null;
-  private singleElementPromise: Promise<TData> | null = null;
-  private loader: Loader<TData, TArgs>;
+  @observable private metadata: TMetadata;
+  private loader: Loader<TData, TMetadata, TArgs>;
+  private isLoadedCheck: IsLoaded<TData, TMetadata, TArgs>;
+  private activePromise: Promise<TData> | null = null;
 
-  constructor(defaultValue: TData, loader: Loader<TData, TArgs>) {
+  constructor(
+    defaultValue: TData,
+    loader: Loader<TData, TMetadata, TArgs>,
+    isLoadedCheck: IsLoaded<TData, TMetadata, TArgs>,
+    metadata?: TMetadata,
+  ) {
     this.data = defaultValue;
     this.loader = loader;
+    this.isLoadedCheck = isLoadedCheck;
+    this.metadata = metadata || {} as TMetadata;
   }
 
-  isLoaded(): boolean {
-    return this.loaded;
+  isLoaded(...args: TArgs): boolean {
+    return this.isLoadedCheck(this.data, this.metadata, ...args);
   }
 
   isLoading(): boolean {
@@ -33,64 +51,44 @@ export class CachedResource<TData, TArgs extends any[] = []> {
   }
 
   async refresh(...args: TArgs): Promise<TData> {
-    if (args.length > 0) {
-      await this.loadSingle(true, args);
-    } else {
-      await this.loadAll(true, args);
-    }
-    return this.data;
+    return this.loadAll(true, args);
   }
 
   async load(...args: TArgs): Promise<TData> {
-    if (!this.loaded) {
-      if (args.length > 0) {
-        await this.loadSingle(false, args);
-      } else {
-        await this.loadAll(false, args);
-      }
-    }
-    return this.data;
+    return this.loadAll(false, args);
   }
 
   private async loadAll(update: boolean, args: TArgs) {
-    if (this.refreshPromise) {
-      return this.refreshPromise;
-    }
-    this.refreshPromise = this.loadingTask(update, args);
+    await this.waitActive();
+    this.activePromise = this.loadingTask(update, args);
     try {
-      await this.refreshPromise;
+      return await this.activePromise;
     } finally {
-      this.refreshPromise = null;
-    }
-  }
-
-  private async loadSingle(update: boolean, args: TArgs) {
-    if (this.singleElementPromise) {
-      return this.singleElementPromise;
-    }
-    this.singleElementPromise = this.loadingTask(update, args);
-    try {
-      await this.singleElementPromise;
-    } finally {
-      this.singleElementPromise = null;
+      this.activePromise = null;
     }
   }
 
   private async loadingTask(update: boolean, args: TArgs): Promise<TData> {
-    if (args.length === 0) {
-      this.loaded = false;
-    }
     this.loading = true;
 
     try {
-      this.data = await this.loader(this.data, update, ...args);
+      if (this.isLoaded(...args) && !update) {
+        return this.data;
+      }
+
+      this.data = await this.loader(this.data, this.metadata, update, ...args);
     } finally {
       this.loading = false;
     }
 
-    if (args.length === 0) {
-      this.loaded = true;
-    }
     return this.data;
+  }
+
+  private async waitActive() {
+    if (this.activePromise) {
+      try {
+        await this.activePromise;
+      } catch {}
+    }
   }
 }

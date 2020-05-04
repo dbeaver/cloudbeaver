@@ -16,9 +16,17 @@ import { Deferred } from '@dbeaver/core/utils';
 import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
 
+type ProcessorsResourceMetadata = {
+  loaded: boolean;
+}
+
 @injectable()
 export class DataExportService {
-  readonly processors = new CachedResource(new Map(), this.refreshProcessorsAsync.bind(this));
+  readonly processors = new CachedResource(
+    new Map(),
+    this.refreshProcessorsAsync.bind(this),
+    (_, { loaded }) => loaded
+  );
   private exportProcesses = new Map<string, Deferred<string>>();
 
   constructor(
@@ -96,7 +104,8 @@ export class DataExportService {
   }
 
   private async refreshProcessorsAsync(
-    data: Map<string, DataTransferProcessorInfo>
+    data: Map<string, DataTransferProcessorInfo>,
+    metadata: ProcessorsResourceMetadata,
   ): Promise<Map<string, DataTransferProcessorInfo>> {
     const { processors } = await this.graphQLService.gql.getDataTransferProcessors();
 
@@ -105,7 +114,7 @@ export class DataExportService {
     for (const processor of processors) {
       data.set(processor.id, processor);
     }
-
+    metadata.loaded = true;
     return data;
   }
 }
