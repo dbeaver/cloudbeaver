@@ -35,7 +35,7 @@ cd ..\webapp
 
 call npm i lerna -g
 call lerna bootstrap
-call lerna run build --scope @dbeaver/dbeaver -- -- --pluginsList=../../../../products/default/plugins-list.js
+call lerna run build --scope @dbeaver/dbeaver -- --pluginsList=../../../../products/default/plugins-list.js
 
 cd ..\deploy
 

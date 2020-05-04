@@ -38,7 +38,7 @@ echo "Build static content"
 cd ../webapp
 
 lerna bootstrap
-lerna run build --scope @dbeaver/dbeaver -- -- --pluginsList=../../../../products/default/plugins-list.js
+lerna run build --scope @dbeaver/dbeaver -- --pluginsList=../../../../products/default/plugins-list.js
 
 cd ../deploy
 
