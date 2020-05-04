@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
+import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import {
   CachedResource, GraphQLService, DataTransferProcessorInfo, DataTransferParameters
@@ -15,6 +17,7 @@ import { Deferred } from '@dbeaver/core/utils';
 
 import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
+import { PendingNotification } from './PendingNotification';
 
 type ProcessorsResourceMetadata = {
   loaded: boolean;
@@ -27,11 +30,12 @@ export class DataExportService {
     this.refreshProcessorsAsync.bind(this),
     (_, { loaded }) => loaded
   );
-  private exportProcesses = new Map<string, Deferred<string>>();
+  readonly exportProcesses = new Map<string, Deferred<string>>();
 
   constructor(
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private commonDialogService: CommonDialogService,
   ) { }
 
   async cancel(exportId: string) {
@@ -54,7 +58,19 @@ export class DataExportService {
     try {
       await this.graphQLService.gql.removeDataTransferFile({ dataFileId });
       this.exportProcesses.delete(exportId);
-    } catch (e) {
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Error occurred while deleting file');
+    }
+  }
+
+  async showDetails(exportId: string) {
+    const process = this.exportProcesses.get(exportId);
+    if (!process) {
+      return;
+    }
+    try {
+      await this.commonDialogService.open(ErrorDetailsDialog, process.getRejectionReason());
+    } finally {
     }
   }
 
@@ -68,6 +84,17 @@ export class DataExportService {
       return;
     }
     this.exportProcesses.delete(exportId);
+  }
+
+  downloadUrl(exportId: string) {
+    const process = this.exportProcesses.get(exportId);
+    if (!process) {
+      return;
+    }
+    const dataFileId = process.getPayload();
+    if (!dataFileId) {
+      return;
+    }
     return `/dbeaver/data/${dataFileId}`;
   }
 
@@ -80,9 +107,7 @@ export class DataExportService {
     const taskId = await process.start(connectionId, containerNodePath, parameters);
     if (taskId) {
       this.exportProcesses.set(taskId, process);
-      // this.notificationService.logInfo({ title: 'We prepare your file for export. Please wait' });
-      await process.promise;
-      window.open(this.download(taskId), '_blank');
+      this.showPendingNotification(taskId);
       return taskId;
     }
   }
@@ -97,10 +122,17 @@ export class DataExportService {
     const taskId = await process.start(connectionId, contextId, resultsId, parameters);
     if (taskId) {
       this.exportProcesses.set(taskId, process);
-      await process.promise;
-      window.open(this.download(taskId), '_blank');
+      this.showPendingNotification(taskId);
       return taskId;
     }
+  }
+
+  private showPendingNotification(taskId: string) {
+    this.notificationService.logInfo({
+      title: 'We prepare your file for export. Please wait',
+      source: taskId,
+      customComponent: () => PendingNotification,
+    });
   }
 
   private async refreshProcessorsAsync(

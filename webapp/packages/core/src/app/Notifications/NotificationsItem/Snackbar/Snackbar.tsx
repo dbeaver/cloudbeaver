@@ -12,6 +12,7 @@ import styled, { use } from 'reshadow';
 
 import { Icon, Button } from '@dbeaver/core/blocks';
 import { ENotificationType } from '@dbeaver/core/eventsLog';
+import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { NotificationMark } from './NotificationMark';
@@ -37,6 +38,7 @@ export function Snackbar({
   const styles = useStyles(SNACKBAR_STYLES);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
+  const translate = useTranslate();
 
   useEffect(() => {
     setMounted(true);
@@ -78,7 +80,7 @@ export function Snackbar({
               onClick={onShowDetails}
               disabled={disableShowDetails}
             >
-              Details
+              {translate('ui_errors_details')}
             </Button>
           </actions>
         )}
