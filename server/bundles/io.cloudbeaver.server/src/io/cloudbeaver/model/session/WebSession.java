@@ -439,17 +439,6 @@ public class WebSession {
         return progressMonitor;
     }
 
-    public List<WebDatabaseDriverConfig> getDriverList(@Nullable String driverId) {
-        List<WebDatabaseDriverConfig> result = new ArrayList<>();
-        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
-            if (driverId == null || driverId.equals(WebServiceUtils.makeDriverFullId(driver))) {
-                result.add(new WebDatabaseDriverConfig(this, driver));
-            }
-        }
-
-        return result;
-    }
-
     ///////////////////////////////////////////////////////
     // Async model
 

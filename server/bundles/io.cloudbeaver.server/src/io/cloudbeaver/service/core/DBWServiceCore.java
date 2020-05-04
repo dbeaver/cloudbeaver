@@ -17,10 +17,53 @@
 package io.cloudbeaver.service.core;
 
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebDataSourceConfig;
+import io.cloudbeaver.model.WebDatabaseDriverConfig;
+import io.cloudbeaver.model.WebServerConfig;
+import io.cloudbeaver.model.WebServerMessage;
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.dbeaver.model.exec.DBCException;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Web service API
  */
 public interface DBWServiceCore extends DBWService {
 
+    @WebAction(requirePermissions = {})
+    WebServerConfig getServerConfig() throws DBWebException;
+
+    @WebAction
+    List<WebDatabaseDriverConfig> getDriverList(WebSession webSession, String driverId) throws DBWebException;
+
+    @WebAction
+    List<WebDataSourceConfig> getGlobalDataSources() throws DBWebException;
+
+    @WebAction
+    String[] getSessionPermissions(WebSession webSession) throws DBWebException;
+
+    ///////////////////////////////////////////
+    // Session
+
+    @WebAction(requirePermissions = {})
+    WebSession openSession(WebSession webSession) throws DBWebException;
+
+    @WebAction
+    WebSession getSessionState(WebSession webSession) throws DBWebException;
+
+    @WebAction
+    List<WebServerMessage> readSessionLog(WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
+
+    @WebAction
+    boolean closeSession(HttpServletRequest request) throws DBWebException;
+
+    @WebAction
+    boolean touchSession(HttpServletRequest request) throws DBWebException;
+
+    boolean changeSessionLanguage(WebSession webSession, String locale);
 }

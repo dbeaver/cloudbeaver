@@ -51,11 +51,15 @@ type WebServiceConfig {
 type ServerConfig {
     name: String!
     version: String!
+
+    anonymousAccessEnabled: Boolean
+    authenticationEnabled: Boolean
     supportsPredefinedConnections: Boolean
     supportsProvidedConnections: Boolean
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
+
     supportedLanguages: [ ServerLanguage ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!

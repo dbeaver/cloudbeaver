@@ -16,13 +16,14 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,73 +34,53 @@ import java.util.Map;
  */
 public class WebServerConfig {
 
-    private String name;
-    private String version;
-    private boolean supportsPredefinedConnections;
-    private boolean supportsCustomConnections;
-    private boolean supportsConnectionBrowser;
-    private boolean supportsWorkspaces;
+    private final CBApplication application;
 
-    public WebServerConfig(String name, String version) {
-        this.name = name;
-        this.version = version;
+    public WebServerConfig(CBApplication application) {
+        this.application = application;
     }
 
     @Property
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return application.getServerName();
     }
 
     @Property
     public String getVersion() {
-        return version;
+        return GeneralUtils.getProductVersion().toString();
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    @Property
+    public boolean isAnonymousAccessEnabled() {
+        return application.getAppConfiguration().isAnonymousAccessEnabled();
+    }
+
+    @Property
+    public boolean isAuthenticationEnabled() {
+        return application.getAppConfiguration().isAuthenticationEnabled();
     }
 
     @Property
     public boolean isSupportsPredefinedConnections() {
-        return supportsPredefinedConnections;
-    }
-
-    public void setSupportsPredefinedConnections(boolean supportsPredefinedConnections) {
-        this.supportsPredefinedConnections = supportsPredefinedConnections;
+        return application.getAppConfiguration().isSupportsPredefinedConnections();
     }
 
     @Property
     public boolean isSupportsCustomConnections() {
-        return supportsCustomConnections;
-    }
-
-    public void setSupportsCustomConnections(boolean supportsCustomConnections) {
-        this.supportsCustomConnections = supportsCustomConnections;
+        return application.getAppConfiguration().isSupportsCustomConnections();
     }
 
     @Property
     public boolean isSupportsConnectionBrowser() {
-        return supportsConnectionBrowser;
-    }
-
-    public void setSupportsConnectionBrowser(boolean supportsConnectionBrowser) {
-        this.supportsConnectionBrowser = supportsConnectionBrowser;
+        return application.getAppConfiguration().isSupportsConnectionBrowser();
     }
 
     @Property
     public boolean isSupportsWorkspaces() {
-        return supportsWorkspaces;
+        return application.getAppConfiguration().isSupportsUserWorkspaces();
     }
 
-    public void setSupportsWorkspaces(boolean supportsWorkspaces) {
-        this.supportsWorkspaces = supportsWorkspaces;
-    }
-
-    @WebAction
+    @Property
     public WebServerLanguage[] getSupportedLanguages() {
         List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];
@@ -109,7 +90,7 @@ public class WebServerConfig {
         return webLangs;
     }
 
-    @WebAction
+    @Property
     public WebServiceConfig[] getServices() {
         List<WebServiceConfig> services = new ArrayList<>();
         for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
@@ -118,7 +99,7 @@ public class WebServerConfig {
         return services.toArray(new WebServiceConfig[0]);
     }
 
-    @WebAction
+    @Property
     public Map<String, Object> getProductConfiguration() {
         return CBPlatform.getInstance().getApplication().getProductConfiguration();
     }

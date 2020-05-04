@@ -24,6 +24,10 @@ public class CBAppConfig {
     private boolean authenticationEnabled = true;
     private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
     private String defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
+    private boolean supportsPredefinedConnections = true;
+    private boolean supportsCustomConnections = true;
+    private boolean supportsConnectionBrowser = false;
+    private boolean supportsUserWorkspaces = false;
 
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
@@ -39,5 +43,21 @@ public class CBAppConfig {
 
     public String getDefaultUserRole() {
         return defaultUserRole;
+    }
+
+    public boolean isSupportsPredefinedConnections() {
+        return supportsPredefinedConnections;
+    }
+
+    public boolean isSupportsCustomConnections() {
+        return supportsCustomConnections;
+    }
+
+    public boolean isSupportsConnectionBrowser() {
+        return supportsConnectionBrowser;
+    }
+
+    public boolean isSupportsUserWorkspaces() {
+        return supportsUserWorkspaces;
     }
 }

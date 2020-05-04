@@ -306,32 +306,8 @@ public class CBPlatform extends BasePlatformImpl {
         return false;
     }
 
-    public WebServerConfig getServerConfig() {
-        WebServerConfig config = new WebServerConfig(
-            CBApplication.getInstance().getServerName(),
-            GeneralUtils.getProductVersion().toString()
-        );
-        config.setSupportsPredefinedConnections(true);
-        return  config;
-    }
-
     public WebSessionManager getSessionManager() {
         return sessionManager;
-    }
-
-    public List<WebDataSourceConfig> getGlobalDataSources() throws DBWebException {
-        List<WebDataSourceConfig> result = new ArrayList<>();
-        DBPDataSourceRegistry dsRegistry = WebServiceUtils.getDataSourceRegistry();
-
-        for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
-            if (applicableDrivers.contains(ds.getDriver()) && !ds.isProvided()) {
-                result.add(new WebDataSourceConfig(ds));
-            } else {
-                log.debug("Global datasource '" + ds.getName() + "' ignored - driver is not applicable");
-            }
-        }
-
-        return result;
     }
 
 }

@@ -16,9 +16,12 @@
  */
 package io.cloudbeaver.service.core;
 
+import graphql.TypeResolutionEnvironment;
 import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.session.WebSessionManager;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
@@ -39,27 +42,25 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         CBPlatform platform = CBPlatform.getInstance();
         WebSessionManager sessionManager = platform.getSessionManager();
         model.getQueryType()
-            .dataFetcher("serverConfig", env -> platform.getServerConfig())
+            .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
 
-            .dataFetcher("driverList", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).getDriverList(env.getArgument("id")))
-            .dataFetcher("dataSourceList", env -> platform.getGlobalDataSources())
+            .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("dataSourceList", env -> getService(env).getGlobalDataSources())
 
-            .dataFetcher("sessionPermissions", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).getSessionPermissions())
-            .dataFetcher("sessionState", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)))
+            .dataFetcher("sessionPermissions", env -> getService(env).getSessionPermissions(getWebSession(env)))
+            .dataFetcher("sessionState", env -> getService(env).getSessionState(getWebSession(env)))
 
-            .dataFetcher("readSessionLog", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false, true).readLog(
+            .dataFetcher("readSessionLog", env -> getService(env).readSessionLog(
+                getWebSession(env),
                 env.getArgument("maxEntries"),
                 env.getArgument("clearEntries")))
         ;
 
         model.getMutationType()
-            .dataFetcher("openSession", env -> sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false))
-            .dataFetcher("closeSession", env -> sessionManager.closeSession(GraphQLEndpoint.getServletRequest(env)))
-            .dataFetcher("touchSession", env -> sessionManager.touchSession(GraphQLEndpoint.getServletRequest(env)))
-            .dataFetcher("changeSessionLanguage", env -> {
-                sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env)).setLocale(env.getArgument("locale"));
-                return true;
-            })
+            .dataFetcher("openSession", env -> getService(env).openSession(sessionManager.getWebSession(GraphQLEndpoint.getServletRequest(env), false)))
+            .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
+            .dataFetcher("touchSession", env -> getService(env).touchSession(GraphQLEndpoint.getServletRequest(env)))
+            .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
             .dataFetcher("openConnection", env -> sessionManager.openConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("config")))
             .dataFetcher("createConnection", env -> sessionManager.createConnection(GraphQLEndpoint.getServletRequest(env), env.getArgument("config")))
@@ -76,9 +77,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             )
         ;
 
-        model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(env -> {
-                return env.getObject();
-            })
+        model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)
         );
     }
 
