@@ -49,6 +49,6 @@ public interface DBWServiceDataTransfer extends DBWService {
         WebDataTransferParameters parameters) throws DBWebException;
 
     @WebAction
-    Boolean dataTransferRemoveDataFile(WebSQLProcessor sqlProcessor, String dataFileId) throws DBWebException;
+    Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
 
 }

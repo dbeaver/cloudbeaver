@@ -117,7 +117,20 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @Override
-    public Boolean dataTransferRemoveDataFile(WebSQLProcessor sqlProcessor, String dataFileId) {
+    public Boolean dataTransferRemoveDataFile(WebSession webSession, String dataFileId) throws DBWebException {
+        WebDataTransferSessionConfig dtConfig = WebDataTransferUtils.getSessionDataTransferConfig(webSession);
+        WebDataTransferTaskConfig taskInfo = dtConfig.getTask(dataFileId);
+        if (taskInfo == null) {
+            throw new DBWebException("Session task '" + dataFileId + "' not found");
+        }
+        File dataFile = taskInfo.getDataFile();
+        if (dataFile != null) {
+            if (!dataFile.delete()) {
+                log.warn("Error deleting data file '" + dataFile.getAbsolutePath() + "'");
+            }
+        }
+        dtConfig.removeTask(taskInfo);
+
         return true;
     }
 
