@@ -23,6 +23,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -422,6 +423,37 @@ class CBSecurityController implements DBWSecurityController {
             }
         } catch (SQLException e) {
             throw new DBCException("Error updating session in database", e);
+        }
+    }
+
+    @Override
+    public void createOrUpdateAuthProvider(WebAuthProviderDescriptor authProvider) throws DBCException {
+
+    }
+
+    void initializeMetaInformation() throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            Set<String> registeredProviders = new HashSet<>();
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT PROVIDER_ID FROM CB_AUTH_PROVIDER")) {
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        registeredProviders.add(dbResult.getString(1));
+                    }
+                }
+            }
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
+                for (WebAuthProviderDescriptor authProvider : WebServiceRegistry.getInstance().getAuthProviders()) {
+                    if (!registeredProviders.contains(authProvider.getId())) {
+                        dbStat.setString(1, authProvider.getId());
+                        dbStat.executeUpdate();
+                        log.debug("Auth provider '" + authProvider.getId() + "' registered");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading session state", e);
         }
     }
 }

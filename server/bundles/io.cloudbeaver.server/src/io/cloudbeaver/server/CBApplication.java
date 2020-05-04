@@ -224,6 +224,8 @@ public class CBApplication extends BaseApplicationImpl {
         securityController = new CBSecurityController(database);
 
         database.initialize();
+
+        securityController.initializeMetaInformation();
     }
 
     private void loadConfiguration(String configPath) {

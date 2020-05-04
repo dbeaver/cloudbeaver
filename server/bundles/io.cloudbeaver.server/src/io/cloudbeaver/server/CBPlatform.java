@@ -54,6 +54,7 @@ import org.osgi.framework.Bundle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CBPlatform
@@ -130,7 +131,7 @@ public class CBPlatform extends BasePlatformImpl {
     @Override
     protected void initialize() {
         long startTime = System.currentTimeMillis();
-        log.debug("Initialize web platform...");
+        log.info("Initialize web platform...");
 
         // Register BC security provider
         SecurityProviderUtils.registerSecurityProvider();
@@ -161,7 +162,7 @@ public class CBPlatform extends BasePlatformImpl {
                     for (DBPDriverLibrary lib : libraries) {
                         if (!lib.isOptional() && (lib.getLocalFile() == null || !lib.getLocalFile().exists())) {
                             hasAllFiles = false;
-                            log.error("Driver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
+                            log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
                             break;
                         }
                     }
@@ -171,12 +172,13 @@ public class CBPlatform extends BasePlatformImpl {
                 }
             }
         }
+        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getId).collect(Collectors.joining(",")));
 
         sessionManager = WebSessionManager.getInstance();
 
         new WebSessionMonitorJob(this).scheduleMonitor();
 
-        log.debug("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
+        log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
     public synchronized void dispose() {

@@ -28,6 +28,8 @@ public class CBAppConfig {
     private boolean supportsCustomConnections = true;
     private boolean supportsConnectionBrowser = false;
     private boolean supportsUserWorkspaces = false;
+    private String[] enabledDrivers = new String[0];
+    private String[] disabledDrivers = new String[0];
 
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
@@ -59,5 +61,13 @@ public class CBAppConfig {
 
     public boolean isSupportsUserWorkspaces() {
         return supportsUserWorkspaces;
+    }
+
+    public String[] getEnabledDrivers() {
+        return enabledDrivers;
+    }
+
+    public String[] getDisabledDrivers() {
+        return disabledDrivers;
     }
 }

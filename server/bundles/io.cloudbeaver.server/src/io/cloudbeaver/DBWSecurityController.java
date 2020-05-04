@@ -92,6 +92,11 @@ public interface DBWSecurityController {
     void updateSession(WebSession session) throws DBCException;
 
     ///////////////////////////////////////////
+    // Meta info
+
+    void createOrUpdateAuthProvider(WebAuthProviderDescriptor authProvider) throws DBCException;
+
+    ///////////////////////////////////////////
     // Utils
 
     static DBWSecurityController getInstance() {
