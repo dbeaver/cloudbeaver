@@ -11,20 +11,32 @@ export enum ENotificationType {
   Error = 'Error',
 }
 
-export interface INotification {
+export type NotificationComponentProps<T = undefined> = {
+  notification: INotification<T>;
+  onClose: () => void;
+}
+export type NotificationComponent<T = undefined> = React.FunctionComponent<NotificationComponentProps<T>>
+
+export interface INotification<T = undefined> {
   readonly id: number;
   type: ENotificationType;
   title: string;
   message?: string;
   details?: string | Error;
+  persistent: boolean;
   isSilent: boolean;
+  customComponent?: () => NotificationComponent<T>;
+  source: T;
   close: () => void;
   showDetails: () => void;
 }
 
-export interface INotificationOptions {
+export interface INotificationOptions<T = undefined> {
   title: string;
   message?: string;
   details?: string | Error;
   isSilent?: boolean;
+  persistent?: boolean;
+  customComponent?: () => NotificationComponent<T>;
+  source?: T;
 }

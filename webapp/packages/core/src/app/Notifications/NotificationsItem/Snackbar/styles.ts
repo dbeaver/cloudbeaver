@@ -10,7 +10,7 @@ import { css } from 'reshadow';
 
 import { composes } from '@dbeaver/core/theming';
 
-export const snackbarStyles = composes(
+export const SNACKBAR_STYLES = composes(
   css`
     notification {
       composes: theme-background-surface theme-text-on-surface from global;

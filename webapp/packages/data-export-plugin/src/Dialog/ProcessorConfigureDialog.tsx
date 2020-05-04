@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { Loader, IProperty, PropertiesTable } from '@dbeaver/core/blocks';
+import { IProperty, PropertiesTable } from '@dbeaver/core/blocks';
 import { CommonDialogWrapper } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { DataTransferProcessorInfo } from '@dbeaver/core/sdk';
@@ -49,7 +49,8 @@ export const ProcessorConfigureDialog = observer(
     onBack,
     onExport,
   }: ProcessorSelectDialogProps) {
-    const title = `${useTranslate('data_transfer_dialog_configuration_title')} (${processor.name})`;
+    const translate = useTranslate();
+    const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
 
     return styled(styles)(
       <CommonDialogWrapper
@@ -65,7 +66,7 @@ export const ProcessorConfigureDialog = observer(
         }
         onReject={onClose}
       >
-        {isExporting && <message as="div">We prepare your file for export. Please wait...</message>}
+        {isExporting && <message as="div">{translate('data_transfer_dialog_preparation')}</message>}
         {!isExporting && (
           <PropertiesTable
             properties={properties}

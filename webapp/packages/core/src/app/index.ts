@@ -18,6 +18,8 @@ export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
+export * from './Notifications/NotificationsItem/Snackbar/styles';
+export * from './Notifications/NotificationsItem/Snackbar/NotificationMark';
 
 // Models
 export * from './shared/NavigationTabs/ITab';
