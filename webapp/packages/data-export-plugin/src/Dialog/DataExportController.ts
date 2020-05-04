@@ -106,6 +106,7 @@ export class DataExportController implements IInitializableController {
       name: property.displayName!,
       description: property.description,
       validValues: property.validValues,
+      defaultValue: property.defaultValue,
     })) || [];
     this.step = DataExportStep.Configure;
   }

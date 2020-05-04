@@ -918,7 +918,7 @@ export type GetDataTransferProcessorsQuery = {
                   | "description"
                   | "category"
                   | "dataType"
-                  | "value"
+                  | "defaultValue"
                   | "validValues"
                   | "features"
                 >
@@ -1580,7 +1580,7 @@ export const GetDataTransferProcessorsDocument = gql`
         description
         category
         dataType
-        value
+        defaultValue
         validValues
         features
       }

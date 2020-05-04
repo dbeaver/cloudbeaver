@@ -14,7 +14,7 @@ query getDataTransferProcessors {
       description
       category
       dataType
-      value
+      defaultValue
       validValues
       features
     }
