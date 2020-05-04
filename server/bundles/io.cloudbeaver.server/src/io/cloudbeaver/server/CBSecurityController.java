@@ -17,14 +17,13 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWSecurityController;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
-import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -97,6 +96,23 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public WebUser getUserById(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        return new WebUser(dbResult.getString(1));
+                    }
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while searching credentials", e);
+        }
+    }
+
     ///////////////////////////////////////////
     // Credentials
 
@@ -106,7 +122,7 @@ class CBSecurityController implements DBWSecurityController {
         try {
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
-                WebAuthProviderPropertyDescriptor property = authProvider.getProperty(propertyName);
+                WebAuthProviderPropertyDescriptor property = authProvider.getCredentialParameter(propertyName);
                 if (property == null) {
                     throw new IllegalArgumentException("Invalid auth provider '" + authProvider.getId() + "' property '" + propertyName + "'");
                 }
@@ -115,7 +131,7 @@ class CBSecurityController implements DBWSecurityController {
                 return new String[] {propertyName, encodedValue };
             }).collect(Collectors.toList());
         } catch (Exception e) {
-            throw new DBCException("Error passing properties to provider", e);
+            throw new DBCException(e.getMessage(), e);
         }
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?", userId, authProvider.getId());
@@ -135,11 +151,11 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
-    @NotNull
+    @Nullable
     @Override
     public String getUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
-        for (WebAuthProviderPropertyDescriptor prop : authProvider.getProperties()) {
+        for (WebAuthProviderPropertyDescriptor prop : authProvider.getCredentialParameters()) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
                 Object paramValue = authParameters.get(propId);
@@ -191,11 +207,7 @@ class CBSecurityController implements DBWSecurityController {
                         }
                     }
 
-                    if (userId == null) {
-                        // User doesn't exist. We can create new user automatically if auth provider supports this
-                        throw new DBCException("Invalid user credentials");
-                    }
-                    if (!isActive) {
+                    if (userId != null && !isActive) {
                         throw new DBCException("User account is locked");
                     }
 

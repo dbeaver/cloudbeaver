@@ -105,6 +105,10 @@ public class CBApplication extends BaseApplicationImpl {
         return maxSessionIdleTime;
     }
 
+    public CBDatabaseConfig getDatabaseConfiguration() {
+        return databaseConfiguration;
+    }
+
     public CBAppConfig getAppConfiguration() {
         return appConfiguration;
     }

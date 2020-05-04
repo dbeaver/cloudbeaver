@@ -25,7 +25,8 @@ type AuthProviderInfo {
 
     isDefault: Boolean
 
-    properties: [AuthCredentialInfo]!
+    configurationParameters: [ObjectPropertyInfo]!
+    credentialParameters: [AuthCredentialInfo]!
 }
 
 type UserAuthInfo {

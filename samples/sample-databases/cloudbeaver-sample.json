@@ -1,7 +1,0 @@
-{
-  // Server configuration
-  "logView": {
-    "logRefreshInterval": 3,
-    "logBatchSize": 1000
-  }
-}

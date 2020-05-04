@@ -23,6 +23,7 @@ public class CBAppConfig {
     private boolean anonymousAccessEnabled = true;
     private boolean authenticationEnabled = true;
     private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
+    private String defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
 
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
@@ -36,4 +37,7 @@ public class CBAppConfig {
         return anonymousUserRole;
     }
 
+    public String getDefaultUserRole() {
+        return defaultUserRole;
+    }
 }

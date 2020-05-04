@@ -39,19 +39,32 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     private ObjectType implType;
     private DBWAuthProvider instance;
-    private final Map<String, WebAuthProviderPropertyDescriptor> properties = new LinkedHashMap<>();
+    private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
+    private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
         this.cfg = cfg;
         this.implType = new ObjectType(cfg, "class");
 
-        for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfg.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
-            String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
-            IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
-            for (IConfigurationElement prop : propElements) {
-                WebAuthProviderPropertyDescriptor propertyDescriptor = new WebAuthProviderPropertyDescriptor(category, prop);
-                properties.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
+        for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
+            for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
+                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
+                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
+                for (IConfigurationElement prop : propElements) {
+                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(category, prop);
+                    configurationParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
+                }
+            }
+        }
+        for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
+            for (IConfigurationElement propGroup : ArrayUtils.safeArray(credElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
+                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
+                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
+                for (IConfigurationElement prop : propElements) {
+                    WebAuthProviderPropertyDescriptor propertyDescriptor = new WebAuthProviderPropertyDescriptor(category, prop);
+                    credentialParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
+                }
             }
         }
     }
@@ -73,12 +86,16 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return cfg.getAttribute("icon");
     }
 
-    public List<WebAuthProviderPropertyDescriptor> getProperties() {
-        return new ArrayList<>(properties.values());
+    public List<PropertyDescriptor> getConfigurationParameters() {
+        return new ArrayList<>(configurationParameters.values());
     }
 
-    public WebAuthProviderPropertyDescriptor getProperty(String id) {
-        return properties.get(id);
+    public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
+        return new ArrayList<>(credentialParameters.values());
+    }
+
+    public WebAuthProviderPropertyDescriptor getCredentialParameter(String id) {
+        return credentialParameters.get(id);
     }
 
     @NotNull

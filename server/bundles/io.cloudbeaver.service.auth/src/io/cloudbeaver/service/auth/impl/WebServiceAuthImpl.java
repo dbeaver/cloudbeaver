@@ -28,6 +28,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthInfo;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.OffsetDateTime;
@@ -53,15 +54,26 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             Map<String, Object> providerConfig = Collections.emptyMap();
 
             DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
-            if (authProviderInstance instanceof DBWAuthProviderExternal<?>) {
-                Map<String, Object> externalCredentials = ((DBWAuthProviderExternal<?>) authProviderInstance).readExternalCredentials(providerConfig,
-                    authParameters);
-                if (externalCredentials != null) {
-                    authParameters.putAll(externalCredentials);
+            DBWAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBWAuthProviderExternal<?> ?
+                (DBWAuthProviderExternal<?>) authProviderInstance : null;
+            if (authProviderExternal != null) {
+                authParameters = authProviderExternal.readExternalCredentials(providerConfig, authParameters);
+            }
+
+            WebUser user = null;
+            String userId = serverController.getUserByCredentials(authProvider, authParameters);
+            if (userId == null) {
+                // User doesn't exist. We can create new user automatically if auth provider supports this
+                if (authProviderExternal != null) {
+                    user = authProviderExternal.registerNewUser(serverController, providerConfig, authParameters);
+                    userId = user.getUserId();
+                }
+
+                if (userId == null) {
+                    throw new DBCException("Invalid user credentials");
                 }
             }
 
-            String userId = serverController.getUserByCredentials(authProvider, authParameters);
             Map<String, Object> userCredentials = serverController.getUserCredentials(userId, authProvider);
 
             Object authToken = authProviderInstance.openSession(
@@ -75,7 +87,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authInfo.setAuthToken(authToken);
             authInfo.setMessage("Logged using " + authProvider.getLabel() + " provider");
 
-            WebUser user = new WebUser(userId);
+            if (user == null) {
+                user = new WebUser(userId);
+            }
             webSession.setUser(user);
 
             return authInfo;
