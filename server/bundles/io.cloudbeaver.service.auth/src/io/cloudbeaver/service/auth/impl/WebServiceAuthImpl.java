@@ -24,6 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthInfo;
@@ -42,6 +43,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
+        if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
+            throw new DBWebException("Authentication was disabled for this server");
+        }
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
@@ -85,7 +89,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authInfo.setLoginTime(OffsetDateTime.now());
             authInfo.setAuthProvider(authProvider.getId());
             authInfo.setAuthToken(authToken);
-            authInfo.setMessage("Logged using " + authProvider.getLabel() + " provider");
+            authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
 
             if (user == null) {
                 user = new WebUser(userId);

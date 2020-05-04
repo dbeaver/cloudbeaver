@@ -17,7 +17,7 @@
 package io.cloudbeaver.server;
 
 /**
- * Database configuration
+ * Application configuration
  */
 public class CBAppConfig {
     private boolean anonymousAccessEnabled = true;
