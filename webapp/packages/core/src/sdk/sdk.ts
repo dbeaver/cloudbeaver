@@ -359,6 +359,8 @@ export type ObjectPropertyInfo = {
   value?: Maybe<Scalars["Object"]>;
   /** List of values this property can take. Makes sense only for enumerable properties */
   validValues?: Maybe<Array<Maybe<Scalars["Object"]>>>;
+  /** Default property value */
+  defaultValue?: Maybe<Scalars["Object"]>;
   /** Supported features (system, hidden, inherited, foreign, expensive, etc) */
   features?: Maybe<Array<Scalars["String"]>>;
 };
@@ -1247,7 +1249,10 @@ export type OpenSessionMutationVariables = {};
 
 export type OpenSessionMutation = {
   session: Maybe<
-    Pick<SessionInfo, "id" | "createTime" | "lastAccessTime" | "locale"> & {
+    Pick<
+      SessionInfo,
+      "id" | "createTime" | "lastAccessTime" | "cacheExpired" | "locale"
+    > & {
       connections: Array<
         Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
       >;
@@ -1281,7 +1286,10 @@ export type SessionStateQueryVariables = {};
 
 export type SessionStateQuery = {
   sessionState: Maybe<
-    Pick<SessionInfo, "id" | "createTime" | "lastAccessTime" | "locale"> & {
+    Pick<
+      SessionInfo,
+      "id" | "createTime" | "lastAccessTime" | "locale" | "cacheExpired"
+    > & {
       connections: Array<
         Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
       >;
@@ -1885,6 +1893,7 @@ export const OpenSessionDocument = gql`
       id
       createTime
       lastAccessTime
+      cacheExpired
       locale
       connections {
         id
@@ -1922,6 +1931,7 @@ export const SessionStateDocument = gql`
       createTime
       lastAccessTime
       locale
+      cacheExpired
       connections {
         id
         name

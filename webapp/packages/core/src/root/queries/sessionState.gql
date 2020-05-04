@@ -4,6 +4,7 @@ query sessionState {
     createTime
     lastAccessTime
     locale
+    cacheExpired
     connections {
       id
       name

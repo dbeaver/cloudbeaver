@@ -14,6 +14,7 @@ import { Subject } from 'rxjs';
 
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
+import { SessionService } from '@dbeaver/core/root';
 import { LocalStorageSaveService } from '@dbeaver/core/settings';
 
 import { ITab } from './ITab';
@@ -49,8 +50,11 @@ export class NavigationTabsService {
   onTabSelect = new Subject<ITab>();
   onTabClose = new Subject<ITab>();
 
-  constructor(private notificationService: NotificationService,
-              private autoSaveService: LocalStorageSaveService) {
+  constructor(
+    private notificationService: NotificationService,
+    private autoSaveService: LocalStorageSaveService,
+    private sessionService: SessionService
+  ) {
     this.autoSaveService.withAutoSave(
       this.tabsMap,
       `${NAVIGATION_TABS_BASE_KEY}_tab_map`,
@@ -174,8 +178,14 @@ export class NavigationTabsService {
   async restoreTabs() {
     const removedTabs: string[] = [];
     const restoreTasks: Promise<void>[] = [];
+    const session = await this.sessionService.session.load();
 
     for (const tabId of this.state.tabs) {
+      if (session?.cacheExpired) {
+        removedTabs.push(tabId);
+        continue;
+      }
+
       const tab = this.tabsMap.get(tabId);
       if (!tab) {
         removedTabs.push(tabId);

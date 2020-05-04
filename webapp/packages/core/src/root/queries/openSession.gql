@@ -3,6 +3,7 @@ mutation openSession {
     id
     createTime
     lastAccessTime
+    cacheExpired
     locale
     connections {
       id
