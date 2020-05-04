@@ -27,7 +27,7 @@ xcopy /E /Q ..\server\product\web-server\target\products\io.cloudbeaver.product\
 copy scripts\run-server.bat cloudbeaver >NUL
 mkdir cloudbeaver\workspace\GlobalConfiguration
 xcopy /E /Q ..\samples\sample-databases\GlobalConfiguration cloudbeaver\workspace\GlobalConfiguration >NUL
-copy ..\samples\sample-databases\cloudbeaver-sample.conf cloudbeaver\conf\cloudbeaver.conf >NUL
+copy ..\samples\sample-databases\*.conf cloudbeaver\conf >NUL
 
 echo "Build static content"
 

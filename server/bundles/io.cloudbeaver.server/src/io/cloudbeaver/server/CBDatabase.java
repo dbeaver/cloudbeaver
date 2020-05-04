@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.user.WebRole;
@@ -41,8 +43,7 @@ import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
@@ -56,7 +57,7 @@ public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
-    private static final String CURRENT_SCHEMA_VERSION = "2.beta";
+    private static final String CURRENT_SCHEMA_VERSION = "5.beta";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
@@ -231,46 +232,59 @@ public class CBDatabase {
     private void fillInitialData() throws DBCException {
         // Fill initial data
         DBWSecurityController serverController = application.getSecurityController();
-        CBDatabaseConfig.InitialData initialData = databaseConfiguration.getInitialData();
-
-        WebUser adminUser = null;
-        if (!CommonUtils.isEmpty(initialData.getAdminName())) {
-            // Create admin user
-            adminUser = new WebUser(initialData.getAdminName());
-            serverController.createUser(adminUser);
-
-            String userPassword = initialData.getAdminPassword();
-
-            // This is how client password will be transmitted from client
-            String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), userPassword);
-
-            Map<String, Object> credentials = new LinkedHashMap<>();
-            credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
-            credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
-
-            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
-            if (authProvider != null) {
-                serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
-            }
+        String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
+        if (CommonUtils.isEmpty(initialDataPath)) {
+            return;
         }
 
-        if (!CommonUtils.isEmpty(initialData.getRoles())) {
-            // Create roles
-            for (WebRole role : initialData.getRoles()) {
-                serverController.createRole(role);
-                if (adminUser != null) {
-                    serverController.setRolePermissions(role.getId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
+        initialDataPath = CBApplication.getRelativePath(
+            databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
+
+        try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
+            Gson gson = new GsonBuilder().setLenient().create();
+            CBDatabaseInitialData initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
+
+            WebUser adminUser = null;
+            if (!CommonUtils.isEmpty(initialData.getAdminName())) {
+                // Create admin user
+                adminUser = new WebUser(initialData.getAdminName());
+                serverController.createUser(adminUser);
+
+                String userPassword = initialData.getAdminPassword();
+
+                // This is how client password will be transmitted from client
+                String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), userPassword);
+
+                Map<String, Object> credentials = new LinkedHashMap<>();
+                credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
+                credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
+
+                WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
+                if (authProvider != null) {
+                    serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
                 }
             }
-        }
 
-        if (adminUser != null) {
-            // Grant all roles
-            WebRole[] allRoles = serverController.readAllRoles();
-            serverController.setUserRoles(
-                adminUser.getUserId(),
-                Arrays.stream(allRoles).map(WebRole::getId).toArray(String[]::new),
-                adminUser.getUserId());
+            if (!CommonUtils.isEmpty(initialData.getRoles())) {
+                // Create roles
+                for (WebRole role : initialData.getRoles()) {
+                    serverController.createRole(role);
+                    if (adminUser != null) {
+                        serverController.setRolePermissions(role.getId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
+                    }
+                }
+            }
+
+            if (adminUser != null) {
+                // Grant all roles
+                WebRole[] allRoles = serverController.readAllRoles();
+                serverController.setUserRoles(
+                    adminUser.getUserId(),
+                    Arrays.stream(allRoles).map(WebRole::getId).toArray(String[]::new),
+                    adminUser.getUserId());
+            }
+        } catch (IOException e) {
+            log.error("Error loading initial data configuration", e);
         }
     }
 

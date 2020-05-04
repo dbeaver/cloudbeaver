@@ -63,6 +63,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     private String workspaceLocation = CBConstants.DEFAULT_WORKSPACE_LOCATION;
     private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
+    private File homeDirectory;
 
     private Map<String, Object> productConfiguration = new HashMap<>();
     private CBAppConfig appConfiguration;
@@ -99,6 +100,10 @@ public class CBApplication extends BaseApplicationImpl {
 
     public String getDriversLocation() {
         return driversLocation;
+    }
+
+    public File getHomeDirectory() {
+        return homeDirectory;
     }
 
     public long getMaxSessionIdleTime() {
@@ -242,6 +247,7 @@ public class CBApplication extends BaseApplicationImpl {
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = ".";
         }
+        homeDirectory = new File(homeFolder);
         String productConfigPath = null;
 
         Gson gson = new GsonBuilder().setLenient().create();
@@ -252,13 +258,13 @@ public class CBApplication extends BaseApplicationImpl {
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, CBConstants.DEFAULT_SERVER_PORT);
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, CBConstants.DEFAULT_SERVER_NAME);
-            contentRoot = this.getRelativePath(
+            contentRoot = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, CBConstants.DEFAULT_CONTENT_ROOT), homeFolder);
             rootURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, CBConstants.DEFAULT_ROOT_URI);
             servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, CBConstants.DEFAULT_SERVICES_URI);
-            driversLocation = this.getRelativePath(
+            driversLocation = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, CBConstants.DEFAULT_DRIVERS_LOCATION), homeFolder);
-            workspaceLocation = this.getRelativePath(
+            workspaceLocation = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, CBConstants.DEFAULT_WORKSPACE_LOCATION), homeFolder);
 
             maxSessionIdleTime = JSONUtils.getLong(serverConfig, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, CBConstants.MAX_SESSION_IDLE_TIME);
@@ -271,7 +277,7 @@ public class CBApplication extends BaseApplicationImpl {
             databaseConfiguration = gson.fromJson(
                 gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
 
-            productConfigPath = this.getRelativePath(
+            productConfigPath = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_PRODUCT_CONFIGURATION, CBConstants.DEFAULT_PRODUCT_CONFIGURATION), homeFolder);
         } catch (IOException e) {
             log.error("Error parsing server configuration", e);
@@ -295,7 +301,11 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private String getRelativePath(String path, String curDir) {
+    static String getRelativePath(String path, String curDir) {
+        return getRelativePath(path, new File(curDir));
+    }
+
+    static String getRelativePath(String path, File curDir) {
         if (path.startsWith("/") || path.length() > 2 && path.charAt(1) == ':') {
             return path;
         }

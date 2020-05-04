@@ -16,14 +16,6 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.model.user.WebRole;
-import org.jkiss.dbeaver.model.DBConstants;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Database configuration
  */
@@ -35,9 +27,9 @@ public class CBDatabaseConfig {
 
     private boolean createDatabase = true;
     private boolean allowPublicAccess = true;
+    private String initialDataConfiguration;
 
     private final Pool pool = new Pool();
-    private final InitialData initialData = new InitialData();
 
     public static class Pool {
         private int minIdleConnections = 2;
@@ -59,28 +51,6 @@ public class CBDatabaseConfig {
 
         public String getValidationQuery() {
             return validationQuery;
-        }
-    }
-
-    public static class InitialData {
-        private String adminName = "cbadmin";
-        private String adminPassword = "cbadmin20";
-        private List<WebRole> roles;
-
-        public String getAdminName() {
-            return adminName;
-        }
-
-        public String getAdminPassword() {
-            return adminPassword;
-        }
-
-        public List<WebRole> getRoles() {
-            return roles;
-        }
-
-        public void setRoles(List<WebRole> roles) {
-            this.roles = roles;
         }
     }
 
@@ -112,11 +82,12 @@ public class CBDatabaseConfig {
         return allowPublicAccess;
     }
 
+    public String getInitialDataConfiguration() {
+        return initialDataConfiguration;
+    }
+
     public Pool getPool() {
         return pool;
     }
 
-    public InitialData getInitialData() {
-        return initialData;
-    }
 }
