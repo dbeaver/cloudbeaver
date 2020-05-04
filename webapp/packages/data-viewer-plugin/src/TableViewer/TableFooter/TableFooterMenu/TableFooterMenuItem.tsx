@@ -42,6 +42,7 @@ export const tableFooterMenuStyles = composes(
       cursor: pointer;
     }
     Button {
+      background: transparent;
       outline: none;
     }
     menu-trigger-icon IconOrImage {

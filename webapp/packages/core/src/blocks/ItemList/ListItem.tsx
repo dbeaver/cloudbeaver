@@ -9,9 +9,9 @@
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { StaticImage } from '@dbeaver/core/blocks';
 import { useStyles } from '@dbeaver/core/theming';
 
+import { StaticImage } from '../StaticImage';
 import { Styles } from './styles';
 
 type ListItemProps = {

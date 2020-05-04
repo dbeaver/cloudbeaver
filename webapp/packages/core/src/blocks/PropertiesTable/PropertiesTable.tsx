@@ -10,10 +10,10 @@ import { observer, useLocalStore } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { Button } from '@dbeaver/core/blocks';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
+import { Button } from '../Button';
 import { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';

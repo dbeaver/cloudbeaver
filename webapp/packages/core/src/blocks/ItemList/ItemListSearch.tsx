@@ -11,10 +11,10 @@ import {
 } from 'react';
 import styled, { use } from 'reshadow';
 
-import { StaticImage } from '@dbeaver/core/blocks';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
+import { StaticImage } from '../StaticImage';
 import { Styles } from './styles';
 
 type ItemListProps = React.PropsWithChildren<{

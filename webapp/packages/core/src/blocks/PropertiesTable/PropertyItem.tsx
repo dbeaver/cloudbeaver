@@ -12,9 +12,10 @@ import {
 } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ShadowInput, Icon } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
+import { Icon } from '../Icons';
+import { ShadowInput } from '../ShadowInput';
 import { DriverPropertyValueSelector } from './DriverPropertyValueSelector';
 import { IProperty } from './IProperty';
 
