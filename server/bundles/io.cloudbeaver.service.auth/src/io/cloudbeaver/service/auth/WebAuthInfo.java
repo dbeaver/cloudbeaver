@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.model.user.WebUser;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -25,18 +27,22 @@ import java.util.Date;
  */
 public class WebAuthInfo {
 
-    private String userId;
+    private WebUser user;
     private String authProvider;
     private Object authToken;
     private OffsetDateTime loginTime;
     private String message;
 
-    public String getUserId() {
-        return userId;
+    public WebAuthInfo(WebUser user) {
+        this.user = user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getUserId() {
+        return user.getUserId();
+    }
+
+    public String getDisplayName() {
+        return user.getDisplayName();
     }
 
     public String getAuthProvider() {

@@ -84,17 +84,21 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 providerConfig,
                 userCredentials,
                 authParameters);
-            WebAuthInfo authInfo = new WebAuthInfo();
-            authInfo.setUserId(userId);
-            authInfo.setLoginTime(OffsetDateTime.now());
-            authInfo.setAuthProvider(authProvider.getId());
-            authInfo.setAuthToken(authToken);
-            authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
 
             if (user == null) {
                 user = new WebUser(userId);
             }
+            if (authProviderExternal != null) {
+                user.setDisplayName(authProviderExternal.getUserDisplayName(providerConfig, authParameters));
+            }
+
             webSession.setUser(user);
+
+            WebAuthInfo authInfo = new WebAuthInfo(user);
+            authInfo.setLoginTime(OffsetDateTime.now());
+            authInfo.setAuthProvider(authProvider.getId());
+            authInfo.setAuthToken(authToken);
+            authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
 
             return authInfo;
         } catch (DBException e) {

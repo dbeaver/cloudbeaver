@@ -17,7 +17,10 @@
 package io.cloudbeaver;
 
 import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -29,11 +32,16 @@ public interface DBWAuthProviderExternal<AUTH_SESSION> extends DBWAuthProvider<A
     /**
      * Returns new identifying credentials which can be used to find/create user in database
      */
+    @NotNull
     Map<String, Object> readExternalCredentials(
         Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException;
 
+    @NotNull
     WebUser registerNewUser(DBWSecurityController securityController, Map<String, Object> providerConfig, Map<String, Object> credentials) throws DBException;
+
+    @Nullable
+    String getUserDisplayName(Map<String, Object> providerConfig, Map<String, Object> credentials);
 
 }

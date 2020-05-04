@@ -30,6 +30,7 @@ public class WebUser {
 
     @NotNull
     private final String userId;
+    private String displayName;
 
     private Map<String, Object> metaParameters = new LinkedHashMap<>();
     private Map<String, Object> configurationParameters = new LinkedHashMap<>();
@@ -46,6 +47,17 @@ public class WebUser {
     @NotNull
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * User display name may be set by 3rd party auth providers
+     */
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String[] getGrantedRoles() {

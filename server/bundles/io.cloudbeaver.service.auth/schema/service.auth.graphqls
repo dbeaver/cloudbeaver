@@ -30,8 +30,13 @@ type AuthProviderInfo {
 }
 
 type UserAuthInfo {
+    # User unique identifier
     userId: String!
+    # Human readable display name. May be null
+    displayName: String
+    # Auth provider ID
     authProvider: String!
+
     loginTime: DateTime!
 
     # Optional login message
