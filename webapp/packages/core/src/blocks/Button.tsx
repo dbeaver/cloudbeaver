@@ -12,52 +12,69 @@ import { useStyles, composes } from '@dbeaver/core/theming';
 
 const buttonStyles = composes(
   css`
-  button {
-    composes: theme-button from global;
-  }
-  ripple {
-    composes: theme-button_ripple from global;
-  }
+    Button {
+      composes: theme-button from global;
+    }
+    ripple {
+      composes: theme-button_ripple from global;
+    }
+  `,
+  css`
+    Button {
+      display: flex;
+    }
   `
 );
 
 const buttonMod = {
   raised: composes(
     css`
-    button {
+    Button {
       composes: theme-button_raised from global;
     }
     `
   ),
   unelevated: composes(
     css`
-    button {
+    Button {
       composes: theme-button_unelevated from global;
     }
     `
   ),
   outlined: composes(
     css`
-    button {
+    Button {
       composes: theme-button_outlined from global;
     }
     `
   ),
   secondary: composes(
     css`
-    button {
+    Button {
       composes: theme-button_secondary from global;
     }
     `
   ),
 };
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = (
+    React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
+    & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
+  ) & {
   mod?: (keyof typeof buttonMod)[];
+  tag?: 'button' | 'a';
+  href?: string;
+  download?: boolean;
 }
 
-export function Button({ children, mod, ...rest }: ButtonProps) {
+export function Button({
+  children,
+  mod,
+  tag = 'button',
+  ...rest
+}: ButtonProps) {
+  const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <button {...rest}><ripple as="div"/>{children}</button>
+    <Button {...rest}><ripple as="div"/>{children}</Button>
   );
 }

@@ -38,7 +38,7 @@ export class DataExportController implements IInitializableController {
       .sort((a, b) => this.sortProcessors(a, b));
   }
 
-  @observable readonly processorProperties: any = {}
+  @observable processorProperties: any = {}
   @observable properties: IProperty[] = []
 
   private context!: IExportContext;
@@ -108,6 +108,9 @@ export class DataExportController implements IInitializableController {
       validValues: property.validValues,
       defaultValue: property.defaultValue,
     })) || [];
+
+    this.processorProperties = {};
+
     this.step = DataExportStep.Configure;
   }
 

@@ -19,16 +19,12 @@ export type SessionState = Pick<SessionInfo, 'id' | 'createTime' | 'cacheExpired
 
 @injectable()
 export class SessionService {
-  readonly session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this));
+  readonly session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this), data => !!data);
   readonly settings = new SessionSettingsService('session_settings');
 
   constructor(private graphQLService: GraphQLService) {}
 
   private async refreshSessionStateAsync(data: SessionState | undefined): Promise<SessionState> {
-    if (data) {
-      return data;
-    }
-
     const { session } = await this.graphQLService.gql.openSession();
 
     return session;

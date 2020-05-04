@@ -20,18 +20,18 @@ const FadeTimeout = 5000;
 export class NotificationItemController implements IInitializableController {
   closeAfter = 0;
   @observable isDetailsDialogOpen = false;
-  private notification!: INotification;
+  private notification!: INotification<any>;
 
   constructor(private commonDialogService: CommonDialogService) {}
 
-  init(notification: INotification) {
+  init(notification: INotification<any>) {
     this.notification = notification;
 
     if (this.notification.details) {
       this.handleShowDetails = this.showDetails.bind(this);
     }
 
-    if (notification.type !== ENotificationType.Error) {
+    if (notification.type !== ENotificationType.Error && !notification.persistent) {
       this.closeAfter = FadeTimeout;
     }
   }
