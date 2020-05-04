@@ -15,24 +15,28 @@ import { ENotificationType } from '@dbeaver/core/eventsLog';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { NotificationMark } from './NotificationMark';
-import { snackbarStyles } from './styles';
+import { SNACKBAR_STYLES } from './styles';
 
 type SnackbarProps = {
+  type?: ENotificationType;
   text: string;
   closeAfter?: number;
-  type?: ENotificationType;
   disableShowDetails?: boolean;
   onClose?: () => void;
   onShowDetails?: () => void;
 }
 
-export function Snackbar(props: SnackbarProps) {
-  const styles = useStyles(snackbarStyles);
+export function Snackbar({
+  type,
+  text,
+  closeAfter,
+  disableShowDetails,
+  onClose,
+  onShowDetails,
+}: SnackbarProps) {
+  const styles = useStyles(SNACKBAR_STYLES);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
-  const {
-    closeAfter, onClose, onShowDetails, type, text,
-  } = props;
 
   useEffect(() => {
     setMounted(true);
@@ -72,7 +76,7 @@ export function Snackbar(props: SnackbarProps) {
               type="button"
               mod={['outlined']}
               onClick={onShowDetails}
-              disabled={props.disableShowDetails}
+              disabled={disableShowDetails}
             >
               Details
             </Button>

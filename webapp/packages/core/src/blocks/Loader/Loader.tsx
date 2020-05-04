@@ -20,6 +20,8 @@ export type LoaderProps = {
   loading?: boolean;
   /** disable cancel button */
   cancelDisabled?: boolean;
+  /** hides message */
+  hideMessage?: boolean;
   /** render loader as overlay with white spinner */
   overlay?: boolean;
   /** loader with white spinner */
@@ -38,6 +40,7 @@ const spinnerType = {
 export function Loader({
   cancelDisabled,
   overlay,
+  hideMessage,
   secondary,
   small,
   className,
@@ -66,7 +69,7 @@ export function Loader({
   return styled(useStyles(loaderStyles, ...(overlay ? [overlayStyles] : [])))(
     <loader as="div" className={className} {...use({ small })}>
       <icon as="div"><img src={spinnerURL}/></icon>
-      <message as="div"><Translate token='ui_processing_loading' /></message>
+      {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}
       {onCancel && (
         <actions as='div'>
           <Button type="button" mod={['unelevated']}

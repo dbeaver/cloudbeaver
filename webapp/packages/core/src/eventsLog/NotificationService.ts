@@ -10,44 +10,47 @@ import { computed } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 import { GQLError, ServerInternalError } from '@dbeaver/core/sdk';
-import { OrderedMap } from '@dbeaver/core/utils';
+import { EntityList } from '@dbeaver/core/utils';
 
 import { ENotificationType, INotification, INotificationOptions } from './INotification';
 
 @injectable()
 export class NotificationService {
-  private notificationList = new OrderedMap<number, INotification>();
+  private notificationList = new EntityList<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0
 
   /**
    * By default filtered without silent notifications
    */
-  @computed get notifications(): INotification[] {
+  @computed get notifications(): INotification<any>[] {
     return this.notificationList.values
       .filter(notification => !notification.isSilent);
   }
 
-  notify(options: INotificationOptions, type: ENotificationType) {
+  notify<T = never>(options: INotificationOptions<T>, type: ENotificationType) {
     const id = this.notificationNextId++;
 
-    const notification: INotification = {
+    const notification: INotification<T> = {
       id,
       title: options.title,
       message: options.message,
       details: options.details,
       isSilent: !!options.isSilent,
+      persistent: !!options.persistent,
+      customComponent: options.customComponent,
+      source: options.source!,
       type,
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
-    this.notificationList.add(notification.id, notification);
+    this.notificationList.set(notification);
   }
 
-  logInfo(notification: INotificationOptions) {
+  logInfo<T>(notification: INotificationOptions<T>) {
     this.notify(notification, ENotificationType.Info);
   }
 
-  logError(notification: INotificationOptions) {
+  logError<T>(notification: INotificationOptions<T>) {
     this.notify(notification, ENotificationType.Error);
   }
 

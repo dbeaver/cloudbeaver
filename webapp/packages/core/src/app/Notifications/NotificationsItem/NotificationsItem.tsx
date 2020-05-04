@@ -15,7 +15,7 @@ import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
 type NotificationProps = {
-  notification: INotification;
+  notification: INotification<any>;
 }
 
 export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
@@ -23,6 +23,11 @@ export const NotificationsItem = observer(function Notification({ notification }
     return null;
   }
   const controller = useController(NotificationItemController, notification);
+
+  if (notification.customComponent) {
+    const Custom = notification.customComponent();
+    return <Custom notification={notification} onClose={controller.handleClose} />;
+  }
 
   return (
     <Snackbar
