@@ -94,7 +94,7 @@ public class WebPropertyInfo {
 
     @Property
     public Object getDefaultValue() throws DBException {
-        return getValue();
+        return property.getDefaultValue();
     }
 
     @Property
