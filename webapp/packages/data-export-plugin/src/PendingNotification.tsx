@@ -136,7 +136,7 @@ export const PendingNotification = observer(function PendingNotification({
               </Button>
             </>
           )}
-          {task.isFinished && !isSuccess && (
+          {task.isFinished && !isSuccess && task.getRejectionReason() && (
             <Button
               type="button"
               mod={['outlined']}
@@ -151,6 +151,7 @@ export const PendingNotification = observer(function PendingNotification({
               type="button"
               mod={['outlined']}
               onClick={handleCancel}
+              disabled={task.getState() === EDeferredState.CANCELLING}
             >
               {translate('ui_processing_cancel')}
             </Button>
