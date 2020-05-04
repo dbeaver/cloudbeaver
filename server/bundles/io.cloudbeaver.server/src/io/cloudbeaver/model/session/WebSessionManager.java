@@ -17,8 +17,6 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -118,22 +116,6 @@ public class WebSessionManager {
         }
     }
 
-    public WebConnectionInfo openConnection(HttpServletRequest servletRequest, Map<String, Object> config) throws DBWebException {
-        return getWebSession(servletRequest).openConnectionFromTemplate(new WebConnectionConfig(config));
-    }
-
-    public WebConnectionInfo createConnection(HttpServletRequest servletRequest, Map<String, Object> config) throws DBWebException {
-        return getWebSession(servletRequest).createConnection(new WebConnectionConfig(config));
-    }
-
-    public WebConnectionInfo testConnection(HttpServletRequest servletRequest, Map<String, Object> config) throws DBWebException {
-        return getWebSession(servletRequest).testConnection(new WebConnectionConfig(config));
-    }
-
-    public boolean closeConnection(HttpServletRequest servletRequest, String connectionId) throws DBWebException {
-        return getWebSession(servletRequest).closeConnection(connectionId);
-    }
-
     public void expireIdleSessions() {
         long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
 
@@ -154,4 +136,5 @@ public class WebSessionManager {
             session.close();
         }
     }
+
 }

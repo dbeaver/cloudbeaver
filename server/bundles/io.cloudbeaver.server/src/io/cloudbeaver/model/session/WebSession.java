@@ -18,35 +18,29 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.model.*;
+import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
 import org.jkiss.dbeaver.model.runtime.*;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpSession;
@@ -241,149 +235,6 @@ public class WebSession {
         }
     }
 
-    public WebConnectionInfo openConnectionFromTemplate(WebConnectionConfig config) throws DBWebException {
-        String dataSourceId = config.getDataSourceId();
-        if (CommonUtils.isEmpty(dataSourceId)) {
-            throw new DBWebException("Only preconfigured data sources are supported yet");
-        }
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(dataSourceId);
-        if (dataSourceTemplate == null) {
-            throw new DBWebException("Datasource '" + dataSourceId + "' not found");
-        }
-
-        DBPDataSourceRegistry sessionRegistry = databases.getDataSourceRegistry();
-        DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
-        newDataSource.setSavePassword(true);
-        ((DataSourceDescriptor)newDataSource).setTemporary(true);
-
-        DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
-        cfg.setUserName(config.getUserName());
-        cfg.setUserPassword(config.getUserPassword());
-        if (!CommonUtils.isEmpty(config.getName())) {
-            newDataSource.setName(config.getName());
-        }
-        if (!CommonUtils.isEmpty(config.getDescription())) {
-            newDataSource.setDescription(config.getDescription());
-        }
-        try {
-            newDataSource.connect(getProgressMonitor(), true, false);
-        } catch (DBException e) {
-            throw new DBWebException("Error connecting to database", e);
-        }
-        sessionRegistry.addDataSource(newDataSource);
-
-        WebConnectionInfo connectionInfo = new WebConnectionInfo(this, newDataSource);
-        synchronized (connections) {
-            connections.add(connectionInfo);
-        }
-
-        return connectionInfo;
-    }
-
-    public WebConnectionInfo createConnection(WebConnectionConfig config) throws DBWebException {
-        DBPDataSourceRegistry sessionRegistry = databases.getDataSourceRegistry();
-
-        DBPDataSourceContainer newDataSource = makeConnectionInstance(config, sessionRegistry);
-        if (CommonUtils.isEmpty(newDataSource.getName())) {
-            newDataSource.setName(CommonUtils.notNull(config.getName(), "NewConnection"));
-        }
-        ((DataSourceDescriptor)newDataSource).setTemporary(true);
-        sessionRegistry.addDataSource(newDataSource);
-
-        WebConnectionInfo connectionInfo = new WebConnectionInfo(this, newDataSource);
-        synchronized (connections) {
-            connections.add(connectionInfo);
-        }
-
-        return connectionInfo;
-    }
-
-    public WebConnectionInfo testConnection(WebConnectionConfig config) throws DBWebException {
-        DBPDataSourceRegistry sessionRegistry = databases.getDataSourceRegistry();
-
-        DBPDataSourceContainer newDataSource = makeConnectionInstance(config, sessionRegistry);
-        try {
-            ConnectionTestJob ct = new ConnectionTestJob(newDataSource, param -> {});
-            ct.run(getProgressMonitor());
-            if (ct.getConnectError() != null) {
-                throw new DBWebException("Connection failed", ct.getConnectError());
-            }
-            WebConnectionInfo connectionInfo = new WebConnectionInfo(this, newDataSource);
-            connectionInfo.setConnectError(ct.getConnectError());
-            connectionInfo.setServerVersion(ct.getServerVersion());
-            connectionInfo.setClientVersion(ct.getClientVersion());
-            connectionInfo.setConnectTime(RuntimeUtils.formatExecutionTime(ct.getConnectTime()));
-            return connectionInfo;
-        } catch (DBException e) {
-            throw new DBWebException("Error connecting to database", e);
-        }
-    }
-
-    @NotNull
-    private DBPDataSourceContainer makeConnectionInstance(WebConnectionConfig config, DBPDataSourceRegistry sessionRegistry) throws DBWebException {
-        String driverId = config.getDriverId();
-        if (CommonUtils.isEmpty(driverId)) {
-            throw new DBWebException("Driver not specified");
-        }
-        DBPDriver driver = WebServiceUtils.getDriverById(driverId);
-
-        DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
-
-        DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(driver, dsConfig);
-        newDataSource.setSavePassword(true);
-
-        if (!CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(config.getUrl());
-        } else {
-            dsConfig.setHostName(config.getHost());
-            dsConfig.setHostPort(config.getPort());
-            dsConfig.setDatabaseName(config.getDatabaseName());
-            dsConfig.setServerName(config.getServerName());
-            dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
-        }
-        if (config.getProperties() != null) {
-            for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
-                dsConfig.setProperty(pe.getKey(), CommonUtils.toString(pe.getValue()));
-            }
-        }
-        dsConfig.setUserName(config.getUserName());
-        dsConfig.setUserPassword(config.getUserPassword());
-        newDataSource.setName(config.getName());
-        newDataSource.setDescription(config.getDescription());
-
-        // Set default navigator settings
-        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
-        navSettings.setShowSystemObjects(false);
-        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
-
-        return newDataSource;
-    }
-
-    public boolean closeConnection(String connectionID) throws DBWebException {
-
-        WebConnectionInfo connectionInfo = getWebConnectionInfo(connectionID);
-
-        boolean disconnected = false;
-        if (connectionInfo.isConnected()) {
-            try {
-                connectionInfo.getDataSourceContainer().disconnect(getProgressMonitor());
-                disconnected = true;
-            } catch (DBException e) {
-                log.error("Error closing connection", e);
-            }
-            // Disconnect in async mode?
-            //new DisconnectJob(connectionInfo.getDataSource()).schedule();
-        }
-        databases.getDataSourceRegistry().removeDataSource(connectionInfo.getDataSourceContainer());
-
-        synchronized (connections) {
-            connections.remove(connectionInfo);
-        }
-
-        return disconnected;
-    }
-
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
         WebConnectionInfo connectionInfo = null;
@@ -399,6 +250,19 @@ public class WebSession {
             throw new DBWebException("Connection '" + connectionID + "' not found");
         }
         return connectionInfo;
+    }
+
+
+    public void addConnection(WebConnectionInfo connectionInfo) {
+        synchronized (connections) {
+            connections.add(connectionInfo);
+        }
+    }
+
+    public void removeConnection(WebConnectionInfo connectionInfo) {
+        synchronized (connections) {
+            connections.remove(connectionInfo);
+        }
     }
 
     void close() {

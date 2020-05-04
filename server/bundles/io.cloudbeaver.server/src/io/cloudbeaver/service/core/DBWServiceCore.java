@@ -19,10 +19,7 @@ package io.cloudbeaver.service.core;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.WebDataSourceConfig;
-import io.cloudbeaver.model.WebDatabaseDriverConfig;
-import io.cloudbeaver.model.WebServerConfig;
-import io.cloudbeaver.model.WebServerMessage;
+import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 
@@ -65,5 +62,30 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     boolean touchSession(HttpServletRequest request) throws DBWebException;
 
-    boolean changeSessionLanguage(WebSession webSession, String locale);
+    @WebAction
+    boolean changeSessionLanguage(WebSession webSession, String locale) throws DBWebException;
+
+    ///////////////////////////////////////////
+    // Connections
+
+    @WebAction
+    WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
+
+    @WebAction
+    WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
+
+    @WebAction
+    WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
+
+    @WebAction
+    boolean closeConnection(WebSession webSession, String connectionId) throws DBWebException;
+
+    ///////////////////////////////////////////
+    // Async tasks
+
+    @WebAction
+    WebAsyncTaskInfo getAsyncTaskStatus(WebSession webSession, String taskId) throws DBWebException;
+
+    @WebAction
+    boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException;
 }
