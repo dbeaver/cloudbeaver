@@ -24,6 +24,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -42,8 +43,11 @@ class CBSecurityController implements DBWSecurityController {
 
     private static final Log log = Log.getLog(CBSecurityController.class);
 
-    public static final String CHAR_BOOL_TRUE = "Y";
-    public static final String CHAR_BOOL_FALSE = "N";
+    private static final String CHAR_BOOL_TRUE = "Y";
+    private static final String CHAR_BOOL_FALSE = "N";
+
+    private static final String SUBJECT_USER = "U";
+    private static final String SUBJECT_ROLE = "R";
 
     private final CBDatabase database;
 
@@ -57,6 +61,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void createUser(WebUser user) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            createAuthSubject(dbCon, user.getUserId(), SUBJECT_USER);
             try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
                 dbStat.setString(1, user.getUserId());
                 dbStat.setString(2, CHAR_BOOL_TRUE);
@@ -94,6 +99,24 @@ class CBSecurityController implements DBWSecurityController {
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user roles in database", e);
+        }
+    }
+
+    @Override
+    public WebRole[] getUserRoles(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+                List<WebRole> roles = new ArrayList<>();
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        roles.add(fetchRole(dbResult));
+                    }
+                }
+                return roles.toArray(new WebRole[0]);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while reading user roles", e);
         }
     }
 
@@ -254,14 +277,13 @@ class CBSecurityController implements DBWSecurityController {
             try (Statement dbStat = dbCon.createStatement()) {
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_ROLE ORDER BY ROLE_ID")) {
                     while (dbResult.next()) {
-                        WebRole role = new WebRole();
-                        role.setId(dbResult.getString("ROLE_ID"));
-                        role.setName(dbResult.getString("ROLE_NAME"));
-                        role.setDescription(dbResult.getString("ROLE_DESCRIPTION"));
-                        roles.put(role.getId(), role);
+                        WebRole role = fetchRole(dbResult);
+                        roles.put(role.getRoleId(), role);
                     }
                 }
-                try (ResultSet dbResult = dbStat.executeQuery("SELECT ROLE_ID,PERMISSION_ID FROM CB_ROLE_PERMISSIONS")) {
+                try (ResultSet dbResult = dbStat.executeQuery("SELECT SUBJECT_ID,PERMISSION_ID\n" +
+                    "FROM CB_AUTH_PERMISSIONS AP,CB_ROLE R\n" +
+                    "WHERE AP.SUBJECT_ID=R.ROLE_ID\n")) {
                     while (dbResult.next()) {
                         WebRole role = roles.get(dbResult.getString(1));
                         if (role != null) {
@@ -272,15 +294,24 @@ class CBSecurityController implements DBWSecurityController {
             }
             return roles.values().toArray(new WebRole[0]);
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error reading roles from database", e);
         }
+    }
+
+    @NotNull
+    private WebRole fetchRole(ResultSet dbResult) throws SQLException {
+        WebRole role = new WebRole(dbResult.getString("ROLE_ID"));
+        role.setName(dbResult.getString("ROLE_NAME"));
+        role.setDescription(dbResult.getString("ROLE_DESCRIPTION"));
+        return role;
     }
 
     @Override
     public void createRole(WebRole role) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
             try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
-                dbStat.setString(1, role.getId());
+                dbStat.setString(1, role.getRoleId());
                 dbStat.setString(2, CommonUtils.notEmpty(role.getName()));
                 dbStat.setString(3, CommonUtils.notEmpty(role.getDescription()));
                 dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
@@ -304,13 +335,13 @@ class CBSecurityController implements DBWSecurityController {
     // Permissions
 
     @Override
-    public void setRolePermissions(String roleId, String[] permissionIds, String grantorId) throws DBCException {
+    public void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE_PERMISSIONS WHERE ROLE_ID=?", roleId);
+            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
             if (!ArrayUtils.isEmpty(permissionIds)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE_PERMISSIONS(ROLE_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
                     for (String permission : permissionIds) {
-                        dbStat.setString(1, roleId);
+                        dbStat.setString(1, subjectId);
                         dbStat.setString(2, permission);
                         dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                         dbStat.setString(4, grantorId);
@@ -324,11 +355,11 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
-    public Set<String> getRolePermissions(String roleId) throws DBCException {
+    public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_ROLE_PERMISSIONS WHERE ROLE_ID=?")) {
-                dbStat.setString(1, roleId);
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
+                dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         permissions.add(dbResult.getString(1));
@@ -346,8 +377,8 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT PERMISSION_ID FROM CB_ROLE_PERMISSIONS RP,CB_USER_ROLE UR\n" +
-                    "WHERE RP.ROLE_ID=UR.ROLE_ID AND UR.USER_ID=?")) {
+                "SELECT UNIQUE AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_ROLE UR\n" +
+                    "WHERE UR.ROLE_ID=AP.SUBJECT_ID AND UR.USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -355,6 +386,15 @@ class CBSecurityController implements DBWSecurityController {
                     }
                 }
             }
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        permissions.add(dbResult.getString(1));
+                    }
+                }
+            }
+            permissions.addAll(getSubjectPermissions(userId));
             return permissions;
         } catch (SQLException e) {
             throw new DBCException("Error saving role in database", e);
@@ -386,7 +426,7 @@ class CBSecurityController implements DBWSecurityController {
     public void createSession(WebSession session) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME) VALUES(?,?,?,?)")) {
+                "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT) VALUES(?,?,?,?,?,?)")) {
                 dbStat.setString(1, session.getId());
                 WebUser user = session.getUser();
                 if (user == null) {
@@ -397,6 +437,16 @@ class CBSecurityController implements DBWSecurityController {
                 Timestamp currentTS = new Timestamp(System.currentTimeMillis());
                 dbStat.setTimestamp(3, currentTS);
                 dbStat.setTimestamp(4, currentTS);
+                if (session.getLastRemoteAddr() != null) {
+                    dbStat.setString(5, session.getLastRemoteAddr());
+                } else {
+                    dbStat.setNull(5, Types.VARCHAR);
+                }
+                if (session.getLastRemoteUserAgent() != null) {
+                    dbStat.setString(6, session.getLastRemoteUserAgent());
+                } else {
+                    dbStat.setNull(6, Types.VARCHAR);
+                }
                 dbStat.execute();
             }
         } catch (SQLException e) {
@@ -408,7 +458,7 @@ class CBSecurityController implements DBWSecurityController {
     public void updateSession(WebSession session) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=? WHERE SESSION_ID=?")) {
+                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=? WHERE SESSION_ID=?")) {
                 WebUser user = session.getUser();
                 if (user == null) {
                     dbStat.setNull(1, Types.VARCHAR);
@@ -416,7 +466,18 @@ class CBSecurityController implements DBWSecurityController {
                     dbStat.setString(1, user.getUserId());
                 }
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                dbStat.setString(3, session.getId());
+                if (session.getLastRemoteAddr() != null) {
+                    dbStat.setString(3, session.getLastRemoteAddr());
+                } else {
+                    dbStat.setNull(3, Types.VARCHAR);
+                }
+                if (session.getLastRemoteUserAgent() != null) {
+                    dbStat.setString(4, session.getLastRemoteUserAgent());
+                } else {
+                    dbStat.setNull(4, Types.VARCHAR);
+                }
+
+                dbStat.setString(5, session.getId());
                 if (dbStat.executeUpdate() == 0) {
                     throw new DBCException("Session not exists in database");
                 }
@@ -424,11 +485,6 @@ class CBSecurityController implements DBWSecurityController {
         } catch (SQLException e) {
             throw new DBCException("Error updating session in database", e);
         }
-    }
-
-    @Override
-    public void createOrUpdateAuthProvider(WebAuthProviderDescriptor authProvider) throws DBCException {
-
     }
 
     void initializeMetaInformation() throws DBCException {
@@ -456,4 +512,17 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException("Error reading session state", e);
         }
     }
+
+    ///////////////////////////////////////////
+    // Utils
+
+    private void createAuthSubject(Connection dbCon, String subjectId, String subjectType) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE) VALUES(?,?)")) {
+            dbStat.setString(1, subjectId);
+            dbStat.setString(2, subjectType);
+            dbStat.execute();
+        }
+    }
+
+
 }

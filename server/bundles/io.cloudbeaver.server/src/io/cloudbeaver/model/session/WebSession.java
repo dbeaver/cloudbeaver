@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -64,6 +65,8 @@ public class WebSession {
     private final String id;
     private final long createTime;
     private long lastAccessTime;
+    private String lastRemoteAddr;
+    private String lastRemoteUserAgent;
     private boolean persisted;
 
     private WebUser user;
@@ -136,6 +139,14 @@ public class WebSession {
         return lastAccessTime;
     }
 
+    public String getLastRemoteAddr() {
+        return lastRemoteAddr;
+    }
+
+    public String getLastRemoteUserAgent() {
+        return lastRemoteUserAgent;
+    }
+
     // Clear cache when
     @Property
     public boolean isCacheExpired() {
@@ -173,7 +184,7 @@ public class WebSession {
     private void refreshSessionAuth() throws DBCException {
         CBApplication application = CBPlatform.getInstance().getApplication();
         if (this.user == null) {
-            sessionPermissions = application.getSecurityController().getRolePermissions(application.getAppConfiguration().getAnonymousUserRole());
+            sessionPermissions = application.getSecurityController().getSubjectPermissions(application.getAppConfiguration().getAnonymousUserRole());
         } else {
             sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
         }
@@ -208,8 +219,11 @@ public class WebSession {
         }
     }
 
-    synchronized void updateInfo(HttpSession httpSession) {
+    synchronized void updateInfo(HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
+        this.lastRemoteAddr = request.getRemoteAddr();
+        this.lastRemoteUserAgent = request.getHeader("User-Agent");
         this.cacheExpired = false;
         if (!httpSession.isNew()) {
             try {

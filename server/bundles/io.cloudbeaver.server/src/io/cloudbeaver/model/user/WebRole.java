@@ -18,30 +18,33 @@ package io.cloudbeaver.model.user;
 
 import org.jkiss.dbeaver.Log;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * Web role.
  */
-public class WebRole {
+public class WebRole implements WebAuthSubject {
 
     private static final Log log = Log.getLog(WebRole.class);
 
-    private String id;
+    private String roleId;
     private String name;
     private String icon;
     private String description;
 
     private Set<String> permissions = new LinkedHashSet<>();
 
-    public String getId() {
-        return id;
+    public WebRole(String roleId) {
+        this.roleId = roleId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String id) {
+        this.roleId = id;
     }
 
     public String getName() {
@@ -82,6 +85,11 @@ public class WebRole {
 
     @Override
     public String toString() {
-        return id;
+        return roleId;
+    }
+
+    @Override
+    public String getSubjectId() {
+        return getRoleId();
     }
 }

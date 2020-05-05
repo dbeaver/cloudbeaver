@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Web user.
  */
-public class WebUser {
+public class WebUser implements WebAuthSubject {
 
     private static final Log log = Log.getLog(WebUser.class);
 
@@ -61,7 +61,7 @@ public class WebUser {
     }
 
     public String[] getGrantedRoles() {
-        return roles.stream().map(WebRole::getId).toArray(String[]::new);
+        return roles.stream().map(WebRole::getRoleId).toArray(String[]::new);
     }
 
     public Map<String, Object> getMetaParameters() {
@@ -89,5 +89,10 @@ public class WebUser {
     @Override
     public String toString() {
         return userId;
+    }
+
+    @Override
+    public String getSubjectId() {
+        return getUserId();
     }
 }

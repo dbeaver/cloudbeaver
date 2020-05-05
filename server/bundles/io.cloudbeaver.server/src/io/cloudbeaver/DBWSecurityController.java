@@ -42,6 +42,8 @@ public interface DBWSecurityController {
 
     void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException;
 
+    WebRole[] getUserRoles(String userId) throws DBCException;
+
     WebUser getUserById(String userId) throws DBCException;
 
     ///////////////////////////////////////////
@@ -76,9 +78,9 @@ public interface DBWSecurityController {
     ///////////////////////////////////////////
     // Permissions
 
-    void setRolePermissions(String roleId, String[] permissionIds, String grantorId) throws DBCException;
+    void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException;
 
-    Set<String> getRolePermissions(String roleId) throws DBCException;
+    Set<String> getSubjectPermissions(String subjectId) throws DBCException;
 
     Set<String> getUserPermissions(String userId) throws DBCException;
 
@@ -93,8 +95,6 @@ public interface DBWSecurityController {
 
     ///////////////////////////////////////////
     // Meta info
-
-    void createOrUpdateAuthProvider(WebAuthProviderDescriptor authProvider) throws DBCException;
 
     ///////////////////////////////////////////
     // Utils

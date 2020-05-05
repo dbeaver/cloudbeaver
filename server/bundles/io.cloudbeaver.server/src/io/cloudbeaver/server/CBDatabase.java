@@ -270,7 +270,7 @@ public class CBDatabase {
                 for (WebRole role : initialData.getRoles()) {
                     serverController.createRole(role);
                     if (adminUser != null) {
-                        serverController.setRolePermissions(role.getId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
+                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
                     }
                 }
             }
@@ -280,7 +280,7 @@ public class CBDatabase {
                 WebRole[] allRoles = serverController.readAllRoles();
                 serverController.setUserRoles(
                     adminUser.getUserId(),
-                    Arrays.stream(allRoles).map(WebRole::getId).toArray(String[]::new),
+                    Arrays.stream(allRoles).map(WebRole::getRoleId).toArray(String[]::new),
                     adminUser.getUserId());
             }
         } catch (Exception e) {

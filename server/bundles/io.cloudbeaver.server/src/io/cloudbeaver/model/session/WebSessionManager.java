@@ -66,7 +66,7 @@ public class WebSessionManager {
 
     public boolean touchSession(@NotNull HttpServletRequest request) throws DBWebException {
         WebSession webSession = getWebSession(request, false);
-        webSession.updateInfo(request.getSession());
+        webSession.updateInfo(request);
         return true;
     }
 
@@ -100,7 +100,7 @@ public class WebSessionManager {
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(httpSession);
+                        webSession.updateInfo(request);
                         request.setAttribute("sessionUpdated", true);
                     }
                 }
