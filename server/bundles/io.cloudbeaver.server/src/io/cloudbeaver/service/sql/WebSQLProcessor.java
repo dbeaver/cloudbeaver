@@ -144,7 +144,10 @@ public class WebSQLProcessor {
             DBDDataFilter dataFilter = filter.makeDataFilter();
             if (dataFilter.hasFilters()) {
                 sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
-                    context.getDataSource(), sql, dataFilter);
+                    monitor,
+                    context.getDataSource(),
+                    sql,
+                    dataFilter);
             }
         }
 
