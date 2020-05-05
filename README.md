@@ -30,4 +30,4 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 - User authentication API was added
 - Product configuration framework and API was added
 - Embedded database for user management was added
-
+- Many minor bugfixes
