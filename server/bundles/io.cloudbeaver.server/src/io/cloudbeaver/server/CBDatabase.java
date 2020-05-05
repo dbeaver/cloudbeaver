@@ -283,7 +283,7 @@ public class CBDatabase {
                     Arrays.stream(allRoles).map(WebRole::getId).toArray(String[]::new),
                     adminUser.getUserId());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error loading initial data configuration", e);
         }
     }
