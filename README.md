@@ -22,3 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
+## Changelog
+
+### CloudBeaver 1.0.1 - 2020-05-05
+
+- Data export feature added to the data viewer
+- User authentication API was added
+- Product configuration framework and API was added
+- Embedded database for user management was added
+
