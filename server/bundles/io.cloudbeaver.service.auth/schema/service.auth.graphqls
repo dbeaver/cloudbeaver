@@ -11,7 +11,9 @@ type AuthCredentialInfo {
 
     editable: Boolean
     identifying: Boolean
+    # This field must be shown in admin panel
     admin: Boolean
+    # This field must be shown in login form
     user: Boolean
     possibleValues: [String]!
     encryption: AuthCredentialEncryption
@@ -26,6 +28,7 @@ type AuthProviderInfo {
     isDefault: Boolean
 
     configurationParameters: [ObjectPropertyInfo]!
+
     credentialParameters: [AuthCredentialInfo]!
 }
 
