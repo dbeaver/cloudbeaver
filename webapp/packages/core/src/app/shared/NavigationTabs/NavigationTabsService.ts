@@ -47,8 +47,8 @@ export class NavigationTabsService {
     return this.state.tabs;
   }
 
-  onTabSelect = new Subject<ITab>();
-  onTabClose = new Subject<ITab>();
+  readonly onTabSelect = new Subject<ITab>();
+  readonly onTabClose = new Subject<ITab>();
 
   constructor(
     private notificationService: NotificationService,
@@ -64,8 +64,6 @@ export class NavigationTabsService {
           if (
             typeof value.id === 'string'
             && typeof value.handlerId === 'string'
-            && (!value.name || typeof value.name === 'string')
-            && (!value.icon || typeof value.icon === 'string')
           ) {
             map[key] = value;
           }

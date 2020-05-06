@@ -22,8 +22,8 @@ export const ObjectViewerTab = observer(function ObjectViewerTab({
 
   return styled(useStyles(...style))(
     <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >
-      <TabIcon icon={node?.icon || tab.icon} />
-      <TabTitle title={node?.name || tab.name} />
+      <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
+      <TabTitle title={node?.name || tab.handlerState.tabTitle} />
     </Tab>
   );
 });

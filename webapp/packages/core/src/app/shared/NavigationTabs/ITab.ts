@@ -10,8 +10,6 @@ export interface ITabOptions<T = any> {
   id?: string;
   handlerId: string;
   handlerState: T;
-  name?: string;
-  icon?: string;
 }
 
 export interface ITab<T = any> extends ITabOptions<T> {
