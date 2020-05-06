@@ -33,7 +33,7 @@ export class TableFooterMenuService {
     return this.contextMenuService.createContextMenu(context, this.tableFooterMenuToken).menuItems;
   }
 
-  registerMenuItem(options: IContextMenuItem<TableViewerModel>, panelId?: string): void {
-    this.contextMenuService.addMenuItem<TableViewerModel>(panelId || this.tableFooterMenuToken, options);
+  registerMenuItem(options: IContextMenuItem<TableViewerModel>): void {
+    this.contextMenuService.addMenuItem<TableViewerModel>(this.tableFooterMenuToken, options);
   }
 }

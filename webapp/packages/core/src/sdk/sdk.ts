@@ -472,6 +472,8 @@ export type QueryMetadataGetNodeDdlArgs = {
 export type ServerConfig = {
   name: Scalars["String"];
   version: Scalars["String"];
+  anonymousAccessEnabled?: Maybe<Scalars["Boolean"]>;
+  authenticationEnabled?: Maybe<Scalars["Boolean"]>;
   supportsPredefinedConnections?: Maybe<Scalars["Boolean"]>;
   supportsProvidedConnections?: Maybe<Scalars["Boolean"]>;
   supportsCustomConnections?: Maybe<Scalars["Boolean"]>;
@@ -501,7 +503,6 @@ export type ServerMessage = {
 };
 
 export type SessionInfo = {
-  id: Scalars["ID"];
   createTime: Scalars["String"];
   lastAccessTime: Scalars["String"];
   locale: Scalars["String"];
@@ -859,7 +860,10 @@ export type AsyncExportTaskStatusMutationVariables = {
 };
 
 export type AsyncExportTaskStatusMutation = {
-  taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
+  taskInfo: Pick<
+    AsyncTaskInfo,
+    "id" | "name" | "running" | "status" | "taskResult"
+  > & {
     error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
@@ -1251,7 +1255,7 @@ export type OpenSessionMutation = {
   session: Maybe<
     Pick<
       SessionInfo,
-      "id" | "createTime" | "lastAccessTime" | "cacheExpired" | "locale"
+      "createTime" | "lastAccessTime" | "cacheExpired" | "locale"
     > & {
       connections: Array<
         Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
@@ -1288,7 +1292,7 @@ export type SessionStateQuery = {
   sessionState: Maybe<
     Pick<
       SessionInfo,
-      "id" | "createTime" | "lastAccessTime" | "locale" | "cacheExpired"
+      "createTime" | "lastAccessTime" | "locale" | "cacheExpired"
     > & {
       connections: Array<
         Maybe<Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">>
@@ -1507,13 +1511,15 @@ export const AsyncExportTaskStatusDocument = gql`
   mutation asyncExportTaskStatus($taskId: String!) {
     taskInfo: asyncTaskStatus(id: $taskId) {
       id
+      name
       running
-      taskResult
+      status
       error {
         message
         errorCode
         stackTrace
       }
+      taskResult
     }
   }
 `;
@@ -1890,7 +1896,6 @@ export const UpdateResultsDataDocument = gql`
 export const OpenSessionDocument = gql`
   mutation openSession {
     session: openSession {
-      id
       createTime
       lastAccessTime
       cacheExpired
@@ -1927,7 +1932,6 @@ export const ServerConfigDocument = gql`
 export const SessionStateDocument = gql`
   query sessionState {
     sessionState {
-      id
       createTime
       lastAccessTime
       locale

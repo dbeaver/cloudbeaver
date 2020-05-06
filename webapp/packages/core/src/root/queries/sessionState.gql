@@ -1,6 +1,5 @@
 query sessionState {
   sessionState {
-    id
     createTime
     lastAccessTime
     locale

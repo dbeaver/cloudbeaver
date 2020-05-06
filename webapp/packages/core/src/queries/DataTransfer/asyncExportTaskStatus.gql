@@ -5,12 +5,14 @@ mutation asyncExportTaskStatus(
         id: $taskId
     ) {
         id
+        name
         running
-        taskResult
+        status
         error {
             message
             errorCode
             stackTrace
         }
+        taskResult
     }
 }

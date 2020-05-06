@@ -1,6 +1,5 @@
 mutation openSession {
   session: openSession {
-    id
     createTime
     lastAccessTime
     cacheExpired

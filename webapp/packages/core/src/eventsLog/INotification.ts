@@ -9,6 +9,7 @@
 export enum ENotificationType {
   Info = 'Info',
   Error = 'Error',
+  Custom =' Custom'
 }
 
 export type NotificationComponentProps<T = undefined> = {
@@ -23,7 +24,6 @@ export interface INotification<T = undefined> {
   title: string;
   message?: string;
   details?: string | Error;
-  persistent: boolean;
   isSilent: boolean;
   customComponent?: () => NotificationComponent<T>;
   source: T;

@@ -12,20 +12,14 @@ import { injectable } from '@dbeaver/core/di';
 import { GQLError, ServerInternalError } from '@dbeaver/core/sdk';
 import { EntityList } from '@dbeaver/core/utils';
 
-import { ENotificationType, INotification, INotificationOptions } from './INotification';
+import {
+  ENotificationType, INotification, INotificationOptions, NotificationComponent
+} from './INotification';
 
 @injectable()
 export class NotificationService {
-  private notificationList = new EntityList<number, INotification<any>>(({ id }) => id);
+  readonly notificationList = new EntityList<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0
-
-  /**
-   * By default filtered without silent notifications
-   */
-  @computed get notifications(): INotification<any>[] {
-    return this.notificationList.values
-      .filter(notification => !notification.isSilent);
-  }
 
   notify<T = never>(options: INotificationOptions<T>, type: ENotificationType) {
     const id = this.notificationNextId++;
@@ -36,7 +30,6 @@ export class NotificationService {
       message: options.message,
       details: options.details,
       isSilent: !!options.isSilent,
-      persistent: !!options.persistent,
       customComponent: options.customComponent,
       source: options.source!,
       type,
@@ -44,6 +37,19 @@ export class NotificationService {
       showDetails: this.showDetails.bind(this, id),
     };
     this.notificationList.set(notification);
+  }
+
+  customNotification<T = never>(
+    component: () => NotificationComponent<T>,
+    source?: T,
+    options?: INotificationOptions<T>
+  ) {
+    this.notify({
+      title: '',
+      ...options,
+      customComponent: component,
+      source,
+    }, ENotificationType.Custom);
   }
 
   logInfo<T>(notification: INotificationOptions<T>) {

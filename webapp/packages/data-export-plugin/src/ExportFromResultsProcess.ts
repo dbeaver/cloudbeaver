@@ -33,7 +33,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
     contextId: string,
     resultsId: string,
     parameters: DataTransferParameters
-  ): Promise<string | undefined> {
+  ): Promise<string> {
     // start async task
     try {
       const { taskInfo } = await this.graphQLService.gql.exportDataFromResults({
@@ -47,14 +47,14 @@ export class ExportFromResultsProcess extends Deferred<string> {
       if (this.getState() === EDeferredState.CANCELLING) {
         await this.cancelAsync(this.taskId);
       }
+
+      this.statusUpdateProcess();
+
+      return this.taskId;
     } catch (e) {
       this.onError(e);
       throw e;
     }
-
-    this.statusUpdateProcess();
-
-    return this.taskId;
   }
 
   /**
@@ -135,9 +135,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
   private onError(error: Error, status?: string) {
     // if task failed to execute during cancelling - it means it was cancelled successfully
     if (this.getState() === EDeferredState.CANCELLING) {
-      this.toCancelled();
-      const message = `Data export has been canceled${status ? `: ${status}` : ''}`;
-      this.notificationService.logException(error, message);
+      this.toCancelled(error);
     } else {
       this.toRejected(error);
     }

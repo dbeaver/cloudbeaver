@@ -29,7 +29,14 @@ const styles = css`
   }
   export-object {
     composes: theme-typography--body2 from global;
+    flex-shrink: 0;
     padding: 16px;
+    max-height: 50px;
+    overflow: hidden;
+
+    & pre {
+      margin: 0;
+    }
   }
 `;
 
@@ -58,7 +65,10 @@ export const ProcessorSelectDialog = observer(
         noBodyPadding
         onReject={onClose}
       >
-        <export-object as="div">{translate('data_transfer_dialog_exporting_object')} {context.sourceName || node?.name}</export-object>
+        <export-object as="div">
+          {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
+          <pre>{context.sourceName}</pre>
+        </export-object>
         {isLoading && <Loader />}
         {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect}/>}
       </CommonDialogWrapper>

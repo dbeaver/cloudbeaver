@@ -8,18 +8,20 @@
 
 import { observer } from 'mobx-react';
 
-import { useController } from '@dbeaver/core/di';
-import { INotification } from '@dbeaver/core/eventsLog';
+import { useController, useService } from '@dbeaver/core/di';
+import { NotificationService } from '@dbeaver/core/eventsLog';
 
 import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
 type NotificationProps = {
-  notification: INotification<any>;
+  notificationId: number;
 }
 
-export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
-  if (!notification) {
+export const NotificationsItem = observer(function Notification({ notificationId }: NotificationProps) {
+  const notificationService = useService(NotificationService);
+  const notification = notificationService.notificationList.get(notificationId);
+  if (!notification || notification.isSilent) {
     return null;
   }
   const controller = useController(NotificationItemController, notification);

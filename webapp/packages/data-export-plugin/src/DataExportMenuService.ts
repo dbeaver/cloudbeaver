@@ -30,7 +30,6 @@ export class DataExportMenuService {
       title: 'Export',
       icon: 'export',
       onClick: this.exportData.bind(this),
-      // isPanel: true,
     };
     this.tableFooterMenuService.registerMenuItem(exportData);
   }
