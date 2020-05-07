@@ -77,7 +77,7 @@ export class Deferred<T> {
   protected toCancelled(reason?: any): void {
     this.state = EDeferredState.CANCELLED;
     this.rejectionReason = reason;
-    this.promiseExecutor.reject(reason || new PromiseCancelledError());
+    this.promiseExecutor.reject(new PromiseCancelledError(reason));
   }
 
   @action
@@ -102,7 +102,7 @@ export class DeferredFromPromise<T> extends Deferred<T> {
       value => this.toResolved(value),
       (err) => {
         if (err instanceof PromiseCancelledError) {
-          this.toCancelled(err);
+          this.toCancelled(err.reason);
         } else {
           this.toRejected(err);
         }

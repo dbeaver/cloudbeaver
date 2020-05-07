@@ -8,8 +8,8 @@
 
 
 export class PromiseCancelledError extends Error {
-  constructor(message?: string) {
-    super(message);
+  constructor(public reason?: Error) {
+    super(reason?.message);
   }
 }
 
