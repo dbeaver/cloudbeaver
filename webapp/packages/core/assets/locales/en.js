@@ -40,6 +40,8 @@ module.exports = {
   data_transfer_exporting_table: 'Table:',
   data_transfer_exporting_sql: 'SQL:',
 
+  administration_menu_enter: 'Administration',
+
   ui_stepper_back: 'Back',
   ui_processing_loading: 'Loading...',
   ui_processing_cancel: 'Cancel',

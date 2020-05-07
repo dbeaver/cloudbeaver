@@ -39,6 +39,8 @@ module.exports = {
   data_transfer_exporting_table: 'Таблица:',
   data_transfer_exporting_sql: 'SQL:',
 
+  administration_menu_enter: 'Администрирование',
+
   ui_stepper_back: 'Назад',
   ui_processing_loading: 'Загрузка...',
   ui_processing_cancel: 'Отменить',

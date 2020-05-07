@@ -8,22 +8,22 @@
 
 import { SettingsMenuService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
+import { PermissionsService } from '@dbeaver/core/root';
 
 @injectable()
 export class AdministrationMenuService {
   static administrationMenuToken = 'settingsMenu';
   constructor(
     private settingsMenuService: SettingsMenuService,
+    private permissionsService: PermissionsService,
   ) { }
 
   register() {
     this.settingsMenuService.addMenuItem({
       id: AdministrationMenuService.administrationMenuToken,
       order: 0,
-      isHidden() {
-        return true;
-      },
-      title: 'Administration',
+      isHidden: () => !this.permissionsService.has('admin'),
+      title: 'administration_menu_enter',
     });
   }
 }
