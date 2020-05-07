@@ -12,7 +12,7 @@ import { PermissionsService } from '@dbeaver/core/root';
 
 @injectable()
 export class AdministrationMenuService {
-  static administrationMenuToken = 'settingsMenu';
+  static administrationMenuToken = 'administrationMenu';
   constructor(
     private settingsMenuService: SettingsMenuService,
     private permissionsService: PermissionsService,
