@@ -18,7 +18,7 @@ import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 import { EDeferredState } from '@dbeaver/core/utils';
 
-import { Controller } from './Controller';
+import { ExportNotificationController } from './ExportNotificationController';
 
 const styles = css`
   Loader {
@@ -39,7 +39,7 @@ const styles = css`
 export const ExportNotification = observer(function ExportNotification({
   notification,
 }: NotificationComponentProps<string>) {
-  const controller = useController(Controller, notification);
+  const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
   const [mounted, setMounted] = useState(false);
 

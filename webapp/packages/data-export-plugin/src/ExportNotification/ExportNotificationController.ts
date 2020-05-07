@@ -18,7 +18,7 @@ import { EDeferredState } from '@dbeaver/core/utils';
 import { DataExportProcessService } from '../DataExportProcessService';
 
 @injectable()
-export class Controller implements IInitializableController {
+export class ExportNotificationController implements IInitializableController {
   @observable isDetailsDialogOpen = false;
 
   get isSuccess() {
