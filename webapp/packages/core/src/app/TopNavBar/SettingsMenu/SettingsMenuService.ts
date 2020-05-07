@@ -14,7 +14,7 @@ import { ThemeService } from '@dbeaver/core/theming';
 
 @injectable()
 export class SettingsMenuService {
-  settingsMenuToken = 'settingsMenu';
+  static settingsMenuToken = 'settingsMenu';
 
   private menu = new StaticMenu();
   private langMenuToken = 'langMenu';
@@ -23,21 +23,21 @@ export class SettingsMenuService {
   constructor(private localizationService: LocalizationService,
               private themeService: ThemeService) {
 
-    this.menu.addRootPanel(this.settingsMenuToken);
+    this.menu.addRootPanel(SettingsMenuService.settingsMenuToken);
     this.addThemes();
     this.addLocales();
   }
 
   getMenu() {
-    return this.menu.getMenu(this.settingsMenuToken);
+    return this.menu.getMenu(SettingsMenuService.settingsMenuToken);
   }
 
-  addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
+  addMenuItem(options: IComputedMenuItemOptions, panelId: string = SettingsMenuService.settingsMenuToken) {
     this.menu.addMenuItem(panelId, options);
   }
 
   private addThemes() {
-    this.addMenuItem(this.settingsMenuToken, {
+    this.addMenuItem({
       id: this.themeMenuToken,
       order: 1,
       title: 'app_shared_settingsMenu_theme',
@@ -46,19 +46,19 @@ export class SettingsMenuService {
 
     this.themeService.themes.forEach((theme) => {
       this.addMenuItem(
-        this.themeMenuToken,
         {
           id: theme.id,
           title: theme.name,
           isDisabled: () => theme.id === this.themeService.currentThemeId,
           onClick: () => this.themeService.changeThemeAsync(theme.id),
-        }
+        },
+        this.themeMenuToken
       );
     });
   }
 
   private addLocales() {
-    this.addMenuItem(this.settingsMenuToken, {
+    this.addMenuItem({
       id: this.langMenuToken,
       order: 2,
       title: 'app_shared_settingsMenu_lang',
@@ -67,13 +67,13 @@ export class SettingsMenuService {
 
     this.localizationService.getSupportedLanguages().forEach((lang) => {
       this.addMenuItem(
-        this.langMenuToken,
         {
           id: lang.isoCode,
           title: lang.nativeName,
           isDisabled: () => lang.isoCode === this.localizationService.getCurrentLanguage(),
           onClick: () => this.localizationService.changeLocaleAsync(lang.isoCode),
-        }
+        },
+        this.langMenuToken
       );
     });
   }
