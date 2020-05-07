@@ -47,22 +47,6 @@ export const SNACKBAR_STYLES = composes(
       display: flex;
     }
 
-    ReakitButton {
-      color: rgba(0, 0, 0, 0.45);
-      outline: none;
-      border: none;
-      background: none;
-      cursor: pointer;
-      padding: 0;
-      margin: 4px;
-      height: 16px;
-
-      & Icon {
-        width: 16px;
-        height: 16px;
-      }
-    }
-
     message {
       flex: 1;
       overflow: auto;
@@ -98,11 +82,15 @@ export const SNACKBAR_STYLES = composes(
     }
 
     actions {
+      display: flex;
       margin-top: 24px;
 
       & Button {
-        margin-left: auto;
-        display: block;
+        margin-left: 16px;
+
+        &:first-child {
+          margin-left: auto;
+        }
       }
     }
   `

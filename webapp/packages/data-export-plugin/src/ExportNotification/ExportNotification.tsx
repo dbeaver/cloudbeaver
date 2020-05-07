@@ -8,11 +8,10 @@
 
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { Button as ReakitButton } from 'reakit/Button';
 import styled, { use, css } from 'reshadow';
 
 import { SNACKBAR_STYLES } from '@dbeaver/core/app';
-import { Icon, Button, Loader } from '@dbeaver/core/blocks';
+import { Button, Loader, IconButton } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { NotificationComponentProps } from '@dbeaver/core/eventsLog';
 import { useTranslate } from '@dbeaver/core/localization';
@@ -24,18 +23,6 @@ import { Controller } from './Controller';
 const styles = css`
   Loader {
     margin-right: 16px;
-  }
-  actions {
-    display: flex;
-  }
-  fill {
-    flex: 1;
-  }
-  Button {
-    margin-left: 16px !important;
-  }
-  actions Button {
-    display: flex;
   }
   source-name {
     composes: theme-typography--body2 from global;
@@ -66,9 +53,7 @@ export const ExportNotification = observer(function ExportNotification({
         <Loader loading={controller.isPending} hideMessage />
         <message as="div">{translate(controller.status)}</message>
         {!controller.isPending && (
-          <ReakitButton onClick={controller.delete}>
-            <Icon name="cross" viewBox="0 0 16 16" />
-          </ReakitButton>
+          <IconButton onClick={controller.delete} name="cross" viewBox="0 0 16 16" />
         )}
       </notification-header>
       <notification-body as="div">
@@ -77,7 +62,6 @@ export const ExportNotification = observer(function ExportNotification({
           <pre>{controller.task?.context.sourceName}</pre>
         </source-name>
         <actions as="div">
-          <fill as="div" />
           {controller.isSuccess && (
             <>
               <Button

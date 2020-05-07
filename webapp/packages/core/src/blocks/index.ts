@@ -17,3 +17,4 @@ export * from './SubmittingForm';
 export * from './SanitizedHTML/SanitizedHTML';
 export * from './ItemList';
 export * from './PropertiesTable';
+export * from './IconButton';
