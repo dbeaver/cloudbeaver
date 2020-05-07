@@ -18,6 +18,7 @@ import { ThemeService } from '@dbeaver/core/theming';
 
 import { SessionExpireService } from './dialogs';
 import { LocalizationService } from './localization';
+import { PermissionsService } from './root';
 
 /**
  * AppBootstrap.init() will be executed between first and second phase of App initialization,
@@ -38,7 +39,8 @@ export class AppBootstrap {
               private navigationTreeContextMenuService: NavigationTreeContextMenuService,
               private nodesManagerService: NodesManagerService,
               private navigationTabsService: NavigationTabsService,
-              private connectionSchemaManagerService: ConnectionSchemaManagerService) {
+              private connectionSchemaManagerService: ConnectionSchemaManagerService,
+              private permissionsService: PermissionsService) {
   }
 
   async init() {
@@ -47,6 +49,7 @@ export class AppBootstrap {
 
     await this.localizationService.init();
     await this.themeService.init();
+    await this.permissionsService.update();
 
     this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
