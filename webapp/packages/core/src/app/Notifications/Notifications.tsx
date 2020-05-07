@@ -32,8 +32,8 @@ export const Notifications = observer(function Notifications() {
   return styled(useStyles(styles))(
     <Portal>
       <notifications as="div">
-        {notificationService.notificationList.keys.map(notificationId => (
-          <NotificationsItem key={notificationId} notificationId={notificationId} />
+        {notificationService.notificationList.values.map(notification => (
+          <NotificationsItem key={notification.id} notification={notification} />
         ))}
       </notifications>
     </Portal>

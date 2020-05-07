@@ -9,19 +9,17 @@
 import { observer } from 'mobx-react';
 
 import { useController, useService } from '@dbeaver/core/di';
-import { NotificationService } from '@dbeaver/core/eventsLog';
+import { NotificationService, INotification } from '@dbeaver/core/eventsLog';
 
 import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
 type NotificationProps = {
-  notificationId: number;
+  notification: INotification;
 }
 
-export const NotificationsItem = observer(function Notification({ notificationId }: NotificationProps) {
-  const notificationService = useService(NotificationService);
-  const notification = notificationService.notificationList.get(notificationId);
-  if (!notification || notification.isSilent) {
+export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
+  if (notification.isSilent) {
     return null;
   }
   const controller = useController(NotificationItemController, notification);

@@ -9,7 +9,7 @@
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GraphQLService, DataTransferParameters } from '@dbeaver/core/sdk';
-import { Deferred, EntityList } from '@dbeaver/core/utils';
+import { Deferred, OrderedMap } from '@dbeaver/core/utils';
 
 import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
@@ -29,7 +29,7 @@ type ExportProcess = {
 
 @injectable()
 export class DataExportProcessService {
-  readonly exportProcesses = new EntityList<string, ExportProcess>(value => value.taskId);
+  readonly exportProcesses = new OrderedMap<string, ExportProcess>(value => value.taskId);
 
   constructor(
     private graphQLService: GraphQLService,
@@ -96,7 +96,7 @@ export class DataExportProcessService {
       process = await this.exportFromResults(context.connectionId, context.contextId!, context.resultId!, parameters);
     }
 
-    this.exportProcesses.set({
+    this.exportProcesses.addValue({
       ...process,
       context,
       parameters,

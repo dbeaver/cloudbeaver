@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
-
 import { injectable } from '@dbeaver/core/di';
 import { GQLError, ServerInternalError } from '@dbeaver/core/sdk';
-import { EntityList } from '@dbeaver/core/utils';
+import { OrderedMap } from '@dbeaver/core/utils';
 
 import {
   ENotificationType, INotification, INotificationOptions, NotificationComponent
@@ -18,7 +16,7 @@ import {
 
 @injectable()
 export class NotificationService {
-  readonly notificationList = new EntityList<number, INotification<any>>(({ id }) => id);
+  readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0
 
   notify<T = never>(options: INotificationOptions<T>, type: ENotificationType) {
@@ -36,7 +34,7 @@ export class NotificationService {
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
-    this.notificationList.set(notification);
+    this.notificationList.addValue(notification);
   }
 
   customNotification<T = never>(
