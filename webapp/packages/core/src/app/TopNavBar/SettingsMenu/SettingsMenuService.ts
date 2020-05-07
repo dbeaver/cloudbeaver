@@ -14,7 +14,7 @@ import { ThemeService } from '@dbeaver/core/theming';
 
 @injectable()
 export class SettingsMenuService {
-  settingsMenuToken = 'settingsMenu';
+  static settingsMenuToken = 'settingsMenu';
 
   private menu = new StaticMenu();
   private langMenuToken = 'langMenu';
@@ -23,13 +23,13 @@ export class SettingsMenuService {
   constructor(private localizationService: LocalizationService,
               private themeService: ThemeService) {
 
-    this.menu.addRootPanel(this.settingsMenuToken);
+    this.menu.addRootPanel(SettingsMenuService.settingsMenuToken);
     this.addThemes();
     this.addLocales();
   }
 
   getMenu() {
-    return this.menu.getMenu(this.settingsMenuToken);
+    return this.menu.getMenu(SettingsMenuService.settingsMenuToken);
   }
 
   addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
@@ -37,12 +37,15 @@ export class SettingsMenuService {
   }
 
   private addThemes() {
-    this.addMenuItem(this.settingsMenuToken, {
-      id: this.themeMenuToken,
-      order: 1,
-      title: 'app_shared_settingsMenu_theme',
-      isPanel: true,
-    });
+    this.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: this.themeMenuToken,
+        order: 1,
+        title: 'app_shared_settingsMenu_theme',
+        isPanel: true,
+      }
+    );
 
     this.themeService.themes.forEach((theme) => {
       this.addMenuItem(
@@ -52,18 +55,21 @@ export class SettingsMenuService {
           title: theme.name,
           isDisabled: () => theme.id === this.themeService.currentThemeId,
           onClick: () => this.themeService.changeThemeAsync(theme.id),
-        }
+        },
       );
     });
   }
 
   private addLocales() {
-    this.addMenuItem(this.settingsMenuToken, {
-      id: this.langMenuToken,
-      order: 2,
-      title: 'app_shared_settingsMenu_lang',
-      isPanel: true,
-    });
+    this.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: this.langMenuToken,
+        order: 2,
+        title: 'app_shared_settingsMenu_lang',
+        isPanel: true,
+      }
+    );
 
     this.localizationService.getSupportedLanguages().forEach((lang) => {
       this.addMenuItem(

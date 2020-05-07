@@ -3,6 +3,7 @@
  */
 
 module.exports = [
+  "@dbeaver/administration",
   "@dbeaver/ag-grid-plugin",
   "@dbeaver/basic-connection-plugin",
   "@dbeaver/custom-connection-plugin",

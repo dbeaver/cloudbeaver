@@ -20,7 +20,7 @@ import { LocalizationService } from '@dbeaver/core/localization';
 import { PluginManagerService } from '@dbeaver/core/plugin';
 import { ProductManagerService, ProductSettingsService } from '@dbeaver/core/product';
 import {
-  SessionService, ServerService, SessionSettingsService, ServerSettingsService
+  SessionService, ServerService, SessionSettingsService, ServerSettingsService, PermissionsService
 } from '@dbeaver/core/root';
 import { EnvironmentService, GraphQLService } from '@dbeaver/core/sdk';
 import { LocalStorageSaveService, SettingsService } from '@dbeaver/core/settings';
@@ -40,6 +40,7 @@ export const coreManifest: PluginManifest = {
     PluginManagerService,
     ServerSettingsService,
     SessionSettingsService,
+    PermissionsService,
     CoreSettingsService,
     CommonDialogService,
     SessionExpireService,

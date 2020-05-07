@@ -1286,6 +1286,12 @@ export type ServerConfigQuery = {
   >;
 };
 
+export type SessionPermissionsQueryVariables = {};
+
+export type SessionPermissionsQuery = {
+  permissions: Query["sessionPermissions"];
+};
+
 export type SessionStateQueryVariables = {};
 
 export type SessionStateQuery = {
@@ -1929,6 +1935,11 @@ export const ServerConfigDocument = gql`
     }
   }
 `;
+export const SessionPermissionsDocument = gql`
+  query sessionPermissions {
+    permissions: sessionPermissions
+  }
+`;
 export const SessionStateDocument = gql`
   query sessionState {
     sessionState {
@@ -2235,6 +2246,14 @@ export function getSdk(client: GraphQLClient) {
     ): Promise<ServerConfigQuery> {
       return client.request<ServerConfigQuery>(
         print(ServerConfigDocument),
+        variables,
+      );
+    },
+    sessionPermissions(
+      variables?: SessionPermissionsQueryVariables,
+    ): Promise<SessionPermissionsQuery> {
+      return client.request<SessionPermissionsQuery>(
+        print(SessionPermissionsDocument),
         variables,
       );
     },
