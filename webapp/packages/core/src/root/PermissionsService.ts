@@ -29,12 +29,6 @@ export class PermissionsService {
     return this.permissions.data.has(id);
   }
 
-  async hasAsync(id: string): Promise<boolean> {
-    const permissions = await this.permissions.load();
-
-    return permissions.has(id);
-  }
-
   async update() {
     await this.permissions.refresh();
   }

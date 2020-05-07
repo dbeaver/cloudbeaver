@@ -10,6 +10,8 @@ import { SettingsMenuService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
 
+export const ADMINISTRATION_PERMISSION = 'admin';
+
 @injectable()
 export class AdministrationMenuService {
   static administrationMenuToken = 'administrationMenu';
@@ -19,11 +21,14 @@ export class AdministrationMenuService {
   ) { }
 
   register() {
-    this.settingsMenuService.addMenuItem({
-      id: AdministrationMenuService.administrationMenuToken,
-      order: 0,
-      isHidden: () => !this.permissionsService.has('admin'),
-      title: 'administration_menu_enter',
-    });
+    this.settingsMenuService.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: AdministrationMenuService.administrationMenuToken,
+        order: 0,
+        isHidden: () => !this.permissionsService.has(ADMINISTRATION_PERMISSION),
+        title: 'administration_menu_enter',
+      }
+    );
   }
 }

@@ -32,48 +32,54 @@ export class SettingsMenuService {
     return this.menu.getMenu(SettingsMenuService.settingsMenuToken);
   }
 
-  addMenuItem(options: IComputedMenuItemOptions, panelId: string = SettingsMenuService.settingsMenuToken) {
+  addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
     this.menu.addMenuItem(panelId, options);
   }
 
   private addThemes() {
-    this.addMenuItem({
-      id: this.themeMenuToken,
-      order: 1,
-      title: 'app_shared_settingsMenu_theme',
-      isPanel: true,
-    });
+    this.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: this.themeMenuToken,
+        order: 1,
+        title: 'app_shared_settingsMenu_theme',
+        isPanel: true,
+      }
+    );
 
     this.themeService.themes.forEach((theme) => {
       this.addMenuItem(
+        this.themeMenuToken,
         {
           id: theme.id,
           title: theme.name,
           isDisabled: () => theme.id === this.themeService.currentThemeId,
           onClick: () => this.themeService.changeThemeAsync(theme.id),
         },
-        this.themeMenuToken
       );
     });
   }
 
   private addLocales() {
-    this.addMenuItem({
-      id: this.langMenuToken,
-      order: 2,
-      title: 'app_shared_settingsMenu_lang',
-      isPanel: true,
-    });
+    this.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: this.langMenuToken,
+        order: 2,
+        title: 'app_shared_settingsMenu_lang',
+        isPanel: true,
+      }
+    );
 
     this.localizationService.getSupportedLanguages().forEach((lang) => {
       this.addMenuItem(
+        this.langMenuToken,
         {
           id: lang.isoCode,
           title: lang.nativeName,
           isDisabled: () => lang.isoCode === this.localizationService.getCurrentLanguage(),
           onClick: () => this.localizationService.changeLocaleAsync(lang.isoCode),
-        },
-        this.langMenuToken
+        }
       );
     });
   }
