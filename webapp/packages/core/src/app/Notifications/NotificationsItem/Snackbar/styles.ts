@@ -83,7 +83,10 @@ export const SNACKBAR_STYLES = composes(
 
     actions {
       display: flex;
-      margin-top: 24px;
+
+      &:not(:empty) {
+        margin-top: 24px;
+      }
 
       & Button {
         margin-left: 16px;
