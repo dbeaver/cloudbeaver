@@ -8,14 +8,14 @@
 
 import { observer } from 'mobx-react';
 
-import { useController, useService } from '@dbeaver/core/di';
-import { NotificationService, INotification } from '@dbeaver/core/eventsLog';
+import { useController } from '@dbeaver/core/di';
+import { INotification } from '@dbeaver/core/eventsLog';
 
 import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
 type NotificationProps = {
-  notification: INotification;
+  notification: INotification<any>;
 }
 
 export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
