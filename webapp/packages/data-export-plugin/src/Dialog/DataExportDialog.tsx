@@ -29,7 +29,7 @@ export const DataExportDialog: DialogComponent<IExportContext, null> = observer(
           isExporting={controller.isExporting}
           onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
           onClose={props.rejectDialog}
-          onExport={controller.export}
+          onExport={controller.prepareExport}
         />
       );
     }

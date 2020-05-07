@@ -7,10 +7,9 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Button as ReakitButton } from 'reakit/Button';
 import styled, { use } from 'reshadow';
 
-import { Icon, Button } from '@dbeaver/core/blocks';
+import { Button, IconButton } from '@dbeaver/core/blocks';
 import { ENotificationType } from '@dbeaver/core/eventsLog';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
@@ -66,9 +65,7 @@ export function Snackbar({
         {type && <NotificationMark type={type} />}
         <message as="div">{text}</message>
         {!closeAfter && onClose && (
-          <ReakitButton onClick={onClose}>
-            <Icon name="cross" viewBox="0 0 16 16" />
-          </ReakitButton>
+          <IconButton onClick={onClose} name="cross" viewBox="0 0 16 16" />
         )}
       </notification-header>
       <notification-body as="div">

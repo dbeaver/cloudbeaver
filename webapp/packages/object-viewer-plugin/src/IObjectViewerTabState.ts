@@ -9,6 +9,8 @@
 export interface IObjectViewerTabState {
   objectId: string;
   folderId: string;
+  tabIcon?: string;
+  tabTitle?: string;
   pageId: string;
   pagesState: Map<string, any>;
 }

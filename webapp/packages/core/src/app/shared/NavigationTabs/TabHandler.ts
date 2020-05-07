@@ -31,8 +31,6 @@ export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | bool
 
 export type TabHandlerOptions<TState = any> = {
   key: string;
-  navigatorId: string;
-  priority: number;
   getTabComponent(): TabHandlerTabComponent<TState>;
   getPanelComponent(): TabHandlerPanelComponent<TState>;
   onSelect?: TabHandlerEvent<TState>;
@@ -43,7 +41,6 @@ export type TabHandlerOptions<TState = any> = {
 
 export class TabHandler<TState = any> {
   key: string
-  navigatorId: string
   getTabComponent: () => TabHandlerTabComponent<TState>;
   getPanelComponent: () => TabHandlerPanelComponent<TState>;
   onSelect?: TabHandlerEvent<TState>
@@ -53,7 +50,6 @@ export class TabHandler<TState = any> {
 
   constructor(options: TabHandlerOptions<TState>) {
     this.key = options.key;
-    this.navigatorId = options.navigatorId;
     this.getTabComponent = options.getTabComponent;
     this.getPanelComponent = options.getPanelComponent;
     this.onSelect = options.onSelect;

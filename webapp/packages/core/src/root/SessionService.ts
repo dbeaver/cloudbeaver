@@ -13,7 +13,7 @@ import {
 
 import { SessionSettingsService } from './SessionSettingsService';
 
-export type SessionState = Pick<SessionInfo, 'id' | 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
+export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
   connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId'>>;
 };
 

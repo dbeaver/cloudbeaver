@@ -47,8 +47,10 @@ export class NavigationTabsService {
     return this.state.tabs;
   }
 
-  onTabSelect = new Subject<ITab>();
-  onTabClose = new Subject<ITab>();
+  private tabSelectSubject = new Subject<ITab>();
+  private tabCloseSubject = new Subject<ITab>();
+  readonly onTabSelect = this.tabSelectSubject.asObservable();
+  readonly onTabClose = this.tabCloseSubject.asObservable();
 
   constructor(
     private notificationService: NotificationService,
@@ -64,8 +66,6 @@ export class NavigationTabsService {
           if (
             typeof value.id === 'string'
             && typeof value.handlerId === 'string'
-            && (!value.name || typeof value.name === 'string')
-            && (!value.icon || typeof value.icon === 'string')
           ) {
             map[key] = value;
           }
@@ -102,7 +102,7 @@ export class NavigationTabsService {
       this.callHandlerCallback(tab, handler => handler.onSelect);
     }
 
-    this.onTabSelect.next(tab);
+    this.tabSelectSubject.next(tab);
   }
 
   @action async closeTab(tabId: string, skipHandlers?: boolean) {
@@ -111,7 +111,7 @@ export class NavigationTabsService {
       await this.callHandlerCallback(tab, handler => handler.onClose);
     }
 
-    this.onTabClose.next(tab);
+    this.tabCloseSubject.next(tab);
     this.state.history = this.state.history.filter(id => id !== tabId);
     this.tabsMap.delete(tabId);
     this.state.tabs = this.state.tabs.filter(id => id !== tabId);

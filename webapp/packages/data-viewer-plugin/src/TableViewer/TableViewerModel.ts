@@ -34,7 +34,7 @@ export interface ITableViewerModelOptions {
   containerNodePath?: string;
   resultId?: string | null; // will be filled after fist data fetch
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
-  sourceName?: string;
+  sourceName?: string; // TODO: refactor it, used for showing sql query for export
   initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
   requestDataAsync(model: TableViewerModel, rowOffset: number, count: number): Promise<IRequestDataResult>;

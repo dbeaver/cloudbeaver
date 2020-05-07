@@ -55,33 +55,20 @@ export class DataExportController implements IInitializableController {
     this.loadProcessors();
   }
 
-  export = async () => {
+  prepareExport = async () => {
     if (!this.processor || this.isExporting) {
       return;
     }
     this.isExporting = true;
 
     try {
-      if (this.context.containerNodePath) {
-        await this.dataExportService.exportFromContainer(
-          this.context.connectionId,
-          this.context.containerNodePath,
-          {
-            processorId: this.processor.id,
-            processorProperties: this.processorProperties,
-          }
-        );
-      } else if (this.context.contextId && this.context.resultId) {
-        await this.dataExportService.exportFromResults(
-          this.context.connectionId,
-          this.context.contextId,
-          this.context.resultId,
-          {
-            processorId: this.processor.id,
-            processorProperties: this.processorProperties,
-          }
-        );
-      }
+      await this.dataExportService.exportData(
+        this.context,
+        {
+          processorId: this.processor.id,
+          processorProperties: this.processorProperties,
+        }
+      );
       this.close();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t export');
@@ -128,6 +115,6 @@ export class DataExportController implements IInitializableController {
       return (processorA.name || '').localeCompare((processorB.name || ''));
     }
 
-    return (processorB.order || 0) - (processorA.order || 0);
+    return processorA.order - processorB.order;
   }
 }

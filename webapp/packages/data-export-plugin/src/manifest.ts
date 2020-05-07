@@ -10,16 +10,18 @@ import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
 import { Bootstrap } from './Bootstrap';
 import { DataExportMenuService } from './DataExportMenuService';
+import { DataExportProcessService } from './DataExportProcessService';
 import { DataExportService } from './DataExportService';
 
 export const manifest: PluginManifest = {
   info: {
-    name: 'Data Viewer Plugin',
+    name: 'Data Export Plugin',
   },
 
   providers: [
     DataExportMenuService,
     DataExportService,
+    DataExportProcessService,
   ],
 
   async initialize(services: IServiceInjector) {

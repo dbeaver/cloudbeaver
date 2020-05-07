@@ -46,8 +46,6 @@ export class ObjectViewerTabService {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
         key: objectViewerTabHandlerKey,
-        navigatorId: 'database',
-        priority: 1,
         getTabComponent: () => ObjectViewerTab,
         getPanelComponent: () => ObjectViewerPanel,
         onRestore: this.restoreObjectTab.bind(this),
@@ -132,11 +130,16 @@ export class ObjectViewerTabService {
   }
 
   async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
-    if (typeof tab.handlerState?.folderId === 'string' && typeof tab.handlerState?.objectId === 'string') {
+    if (
+      typeof tab.handlerState?.folderId === 'string'
+      && typeof tab.handlerState?.objectId === 'string'
+      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
+      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
+    ) {
       const node = await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
       if (node) {
-        tab.icon = node.icon;
-        tab.name = node.name;
+        tab.handlerState.tabIcon = node.icon;
+        tab.handlerState.tabTitle = node.name;
 
         return this.dbObjectPageService.restorePages(tab);
       }
@@ -162,8 +165,8 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
-        tab.name = nodeInfo.name;
-        tab.icon = nodeInfo.icon;
+        tab.handlerState.tabIcon = nodeInfo.icon;
+        tab.handlerState.tabTitle = nodeInfo.name;
         tabInfo.registerTab(tab);
       } else {
         tabInfo.openNewTab<IObjectViewerTabState>({
@@ -173,9 +176,9 @@ export class ObjectViewerTabService {
             folderId: nodeInfo.folderId,
             pageId: '',
             pagesState: new Map(),
+            tabIcon: nodeInfo.icon,
+            tabTitle: nodeInfo.name,
           },
-          name: nodeInfo.name,
-          icon: nodeInfo.icon,
         });
       }
     }

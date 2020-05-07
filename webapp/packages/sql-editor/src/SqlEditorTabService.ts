@@ -43,8 +43,6 @@ export class SqlEditorTabService {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
         key: sqlEditorTabHandlerKey,
-        navigatorId: 'sql-editor',
-        priority: 1,
         getTabComponent: () => SqlEditorTab,
         getPanelComponent: () => SqlEditorPanel,
         onRestore: this.handleTabRestore.bind(this),

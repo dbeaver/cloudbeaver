@@ -19,7 +19,7 @@ type NotificationProps = {
 }
 
 export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
-  if (!notification) {
+  if (notification.isSilent) {
     return null;
   }
   const controller = useController(NotificationItemController, notification);
