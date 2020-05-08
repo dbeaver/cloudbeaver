@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
+import { PermissionsService } from '@dbeaver/core/root';
 import { DatabaseObjectInfo, GraphQLService } from '@dbeaver/core/sdk';
 
 import { INavigator } from '../Navigation/INavigator';
@@ -43,6 +44,7 @@ export interface INodeNavigationData {
 }
 
 const ROOT_NODE_PATH = '/';
+export const PUBLIC_PERMISSION = 'public';
 
 // TODO: should be renamed to DBObjectManagerService
 @injectable()
@@ -51,7 +53,8 @@ export class NodesManagerService {
   private nodesStore = new NodesStore();
 
   constructor(private graphQLService: GraphQLService,
-              private navigationService: NavigationService) {
+              private navigationService: NavigationService,
+              private permissionsService: PermissionsService) {
 
     this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
       data => data.nodeId,
@@ -134,7 +137,10 @@ export class NodesManagerService {
   }
 
   async updateRootChildren() {
-    return this.updateChildren(ROOT_NODE_PATH);
+    if (!this.permissionsService.has(PUBLIC_PERMISSION)) {
+      return;
+    }
+    this.updateChildren(ROOT_NODE_PATH);
   }
 
   async updateChildrenDatabaseObjectInfo(nodeId: string) {
