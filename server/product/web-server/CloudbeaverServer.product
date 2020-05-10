@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="CloudBeaver Web Server" uid="io.cloudbeaver.product" id="io.cloudbeaver.server.product"
-    application="io.cloudbeaver.server.standalone" version="1.0.2.qualifier" useFeatures="true"
+<product name="CloudBeaver ce Server" uid="io.cloudbeaver.product" id="io.cloudbeaver.product.ce.product"
+    application="io.cloudbeaver.product.ce.application" version="1.0.2.qualifier" useFeatures="true"
     includeLaunchers="false">
 
     <configIni use="default">
@@ -32,9 +32,7 @@
     </plugins>
 
     <features>
-        <feature id="io.cloudbeaver.server.feature"/>
-        <feature id="io.cloudbeaver.sample.feature"/>
-        <feature id="io.cloudbeaver.ce.drivers.feature"/>
+        <feature id="io.cloudbeaver.product.ce.feature"/>
     </features>
 
     <configurations>

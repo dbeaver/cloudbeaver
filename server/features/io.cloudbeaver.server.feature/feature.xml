@@ -14,10 +14,6 @@
         %copyright
     </copyright>
 
-    <license url="%licenseURL">
-        %license
-    </license>
-
     <requires>
         <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>
         <import plugin="org.eclipse.core.expressions" version="0.0.0" match="greaterOrEqual"/>
