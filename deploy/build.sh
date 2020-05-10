@@ -28,7 +28,7 @@ cd ../../../deploy
 echo "Copy server packages"
 
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
-cp -p ./scripts/run-server.sh ./cloudbeaver
+cp -p ./scripts/* ./cloudbeaver
 mkdir ./cloudbeaver/workspace/GlobalConfiguration
 cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace
 cp ../samples/sample-databases/*.conf cloudbeaver/conf/

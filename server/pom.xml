@@ -19,6 +19,7 @@
 
     <properties>
         <dbeaver-product>CloudBeaver</dbeaver-product>
+        <dbeaver-version>1.0.2</dbeaver-version>
     </properties>
 
     <modules>

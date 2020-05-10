@@ -24,7 +24,7 @@ cd ..\..\..\deploy
 echo "Copy server packages"
 
 xcopy /E /Q ..\server\product\web-server\target\products\io.cloudbeaver.product\all\all\all\* cloudbeaver\server >NUL
-copy scripts\run-server.bat cloudbeaver >NUL
+copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\workspace\GlobalConfiguration
 xcopy /E /Q ..\samples\sample-databases\GlobalConfiguration cloudbeaver\workspace\GlobalConfiguration >NUL
 copy ..\samples\sample-databases\*.conf cloudbeaver\conf >NUL
