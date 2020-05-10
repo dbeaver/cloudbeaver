@@ -19,8 +19,8 @@
     </license>
 
     <includes id="io.cloudbeaver.server.feature" version="0.0.0"/>
-    <includes id="io.cloudbeaver.sample.feature"/>
-    <includes id="io.cloudbeaver.ce.drivers.feature"/>
+    <includes id="io.cloudbeaver.sample.feature" version="0.0.0"/>
+    <includes id="io.cloudbeaver.ce.drivers.feature" version="0.0.0"/>
 
     <plugin id="io.cloudbeaver.product.ce" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
