@@ -46,5 +46,3 @@ echo Copy static content
 xcopy /E /Q ..\webapp\packages\dbeaver\dist cloudbeaver\web >NUL
 
 echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.
-
-pause
