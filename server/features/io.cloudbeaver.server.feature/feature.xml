@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.server.feature"
         label="%featureName"
-        version="7.0.4.qualifier"
+        version="1.0.2.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.server">
 
@@ -13,10 +13,6 @@
     <copyright>
         %copyright
     </copyright>
-
-    <license url="%licenseURL">
-        %license
-    </license>
 
     <requires>
         <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>

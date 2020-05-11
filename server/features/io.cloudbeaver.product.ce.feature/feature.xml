@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+        id="io.cloudbeaver.product.ce.feature"
+        label="%featureName"
+        version="1.0.0.qualifier"
+        provider-name="%providerName"
+        plugin="io.cloudbeaver.product.ce">
+
+    <description>
+        %description
+    </description>
+
+    <copyright>
+        %copyright
+    </copyright>
+
+    <license url="%licenseURL">
+        %license
+    </license>
+
+    <includes id="io.cloudbeaver.server.feature" version="0.0.0"/>
+    <includes id="io.cloudbeaver.sample.feature" version="0.0.0"/>
+    <includes id="io.cloudbeaver.ce.drivers.feature" version="0.0.0"/>
+
+    <plugin id="io.cloudbeaver.product.ce" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
+</feature>

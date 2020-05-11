@@ -49,8 +49,6 @@ public class CBApplication extends BaseApplicationImpl {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
-    public static final String APPLICATION_PLUGIN_ID = "io.cloudbeaver.server";
-
     public static CBApplication getInstance() {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
@@ -66,8 +64,8 @@ public class CBApplication extends BaseApplicationImpl {
     private File homeDirectory;
 
     private Map<String, Object> productConfiguration = new HashMap<>();
-    private CBAppConfig appConfiguration;
-    private CBDatabaseConfig databaseConfiguration;
+    private CBAppConfig appConfiguration = new CBAppConfig();
+    private CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
     private CBDatabase database;
     private CBSecurityController securityController;
 

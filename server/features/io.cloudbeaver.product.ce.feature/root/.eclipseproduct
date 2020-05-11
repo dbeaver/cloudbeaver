@@ -1,0 +1,3 @@
+name=${dbeaver-product}
+id=io.cloudbeaver.product.ce
+version=${dbeaver-version}

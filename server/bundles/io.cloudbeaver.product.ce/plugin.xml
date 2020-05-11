@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+    <extension point="org.eclipse.core.runtime.applications" id="application" name="CloudBeaver Web Application">
+        <application visible="true">
+            <run class="io.cloudbeaver.server.CBApplication"/>
+        </application>
+    </extension>
+
+    <extension point="org.eclipse.core.runtime.products" id="product">
+        <product application="io.cloudbeaver.product.ce.application" description="Cloudbeaver Web UI Application" name="CloudBeaver CE Server">
+            <property name="appName" value="CloudBeaver CE Server"/>
+        </product>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.application">
+        <application id="cloudbeaver-server" name="CloudBeaver CE Server" description="CloudBeaver Web UI"/>
+    </extension>
+
+</plugin>
