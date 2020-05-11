@@ -5,3 +5,4 @@ export * from './GQLError';
 export * from './ServerInternalError';
 export * from './CachedResource';
 export * from './EServerErrorCode';
+export * from './GQLErrorCatcher';

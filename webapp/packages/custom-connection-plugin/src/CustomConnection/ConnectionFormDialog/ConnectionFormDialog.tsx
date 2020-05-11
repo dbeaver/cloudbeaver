@@ -24,7 +24,6 @@ import { ConnectionFormDialogController } from './ConnectionFormDialogController
 import { ConnectionFormDialogFooter } from './ConnectionFormDialogFooter';
 import { DriverProperties } from './DriverProperties/DriverProperties';
 
-
 const styles = composes(
   css`
     BaseTab {
@@ -149,10 +148,10 @@ export const ConnectionFormDialog = observer(
             />
           </BaseTabPanel>
         </SubmittingForm>
-        {controller.responseMessage && (
+        {controller.error.responseMessage && (
           <ErrorMessage
-            text={controller.responseMessage}
-            hasDetails={controller.hasDetails}
+            text={controller.error.responseMessage}
+            hasDetails={controller.error.hasDetails}
             onShowDetails={controller.onShowDetails}
           />
         )}

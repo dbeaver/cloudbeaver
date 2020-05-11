@@ -12,7 +12,7 @@ import { DBDriver, ErrorDetailsDialog } from '@dbeaver/core/app';
 import { injectable, IInitializableController, IDestructibleController } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
-import { ConnectionConfig, GQLError } from '@dbeaver/core/sdk';
+import { ConnectionConfig, GQLErrorCatcher } from '@dbeaver/core/sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';
 
@@ -39,10 +39,7 @@ implements IInitializableController, IDestructibleController {
     url: '',
     properties: {},
   }
-  @observable hasDetails = false
-  @observable responseMessage: string | null = null
-
-  private exception: GQLError | null = null;
+  readonly error = new GQLErrorCatcher();
   private onClose!: () => void
   private isDistructed = false;
 
@@ -70,7 +67,7 @@ implements IInitializableController, IDestructibleController {
 
   onTestConnection = async () => {
     this.isConnecting = true;
-    this.clearError();
+    this.error.clear();
     try {
       await this.customConnectionService.testConnectionAsync(this.getConnectionConfig());
 
@@ -84,7 +81,7 @@ implements IInitializableController, IDestructibleController {
 
   onCreateConnection = async () => {
     this.isConnecting = true;
-    this.clearError();
+    this.error.clear();
     try {
       const connection = await this.customConnectionService.createConnectionAsync(this.getConnectionConfig());
 
@@ -98,8 +95,8 @@ implements IInitializableController, IDestructibleController {
   }
 
   onShowDetails = () => {
-    if (this.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.exception);
+    if (this.error.exception) {
+      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   }
 
@@ -144,12 +141,6 @@ implements IInitializableController, IDestructibleController {
     this.config.properties = {};
   }
 
-  private clearError() {
-    this.responseMessage = null;
-    this.hasDetails = false;
-    this.exception = null;
-  }
-
   /**
    * Creates connection name based on connection url
    * @param defaultName default connection name if url parsing failed
@@ -175,11 +166,7 @@ implements IInitializableController, IDestructibleController {
   }
 
   private showError(exception: Error, message: string) {
-    if (exception instanceof GQLError && !this.isDistructed) {
-      this.responseMessage = exception.errorText;
-      this.hasDetails = exception.hasDetails();
-      this.exception = exception;
-    } else {
+    if (!this.error.catch(exception) || this.isDistructed) {
       this.notificationService.logException(exception, message);
     }
   }
