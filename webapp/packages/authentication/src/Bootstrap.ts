@@ -14,7 +14,7 @@ import { AuthenticationService } from './AuthenticationService';
 export class Bootstrap {
   constructor(private authenticationService: AuthenticationService) { }
 
-  bootstrap() {
-    this.authenticationService.register();
+  async bootstrap() {
+    return this.authenticationService.auth();
   }
 }

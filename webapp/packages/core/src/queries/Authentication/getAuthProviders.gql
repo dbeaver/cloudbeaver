@@ -1,0 +1,33 @@
+query getAuthProviders {
+  providers: authProviders {
+    id
+    label
+    icon
+    description
+    isDefault
+
+    #configurationParameters {
+    #  id
+    #  displayName
+    #  description
+    #  category
+    #  dataType
+    #  value
+    #  validValues
+    #  defaultValue
+    #  features
+    #}
+
+    credentialParameters {
+      id
+      displayName
+      description
+      editable
+      identifying
+      admin
+      user
+      possibleValues
+      encryption
+    }
+  } 
+}

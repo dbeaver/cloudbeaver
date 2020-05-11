@@ -31,6 +31,36 @@ export type AsyncTaskInfo = {
   taskResult?: Maybe<Scalars["Object"]>;
 };
 
+export enum AuthCredentialEncryption {
+  None = "none",
+  Plain = "plain",
+  Hash = "hash",
+}
+
+export type AuthCredentialInfo = {
+  id: Scalars["ID"];
+  displayName: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+  editable?: Maybe<Scalars["Boolean"]>;
+  identifying?: Maybe<Scalars["Boolean"]>;
+  /** This field must be shown in admin panel */
+  admin?: Maybe<Scalars["Boolean"]>;
+  /** This field must be shown in login form */
+  user?: Maybe<Scalars["Boolean"]>;
+  possibleValues?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  encryption?: Maybe<AuthCredentialEncryption>;
+};
+
+export type AuthProviderInfo = {
+  id: Scalars["ID"];
+  label: Scalars["String"];
+  icon?: Maybe<Scalars["ID"]>;
+  description?: Maybe<Scalars["String"]>;
+  isDefault?: Maybe<Scalars["Boolean"]>;
+  configurationParameters: Array<Maybe<ObjectPropertyInfo>>;
+  credentialParameters: Array<Maybe<AuthCredentialInfo>>;
+};
+
 /** Configuration of particular connection. Used for new connection create. Includes auth info */
 export type ConnectionConfig = {
   name?: Maybe<Scalars["String"]>;
@@ -387,6 +417,10 @@ export type Query = {
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
+  authLogin?: Maybe<UserAuthInfo>;
+  authLogout?: Maybe<Scalars["Boolean"]>;
+  sessionUser?: Maybe<UserAuthInfo>;
+  authProviders: Array<Maybe<AuthProviderInfo>>;
   /** Available transfer processors */
   dataTransferAvailableStreamProcessors?: Maybe<
     Array<Maybe<DataTransferProcessorInfo>>
@@ -445,6 +479,11 @@ export type QuerySqlCompletionProposalsArgs = {
   query: Scalars["String"];
   position: Scalars["Int"];
   maxResults?: Maybe<Scalars["Int"]>;
+};
+
+export type QueryAuthLoginArgs = {
+  provider: Scalars["ID"];
+  credentials: Scalars["Object"];
 };
 
 export type QueryDataTransferExportDataFromContainerArgs = {
@@ -592,6 +631,18 @@ export type SqlResultSet = {
   rows?: Maybe<Array<Maybe<Array<Maybe<Scalars["Object"]>>>>>;
   /** server always returns hasMoreData = false */
   hasMoreData?: Maybe<Scalars["Boolean"]>;
+};
+
+export type UserAuthInfo = {
+  /** User unique identifier */
+  userId: Scalars["String"];
+  /** Human readable display name. May be null */
+  displayName?: Maybe<Scalars["String"]>;
+  /** Auth provider ID */
+  authProvider: Scalars["String"];
+  loginTime: Scalars["DateTime"];
+  /** Optional login message */
+  message?: Maybe<Scalars["String"]>;
 };
 
 export type WebServiceConfig = {
@@ -854,6 +905,65 @@ export type ChangeSessionLanguageMutation = Pick<
   Mutation,
   "changeSessionLanguage"
 >;
+
+export type AuthLoginQueryVariables = {
+  provider: Scalars["ID"];
+  credentials: Scalars["Object"];
+};
+
+export type AuthLoginQuery = {
+  user: Maybe<
+    Pick<
+      UserAuthInfo,
+      "userId" | "displayName" | "authProvider" | "loginTime" | "message"
+    >
+  >;
+};
+
+export type AuthLogoutQueryVariables = {};
+
+export type AuthLogoutQuery = Pick<Query, "authLogout">;
+
+export type GetAuthProvidersQueryVariables = {};
+
+export type GetAuthProvidersQuery = {
+  providers: Array<
+    Maybe<
+      Pick<
+        AuthProviderInfo,
+        "id" | "label" | "icon" | "description" | "isDefault"
+      > & {
+        credentialParameters: Array<
+          Maybe<
+            Pick<
+              AuthCredentialInfo,
+              | "id"
+              | "displayName"
+              | "description"
+              | "editable"
+              | "identifying"
+              | "admin"
+              | "user"
+              | "possibleValues"
+              | "encryption"
+            >
+          >
+        >;
+      }
+    >
+  >;
+};
+
+export type GetSessionUserQueryVariables = {};
+
+export type GetSessionUserQuery = {
+  user: Maybe<
+    Pick<
+      UserAuthInfo,
+      "userId" | "displayName" | "authProvider" | "loginTime" | "message"
+    >
+  >;
+};
 
 export type AsyncExportTaskStatusMutationVariables = {
   taskId: Scalars["String"];
@@ -1278,6 +1388,8 @@ export type ServerConfigQuery = {
       | "supportsCustomConnections"
       | "supportsConnectionBrowser"
       | "supportsWorkspaces"
+      | "anonymousAccessEnabled"
+      | "authenticationEnabled"
     > & {
       supportedLanguages: Array<
         Maybe<Pick<ServerLanguage, "isoCode" | "displayName" | "nativeName">>
@@ -1511,6 +1623,55 @@ export const ReadSessionLogDocument = gql`
 export const ChangeSessionLanguageDocument = gql`
   mutation changeSessionLanguage($locale: String!) {
     changeSessionLanguage(locale: $locale)
+  }
+`;
+export const AuthLoginDocument = gql`
+  query authLogin($provider: ID!, $credentials: Object!) {
+    user: authLogin(provider: $provider, credentials: $credentials) {
+      userId
+      displayName
+      authProvider
+      loginTime
+      message
+    }
+  }
+`;
+export const AuthLogoutDocument = gql`
+  query authLogout {
+    authLogout
+  }
+`;
+export const GetAuthProvidersDocument = gql`
+  query getAuthProviders {
+    providers: authProviders {
+      id
+      label
+      icon
+      description
+      isDefault
+      credentialParameters {
+        id
+        displayName
+        description
+        editable
+        identifying
+        admin
+        user
+        possibleValues
+        encryption
+      }
+    }
+  }
+`;
+export const GetSessionUserDocument = gql`
+  query getSessionUser {
+    user: sessionUser {
+      userId
+      displayName
+      authProvider
+      loginTime
+      message
+    }
   }
 `;
 export const AsyncExportTaskStatusDocument = gql`
@@ -1926,6 +2087,8 @@ export const ServerConfigDocument = gql`
       supportsCustomConnections
       supportsConnectionBrowser
       supportsWorkspaces
+      anonymousAccessEnabled
+      authenticationEnabled
       supportedLanguages {
         isoCode
         displayName
@@ -2086,6 +2249,34 @@ export function getSdk(client: GraphQLClient) {
     ): Promise<ChangeSessionLanguageMutation> {
       return client.request<ChangeSessionLanguageMutation>(
         print(ChangeSessionLanguageDocument),
+        variables,
+      );
+    },
+    authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
+      return client.request<AuthLoginQuery>(
+        print(AuthLoginDocument),
+        variables,
+      );
+    },
+    authLogout(variables?: AuthLogoutQueryVariables): Promise<AuthLogoutQuery> {
+      return client.request<AuthLogoutQuery>(
+        print(AuthLogoutDocument),
+        variables,
+      );
+    },
+    getAuthProviders(
+      variables?: GetAuthProvidersQueryVariables,
+    ): Promise<GetAuthProvidersQuery> {
+      return client.request<GetAuthProvidersQuery>(
+        print(GetAuthProvidersDocument),
+        variables,
+      );
+    },
+    getSessionUser(
+      variables?: GetSessionUserQueryVariables,
+    ): Promise<GetSessionUserQuery> {
+      return client.request<GetSessionUserQuery>(
+        print(GetSessionUserDocument),
         variables,
       );
     },

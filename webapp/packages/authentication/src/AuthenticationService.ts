@@ -7,14 +7,34 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { PermissionsService } from '@dbeaver/core/root';
+import { ServerService } from '@dbeaver/core/root';
+
+import { AuthInfoService } from './AuthInfoService';
+import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()
 export class AuthenticationService {
   constructor(
-    private permissionsService: PermissionsService,
+    private serverService: ServerService,
+    private authDialogService: AuthDialogService,
+    private authInfoService: AuthInfoService,
   ) { }
 
-  register() {
+  async auth() {
+    if (this.isForceAuthentication()) {
+      await this.authDialogService.showLoginForm();
+    }
+  }
+
+  async isForceAuthentication() {
+    const config = await this.serverService.config.load();
+    if (!config) {
+      throw new Error('Can\'t configure Authentication');
+    }
+    const userInfo = await this.authInfoService.updateAuthInfo();
+
+    return !config.anonymousAccessEnabled
+      && config.authenticationEnabled
+      && !userInfo;
   }
 }

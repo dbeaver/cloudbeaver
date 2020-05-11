@@ -15,7 +15,7 @@ type AuthCredentialInfo {
     admin: Boolean
     # This field must be shown in login form
     user: Boolean
-    possibleValues: [String]!
+    possibleValues: [String]
     encryption: AuthCredentialEncryption
 }
 
