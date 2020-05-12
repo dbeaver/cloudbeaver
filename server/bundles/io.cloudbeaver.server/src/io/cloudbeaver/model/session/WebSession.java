@@ -184,7 +184,12 @@ public class WebSession {
     private void refreshSessionAuth() throws DBCException {
         CBApplication application = CBPlatform.getInstance().getApplication();
         if (this.user == null) {
-            sessionPermissions = application.getSecurityController().getSubjectPermissions(application.getAppConfiguration().getAnonymousUserRole());
+            if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
+                sessionPermissions = application.getSecurityController().getSubjectPermissions(
+                    application.getAppConfiguration().getAnonymousUserRole());
+            } else {
+                sessionPermissions = Collections.emptySet();
+            }
         } else {
             sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
         }
