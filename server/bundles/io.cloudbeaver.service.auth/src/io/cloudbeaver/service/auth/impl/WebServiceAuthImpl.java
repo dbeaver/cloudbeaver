@@ -41,6 +41,8 @@ import java.util.Map;
  */
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
+    private static final String ATTR_USER_AUTH = "user-auth-info";
+
     @Override
     public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
         if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
@@ -100,6 +102,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authInfo.setAuthToken(authToken);
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
 
+            webSession.setAttribute(ATTR_USER_AUTH, authInfo);
+
             return authInfo;
         } catch (DBException e) {
             throw new DBWebException("User authentication failed", e);
@@ -113,4 +117,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         webSession.setUser(null);
     }
+
+    @Override
+    public WebAuthInfo sessionUser(WebSession webSession) throws DBWebException {
+        if (webSession.getUser() == null) {
+            return null;
+        }
+        return webSession.getAttribute(ATTR_USER_AUTH);
+    }
+
 }
