@@ -377,7 +377,7 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT UNIQUE AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_ROLE UR\n" +
+                "SELECT DISTINCT AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_ROLE UR\n" +
                     "WHERE UR.ROLE_ID=AP.SUBJECT_ID AND UR.USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -397,7 +397,7 @@ class CBSecurityController implements DBWSecurityController {
             permissions.addAll(getSubjectPermissions(userId));
             return permissions;
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error reading user permissions", e);
         }
     }
 
