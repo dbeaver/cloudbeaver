@@ -41,8 +41,6 @@ export type AuthCredentialInfo = {
   id: Scalars["ID"];
   displayName: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  editable?: Maybe<Scalars["Boolean"]>;
-  identifying?: Maybe<Scalars["Boolean"]>;
   /** This field must be shown in admin panel */
   admin?: Maybe<Scalars["Boolean"]>;
   /** This field must be shown in login form */
@@ -57,7 +55,6 @@ export type AuthProviderInfo = {
   icon?: Maybe<Scalars["ID"]>;
   description?: Maybe<Scalars["String"]>;
   isDefault?: Maybe<Scalars["Boolean"]>;
-  configurationParameters: Array<Maybe<ObjectPropertyInfo>>;
   credentialParameters: Array<Maybe<AuthCredentialInfo>>;
 };
 
@@ -940,8 +937,6 @@ export type GetAuthProvidersQuery = {
               | "id"
               | "displayName"
               | "description"
-              | "editable"
-              | "identifying"
               | "admin"
               | "user"
               | "possibleValues"
@@ -1653,8 +1648,6 @@ export const GetAuthProvidersDocument = gql`
         id
         displayName
         description
-        editable
-        identifying
         admin
         user
         possibleValues

@@ -22,8 +22,6 @@ query getAuthProviders {
       id
       displayName
       description
-      editable
-      identifying
       admin
       user
       possibleValues
