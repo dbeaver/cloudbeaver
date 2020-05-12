@@ -9,8 +9,6 @@ type AuthCredentialInfo {
     displayName: String!
     description: String
 
-    editable: Boolean
-    identifying: Boolean
     # This field must be shown in admin panel
     admin: Boolean
     # This field must be shown in login form
@@ -27,7 +25,7 @@ type AuthProviderInfo {
 
     isDefault: Boolean
 
-    configurationParameters: [ObjectPropertyInfo]!
+    #configurationParameters: [ObjectPropertyInfo]!
 
     credentialParameters: [AuthCredentialInfo]!
 }

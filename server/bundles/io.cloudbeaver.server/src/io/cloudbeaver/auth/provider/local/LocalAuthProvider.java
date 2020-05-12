@@ -62,7 +62,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
     }
 
     public static String makeClientPasswordHash(String userName, String password) {
-        return SecurityUtils.makeDigest(userName, password);
+        return SecurityUtils.makeDigest(password);
     }
 
 }
