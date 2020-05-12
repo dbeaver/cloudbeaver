@@ -3,10 +3,7 @@
     <!-- PostgreSQL -->
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/postgresql/LICENSE.txt"/>
-        <resource name="drivers/postgresql/postgresql-42.2.5.jar" alias="drivers/postgresql/postgresql.jar"/>
-        <resource name="drivers/postgis/postgis-jdbc-2.2.1.jar" alias="drivers/postgis/postgis-jdbc.jar"/>
-        <resource name="drivers/waffle/waffle-jna-1.9.0.jar" alias="drivers/waffle/waffle-jna.jar"/>
-        <resource name="drivers/waffle/caffeine-2.6.2.jar" alias="drivers/waffle/caffeine.jar"/>
+        <resource name="drivers/postgresql"/>
     </extension>
 
     <!-- MySQL -->
