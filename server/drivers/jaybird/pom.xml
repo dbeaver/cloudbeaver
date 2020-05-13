@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>drivers.firebird</artifactId>
+    <version>1.0.0</version>
+    <parent>
+        <groupId>io.cloudbeaver</groupId>
+        <artifactId>drivers</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <properties>
+        <deps.output.dir>jaybird</deps.output.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.firebirdsql.jdbc</groupId>
+            <artifactId>jaybird</artifactId>
+            <version>4.0.0.java8</version>
+        </dependency>
+    </dependencies>
+
+</project>

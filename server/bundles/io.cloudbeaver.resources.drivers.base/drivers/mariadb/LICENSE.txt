@@ -1,1 +1,0 @@
-MariaDB JDBC driver is distributed under the GNU Lesser General Public License (LGPL). Text of the license can be obtained from http://www.gnu.org/copyleft/lesser.html.

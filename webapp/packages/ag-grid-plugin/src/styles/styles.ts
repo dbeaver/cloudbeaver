@@ -9,7 +9,7 @@
 import { ThemeSelector } from '@dbeaver/core/theming';
 
 export const agGridStyles: ThemeSelector = async (theme) => {
-  const baseStyles = await import('./base.raw.scss');
+  const baseStyles = await import('./base.scss');
   let styles: any;
 
   switch (theme) {

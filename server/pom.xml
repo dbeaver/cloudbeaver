@@ -25,6 +25,7 @@
     <modules>
         <module>bundles</module>
         <module>features</module>
+        <module>drivers</module>
 
         <!-- Products -->
         <module>product</module>
