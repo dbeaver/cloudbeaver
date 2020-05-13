@@ -26,7 +26,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "reakit": "^1.0.0-beta.11",
-    "reshadow": "0.0.1-alpha.75",
+    "reshadow": "0.0.1-alpha.77",
     "rxjs": "^6.5.5"
   }
 }
