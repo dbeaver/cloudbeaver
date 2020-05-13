@@ -49,6 +49,14 @@
     </g>
   </symbol>
 
+  <symbol id="user" width="28" height="28" viewBox="0 0 28 28">
+    <g fill="none" fill-rule="evenodd">
+        <path fill-rule="nonzero" stroke="#FFF" stroke-width="2" d="M5.5 7.5v21c0 1.104.893 2 2 2h21c1.098 0 2-.902 2-2v-21c0-1.098-.902-2-2-2h-21c-1.107 0-2 .896-2 2z" transform="translate(-4 -4)"/>
+        <path fill="#FFF" fill-rule="nonzero" d="M22.5 13.5c0 2.49-2.01 4.5-4.5 4.5s-4.5-2.01-4.5-4.5S15.51 9 18 9s4.5 2.01 4.5 4.5zM9 25.5c0-3 6-4.65 9-4.65s9 1.65 9 4.65V27H9v-1.5z" transform="translate(-4 -4)"/>
+        <path d="M0 0L36 0 36 36 0 36z" transform="translate(-4 -4)"/>
+    </g>
+  </symbol>
+
   <symbol id="angle" viewBox="0 0 15 8">
     <path class="icon-fill" fill-rule="evenodd" d="M14.5.954l-.875-.88L7.5 6.238 1.375 0 .5.88 7.5 8z"/>
   </symbol>

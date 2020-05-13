@@ -52,7 +52,7 @@ export class AuthMenuService {
       id: 'user',
       order: 0,
       isHidden: () => !this.authInfoService.userInfo,
-      icon: 'settings',
+      icon: 'user',
       title: 'User',
     });
   }
