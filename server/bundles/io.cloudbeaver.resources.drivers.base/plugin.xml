@@ -3,24 +3,20 @@
     <!-- PostgreSQL -->
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/postgresql/LICENSE.txt"/>
-        <resource name="drivers/postgresql/postgresql-42.2.5.jar" alias="drivers/postgresql/postgresql.jar"/>
-        <resource name="drivers/postgis/postgis-jdbc-2.2.1.jar" alias="drivers/postgis/postgis-jdbc.jar"/>
-        <resource name="drivers/waffle/waffle-jna-1.9.0.jar" alias="drivers/waffle/waffle-jna.jar"/>
-        <resource name="drivers/waffle/caffeine-2.6.2.jar" alias="drivers/waffle/caffeine.jar"/>
+        <resource name="drivers/postgresql"/>
     </extension>
 
     <!-- MySQL -->
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/mysql/LICENSE.txt"/>
-        <resource name="drivers/mysql/mysql-connector-java-5.1.44.jar" alias="drivers/mysql/mysql-connector-java.jar"/>
-        <resource name="drivers/mysql/mysql-connector-java-8.0.11.jar" alias="drivers/mysql/mysql-connector-java-8.jar"/>
-        <resource name="drivers/mysql/protobuf-java-2.6.0.jar" alias="drivers/mysql/protobuf-java.jar"/>
+        <resource name="drivers/mysql/mysql5"/>
+        <resource name="drivers/mysql/mysql8"/>
     </extension>
 
     <!-- MariaDB -->
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/mariadb/LICENSE.txt"/>
-        <resource name="drivers/mariadb/mariadb-java-client-2.6.0.jar" alias="drivers/mariadb/mariadb-java-client.jar"/>
+        <resource name="drivers/mariadb"/>
     </extension>
 
     <!-- Firebird -->
@@ -36,7 +32,7 @@
 
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/sqlite/xerial/LICENSE.txt"/>
-        <resource name="drivers/sqlite/xerial/sqlite-jdbc-3.30.1.jar" alias="drivers/sqlite/xerial/sqlite-jdbc.jar"/>
+        <resource name="drivers/sqlite/xerial"/>
     </extension>
 
     <!-- H2 -->
