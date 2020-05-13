@@ -1,6 +1,7 @@
 @echo off
 echo Clone and build Cloudbeaver
 
+IF EXIST drivers rmdir /S /Q drivers
 IF EXIST cloudbeaver rmdir /S /Q cloudbeaver
 mkdir cloudbeaver
 mkdir cloudbeaver\server
@@ -43,6 +44,7 @@ cd ..\deploy
 
 echo Copy static content
 
+MOVE drivers cloudbeaver >NUL
 xcopy /E /Q ..\webapp\packages\dbeaver\dist cloudbeaver\web >NUL
 
 echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.

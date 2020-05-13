@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "Clone and build Cloudbeaver"
 
+rm -rf ./drivers
 rm -rf ./cloudbeaver
 mkdir ./cloudbeaver
 mkdir ./cloudbeaver/server
@@ -44,6 +45,7 @@ cd ../deploy
 
 echo "Copy static content"
 
+mv drivers cloudbeaver
 cp -rp ../webapp/packages/dbeaver/dist/* cloudbeaver/web
 
 echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."

@@ -6,6 +6,5 @@ Bundle-Version: 1.0.2.qualifier
 Bundle-Release-Date: 20200518
 Bundle-Vendor: DBeaver Corp
 Bundle-ActivationPolicy: lazy
-Eclipse-BundleShape: dir
 Automatic-Module-Name: io.cloudbeaver.resources.drivers.base
 Require-Bundle: io.cloudbeaver.server
