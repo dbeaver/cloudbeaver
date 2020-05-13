@@ -10,10 +10,12 @@ import { action, observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
+import { PermissionsService } from '@dbeaver/core/root';
 import { GraphQLService } from '@dbeaver/core/sdk';
 import { uuid } from '@dbeaver/core/utils';
 
 import { CoreSettingsService } from '../../../../CoreSettingsService';
+import { PUBLIC_PERMISSION } from '../../NodesManager/NodesManagerService';
 import { ILogEntry } from './ILogEntry';
 
 @injectable()
@@ -24,9 +26,13 @@ export class LogViewerService {
   @observable private log: ILogEntry[] = [];
   private interval: any = null;
 
-  constructor(private graphQLService: GraphQLService,
-              private coreSettingsService: CoreSettingsService,
-              private notificationService: NotificationService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    private coreSettingsService: CoreSettingsService,
+    private notificationService: NotificationService,
+    private permissionsService: PermissionsService,
+  ) {
+    this.permissionsService.onUpdate.subscribe(this.stopIfHasNoPermission.bind(this));
   }
 
   toggle() {
@@ -34,6 +40,9 @@ export class LogViewerService {
       this.stopLog();
       this.isActive = false;
     } else {
+      if (!this.isLogViewerAvailable()) {
+        throw new Error('Access denied');
+      }
       this.startLog();
       this.isActive = true;
     }
@@ -66,15 +75,6 @@ export class LogViewerService {
     this.log = [];
   }
 
-  private async updateLog() {
-    try {
-      const newEntries = await this.loadLog();
-      this.addNewEntries(newEntries);
-    } catch (e) {
-      this.notificationService.logException(e, 'Failed to load log');
-    }
-  }
-
   @action
   addNewEntries(entries: ILogEntry[]) {
     this.log.unshift(...entries.reverse());
@@ -95,5 +95,28 @@ export class LogViewerService {
       id: uuid(),
     }));
     return entries;
+  }
+
+  private async updateLog() {
+    if (!this.isLogViewerAvailable()) {
+      return;
+    }
+
+    try {
+      const newEntries = await this.loadLog();
+      this.addNewEntries(newEntries);
+    } catch (e) {
+      this.notificationService.logException(e, 'Failed to load log');
+    }
+  }
+
+  private stopIfHasNoPermission() {
+    if (this.isActive && !this.isLogViewerAvailable()) {
+      this.toggle();
+    }
+  }
+
+  private isLogViewerAvailable() {
+    return this.permissionsService.has(PUBLIC_PERMISSION);
   }
 }
