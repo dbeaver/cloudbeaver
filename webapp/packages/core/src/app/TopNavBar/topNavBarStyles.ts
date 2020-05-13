@@ -38,5 +38,8 @@ export const topNavBarStyles = composes(
         margin-bottom: 2px;
       }
     }
+    fill {
+      flex: 1;
+    }
   `
 );

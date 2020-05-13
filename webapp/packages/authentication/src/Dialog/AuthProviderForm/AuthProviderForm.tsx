@@ -27,13 +27,12 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   credentials,
   authenticate,
 }: Props) {
-  // const translate = useTranslate();
   const handleChange = useCallback((key: string, value: string) => {
     credentials[key] = value;
   }, [credentials]);
 
   return styled(useStyles(formStyles))(
-    <>
+    <login-form as='div'>
       {provider.credentialParameters.map(parameter => parameter.user && (
         <group as="div" key={parameter.id}>
           <InputField
@@ -48,6 +47,6 @@ export const AuthProviderForm = observer(function AuthProviderForm({
           </InputField>
         </group>
       ))}
-    </>
+    </login-form>
   );
 });

@@ -69,9 +69,10 @@ function NestedDialog(props: NestedDialogType) {
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
     <Dialog {...dialogState} aria-label="can't be provided" tabIndex={0}>
-      <DialogBackdrop {...dialogState} onClick={handleReject} />
+      <DialogBackdrop {...dialogState} onClick={props.dialog.options?.persistent ? () => {} : handleReject} />
       <DialogComponent
         payload={props.dialog.payload}
+        options={props.dialog.options}
         resolveDialog={handleResolve}
         rejectDialog={handleReject}
       />

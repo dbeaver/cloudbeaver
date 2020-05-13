@@ -10,6 +10,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
+import { SessionService } from '@dbeaver/core/root';
 import { GraphQLService, UserAuthInfo } from '@dbeaver/core/sdk';
 
 import { AuthProviderService } from './AuthProviderService';
@@ -22,6 +23,7 @@ export class AuthInfoService {
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
     private authProviderService: AuthProviderService,
+    private sessionService: SessionService,
   ) { }
 
   get userInfo() {
@@ -32,6 +34,7 @@ export class AuthInfoService {
     if (this.user) {
       throw new Error('User already logged in');
     }
+
     const processedCredentials = this.authProviderService.processCredentials(provider, credentials);
 
     const { user } = await this.graphQLService.gql.authLogin({
@@ -40,6 +43,7 @@ export class AuthInfoService {
     });
     this.user = user;
 
+    await this.updateSession();
     return this.user;
   }
 
@@ -47,6 +51,7 @@ export class AuthInfoService {
     if (this.user) {
       await this.graphQLService.gql.authLogout();
       this.user = null;
+      await this.updateSession();
     }
   }
 
@@ -59,5 +64,9 @@ export class AuthInfoService {
     }
 
     return this.user;
+  }
+
+  private async updateSession() {
+    await this.sessionService.update();
   }
 }

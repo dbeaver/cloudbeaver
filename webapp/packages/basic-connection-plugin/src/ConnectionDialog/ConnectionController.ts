@@ -153,7 +153,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   private async loadDBSources() {
     try {
-      await this.basicConnectionService.loadDBSourcesAsync();
+      await this.basicConnectionService.dbSources.load();
       await this.connectionsManagerService.loadDriversAsync();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database sources');

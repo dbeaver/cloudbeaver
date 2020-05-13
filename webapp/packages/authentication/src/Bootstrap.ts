@@ -9,12 +9,17 @@
 import { injectable } from '@dbeaver/core/di';
 
 import { AuthenticationService } from './AuthenticationService';
+import { AuthMenuService } from './AuthMenuService';
 
 @injectable()
 export class Bootstrap {
-  constructor(private authenticationService: AuthenticationService) { }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private authMenuService: AuthMenuService
+  ) { }
 
   async bootstrap() {
-    return this.authenticationService.auth();
+    this.authMenuService.register();
+    await this.authenticationService.auth();
   }
 }

@@ -10,6 +10,7 @@ import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
 import { AuthenticationService } from './AuthenticationService';
 import { AuthInfoService } from './AuthInfoService';
+import { AuthMenuService } from './AuthMenuService';
 import { AuthProviderService } from './AuthProviderService';
 import { Bootstrap } from './Bootstrap';
 import { AuthDialogService } from './Dialog/AuthDialogService';
@@ -24,6 +25,7 @@ export const manifest: PluginManifest = {
     AuthInfoService,
     AuthProviderService,
     AuthDialogService,
+    AuthMenuService,
   ],
 
   async initialize(services: IServiceInjector) {

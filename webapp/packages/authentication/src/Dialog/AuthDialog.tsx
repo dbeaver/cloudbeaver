@@ -36,13 +36,14 @@ const styles = composes(
       box-sizing: border-box;
     }
     CommonDialogWrapper {
-      display: flex;
-      flex-direction: column;
-      max-height: 330px;
-      min-height: 330px;
+      min-height: 400px;
+      min-width: 600px;
     }
     SubmittingForm {
       overflow: auto;
+      margin: auto;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
     SubmittingForm, AuthProviderForm {
       flex: 1;
@@ -103,7 +104,7 @@ export const AuthDialog: DialogComponent<null, null> = observer(
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
-        title={translate('sas')}
+        title={translate('authentication_login_dialog_title')}
         noBodyPadding
         header={(
           <TabList {...tab} aria-label="My tabs">
@@ -118,7 +119,7 @@ export const AuthDialog: DialogComponent<null, null> = observer(
             onLogin={controller.login}
           />
         )}
-        onReject={props.rejectDialog}
+        onReject={props.options?.persistent ? undefined : props.rejectDialog}
       >
         <SubmittingForm onSubmit={controller.login}>
           {controller.provider && (

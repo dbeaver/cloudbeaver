@@ -21,9 +21,11 @@ import { settingsMenuStyles } from './settingsMenuStyles';
 export const SettingsMenu = observer(function SettingsMenu() {
   const settingsMenuService = useService(SettingsMenuService);
 
-  return styled(useStyles(settingsMenuStyles))(
-    <MenuTrigger panel={settingsMenuService.getMenu()} style={[topMenuStyles, settingsMenuStyles]}>
-      <Icon name="settings" viewBox="0 0 28 28" />
-    </MenuTrigger>
-  );
+  return null;
+
+  // return styled(useStyles(settingsMenuStyles))(
+  //   <MenuTrigger panel={settingsMenuService.getMenu()} style={[topMenuStyles, settingsMenuStyles]}>
+  //     <Icon name="settings" viewBox="0 0 28 28" />
+  //   </MenuTrigger>
+  // );
 });

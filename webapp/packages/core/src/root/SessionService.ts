@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Subject, Observable } from 'rxjs';
+
 import { injectable } from '@dbeaver/core/di';
 import {
   ConnectionInfo, GraphQLService, SessionInfo, CachedResource,
@@ -21,12 +23,23 @@ export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'la
 export class SessionService {
   readonly session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this), data => !!data);
   readonly settings = new SessionSettingsService('session_settings');
+  readonly onUpdate: Observable<unknown>;
 
-  constructor(private graphQLService: GraphQLService) {}
+  private updateSubject: Subject<unknown>;
+
+  constructor(private graphQLService: GraphQLService) {
+    this.updateSubject = new Subject();
+    this.onUpdate = this.updateSubject.asObservable();
+  }
+
+  async update() {
+    await this.session.refresh();
+  }
 
   private async refreshSessionStateAsync(data: SessionState | undefined): Promise<SessionState> {
     const { session } = await this.graphQLService.gql.openSession();
 
+    this.updateSubject.next();
     return session;
   }
 }

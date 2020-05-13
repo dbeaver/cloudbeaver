@@ -18,8 +18,8 @@ import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter
 
 const styles = css`
   CommonDialogWrapper {
-    display: flex;
-    min-height: 330px;
+    max-height: 500px;
+    min-height: 500px;
   }
   PropertiesTable {
     flex: 1;

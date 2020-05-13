@@ -21,8 +21,8 @@ export class AuthenticationService {
   ) { }
 
   async auth() {
-    if (this.isForceAuthentication()) {
-      await this.authDialogService.showLoginForm();
+    if (await this.isForceAuthentication()) {
+      await this.authDialogService.showLoginForm(true);
     }
   }
 

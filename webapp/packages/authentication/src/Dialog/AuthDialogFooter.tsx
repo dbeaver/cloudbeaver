@@ -49,7 +49,7 @@ export const AuthDialogFooter = observer(
           onClick={onLogin}
           disabled={isAuthenticating}
         >
-          {translate('Login')}
+          {translate('authentication_login')}
         </Button>
       </controls>
     );

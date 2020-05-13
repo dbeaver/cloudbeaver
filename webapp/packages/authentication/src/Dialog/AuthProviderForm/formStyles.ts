@@ -9,6 +9,14 @@
 import { css } from 'reshadow';
 
 export const formStyles = css`
+  login-form {
+    flex: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
   sub-label {
     composes: theme-typography--caption from global;
     line-height: 14px;

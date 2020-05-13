@@ -137,7 +137,7 @@ export class NodesManagerService {
   }
 
   async updateRootChildren() {
-    if (!this.permissionsService.has(PUBLIC_PERMISSION)) {
+    if (!await this.permissionsService.hasAsync(PUBLIC_PERMISSION)) {
       return;
     }
     this.updateChildren(ROOT_NODE_PATH);

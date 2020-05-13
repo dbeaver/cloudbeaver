@@ -6,30 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Connection, DBSource, ConnectionsManagerService } from '@dbeaver/core/app';
+import {
+  Connection, DBSource, ConnectionsManagerService, PUBLIC_PERMISSION
+} from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
-import { ConnectionConfig, GraphQLService } from '@dbeaver/core/sdk';
+import { PermissionsService } from '@dbeaver/core/root';
+import { ConnectionConfig, GraphQLService, CachedResource } from '@dbeaver/core/sdk';
 
 @injectable()
 export class BasicConnectionService {
-  private dbSourcesCache: DBSource[] = [];
+  readonly dbSources = new CachedResource([], this.loadDBSourcesAsync.bind(this), data => !!data.length)
 
-  constructor(private graphQLService: GraphQLService,
-              private connectionsManagerService: ConnectionsManagerService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    private connectionsManagerService: ConnectionsManagerService,
+    private permissionsService: PermissionsService
+  ) {
+    this.permissionsService.onUpdate.subscribe(() => this.dbSources.refresh());
   }
 
   public getDBSources(): DBSource[] {
-    return this.dbSourcesCache;
+    return this.dbSources.data;
   }
 
-  async loadDBSourcesAsync(): Promise<DBSource[]> {
-    if (this.dbSourcesCache.length > 0) {
-      return this.dbSourcesCache;
+  private async loadDBSourcesAsync(data: DBSource[]): Promise<DBSource[]> {
+    if (!await this.permissionsService.hasAsync(PUBLIC_PERMISSION)) {
+      return [];
     }
-
     const { dataSourceList } = await this.graphQLService.gql.dataSourceList();
-    this.dbSourcesCache = dataSourceList;
-    return this.dbSourcesCache;
+    return dataSourceList;
   }
 
   async openConnectionAsync(config: ConnectionConfig): Promise<Connection> {

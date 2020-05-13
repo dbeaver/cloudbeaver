@@ -16,6 +16,7 @@ import { useStyles } from '@dbeaver/core/theming';
 
 import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
 import { MainMenu } from './MainMenu/MainMenu';
+import { MainRightMenu } from './MainRightMenu/MainRightMenu';
 import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 import { topNavBarStyles } from './topNavBarStyles';
 
@@ -33,6 +34,8 @@ export const TopNavBar = observer(function TopNavBar() {
       </logo>
       <MainMenu />
       <ConnectionSelector/>
+      <fill as='div'/>
+      <MainRightMenu />
       <SettingsMenu />
     </header>
   );

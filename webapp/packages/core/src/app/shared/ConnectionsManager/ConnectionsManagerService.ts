@@ -65,9 +65,12 @@ export class ConnectionsManagerService {
   onOpenConnection = new Subject<Connection>();
   onCloseConnection = new Subject<string>();
 
-  constructor(private graphQLService: GraphQLService,
-              private nodesManagerService: NodesManagerService,
-              private sessionService: SessionService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    private nodesManagerService: NodesManagerService,
+    private sessionService: SessionService
+  ) {
+    this.sessionService.onUpdate.subscribe(this.restoreConnections.bind(this));
   }
 
   getDBDrivers(): Map<string, DBDriver> {
@@ -114,8 +117,7 @@ export class ConnectionsManagerService {
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    await this.nodesManagerService.closeConnection(id);
-    this.onCloseConnection.next(id);
+    await this.beforeRemoveConnection(id);
     await this.graphQLService.gql.closeConnection({ id });
     this.connectionsMap.delete(id);
 
@@ -129,16 +131,29 @@ export class ConnectionsManagerService {
     return data.get(connectionId)!;
   }
 
-  async restoreConnections() {
+  private async beforeRemoveConnection(id: string) {
+    await this.nodesManagerService.closeConnection(id);
+    this.onCloseConnection.next(id);
+  }
+
+  private async restoreConnections() {
     const config = await this.sessionService.session.load();
     if (!config) {
       return;
     }
 
+    let connectionsToRemove = this.connections.concat();
     // TODO: connections must be string[]
     for (const connection of config.connections) {
       await this.restoreConnection(connection);
+      connectionsToRemove = connectionsToRemove.filter(({ id }) => id !== connection.id);
     }
+
+    for (const connection of connectionsToRemove) {
+      await this.beforeRemoveConnection(connection.id);
+      this.connectionsMap.delete(connection.id);
+    }
+
     await this.nodesManagerService.updateRootChildren();
   }
 
@@ -187,6 +202,9 @@ export class ConnectionsManagerService {
     // TODO: Must be loaded based on connection id
     // const { connection } = await this.graphQLService.gql.connectionState({ id });
 
+    if (this.connectionsMap.has(connection.id)) {
+      return;
+    }
     this.connectionsMap.set(connection.id, connection);
     this.onOpenConnection.next(connection);
   }

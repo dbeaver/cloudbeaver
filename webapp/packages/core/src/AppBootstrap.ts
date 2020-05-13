@@ -8,8 +8,6 @@
 
 import {
   ConnectionDialogsService,
-  ConnectionsManagerService,
-  NodesManagerService,
   NavigationTabsService, NavigationTreeContextMenuService, LogViewerMenuService, ConnectionSchemaManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
@@ -18,7 +16,6 @@ import { ThemeService } from '@dbeaver/core/theming';
 
 import { SessionExpireService } from './dialogs';
 import { LocalizationService } from './localization';
-import { PermissionsService } from './root';
 
 /**
  * AppBootstrap.init() will be executed between first and second phase of App initialization,
@@ -33,14 +30,11 @@ export class AppBootstrap {
               private localizationService: LocalizationService,
               private themeService: ThemeService,
               private connectionDialogService: ConnectionDialogsService,
-              private connectionsManager: ConnectionsManagerService,
               private logViewerMenuService: LogViewerMenuService,
               private sessionExpireService: SessionExpireService,
               private navigationTreeContextMenuService: NavigationTreeContextMenuService,
-              private nodesManagerService: NodesManagerService,
               private navigationTabsService: NavigationTabsService,
-              private connectionSchemaManagerService: ConnectionSchemaManagerService,
-              private permissionsService: PermissionsService) {
+              private connectionSchemaManagerService: ConnectionSchemaManagerService) {
   }
 
   async init() {
@@ -49,16 +43,11 @@ export class AppBootstrap {
 
     await this.localizationService.init();
     await this.themeService.init();
-    await this.permissionsService.update();
 
     this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
     this.connectionDialogService.registerMenuItems();
     this.logViewerMenuService.registerMenuItems();
-
-    await this.connectionsManager.restoreConnections();
-
-    await this.nodesManagerService.updateRootChildren();
   }
 
   async doAfterPluginsInit() {

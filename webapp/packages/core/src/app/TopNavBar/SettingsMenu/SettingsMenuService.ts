@@ -7,33 +7,42 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { IComputedMenuItemOptions, StaticMenu } from '@dbeaver/core/dialogs';
+import { IComputedMenuItemOptions } from '@dbeaver/core/dialogs';
 import { LocalizationService } from '@dbeaver/core/localization';
 import { ThemeService } from '@dbeaver/core/theming';
+
+import { MainRightMenuService } from '../MainRightMenu/MainRightMenuService';
 
 
 @injectable()
 export class SettingsMenuService {
   static settingsMenuToken = 'settingsMenu';
 
-  private menu = new StaticMenu();
   private langMenuToken = 'langMenu';
   private themeMenuToken = 'themeMenu';
 
-  constructor(private localizationService: LocalizationService,
-              private themeService: ThemeService) {
+  constructor(
+    private localizationService: LocalizationService,
+    private themeService: ThemeService,
+    private mainRightMenuService: MainRightMenuService,
+  ) {
 
-    this.menu.addRootPanel(SettingsMenuService.settingsMenuToken);
+    this.addSettingsItem();
     this.addThemes();
     this.addLocales();
   }
 
-  getMenu() {
-    return this.menu.getMenu(SettingsMenuService.settingsMenuToken);
+  addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
+    this.mainRightMenuService.registerMenuItem(panelId, options);
   }
 
-  addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
-    this.menu.addMenuItem(panelId, options);
+  private addSettingsItem() {
+    this.mainRightMenuService.registerRootItem({
+      id: SettingsMenuService.settingsMenuToken,
+      order: 1,
+      icon: 'settings',
+      isPanel: true,
+    });
   }
 
   private addThemes() {
