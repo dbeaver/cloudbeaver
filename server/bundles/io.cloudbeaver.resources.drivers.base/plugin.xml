@@ -23,9 +23,7 @@
 
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/jaybird/LICENSE.txt"/>
-        <resource name="drivers/jaybird/antlr4-runtime-4.7.2.jar" alias="drivers/jaybird/antlr4-runtime.jar"/>
-        <resource name="drivers/jaybird/connector-api-1.5.jar" alias="drivers/jaybird/connector-api.jar"/>
-        <resource name="drivers/jaybird/jaybird-4.0.0.java8.jar" alias="drivers/jaybird/jaybird.jar"/>
+        <resource name="drivers/jaybird"/>
     </extension>
 
     <!-- SQLite -->
