@@ -31,12 +31,12 @@ copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\workspace\GlobalConfiguration
 xcopy /E /Q ..\samples\sample-databases\GlobalConfiguration cloudbeaver\workspace\GlobalConfiguration >NUL
 copy ..\samples\sample-databases\*.conf cloudbeaver\conf >NUL
+move drivers cloudbeaver >NUL
 
 echo Build static content
 
 cd ..\webapp
 
-rem call npm i lerna -g
 call lerna bootstrap
 call lerna run build --scope @dbeaver/dbeaver -- --pluginsList=../../../../products/default/plugins-list.js
 
@@ -44,7 +44,6 @@ cd ..\deploy
 
 echo Copy static content
 
-MOVE drivers cloudbeaver >NUL
 xcopy /E /Q ..\webapp\packages\dbeaver\dist cloudbeaver\web >NUL
 
 echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.
