@@ -21,20 +21,22 @@ export class AuthenticationService {
   ) { }
 
   async auth() {
-    if (await this.isForceAuthentication()) {
-      await this.authDialogService.showLoginForm(true);
-    }
-  }
-
-  async isForceAuthentication() {
     const config = await this.serverService.config.load();
     if (!config) {
       throw new Error('Can\'t configure Authentication');
     }
-    const userInfo = await this.authInfoService.updateAuthInfo();
 
-    return !config.anonymousAccessEnabled
-      && config.authenticationEnabled
-      && !userInfo;
+    if (!config.authenticationEnabled) {
+      return;
+    }
+
+    const userInfo = await this.authInfoService.updateAuthInfo();
+    if (userInfo) {
+      return;
+    }
+
+    if (!config.anonymousAccessEnabled) {
+      await this.authDialogService.showLoginForm(true);
+    }
   }
 }

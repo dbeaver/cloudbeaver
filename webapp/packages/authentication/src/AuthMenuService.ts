@@ -42,7 +42,7 @@ export class AuthMenuService {
       SettingsMenuService.settingsMenuToken,
       {
         id: 'logout',
-        order: 0,
+        order: Number.MAX_SAFE_INTEGER,
         isHidden: () => !this.serverService.config.data?.authenticationEnabled || !this.authInfoService.userInfo,
         title: 'authentication_logout',
         onClick: this.logout.bind(this),
