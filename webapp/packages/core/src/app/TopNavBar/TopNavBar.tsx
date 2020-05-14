@@ -8,8 +8,8 @@
 
 import styled from 'reshadow';
 
+import { Placeholder } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
-import { Placeholder } from '@dbeaver/core/placeholder';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { TopNavService } from './TopNavBarService';

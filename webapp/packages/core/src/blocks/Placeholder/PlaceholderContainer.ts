@@ -45,13 +45,13 @@ export class PlaceholderContainer<T = unknown> {
   }
 
   private findPosition(order: number) {
-    for (let i = 0; i < this.placeholders.length; i++) {
-      const placeholder = this.placeholders[i];
-      if (placeholder.order === undefined || order <= placeholder.order) {
-        return i;
-      }
+    const position = this.placeholders
+      .findIndex(placeholder => placeholder.order === undefined || order <= placeholder.order);
+
+    if (position === -1) {
+      return this.placeholders.length;
     }
 
-    return this.placeholders.length;
+    return position;
   }
 }

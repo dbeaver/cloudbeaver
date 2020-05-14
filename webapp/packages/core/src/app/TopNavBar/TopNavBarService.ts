@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { PlaceholderContainer } from '@dbeaver/core/blocks';
 import { injectable } from '@dbeaver/core/di';
-import { PlaceholderContainer } from '@dbeaver/core/placeholder';
 
 import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
 import { Fill } from './Fill';
