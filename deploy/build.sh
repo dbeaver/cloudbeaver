@@ -12,7 +12,7 @@ mkdir ./cloudbeaver/web
 echo "Pull dbeaver platform"
 
 cd ../..
-[ ! -d dbeaver ] && { git clone --depth 1 https://github.com/dbeaver/dbeaver.git }
+[ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 
 cd dbeaver
 git pull
