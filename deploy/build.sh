@@ -12,7 +12,7 @@ mkdir ./cloudbeaver/web
 echo "Pull dbeaver platform"
 
 cd ../..
-if [[ ! -f dbeaver ]] then
+if [ ! -d dbeaver ] then
   git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 fi
 cd dbeaver
