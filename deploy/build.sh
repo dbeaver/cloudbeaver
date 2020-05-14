@@ -12,8 +12,7 @@ mkdir ./cloudbeaver/web
 echo "Pull dbeaver platform"
 
 cd ../..
-if [[ ! -f dbeaver ]]
-then
+if [[ ! -f dbeaver ]] then
   git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 fi
 cd dbeaver
@@ -30,9 +29,9 @@ echo "Copy server packages"
 
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
 cp -p ./scripts/* ./cloudbeaver
-mkdir ./cloudbeaver/workspace/GlobalConfiguration
 cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace
-cp ../samples/sample-databases/*.conf cloudbeaver/conf/
+cp -p ../samples/sample-databases/*.conf cloudbeaver/conf/
+mv drivers cloudbeaver
 
 echo "Build static content"
 
@@ -45,7 +44,6 @@ cd ../deploy
 
 echo "Copy static content"
 
-mv drivers cloudbeaver
 cp -rp ../webapp/packages/dbeaver/dist/* cloudbeaver/web
 
 echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."
