@@ -16,15 +16,10 @@ const styles = css`
   controls {
     display: flex;
     height: 100%;
-    align-items: center;
-  }
-
-  fill {
     flex: 1;
-  }
-
-  Button:not(:first-child) {
-    margin-left: 24px;
+    align-items: center;
+    margin: auto;
+    justify-content: flex-end;
   }
 `;
 
@@ -42,7 +37,6 @@ export const AuthDialogFooter = observer(
 
     return styled(styles)(
       <controls as="div">
-        <fill as="div"/>
         <Button
           type="button"
           mod={['unelevated']}

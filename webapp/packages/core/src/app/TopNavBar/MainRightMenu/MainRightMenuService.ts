@@ -11,8 +11,8 @@ import { IComputedMenuItemOptions, StaticMenu } from '@dbeaver/core/dialogs';
 
 @injectable()
 export class MainRightMenuService {
-
   static menuToken = 'mainRightMenu';
+
   private menuOptions = new StaticMenu();
 
   constructor() {

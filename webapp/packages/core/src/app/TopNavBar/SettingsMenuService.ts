@@ -11,8 +11,7 @@ import { IComputedMenuItemOptions } from '@dbeaver/core/dialogs';
 import { LocalizationService } from '@dbeaver/core/localization';
 import { ThemeService } from '@dbeaver/core/theming';
 
-import { MainRightMenuService } from '../MainRightMenu/MainRightMenuService';
-
+import { MainRightMenuService } from './MainRightMenu/MainRightMenuService';
 
 @injectable()
 export class SettingsMenuService {

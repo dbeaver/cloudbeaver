@@ -22,12 +22,12 @@ const styles = css`
     align-items: center;
     margin-right: 16px;
     width: 250px;
+  }
 
-    & Icon {
-      height: 24px;
-      width: auto;
-      margin-bottom: 2px;
-    }
+  Icon {
+    height: 24px;
+    width: auto;
+    margin-bottom: 2px;
   }
 `;
 

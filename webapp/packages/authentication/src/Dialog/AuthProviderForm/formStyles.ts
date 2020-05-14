@@ -17,21 +17,9 @@ export const formStyles = css`
     align-items: center;
     justify-content: center;
   }
-  sub-label {
-    composes: theme-typography--caption from global;
-    line-height: 14px;
-  }
   group {
     box-sizing: border-box;
     display: flex;
     margin: 0 12px;
-  }
-  InputField[|short] {
-    min-width: unset;
-    max-width: 250px;
-  }
-  hr {
-    margin-left: 24px;
-    margin-right: 24px;
   }
 `;

@@ -13,7 +13,6 @@ import { useService } from '@dbeaver/core/di';
 import { MainRightMenuService } from './MainRightMenuService';
 import { RightMenuItem } from './RightMenuItem';
 
-
 export const MainRightMenu = observer(function MainRightMenu() {
   const mainRightMenuService = useService(MainRightMenuService);
 

@@ -26,11 +26,11 @@ type Props = Omit<ButtonHTMLAttributes<any>, 'style'> & {
 export const RightMenuItem = observer(function RightMenuItem({ menuItem, style = [], ...props }: Props) {
   const translate = useTranslate();
 
-  if (menuItem.isHidden) {
-    return null;
-  }
-
   if (!menuItem.panel) {
+    if (menuItem.isHidden) {
+      return null;
+    }
+
     return styled(useStyles(rightMenuStyles))(
       <Button
         as="button" {...props}
@@ -51,6 +51,7 @@ export const RightMenuItem = observer(function RightMenuItem({ menuItem, style =
       {...props}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
+      hidden={menuItem.isHidden}
       style={[...style, rightMenuStyles]}
     >
       {menuItem.icon && (

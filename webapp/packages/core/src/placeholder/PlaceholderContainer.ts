@@ -38,11 +38,10 @@ export class PlaceholderContainer<T = unknown> {
 
     if (!order) {
       this.placeholders.push(placeholder);
-    } else {
-      const position = this.findPosition(order);
-      console.log(position);
-      this.placeholders.splice(position, 0, placeholder);
+      return;
     }
+
+    this.placeholders.splice(this.findPosition(order), 0, placeholder);
   }
 
   private findPosition(order: number) {

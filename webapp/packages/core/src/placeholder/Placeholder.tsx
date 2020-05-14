@@ -13,7 +13,7 @@ import { PlaceholderContainer } from './PlaceholderContainer';
 type Props<T = unknown> = T extends unknown ? {
   container: PlaceholderContainer<T>;
   context?: T;
-} :{
+} : {
   container: PlaceholderContainer<T>;
   context: T;
 }

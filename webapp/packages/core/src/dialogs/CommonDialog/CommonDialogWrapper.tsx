@@ -82,6 +82,7 @@ const style = composes(
   }
   footer {
     composes: theme-elevation-z10 from global;
+    display: flex;
     z-index: 0;
     box-sizing: border-box;
     min-height: 72px;
