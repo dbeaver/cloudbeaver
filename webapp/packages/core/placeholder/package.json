@@ -1,0 +1,8 @@
+{
+  "name": "@dbeaver/core/placeholder",
+  "private": true,
+  "sideEffects": false,
+  "main": "../dist/placeholder",
+  "module": "../dist/placeholder",
+  "types": "../dist/types/placeholder"
+}

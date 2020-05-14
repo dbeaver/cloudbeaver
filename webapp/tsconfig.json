@@ -19,7 +19,8 @@
       "@dbeaver/core/utils": ["packages/core/src/utils"],
       "@dbeaver/core/extensions": ["packages/core/src/extensions"],
       "@dbeaver/core/plugin": ["packages/core/src/plugin"],
-      "@dbeaver/core/product": ["packages/core/src/product"]
+      "@dbeaver/core/product": ["packages/core/src/product"],
+      "@dbeaver/core/placeholder": ["packages/core/src/placeholder"]
     }
   }
 }

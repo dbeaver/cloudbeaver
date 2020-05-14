@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SettingsMenuService, MainRightMenuService } from '@dbeaver/core/app';
+import { SettingsMenuService, TopNavService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ServerService } from '@dbeaver/core/root';
 
 import { AuthenticationService } from './AuthenticationService';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
+import { UserInfo } from './UserInfo';
 
 @injectable()
 export class AuthMenuService {
@@ -22,7 +23,7 @@ export class AuthMenuService {
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
     private authenticationService: AuthenticationService,
-    private mainRightMenuService: MainRightMenuService,
+    private topNavService: TopNavService,
   ) { }
 
   register() {
@@ -48,13 +49,7 @@ export class AuthMenuService {
       }
     );
 
-    this.mainRightMenuService.registerRootItem({
-      id: 'user',
-      order: 0,
-      isHidden: () => !this.authInfoService.userInfo,
-      icon: 'user',
-      title: 'User',
-    });
+    this.topNavService.placeholder.add(UserInfo, 4);
   }
 
   private async logout() {

@@ -25,21 +25,5 @@ export const topNavBarStyles = composes(
       padding: 0 16px;
       z-index: 1;
     }
-    logo {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      margin-right: 16px;
-      width: 250px;
-
-      & Icon {
-        height: 24px;
-        width: auto;
-        margin-bottom: 2px;
-      }
-    }
-    fill {
-      flex: 1;
-    }
   `
 );

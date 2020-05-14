@@ -26,16 +26,17 @@ import { LocalizationService } from './localization';
 @injectable()
 export class AppBootstrap {
 
-  constructor(private exceptionsCatcherService: ExceptionsCatcherService,
-              private localizationService: LocalizationService,
-              private themeService: ThemeService,
-              private connectionDialogService: ConnectionDialogsService,
-              private logViewerMenuService: LogViewerMenuService,
-              private sessionExpireService: SessionExpireService,
-              private navigationTreeContextMenuService: NavigationTreeContextMenuService,
-              private navigationTabsService: NavigationTabsService,
-              private connectionSchemaManagerService: ConnectionSchemaManagerService) {
-  }
+  constructor(
+    private exceptionsCatcherService: ExceptionsCatcherService,
+    private localizationService: LocalizationService,
+    private themeService: ThemeService,
+    private connectionDialogService: ConnectionDialogsService,
+    private logViewerMenuService: LogViewerMenuService,
+    private sessionExpireService: SessionExpireService,
+    private navigationTreeContextMenuService: NavigationTreeContextMenuService,
+    private navigationTabsService: NavigationTabsService,
+    private connectionSchemaManagerService: ConnectionSchemaManagerService,
+  ) { }
 
   async init() {
     this.exceptionsCatcherService.subscribe();
