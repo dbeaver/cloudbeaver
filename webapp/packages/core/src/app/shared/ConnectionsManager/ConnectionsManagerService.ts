@@ -117,8 +117,8 @@ export class ConnectionsManagerService {
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    await this.beforeRemoveConnection(id);
     await this.graphQLService.gql.closeConnection({ id });
+    await this.afterConnectionClose(id);
     this.connectionsMap.delete(id);
 
     if (!skipNodesRefresh) {
@@ -131,7 +131,7 @@ export class ConnectionsManagerService {
     return data.get(connectionId)!;
   }
 
-  private async beforeRemoveConnection(id: string) {
+  private async afterConnectionClose(id: string) {
     await this.nodesManagerService.closeConnection(id);
     this.onCloseConnection.next(id);
   }
@@ -150,7 +150,7 @@ export class ConnectionsManagerService {
     }
 
     for (const connection of connectionsToRemove) {
-      await this.beforeRemoveConnection(connection.id);
+      await this.afterConnectionClose(connection.id);
       this.connectionsMap.delete(connection.id);
     }
 
