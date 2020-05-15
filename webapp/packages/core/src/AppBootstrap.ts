@@ -13,12 +13,11 @@ import {
   NavigationTabsService, NavigationTreeContextMenuService, LogViewerMenuService, ConnectionSchemaManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
+import { SessionExpireService } from '@dbeaver/core/dialogs';
 import { ExceptionsCatcherService } from '@dbeaver/core/eventsLog';
+import { LocalizationService } from '@dbeaver/core/localization';
+import { PermissionsService } from '@dbeaver/core/root';
 import { ThemeService } from '@dbeaver/core/theming';
-
-import { SessionExpireService } from './dialogs';
-import { LocalizationService } from './localization';
-import { PermissionsService } from './root';
 
 /**
  * AppBootstrap.init() will be executed between first and second phase of App initialization,

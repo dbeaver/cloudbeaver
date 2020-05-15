@@ -11,9 +11,9 @@ import { action, observable } from 'mobx';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GraphQLService } from '@dbeaver/core/sdk';
+import { CoreSettingsService } from '@dbeaver/core/settings';
 import { uuid } from '@dbeaver/core/utils';
 
-import { CoreSettingsService } from '../../../../CoreSettingsService';
 import { ILogEntry } from './ILogEntry';
 
 @injectable()

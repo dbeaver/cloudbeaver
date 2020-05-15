@@ -14,6 +14,8 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "prettify": "prettier --write **/*.ts **/*.tsx",
+    "serve-plugin": "builder serve-plugin",
+    "rollup2": "npm run clean-dist && builder build-plugin",
     "rollup": "npm run clean-dist && rollup --config configs/rollup.config.js"
   },
   "dependencies": {

@@ -1,7 +1,7 @@
 // development config
 const merge = require('webpack-merge');
 const webpack = require('webpack');
-const commonConfig = require('./common');
+const commonConfig = require('./common-exp');
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
     mode: argv.mode || 'development',
@@ -12,14 +12,14 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         './index.ts' // the entry point of our app
     ],
     devServer: {
-        hot: true, // enable HMR on the server
+        hot: false, // enable HMR on the server
         proxy: {
             '/dbeaver': {
                 target: argv.server || 'localhost:3100'
             }
         }
     },
-    devtool: 'cheap-module-eval-source-map',
+    // devtool: 'cheap-module-eval-source-map',
     plugins: [
         // new webpack.HotModuleReplacementPlugin(), // enable HMR globally
         new webpack.NamedModulesPlugin(), // prints more readable module names in the browser console on HMR updates

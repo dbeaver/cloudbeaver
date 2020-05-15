@@ -11,10 +11,10 @@ import { action, observable } from 'mobx';
 import defaultLocale from '@dbeaver/core/assets/locales/en';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
+import { SessionService, ServerService } from '@dbeaver/core/root';
 import { GraphQLService, ServerLanguage } from '@dbeaver/core/sdk';
 import { SettingsService } from '@dbeaver/core/settings';
 
-import { SessionService, ServerService } from '../root';
 import { Locale } from './Locale';
 import { TLocalizationToken } from './TLocalizationToken';
 

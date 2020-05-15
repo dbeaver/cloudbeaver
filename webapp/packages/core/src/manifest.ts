@@ -23,10 +23,9 @@ import {
   SessionService, ServerService, SessionSettingsService, ServerSettingsService, PermissionsService
 } from '@dbeaver/core/root';
 import { EnvironmentService, GraphQLService } from '@dbeaver/core/sdk';
-import { LocalStorageSaveService, SettingsService } from '@dbeaver/core/settings';
+import { LocalStorageSaveService, SettingsService, CoreSettingsService } from '@dbeaver/core/settings';
 import { ThemeService } from '@dbeaver/core/theming';
 
-import { CoreSettingsService } from './CoreSettingsService';
 
 export const coreManifest: PluginManifest = {
   info: {

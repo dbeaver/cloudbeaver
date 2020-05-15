@@ -1,5 +1,5 @@
 const merge = require('webpack-merge');
-const commonConfig = require('../../../../configs/webpack/common');
+const commonConfig = require('./common-root');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -7,8 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const StringReplacePlugin = require("string-replace-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-function replacementWithPluginImportCode(pathToList) {
-  const fullPath = path.resolve(__dirname, pathToList || '../../plugins-list')
+function replacementWithPluginImportCode(pathToList, currentDir) {
+  const fullPath = path.resolve(currentDir, pathToList || './plugins-list')
   const pluginsList = require(fullPath);
 
   let code = '';
@@ -51,8 +51,8 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       "@dbeaver/core/plugin": path.resolve(__dirname, "../../../core/src/plugin"),
 
       // rewrite imports for unnecessary work in `web/src/libs/sdk.ts`
-      'graphql-tag': path.join(__dirname, '../../fix-gql.js'),
-      graphql: path.join(__dirname, '../../fix-gql.js'),
+      'graphql-tag': path.resolve(__dirname, '../../src/fix-gql.js'),
+      graphql: path.resolve(__dirname, '../../src/fix-gql.js'),
 
       react: 'preact/compat',
       react$: 'preact/compat',
@@ -75,7 +75,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
                 {
                   pattern: /const PLUGINS = \[]/ig,
                   replacement: function (match, p1, offset, string) {
-                    return replacementWithPluginImportCode(argv.pluginsList);
+                    return replacementWithPluginImportCode(argv.pluginsList, argv.currentDir);
                   }
                 }
               ]})
@@ -85,10 +85,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     ],
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin({
-      tsconfig: path.resolve(__dirname, '../../tsconfig.json'),
-      async: false, // slow but run before dev-server starts todo try set true later
-    }),
+    // new ForkTsCheckerWebpackPlugin({
+    //   tsconfig: path.resolve(__dirname, '../../tsconfig.json'),
+    //   async: false, // slow but run before dev-server starts todo try set true later
+    // }),
 
     /**
      * this plugin allows to resolve all @dbeaver/some-plugin packages
@@ -100,11 +100,12 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       }
     ),
 
-    new CopyWebpackPlugin([ { from: '../public', to: '' } ]),
-    new HtmlWebpackPlugin({template: 'index.html.ejs',}),
+    new CopyWebpackPlugin([ { from: path.resolve(argv.currentDir, './public'), to: '' } ]),
+    new HtmlWebpackPlugin({
+      template: path.resolve(argv.currentDir, './index.html.ejs'),
+    }),
     new webpack.DefinePlugin({
-      dbeaverPlugins: JSON.stringify(require("../../package.json").dbeaverPlugins),
-      version: JSON.stringify(require("../../package.json").buildVersion),
+      version: JSON.stringify(require(path.resolve(argv.currentDir, './package.json')).buildVersion),
     }),
   ],
 

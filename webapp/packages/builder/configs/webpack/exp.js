@@ -2,21 +2,21 @@
 const merge = require('webpack-merge');
 const {resolve} = require('path');
 
-const commonConfig = require('./common');
+const commonConfig = require('./common-exp');
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
     mode: argv.mode || 'development',
     entry: './index.ts',
     output: {
-        filename: 'js/bundle.[hash].min.js',
-        path: resolve(__dirname, '../../dist'),
+        filename: 'js/bundle.[hash].js',
+        path: resolve(argv.currentDir, './dist'),
         publicPath: '',
     },
     devtool: 'source-map',
     plugins: [],
     optimization: {
-        minimize: true,
-        namedModules: false,
-        concatenateModules: true,
+        minimize: false,
+        namedModules: true,
+        concatenateModules: false,
     },
 });

@@ -1,5 +1,5 @@
 export * from './OrderedMap';
-export * from './uuid';
+export * from './uuid_';
 export * from './parseJSONFlat';
 
 export * from './Promises/CancellablePromise';
