@@ -8,10 +8,10 @@
 
 import { action, computed, observable } from 'mobx';
 
-import './styles/main/normalize.raw.css';
-import './styles/main/elevation.raw.scss';
-import './styles/main/typography.raw.scss';
-import './styles/main/color.raw.scss';
+import './styles/main/normalize.css';
+import './styles/main/elevation.scss';
+import './styles/main/typography.scss';
+import './styles/main/color.scss';
 import { injectable } from '@dbeaver/core/di';
 import { DbeaverError, NotificationService } from '@dbeaver/core/eventsLog';
 import { SettingsService } from '@dbeaver/core/settings';

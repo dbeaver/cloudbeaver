@@ -91,15 +91,6 @@ public class WebSession {
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
 
-        DBPPlatform platform = DBWorkbench.getPlatform();
-        this.navigatorModel = new DBNModel(platform, false);
-        this.navigatorModel.initialize();
-
-        DBPProject project = platform.getWorkspace().getActiveProject();
-        DBNProject projectNode = this.navigatorModel.getRoot().getProjectNode(project);
-        this.databases = projectNode.getDatabases();
-        this.locale = Locale.getDefault().getLanguage();
-
         if (!httpSession.isNew()) {
             try {
                 // Check persistent state
@@ -109,15 +100,7 @@ public class WebSession {
             }
         }
 
-        // Add all provided datasources to the session
-        synchronized (connections) {
-            for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
-                if (ds.isProvided()) {
-                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                    connections.add(connectionInfo);
-                }
-            }
-        }
+        initNavigatorModel();
     }
 
     @Property
@@ -175,10 +158,67 @@ public class WebSession {
         this.user = user;
 
         try {
+            resetSessionCache();
+            initNavigatorModel();
+        } catch (DBCException e) {
+            log.error(e);
+        }
+        try {
             refreshSessionAuth();
         } catch (DBCException e) {
             log.error(e);
         }
+    }
+
+    private void initNavigatorModel() {
+        DBPPlatform platform = DBWorkbench.getPlatform();
+        this.navigatorModel = new DBNModel(platform, false);
+        this.navigatorModel.initialize();
+
+        DBPProject project = platform.getWorkspace().getActiveProject();
+        DBNProject projectNode = this.navigatorModel.getRoot().getProjectNode(project);
+        this.databases = projectNode.getDatabases();
+        this.locale = Locale.getDefault().getLanguage();
+
+        // Add all provided datasources to the session
+        synchronized (connections) {
+            for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
+                if (ds.isProvided()) {
+                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
+                    connections.add(connectionInfo);
+                }
+            }
+        }
+    }
+
+    private void resetSessionCache() throws DBCException {
+        // Clear attributes
+        synchronized (attributes) {
+            for (Map.Entry<String, Function<Object,Object>> attrDisposer : attributeDisposers.entrySet()) {
+                Object attrValue = attributes.get(attrDisposer.getKey());
+                attrDisposer.getValue().apply(attrValue);
+            }
+            attributeDisposers.clear();
+            attributes.clear();
+        }
+
+        List<WebConnectionInfo> conCopy;
+        synchronized (this.connections) {
+            conCopy = new ArrayList<>(this.connections);
+            this.connections.clear();
+        }
+
+        for (WebConnectionInfo connectionInfo : conCopy) {
+            if (connectionInfo.isConnected()) {
+                new DisconnectJob(connectionInfo.getDataSourceContainer()).schedule();
+            }
+        }
+
+        if (this.navigatorModel != null) {
+            this.navigatorModel.dispose();
+            this.navigatorModel = null;
+        }
+        this.databases = null;
     }
 
     private void refreshSessionAuth() throws DBCException {
@@ -286,33 +326,7 @@ public class WebSession {
 
     void close() {
         try {
-            // Clear attributes
-            synchronized (attributes) {
-                for (Map.Entry<String, Function<Object,Object>> attrDisposer : attributeDisposers.entrySet()) {
-                    Object attrValue = attributes.get(attrDisposer.getKey());
-                    attrDisposer.getValue().apply(attrValue);
-                }
-                attributeDisposers.clear();
-                attributes.clear();
-            }
-
-            List<WebConnectionInfo> conCopy;
-            synchronized (this.connections) {
-                conCopy = new ArrayList<>(this.connections);
-                this.connections.clear();
-            }
-
-            for (WebConnectionInfo connectionInfo : conCopy) {
-                if (connectionInfo.isConnected()) {
-                    new DisconnectJob(connectionInfo.getDataSourceContainer()).schedule();
-                }
-            }
-
-            if (this.navigatorModel != null) {
-                this.navigatorModel.dispose();
-                this.navigatorModel = null;
-            }
-            this.databases = null;
+            resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
         }

@@ -1,6 +1,7 @@
 @echo off
 echo Clone and build Cloudbeaver
 
+IF EXIST drivers rmdir /S /Q drivers
 IF EXIST cloudbeaver rmdir /S /Q cloudbeaver
 mkdir cloudbeaver
 mkdir cloudbeaver\server
@@ -30,12 +31,12 @@ copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\workspace\GlobalConfiguration
 xcopy /E /Q ..\samples\sample-databases\GlobalConfiguration cloudbeaver\workspace\GlobalConfiguration >NUL
 copy ..\samples\sample-databases\*.conf cloudbeaver\conf >NUL
+move drivers cloudbeaver >NUL
 
 echo Build static content
 
 cd ..\webapp
 
-rem call npm i lerna -g
 call lerna bootstrap
 call lerna run build --scope @dbeaver/dbeaver -- --pluginsList=../../../../products/default/plugins-list.js
 

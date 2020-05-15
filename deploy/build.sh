@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "Clone and build Cloudbeaver"
 
+rm -rf ./drivers
 rm -rf ./cloudbeaver
 mkdir ./cloudbeaver
 mkdir ./cloudbeaver/server
@@ -11,10 +12,8 @@ mkdir ./cloudbeaver/web
 echo "Pull dbeaver platform"
 
 cd ../..
-if [[ ! -f dbeaver ]]
-then
-  git clone --depth 1 https://github.com/dbeaver/dbeaver.git
-fi
+[ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
+
 cd dbeaver
 git pull
 cd ../cloudbeaver/deploy
@@ -29,9 +28,9 @@ echo "Copy server packages"
 
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
 cp -p ./scripts/* ./cloudbeaver
-mkdir ./cloudbeaver/workspace/GlobalConfiguration
 cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace
-cp ../samples/sample-databases/*.conf cloudbeaver/conf/
+cp -p ../samples/sample-databases/*.conf cloudbeaver/conf/
+mv drivers cloudbeaver
 
 echo "Build static content"
 

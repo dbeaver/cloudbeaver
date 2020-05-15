@@ -17,10 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.WebDataSourceConfig;
-import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,9 +25,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPExternalFileManager;
-import org.jkiss.dbeaver.model.app.*;
+import org.jkiss.dbeaver.model.app.DBACertificateStorage;
+import org.jkiss.dbeaver.model.app.DBASecureStorage;
+import org.jkiss.dbeaver.model.app.DBPResourceHandler;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -160,7 +158,9 @@ public class CBPlatform extends BasePlatformImpl {
                 if (!libraries.isEmpty()) {
                     boolean hasAllFiles = true;
                     for (DBPDriverLibrary lib : libraries) {
-                        if (!lib.isOptional() && (lib.getLocalFile() == null || !lib.getLocalFile().exists())) {
+                        if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
+                            (lib.getLocalFile() == null || !lib.getLocalFile().exists()))
+                        {
                             hasAllFiles = false;
                             log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
                             break;

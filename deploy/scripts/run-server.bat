@@ -1,5 +1,4 @@
 @rem echo off
-
 for /f %%a in ('dir /B /S server\plugins\org.eclipse.equinox.launcher*.jar') do SET launcherJar="%%a"
 
 echo "Starting Cloudbeaver Server"

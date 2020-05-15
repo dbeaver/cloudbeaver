@@ -21,11 +21,9 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.dbeaver.model.exec.DBCException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Web service API
@@ -41,7 +39,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     List<WebDataSourceConfig> getGlobalDataSources() throws DBWebException;
 
-    @WebAction
+    @WebAction(requirePermissions = {})
     String[] getSessionPermissions(WebSession webSession) throws DBWebException;
 
     ///////////////////////////////////////////
@@ -50,16 +48,16 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(requirePermissions = {})
     WebSession openSession(WebSession webSession) throws DBWebException;
 
-    @WebAction
+    @WebAction(requirePermissions = {})
     WebSession getSessionState(WebSession webSession) throws DBWebException;
 
     @WebAction
     List<WebServerMessage> readSessionLog(WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
 
-    @WebAction
+    @WebAction(requirePermissions = {})
     boolean closeSession(HttpServletRequest request) throws DBWebException;
 
-    @WebAction
+    @WebAction(requirePermissions = {})
     boolean touchSession(HttpServletRequest request) throws DBWebException;
 
     @WebAction

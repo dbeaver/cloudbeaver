@@ -1,68 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
-    <!-- PostgreSQL -->
+    <!-- Resource mappings -->
     <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/postgresql/LICENSE.txt"/>
+        <resource name="drivers/clickhouse"/>
+        <resource name="drivers/derby"/>
+        <resource name="drivers/jaybird"/>
+        <resource name="drivers/h2"/>
+        <resource name="drivers/mysql/mysql8"/>
+        <resource name="drivers/mariadb"/>
         <resource name="drivers/postgresql"/>
+        <resource name="drivers/sqlite/xerial"/>
     </extension>
 
-    <!-- MySQL -->
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/mysql/LICENSE.txt"/>
-        <resource name="drivers/mysql/mysql-connector-java-5.1.44.jar" alias="drivers/mysql/mysql-connector-java.jar"/>
-        <resource name="drivers/mysql/mysql-connector-java-8.0.11.jar" alias="drivers/mysql/mysql-connector-java-8.jar"/>
-        <resource name="drivers/mysql/protobuf-java-2.6.0.jar" alias="drivers/mysql/protobuf-java.jar"/>
-    </extension>
-
-    <!-- MariaDB -->
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/mariadb/LICENSE.txt"/>
-        <resource name="drivers/mariadb/mariadb-java-client-2.6.0.jar" alias="drivers/mariadb/mariadb-java-client.jar"/>
-    </extension>
-
-    <!-- Firebird -->
-
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/jaybird/LICENSE.txt"/>
-        <resource name="drivers/jaybird/antlr4-runtime-4.7.2.jar" alias="drivers/jaybird/antlr4-runtime.jar"/>
-        <resource name="drivers/jaybird/connector-api-1.5.jar" alias="drivers/jaybird/connector-api.jar"/>
-        <resource name="drivers/jaybird/jaybird-4.0.0.java8.jar" alias="drivers/jaybird/jaybird.jar"/>
-    </extension>
-
-    <!-- SQLite -->
-
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/sqlite/xerial/LICENSE.txt"/>
-        <resource name="drivers/sqlite/xerial/sqlite-jdbc-3.30.1.jar" alias="drivers/sqlite/xerial/sqlite-jdbc.jar"/>
-    </extension>
-
-    <!-- H2 -->
-
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/h2/LICENSE.txt"/>
-        <resource name="drivers/h2/h2-1.4.196.jar" alias="drivers/h2/h2.jar"/>
-    </extension>
-
-    <!-- Drivers config -->
-
+    <!-- Bundles  -->
     <extension point="org.jkiss.dbeaver.product.bundles">
-        <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
+        <bundle id="drivers.clickhouse" label="Clickhouse drivers"/>
+        <bundle id="drivers.derby" label="Derby drivers"/>
+        <bundle id="drivers.firebird" label="Firebird drivers"/>
+        <bundle id="drivers.h2" label="H2 drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
-        <bundle id="drivers.firebird" label="Firebird drivers"/>
+        <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
-        <bundle id="drivers.h2" label="H2 drivers"/>
     </extension>
 
     <!-- Enabled drivers -->
     <extension point="io.cloudbeaver.driver">
-        <driver id="postgresql:postgres-jdbc"/>
+        <driver id="generic:yandex_clickhouse"/>
+        <driver id="generic:derby_server"/>
+        <driver id="jaybird:jaybird"/>
+        <driver id="generic:h2_embedded"/>
         <driver id="mysql:mysql8"/>
         <driver id="mysql:mariaDB"/>
+        <driver id="postgresql:postgres-jdbc"/>
         <driver id="generic:sqlite_jdbc"/>
-        <driver id="generic:derby_server"/>
-        <driver id="generic:h2_embedded"/>
-        <driver id="jaybird:jaybird"/>
     </extension>
 
 
