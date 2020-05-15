@@ -20,7 +20,11 @@ import { ILogEntry } from './ILogEntry';
 @injectable()
 export class LogViewerService {
 
-  @observable isActive = false;
+  @observable _isActive = false;
+
+  get isActive() {
+    return this._isActive;
+  }
 
   @observable private log: ILogEntry[] = [];
   private interval: any = null;
@@ -35,15 +39,10 @@ export class LogViewerService {
   }
 
   toggle() {
-    if (this.isActive) {
+    if (this._isActive) {
       this.stopLog();
-      this.isActive = false;
     } else {
-      if (!this.isLogViewerAvailable()) {
-        throw new Error('Access denied');
-      }
       this.startLog();
-      this.isActive = true;
     }
   }
 
@@ -52,9 +51,13 @@ export class LogViewerService {
   }
 
   async startLog() {
-    if (this.interval) {
+    if (this._isActive) {
       return;
     }
+    if (!this.isLogViewerAvailable()) {
+      throw new Error('Access denied');
+    }
+    this._isActive = true;
     await this.updateLog();
     const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshInterval');
     this.interval = setInterval(() => {
@@ -67,20 +70,12 @@ export class LogViewerService {
       clearInterval(this.interval);
       this.interval = null;
     }
+    this._isActive = false;
   }
 
   @action
   clearLog() {
     this.log = [];
-  }
-
-  @action
-  addNewEntries(entries: ILogEntry[]) {
-    this.log.unshift(...entries.reverse());
-    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
-    if (this.log.length > maxLogEntries) {
-      this.log.splice(maxLogEntries, this.log.length - maxLogEntries);
-    }
   }
 
   async loadLog(): Promise<ILogEntry[]> {
@@ -94,6 +89,15 @@ export class LogViewerService {
       id: uuid(),
     }));
     return entries;
+  }
+
+  @action
+  private addNewEntries(entries: ILogEntry[]) {
+    this.log.unshift(...entries.reverse());
+    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
+    if (this.log.length > maxLogEntries) {
+      this.log.splice(maxLogEntries, this.log.length - maxLogEntries);
+    }
   }
 
   private async updateLog() {
@@ -110,8 +114,8 @@ export class LogViewerService {
   }
 
   private stopIfHasNoPermission() {
-    if (this.isActive && !this.isLogViewerAvailable()) {
-      this.toggle();
+    if (this._isActive && !this.isLogViewerAvailable()) {
+      this.stopLog();
     }
   }
 
