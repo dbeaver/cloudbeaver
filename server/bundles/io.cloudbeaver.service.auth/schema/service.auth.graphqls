@@ -23,7 +23,7 @@ type AuthProviderInfo {
     icon: ID
     description: String
 
-    default: Boolean
+    defaultProvider: Boolean
 
     #configurationParameters: [ObjectPropertyInfo]!
 

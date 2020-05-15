@@ -52,7 +52,7 @@ public class WebAuthProviderInfo {
         return descriptor.getDescription();
     }
 
-    public boolean isDefault() {
+    public boolean isDefaultProvider() {
         return descriptor.getId().equals(CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultAuthProvider());
     }
 

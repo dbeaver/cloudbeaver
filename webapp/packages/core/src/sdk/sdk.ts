@@ -54,7 +54,7 @@ export type AuthProviderInfo = {
   label: Scalars["String"];
   icon?: Maybe<Scalars["ID"]>;
   description?: Maybe<Scalars["String"]>;
-  isDefault?: Maybe<Scalars["Boolean"]>;
+  defaultProvider?: Maybe<Scalars["Boolean"]>;
   credentialParameters: Array<Maybe<AuthCredentialInfo>>;
 };
 
@@ -928,7 +928,7 @@ export type GetAuthProvidersQuery = {
     Maybe<
       Pick<
         AuthProviderInfo,
-        "id" | "label" | "icon" | "description" | "isDefault"
+        "id" | "label" | "icon" | "description" | "defaultProvider"
       > & {
         credentialParameters: Array<
           Maybe<
@@ -1643,7 +1643,7 @@ export const GetAuthProvidersDocument = gql`
       label
       icon
       description
-      isDefault
+      defaultProvider
       credentialParameters {
         id
         displayName
