@@ -39,6 +39,7 @@ const style = composes(
     padding: 0;
     margin: 0;
     border: none;
+    height: auto;
     min-width: 748px;
     max-height: 100%;
     border-radius: 0.25rem;
