@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { useEffect } from 'react';
 import { useTabState, Tab as BaseTab, TabList } from 'reakit/Tab';
 import styled, { css } from 'reshadow';
 
@@ -101,6 +102,7 @@ export const AuthDialog: DialogComponent<null, null> = observer(
       selectedId: controller.provider?.id,
     });
     tab.selectedId = controller.provider?.id || null;
+    useEffect(() => controller.selectProvider(tab.selectedId!), [tab.selectedId]);
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
