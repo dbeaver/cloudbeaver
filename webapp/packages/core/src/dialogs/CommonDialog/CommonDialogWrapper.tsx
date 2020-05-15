@@ -13,7 +13,7 @@ import { composes, useStyles } from '@dbeaver/core/theming';
 
 export type CommonDialogWrapperProps = {
   title: string;
-  onReject: () => any;
+  onReject?: () => void;
   className?: string;
   noBodyPadding?: boolean;
   footer?: JSX.Element | boolean;
@@ -39,6 +39,7 @@ const style = composes(
     padding: 0;
     margin: 0;
     border: none;
+    height: auto;
     min-width: 748px;
     max-height: 100%;
     border-radius: 0.25rem;
@@ -54,6 +55,8 @@ const style = composes(
   }
   dialog-body {
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     flex: 1;
     overflow: auto;
     padding: 18px 24px;
@@ -80,6 +83,7 @@ const style = composes(
   }
   footer {
     composes: theme-elevation-z10 from global;
+    display: flex;
     z-index: 0;
     box-sizing: border-box;
     min-height: 72px;
@@ -99,17 +103,19 @@ export function CommonDialogWrapper({
 }: CommonDialogWrapperProps) {
 
   return styled(useStyles(style))(
-    <dialog>
+    <dialog className={className}>
       <header>
         <header-title as="div">
           <h1>{title}</h1>
-          <reject as="div">
-            <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
-          </reject>
+          {onReject && (
+            <reject as="div">
+              <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
+            </reject>
+          )}
         </header-title>
         {header}
       </header>
-      <dialog-body as="div" className={className} {...use({ noPadding: noBodyPadding })}>{children}</dialog-body>
+      <dialog-body as="div" {...use({ noPadding: noBodyPadding })}>{children}</dialog-body>
       <footer>
         {footer}
       </footer>

@@ -24,7 +24,6 @@ import { ConnectionFormDialogController } from './ConnectionFormDialogController
 import { ConnectionFormDialogFooter } from './ConnectionFormDialogFooter';
 import { DriverProperties } from './DriverProperties/DriverProperties';
 
-
 const styles = composes(
   css`
     BaseTab {
@@ -41,10 +40,8 @@ const styles = composes(
       box-sizing: border-box;
     }
     CommonDialogWrapper {
-      display: flex;
-      flex-direction: column;
-      max-height: 330px;
-      min-height: 330px;
+      max-height: 500px;
+      min-height: 500px;
     }
     SubmittingForm {
       overflow: auto;
@@ -149,10 +146,10 @@ export const ConnectionFormDialog = observer(
             />
           </BaseTabPanel>
         </SubmittingForm>
-        {controller.responseMessage && (
+        {controller.error.responseMessage && (
           <ErrorMessage
-            text={controller.responseMessage}
-            hasDetails={controller.hasDetails}
+            text={controller.error.responseMessage}
+            hasDetails={controller.error.hasDetails}
             onShowDetails={controller.onShowDetails}
           />
         )}

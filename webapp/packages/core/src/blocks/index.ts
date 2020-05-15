@@ -18,3 +18,5 @@ export * from './SanitizedHTML/SanitizedHTML';
 export * from './ItemList';
 export * from './PropertiesTable';
 export * from './IconButton';
+export * from './Placeholder/Placeholder';
+export * from './Placeholder/PlaceholderContainer';

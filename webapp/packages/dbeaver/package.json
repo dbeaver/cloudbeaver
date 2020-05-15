@@ -21,6 +21,7 @@
     "@ag-grid-community/all-modules": "^23.0.2",
     "@ag-grid-enterprise/all-modules": "^23.0.2",
     "@dbeaver/administration": "^0.1.0",
+    "@dbeaver/authentication": "^0.1.0",
     "@dbeaver/ag-grid-plugin": "^0.1.0",
     "@dbeaver/basic-connection-plugin": "^0.1.0",
     "@dbeaver/core": "^0.1.0",

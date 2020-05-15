@@ -11,7 +11,7 @@ import {
   MainMenuService, NavigationService, NavigationTreeService, NodesManagerService,
   ConnectionSchemaManagerService, NavigationTabsService,
   NavigationTreeContextMenuService,
-  SettingsMenuService, LogViewerService, LogViewerMenuService,
+  SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
 } from '@dbeaver/core/app';
 import { PluginManifest } from '@dbeaver/core/di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@dbeaver/core/dialogs';
@@ -56,6 +56,7 @@ export const coreManifest: PluginManifest = {
     LogViewerMenuService,
     LogViewerService,
     MainMenuService,
+    TopNavService,
     NavigationService,
     NavigationTabsService,
     NavigationTreeContextMenuService,

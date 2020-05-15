@@ -10,8 +10,13 @@ import { observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 
+export type DialogOptions = {
+  persistent?: boolean;
+}
+
 export type DialogComponentProps<TPayload, TResult> = {
   payload: TPayload;
+  options?: DialogOptions;
   resolveDialog(result: TResult | null): void;
   rejectDialog(): void; // the dialog was closed by cancel button or backdrop click
 }
@@ -23,6 +28,7 @@ export type DialogComponent<TPayload, TResult> = React.ElementType<
 export interface DialogInternal {
   component: DialogComponent<any, any>;
   payload: any;
+  options?: DialogOptions;
   resolve(result: any): void;
 }
 
@@ -32,14 +38,16 @@ export class CommonDialogService {
 
   // note that if dialog is closed by user it will be resolved with null
   async open<TPayload, TResult>(
-    dialog: DialogComponent<TPayload, TResult>,
-    payload: TPayload
+    component: DialogComponent<TPayload, TResult>,
+    payload: TPayload,
+    options?: DialogOptions,
   ): Promise<TResult | null> {
     return new Promise<TResult>((resolve, reject) => {
       const dialogInternal: DialogInternal = {
-        component: dialog,
+        component,
         payload,
         resolve,
+        options,
       };
       this.dialogs.push(dialogInternal);
     });

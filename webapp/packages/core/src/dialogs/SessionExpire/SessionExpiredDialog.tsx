@@ -26,9 +26,11 @@ const styles = css`
   }
   controls {
     display: flex;
-    justify-content: flex-end;
+    flex: 1;
     height: 100%;
     align-items: center;
+    margin: auto;
+    justify-content: flex-end;
   }
 `;
 

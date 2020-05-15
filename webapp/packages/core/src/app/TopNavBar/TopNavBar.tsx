@@ -6,34 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { Icon } from '@dbeaver/core/blocks';
+import { Placeholder } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
-import { ServerService } from '@dbeaver/core/root';
 import { useStyles } from '@dbeaver/core/theming';
 
-import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
-import { MainMenu } from './MainMenu/MainMenu';
-import { SettingsMenu } from './SettingsMenu/SettingsMenu';
+import { TopNavService } from './TopNavBarService';
 import { topNavBarStyles } from './topNavBarStyles';
 
-
-declare const version: string; // declared in webpack DefinePlugin // todo move to enviroment?
-
-export const TopNavBar = observer(function TopNavBar() {
-  const serverService = useService(ServerService);
-  const title = `Frontend: ${version}\nBackend: ${serverService.config.data?.version}`;
+export function TopNavBar() {
+  const topNavBarService = useService(TopNavService);
 
   return styled(useStyles(topNavBarStyles))(
     <header>
-      <logo as="div" title={title}>
-        <Icon name="logo" viewBox="0 0 361 73" />
-      </logo>
-      <MainMenu />
-      <ConnectionSelector/>
-      <SettingsMenu />
+      <Placeholder container={topNavBarService.placeholder} />
     </header>
   );
-});
+}

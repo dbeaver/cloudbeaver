@@ -25,7 +25,6 @@ export const settingsMenuStyles = css`
   }
   menu-panel-item {
     flex-direction: row-reverse;
-
     & menu-item-text  {
       text-align: right;
     }

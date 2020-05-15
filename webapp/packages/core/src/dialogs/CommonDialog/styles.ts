@@ -11,24 +11,23 @@ import { css } from 'reshadow';
 export const dialogStyles = css`
     DialogBackdrop {
       box-sizing: border-box;
-      background-color: #0000007a;
+      background-color: rgba(0,0,0,0.48);
       position: fixed;
       top: 0px;
       right: 0px;
       bottom: 0px;
       left: 0px;
+      z-index: 999;
     }
 
     Dialog {
       box-sizing: border-box;
       display: flex;
       position: fixed;
-      align-items: center;
-      justify-content: center;
-      top: 0;
-      padding: 54px;
-      width: 100%;
-      height: 100%;
+      top: 50%;
+      left: 50%;
+      max-height: calc(100vh);
+      transform: translate(-50%, -50%);
       z-index: 999;
     }
   `;

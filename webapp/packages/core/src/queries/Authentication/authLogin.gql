@@ -1,0 +1,12 @@
+query authLogin(
+  $provider: ID!
+  $credentials: Object!
+) {
+  user: authLogin(provider: $provider, credentials: $credentials) {
+    userId
+    displayName
+    authProvider
+    loginTime
+    message
+  } 
+}
