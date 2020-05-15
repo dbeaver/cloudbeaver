@@ -11,9 +11,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** Any object (JSON) */
   Object: any;
-  /** Date/Time */
   DateTime: any;
 };
 
@@ -24,10 +22,6 @@ export type AsyncTaskInfo = {
   status?: Maybe<Scalars["String"]>;
   error?: Maybe<ServerError>;
   result?: Maybe<SqlExecuteInfo>;
-  /**
-   * Task result.
-   * Can be some kind of identifier to obtain real result using another API function
-   */
   taskResult?: Maybe<Scalars["Object"]>;
 };
 
@@ -41,9 +35,7 @@ export type AuthCredentialInfo = {
   id: Scalars["ID"];
   displayName: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  /** This field must be shown in admin panel */
   admin?: Maybe<Scalars["Boolean"]>;
-  /** This field must be shown in login form */
   user?: Maybe<Scalars["Boolean"]>;
   possibleValues?: Maybe<Array<Maybe<Scalars["String"]>>>;
   encryption?: Maybe<AuthCredentialEncryption>;
@@ -54,33 +46,24 @@ export type AuthProviderInfo = {
   label: Scalars["String"];
   icon?: Maybe<Scalars["ID"]>;
   description?: Maybe<Scalars["String"]>;
-  isDefault?: Maybe<Scalars["Boolean"]>;
+  default?: Maybe<Scalars["Boolean"]>;
   credentialParameters: Array<Maybe<AuthCredentialInfo>>;
 };
 
-/** Configuration of particular connection. Used for new connection create. Includes auth info */
 export type ConnectionConfig = {
   name?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
-  /** ID of predefined datasource */
   dataSourceId?: Maybe<Scalars["ID"]>;
-  /** Driver ID */
   driverId?: Maybe<Scalars["ID"]>;
-  /** Host */
   host?: Maybe<Scalars["String"]>;
-  /** Port */
   port?: Maybe<Scalars["String"]>;
-  /** Databae name */
   databaseName?: Maybe<Scalars["String"]>;
-  /** Databae name */
   url?: Maybe<Scalars["String"]>;
-  /** Properties */
   properties?: Maybe<Scalars["Object"]>;
   userName?: Maybe<Scalars["String"]>;
   userPassword?: Maybe<Scalars["String"]>;
 };
 
-/** Connection instance */
 export type ConnectionInfo = {
   id: Scalars["ID"];
   driverId: Scalars["ID"];
@@ -93,32 +76,20 @@ export type ConnectionInfo = {
   connectionError?: Maybe<ServerError>;
   serverVersion?: Maybe<Scalars["String"]>;
   clientVersion?: Maybe<Scalars["String"]>;
-  /** Supported features (provided etc) */
   features?: Maybe<Array<Scalars["String"]>>;
 };
 
 export type DatabaseObjectInfo = {
-  /** Object name */
   name?: Maybe<Scalars["String"]>;
-  /** Description - optional */
   description?: Maybe<Scalars["String"]>;
-  /** Object type. Java class name in most cases */
   type?: Maybe<Scalars["String"]>;
-  /**
-   * Read object properties.
-   * Optional parameter 'ids' filters properties by id. null means all properties.
-   * Note: property value reading may take a lot of time so don't read all property values always
-   * Examine property meta (features in particular) before reading them
-   */
   properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
   ordinalPosition?: Maybe<Scalars["Int"]>;
   fullyQualifiedName?: Maybe<Scalars["String"]>;
   overloadedName?: Maybe<Scalars["String"]>;
   uniqueName?: Maybe<Scalars["String"]>;
   state?: Maybe<Scalars["String"]>;
-  /** Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog */
   features?: Maybe<Array<Maybe<Scalars["String"]>>>;
-  /** Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition */
   editors?: Maybe<Array<Maybe<Scalars["String"]>>>;
 };
 
@@ -131,7 +102,6 @@ export type DatabaseStructContainers = {
   schemaList: Array<DatabaseObjectInfo>;
 };
 
-/** Data source info is a description of some remote database. Doesn't include user credentials */
 export type DataSourceInfo = {
   id: Scalars["ID"];
   driverId: Scalars["ID"];
@@ -145,16 +115,9 @@ export type DataSourceInfo = {
 };
 
 export type DataTransferParameters = {
-  /** Processor ID */
   processorId: Scalars["ID"];
-  /**
-   * General settings:
-   *   - openNewConnection: opens new database connection for data transfer task
-   */
   settings?: Maybe<Scalars["Object"]>;
-  /** Processor properties. See DataTransferProcessorInfo.properties */
   processorProperties: Scalars["Object"];
-  /** Data filter settings */
   filter?: Maybe<SqlDataFilter>;
 };
 
@@ -178,9 +141,7 @@ export type DriverInfo = {
   description?: Maybe<Scalars["String"]>;
   icon?: Maybe<Scalars["String"]>;
   iconBig?: Maybe<Scalars["String"]>;
-  /** Driver provider ID */
   providerId?: Maybe<Scalars["ID"]>;
-  /** Driver Java class name */
   driverClassName?: Maybe<Scalars["String"]>;
   defaultPort?: Maybe<Scalars["String"]>;
   sampleURL?: Maybe<Scalars["String"]>;
@@ -192,15 +153,9 @@ export type DriverInfo = {
   licenseRequired?: Maybe<Scalars["Boolean"]>;
   license?: Maybe<Scalars["String"]>;
   custom?: Maybe<Scalars["Boolean"]>;
-  /** Driver score for ordering, biggest first */
   promotedScore?: Maybe<Scalars["Int"]>;
   connectionProperties?: Maybe<Scalars["Object"]>;
   defaultConnectionProperties?: Maybe<Scalars["Object"]>;
-  /**
-   * Driver properties.
-   * Note: it is expensive property and it may produce database server roundtrips.
-   * Call it only when you really need it.
-   */
   driverProperties?: Maybe<Array<Maybe<DriverPropertyInfo>>>;
   driverParameters?: Maybe<Scalars["Object"]>;
 };
@@ -223,53 +178,31 @@ export type LogEntry = {
 };
 
 export type Mutation = {
-  /** Initialize session */
-  openSession?: Maybe<SessionInfo>;
-  /** Destroy session */
-  closeSession?: Maybe<Scalars["Boolean"]>;
-  /** Refreshes session on server and returns its state */
-  touchSession?: Maybe<Scalars["Boolean"]>;
-  /** Refreshes session on server and returns its state */
-  changeSessionLanguage?: Maybe<Scalars["Boolean"]>;
-  /** Create new connection */
-  createConnection?: Maybe<ConnectionInfo>;
-  /** Test connection configuration. Returns remote server version */
-  testConnection?: Maybe<ConnectionInfo>;
-  /** Connect to database */
-  openConnection?: Maybe<ConnectionInfo>;
-  /** Disconnect from database */
-  closeConnection: Scalars["Boolean"];
+  asyncSqlExecuteQuery: AsyncTaskInfo;
   asyncTaskCancel?: Maybe<Scalars["Boolean"]>;
   asyncTaskStatus: AsyncTaskInfo;
+  changeSessionLanguage?: Maybe<Scalars["Boolean"]>;
+  closeConnection: Scalars["Boolean"];
+  closeSession?: Maybe<Scalars["Boolean"]>;
+  createConnection?: Maybe<ConnectionInfo>;
+  openConnection?: Maybe<ConnectionInfo>;
+  openSession?: Maybe<SessionInfo>;
+  readDataFromContainer?: Maybe<SqlExecuteInfo>;
   sqlContextCreate: SqlContextInfo;
-  sqlContextSetDefaults: Scalars["Boolean"];
   sqlContextDestroy: Scalars["Boolean"];
+  sqlContextSetDefaults: Scalars["Boolean"];
   sqlExecuteQuery?: Maybe<SqlExecuteInfo>;
   sqlResultClose: Scalars["Boolean"];
-  readDataFromContainer?: Maybe<SqlExecuteInfo>;
+  testConnection?: Maybe<ConnectionInfo>;
+  touchSession?: Maybe<Scalars["Boolean"]>;
   updateResultsData?: Maybe<SqlExecuteInfo>;
-  /** Returns SQLExecuteInfo */
-  asyncSqlExecuteQuery: AsyncTaskInfo;
 };
 
-export type MutationChangeSessionLanguageArgs = {
-  locale?: Maybe<Scalars["String"]>;
-};
-
-export type MutationCreateConnectionArgs = {
-  config: ConnectionConfig;
-};
-
-export type MutationTestConnectionArgs = {
-  config: ConnectionConfig;
-};
-
-export type MutationOpenConnectionArgs = {
-  config: ConnectionConfig;
-};
-
-export type MutationCloseConnectionArgs = {
-  id: Scalars["ID"];
+export type MutationAsyncSqlExecuteQueryArgs = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
+  sql: Scalars["String"];
+  filter?: Maybe<SqlDataFilter>;
 };
 
 export type MutationAsyncTaskCancelArgs = {
@@ -280,10 +213,38 @@ export type MutationAsyncTaskStatusArgs = {
   id: Scalars["String"];
 };
 
+export type MutationChangeSessionLanguageArgs = {
+  locale?: Maybe<Scalars["String"]>;
+};
+
+export type MutationCloseConnectionArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationCreateConnectionArgs = {
+  config: ConnectionConfig;
+};
+
+export type MutationOpenConnectionArgs = {
+  config: ConnectionConfig;
+};
+
+export type MutationReadDataFromContainerArgs = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
+  containerNodePath: Scalars["ID"];
+  filter?: Maybe<SqlDataFilter>;
+};
+
 export type MutationSqlContextCreateArgs = {
   connectionId: Scalars["ID"];
   defaultCatalog?: Maybe<Scalars["String"]>;
   defaultSchema?: Maybe<Scalars["String"]>;
+};
+
+export type MutationSqlContextDestroyArgs = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
 };
 
 export type MutationSqlContextSetDefaultsArgs = {
@@ -291,11 +252,6 @@ export type MutationSqlContextSetDefaultsArgs = {
   contextId: Scalars["ID"];
   defaultCatalog?: Maybe<Scalars["ID"]>;
   defaultSchema?: Maybe<Scalars["ID"]>;
-};
-
-export type MutationSqlContextDestroyArgs = {
-  connectionId: Scalars["ID"];
-  contextId: Scalars["ID"];
 };
 
 export type MutationSqlExecuteQueryArgs = {
@@ -311,11 +267,8 @@ export type MutationSqlResultCloseArgs = {
   resultId: Scalars["ID"];
 };
 
-export type MutationReadDataFromContainerArgs = {
-  connectionId: Scalars["ID"];
-  contextId: Scalars["ID"];
-  containerNodePath: Scalars["ID"];
-  filter?: Maybe<SqlDataFilter>;
+export type MutationTestConnectionArgs = {
+  config: ConnectionConfig;
 };
 
 export type MutationUpdateResultsDataArgs = {
@@ -326,29 +279,14 @@ export type MutationUpdateResultsDataArgs = {
   updateValues?: Maybe<Scalars["Object"]>;
 };
 
-export type MutationAsyncSqlExecuteQueryArgs = {
-  connectionId: Scalars["ID"];
-  contextId: Scalars["ID"];
-  sql: Scalars["String"];
-  filter?: Maybe<SqlDataFilter>;
-};
-
 export type NavigatorNodeInfo = {
-  /** Node ID - generally a full path to the node from root of tree */
   id: Scalars["ID"];
-  /** Node human readable name */
   name?: Maybe<Scalars["String"]>;
-  /** Node icon path */
   icon?: Maybe<Scalars["String"]>;
-  /** Node description */
   description?: Maybe<Scalars["String"]>;
-  /** Node type */
   nodeType?: Maybe<Scalars["String"]>;
-  /** Can this property have child nodes? */
   hasChildren?: Maybe<Scalars["Boolean"]>;
-  /** Associated object. Maybe null for non-database objects */
   object?: Maybe<DatabaseObjectInfo>;
-  /** Supported features: item, container, leaf */
   features?: Maybe<Array<Maybe<Scalars["String"]>>>;
   folder?: Maybe<Scalars["Boolean"]>;
   inline?: Maybe<Scalars["Boolean"]>;
@@ -372,115 +310,52 @@ export type ObjectPropertyFilter = {
 };
 
 export type ObjectPropertyInfo = {
-  /** ID */
   id?: Maybe<Scalars["String"]>;
-  /** Human readable name */
   displayName?: Maybe<Scalars["String"]>;
-  /** Property description */
   description?: Maybe<Scalars["String"]>;
-  /** Property category (may be used if object has a lot of properties) */
   category?: Maybe<Scalars["String"]>;
-  /** Property data type (int, String, etc) */
   dataType?: Maybe<Scalars["String"]>;
-  /** Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables) */
   value?: Maybe<Scalars["Object"]>;
-  /** List of values this property can take. Makes sense only for enumerable properties */
   validValues?: Maybe<Array<Maybe<Scalars["Object"]>>>;
-  /** Default property value */
   defaultValue?: Maybe<Scalars["Object"]>;
-  /** Supported features (system, hidden, inherited, foreign, expensive, etc) */
   features?: Maybe<Array<Scalars["String"]>>;
 };
 
 export type Query = {
-  /** Returns server config */
-  serverConfig?: Maybe<ServerConfig>;
-  /** Returns session state ( initialize if not ) */
-  sessionState?: Maybe<SessionInfo>;
-  /** Session permissions */
-  sessionPermissions: Array<Maybe<Scalars["ID"]>>;
-  /** Get driver info */
-  driverList?: Maybe<Array<DriverInfo>>;
-  /** Get list of predefined data sources */
-  dataSourceList?: Maybe<Array<DataSourceInfo>>;
-  /** Return connection state */
-  connectionState?: Maybe<ConnectionInfo>;
-  readSessionLog?: Maybe<Array<LogEntry>>;
-  /** Get child nodes */
-  navNodeChildren?: Maybe<Array<NavigatorNodeInfo>>;
-  navNodeInfo?: Maybe<NavigatorNodeInfo>;
-  navRefreshNode?: Maybe<Scalars["Boolean"]>;
-  navGetStructContainers: DatabaseStructContainers;
-  sqlDialectInfo?: Maybe<SqlDialectInfo>;
-  sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
-  sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   authLogin?: Maybe<UserAuthInfo>;
   authLogout?: Maybe<Scalars["Boolean"]>;
-  sessionUser?: Maybe<UserAuthInfo>;
   authProviders: Array<Maybe<AuthProviderInfo>>;
-  /** Available transfer processors */
+  connectionState?: Maybe<ConnectionInfo>;
+  dataSourceList?: Maybe<Array<DataSourceInfo>>;
   dataTransferAvailableStreamProcessors?: Maybe<
     Array<Maybe<DataTransferProcessorInfo>>
   >;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars["Boolean"]>;
-  /** Get child nodes */
+  driverList?: Maybe<Array<DriverInfo>>;
   metadataGetNodeDDL?: Maybe<Scalars["String"]>;
-};
-
-export type QueryDriverListArgs = {
-  id?: Maybe<Scalars["ID"]>;
-};
-
-export type QueryConnectionStateArgs = {
-  id: Scalars["ID"];
-};
-
-export type QueryReadSessionLogArgs = {
-  maxEntries?: Maybe<Scalars["Int"]>;
-  clearEntries?: Maybe<Scalars["Boolean"]>;
-};
-
-export type QueryNavNodeChildrenArgs = {
-  parentPath: Scalars["ID"];
-  offset?: Maybe<Scalars["Int"]>;
-  limit?: Maybe<Scalars["Int"]>;
-  onlyFolders?: Maybe<Scalars["Boolean"]>;
-};
-
-export type QueryNavNodeInfoArgs = {
-  nodePath: Scalars["ID"];
-};
-
-export type QueryNavRefreshNodeArgs = {
-  nodePath: Scalars["ID"];
-};
-
-export type QueryNavGetStructContainersArgs = {
-  connectionId: Scalars["ID"];
-  catalog?: Maybe<Scalars["ID"]>;
-};
-
-export type QuerySqlDialectInfoArgs = {
-  connectionId: Scalars["ID"];
-};
-
-export type QuerySqlListContextsArgs = {
-  connectionId: Scalars["ID"];
-};
-
-export type QuerySqlCompletionProposalsArgs = {
-  connectionId: Scalars["ID"];
-  contextId: Scalars["ID"];
-  query: Scalars["String"];
-  position: Scalars["Int"];
-  maxResults?: Maybe<Scalars["Int"]>;
+  navGetStructContainers: DatabaseStructContainers;
+  navNodeChildren?: Maybe<Array<NavigatorNodeInfo>>;
+  navNodeInfo?: Maybe<NavigatorNodeInfo>;
+  navRefreshNode?: Maybe<Scalars["Boolean"]>;
+  readSessionLog?: Maybe<Array<LogEntry>>;
+  serverConfig?: Maybe<ServerConfig>;
+  sessionPermissions: Array<Maybe<Scalars["ID"]>>;
+  sessionState?: Maybe<SessionInfo>;
+  sessionUser?: Maybe<UserAuthInfo>;
+  sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
+  sqlDialectInfo?: Maybe<SqlDialectInfo>;
+  sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
 };
 
 export type QueryAuthLoginArgs = {
   provider: Scalars["ID"];
   credentials: Scalars["Object"];
+};
+
+export type QueryConnectionStateArgs = {
+  id: Scalars["ID"];
 };
 
 export type QueryDataTransferExportDataFromContainerArgs = {
@@ -500,9 +375,54 @@ export type QueryDataTransferRemoveDataFileArgs = {
   dataFileId: Scalars["String"];
 };
 
+export type QueryDriverListArgs = {
+  id?: Maybe<Scalars["ID"]>;
+};
+
 export type QueryMetadataGetNodeDdlArgs = {
   nodeId: Scalars["ID"];
   options?: Maybe<Scalars["Object"]>;
+};
+
+export type QueryNavGetStructContainersArgs = {
+  connectionId: Scalars["ID"];
+  catalog?: Maybe<Scalars["ID"]>;
+};
+
+export type QueryNavNodeChildrenArgs = {
+  parentPath: Scalars["ID"];
+  offset?: Maybe<Scalars["Int"]>;
+  limit?: Maybe<Scalars["Int"]>;
+  onlyFolders?: Maybe<Scalars["Boolean"]>;
+};
+
+export type QueryNavNodeInfoArgs = {
+  nodePath: Scalars["ID"];
+};
+
+export type QueryNavRefreshNodeArgs = {
+  nodePath: Scalars["ID"];
+};
+
+export type QueryReadSessionLogArgs = {
+  maxEntries?: Maybe<Scalars["Int"]>;
+  clearEntries?: Maybe<Scalars["Boolean"]>;
+};
+
+export type QuerySqlCompletionProposalsArgs = {
+  connectionId: Scalars["ID"];
+  contextId: Scalars["ID"];
+  query: Scalars["String"];
+  position: Scalars["Int"];
+  maxResults?: Maybe<Scalars["Int"]>;
+};
+
+export type QuerySqlDialectInfoArgs = {
+  connectionId: Scalars["ID"];
+};
+
+export type QuerySqlListContextsArgs = {
+  connectionId: Scalars["ID"];
 };
 
 export type ServerConfig = {
@@ -559,7 +479,6 @@ export type SqlCompletionProposal = {
   nodePath?: Maybe<Scalars["String"]>;
 };
 
-/** SQL context must be created for each SQL editor */
 export type SqlContextInfo = {
   id: Scalars["ID"];
   defaultCatalog?: Maybe<Scalars["String"]>;
@@ -626,19 +545,14 @@ export type SqlResultSet = {
   id: Scalars["ID"];
   columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
   rows?: Maybe<Array<Maybe<Array<Maybe<Scalars["Object"]>>>>>;
-  /** server always returns hasMoreData = false */
   hasMoreData?: Maybe<Scalars["Boolean"]>;
 };
 
 export type UserAuthInfo = {
-  /** User unique identifier */
   userId: Scalars["String"];
-  /** Human readable display name. May be null */
   displayName?: Maybe<Scalars["String"]>;
-  /** Auth provider ID */
   authProvider: Scalars["String"];
   loginTime: Scalars["DateTime"];
-  /** Optional login message */
   message?: Maybe<Scalars["String"]>;
 };
 
@@ -676,7 +590,7 @@ export type ConnectionStateQueryVariables = {
 };
 
 export type ConnectionStateQuery = {
-  connection: Maybe<
+  connection?: Maybe<
     Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">
   >;
 };
@@ -686,7 +600,7 @@ export type CreateConnectionMutationVariables = {
 };
 
 export type CreateConnectionMutation = {
-  createConnection: Maybe<
+  createConnection?: Maybe<
     Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">
   >;
 };
@@ -694,7 +608,7 @@ export type CreateConnectionMutation = {
 export type DataSourceListQueryVariables = {};
 
 export type DataSourceListQuery = {
-  dataSourceList: Maybe<
+  dataSourceList?: Maybe<
     Array<Pick<DataSourceInfo, "id" | "name" | "driverId" | "description">>
   >;
 };
@@ -702,7 +616,7 @@ export type DataSourceListQuery = {
 export type DriverListQueryVariables = {};
 
 export type DriverListQuery = {
-  driverList: Maybe<
+  driverList?: Maybe<
     Array<
       Pick<
         DriverInfo,
@@ -725,10 +639,10 @@ export type DriverPropertiesQueryVariables = {
 };
 
 export type DriverPropertiesQuery = {
-  driver: Maybe<
+  driver?: Maybe<
     Array<
       Pick<DriverInfo, "driverParameters"> & {
-        driverProperties: Maybe<
+        driverProperties?: Maybe<
           Array<
             Maybe<
               Pick<
@@ -754,7 +668,7 @@ export type GetDriverByIdQueryVariables = {
 };
 
 export type GetDriverByIdQuery = {
-  driverList: Maybe<Array<Pick<DriverInfo, "id" | "name" | "icon">>>;
+  driverList?: Maybe<Array<Pick<DriverInfo, "id" | "name" | "icon">>>;
 };
 
 export type OpenConnectionMutationVariables = {
@@ -762,7 +676,7 @@ export type OpenConnectionMutationVariables = {
 };
 
 export type OpenConnectionMutation = {
-  openConnection: Maybe<
+  openConnection?: Maybe<
     Pick<ConnectionInfo, "id" | "name" | "driverId" | "connected">
   >;
 };
@@ -772,7 +686,7 @@ export type TestConnectionMutationVariables = {
 };
 
 export type TestConnectionMutation = {
-  testConnection: Maybe<Pick<ConnectionInfo, "id">>;
+  testConnection?: Maybe<Pick<ConnectionInfo, "id">>;
 };
 
 export type NavNodeChildrenQueryVariables = {
@@ -780,7 +694,7 @@ export type NavNodeChildrenQueryVariables = {
 };
 
 export type NavNodeChildrenQuery = {
-  navNodeChildren: Maybe<
+  navNodeChildren?: Maybe<
     Array<
       Pick<
         NavigatorNodeInfo,
@@ -793,7 +707,7 @@ export type NavNodeChildrenQuery = {
         | "inline"
         | "navigable"
         | "features"
-      > & { object: Maybe<Pick<DatabaseObjectInfo, "features">> }
+      > & { object?: Maybe<Pick<DatabaseObjectInfo, "features">> }
     >
   >;
 };
@@ -803,7 +717,7 @@ export type NavNodeInfoQueryVariables = {
 };
 
 export type NavNodeInfoQuery = {
-  navNodeInfo: Maybe<
+  navNodeInfo?: Maybe<
     Pick<
       NavigatorNodeInfo,
       | "id"
@@ -815,7 +729,7 @@ export type NavNodeInfoQuery = {
       | "inline"
       | "navigable"
       | "features"
-    > & { object: Maybe<Pick<DatabaseObjectInfo, "features">> }
+    > & { object?: Maybe<Pick<DatabaseObjectInfo, "features">> }
   >;
 };
 
@@ -825,12 +739,12 @@ export type QueryChildrenDatabaseObjectInfoQueryVariables = {
 };
 
 export type QueryChildrenDatabaseObjectInfoQuery = {
-  childrenDatabaseObjectInfo: Maybe<
+  childrenDatabaseObjectInfo?: Maybe<
     Array<
       Pick<NavigatorNodeInfo, "id"> & {
-        object: Maybe<
+        object?: Maybe<
           Pick<DatabaseObjectInfo, "features"> & {
-            properties: Maybe<
+            properties?: Maybe<
               Array<
                 Maybe<
                   Pick<
@@ -859,11 +773,11 @@ export type QueryDatabaseObjectInfoQueryVariables = {
 };
 
 export type QueryDatabaseObjectInfoQuery = {
-  objectInfo: Maybe<
+  objectInfo?: Maybe<
     Pick<NavigatorNodeInfo, "id"> & {
-      object: Maybe<
+      object?: Maybe<
         Pick<DatabaseObjectInfo, "features"> & {
-          properties: Maybe<
+          properties?: Maybe<
             Array<
               Maybe<
                 Pick<
@@ -891,7 +805,9 @@ export type ReadSessionLogQueryVariables = {
 };
 
 export type ReadSessionLogQuery = {
-  log: Maybe<Array<Pick<LogEntry, "time" | "type" | "message" | "stackTrace">>>;
+  log?: Maybe<
+    Array<Pick<LogEntry, "time" | "type" | "message" | "stackTrace">>
+  >;
 };
 
 export type ChangeSessionLanguageMutationVariables = {
@@ -909,7 +825,7 @@ export type AuthLoginQueryVariables = {
 };
 
 export type AuthLoginQuery = {
-  user: Maybe<
+  user?: Maybe<
     Pick<
       UserAuthInfo,
       "userId" | "displayName" | "authProvider" | "loginTime" | "message"
@@ -928,7 +844,7 @@ export type GetAuthProvidersQuery = {
     Maybe<
       Pick<
         AuthProviderInfo,
-        "id" | "label" | "icon" | "description" | "isDefault"
+        "id" | "label" | "icon" | "description" | "default"
       > & {
         credentialParameters: Array<
           Maybe<
@@ -952,7 +868,7 @@ export type GetAuthProvidersQuery = {
 export type GetSessionUserQueryVariables = {};
 
 export type GetSessionUserQuery = {
-  user: Maybe<
+  user?: Maybe<
     Pick<
       UserAuthInfo,
       "userId" | "displayName" | "authProvider" | "loginTime" | "message"
@@ -969,7 +885,7 @@ export type AsyncExportTaskStatusMutation = {
     AsyncTaskInfo,
     "id" | "name" | "running" | "status" | "taskResult"
   > & {
-    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+    error?: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
 
@@ -981,7 +897,7 @@ export type ExportDataFromContainerQueryVariables = {
 
 export type ExportDataFromContainerQuery = {
   taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
-    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+    error?: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
 
@@ -994,14 +910,14 @@ export type ExportDataFromResultsQueryVariables = {
 
 export type ExportDataFromResultsQuery = {
   taskInfo: Pick<AsyncTaskInfo, "id" | "running" | "taskResult"> & {
-    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+    error?: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
 
 export type GetDataTransferProcessorsQueryVariables = {};
 
 export type GetDataTransferProcessorsQuery = {
-  processors: Maybe<
+  processors?: Maybe<
     Array<
       Maybe<
         Pick<
@@ -1017,7 +933,7 @@ export type GetDataTransferProcessorsQuery = {
           | "isBinary"
           | "isHTML"
         > & {
-          properties: Maybe<
+          properties?: Maybe<
             Array<
               Maybe<
                 Pick<
@@ -1057,17 +973,17 @@ export type AsyncSqlExecuteQueryMutationVariables = {
 
 export type AsyncSqlExecuteQueryMutation = {
   taskInfo: Pick<AsyncTaskInfo, "id" | "running"> & {
-    result: Maybe<
+    result?: Maybe<
       Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
-        results: Maybe<
+        results?: Maybe<
           Array<
             Pick<
               SqlQueryResults,
               "updateRowCount" | "sourceQuery" | "title"
             > & {
-              resultSet: Maybe<
+              resultSet?: Maybe<
                 Pick<SqlResultSet, "id" | "rows"> & {
-                  columns: Maybe<
+                  columns?: Maybe<
                     Array<
                       Maybe<
                         Pick<
@@ -1094,7 +1010,7 @@ export type AsyncSqlExecuteQueryMutation = {
         >;
       }
     >;
-    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+    error?: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
 
@@ -1110,17 +1026,17 @@ export type AsyncTaskStatusMutationVariables = {
 
 export type AsyncTaskStatusMutation = {
   taskInfo: Pick<AsyncTaskInfo, "id" | "running"> & {
-    result: Maybe<
+    result?: Maybe<
       Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
-        results: Maybe<
+        results?: Maybe<
           Array<
             Pick<
               SqlQueryResults,
               "updateRowCount" | "sourceQuery" | "title"
             > & {
-              resultSet: Maybe<
+              resultSet?: Maybe<
                 Pick<SqlResultSet, "id" | "rows"> & {
-                  columns: Maybe<
+                  columns?: Maybe<
                     Array<
                       Maybe<
                         Pick<
@@ -1147,7 +1063,7 @@ export type AsyncTaskStatusMutation = {
         >;
       }
     >;
-    error: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
+    error?: Maybe<Pick<ServerError, "message" | "errorCode" | "stackTrace">>;
   };
 };
 
@@ -1159,14 +1075,14 @@ export type ExecuteSqlQueryMutationVariables = {
 };
 
 export type ExecuteSqlQueryMutation = {
-  result: Maybe<
+  result?: Maybe<
     Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
-      results: Maybe<
+      results?: Maybe<
         Array<
           Pick<SqlQueryResults, "updateRowCount" | "sourceQuery" | "title"> & {
-            resultSet: Maybe<
+            resultSet?: Maybe<
               Pick<SqlResultSet, "id" | "rows"> & {
-                columns: Maybe<
+                columns?: Maybe<
                   Array<
                     Maybe<
                       Pick<
@@ -1210,7 +1126,7 @@ export type QuerySqlCompletionProposalsQueryVariables = {
 };
 
 export type QuerySqlCompletionProposalsQuery = {
-  sqlCompletionProposals: Maybe<
+  sqlCompletionProposals?: Maybe<
     Array<
       Maybe<
         Pick<
@@ -1235,7 +1151,7 @@ export type QuerySqlDialectInfoQueryVariables = {
 };
 
 export type QuerySqlDialectInfoQuery = {
-  dialect: Maybe<
+  dialect?: Maybe<
     Pick<
       SqlDialectInfo,
       | "name"
@@ -1260,14 +1176,14 @@ export type ReadDataFromContainerMutationVariables = {
 };
 
 export type ReadDataFromContainerMutation = {
-  readDataFromContainer: Maybe<
+  readDataFromContainer?: Maybe<
     Pick<SqlExecuteInfo, "duration" | "statusMessage"> & {
-      results: Maybe<
+      results?: Maybe<
         Array<
           Pick<SqlQueryResults, "updateRowCount" | "sourceQuery" | "title"> & {
-            resultSet: Maybe<
+            resultSet?: Maybe<
               Pick<SqlResultSet, "id" | "rows"> & {
-                columns: Maybe<
+                columns?: Maybe<
                   Array<
                     Maybe<
                       Pick<
@@ -1341,12 +1257,12 @@ export type UpdateResultsDataMutationVariables = {
 };
 
 export type UpdateResultsDataMutation = {
-  result: Maybe<
+  result?: Maybe<
     Pick<SqlExecuteInfo, "duration"> & {
-      results: Maybe<
+      results?: Maybe<
         Array<
           Pick<SqlQueryResults, "updateRowCount"> & {
-            resultSet: Maybe<Pick<SqlResultSet, "id" | "rows">>;
+            resultSet?: Maybe<Pick<SqlResultSet, "id" | "rows">>;
           }
         >
       >;
@@ -1357,7 +1273,7 @@ export type UpdateResultsDataMutation = {
 export type OpenSessionMutationVariables = {};
 
 export type OpenSessionMutation = {
-  session: Maybe<
+  session?: Maybe<
     Pick<
       SessionInfo,
       "createTime" | "lastAccessTime" | "cacheExpired" | "locale"
@@ -1372,7 +1288,7 @@ export type OpenSessionMutation = {
 export type ServerConfigQueryVariables = {};
 
 export type ServerConfigQuery = {
-  serverConfig: Maybe<
+  serverConfig?: Maybe<
     Pick<
       ServerConfig,
       | "name"
@@ -1402,7 +1318,7 @@ export type SessionPermissionsQuery = {
 export type SessionStateQueryVariables = {};
 
 export type SessionStateQuery = {
-  sessionState: Maybe<
+  sessionState?: Maybe<
     Pick<
       SessionInfo,
       "createTime" | "lastAccessTime" | "locale" | "cacheExpired"
@@ -1643,7 +1559,7 @@ export const GetAuthProvidersDocument = gql`
       label
       icon
       description
-      isDefault
+      default
       credentialParameters {
         id
         displayName
@@ -2117,345 +2033,427 @@ export const TouchSessionDocument = gql`
     touchSession
   }
 `;
-export function getSdk(client: GraphQLClient) {
+
+export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
+
+const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
+export function getSdk(
+  client: GraphQLClient,
+  withWrapper: SdkFunctionWrapper = defaultWrapper,
+) {
   return {
     navGetStructContainers(
       variables: NavGetStructContainersQueryVariables,
     ): Promise<NavGetStructContainersQuery> {
-      return client.request<NavGetStructContainersQuery>(
-        print(NavGetStructContainersDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<NavGetStructContainersQuery>(
+          print(NavGetStructContainersDocument),
+          variables,
+        ),
       );
     },
     closeConnection(
       variables: CloseConnectionMutationVariables,
     ): Promise<CloseConnectionMutation> {
-      return client.request<CloseConnectionMutation>(
-        print(CloseConnectionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<CloseConnectionMutation>(
+          print(CloseConnectionDocument),
+          variables,
+        ),
       );
     },
     connectionState(
       variables: ConnectionStateQueryVariables,
     ): Promise<ConnectionStateQuery> {
-      return client.request<ConnectionStateQuery>(
-        print(ConnectionStateDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ConnectionStateQuery>(
+          print(ConnectionStateDocument),
+          variables,
+        ),
       );
     },
     createConnection(
       variables: CreateConnectionMutationVariables,
     ): Promise<CreateConnectionMutation> {
-      return client.request<CreateConnectionMutation>(
-        print(CreateConnectionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<CreateConnectionMutation>(
+          print(CreateConnectionDocument),
+          variables,
+        ),
       );
     },
     dataSourceList(
       variables?: DataSourceListQueryVariables,
     ): Promise<DataSourceListQuery> {
-      return client.request<DataSourceListQuery>(
-        print(DataSourceListDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<DataSourceListQuery>(
+          print(DataSourceListDocument),
+          variables,
+        ),
       );
     },
     driverList(variables?: DriverListQueryVariables): Promise<DriverListQuery> {
-      return client.request<DriverListQuery>(
-        print(DriverListDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<DriverListQuery>(print(DriverListDocument), variables),
       );
     },
     driverProperties(
       variables: DriverPropertiesQueryVariables,
     ): Promise<DriverPropertiesQuery> {
-      return client.request<DriverPropertiesQuery>(
-        print(DriverPropertiesDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<DriverPropertiesQuery>(
+          print(DriverPropertiesDocument),
+          variables,
+        ),
       );
     },
     getDriverById(
       variables: GetDriverByIdQueryVariables,
     ): Promise<GetDriverByIdQuery> {
-      return client.request<GetDriverByIdQuery>(
-        print(GetDriverByIdDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<GetDriverByIdQuery>(
+          print(GetDriverByIdDocument),
+          variables,
+        ),
       );
     },
     openConnection(
       variables: OpenConnectionMutationVariables,
     ): Promise<OpenConnectionMutation> {
-      return client.request<OpenConnectionMutation>(
-        print(OpenConnectionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<OpenConnectionMutation>(
+          print(OpenConnectionDocument),
+          variables,
+        ),
       );
     },
     testConnection(
       variables: TestConnectionMutationVariables,
     ): Promise<TestConnectionMutation> {
-      return client.request<TestConnectionMutation>(
-        print(TestConnectionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<TestConnectionMutation>(
+          print(TestConnectionDocument),
+          variables,
+        ),
       );
     },
     navNodeChildren(
       variables: NavNodeChildrenQueryVariables,
     ): Promise<NavNodeChildrenQuery> {
-      return client.request<NavNodeChildrenQuery>(
-        print(NavNodeChildrenDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<NavNodeChildrenQuery>(
+          print(NavNodeChildrenDocument),
+          variables,
+        ),
       );
     },
     navNodeInfo(
       variables: NavNodeInfoQueryVariables,
     ): Promise<NavNodeInfoQuery> {
-      return client.request<NavNodeInfoQuery>(
-        print(NavNodeInfoDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<NavNodeInfoQuery>(print(NavNodeInfoDocument), variables),
       );
     },
     queryChildrenDatabaseObjectInfo(
       variables: QueryChildrenDatabaseObjectInfoQueryVariables,
     ): Promise<QueryChildrenDatabaseObjectInfoQuery> {
-      return client.request<QueryChildrenDatabaseObjectInfoQuery>(
-        print(QueryChildrenDatabaseObjectInfoDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<QueryChildrenDatabaseObjectInfoQuery>(
+          print(QueryChildrenDatabaseObjectInfoDocument),
+          variables,
+        ),
       );
     },
     queryDatabaseObjectInfo(
       variables: QueryDatabaseObjectInfoQueryVariables,
     ): Promise<QueryDatabaseObjectInfoQuery> {
-      return client.request<QueryDatabaseObjectInfoQuery>(
-        print(QueryDatabaseObjectInfoDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<QueryDatabaseObjectInfoQuery>(
+          print(QueryDatabaseObjectInfoDocument),
+          variables,
+        ),
       );
     },
     readSessionLog(
       variables: ReadSessionLogQueryVariables,
     ): Promise<ReadSessionLogQuery> {
-      return client.request<ReadSessionLogQuery>(
-        print(ReadSessionLogDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ReadSessionLogQuery>(
+          print(ReadSessionLogDocument),
+          variables,
+        ),
       );
     },
     changeSessionLanguage(
       variables: ChangeSessionLanguageMutationVariables,
     ): Promise<ChangeSessionLanguageMutation> {
-      return client.request<ChangeSessionLanguageMutation>(
-        print(ChangeSessionLanguageDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ChangeSessionLanguageMutation>(
+          print(ChangeSessionLanguageDocument),
+          variables,
+        ),
       );
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
-      return client.request<AuthLoginQuery>(
-        print(AuthLoginDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AuthLoginQuery>(print(AuthLoginDocument), variables),
       );
     },
     authLogout(variables?: AuthLogoutQueryVariables): Promise<AuthLogoutQuery> {
-      return client.request<AuthLogoutQuery>(
-        print(AuthLogoutDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AuthLogoutQuery>(print(AuthLogoutDocument), variables),
       );
     },
     getAuthProviders(
       variables?: GetAuthProvidersQueryVariables,
     ): Promise<GetAuthProvidersQuery> {
-      return client.request<GetAuthProvidersQuery>(
-        print(GetAuthProvidersDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<GetAuthProvidersQuery>(
+          print(GetAuthProvidersDocument),
+          variables,
+        ),
       );
     },
     getSessionUser(
       variables?: GetSessionUserQueryVariables,
     ): Promise<GetSessionUserQuery> {
-      return client.request<GetSessionUserQuery>(
-        print(GetSessionUserDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<GetSessionUserQuery>(
+          print(GetSessionUserDocument),
+          variables,
+        ),
       );
     },
     asyncExportTaskStatus(
       variables: AsyncExportTaskStatusMutationVariables,
     ): Promise<AsyncExportTaskStatusMutation> {
-      return client.request<AsyncExportTaskStatusMutation>(
-        print(AsyncExportTaskStatusDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AsyncExportTaskStatusMutation>(
+          print(AsyncExportTaskStatusDocument),
+          variables,
+        ),
       );
     },
     exportDataFromContainer(
       variables: ExportDataFromContainerQueryVariables,
     ): Promise<ExportDataFromContainerQuery> {
-      return client.request<ExportDataFromContainerQuery>(
-        print(ExportDataFromContainerDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ExportDataFromContainerQuery>(
+          print(ExportDataFromContainerDocument),
+          variables,
+        ),
       );
     },
     exportDataFromResults(
       variables: ExportDataFromResultsQueryVariables,
     ): Promise<ExportDataFromResultsQuery> {
-      return client.request<ExportDataFromResultsQuery>(
-        print(ExportDataFromResultsDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ExportDataFromResultsQuery>(
+          print(ExportDataFromResultsDocument),
+          variables,
+        ),
       );
     },
     getDataTransferProcessors(
       variables?: GetDataTransferProcessorsQueryVariables,
     ): Promise<GetDataTransferProcessorsQuery> {
-      return client.request<GetDataTransferProcessorsQuery>(
-        print(GetDataTransferProcessorsDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<GetDataTransferProcessorsQuery>(
+          print(GetDataTransferProcessorsDocument),
+          variables,
+        ),
       );
     },
     removeDataTransferFile(
       variables: RemoveDataTransferFileQueryVariables,
     ): Promise<RemoveDataTransferFileQuery> {
-      return client.request<RemoveDataTransferFileQuery>(
-        print(RemoveDataTransferFileDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<RemoveDataTransferFileQuery>(
+          print(RemoveDataTransferFileDocument),
+          variables,
+        ),
       );
     },
     asyncSqlExecuteQuery(
       variables: AsyncSqlExecuteQueryMutationVariables,
     ): Promise<AsyncSqlExecuteQueryMutation> {
-      return client.request<AsyncSqlExecuteQueryMutation>(
-        print(AsyncSqlExecuteQueryDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AsyncSqlExecuteQueryMutation>(
+          print(AsyncSqlExecuteQueryDocument),
+          variables,
+        ),
       );
     },
     asyncTaskCancel(
       variables: AsyncTaskCancelMutationVariables,
     ): Promise<AsyncTaskCancelMutation> {
-      return client.request<AsyncTaskCancelMutation>(
-        print(AsyncTaskCancelDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AsyncTaskCancelMutation>(
+          print(AsyncTaskCancelDocument),
+          variables,
+        ),
       );
     },
     asyncTaskStatus(
       variables: AsyncTaskStatusMutationVariables,
     ): Promise<AsyncTaskStatusMutation> {
-      return client.request<AsyncTaskStatusMutation>(
-        print(AsyncTaskStatusDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<AsyncTaskStatusMutation>(
+          print(AsyncTaskStatusDocument),
+          variables,
+        ),
       );
     },
     executeSqlQuery(
       variables: ExecuteSqlQueryMutationVariables,
     ): Promise<ExecuteSqlQueryMutation> {
-      return client.request<ExecuteSqlQueryMutation>(
-        print(ExecuteSqlQueryDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ExecuteSqlQueryMutation>(
+          print(ExecuteSqlQueryDocument),
+          variables,
+        ),
       );
     },
     metadataGetNodeDDL(
       variables: MetadataGetNodeDdlQueryVariables,
     ): Promise<MetadataGetNodeDdlQuery> {
-      return client.request<MetadataGetNodeDdlQuery>(
-        print(MetadataGetNodeDdlDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<MetadataGetNodeDdlQuery>(
+          print(MetadataGetNodeDdlDocument),
+          variables,
+        ),
       );
     },
     querySqlCompletionProposals(
       variables: QuerySqlCompletionProposalsQueryVariables,
     ): Promise<QuerySqlCompletionProposalsQuery> {
-      return client.request<QuerySqlCompletionProposalsQuery>(
-        print(QuerySqlCompletionProposalsDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<QuerySqlCompletionProposalsQuery>(
+          print(QuerySqlCompletionProposalsDocument),
+          variables,
+        ),
       );
     },
     querySqlDialectInfo(
       variables: QuerySqlDialectInfoQueryVariables,
     ): Promise<QuerySqlDialectInfoQuery> {
-      return client.request<QuerySqlDialectInfoQuery>(
-        print(QuerySqlDialectInfoDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<QuerySqlDialectInfoQuery>(
+          print(QuerySqlDialectInfoDocument),
+          variables,
+        ),
       );
     },
     readDataFromContainer(
       variables: ReadDataFromContainerMutationVariables,
     ): Promise<ReadDataFromContainerMutation> {
-      return client.request<ReadDataFromContainerMutation>(
-        print(ReadDataFromContainerDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ReadDataFromContainerMutation>(
+          print(ReadDataFromContainerDocument),
+          variables,
+        ),
       );
     },
     sqlContextCreate(
       variables: SqlContextCreateMutationVariables,
     ): Promise<SqlContextCreateMutation> {
-      return client.request<SqlContextCreateMutation>(
-        print(SqlContextCreateDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SqlContextCreateMutation>(
+          print(SqlContextCreateDocument),
+          variables,
+        ),
       );
     },
     sqlContextDestroy(
       variables: SqlContextDestroyMutationVariables,
     ): Promise<SqlContextDestroyMutation> {
-      return client.request<SqlContextDestroyMutation>(
-        print(SqlContextDestroyDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SqlContextDestroyMutation>(
+          print(SqlContextDestroyDocument),
+          variables,
+        ),
       );
     },
     sqlContextSetDefaults(
       variables: SqlContextSetDefaultsMutationVariables,
     ): Promise<SqlContextSetDefaultsMutation> {
-      return client.request<SqlContextSetDefaultsMutation>(
-        print(SqlContextSetDefaultsDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SqlContextSetDefaultsMutation>(
+          print(SqlContextSetDefaultsDocument),
+          variables,
+        ),
       );
     },
     sqlResultClose(
       variables: SqlResultCloseMutationVariables,
     ): Promise<SqlResultCloseMutation> {
-      return client.request<SqlResultCloseMutation>(
-        print(SqlResultCloseDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SqlResultCloseMutation>(
+          print(SqlResultCloseDocument),
+          variables,
+        ),
       );
     },
     updateResultsData(
       variables: UpdateResultsDataMutationVariables,
     ): Promise<UpdateResultsDataMutation> {
-      return client.request<UpdateResultsDataMutation>(
-        print(UpdateResultsDataDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<UpdateResultsDataMutation>(
+          print(UpdateResultsDataDocument),
+          variables,
+        ),
       );
     },
     openSession(
       variables?: OpenSessionMutationVariables,
     ): Promise<OpenSessionMutation> {
-      return client.request<OpenSessionMutation>(
-        print(OpenSessionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<OpenSessionMutation>(
+          print(OpenSessionDocument),
+          variables,
+        ),
       );
     },
     serverConfig(
       variables?: ServerConfigQueryVariables,
     ): Promise<ServerConfigQuery> {
-      return client.request<ServerConfigQuery>(
-        print(ServerConfigDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<ServerConfigQuery>(
+          print(ServerConfigDocument),
+          variables,
+        ),
       );
     },
     sessionPermissions(
       variables?: SessionPermissionsQueryVariables,
     ): Promise<SessionPermissionsQuery> {
-      return client.request<SessionPermissionsQuery>(
-        print(SessionPermissionsDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SessionPermissionsQuery>(
+          print(SessionPermissionsDocument),
+          variables,
+        ),
       );
     },
     sessionState(
       variables?: SessionStateQueryVariables,
     ): Promise<SessionStateQuery> {
-      return client.request<SessionStateQuery>(
-        print(SessionStateDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<SessionStateQuery>(
+          print(SessionStateDocument),
+          variables,
+        ),
       );
     },
     touchSession(
       variables?: TouchSessionMutationVariables,
     ): Promise<TouchSessionMutation> {
-      return client.request<TouchSessionMutation>(
-        print(TouchSessionDocument),
-        variables,
+      return withWrapper(() =>
+        client.request<TouchSessionMutation>(
+          print(TouchSessionDocument),
+          variables,
+        ),
       );
     },
   };
 }
+export type Sdk = ReturnType<typeof getSdk>;
