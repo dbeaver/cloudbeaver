@@ -103,8 +103,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
     }
 
     if (providerA.default) {
-      return 1;
+      return -1;
     }
-    return -1;
+    return 1;
   }
 }
