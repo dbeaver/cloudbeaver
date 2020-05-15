@@ -102,6 +102,11 @@ export class AuthDialogController implements IInitializableController, IDestruct
       return providerA.label.localeCompare(providerB.label);
     }
 
-    return +!!providerA.isDefault - +!!providerB.isDefault;
+    if (providerA.isDefault === providerB.isDefault) {
+      return 0;
+    } if (providerA.isDefault) {
+      return 1;
+    }
+    return -1;
   }
 }
