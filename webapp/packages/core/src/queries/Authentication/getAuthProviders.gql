@@ -4,7 +4,7 @@ query getAuthProviders {
     label
     icon
     description
-    default
+    isDefault
 
     #configurationParameters {
     #  id

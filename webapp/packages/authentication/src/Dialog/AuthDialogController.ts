@@ -97,12 +97,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   private compareProviders = (providerA: AuthProvider, providerB: AuthProvider): number => {
-    if (providerA.default === providerB.default)
+    if (providerA.isDefault === providerB.isDefault)
     {
       return providerA.label.localeCompare(providerB.label);
     }
 
-    if (providerA.default) {
+    if (providerA.isDefault === providerB.isDefault) {
+      return 0;
+    } if (providerA.isDefault) {
       return 1;
     }
     return -1;
