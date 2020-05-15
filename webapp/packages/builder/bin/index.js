@@ -64,9 +64,16 @@ require('yargs')
       async function build() {
         const config = createRollupConfig()
         for (const moduleConfig of config) {
-          console.log(`Building ${moduleConfig.output.dir}`);
-          const bundle = await rollup.rollup(moduleConfig);
-          await bundle.write(moduleConfig.output);
+          console.log(`Building ${packageName} ${moduleConfig.output.dir}`);
+          try {
+            const bundle = await rollup.rollup(moduleConfig);
+            await bundle.write(moduleConfig.output);
+          } catch (e) {
+            console.error(e)
+            process.exitCode = 1;
+          } finally {
+            console.log(`Build finished ${packageName} ${moduleConfig.output.dir}`);
+          }
         }
       }
 

@@ -6,17 +6,14 @@
   "module": "dist/index.js",
   "types": "dist/types",
   "scripts": {
-    "build-plugin": "npm run clean-dist && webpack -p --config=configs/webpack/exp.js",
+    "build-plugin": "npm run clean-dist && builder build-plugin",
+    "serve-plugin": "builder serve-plugin",
     "build:analyze": "echo \"no analyze specified\" && exit 0",
     "clean-dist": "rimraf dist/*",
     "gql:gen": "graphql-codegen",
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "prettify": "prettier --write **/*.ts **/*.tsx",
-    "serve-plugin": "builder serve-plugin",
-    "rollup2": "npm run clean-dist && builder build-plugin",
-    "rollup": "npm run clean-dist && rollup --config configs/rollup.config.js"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "graphql-request": "^1.8.2",

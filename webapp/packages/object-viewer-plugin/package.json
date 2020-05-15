@@ -6,10 +6,13 @@
   "main": "dist/index.js",
   "types": "dist/types",
   "scripts": {
-    "build-plugin": "npm run clean-dist && webpack -p --config=../../configs/webpack/build-plugin.js",
+    "build-plugin": "npm run clean-dist && builder build-plugin",
+    "serve-plugin": "builder serve-plugin",
     "clean-dist": "rimraf dist/*",
-    "rollup": "npm run clean-dist && rollup --config ../../configs/rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@dbeaver/core": "^0.1.0"
   },
   "peerDependencies": {
     "@dbeaver/core": "^0.1.0",

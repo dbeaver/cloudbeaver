@@ -12,6 +12,9 @@
     "clean-dist": "rimraf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "devDependencies": {
+    "@dbeaver/core": "^0.1.0"
+  },
   "peerDependencies": {
     "@dbeaver/core": "^0.1.0",
     "@material/button": "^4.0.0",

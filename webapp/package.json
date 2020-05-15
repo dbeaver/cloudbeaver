@@ -14,7 +14,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build --stream",
-    "build-plugin": "lerna run build-plugin --stream --scope @dbeaver/core --scope @dbeaver/basic-connection-plugin",
+    "build-plugin": "lerna run build-plugin --stream",
+    "clean-dist": "lerna run clean-dist",
     "start": "lerna run start --stream",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "lerna run tsc --stream",

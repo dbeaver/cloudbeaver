@@ -461,6 +461,11 @@ export class RangeController implements IRangeController {
       return false;
     }
 
+    isBottomRightCell(cellRange: CellRange, cell: CellPosition): boolean {
+      console.log('isBottomRightCell');
+      return false;
+    }
+
     isContiguousRange(cellRange: CellRange) {
       console.log('isContiguousRange');
       return false;

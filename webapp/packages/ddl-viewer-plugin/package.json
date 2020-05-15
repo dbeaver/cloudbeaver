@@ -5,10 +5,16 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build-plugin": "npm run clean-dist && webpack -p --config=../../configs/webpack/build-plugin.js",
+    "build-plugin": "npm run clean-dist && builder build-plugin",
+    "serve-plugin": "builder serve-plugin",
     "clean-dist": "rimraf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
+  },
+  "devDependencies": {
+    "@dbeaver/core": "^0.1.0",
+    "@dbeaver/object-viewer-plugin": "^0.1.0",
+    "@dbeaver/sql-editor": "^0.1.0"
   },
   "peerDependencies": {
     "@dbeaver/core": "^0.1.0",
