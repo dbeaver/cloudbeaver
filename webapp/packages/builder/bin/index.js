@@ -9,10 +9,25 @@ const path = require('path');
 
 const currentDir = process.cwd();
 
-const webpackArgv = {
-  mode: 'production',
-  pluginsList: '',
-  currentDir: currentDir,
+
+function createWebpackArgv(argv) {
+
+  const fullPath = path.resolve(currentDir, argv.pluginsList || './plugins-list')
+  let pluginsList = [];
+  try {
+    pluginsList = require(fullPath);
+  } catch (e) {
+    console.log('Plugins list is not found: ', fullPath);
+  }
+
+  const webpackArgv = {
+    mode: 'production',
+    pluginsList: pluginsList,
+
+    currentDir: currentDir,
+  }
+  return webpackArgv;
+
 }
 
 const packageJson = require(path.join(currentDir, 'package.json'));
@@ -35,10 +50,8 @@ function createRollupConfig() {
     moduleDir = module ? `/${module}` : ''; // don't add slash for root module
     const moduleConfig = {...baseRollupConfig};
     moduleConfig.input = `src${moduleDir}/index.ts`;
-    moduleConfig.output = {
-      dir: `dist${moduleDir}`,
-      format: 'esm',
-    };
+    moduleConfig.output = {...baseRollupConfig.output};
+    moduleConfig.output.dir = `dist${moduleDir}`;
 
     moduleConfig.external = [
       ...baseRollupConfig.external,
@@ -55,6 +68,15 @@ function createRollupConfig() {
 }
 
 require('yargs')
+  .options({
+    'l': {
+      alias: 'pluginsList',
+      demandOption: false,
+      default: '',
+      describe: 'path to plugins list relative to product location',
+      type: 'string'
+    }
+  })
   // build-plugin and serve-plugin use rollup
   .command(
     'build-plugin',
@@ -105,11 +127,43 @@ require('yargs')
     'Build application',
     {},
     function (argv) {
+      const webpackArgv = createWebpackArgv(argv);
+      // console.log(webpackArgv)
       const configObject = buildConfig({}, webpackArgv)
       const compiler = webpack(configObject);
 
       compiler.run((err, stats) => {
         console.log(stats.compilation.errors)
+      });
+    }
+  )
+  .command(
+    'serve-app',
+    'Start webpack dev server for serving application',
+    {
+      server: {
+        alias: 's',
+        default: 'localhost:3100'
+      },
+      port: {
+        alias: 'p',
+        default: 3100
+      }
+    },
+    function (argv) {
+      const webpackArgv = createWebpackArgv(argv);
+      webpackArgv.mode = 'development'
+      webpackArgv.server = argv.server
+      const configObject = devConfig({}, webpackArgv)
+      const WebpackDevServer = require('webpack-dev-server');
+      const server = new WebpackDevServer(webpack(configObject), configObject.devServer);
+      const port = argv.port
+
+      server.listen(port, 'localhost', function (err) {
+        if (err) {
+          console.log(err);
+        }
+        console.log('WebpackDevServer listening at localhost:', port);
       });
     }
   )
@@ -130,6 +184,7 @@ require('yargs')
     function (argv) {
       console.log('Serve app old way')
       console.log(argv)
+      const webpackArgv = createWebpackArgv(argv);
       webpackArgv.mode = 'development'
       webpackArgv.server = argv.server
       const devConfigOld = require('../configs/webpack/dev')
@@ -147,34 +202,4 @@ require('yargs')
       });
     }
   )
-  .command(
-    'serve-app',
-    'Start webpack dev server for serving application',
-    {
-      server: {
-        alias: 's',
-        default: 'localhost:3100'
-      },
-      port: {
-        alias: 'p',
-        default: 3100
-      }
-    },
-    function (argv) {
-      webpackArgv.mode = 'development'
-      webpackArgv.server = argv.server
-      const configObject = devConfig({}, webpackArgv)
-      const WebpackDevServer = require('webpack-dev-server');
-      const server = new WebpackDevServer(webpack(configObject), configObject.devServer);
-      const port = argv.port
-
-      server.listen(port, 'localhost', function (err) {
-        if (err) {
-          console.log(err);
-        }
-        console.log('WebpackDevServer listening at localhost:', port);
-      });
-    }
-  )
-  .help()
-  .argv
+  .help().argv;

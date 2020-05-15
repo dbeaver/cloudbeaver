@@ -28,6 +28,7 @@ function configBuilder(options = defaultBuilderOptions) {
     output: {
         dir: 'dist',
         format: 'esm',
+        sourcemap: true,
       },
     external: [
       // externals beyond peer dependencies

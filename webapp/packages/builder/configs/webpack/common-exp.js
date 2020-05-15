@@ -5,10 +5,10 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const StringReplacePlugin = require("string-replace-webpack-plugin");
+const resolve = require('resolve');
+const fs = require('fs');
 
-function replacementWithPluginImportCode(pathToList, currentDir) {
-  const fullPath = path.resolve(currentDir, pathToList || './plugins-list')
-  const pluginsList = require(fullPath);
+function replacementWithPluginImportCode(pluginsList, currentDir) {
 
   let code = '';
   const names = [];
@@ -28,6 +28,28 @@ ${names.map(n => `  ${n},\n`).join('')}]`;
   return code;
 }
 
+function copyPublic(currentDir, pluginsList) {
+  const pathsToCopy = [];
+
+  pluginsList.forEach(plugin => {
+    try {
+      const pathToPlugin = resolve.sync(plugin, {basedir: currentDir});
+      const dir = path.parse(pathToPlugin).dir;
+      const pathToPublic = path.resolve(dir, '../public');
+      const stats = fs.statSync(pathToPublic);
+      if (stats && stats.isDirectory()) {
+        pathsToCopy.push({
+          from: pathToPublic,
+          to: '',
+        });
+      }
+    } catch (e) {
+    }
+  });
+  pathsToCopy.push({from: path.resolve(currentDir, './public'), to: ''});
+  console.log(pathsToCopy);
+  return pathsToCopy;
+}
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   resolve: {
@@ -60,14 +82,15 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
                     return replacementWithPluginImportCode(argv.pluginsList, argv.currentDir);
                   }
                 }
-              ]})
+              ]
+            })
           }
         ],
       },
     ],
   },
   plugins: [
-    new CopyWebpackPlugin([ { from: path.resolve(argv.currentDir, './public'), to: '' } ]),
+    new CopyWebpackPlugin(copyPublic(argv.currentDir, argv.pluginsList)),
     new HtmlWebpackPlugin({
       template: path.resolve(argv.currentDir, './index.html.ejs'),
     }),
