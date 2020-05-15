@@ -3,21 +3,101 @@
 const webpack = require('webpack');
 const buildConfig = require('../configs/webpack/exp')
 const devConfig = require('../configs/webpack/dev-exp')
-const rollupConfig = require('../configs/rollup.config.js');
+const baseRollupConfig = require('../configs/rollup.config.js');
 const rollup = require('rollup');
+const path = require('path');
+
+const currentDir = process.cwd();
 
 const webpackArgv = {
   mode: 'production',
   pluginsList: '',
-  currentDir: process.cwd()
+  currentDir: currentDir,
+}
+
+const packageJson = require(path.join(currentDir, 'package.json'));
+const packageName = packageJson.name;
+
+
+function createRollupConfig() {
+  let modules = []
+  try {
+    modules = require(path.join(currentDir, 'modules.js'));
+  } catch {
+  }
+
+  if (!modules.length) {
+    return [baseRollupConfig];
+  }
+
+  return modules.map(module => {
+
+    moduleDir = module ? `/${module}` : ''; // don't add slash for root module
+    const moduleConfig = {...baseRollupConfig};
+    moduleConfig.input = `src${moduleDir}/index.ts`;
+    moduleConfig.output = {
+      dir: `dist${moduleDir}`,
+      format: 'esm',
+    };
+
+    moduleConfig.external = [
+      ...baseRollupConfig.external,
+      ...modules
+        .filter(name => name !== module && name !== '')
+        .map(name => {
+          moduleDir = name ? `/${name}` : ''; // don't add slash for root module
+          return `${packageName}${moduleDir}`;
+        }),
+    ];
+    return moduleConfig;
+  })
+
 }
 
 require('yargs')
+  // build-plugin and serve-plugin use rollup
+  .command(
+    'build-plugin',
+    'Build plugin',
+    {},
+    function (argv) {
+      async function build() {
+        const config = createRollupConfig()
+        for (const moduleConfig of config) {
+          console.log(`Building ${moduleConfig.output.dir}`);
+          const bundle = await rollup.rollup(moduleConfig);
+          await bundle.write(moduleConfig.output);
+        }
+      }
+
+      build()
+    }
+  )
+  .command(
+    'serve-plugin',
+    'Build and watch plugin',
+    {},
+    function (argv) {
+      const rollup = require('rollup');
+
+      const watchOptions = createRollupConfig();
+      watchOptions.watch = {
+        buildDelay: 500,
+      };
+      const watcher = rollup.watch(watchOptions);
+
+      watcher.on('event', event => {
+        console.log(event.code, event.input)
+      });
+
+    }
+  )
+  // build-app and serve-app use webpack to build final application from plugins
   .command(
     'build-app',
     'Build application',
     {},
-    function(argv) {
+    function (argv) {
       const configObject = buildConfig({}, webpackArgv)
       const compiler = webpack(configObject);
 
@@ -26,18 +106,7 @@ require('yargs')
       });
     }
   )
-  .command(
-    'build-plugin',
-    'Build plugin',
-    {},
-    function(argv) {
-      async function build() {
-        const bundle = await rollup.rollup(rollupConfig);
-        await bundle.write(rollupConfig.output);
-      }
-      build()
-    }
-  )
+  // todo deprecated, just for test purposes
   .command(
     'serve-app-old',
     'Start webpack dev server for serving application',
@@ -51,7 +120,7 @@ require('yargs')
         default: 3100
       }
     },
-    function(argv) {
+    function (argv) {
       console.log('Serve app old way')
       console.log(argv)
       webpackArgv.mode = 'development'
@@ -84,7 +153,7 @@ require('yargs')
         default: 3100
       }
     },
-    function(argv) {
+    function (argv) {
       webpackArgv.mode = 'development'
       webpackArgv.server = argv.server
       const configObject = devConfig({}, webpackArgv)
@@ -98,25 +167,6 @@ require('yargs')
         }
         console.log('WebpackDevServer listening at localhost:', port);
       });
-    }
-  )
-  .command(
-    'serve-plugin',
-    'Build and watch plugin',
-    {},
-    function(argv) {
-      const rollup = require('rollup');
-
-      const watchOptions = rollupConfig;
-      watchOptions.watch = {
-        buildDelay: 500,
-      };
-      const watcher = rollup.watch(watchOptions);
-
-      watcher.on('event', event => {
-        console.log(event.code)
-      });
-
     }
   )
   .help()
