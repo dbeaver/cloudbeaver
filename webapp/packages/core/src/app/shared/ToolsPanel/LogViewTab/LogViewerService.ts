@@ -10,12 +10,11 @@ import { action, observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
-import { PermissionsService } from '@dbeaver/core/root';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 import { GraphQLService } from '@dbeaver/core/sdk';
 import { uuid } from '@dbeaver/core/utils';
 
 import { CoreSettingsService } from '../../../../CoreSettingsService';
-import { PUBLIC_PERMISSION } from '../../NodesManager/NodesManagerService';
 import { ILogEntry } from './ILogEntry';
 
 @injectable()
@@ -117,6 +116,6 @@ export class LogViewerService {
   }
 
   private isLogViewerAvailable() {
-    return this.permissionsService.has(PUBLIC_PERMISSION);
+    return this.permissionsService.has(EPermission.public);
   }
 }

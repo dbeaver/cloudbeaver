@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { usePermission } from '@dbeaver/core/root';
+import { usePermission, EPermission } from '@dbeaver/core/root';
 
-import { PUBLIC_PERMISSION } from '../shared/NodesManager/NodesManagerService';
 import { useChildren } from '../shared/useChildren';
 import { NavigationTreeNode } from './NavigationTreeNode/NavigationTreeNode';
 
@@ -41,7 +40,7 @@ const navigationTreeStyles = css`
 
 export const NavigationTree = observer(function NavigationTree() {
   const nodeChildren = useChildren();
-  const isEnabled = usePermission(PUBLIC_PERMISSION);
+  const isEnabled = usePermission(EPermission.public);
 
   if (!isEnabled) {
     return null;

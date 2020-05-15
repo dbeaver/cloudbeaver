@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { PermissionsService } from '@dbeaver/core/root';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 import { DatabaseObjectInfo, GraphQLService } from '@dbeaver/core/sdk';
 
 import { INavigator } from '../Navigation/INavigator';
@@ -44,7 +44,6 @@ export interface INodeNavigationData {
 }
 
 const ROOT_NODE_PATH = '/';
-export const PUBLIC_PERMISSION = 'public';
 
 // TODO: should be renamed to DBObjectManagerService
 @injectable()
@@ -137,7 +136,7 @@ export class NodesManagerService {
   }
 
   async updateRootChildren() {
-    if (!await this.permissionsService.hasAsync(PUBLIC_PERMISSION)) {
+    if (!await this.permissionsService.hasAsync(EPermission.public)) {
       return;
     }
     this.updateChildren(ROOT_NODE_PATH);

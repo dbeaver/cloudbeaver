@@ -7,10 +7,10 @@
  */
 
 import {
-  Connection, DBSource, ConnectionsManagerService, PUBLIC_PERMISSION
+  Connection, DBSource, ConnectionsManagerService
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
-import { PermissionsService } from '@dbeaver/core/root';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 import { ConnectionConfig, GraphQLService, CachedResource } from '@dbeaver/core/sdk';
 
 @injectable()
@@ -30,7 +30,7 @@ export class BasicConnectionService {
   }
 
   private async loadDBSourcesAsync(data: DBSource[]): Promise<DBSource[]> {
-    if (!await this.permissionsService.hasAsync(PUBLIC_PERMISSION)) {
+    if (!await this.permissionsService.hasAsync(EPermission.public)) {
       return [];
     }
     const { dataSourceList } = await this.graphQLService.gql.dataSourceList();

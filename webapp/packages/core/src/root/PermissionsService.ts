@@ -17,6 +17,10 @@ type PermissionsMetadata = {
   loaded: boolean;
 }
 
+export enum EPermission {
+  public = 'public'
+}
+
 @injectable()
 export class PermissionsService {
   readonly onUpdate: Observable<unknown>;

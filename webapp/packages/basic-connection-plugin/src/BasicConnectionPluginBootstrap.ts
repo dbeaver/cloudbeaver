@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, ConnectionDialogsService, PUBLIC_PERMISSION } from '@dbeaver/core/app';
+import { MainMenuService, ConnectionDialogsService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
-import { PermissionsService } from '@dbeaver/core/root';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 
 import { BasicConnectionService } from './BasicConnectionService';
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
@@ -37,7 +37,7 @@ export class BasicConnectionPluginBootstrap {
         order: 2,
         title: 'basicConnection_main_menu_item',
         onClick: () => this.openConnectionsDialog(),
-        isHidden: () => !this.permissionsService.has(PUBLIC_PERMISSION),
+        isHidden: () => !this.permissionsService.has(EPermission.public),
         isDisabled: () => !this.basicConnectionService.dbSources.data.length,
       }
     );
