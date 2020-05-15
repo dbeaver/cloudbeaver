@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+
 /**
  * Application configuration
  */
@@ -30,6 +32,7 @@ public class CBAppConfig {
     private boolean supportsUserWorkspaces = false;
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
+    private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
 
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
@@ -69,5 +72,9 @@ public class CBAppConfig {
 
     public String[] getDisabledDrivers() {
         return disabledDrivers;
+    }
+
+    public String getDefaultAuthProvider() {
+        return defaultAuthProvider;
     }
 }

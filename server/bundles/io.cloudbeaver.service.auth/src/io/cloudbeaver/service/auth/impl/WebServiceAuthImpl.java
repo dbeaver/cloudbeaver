@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -124,6 +125,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             return null;
         }
         return webSession.getAttribute(ATTR_USER_AUTH);
+    }
+
+    @Override
+    public WebAuthProviderInfo[] getAuthProviders(WebSession webSession) {
+        return WebServiceRegistry.getInstance().getAuthProviders()
+            .stream().map(WebAuthProviderInfo::new)
+            .toArray(WebAuthProviderInfo[]::new);
     }
 
 }
