@@ -99,7 +99,7 @@ type SQLExecuteInfo {
 
     statusMessage: String
     duration: Int
-    results: [ SQLQueryResults ]!
+    results: [ SQLQueryResults! ]!
 }
 
 extend type Query {

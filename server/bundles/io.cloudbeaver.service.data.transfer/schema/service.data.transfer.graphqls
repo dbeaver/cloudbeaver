@@ -29,7 +29,7 @@ input DataTransferParameters {
 extend type Query {
 
     # Available transfer processors
-    dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo ]!
+    dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo! ]!
 
     dataTransferExportDataFromContainer(
         connectionId: ID!,

@@ -60,7 +60,7 @@ type ServerConfig {
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
 
-    supportedLanguages: [ ServerLanguage ]!
+    supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
 }
@@ -73,7 +73,7 @@ type SessionInfo {
     cacheExpired: Boolean!
 
     serverMessages: [ ServerMessage ]
-    connections: [ ConnectionInfo ]!
+    connections: [ ConnectionInfo! ]!
 }
 
 ####################################################
@@ -183,7 +183,7 @@ type ConnectionInfo {
     clientVersion: String
 
     # Supported features (provided etc)
-    features: [ String ]!
+    features: [ String! ]!
 }
 
 type LogEntry {
@@ -208,15 +208,15 @@ extend type Query {
     sessionPermissions: [ID]!
 
     # Get driver info
-    driverList( id: ID ): [ DriverInfo ]!
+    driverList( id: ID ): [ DriverInfo! ]!
 
     # Get list of predefined data sources
-    dataSourceList: [ DataSourceInfo ]!
+    dataSourceList: [ DataSourceInfo! ]!
 
     # Return connection state
     connectionState( id: ID! ): ConnectionInfo!
 
-    readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry ]!
+    readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 
 }
 
