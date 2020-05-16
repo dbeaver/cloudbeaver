@@ -7,8 +7,9 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
-import { useTabState, Tab as BaseTab, TabList } from 'reakit/Tab';
+import {
+  useTabState, Tab as BaseTab, TabList
+} from 'reakit/Tab';
 import styled, { css } from 'reshadow';
 
 import { SubmittingForm, ErrorMessage } from '@dbeaver/core/blocks';
@@ -102,7 +103,6 @@ export const AuthDialog: DialogComponent<null, null> = observer(
       selectedId: controller.provider?.id,
     });
     tab.selectedId = controller.provider?.id || null;
-    useEffect(() => controller.selectProvider(tab.selectedId!), [tab.selectedId]);
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
@@ -111,7 +111,15 @@ export const AuthDialog: DialogComponent<null, null> = observer(
         header={(
           <TabList {...tab} aria-label="My tabs">
             {controller.providers.map(provider => (
-              <BaseTab {...tab} key={provider.id} type='button' stopId={provider.id}>{provider.label}</BaseTab>
+              <BaseTab
+                {...tab}
+                key={provider.id}
+                type='button'
+                stopId={provider.id}
+                onClick={() => controller.selectProvider(provider.id)}
+              >
+                {provider.label}
+              </BaseTab>
             ))}
           </TabList>
         )}
@@ -131,6 +139,7 @@ export const AuthDialog: DialogComponent<null, null> = observer(
               authenticate={controller.isAuthenticating}
             />
           )}
+          {!controller.provider && <>Select available provider</>}
         </SubmittingForm>
         {controller.error.responseMessage && (
           <ErrorMessage

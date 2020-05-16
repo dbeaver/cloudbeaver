@@ -76,12 +76,15 @@ module.exports = {
     'no-restricted-globals': 'off',
     'no-useless-constructor': 'off',
     'max-classes-per-file': 'off',
+    'arrow-body-style': ['error', 'as-needed'],
+    'function-call-argument-newline': ['error', 'consistent'],
     'max-len': [
       'error',
       {
         code: 120,
         ignoreTrailingComments: true,
-        ignoreStrings: true
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true
       }
     ],
     'lines-between-class-members': 'off',

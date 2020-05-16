@@ -11,16 +11,21 @@ documents:
 generates:
   src/sdk/sdk.ts:
     plugins:
-      - add: '/* eslint-disable */'
+      - add: '/* eslint-disable max-len */'
       - typescript
       - typescript-operations
       - typescript-graphql-request
     config:
       skipTypename: true
+      documentMode : 'string'
+      avoidOptionals:
+        field: false
+        inputValue: false
+        object: false
       maybeValue: T
       scalars:
-        Object: any
+        Object: "{ [key: string]: any }"
         DateTime: any
 hooks:
   afterAllFileWrite:
-    - prettier --write --config ../../.prettierrc.js
+    - eslint --fix

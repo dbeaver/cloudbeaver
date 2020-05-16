@@ -74,6 +74,9 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   selectProvider = (providerId: string) => {
+    if (providerId === this.provider?.id) {
+      return;
+    }
     this.provider = this.authProviderService
       .providers.data.find(provider => provider.id === providerId) || null;
     this.credentials = {};
