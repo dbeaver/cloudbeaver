@@ -183,7 +183,7 @@ type ConnectionInfo {
     clientVersion: String
 
     # Supported features (provided etc)
-    features: [ String! ]
+    features: [ String ]!
 }
 
 type LogEntry {
@@ -199,30 +199,30 @@ type LogEntry {
 
 extend type Query {
     # Returns server config
-    serverConfig: ServerConfig
+    serverConfig: ServerConfig!
 
     # Returns session state ( initialize if not )
-    sessionState: SessionInfo
+    sessionState: SessionInfo!
 
     # Session permissions
     sessionPermissions: [ID]!
 
     # Get driver info
-    driverList( id: ID ): [ DriverInfo! ]
+    driverList( id: ID ): [ DriverInfo ]!
 
     # Get list of predefined data sources
-    dataSourceList: [ DataSourceInfo! ]
+    dataSourceList: [ DataSourceInfo ]!
 
     # Return connection state
-    connectionState( id: ID! ): ConnectionInfo
+    connectionState( id: ID! ): ConnectionInfo!
 
-    readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]
+    readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry ]!
 
 }
 
 extend type Mutation {
     # Initialize session
-    openSession: SessionInfo
+    openSession: SessionInfo!
 
     # Destroy session
     closeSession: Boolean
@@ -234,13 +234,13 @@ extend type Mutation {
     changeSessionLanguage(locale: String): Boolean
 
     # Create new connection
-    createConnection( config: ConnectionConfig! ): ConnectionInfo
+    createConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig! ): ConnectionInfo
+    testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Connect to database
-    openConnection( config: ConnectionConfig! ): ConnectionInfo
+    openConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID! ): Boolean!

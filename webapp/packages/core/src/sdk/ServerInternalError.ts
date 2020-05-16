@@ -11,10 +11,12 @@ import { ServerError } from './sdk';
 export class ServerInternalError extends Error implements ServerError {
   readonly errorCode?: string;
   readonly stackTrace?: string;
+  readonly causedBy?: ServerError;
 
   constructor(error: ServerError) {
     super(error.message);
     this.errorCode = error.errorCode;
     this.stackTrace = error.stackTrace;
+    this.causedBy = error.causedBy;
   }
 }

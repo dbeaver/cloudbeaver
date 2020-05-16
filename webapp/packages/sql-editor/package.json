@@ -21,9 +21,6 @@
   "peerDependencies": {
     "@dbeaver/core": "^0.1.0",
     "@dbeaver/data-viewer-plugin": "^0.1.0",
-    "graphql": "^14.5.8",
-    "graphql-request": "^1.8.2",
-    "graphql-tag": "^2.10.1",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
     "react": "^16.13.1",

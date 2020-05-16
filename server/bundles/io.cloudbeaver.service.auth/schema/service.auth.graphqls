@@ -46,7 +46,7 @@ type UserAuthInfo {
 
 extend type Query {
 
-    authLogin(provider: ID!, credentials: Object!): UserAuthInfo
+    authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
 
     authLogout: Boolean
 

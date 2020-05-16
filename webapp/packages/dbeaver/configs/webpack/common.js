@@ -50,10 +50,6 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       "@dbeaver/core/product": path.resolve(__dirname, "../../../core/src/product"),
       "@dbeaver/core/plugin": path.resolve(__dirname, "../../../core/src/plugin"),
 
-      // rewrite imports for unnecessary work in `web/src/libs/sdk.ts`
-      'graphql-tag': path.join(__dirname, '../../fix-gql.js'),
-      graphql: path.join(__dirname, '../../fix-gql.js'),
-
       react: 'preact/compat',
       react$: 'preact/compat',
       'react-dom': 'preact/compat',
