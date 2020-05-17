@@ -6,7 +6,7 @@
         <resource name="drivers/derby"/>
         <resource name="drivers/jaybird"/>
         <resource name="drivers/h2"/>
-        <resource name="drivers/mysql" alias="drivers/mysql/mysql8"/>
+        <resource name="drivers/mysql/mysql8"/>
         <resource name="drivers/mariadb"/>
         <resource name="drivers/postgresql"/>
         <resource name="drivers/sqlite/xerial"/>
