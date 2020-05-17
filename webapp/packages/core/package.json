@@ -13,7 +13,6 @@
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "prettify": "prettier --write **/*.ts **/*.tsx",
     "rollup": "npm run clean-dist && rollup --config configs/rollup.config.js"
   },
   "dependencies": {

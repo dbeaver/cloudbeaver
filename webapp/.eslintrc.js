@@ -5,15 +5,12 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    // 'plugin:prettier/recommended',
-    // 'prettier/@typescript-eslint',
   ],
 
   plugins: [
     'import',
     '@typescript-eslint',
     'eslint-plugin-import-helpers',
-    // 'prettier',
     'jest',
   ],
 
@@ -37,7 +34,6 @@ module.exports = {
   },
 
   rules: {
-    // 'prettier/prettier': 'warn',
     'arrow-parens': ['error', 'as-needed', { 'requireForBlockBody': true }],
     'curly': ['error', 'all'],
     'class-methods-use-this': 'off',
