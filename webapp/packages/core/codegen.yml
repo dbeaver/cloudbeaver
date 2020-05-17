@@ -24,7 +24,8 @@ generates:
         object: false
       maybeValue: T
       scalars:
-        Object: "{ [key: string]: any }"
+        Object: any
+        JSON: "{ [key: string]: any }"
         DateTime: any
 hooks:
   afterAllFileWrite:

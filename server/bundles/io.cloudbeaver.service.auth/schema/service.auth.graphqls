@@ -27,7 +27,7 @@ type AuthProviderInfo {
 
     #configurationParameters: [ObjectPropertyInfo]!
 
-    credentialParameters: [AuthCredentialInfo]!
+    credentialParameters: [AuthCredentialInfo!]!
 }
 
 type UserAuthInfo {
@@ -52,6 +52,6 @@ extend type Query {
 
     sessionUser: UserAuthInfo
 
-    authProviders: [AuthProviderInfo]!
+    authProviders: [AuthProviderInfo!]!
 
 }
