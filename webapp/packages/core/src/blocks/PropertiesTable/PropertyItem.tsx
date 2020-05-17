@@ -80,7 +80,7 @@ const styles = composes(
       &[|edited] {
         font-weight: 600;
       }
-      &:not(:focus):not([|focus]) {
+      &:global([readonly]), &:not(:focus):not([|focus]) {
         background: transparent;
         border: solid 1px transparent;
       }
@@ -105,7 +105,7 @@ const styles = composes(
   `
 );
 
-type PropertyItemProps = {
+type Props = {
   property: IProperty;
   value?: string;
   onNameChange(staticId: string, newId: string): void;
@@ -121,12 +121,12 @@ export const PropertyItem = observer(function PropertyItem({
   onValueChange,
   onRemove,
   error,
-}: PropertyItemProps) {
-  const isEditable = property.name !== property.id;
+}: Props) {
+  const isKeyEditable = !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const [focus, setFocus] = useState(false);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const handleNameChange = useCallback((value: string) => onNameChange(property.id, value), [property]);
+  const keyInputRef = useRef<HTMLInputElement>(null);
+  const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
   const handleValueChange = useCallback(
     (value: string) => onValueChange(property.id, value),
     [property]
@@ -134,8 +134,8 @@ export const PropertyItem = observer(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useEffect(() => {
-    if (nameInputRef.current && isEditable) {
-      nameInputRef.current.focus();
+    if (keyInputRef.current && isKeyEditable) {
+      keyInputRef.current.focus();
     }
   }, []);
 
@@ -145,12 +145,12 @@ export const PropertyItem = observer(function PropertyItem({
         <ShadowInput
           type='text'
           name={property.id}
-          onChange={handleNameChange}
-          ref={nameInputRef}
-          readOnly={!isEditable}
+          onChange={handleKeyChange}
+          ref={keyInputRef}
+          readOnly={!isKeyEditable}
           autoComplete='none'
         >
-          {property.name || property.id}
+          {property.displayName || property.key}
         </ShadowInput>
       </property-name>
       <property-value as='div'>
@@ -176,7 +176,7 @@ export const PropertyItem = observer(function PropertyItem({
           </DriverPropertyValueSelector>
         </property-select>
       )}
-      {isEditable && (
+      {isKeyEditable && (
         <property-remove as="div">
           <button type="button" onClick={handleRemove}><Icon name="reject" viewBox="0 0 11 11" /></button>
         </property-remove>

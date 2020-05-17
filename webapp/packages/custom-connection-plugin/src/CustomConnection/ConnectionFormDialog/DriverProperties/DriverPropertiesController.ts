@@ -47,7 +47,7 @@ export class DriverPropertiesController implements IInitializableController {
   onAddProperty = () => {
     this.driverProperties.unshift({
       id: uuid(),
-      name: 'property',
+      key: 'property',
       defaultValue: '',
     });
   }
@@ -60,8 +60,9 @@ export class DriverPropertiesController implements IInitializableController {
     try {
       const driverProperties = await this.customConnectionService.loadDriverProperties(this.driver.id);
       this.driverProperties = observable(driverProperties.map(property => ({
-        id: property.displayName!,
-        name: property.displayName!,
+        id: property.id!,
+        key: property.id!,
+        displayName: property.displayName!,
         defaultValue: property.defaultValue,
         description: property.description,
         validValues: property.validValues,
