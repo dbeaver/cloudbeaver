@@ -32,7 +32,7 @@ export const ConnectionForm = observer(function ConnectionForm({
   const translate = useTranslate();
 
   return styled(useStyles(formStyles))(
-    <>
+    <connection-form as='div'>
       <connection-type as="div">
         <Radio
           name="type"
@@ -74,6 +74,6 @@ export const ConnectionForm = observer(function ConnectionForm({
         </group>
       )}
       {!driver?.anonymousAccess && <CredentialsForm controller={controller}/>}
-    </>
+    </connection-form>
   );
 });
