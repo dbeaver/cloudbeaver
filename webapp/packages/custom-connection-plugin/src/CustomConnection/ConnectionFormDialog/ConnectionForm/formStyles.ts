@@ -9,6 +9,10 @@
 import { css } from 'reshadow';
 
 export const formStyles = css`
+  connection-form {
+    flex-direction: column;
+    padding: 18px 24px;
+  }
   connection-type {
     padding: 12px;
   }

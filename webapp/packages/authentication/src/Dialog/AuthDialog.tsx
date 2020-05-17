@@ -7,12 +7,11 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  useTabState, Tab as BaseTab, TabList
-} from 'reakit/Tab';
 import styled, { css } from 'reshadow';
 
-import { SubmittingForm, ErrorMessage } from '@dbeaver/core/blocks';
+import {
+  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle
+} from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { DialogComponent, CommonDialogWrapper } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
@@ -24,7 +23,7 @@ import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 
 const styles = composes(
   css`
-    BaseTab {
+    Tab {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
     ErrorMessage {
@@ -53,34 +52,19 @@ const styles = composes(
       flex-direction: column;
     }
 
-    BaseTab {
-      outline: none;
-    }
-
     TabList {
       box-sizing: border-box;
       display: inline-flex;
       width: 100%;
       padding-left: 24px;
     }
-    BaseTab {
+    Tab {
       composes: theme-typography--body2 from global;
       text-transform: uppercase;
-      padding: 12px 16px;
-      border-top: solid 2px transparent;
-      height: 48px;
+      font-weight: normal;
 
-      &:global([aria-selected='true']) {
-        border-top-color: #fd1d48;
-
-        &:before {
-          display: none;
-        }
-      }
-
-      &:not(:global([aria-selected='true'])) {
-        cursor: pointer;
-        background-color: transparent !important;
+      &:global([aria-selected=true]) {
+        font-weight: normal !important;
       }
     }
     AuthProviderForm {
@@ -99,56 +83,52 @@ export const AuthDialog: DialogComponent<null, null> = observer(
   function AuthDialog(props) {
     const controller = useController(AuthDialogController, props.rejectDialog);
     const translate = useTranslate();
-    const tab = useTabState({
-      selectedId: controller.provider?.id,
-    });
-    tab.selectedId = controller.provider?.id || null;
 
     return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={translate('authentication_login_dialog_title')}
-        noBodyPadding
-        header={(
-          <TabList {...tab} aria-label="My tabs">
-            {controller.providers.map(provider => (
-              <BaseTab
-                {...tab}
-                key={provider.id}
-                type='button'
-                stopId={provider.id}
-                onClick={() => controller.selectProvider(provider.id)}
-              >
-                {provider.label}
-              </BaseTab>
-            ))}
-          </TabList>
-        )}
-        footer={(
-          <AuthDialogFooter
-            isAuthenticating={controller.isAuthenticating}
-            onLogin={controller.login}
-          />
-        )}
-        onReject={props.options?.persistent ? undefined : props.rejectDialog}
-      >
-        <SubmittingForm onSubmit={controller.login}>
-          {controller.provider && (
-            <AuthProviderForm
-              provider={controller.provider}
-              credentials={controller.credentials}
-              authenticate={controller.isAuthenticating}
+      <TabsState currentTabId={controller.provider?.id || null}>
+        <CommonDialogWrapper
+          title={translate('authentication_login_dialog_title')}
+          noBodyPadding
+          header={(
+            <TabList>
+              {controller.providers.map(provider => (
+                <Tab
+                  key={provider.id}
+                  tabId={provider.id}
+                  onOpen={() => controller.selectProvider(provider.id)}
+                >
+                  <TabTitle title={provider.label} />
+                </Tab>
+              ))}
+            </TabList>
+          )}
+          footer={(
+            <AuthDialogFooter
+              isAuthenticating={controller.isAuthenticating}
+              onLogin={controller.login}
             />
           )}
-          {!controller.provider && <>Select available provider</>}
-        </SubmittingForm>
-        {controller.error.responseMessage && (
-          <ErrorMessage
-            text={controller.error.responseMessage}
-            hasDetails={controller.error.hasDetails}
-            onShowDetails={controller.showDetails}
-          />
-        )}
-      </CommonDialogWrapper>
+          onReject={props.options?.persistent ? undefined : props.rejectDialog}
+        >
+          <SubmittingForm onSubmit={controller.login}>
+            {controller.provider && (
+              <AuthProviderForm
+                provider={controller.provider}
+                credentials={controller.credentials}
+                authenticate={controller.isAuthenticating}
+              />
+            )}
+            {!controller.provider && <>Select available provider</>}
+          </SubmittingForm>
+          {controller.error.responseMessage && (
+            <ErrorMessage
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.showDetails}
+            />
+          )}
+        </CommonDialogWrapper>
+      </TabsState>
     );
   }
 );

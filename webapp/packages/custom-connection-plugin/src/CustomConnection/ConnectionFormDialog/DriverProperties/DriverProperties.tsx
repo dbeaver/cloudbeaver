@@ -22,6 +22,7 @@ const styles = css`
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: auto;
   }
 `;
 
@@ -32,21 +33,21 @@ type DriverPropertyState = {
 type DriverPropertiesProps = {
   driver: DBDriver;
   state: DriverPropertyState;
-  isSelected: boolean;
+  loadProperties: boolean;
 }
 
 export const DriverProperties = observer(function DriverProperties({
   driver,
   state,
-  isSelected,
+  loadProperties,
 }: DriverPropertiesProps) {
   const controller = useController(DriverPropertiesController, driver);
 
   useEffect(() => {
-    if (isSelected) {
+    if (loadProperties) {
       controller.loadDriverProperties();
     }
-  }, [isSelected]);
+  }, [loadProperties]);
 
   return styled(useStyles(styles))(
     <properties as="div">
