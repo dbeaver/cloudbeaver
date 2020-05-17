@@ -10,7 +10,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Object: { [key: string]: any };
+  Object: any;
   DateTime: any;
 };
 
@@ -18,7 +18,7 @@ export type Scalars = {
 export type Query = {
   authLogin: UserAuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
-  authProviders: Array<Maybe<AuthProviderInfo>>;
+  authProviders: Array<AuthProviderInfo>;
   connectionState: ConnectionInfo;
   dataSourceList: Array<DataSourceInfo>;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
@@ -560,7 +560,7 @@ export type AuthProviderInfo = {
   icon?: Maybe<Scalars['ID']>;
   description?: Maybe<Scalars['String']>;
   defaultProvider?: Maybe<Scalars['Boolean']>;
-  credentialParameters: Array<Maybe<AuthCredentialInfo>>;
+  credentialParameters: Array<AuthCredentialInfo>;
 };
 
 export type UserAuthInfo = {
@@ -741,10 +741,10 @@ export type AuthLogoutQuery = Pick<Query, 'authLogout'>;
 export type GetAuthProvidersQueryVariables = {};
 
 
-export type GetAuthProvidersQuery = { providers: Array<Maybe<(
+export type GetAuthProvidersQuery = { providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
-    & { credentialParameters: Array<Maybe<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>>> }
-  )>>; };
+    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
+  )>; };
 
 export type GetSessionUserQueryVariables = {};
 
