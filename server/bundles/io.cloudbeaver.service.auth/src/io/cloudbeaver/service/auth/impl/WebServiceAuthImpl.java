@@ -42,8 +42,6 @@ import java.util.Map;
  */
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
-    private static final String ATTR_USER_AUTH = "user-auth-info";
-
     @Override
     public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
         if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {

@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public interface DBWServiceAuth extends DBWService {
 
+    String ATTR_USER_AUTH = "user-auth-info";
+
     @WebAction(requirePermissions = {} )
     WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException;
 

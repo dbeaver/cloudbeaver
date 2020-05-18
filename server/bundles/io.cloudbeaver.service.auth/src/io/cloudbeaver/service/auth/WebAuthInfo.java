@@ -16,11 +16,10 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 /**
  * WebAuthInfo
@@ -75,5 +74,9 @@ public class WebAuthInfo {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public static WebAuthInfo getFromSession(WebSession webSession) {
+        return webSession.getAttribute(DBWServiceAuth.ATTR_USER_AUTH);
     }
 }

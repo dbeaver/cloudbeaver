@@ -171,7 +171,7 @@ public class WebSession {
 
     private void initNavigatorModel() {
         CBPlatform platform = CBPlatform.getInstance();
-        this.navigatorModel = new DBNModel(platform, false);
+        this.navigatorModel = new DBNModel(platform, this);
         this.navigatorModel.initialize();
 
         DBPProject project = platform.getWorkspace().getActiveProject();
