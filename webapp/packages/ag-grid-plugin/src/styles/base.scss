@@ -10,11 +10,9 @@
 @import "ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham-mixin.scss";
 @import "ag-grid-community/src/styles/webfont/agGridAlpineFont.scss";
 
-:local(.__ag-grid-theme) {
-  composes: ag-theme-balham from global;
-}
 
-.ag-theme-balham {
+.cb-ag-grid-theme {
+
   @include ag-theme-balham();
 
   font-family: inherit;

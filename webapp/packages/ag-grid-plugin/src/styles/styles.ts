@@ -9,17 +9,16 @@
 import { ThemeSelector } from '@dbeaver/core/theming';
 
 export const agGridStyles: ThemeSelector = async (theme) => {
-  const baseStyles = await import('./base.scss');
   let styles: any;
 
   switch (theme) {
     case 'dark':
-      styles = await import('./themes/dark.scss');
+      styles = await import('./themes/dark.module.scss');
       break;
     default:
-      styles = await import('./themes/light.scss');
+      styles = await import('./themes/light.module.scss');
       break;
   }
 
-  return [baseStyles.default, styles.default];
+  return [styles.default];
 };
