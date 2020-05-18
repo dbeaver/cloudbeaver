@@ -9,6 +9,16 @@
 import { ThemeSelector } from '@dbeaver/core/theming';
 
 export const SqlEditorStyles: ThemeSelector = async (theme) => {
-  const styles = await import(`./${theme}.scss`);
+  let styles: any;
+
+  switch (theme) {
+    case 'dark':
+      styles = await import('./dark.module.scss');
+      break;
+    default:
+      styles = await import('./light.module.scss');
+      break;
+  }
+
   return styles.default;
 };
