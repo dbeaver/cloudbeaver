@@ -74,7 +74,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.js?$/,
         use: [
           {
             loader: StringReplacePlugin.replace({

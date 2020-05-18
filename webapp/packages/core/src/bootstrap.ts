@@ -1,18 +1,12 @@
-/* eslint-disable import-helpers/order-imports, import/order, import/no-duplicates */
-/* this eslint-disable required for webpack inject */
-import 'reflect-metadata';
-
-import { AppBootstrap } from '@dbeaver/core';
 import { App, PluginManifest } from '@dbeaver/core/di';
 
-import { renderLayout } from './renderLayout';
+import { AppBootstrap } from './AppBootstrap';
 import { showErrorPage } from './ErrorPage';
+import { renderLayout } from './renderLayout';
 
-const PLUGINS = [] as PluginManifest[]; // will be injected by webpack
+export async function bootstrap(plugins: PluginManifest[]) {
 
-async function bootstrap() {
-
-  const app = new App(PLUGINS);
+  const app = new App(plugins);
   app.registerServices();
 
   const appBootstrap = app.getServiceInjector().resolveServiceByClass(AppBootstrap);
@@ -29,5 +23,3 @@ async function bootstrap() {
     showErrorPage();
   }
 }
-
-bootstrap();

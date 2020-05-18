@@ -71,7 +71,8 @@ module.exports = (env, argv) => {
 
   return {
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      // extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      extensions: ['.js'],
     },
     module: {
       rules: [
@@ -152,9 +153,9 @@ module.exports = (env, argv) => {
         modules: true,
         modulesCount: 100,
         profile: true,
-        handler: (percentage, message, ...args) => {
-          // custom logic
-        }
+        // handler: (percentage, message, ...args) => {
+        //   // custom logic
+        // }
       }),
       new CircularDependencyPlugin({
         // exclude detection of files based on a RegExp

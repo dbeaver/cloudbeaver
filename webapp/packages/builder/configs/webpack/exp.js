@@ -6,7 +6,7 @@ const commonConfig = require('./common-exp');
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
     mode: argv.mode || 'development',
-    entry: './index.ts',
+    entry: './index.js',
     output: {
         filename: 'js/bundle.[hash].js',
         path: resolve(argv.currentDir, './dist'),
