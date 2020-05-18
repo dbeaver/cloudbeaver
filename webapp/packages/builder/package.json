@@ -65,7 +65,7 @@
     "react-hot-loader": "^4.12.18",
     "reakit": "1.0.0-beta.11",
     "reflect-metadata": "^0.1.13",
-    "reshadow": "0.0.1-alpha.75",
+    "reshadow": "0.0.1-alpha.77",
     "resolve": "^1.17.0",
     "rimraf": "^3.0.0",
     "rollup": "^2.0.6",

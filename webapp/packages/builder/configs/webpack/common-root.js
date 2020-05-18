@@ -28,9 +28,10 @@ class IgnoreNotFoundExportPlugin {
 
 module.exports = (env, argv) => {
 
-  function generateStyleLoaders(options = { hasModule: false, hasReshadow: false }) {
+  function generateStyleLoaders(options = { hasModule: false }) {
+    const moduleScope = options.hasModule ? 'local' : 'global';
     const modules = {
-      mode: options.hasModule ? 'local' : 'global',
+      mode: moduleScope,
       localIdentName: '[local]___[hash:base64:5]',
     };
 
@@ -40,11 +41,8 @@ module.exports = (env, argv) => {
         includePaths: ['node_modules', path.resolve('../../node_modules')],
       }),
       require('postcss-discard-comments'),
+      require('reshadow/postcss')({ scopeBehaviour: moduleScope })
     ];
-
-    if (options.hasReshadow) {
-      postCssPlugins.push(require('reshadow/postcss'));
-    }
 
     // 'use' clause in webpack rules
     return [
@@ -114,12 +112,7 @@ module.exports = (env, argv) => {
             // css-module files ( should have *.module mask )
             {
               test: /\.module\.(css|scss|sass)$/,
-              use: generateStyleLoaders({ hasModule: true, hasReshadow: true }),
-            },
-            // not css-module files - 3 ways to treat them
-            {
-              test: /\.raw\.(css|scss|sass)$/,
-              use: generateStyleLoaders({ hasModule: false, hasReshadow: false }),
+              use: generateStyleLoaders({ hasModule: true }),
             },
             {
               include: /node_modules/,
@@ -134,7 +127,7 @@ module.exports = (env, argv) => {
               ]
             },
             {
-              use: generateStyleLoaders({ hasModule: false, hasReshadow: true }),
+              use: generateStyleLoaders({ hasModule: false }),
             }
           ]
         },
