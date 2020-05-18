@@ -54,10 +54,6 @@ function copyPublic(currentDir, pluginsList) {
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   resolve: {
     alias: {
-      // // rewrite imports for unnecessary work in `web/src/libs/sdk.ts`
-      'graphql-tag': path.resolve(__dirname, '../../src/fix-gql.js'),
-      graphql: path.resolve(__dirname, '../../src/fix-gql.js'),
-
       react: 'preact/compat',
       react$: 'preact/compat',
       'react-dom': 'preact/compat',
