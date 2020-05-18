@@ -56,7 +56,7 @@ export class ConnectionDialogsService {
       id: 'closeConnection',
       isPresent(context) {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType
-          && Boolean((context.data as NodeWithParent)?.object?.features?.includes(EObjectFeature.dataSource));
+          && !!context.data.object?.features?.includes(EObjectFeature.dataSource);
       },
       title: 'Disconnect',
       onClick: (context: IMenuContext<NodeWithParent>) => {
