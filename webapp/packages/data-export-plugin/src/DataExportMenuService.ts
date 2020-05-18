@@ -6,8 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import {
+  NavigationTreeContextMenuService, NodeManagerUtils, NodeWithParent, EObjectFeature
+} from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
-import { IContextMenuItem, IMenuContext, CommonDialogService } from '@dbeaver/core/dialogs';
+import {
+  IContextMenuItem, IMenuContext, CommonDialogService, ContextMenuService
+} from '@dbeaver/core/dialogs';
 import { TableFooterMenuService, TableViewerModel } from '@dbeaver/data-viewer-plugin';
 
 import { DataExportDialog } from './Dialog/DataExportDialog';
@@ -18,6 +23,7 @@ export class DataExportMenuService {
   constructor(
     private commonDialogService: CommonDialogService,
     private tableFooterMenuService: TableFooterMenuService,
+    private contextMenuService: ContextMenuService,
   ) { }
 
   register() {
@@ -32,6 +38,27 @@ export class DataExportMenuService {
       onClick: this.exportData.bind(this),
     };
     this.tableFooterMenuService.registerMenuItem(exportData);
+
+    this.contextMenuService.addMenuItem<NodeWithParent>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'export',
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+           && !!context.data.object?.features?.includes(EObjectFeature.dataContainer);
+        },
+        order: 2,
+        title: 'Export',
+        onClick: (context) => {
+          const node = context.data;
+          const connectionId = NodeManagerUtils.nodeIdToConnectionId(node.id);
+          this.commonDialogService.open(DataExportDialog, {
+            connectionId,
+            containerNodePath: node.id,
+          });
+        },
+      }
+    );
   }
 
   private exportData(context: IMenuContext<TableViewerModel>) {

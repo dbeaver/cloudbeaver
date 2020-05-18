@@ -17,4 +17,13 @@ export class NodeManagerUtils {
     return connectionNodeId.replace('database://', '');
   }
 
+  static nodeIdToConnectionId(nodeId: string): string {
+    const matches = nodeId.match(/database:\/\/(.*?)(|\/.*)$/);
+    if (!matches) {
+      throw new Error('Not database object');
+    }
+
+    return matches[1];
+  }
+
 }
