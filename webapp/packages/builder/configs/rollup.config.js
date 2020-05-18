@@ -6,6 +6,7 @@ const commonjs = require('rollup-plugin-commonjs');
 const peerDepsExternal = require('rollup-plugin-peer-deps-external');
 const includePaths = require('rollup-plugin-includepaths');
 const typescriptPlugin = require('rollup-plugin-typescript2');
+const reshadowLoader = require('./reshadow-loader');
 
 const includePathOptions = {
   include: {},
@@ -56,20 +57,22 @@ function configBuilder(options = defaultBuilderOptions) {
         //   generateScopedName: "[local]___[hash:base64:5]"
         // },
         inject: true,
-        use: {
-          sass: {
-            includePaths: ['node_modules', '../../node_modules'],
-          }
-        },
-        // this option is added in dkrupenya/rollup-plugin-postcss#develop
-        // todo to be converted to custom loader
-        // firstPlugin: require('reshadow/postcss'),
-        // firstPlugin: require('reshadow/postcss')({ scopeBehaviour: 'global' }),
+        use: [
+          [
+            'reshadow-loader',
+            {}
+          ],
+          [
+            'sass',
+            {
+              includePaths: ['node_modules', '../../node_modules'],
+            }
+          ],
+        ],
+        loaders: [ reshadowLoader ],
         plugins: [
           require('postcss-preset-env')({ stage: 0 }),
           require('postcss-discard-comments'),
-          // todo move 'reshadow/postcss' to custom loader to run it before postcss-loader
-          require('reshadow/postcss'),
         ]
       }),
       peerDepsExternal(),
