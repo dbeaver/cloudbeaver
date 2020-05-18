@@ -8,8 +8,8 @@
 
 import { observer } from 'mobx-react';
 
+import { ItemList } from '@dbeaver/core/blocks';
 import { DataTransferProcessorInfo } from '@dbeaver/core/sdk';
-import { ItemList } from '@dbeaver/core/src/blocks';
 
 import { ProcessorItem } from './ProcessorItem';
 
