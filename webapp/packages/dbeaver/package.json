@@ -24,6 +24,7 @@
     "@dbeaver/ag-grid-plugin": "^0.1.0",
     "@dbeaver/basic-connection-plugin": "^0.1.0",
     "@dbeaver/builder": "^0.1.0",
+    "@dbeaver/core": "^0.1.0",
     "@dbeaver/custom-connection-plugin": "^0.1.0",
     "@dbeaver/data-viewer-plugin": "^0.1.0",
     "@dbeaver/ddl-viewer-plugin": "^0.1.0",

@@ -27,6 +27,10 @@ function createWebpackArgv(argv) {
     console.log('Plugins list is not found: ', fullPath);
   }
 
+  // add mandatory plugin
+  pluginsList = pluginsList.filter(plugin => plugin !== '@dbeaver/core');
+  pluginsList.unshift('@dbeaver/core')
+
   const webpackArgv = {
     mode: 'production',
     pluginsList: pluginsList,

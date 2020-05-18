@@ -28,26 +28,36 @@ ${names.map(n => `  ${n},\n`).join('')}]`;
   return code;
 }
 
+function dirExists(path) {
+  try {
+    const stats = fs.statSync(path)
+    return stats && stats.isDirectory()
+  } catch (e) {
+    return false;
+  }
+}
+
 function copyPublic(currentDir, pluginsList) {
   const pathsToCopy = [];
-
   pluginsList.forEach(plugin => {
     try {
-      const pathToPlugin = resolve.sync(plugin, {basedir: currentDir});
+      const pathToPlugin = resolve.sync(plugin);
       const dir = path.parse(pathToPlugin).dir;
       const pathToPublic = path.resolve(dir, '../public');
-      const stats = fs.statSync(pathToPublic);
-      if (stats && stats.isDirectory()) {
+      if (dirExists(pathToPublic)) {
         pathsToCopy.push({
           from: pathToPublic,
           to: '',
         });
       }
     } catch (e) {
+      console.error(e);
     }
   });
-  pathsToCopy.push({from: path.resolve(currentDir, './public'), to: ''});
-  console.log(pathsToCopy);
+  const pathToAppPublic = path.resolve(currentDir, './public')
+  if (dirExists(pathToAppPublic)) {
+    pathsToCopy.push({from: path.resolve(currentDir, './public'), to: ''});
+  }
   return pathsToCopy;
 }
 

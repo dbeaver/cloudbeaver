@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/types",
   "scripts": {
