@@ -8,10 +8,12 @@
 
 import { observable, computed } from 'mobx';
 
+import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { IProperty } from '@dbeaver/core/blocks';
-import { injectable, IInitializableController } from '@dbeaver/core/di';
+import { injectable, IInitializableController, IDestructibleController } from '@dbeaver/core/di';
+import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
-import { DataTransferProcessorInfo } from '@dbeaver/core/sdk';
+import { DataTransferProcessorInfo, GQLErrorCatcher } from '@dbeaver/core/sdk';
 
 import { DataExportService } from '../DataExportService';
 import { IExportContext } from '../IExportContext';
@@ -22,7 +24,7 @@ export enum DataExportStep {
 }
 
 @injectable()
-export class DataExportController implements IInitializableController {
+export class DataExportController implements IInitializableController, IDestructibleController {
   @observable step = DataExportStep.DataTransferProcessor
   get isLoading() {
     return this.dataExportService.processors.isLoading();
@@ -35,24 +37,32 @@ export class DataExportController implements IInitializableController {
       .from(
         this.dataExportService.processors.data.values()
       )
-      .sort((a, b) => this.sortProcessors(a, b));
+      .sort(sortProcessors);
   }
 
   @observable processorProperties: any = {}
   @observable properties: IProperty[] = []
 
+  readonly error = new GQLErrorCatcher();
+
   private context!: IExportContext;
   private close!: () => void;
+  private isDistructed = false;
 
   constructor(
     private dataExportService: DataExportService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private commonDialogService: CommonDialogService
   ) { }
 
   init(context: IExportContext, close: () => void) {
     this.context = context;
     this.close = close;
     this.loadProcessors();
+  }
+
+  destruct(): void {
+    this.isDistructed = true;
   }
 
   prepareExport = async () => {
@@ -71,7 +81,9 @@ export class DataExportController implements IInitializableController {
       );
       this.close();
     } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t export');
+      if (!this.error.catch(exception) || this.isDistructed) {
+        this.notificationService.logException(exception, 'Can\'t export');
+      }
     } finally {
       this.isExporting = false;
       close();
@@ -100,6 +112,13 @@ export class DataExportController implements IInitializableController {
     this.processorProperties = {};
 
     this.step = DataExportStep.Configure;
+    this.error.clear();
+  }
+
+  showDetails = () => {
+    if (this.error.exception) {
+      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
+    }
   }
 
   private async loadProcessors() {
@@ -109,13 +128,13 @@ export class DataExportController implements IInitializableController {
       this.notificationService.logException(exception, 'Can\'t load data export processors');
     }
   }
+}
 
-  private sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
-    if (processorA.order === processorB.order)
-    {
-      return (processorA.name || '').localeCompare((processorB.name || ''));
-    }
-
-    return processorA.order - processorB.order;
+function sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
+  if (processorA.order === processorB.order)
+  {
+    return (processorA.name || '').localeCompare((processorB.name || ''));
   }
+
+  return processorA.order - processorB.order;
 }
