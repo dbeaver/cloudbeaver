@@ -74,7 +74,7 @@
     "rollup-plugin-includepaths": "^0.2.3",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.2",
-    "rollup-plugin-postcss": "dkrupenya/rollup-plugin-postcss#develop",
+    "rollup-plugin-postcss": "^3.1.1",
     "rollup-plugin-typescript2": "^0.26.0",
     "rxjs": "^6.5.5",
     "sass-loader": "^8.0.0",

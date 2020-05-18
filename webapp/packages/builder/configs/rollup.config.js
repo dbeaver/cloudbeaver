@@ -63,12 +63,13 @@ function configBuilder(options = defaultBuilderOptions) {
         },
         // this option is added in dkrupenya/rollup-plugin-postcss#develop
         // todo to be converted to custom loader
-        firstPlugin: require('reshadow/postcss'),
+        // firstPlugin: require('reshadow/postcss'),
+        // firstPlugin: require('reshadow/postcss')({ scopeBehaviour: 'global' }),
         plugins: [
           require('postcss-preset-env')({ stage: 0 }),
           require('postcss-discard-comments'),
           // todo move 'reshadow/postcss' to custom loader to run it before postcss-loader
-          // require('reshadow/postcss'),
+          require('reshadow/postcss'),
         ]
       }),
       peerDepsExternal(),

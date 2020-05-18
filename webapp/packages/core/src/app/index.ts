@@ -41,7 +41,7 @@ export * from './Body';
 export * from './Notifications/NotificationsItem/ErrorDetailsDialog/ErrorDetailsDialog';
 
 // Interfaces
-export * from './shared/Navigation';
+export * from './shared/Navigation/INavigator';
 export * from './shared/NodesManager/ENodeFeature';
 export * from './shared/NodesManager/EObjectFeature';
 export * from './shared/NodesManager/NodeManagerUtils';

@@ -33,7 +33,7 @@
     flex: 1;
   }
 
-  Tab {
+  .__Tab {
     composes: theme-typography--body2 from global;
     position: relative;
     display: flex;
