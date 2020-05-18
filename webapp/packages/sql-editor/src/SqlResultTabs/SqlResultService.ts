@@ -39,7 +39,7 @@ export class SqlResultService {
         limit: count,
       },
     });
-    return response.result;
+    return response.result!;
   }
 
   asyncSqlQuery(sqlQueryParams: ISqlQueryParams,
@@ -65,7 +65,7 @@ export class SqlResultService {
       values: firstRow.values,
     });
 
-    return response.result;
+    return response.result!;
   }
 
   sqlExecuteInfoToData(result: SqlExecuteInfo, indexInResultSet: number, count?: number): IRequestDataResult {
