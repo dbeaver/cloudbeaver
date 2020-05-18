@@ -23,11 +23,11 @@ type AuthProviderInfo {
     icon: ID
     description: String
 
-    isDefault: Boolean
+    defaultProvider: Boolean
 
     #configurationParameters: [ObjectPropertyInfo]!
 
-    credentialParameters: [AuthCredentialInfo]!
+    credentialParameters: [AuthCredentialInfo!]!
 }
 
 type UserAuthInfo {
@@ -46,12 +46,12 @@ type UserAuthInfo {
 
 extend type Query {
 
-    authLogin(provider: ID!, credentials: Object!): UserAuthInfo
+    authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
 
     authLogout: Boolean
 
     sessionUser: UserAuthInfo
 
-    authProviders: [AuthProviderInfo]!
+    authProviders: [AuthProviderInfo!]!
 
 }

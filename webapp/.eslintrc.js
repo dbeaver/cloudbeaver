@@ -5,15 +5,12 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    // 'plugin:prettier/recommended',
-    // 'prettier/@typescript-eslint',
   ],
 
   plugins: [
     'import',
     '@typescript-eslint',
     'eslint-plugin-import-helpers',
-    // 'prettier',
     'jest',
   ],
 
@@ -37,7 +34,6 @@ module.exports = {
   },
 
   rules: {
-    // 'prettier/prettier': 'warn',
     'arrow-parens': ['error', 'as-needed', { 'requireForBlockBody': true }],
     'curly': ['error', 'all'],
     'class-methods-use-this': 'off',
@@ -76,12 +72,15 @@ module.exports = {
     'no-restricted-globals': 'off',
     'no-useless-constructor': 'off',
     'max-classes-per-file': 'off',
+    'arrow-body-style': ['error', 'as-needed'],
+    'function-call-argument-newline': ['error', 'consistent'],
     'max-len': [
       'error',
       {
         code: 120,
         ignoreTrailingComments: true,
-        ignoreStrings: true
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true
       }
     ],
     'lines-between-class-members': 'off',

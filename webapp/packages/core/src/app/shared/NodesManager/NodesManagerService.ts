@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 import { DatabaseObjectInfo, GraphQLService } from '@dbeaver/core/sdk';
 
 import { INavigator } from '../Navigation/INavigator';
@@ -51,7 +52,8 @@ export class NodesManagerService {
   private nodesStore = new NodesStore();
 
   constructor(private graphQLService: GraphQLService,
-              private navigationService: NavigationService) {
+              private navigationService: NavigationService,
+              private permissionsService: PermissionsService) {
 
     this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
       data => data.nodeId,
@@ -134,7 +136,10 @@ export class NodesManagerService {
   }
 
   async updateRootChildren() {
-    return this.updateChildren(ROOT_NODE_PATH);
+    if (!await this.permissionsService.hasAsync(EPermission.public)) {
+      return;
+    }
+    this.updateChildren(ROOT_NODE_PATH);
   }
 
   async updateChildrenDatabaseObjectInfo(nodeId: string) {

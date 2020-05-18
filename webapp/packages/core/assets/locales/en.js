@@ -12,6 +12,7 @@ module.exports = {
   basicConnection_connectionDialog_connecting: 'Connecting...',
   basicConnection_connectionDialog_connect: 'Connect',
   basicConnection_connectionDialog_connecting_message: 'Connecting to database...',
+  basicConnection_main_menu_item: 'Preconfigured',
 
   customConnection_connectionType_custom: 'Parameters',
   customConnection_connectionType_url: 'URL',
@@ -41,6 +42,10 @@ module.exports = {
   data_transfer_exporting_sql: 'SQL:',
 
   administration_menu_enter: 'Administration',
+
+  authentication_login_dialog_title: 'Authentication',
+  authentication_login: 'Login',
+  authentication_logout: 'Logout',
 
   ui_stepper_back: 'Back',
   ui_processing_loading: 'Loading...',

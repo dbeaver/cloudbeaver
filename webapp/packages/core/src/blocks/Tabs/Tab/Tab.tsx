@@ -18,7 +18,7 @@ import { TabsContext } from '../TabsContext';
 type TabProps = PropsWithChildren<{
   tabId: string;
   className?: string;
-  onOpen: (tabId: string) => void;
+  onOpen?: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }>
 
@@ -36,8 +36,10 @@ export function Tab({
 
   const handleOpen = useCallback((e: React.MouseEvent<any>) => {
     e.preventDefault();
-    onOpen(tabId);
-  }, []);
+    if (onOpen) {
+      onOpen(tabId);
+    }
+  }, [onOpen]);
 
   const handleClose = useCallback((e: React.MouseEvent<any>) => {
     e.preventDefault();
@@ -54,12 +56,14 @@ export function Tab({
       className={className}
       onClick={handleOpen}
     >
-      {children}
-      {onClose && (
-        <tab-action as="div" onClick={handleClose}>
-          <Icon name="cross-bold" viewBox="0 0 7 8"/>
-        </tab-action>
-      )}
+      <tab-container as='div'>
+        {children}
+        {onClose && (
+          <tab-action as="div" onClick={handleClose}>
+            <Icon name="cross-bold" viewBox="0 0 7 8"/>
+          </tab-action>
+        )}
+      </tab-container>
     </BaseTab>
   );
 }

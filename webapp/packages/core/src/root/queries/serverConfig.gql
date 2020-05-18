@@ -8,6 +8,8 @@ query serverConfig {
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces
+    anonymousAccessEnabled
+    authenticationEnabled
     supportedLanguages {
       isoCode
       displayName

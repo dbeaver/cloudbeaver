@@ -20,9 +20,8 @@ import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
 
 const styles = css`
   CommonDialogWrapper {
-    display: flex;
-    flex-direction: column;
-    min-height: 330px;
+    max-height: 500px;
+    min-height: 500px;
   }
   ExportProcessorList {
     flex: 1;

@@ -10,6 +10,7 @@ import { MainMenuService, ConnectionDialogsService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
+import { PermissionsService, EPermission } from '@dbeaver/core/root';
 
 import { BasicConnectionService } from './BasicConnectionService';
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
@@ -17,13 +18,14 @@ import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 @injectable()
 export class BasicConnectionPluginBootstrap {
 
-  private hasPreconfiguredConnection = false;
-
-  constructor(private connectionDialogsService: ConnectionDialogsService,
-              private mainMenuService: MainMenuService,
-              private basicConnectionService: BasicConnectionService,
-              private notificationService: NotificationService,
-              private commonDialogService: CommonDialogService) {
+  constructor(
+    private connectionDialogsService: ConnectionDialogsService,
+    private mainMenuService: MainMenuService,
+    private basicConnectionService: BasicConnectionService,
+    private commonDialogService: CommonDialogService,
+    private notificationService: NotificationService,
+    private permissionsService: PermissionsService
+  ) {
   }
 
   bootstrap() {
@@ -33,9 +35,10 @@ export class BasicConnectionPluginBootstrap {
       {
         id: 'mainMenuConnect',
         order: 2,
-        title: 'Preconfigured',
+        title: 'basicConnection_main_menu_item',
         onClick: () => this.openConnectionsDialog(),
-        isDisabled: () => !this.hasPreconfiguredConnection,
+        isHidden: () => !this.permissionsService.has(EPermission.public),
+        isDisabled: () => !this.basicConnectionService.dbSources.data.length,
       }
     );
   }
@@ -46,11 +49,9 @@ export class BasicConnectionPluginBootstrap {
 
   private async loadDbSources() {
     try {
-      const sources = await this.basicConnectionService.loadDBSourcesAsync();
-      this.hasPreconfiguredConnection = !!sources.length;
+      await this.basicConnectionService.dbSources.load();
     } catch (error) {
       this.notificationService.logException(error, 'DBSources loading failed');
     }
   }
-
 }

@@ -7,13 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  useTabState, Tab as BaseTab, TabList, TabPanel as BaseTabPanel,
-} from 'reakit/Tab';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { DBDriver } from '@dbeaver/core/app';
-import { SubmittingForm, ErrorMessage } from '@dbeaver/core/blocks';
+import {
+  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel
+} from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { CommonDialogWrapper } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
@@ -24,10 +24,9 @@ import { ConnectionFormDialogController } from './ConnectionFormDialogController
 import { ConnectionFormDialogFooter } from './ConnectionFormDialogFooter';
 import { DriverProperties } from './DriverProperties/DriverProperties';
 
-
 const styles = composes(
   css`
-    BaseTab {
+    Tab {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
     ErrorMessage {
@@ -41,10 +40,8 @@ const styles = composes(
       box-sizing: border-box;
     }
     CommonDialogWrapper {
-      display: flex;
-      flex-direction: column;
-      max-height: 330px;
-      min-height: 330px;
+      max-height: 500px;
+      min-height: 500px;
     }
     SubmittingForm {
       overflow: auto;
@@ -55,39 +52,20 @@ const styles = composes(
       flex-direction: column;
     }
 
-    BaseTab, BaseTabPanel {
-      outline: none;
-    }
-
     TabList {
       box-sizing: border-box;
       display: inline-flex;
       width: 100%;
       padding-left: 24px;
     }
-    BaseTab {
+    Tab {
       composes: theme-typography--body2 from global;
       text-transform: uppercase;
-      padding: 12px 16px;
-      border-top: solid 2px transparent;
-      height: 48px;
+      font-weight: normal;
 
-      &:global([aria-selected='true']) {
-        border-top-color: #fd1d48;
-
-        &:before {
-          display: none;
-        }
+      &:global([aria-selected=true]) {
+        font-weight: normal !important;
       }
-
-      &:not(:global([aria-selected='true'])) {
-        cursor: pointer;
-        background-color: transparent !important;
-      }
-    }
-    BaseTabPanel::first-child {
-      flex-direction: column;
-      padding: 18px 24px;
     }
     ErrorMessage {
       position: sticky;
@@ -113,50 +91,54 @@ export const ConnectionFormDialog = observer(
   }: ConnectionFormDialogProps) {
     const translate = useTranslate();
     const controller = useController(ConnectionFormDialogController, driver, onClose);
-    const tab = useTabState({
-      selectedId: 'options',
-    });
+    const [loadProperties, setLoadProperties] = useState(false);
 
     return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={title}
-        noBodyPadding
-        header={(
-          <TabList {...tab} aria-label="My tabs">
-            <BaseTab {...tab} type='button' stopId='options'>{translate('customConnection_options')}</BaseTab>
-            <BaseTab {...tab} type='button' stopId='driver_properties'>{translate('customConnection_properties')}</BaseTab>
-          </TabList>
-        )}
-        footer={(
-          <ConnectionFormDialogFooter
-            isConnecting={controller.isConnecting}
-            onConnectionTest={controller.onTestConnection}
-            onCreateConnection={controller.onCreateConnection}
-            onBack={onBack}
-          />
-        )}
-        onReject={onClose}
-      >
-        <SubmittingForm onSubmit={controller.onCreateConnection}>
-          <BaseTabPanel {...tab} stopId='options'>
-            <ConnectionForm driver={driver} controller={controller} />
-          </BaseTabPanel>
-          <BaseTabPanel {...tab} stopId='driver_properties'>
-            <DriverProperties
-              driver={driver}
-              state={controller.config.properties}
-              isSelected={tab.selectedId === 'driver_properties'}
+      <TabsState selectedId='options'>
+        <CommonDialogWrapper
+          title={title}
+          noBodyPadding
+          header={(
+            <TabList>
+              <Tab tabId='options' >
+                <TabTitle title={translate('customConnection_options')} />
+              </Tab>
+              <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} >
+                <TabTitle title={translate('customConnection_properties')} />
+              </Tab>
+            </TabList>
+          )}
+          footer={(
+            <ConnectionFormDialogFooter
+              isConnecting={controller.isConnecting}
+              onConnectionTest={controller.onTestConnection}
+              onCreateConnection={controller.onCreateConnection}
+              onBack={onBack}
             />
-          </BaseTabPanel>
-        </SubmittingForm>
-        {controller.responseMessage && (
-          <ErrorMessage
-            text={controller.responseMessage}
-            hasDetails={controller.hasDetails}
-            onShowDetails={controller.onShowDetails}
-          />
-        )}
-      </CommonDialogWrapper>
+          )}
+          onReject={onClose}
+        >
+          <SubmittingForm onSubmit={controller.onCreateConnection}>
+            <TabPanel tabId='options'>
+              <ConnectionForm driver={driver} controller={controller} />
+            </TabPanel>
+            <TabPanel tabId='driver_properties'>
+              <DriverProperties
+                driver={driver}
+                state={controller.config.properties!}
+                loadProperties={loadProperties}
+              />
+            </TabPanel>
+          </SubmittingForm>
+          {controller.error.responseMessage && (
+            <ErrorMessage
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.onShowDetails}
+            />
+          )}
+        </CommonDialogWrapper>
+      </TabsState>
     );
   }
 );

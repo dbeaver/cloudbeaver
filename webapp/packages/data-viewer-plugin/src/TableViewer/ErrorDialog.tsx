@@ -18,8 +18,10 @@ import { useStyles } from '@dbeaver/core/theming';
 const styles = css`
   controls {
     display: flex;
+    flex: 1;
     height: 100%;
     align-items: center;
+    margin: auto;
   }
 
   fill {

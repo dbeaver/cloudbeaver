@@ -3,3 +3,4 @@ export * from './ServerService';
 export * from './PermissionsService';
 export * from '../settings/ServerSettingsService';
 export * from '../settings/SessionSettingsService';
+export * from './usePermission';

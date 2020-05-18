@@ -36,19 +36,15 @@
   .__Tab {
     composes: theme-typography--body2 from global;
     position: relative;
-    display: flex;
-    flex-shrink: 0;
-    text-align: left;
-    align-items: center;
     outline: none;
     font-weight: normal;
     cursor: pointer;
+    padding: 0;
 
     height: 48px;
-    padding: 0 24px 0 12px;
     border-top: solid 2px transparent;
 
-    &:global([aria-selected=true]) {
+    &:global([aria-selected="true"]) {
       font-weight: 500;
       cursor: auto;
       border-top-color: $color-negative;
@@ -58,52 +54,64 @@
       }
     }
 
-    &:not(:global([aria-selected=true])) {
+    &:not(:global([aria-selected="true"])) {
       background-color: transparent !important;
     }
   }
 
-  tab-icon {
-    height: 22px;
-    padding-right: 8px;
+  tab-container {
+    height: 100%;
+    display: flex;
+    flex-shrink: 0;
+    text-align: left;
+    align-items: center;
 
-    & StaticImage,
-    & img {
-      width: 22px;
-    }
-
-    & placeholder {
-      width: 22px;
+    tab-icon {
       height: 22px;
+      padding-left: 12px;
+
+      StaticImage,
+      img {
+        width: 22px;
+      }
+
+      placeholder {
+        width: 22px;
+        height: 22px;
+      }
     }
-  }
 
-  tab-title placeholder {
-    width: 80px;
-    height: 16px;
-  }
+    tab-title {
+      padding: 0 12px;
+    }
 
-  tab-action:before {
-    content: "";
-    display: block;
-    left: -2px;
-    top: -2px;
-    height: 12px;
-    width: 12px;
-    position: absolute;
-    cursor: pointer;
-  }
+    tab-title placeholder {
+      width: 80px;
+      height: 16px;
+    }
 
-  tab-action {
-    height: 8px;
-    width: 8px;
-    align-self: flex-start;
-    position: absolute;
-    top: 4px;
-    right: 4px;
-
-    & Icon {
+    tab-action:before {
+      content: "";
       display: block;
+      left: -4px;
+      top: 0;
+      height: 16px;
+      width: 16px;
+      position: absolute;
+      cursor: pointer;
+    }
+
+    tab-action {
+      position: relative;
+      height: 8px;
+      width: 8px;
+      align-self: flex-start;
+      padding: 4px;
+      padding-left: 0;
+
+      Icon {
+        display: block;
+      }
     }
   }
 

@@ -11,6 +11,7 @@ module.exports = {
   basicConnection_connectionDialog_connecting: 'Подключение...',
   basicConnection_connectionDialog_connect: 'Подключиться',
   basicConnection_connectionDialog_connecting_message: 'Подключение к базе...',
+  basicConnection_main_menu_item: 'Подключиться',
 
   customConnection_connectionType_custom: 'Параметры',
   customConnection_connectionType_url: 'URL',
@@ -40,6 +41,10 @@ module.exports = {
   data_transfer_exporting_sql: 'SQL:',
 
   administration_menu_enter: 'Администрирование',
+
+  authentication_login_dialog_title: 'Авторизация',
+  authentication_login: 'Войти',
+  authentication_logout: 'Выйти',
 
   ui_stepper_back: 'Назад',
   ui_processing_loading: 'Загрузка...',

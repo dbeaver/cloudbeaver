@@ -11,7 +11,7 @@
     </parent>
 
     <properties>
-        <deps.output.dir>mysql</deps.output.dir>
+        <deps.output.dir>mysql/mysql8</deps.output.dir>
     </properties>
 
     <dependencies>

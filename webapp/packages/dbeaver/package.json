@@ -16,11 +16,11 @@
     "gql:gen": "graphql-codegen",
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "prettify": "prettier --write **/*.ts **/*.tsx"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@dbeaver/administration": "^0.1.0",
+    "@dbeaver/authentication": "^0.1.0",
     "@dbeaver/ag-grid-plugin": "^0.1.0",
     "@dbeaver/basic-connection-plugin": "^0.1.0",
     "@dbeaver/builder": "^0.1.0",

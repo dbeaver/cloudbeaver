@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
@@ -45,7 +44,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 return true;
             })
             .dataFetcher("sessionUser", env -> getService(env).sessionUser(getWebSession(env)))
-            .dataFetcher("authProviders", env -> WebServiceRegistry.getInstance().getAuthProviders())
+            .dataFetcher("authProviders", env -> getService(env).getAuthProviders(getWebSession(env)))
         ;
 
     }

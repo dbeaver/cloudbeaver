@@ -26,7 +26,7 @@ type PropertiesState = {
 type PropertiesTableProps = {
   properties: IProperty[];
   propertiesState?: PropertiesState;
-  onNameChange?(id: string, name: string): void;
+  onKeyChange?(id: string, name: string): void;
   onChange?(state: PropertiesState): void;
   onAdd?(): void;
   onRemove?(id: string): void;
@@ -36,7 +36,7 @@ type PropertiesTableProps = {
 export const PropertiesTable = observer(function PropertiesTable({
   propertiesState,
   properties,
-  onNameChange,
+  onKeyChange,
   onChange,
   onAdd,
   onRemove,
@@ -44,22 +44,22 @@ export const PropertiesTable = observer(function PropertiesTable({
 }: PropertiesTableProps) {
   const translate = useTranslate();
   const state = useLocalStore<PropertiesState>(() => (propertiesState || {}));
-  const changeName = useCallback((id: string, name: string) => {
+  const changeName = useCallback((id: string, key: string) => {
     const property = properties.find(property => property.id === id);
 
     if (!property) {
       return;
     }
 
-    if (state[property.name] !== undefined) {
-      state[name] = state[property.name];
-      delete state[property.name];
+    if (state[property.key] !== undefined) {
+      state[key] = state[property.key];
+      delete state[property.key];
     }
 
-    if (onNameChange) {
-      onNameChange(property.name, name);
+    if (onKeyChange) {
+      onKeyChange(property.key, key);
     }
-    property.name = name;
+    property.key = key;
   }, [properties]);
 
   const changeValue = useCallback((id: string, value: string) => {
@@ -69,7 +69,7 @@ export const PropertiesTable = observer(function PropertiesTable({
       return;
     }
 
-    state[property.name] = value;
+    state[property.key] = value;
 
     if (onChange) {
       onChange(state);
@@ -83,8 +83,8 @@ export const PropertiesTable = observer(function PropertiesTable({
       return;
     }
 
-    if (state[property.name] !== undefined) {
-      delete state[property.name];
+    if (state[property.key] !== undefined) {
+      delete state[property.key];
     }
 
     if (onRemove) {
@@ -93,8 +93,8 @@ export const PropertiesTable = observer(function PropertiesTable({
     properties.splice(properties.indexOf(property), 1);
   }, [properties, onRemove]);
 
-  const isNameUnique = useCallback(
-    (name: string) => properties.filter(property => property.name === name).length === 1,
+  const isKeyUnique = useCallback(
+    (key: string) => properties.filter(property => property.key === key).length === 1,
     []
   );
 
@@ -116,11 +116,11 @@ export const PropertiesTable = observer(function PropertiesTable({
           <PropertyItem
             key={property.id}
             property={property}
-            value={state[property.name]}
+            value={state[property.key]}
             onNameChange={changeName}
             onValueChange={changeValue}
             onRemove={removeProperty}
-            error={!isNameUnique(property.name)}
+            error={!isKeyUnique(property.key)}
           />
         ))}
       </properties-list>

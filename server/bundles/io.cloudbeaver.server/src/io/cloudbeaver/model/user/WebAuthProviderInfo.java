@@ -17,10 +17,14 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 
+import java.util.List;
+
 /**
- * Web user.
+ * WebAuthProviderInfo.
  */
 public class WebAuthProviderInfo {
 
@@ -46,6 +50,14 @@ public class WebAuthProviderInfo {
 
     public String getDescription() {
         return descriptor.getDescription();
+    }
+
+    public boolean isDefaultProvider() {
+        return descriptor.getId().equals(CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultAuthProvider());
+    }
+
+    public List<WebAuthProviderPropertyDescriptor> getCredentialParameters() {
+        return descriptor.getCredentialParameters();
     }
 
     @Override

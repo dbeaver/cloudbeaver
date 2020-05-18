@@ -1,7 +1,8 @@
 // Services
 export * from './TopNavBar/MainMenu/MainMenuService';
-export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/SettingsMenu/SettingsMenuService';
+export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
+export * from './TopNavBar/TopNavBarService';
 export * from './shared/ConnectionsManager/ConnectionsManagerService';
 export * from './shared/ConnectionsManager/ConnectionDialogsService';
 export * from './shared/ConnectionsManager/extensions/IConnectionProvider';

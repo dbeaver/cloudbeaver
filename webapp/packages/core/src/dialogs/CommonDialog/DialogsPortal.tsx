@@ -13,6 +13,7 @@ import {
   DialogBackdrop,
   useDialogState,
 } from 'reakit/Dialog';
+import { Portal } from 'reakit/Portal';
 import styled from 'reshadow';
 
 import { useService } from '@dbeaver/core/di';
@@ -63,18 +64,26 @@ function NestedDialog(props: NestedDialogType) {
     (result: any) => props.resolveDialog(props.dialog, result),
     [props.dialog, props.resolveDialog]
   );
+  const backdropClickCallback = useCallback(() => {
+    if (!props.dialog.options?.persistent) {
+      handleReject();
+    }
+  }, [props.dialog.options?.persistent, handleReject]);
 
   const DialogComponent = props.dialog.component;
 
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
-    <Dialog {...dialogState} aria-label="can't be provided" tabIndex={0}>
-      <DialogBackdrop {...dialogState} onClick={handleReject} />
-      <DialogComponent
-        payload={props.dialog.payload}
-        resolveDialog={handleResolve}
-        rejectDialog={handleReject}
-      />
-    </Dialog>
+    <>
+      <Portal><DialogBackdrop {...dialogState} onClick={backdropClickCallback} /></Portal>
+      <Dialog {...dialogState} aria-label="can't be provided" tabIndex={0} >
+        <DialogComponent
+          payload={props.dialog.payload}
+          options={props.dialog.options}
+          resolveDialog={handleResolve}
+          rejectDialog={handleReject}
+        />
+      </Dialog>
+    </>
   );
 }

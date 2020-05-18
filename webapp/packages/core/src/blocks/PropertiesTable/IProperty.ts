@@ -8,7 +8,8 @@
 
 export interface IProperty {
   id: string;
-  name: string;
+  key: string;
+  displayName?: string;
   defaultValue?: string;
   description?: string;
   validValues?: string[];

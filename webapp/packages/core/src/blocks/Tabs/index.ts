@@ -1,6 +1,8 @@
 export * from './Tab';
 export * from './TabPanel';
 export * from './TabsContext';
+export * from './TabsState';
+export * from './TabList';
 
 export * from './ITab';
 

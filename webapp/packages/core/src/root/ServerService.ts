@@ -33,8 +33,7 @@ export class ServerService {
       this.settings.clear();
       parseJSONFlat(
         serverConfig.productConfiguration,
-        this.settings.setSelfValue.bind(this.settings),
-        undefined
+        this.settings.setSelfValue.bind(this.settings)
       );
     }
     return serverConfig;
