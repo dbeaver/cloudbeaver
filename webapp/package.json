@@ -14,12 +14,10 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build --stream",
-    "build-plugin": "lerna run build-plugin --stream",
-    "clean-dist": "lerna run clean-dist",
-    "start": "lerna run start --stream",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "lerna run tsc --stream",
-    "watch": "lerna run watch --stream"
+    "serve": "lerna run serve --stream",
+    "serve-plugin": "lerna run serve-plugin --stream --parallel",
+    "clean-dist": "lerna run clean-dist --stream",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@babel/runtime": "7.8.4"

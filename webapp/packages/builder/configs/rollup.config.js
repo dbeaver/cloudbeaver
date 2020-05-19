@@ -18,7 +18,7 @@ const includePathOptions = {
 };
 
 const defaultBuilderOptions = {
-  babelConfig: path.join(__dirname, './babel-rollup.config.js'),
+  babelConfig: path.join(__dirname, './babel-plugin.config.js'),
   typescriptConfig: '', // tbd
 }
 
@@ -34,9 +34,16 @@ function configBuilder(options = defaultBuilderOptions) {
     external: [
       // externals beyond peer dependencies
     ],
+    onwarn(warning, warn) {
+      // hides some warning drom ag-grid-plugin todo to investigate later
+      if (warning.code === 'THIS_IS_UNDEFINED') return;
+      warn(warning); // this requires Rollup 0.46
+    },
     plugins: [
       includePaths(includePathOptions),
-      nodeResolve(),
+      nodeResolve({
+        preferBuiltins: true, // fix crypto import in core/utils/uuid library. todo replace uuid library with simple uuid generation
+      }),
       commonjs({
         sourceMap: false,
       }),

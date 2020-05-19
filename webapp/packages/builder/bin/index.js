@@ -8,8 +8,8 @@
  */
 
 const webpack = require('webpack');
-const buildConfig = require('../configs/webpack/exp')
-const devConfig = require('../configs/webpack/dev-exp')
+const buildConfig = require('../configs/webpack-build-config');
+const devConfig = require('../configs/webpack-serve-config');
 const baseRollupConfig = require('../configs/rollup.config.js');
 const rollup = require('rollup');
 const path = require('path');
@@ -32,7 +32,7 @@ function createWebpackArgv(argv) {
   pluginsList.unshift('@dbeaver/core')
 
   const webpackArgv = {
-    mode: 'production',
+    mode: argv.mode,
     pluginsList: pluginsList,
 
     currentDir: currentDir,
@@ -48,6 +48,7 @@ const packageName = packageJson.name;
 function createRollupConfig() {
   let modules = []
   try {
+    // required if you build plugin with several modules, for example, see @dbeaver/core
     modules = require(path.join(currentDir, 'modules.js'));
   } catch {
   }
@@ -116,7 +117,6 @@ require('yargs')
   .command(
     'serve-plugin',
     'Build and watch plugin',
-    {},
     function (argv) {
       const rollup = require('rollup');
 
@@ -136,7 +136,12 @@ require('yargs')
   .command(
     'build-app',
     'Build application',
-    {},
+    {
+      mode: {
+        alias: 'm',
+        default: 'production',
+      },
+    },
     function (argv) {
       const webpackArgv = createWebpackArgv(argv);
       // console.log(webpackArgv)
@@ -159,48 +164,17 @@ require('yargs')
       port: {
         alias: 'p',
         default: 3100
-      }
+      },
+      mode: {
+        alias: 'm',
+        default: 'development',
+      },
     },
     function (argv) {
       const webpackArgv = createWebpackArgv(argv);
       webpackArgv.mode = 'development'
       webpackArgv.server = argv.server
       const configObject = devConfig({}, webpackArgv)
-      const WebpackDevServer = require('webpack-dev-server');
-      const server = new WebpackDevServer(webpack(configObject), configObject.devServer);
-      const port = argv.port
-
-      server.listen(port, 'localhost', function (err) {
-        if (err) {
-          console.log(err);
-        }
-        console.log('WebpackDevServer listening at localhost:', port);
-      });
-    }
-  )
-  // todo deprecated, just for test purposes
-  .command(
-    'serve-app-old',
-    'Start webpack dev server for serving application',
-    {
-      server: {
-        alias: 's',
-        default: 'localhost:3100'
-      },
-      port: {
-        alias: 'p',
-        default: 3100
-      }
-    },
-    function (argv) {
-      console.log('Serve app old way')
-      console.log(argv)
-      const webpackArgv = createWebpackArgv(argv);
-      webpackArgv.mode = 'development'
-      webpackArgv.server = argv.server
-      const devConfigOld = require('../configs/webpack/dev')
-      const configObject = devConfigOld({}, webpackArgv)
-      console.log(configObject.devServer)
       const WebpackDevServer = require('webpack-dev-server');
       const server = new WebpackDevServer(webpack(configObject), configObject.devServer);
       const port = argv.port
