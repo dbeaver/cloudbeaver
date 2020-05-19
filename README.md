@@ -24,6 +24,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 1.0.2 - 2020-05-19
+
+- Data export feature UI was improved
+- User authentication and permission management
+- Driver management was redesigned
+- Clickhouse driver was added
+- Build procedure was redesigned
+- Many minor bugfixes
+
 ### CloudBeaver 1.0.1 - 2020-05-05
 
 - Data export feature added to the data viewer
