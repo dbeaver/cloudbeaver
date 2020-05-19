@@ -70,6 +70,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
+            // Add navigator extensions
+            for (DBNNode extraNode : session.getNavigatorModel().getRoot().getExtraNodes()) {
+                result.add(new WebNavigatorNodeInfo(session, extraNode));
+            }
+
             for (DBNNode node : nodeChildren) {
                 if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
                     result.add(new WebNavigatorNodeInfo(session, node));
