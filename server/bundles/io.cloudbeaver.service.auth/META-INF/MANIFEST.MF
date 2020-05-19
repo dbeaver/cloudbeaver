@@ -11,3 +11,4 @@ Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.auth
+Export-Package: io.cloudbeaver.service.auth
