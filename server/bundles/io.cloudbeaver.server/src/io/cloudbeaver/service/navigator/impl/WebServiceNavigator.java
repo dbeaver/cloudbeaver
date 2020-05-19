@@ -54,7 +54,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
             DBNNode[] nodeChildren;
-            if (CommonUtils.isEmpty(parentPath) || "/".equals(parentPath)) {
+            boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath);
+            if (isRootPath) {
                 nodeChildren = session.getDatabases().getChildren(monitor);
             } else {
                 DBNNode parentNode = session.getNavigatorModel().getNodeByPath(monitor, parentPath);
@@ -70,9 +71,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
-            // Add navigator extensions
-            for (DBNNode extraNode : session.getNavigatorModel().getRoot().getExtraNodes()) {
-                result.add(new WebNavigatorNodeInfo(session, extraNode));
+            if (isRootPath) {
+                // Add navigator extensions
+                for (DBNNode extraNode : session.getNavigatorModel().getRoot().getExtraNodes()) {
+                    result.add(new WebNavigatorNodeInfo(session, extraNode));
+                }
             }
 
             for (DBNNode node : nodeChildren) {
