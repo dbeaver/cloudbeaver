@@ -18,7 +18,7 @@ const includePathOptions = {
 };
 
 const defaultBuilderOptions = {
-  babelConfig: path.join(__dirname, './babel-plugin.config.js'),
+  babelConfig: path.join(__dirname, 'babel-plugin.config.js'),
   typescriptConfig: '', // tbd
 }
 

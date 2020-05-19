@@ -20,6 +20,8 @@ function replacementWithPluginImportCode(pluginsList) {
 
   let code = '';
   const names = [];
+  console.info('build with plugins:');
+  console.info(pluginsList);
 
   pluginsList.forEach(plugin => {
     const name = plugin
@@ -41,7 +43,6 @@ function dirExists(path) {
     const stats = fs.statSync(path)
     return stats && stats.isDirectory()
   } catch (e) {
-    console.log(e)
     return false;
   }
 }
@@ -90,7 +91,7 @@ module.exports = (env, argv) => {
             {
               loader: 'babel-loader',
               options: {
-                configFile: path.join(__dirname, './babel-app.config.js')
+                configFile: path.join(__dirname, 'babel-app.config.js')
               },
             },
             {
@@ -121,15 +122,6 @@ module.exports = (env, argv) => {
       }),
       new webpack.DefinePlugin({
         version: JSON.stringify(require(path.resolve(argv.currentDir, './package.json')).buildVersion),
-      }),
-      new webpack.ProgressPlugin({
-        entries: true,
-        modules: true,
-        modulesCount: 100,
-        profile: true,
-        // handler: (percentage, message, ...args) => {
-        //   // custom logic
-        // }
       }),
       new CircularDependencyPlugin({
         // exclude detection of files based on a RegExp
