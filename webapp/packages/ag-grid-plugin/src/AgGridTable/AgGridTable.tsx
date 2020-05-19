@@ -31,7 +31,7 @@ export type AgGridTableProps = PropsWithChildren<
   }>
 
 async function loader() {
-  // const styles = await import('../styles/base.scss');
+  const styles = await import('../styles/base.scss');
   const { AgGridReact } = await import('ag-grid-react');
   const { AllCommunityModules } = await import('@ag-grid-community/all-modules');
 
@@ -60,7 +60,7 @@ export const AgGridTable = observer(function AgGridTable({
       {({ AgGridReact, AllCommunityModules }) => (
         <Observer>
           {() => styled(styles)(
-            <ag-grid-theme as="div" className={className}>
+            <ag-grid-theme as="div" className={`cb-ag-grid-theme ${className}`}>
               <AgGridReact
                 key={controller.refreshId}
                 columnDefs={controller.columns}

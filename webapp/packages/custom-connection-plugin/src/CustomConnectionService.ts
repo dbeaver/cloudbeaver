@@ -26,7 +26,7 @@ export class CustomConnectionService {
       throw new Error('Driver properties loading failed');
     }
 
-    return response.driver[0].driverProperties;
+    return response.driver[0].driverProperties!;
   }
 
   async createConnectionAsync(config: ConnectionConfig): Promise<Connection> {

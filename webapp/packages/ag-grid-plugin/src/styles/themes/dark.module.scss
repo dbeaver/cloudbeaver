@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@dbeaver/core/assets/styles/theme-light';
+@import "@dbeaver/core/assets/styles/theme-dark";
 @import "base-ag-grid";
 
-.theme-light {
+:global .theme-dark {
   @include base-ag-grid;
 }

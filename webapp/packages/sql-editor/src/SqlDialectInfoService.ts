@@ -30,7 +30,7 @@ export class SqlDialectInfoService {
     if (!this.dialectInfo.has(connectionId)) {
       try {
         const result = await this.graphQLService.gql.querySqlDialectInfo({ connectionId });
-        this.dialectInfo.set(connectionId, result.dialect);
+        this.dialectInfo.set(connectionId, result.dialect!);
       } catch (error) {
         this.notificationService.logException(error, 'Failed to load SqlDialectInfo');
       }

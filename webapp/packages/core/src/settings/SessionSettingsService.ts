@@ -7,7 +7,9 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { SettingsSource } from '@dbeaver/core/settings';
+
+import { SettingsSource } from './SettingsSource';
+
 
 @injectable()
 export class SessionSettingsService extends SettingsSource {

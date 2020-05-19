@@ -12,7 +12,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GQLErrorCatcher } from '@dbeaver/core/sdk';
-import { ErrorDetailsDialog } from '@dbeaver/core/src/app';
+import { ErrorDetailsDialog } from '@dbeaver/core/app';
 
 import { AuthInfoService } from '../AuthInfoService';
 import { AuthProviderService, AuthProvider } from '../AuthProviderService';

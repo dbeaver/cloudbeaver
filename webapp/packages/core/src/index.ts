@@ -1,6 +1,6 @@
 // reexports
 import { coreManifest } from './manifest';
 
-export * from './AppBootstrap';
+export * from './bootstrap';
 
 export default coreManifest;

@@ -8,9 +8,9 @@
 
 import { injectable } from '@dbeaver/core/di';
 import { ServerService } from '@dbeaver/core/root';
+import { ProductSettingsService } from '@dbeaver/core/settings';
 import { parseJSONFlat } from '@dbeaver/core/utils';
 
-import { ProductSettingsService } from './ProductSettingsService';
 
 @injectable()
 export class ProductManagerService {

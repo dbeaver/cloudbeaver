@@ -8,9 +8,9 @@
 
 import { injectable } from '@dbeaver/core/di';
 import { GraphQLService, ServerConfig, CachedResource } from '@dbeaver/core/sdk';
+import { ServerSettingsService } from '@dbeaver/core/settings';
 import { parseJSONFlat } from '@dbeaver/core/utils';
 
-import { ServerSettingsService } from './ServerSettingsService';
 import { SessionService } from './SessionService';
 
 @injectable()

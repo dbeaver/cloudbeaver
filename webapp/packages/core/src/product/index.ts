@@ -1,2 +1,2 @@
 export * from './ProductManagerService';
-export * from './ProductSettingsService';
+export * from '../settings/ProductSettingsService';

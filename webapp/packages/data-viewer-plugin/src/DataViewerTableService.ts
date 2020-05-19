@@ -83,12 +83,12 @@ export class DataViewerTableService {
       values: firstRow.values,
     });
 
-    const dataSet = response.result.results[0].resultSet; // we expect only one dataset for a table
+    const dataSet = response.result!.results[0].resultSet!; // we expect only one dataset for a table
 
     const result: IRequestDataResult = {
       rows: dataSet.rows!,
       columns: [], // not in use while saving data
-      duration: response.result.duration,
+      duration: response.result!.duration,
       isFullyLoaded: false, // not in use while saving data
       statusMessage: 'Saved successfully',
     };
@@ -119,14 +119,14 @@ export class DataViewerTableService {
         limit: count,
       },
     });
-    const dataSet = readDataFromContainer.results[0].resultSet; // we expect only one dataset for a table
+    const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table
     data.resultId = dataSet.id; // server generates new resultId on each fetch
 
     const result: IRequestDataResult = {
       rows: dataSet.rows!,
-      columns: dataSet.columns,
-      duration: readDataFromContainer.duration,
-      statusMessage: readDataFromContainer.statusMessage || '',
+      columns: dataSet.columns!,
+      duration: readDataFromContainer!.duration,
+      statusMessage: readDataFromContainer!.statusMessage || '',
       isFullyLoaded: (dataSet.rows?.length || 0) < count,
     };
     return result;

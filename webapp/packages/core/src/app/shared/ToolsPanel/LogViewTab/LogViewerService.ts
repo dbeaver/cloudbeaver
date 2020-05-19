@@ -12,9 +12,9 @@ import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { PermissionsService, EPermission } from '@dbeaver/core/root';
 import { GraphQLService } from '@dbeaver/core/sdk';
+import { CoreSettingsService } from '@dbeaver/core/settings';
 import { uuid } from '@dbeaver/core/utils';
 
-import { CoreSettingsService } from '../../../../CoreSettingsService';
 import { ILogEntry } from './ILogEntry';
 
 @injectable()

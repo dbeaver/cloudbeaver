@@ -7,11 +7,12 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { SettingsSource, ISettingsSource } from '@dbeaver/core/settings';
+
+import { ISettingsSource } from './ISettingsSource';
+import { SettingsSource } from './SettingsSource';
 
 @injectable()
 export class ProductSettingsService extends SettingsSource {
-
   constructor(fallback: ISettingsSource) {
     super(fallback);
   }

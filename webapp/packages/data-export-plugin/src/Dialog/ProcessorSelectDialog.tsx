@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { useNode } from '@dbeaver/core/app';
 import { Loader } from '@dbeaver/core/blocks';
 import { CommonDialogWrapper } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { DataTransferProcessorInfo } from '@dbeaver/core/sdk';
-import { useNode } from '@dbeaver/core/src/app';
 
 import { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';

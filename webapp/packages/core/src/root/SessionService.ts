@@ -13,7 +13,7 @@ import {
   ConnectionInfo, GraphQLService, SessionInfo, CachedResource,
 } from '@dbeaver/core/sdk';
 
-import { SessionSettingsService } from './SessionSettingsService';
+import { SessionSettingsService } from '../settings/SessionSettingsService';
 
 export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
   connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId'>>;
