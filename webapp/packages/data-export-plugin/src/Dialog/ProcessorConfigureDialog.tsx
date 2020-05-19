@@ -9,31 +9,49 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { IProperty, PropertiesTable } from '@dbeaver/core/blocks';
+import { IProperty, PropertiesTable, ErrorMessage } from '@dbeaver/core/blocks';
 import { CommonDialogWrapper } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
-import { DataTransferProcessorInfo } from '@dbeaver/core/sdk';
+import { DataTransferProcessorInfo, GQLErrorCatcher } from '@dbeaver/core/sdk';
+import { composes, useStyles } from '@dbeaver/core/theming';
 
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
 
-const styles = css`
-  CommonDialogWrapper {
-    max-height: 500px;
-    min-height: 500px;
-  }
-  PropertiesTable {
-    flex: 1;
-  }
-  message {
-    margin: auto;
-  }
-`;
+const styles = composes(
+  css`
+    Tab {
+      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
+    }
+    ErrorMessage {
+      composes: theme-background-secondary from global;
+    }
+  `,
+  css`
+    CommonDialogWrapper {
+      max-height: 500px;
+      min-height: 500px;
+    }
+    PropertiesTable {
+      flex: 1;
+    }
+    message {
+      margin: auto;
+    }
+    ErrorMessage {
+      position: sticky;
+      bottom: 0;
+      padding: 8px 24px;
+    }
+  `
+);
 
 type ProcessorSelectDialogProps = {
   processor: DataTransferProcessorInfo;
   properties: IProperty[];
   processorProperties: any;
+  error: GQLErrorCatcher;
   isExporting: boolean;
+  onShowDetails(): void;
   onClose(): void;
   onBack(): void;
   onExport(): void;
@@ -44,7 +62,9 @@ export const ProcessorConfigureDialog = observer(
     processor,
     properties,
     processorProperties,
+    error,
     isExporting,
+    onShowDetails,
     onClose,
     onBack,
     onExport,
@@ -52,7 +72,7 @@ export const ProcessorConfigureDialog = observer(
     const translate = useTranslate();
     const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
 
-    return styled(styles)(
+    return styled(useStyles(styles))(
       <CommonDialogWrapper
         title={title}
         noBodyPadding
@@ -66,11 +86,15 @@ export const ProcessorConfigureDialog = observer(
         }
         onReject={onClose}
       >
-        {isExporting && <message as="div">{translate('data_transfer_dialog_preparation')}</message>}
-        {!isExporting && (
-          <PropertiesTable
-            properties={properties}
-            propertiesState={processorProperties}
+        <PropertiesTable
+          properties={properties}
+          propertiesState={processorProperties}
+        />
+        {error.responseMessage && (
+          <ErrorMessage
+            text={error.responseMessage}
+            hasDetails={error.hasDetails}
+            onShowDetails={onShowDetails}
           />
         )}
       </CommonDialogWrapper>

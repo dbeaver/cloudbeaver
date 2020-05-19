@@ -59,7 +59,7 @@ export const ExportNotification = observer(function ExportNotification({
       <notification-body as="div">
         <source-name as="div">
           {controller.sourceName}
-          <pre>{controller.task?.context.sourceName}</pre>
+          <pre title={controller.task?.context.sourceName}>{controller.task?.context.sourceName}</pre>
         </source-name>
         <actions as="div">
           {controller.isSuccess && (

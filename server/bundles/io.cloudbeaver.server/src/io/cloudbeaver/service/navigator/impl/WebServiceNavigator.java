@@ -19,10 +19,10 @@ package io.cloudbeaver.service.navigator.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
+import io.cloudbeaver.service.navigator.WebDatabaseObjectInfo;
+import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -53,18 +53,28 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode parentNode = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) ? session.getDatabases() : session.getNavigatorModel().getNodeByPath(monitor, parentPath);
-            if (parentNode == null) {
-                throw new DBWebException("Node '" + parentPath + "' not found");
+            DBNNode[] nodeChildren;
+            if (CommonUtils.isEmpty(parentPath) || "/".equals(parentPath)) {
+                nodeChildren = session.getDatabases().getChildren(monitor);
+            } else {
+                DBNNode parentNode = session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+                if (parentNode == null) {
+                    throw new DBWebException("Node '" + parentPath + "' not found");
+                }
+                if (!parentNode.hasChildren(true)) {
+                    return EMPTY_NODE_LIST;
+                }
+                nodeChildren = parentNode.getChildren(monitor);
             }
-            if (!parentNode.hasChildren(true)) {
-                return EMPTY_NODE_LIST;
-            }
-            DBNNode[] nodeChildren = parentNode.getChildren(monitor);
             if (nodeChildren == null) {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
+            // Add navigator extensions
+            for (DBNNode extraNode : session.getNavigatorModel().getRoot().getExtraNodes()) {
+                result.add(new WebNavigatorNodeInfo(session, extraNode));
+            }
+
             for (DBNNode node : nodeChildren) {
                 if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
                     result.add(new WebNavigatorNodeInfo(session, node));

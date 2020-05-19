@@ -62,7 +62,7 @@ public class CBResourceHandler implements DBPResourceHandler {
 
     @Override
     public String getResourceNodeName(IResource resource) {
-        return resource.toString();
+        return resource.getName();
     }
 
     @NotNull

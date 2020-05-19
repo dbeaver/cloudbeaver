@@ -30,16 +30,15 @@ import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
 import org.jkiss.dbeaver.model.runtime.*;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
@@ -171,8 +170,8 @@ public class WebSession {
     }
 
     private void initNavigatorModel() {
-        DBPPlatform platform = DBWorkbench.getPlatform();
-        this.navigatorModel = new DBNModel(platform, false);
+        CBPlatform platform = CBPlatform.getInstance();
+        this.navigatorModel = new DBNModel(platform, this);
         this.navigatorModel.initialize();
 
         DBPProject project = platform.getWorkspace().getActiveProject();
@@ -249,6 +248,10 @@ public class WebSession {
     }
 
     public DBNProjectDatabases getDatabases() {
+        return databases;
+    }
+
+    public DBNNode getNavigatorNodes() {
         return databases;
     }
 

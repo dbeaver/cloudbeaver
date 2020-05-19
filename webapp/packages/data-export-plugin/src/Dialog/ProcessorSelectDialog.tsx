@@ -66,7 +66,7 @@ export const ProcessorSelectDialog = observer(
       >
         <export-object as="div">
           {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
-          <pre>{context.sourceName}</pre>
+          <pre title={context.sourceName}>{context.sourceName}</pre>
         </export-object>
         {isLoading && <Loader />}
         {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect}/>}

@@ -76,7 +76,7 @@ module.exports = {
   app_shared_settingsMenu_theme: 'Theme',
   app_shared_settingsMenu_lang: 'Language',
 
-  core_eventsLog_dbeaverErrorDetails: 'DBeaver error details',
+  core_eventsLog_dbeaverErrorDetails: 'Error details',
 
   app_shared_inlineEditor_dialog_title: 'Edit mode',
   app_shared_inlineEditor_dialog_apply: 'Apply',

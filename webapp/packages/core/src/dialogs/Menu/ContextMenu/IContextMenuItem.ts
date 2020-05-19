@@ -15,7 +15,7 @@ import { IMenuContext } from './IMenuContext';
 export interface IContextMenuItem<T> extends IMenuItemOptions {
   onClick?: (context: IMenuContext<T>) => void;
   // if isPresent is false menu item will not be included in resulting context menu
-  isPresent: (context: IMenuContext<any>) => boolean;
+  isPresent: (context: IMenuContext<T>) => boolean;
   isDisabled?: (context: IMenuContext<T>) => boolean;
   // When the item is present in menu it can be hidden based on certain conditions
   isHidden?: (context: IMenuContext<T>) => boolean;
