@@ -148,7 +148,7 @@ class CBSecurityController implements DBWSecurityController {
                 String propertyName = cred.getKey();
                 WebAuthProviderPropertyDescriptor property = authProvider.getCredentialParameter(propertyName);
                 if (property == null) {
-                    throw new IllegalArgumentException("Invalid auth provider '" + authProvider.getId() + "' property '" + propertyName + "'");
+                    return null;
                 }
                 String encodedValue = CommonUtils.toString(cred.getValue());
                 encodedValue = property.getEncryption().encrypt(userId, encodedValue);
@@ -162,6 +162,9 @@ class CBSecurityController implements DBWSecurityController {
             if (!CommonUtils.isEmpty(credentials)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")) {
                     for (String[] cred : transformedCredentials) {
+                        if (cred == null) {
+                            continue;
+                        }
                         dbStat.setString(1, userId);
                         dbStat.setString(2, authProvider.getId());
                         dbStat.setString(3, cred[0]);

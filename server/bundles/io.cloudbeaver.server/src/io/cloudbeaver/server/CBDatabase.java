@@ -82,7 +82,7 @@ public class CBDatabase {
 
     void initialize() throws DBException {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
-            throw new DBException("Database driver not specified");
+            throw new DBException("No database driver configured for CloudBeaver database");
         }
         DriverDescriptor driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
