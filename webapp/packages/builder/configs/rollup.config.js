@@ -11,9 +11,7 @@ const reshadowLoader = require('./reshadow-loader');
 const includePathOptions = {
   include: {},
   paths: ['src'],
-  external: [
-
-  ],
+  external: [],
   extensions: ['.ts', '.tsx', '.js']
 };
 
@@ -24,15 +22,31 @@ const defaultBuilderOptions = {
 
 function configBuilder(options = defaultBuilderOptions) {
 
-  return  {
+  return {
     input: 'src/index.ts',
     output: {
-        dir: 'dist',
-        format: 'esm',
-        sourcemap: true,
-      },
+      dir: 'dist',
+      format: 'esm',
+      sourcemap: true,
+    },
     external: [
-      // externals beyond peer dependencies
+      // externals beyond peer dependencies - common dependencies of the whole application
+      'mobx',
+      // todo check that @dbeaver/core/blocks provide wrapper for go-split
+      // todo add go-split to @dbeaver/core dependencies and remove it from here
+      'go-split',
+      'mobx-react',
+      'react',
+      'react-dom',
+      // todo add reakit to @dbeaver/core dependencies and remove it from here
+      // todo be sure that @dbeaver/core provides all necessary wrappers around reakit
+      'reakit',
+      // todo magic. It nested dependency of reakit and should not be mentioned here
+      // todo but by unknown reasons without this build fails
+      // todo should be removed when reakit will be incorporated into @dbeaver/core
+      'body-scroll-lock',
+      'reshadow',
+      'rxjs',
     ],
     onwarn(warning, warn) {
       // hides some warning drom ag-grid-plugin todo to investigate later
@@ -46,6 +60,9 @@ function configBuilder(options = defaultBuilderOptions) {
       }),
       commonjs({
         sourceMap: false,
+        exclude: [
+          'node_modules/@reshadow/**'
+        ],
       }),
       typescriptPlugin({
         tsconfig: 'tsconfig.json',
@@ -76,9 +93,9 @@ function configBuilder(options = defaultBuilderOptions) {
             }
           ],
         ],
-        loaders: [ reshadowLoader ],
+        loaders: [reshadowLoader],
         plugins: [
-          require('postcss-preset-env')({ stage: 0 }),
+          require('postcss-preset-env')({stage: 0}),
           require('postcss-discard-comments'),
         ]
       }),
