@@ -7,9 +7,6 @@
   "scripts": {
     "lint": "eslint ./src/ --ext .ts,.tsx"
   },
-  "peerDependencies": {
-    "@dbeaver/core": "^0.1.0"
-  },
   "dependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
@@ -22,6 +19,7 @@
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
     "@csstools/postcss-sass": "^4.0.0",
+    "@dbeaver/core": "^0.1.0",
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",
     "@material/ripple": "^4.0.0",
