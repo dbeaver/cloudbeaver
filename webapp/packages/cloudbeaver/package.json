@@ -1,5 +1,5 @@
 {
-  "name": "@dbeaver/dbeaver",
+  "name": "@dbeaver/cloudbeaver",
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
@@ -7,11 +7,7 @@
     "build": "npm run clean-dist && builder build-app",
     "serve": "builder serve-app",
     "build:analyze": "echo \"no analyze specified\" && exit 0",
-    "clean-dist": "rimraf dist/*",
-    "gql:gen": "graphql-codegen",
-    "gql:gen:dev": "graphql-codegen --watch",
-    "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "clean-dist": "rimraf dist/*"
   },
   "dependencies": {
     "@dbeaver/administration": "^0.1.0",
