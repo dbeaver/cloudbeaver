@@ -66,9 +66,9 @@ public class SampleDataSourceConfigurationStorage implements DBPDataSourceConfig
             if (sampleConfigFile.exists()) {
                 log.debug("Loading provided connections from [" + sampleConfigFile.getFullPath().toString() + "]");
                 List<? extends DBPDataSourceContainer> dsList = registry.loadDataSourcesFromFile(this, sampleConfigFile);
-                for (DBPDataSourceContainer ds : dsList) {
-                    log.debug("\tProvided connection: " + ds.getName());
-                }
+//                for (DBPDataSourceContainer ds : dsList) {
+//                    log.debug("\tProvided connection: " + ds.getName());
+//                }
                 return dsList;
             }
         }
