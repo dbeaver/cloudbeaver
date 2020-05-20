@@ -28,16 +28,14 @@ import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
-import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
+import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.*;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -73,7 +71,7 @@ public class WebSession {
     private String locale;
     private boolean cacheExpired;
 
-    private final List<WebConnectionInfo> connections = new ArrayList<>();
+    private final Map<String, WebConnectionInfo> connections = new HashMap<>();
     private final List<WebServerMessage> progressMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
@@ -184,7 +182,7 @@ public class WebSession {
             for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
                 if (ds.isProvided()) {
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                    connections.add(connectionInfo);
+                    connections.put(connectionInfo.getId(), connectionInfo);
                 }
             }
         }
@@ -201,13 +199,13 @@ public class WebSession {
             attributes.clear();
         }
 
-        List<WebConnectionInfo> conCopy;
+        Map<String, WebConnectionInfo> conCopy;
         synchronized (this.connections) {
-            conCopy = new ArrayList<>(this.connections);
+            conCopy = new HashMap<>(this.connections);
             this.connections.clear();
         }
 
-        for (WebConnectionInfo connectionInfo : conCopy) {
+        for (WebConnectionInfo connectionInfo : conCopy.values()) {
             if (connectionInfo.isConnected()) {
                 new DisconnectJob(connectionInfo.getDataSourceContainer()).schedule();
             }
@@ -293,23 +291,28 @@ public class WebSession {
     @Association
     public List<WebConnectionInfo> getConnections() {
         synchronized (connections) {
-            return new ArrayList<>(connections);
+            return new ArrayList<>(connections.values());
         }
     }
 
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
-        WebConnectionInfo connectionInfo = null;
+        WebConnectionInfo connectionInfo;
         synchronized (connections) {
-            for (WebConnectionInfo ci : connections) {
-                if (ci.getId().equals(connectionID)) {
-                    connectionInfo = ci;
-                    break;
-                }
-            }
+            connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            throw new DBWebException("Connection '" + connectionID + "' not found");
+            DBNNode dbNode = null;
+            try {
+                dbNode = navigatorModel.getNodeByPath(progressMonitor, connectionID);
+            } catch (DBException e) {
+                log.debug(e);
+            }
+            if (dbNode instanceof DBNDataSource) {
+                return new WebConnectionInfo(this, ((DBNDataSource) dbNode).getDataSourceContainer());
+            } else {
+                throw new DBWebException("Connection '" + connectionID + "' not found");
+            }
         }
         return connectionInfo;
     }
@@ -317,13 +320,13 @@ public class WebSession {
 
     public void addConnection(WebConnectionInfo connectionInfo) {
         synchronized (connections) {
-            connections.add(connectionInfo);
+            connections.put(connectionInfo.getId(), connectionInfo);
         }
     }
 
     public void removeConnection(WebConnectionInfo connectionInfo) {
         synchronized (connections) {
-            connections.remove(connectionInfo);
+            connections.remove(connectionInfo.getId());
         }
     }
 
