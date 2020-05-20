@@ -77,7 +77,7 @@ public class SampleDataSourceConfigurationStorage implements DBPDataSourceConfig
 
     @Override
     public String getConfigurationFileSuffix() {
-        return "sample";
+        return "-sample";
     }
 
 }
