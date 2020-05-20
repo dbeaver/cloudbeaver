@@ -1,5 +1,12 @@
 {
   "extends": "../../tsconfig.json",
-  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "declarationDir": "dist/types",
+    "outDir": "dist/js"
+  },
+  "exclude": [
+    "node_modules",
+    "@dbeaver/**"
+  ],
   "include": ["src/**/*"]
 }

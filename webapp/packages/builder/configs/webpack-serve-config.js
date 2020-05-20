@@ -15,7 +15,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     hot: false, // enable HMR on the server
     proxy: {
       '/dbeaver': {
-        target: argv.server || 'localhost:3100'
+        target: argv.server || 'localhost:8978'
       }
     }
   },

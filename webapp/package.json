@@ -16,6 +16,7 @@
     "build": "lerna run build --stream",
     "serve": "lerna run serve --stream",
     "serve-plugin": "lerna run serve-plugin --stream --parallel",
+    "builder-help": "builder help",
     "clean-dist": "lerna run clean-dist --stream",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

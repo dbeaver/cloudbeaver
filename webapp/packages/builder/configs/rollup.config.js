@@ -48,7 +48,7 @@ function configBuilder(options = defaultBuilderOptions) {
         sourceMap: false,
       }),
       typescriptPlugin({
-        tsconfig: 'tsconfig.build.json',
+        tsconfig: 'tsconfig.json',
         useTsconfigDeclarationDir: true,
       }),
       babelPlugin({
