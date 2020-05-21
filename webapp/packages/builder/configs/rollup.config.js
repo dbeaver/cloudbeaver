@@ -15,12 +15,7 @@ const includePathOptions = {
   extensions: ['.ts', '.tsx', '.js']
 };
 
-const defaultBuilderOptions = {
-  babelConfig: path.join(__dirname, 'babel-plugin.config.js'),
-  typescriptConfig: '', // tbd
-}
-
-function configBuilder(options = defaultBuilderOptions) {
+function configBuilder() {
 
   return {
     input: 'src/index.ts',
@@ -58,12 +53,6 @@ function configBuilder(options = defaultBuilderOptions) {
       nodeResolve({
         preferBuiltins: true, // fix crypto import in core/utils/uuid library. todo replace uuid library with simple uuid generation
       }),
-      commonjs({
-        sourceMap: false,
-        exclude: [
-          'node_modules/@reshadow/**'
-        ],
-      }),
       typescriptPlugin({
         tsconfig: 'tsconfig.json',
         useTsconfigDeclarationDir: true,
@@ -71,7 +60,13 @@ function configBuilder(options = defaultBuilderOptions) {
       babelPlugin({
         exclude: 'node_modules/**',
         extensions: ['.js', '.ts', '.tsx'],
-        configFile: options.babelConfig,
+        configFile: path.join(__dirname, 'babel-plugin.config.js'),
+      }),
+      commonjs({
+        sourceMap: false,
+        exclude: [
+          'node_modules/@reshadow/**',
+        ],
       }),
       postcssPlugin({
         extract: false,
@@ -105,4 +100,4 @@ function configBuilder(options = defaultBuilderOptions) {
 
 }
 
-module.exports = configBuilder(defaultBuilderOptions);
+module.exports = configBuilder();
