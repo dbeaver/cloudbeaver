@@ -28,14 +28,16 @@ import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
 import org.jkiss.dbeaver.model.runtime.*;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -81,6 +83,7 @@ public class WebSession {
     private DBNModel navigatorModel;
     private DBNProjectDatabases databases;
     private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
+    private DBNProject projectNode;
 
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
@@ -173,7 +176,7 @@ public class WebSession {
         this.navigatorModel.initialize();
 
         DBPProject project = platform.getWorkspace().getActiveProject();
-        DBNProject projectNode = this.navigatorModel.getRoot().getProjectNode(project);
+        this.projectNode = this.navigatorModel.getRoot().getProjectNode(project);
         this.databases = projectNode.getDatabases();
         this.locale = Locale.getDefault().getLanguage();
 
@@ -245,7 +248,11 @@ public class WebSession {
         return navigatorModel;
     }
 
-    public DBNProjectDatabases getDatabases() {
+    public DBNProject getProjectNode() {
+        return projectNode;
+    }
+
+    public DBNProjectDatabases getDatabasesNode() {
         return databases;
     }
 
@@ -302,14 +309,12 @@ public class WebSession {
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBNNode dbNode = null;
-            try {
-                dbNode = navigatorModel.getNodeByPath(progressMonitor, connectionID);
-            } catch (DBException e) {
-                log.debug(e);
-            }
-            if (dbNode instanceof DBNDataSource) {
-                return new WebConnectionInfo(this, ((DBNDataSource) dbNode).getDataSourceContainer());
+            DBPDataSourceContainer dataSource = databases.getDataSourceRegistry().getDataSource(connectionID);
+            if (dataSource != null) {
+                connectionInfo = new WebConnectionInfo(this, dataSource);
+                synchronized (connections) {
+                    connections.put(connectionID, connectionInfo);
+                }
             } else {
                 throw new DBWebException("Connection '" + connectionID + "' not found");
             }

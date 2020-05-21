@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,7 +57,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBNNode[] nodeChildren;
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath);
             if (isRootPath) {
-                nodeChildren = session.getDatabases().getChildren(monitor);
+                nodeChildren = session.getDatabasesNode().getChildren(monitor);
+                // Inject extra nodes
+                List<DBNNode> extraNodes = session.getProjectNode().getExtraNodes();
+                if (!extraNodes.isEmpty()) {
+                    nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
+                }
             } else {
                 DBNNode parentNode = session.getNavigatorModel().getNodeByPath(monitor, parentPath);
                 if (parentNode == null) {

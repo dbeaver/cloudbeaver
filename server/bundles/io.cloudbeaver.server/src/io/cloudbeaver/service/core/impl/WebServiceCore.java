@@ -135,7 +135,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Datasource '" + dataSourceId + "' not found");
         }
 
-        DBPDataSourceRegistry sessionRegistry = webSession.getDatabases().getDataSourceRegistry();
+        DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
         newDataSource.setSavePassword(true);
         ((DataSourceDescriptor)newDataSource).setTemporary(true);
@@ -164,7 +164,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
-        DBPDataSourceRegistry sessionRegistry = webSession.getDatabases().getDataSourceRegistry();
+        DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = makeConnectionInstance(connectionConfig, sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
@@ -181,7 +181,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
-        DBPDataSourceRegistry sessionRegistry = webSession.getDatabases().getDataSourceRegistry();
+        DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = makeConnectionInstance(connectionConfig, sessionRegistry);
         try {
@@ -216,7 +216,7 @@ public class WebServiceCore implements DBWServiceCore {
             // Disconnect in async mode?
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
-        webSession.getDatabases().getDataSourceRegistry().removeDataSource(connectionInfo.getDataSourceContainer());
+        webSession.getDatabasesNode().getDataSourceRegistry().removeDataSource(connectionInfo.getDataSourceContainer());
         webSession.removeConnection(connectionInfo);
 
         return disconnected;
