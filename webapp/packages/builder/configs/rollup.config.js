@@ -1,8 +1,8 @@
-const babelPlugin = require('rollup-plugin-babel');
 const path = require('path');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const { babel } = require('@rollup/plugin-babel');
+const commonjs = require('@rollup/plugin-commonjs');
 const postcssPlugin = require('rollup-plugin-postcss');
-const nodeResolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
 const peerDepsExternal = require('rollup-plugin-peer-deps-external');
 const includePaths = require('rollup-plugin-includepaths');
 const typescriptPlugin = require('rollup-plugin-typescript2');
@@ -57,14 +57,21 @@ function configBuilder() {
         tsconfig: 'tsconfig.json',
         useTsconfigDeclarationDir: true,
       }),
-      babelPlugin({
-        exclude: 'node_modules/**',
+      babel({
+        exclude: ['../../node_modules/**', 'node_modules/**'], // exclude package node_modules and lerna node_modules
         extensions: ['.js', '.ts', '.tsx'],
+        babelHelpers: 'external',
         configFile: path.join(__dirname, 'babel-plugin.config.js'),
       }),
       commonjs({
         sourceMap: false,
         exclude: [
+          /**
+           * todo Now all plugins after build contain reshadow source code
+           * todo Expected next line should remove reshadow code from build artifact but it doesnt work.
+           * todo It was found that reshadow code disappear if to comment 'reshadow/babel' in babel-plugin.config.js
+           * todo So it is reshadow/babel plugin inject code into the artifact. Further investigations required.
+           */
           'node_modules/@reshadow/**',
         ],
       }),
