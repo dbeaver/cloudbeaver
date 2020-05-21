@@ -51,7 +51,7 @@ function configBuilder() {
     plugins: [
       includePaths(includePathOptions),
       nodeResolve({
-        preferBuiltins: true, // fix crypto import in core/utils/uuid library. todo replace uuid library with simple uuid generation
+        preferBuiltins: false, // fix crypto import in core/utils/uuid library. todo replace uuid library with simple uuid generation
       }),
       typescriptPlugin({
         tsconfig: 'tsconfig.json',
@@ -60,7 +60,7 @@ function configBuilder() {
       babel({
         exclude: ['../../node_modules/**', 'node_modules/**'], // exclude package node_modules and lerna node_modules
         extensions: ['.js', '.ts', '.tsx'],
-        babelHelpers: 'external',
+        babelHelpers: 'bundled',
         configFile: path.join(__dirname, 'babel-plugin.config.js'),
       }),
       commonjs({
@@ -73,6 +73,9 @@ function configBuilder() {
            * todo So it is reshadow/babel plugin inject code into the artifact. Further investigations required.
            */
           'node_modules/@reshadow/**',
+          'node_modules/react-dom',
+          'node_modules/react-dom/server',
+          'node_modules/react',
         ],
       }),
       postcssPlugin({

@@ -12,10 +12,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@ag-grid-community/all-modules": "^23.0.2",
-    "@ag-grid-community/core": "^23.0.2",
-    "ag-grid-community": "^23.0.2",
-    "ag-grid-react": "^23.0.3"
+    "@ag-grid-community/all-modules": "^23.1.1",
+    "@ag-grid-community/core": "^23.1.1",
+    "ag-grid-community": "^23.1.1",
+    "ag-grid-react": "^23.1.1"
   },
   "devDependencies": {
     "@dbeaver/core": "^0.1.0",

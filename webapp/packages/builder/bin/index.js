@@ -178,7 +178,7 @@ require('yargs')
     },
     function (argv) {
       const webpackArgv = createWebpackArgv(argv);
-      webpackArgv.mode = 'development'
+      console.log(webpackArgv.mode)
       webpackArgv.server = argv.server
       const configObject = devConfig({}, webpackArgv)
       const WebpackDevServer = require('webpack-dev-server');

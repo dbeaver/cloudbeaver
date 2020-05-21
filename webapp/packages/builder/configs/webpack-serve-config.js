@@ -33,4 +33,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     // new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     new webpack.NamedModulesPlugin(), // prints more readable module names in the browser console on HMR updates
   ],
+  optimization: {
+    minimize: argv.mode === 'production',
+    namedModules: argv.mode !== 'production',
+    concatenateModules: argv.mode === 'production',
+  },
 });

@@ -125,9 +125,9 @@ module.exports = (env, argv) => {
       }),
       new CircularDependencyPlugin({
         // exclude detection of files based on a RegExp
-        // exclude: /\.js|node_modules/,
+        exclude: /node_modules/,
         // include specific files based on a RegExp
-        // include: /dir/,
+        include: /@dbeaver/,
         // add errors to webpack instead of warnings
         failOnError: false,
         // allow import cycles that include an asyncronous import,
