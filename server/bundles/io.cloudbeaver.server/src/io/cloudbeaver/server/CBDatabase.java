@@ -33,10 +33,10 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
-import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
@@ -82,9 +82,9 @@ public class CBDatabase {
 
     void initialize() throws DBException {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
-            throw new DBException("Database driver not specified");
+            throw new DBException("No database driver configured for CloudBeaver database");
         }
-        DriverDescriptor driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
+        DBPDriver driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }

@@ -152,6 +152,9 @@ public class WebDatabaseDriverConfig {
             cfg.setHostPort(driver.getDefaultPort());
             cfg.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
+            if (properties == null) {
+                return new WebPropertyInfo[0];
+            }
 
             PropertySourceCustom propertySource = new PropertySourceCustom(
                 properties,

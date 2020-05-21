@@ -52,7 +52,7 @@ export const UserInfo = observer(function UserInfo() {
       <user-icon as="div">
         <IconOrImage icon='user' viewBox='0 0 28 28' />
       </user-icon>
-      <user-name as='div'>{authInfoService.userInfo.userId}</user-name>
+      <user-name as='div'>{authInfoService.userInfo.displayName || authInfoService.userInfo.userId}</user-name>
     </user>
   );
 });

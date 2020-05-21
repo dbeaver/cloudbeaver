@@ -155,7 +155,7 @@ public class CBPlatform extends BasePlatformImpl {
                     continue;
                 }
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
-                if (!libraries.isEmpty()) {
+                {
                     boolean hasAllFiles = true;
                     for (DBPDriverLibrary lib : libraries) {
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
@@ -172,7 +172,7 @@ public class CBPlatform extends BasePlatformImpl {
                 }
             }
         }
-        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getId).collect(Collectors.joining(",")));
+        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
 
         sessionManager = WebSessionManager.getInstance();
 
