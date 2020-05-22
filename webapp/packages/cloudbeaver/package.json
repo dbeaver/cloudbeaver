@@ -4,7 +4,7 @@
   "description": "",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "npm run clean-dist && builder build-app",
+    "build": "yarn run clean-dist && builder build-app",
     "serve": "builder serve-app",
     "build:analyze": "echo \"no analyze specified\" && exit 0",
     "clean-dist": "rimraf dist/*"

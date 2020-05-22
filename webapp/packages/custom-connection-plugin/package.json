@@ -7,7 +7,7 @@
   "module": "dist/index.js",
   "types": "dist/types",
   "scripts": {
-    "build": "npm run clean-dist && builder build-plugin",
+    "build": "yarn run clean-dist && builder build-plugin",
     "serve-plugin": "builder serve-plugin",
     "clean-dist": "rimraf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1"
