@@ -9,6 +9,7 @@
 import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
 import { AdministrationMenuService } from './AdministrationMenuService';
+import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
 import { Bootstrap } from './Bootstrap';
 
 export const manifest: PluginManifest = {
@@ -18,6 +19,7 @@ export const manifest: PluginManifest = {
 
   providers: [
     AdministrationMenuService,
+    AdministrationScreenService,
   ],
 
   async initialize(services: IServiceInjector) {

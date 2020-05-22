@@ -10,6 +10,8 @@ import { SettingsMenuService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
 
+import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
+
 export const ADMINISTRATION_PERMISSION = 'admin';
 
 @injectable()
@@ -18,6 +20,7 @@ export class AdministrationMenuService {
   constructor(
     private settingsMenuService: SettingsMenuService,
     private permissionsService: PermissionsService,
+    private administrationScreenService: AdministrationScreenService,
   ) { }
 
   register() {
@@ -28,6 +31,7 @@ export class AdministrationMenuService {
         order: 0,
         isHidden: () => !this.permissionsService.has(ADMINISTRATION_PERMISSION),
         title: 'administration_menu_enter',
+        onClick: () => this.administrationScreenService.navigateToRoot(),
       }
     );
   }

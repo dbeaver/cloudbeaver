@@ -15,9 +15,9 @@ import {
 import { useController } from '@dbeaver/core/di';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
-import { NavigationTabsBar } from './shared/NavigationTabs/NavigationTabsBar';
-import { LogViewTab } from './shared/ToolsPanel/LogViewTab/LogViewTab';
-import { LogViewTabController } from './shared/ToolsPanel/LogViewTab/LogViewTabController';
+import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
+import { LogViewTab } from '../shared/ToolsPanel/LogViewTab/LogViewTab';
+import { LogViewTabController } from '../shared/ToolsPanel/LogViewTab/LogViewTabController';
 
 const styles = composes(
   css`

@@ -13,7 +13,7 @@ import {
 } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
-import { NavigationTree } from './NavigationTree';
+import { NavigationTree } from '../NavigationTree';
 import { RightArea } from './RightArea';
 
 const mainStyles = composes(

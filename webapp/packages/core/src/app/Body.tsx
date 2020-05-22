@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { DialogsPortal } from '@dbeaver/core/dialogs';
+import { useService } from '@dbeaver/core/di';
 import { useStyles, useTheme } from '@dbeaver/core/theming';
 
-import { Main } from './Main';
-import { Notifications } from './Notifications/Notifications';
-import { TopNavBar } from './TopNavBar/TopNavBar';
+import { ScreenService } from './Screen/ScreenService';
 
 const bodyStyles = css`
     container {
@@ -23,15 +22,15 @@ const bodyStyles = css`
     }
 `;
 
-export function Body() {
+export const Body = observer(function Body() {
   useTheme();
+
+  const screenService = useService(ScreenService);
+  const Screen = screenService.screen?.component;
 
   return styled(useStyles(bodyStyles))(
     <container as="div">
-      <TopNavBar />
-      <Main />
-      <DialogsPortal />
-      <Notifications />
+      {Screen && <Screen />}
     </container>
   );
-}
+});

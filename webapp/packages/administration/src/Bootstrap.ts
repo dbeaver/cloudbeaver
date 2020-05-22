@@ -9,12 +9,17 @@
 import { injectable } from '@dbeaver/core/di';
 
 import { AdministrationMenuService } from './AdministrationMenuService';
+import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
 
 @injectable()
 export class Bootstrap {
-  constructor(private administrationMenuService: AdministrationMenuService) { }
+  constructor(
+    private administrationMenuService: AdministrationMenuService,
+    private administrationScreenService: AdministrationScreenService,
+  ) { }
 
   bootstrap() {
+    this.administrationScreenService.register();
     this.administrationMenuService.register();
   }
 }
