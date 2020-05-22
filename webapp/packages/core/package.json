@@ -17,16 +17,18 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "go-split": "^1.3.2",
-    "graphql-request": "^1.8.2",
-    "inversify": "^5.0.1",
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",
     "@material/radio": "^4.0.0",
     "@material/ripple": "^4.0.0",
     "@material/theme": "^4.0.0",
     "@material/typography": "^4.0.0",
+    "go-split": "^1.3.2",
+    "graphql-request": "^1.8.2",
+    "inversify": "^5.0.1",
     "react-sanitized-html": "^2.0.0",
+    "router5": "^8.0.1",
+    "router5-plugin-browser": "^8.0.1",
     "sanitize-html": "^1.23.0",
     "uuid": "^7.0.3"
   },
