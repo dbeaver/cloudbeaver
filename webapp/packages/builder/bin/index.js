@@ -98,7 +98,9 @@ require('yargs')
       async function build() {
         const config = createRollupConfig()
         for (const moduleConfig of config) {
-          console.log(`Building ${packageName} ${moduleConfig.output.dir}`);
+          const module = moduleConfig.output.dir.replace('dist' , '')
+          const start = Date.now()
+          console.log(`Building ${packageName}${module}`);
           try {
             const bundle = await rollup.rollup(moduleConfig);
             await bundle.write(moduleConfig.output);
@@ -106,7 +108,8 @@ require('yargs')
             console.error(e)
             process.exitCode = 1;
           } finally {
-            console.log(`Build finished ${packageName} ${moduleConfig.output.dir}`);
+            const buildTime = Math.floor((Date.now() - start) / 1000);
+            console.log(`Build finished ${packageName}${module}, ${buildTime} s`);
           }
         }
       }
@@ -143,6 +146,7 @@ require('yargs')
       },
     },
     function (argv) {
+      const start = Date.now()
       const webpackArgv = createWebpackArgv(argv);
       // console.log(webpackArgv)
       const configObject = buildConfig({}, webpackArgv)
@@ -150,6 +154,8 @@ require('yargs')
 
       compiler.run((err, stats) => {
         console.log(stats.compilation.errors)
+        const buildTime = Math.floor((Date.now() - start) / 1000);
+        console.log(`Build app finished in ${buildTime} s`);
       });
     }
   )
@@ -172,7 +178,7 @@ require('yargs')
     },
     function (argv) {
       const webpackArgv = createWebpackArgv(argv);
-      webpackArgv.mode = 'development'
+      console.log(webpackArgv.mode)
       webpackArgv.server = argv.server
       const configObject = devConfig({}, webpackArgv)
       const WebpackDevServer = require('webpack-dev-server');

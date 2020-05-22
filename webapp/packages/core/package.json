@@ -17,33 +17,21 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "go-split": "^1.3.2",
     "graphql-request": "^1.8.2",
     "inversify": "^5.0.1",
-    "react-sanitized-html": "^2.0.0",
-    "reflect-metadata": "^0.1.13",
-    "sanitize-html": "^1.23.0",
-    "uuid": "^7.0.3"
-  },
-  "devDependencies": {
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",
     "@material/radio": "^4.0.0",
     "@material/ripple": "^4.0.0",
     "@material/theme": "^4.0.0",
     "@material/typography": "^4.0.0",
-    "@types/uuid": "^7.0.2",
-    "graphql-request": "^1.8.2"
+    "react-sanitized-html": "^2.0.0",
+    "sanitize-html": "^1.23.0",
+    "uuid": "^7.0.3"
   },
-  "peerDependencies": {
-    "go-split": "^1.3.2",
-    "mobx": "^5.15.4",
-    "mobx-react": "^6.2.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "reakit": "^1.0.0-beta.11",
-    "reshadow": "0.0.1-alpha.77",
-    "rxjs": "^6.5.5"
+  "devDependencies": {
+    "@types/uuid": "^7.0.2"
   },
-  "buildVersion": "0.13.0",
-  "dbeaverPlugins": []
+  "buildVersion": "0.13.0"
 }

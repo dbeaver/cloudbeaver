@@ -12,11 +12,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     path: path.resolve(argv.currentDir, './dist'),
     publicPath: '',
   },
-  devtool: 'source-map',
+  devtool: argv.mode === 'production' ? false : 'source-map',
   plugins: [],
   optimization: {
-    minimize: false,
-    namedModules: true,
-    concatenateModules: false,
+    minimize: argv.mode === 'production',
+    namedModules: argv.mode !== 'production',
+    concatenateModules: argv.mode === 'production',
   },
 });

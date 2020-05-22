@@ -12,16 +12,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@dbeaver/core": "^0.1.0"
+    "@dbeaver/core": "^0.1.0",
+    "@dbeaver/builder": "^0.1.0"
   },
   "peerDependencies": {
-    "@dbeaver/core": "^0.1.0",
-    "mobx": "^5.15.4",
-    "mobx-react": "^6.2.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "reakit": "^1.0.0-beta.11",
-    "reshadow": "0.0.1-alpha.76",
-    "rxjs": "^6.5.5"
+    "@dbeaver/core": "^0.1.0"
   }
 }

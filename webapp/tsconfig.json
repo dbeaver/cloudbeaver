@@ -1,26 +1,25 @@
 {
-  "extends": "./tsconfig.base.json",
+  "files": ["typings.d.ts"],
   "compilerOptions": {
-    "paths": {
-      "@dbeaver/*": ["packages/*/src"],
-
-      "@dbeaver/core/assets": ["packages/core/assets"],
-
-      "@dbeaver/core/app": ["packages/core/src/app"],
-      "@dbeaver/core/blocks": ["packages/core/src/blocks"],
-      "@dbeaver/core/di": ["packages/core/src/di"],
-      "@dbeaver/core/dialogs": ["packages/core/src/dialogs"],
-      "@dbeaver/core/eventsLog": ["packages/core/src/eventsLog"],
-      "@dbeaver/core/localization": ["packages/core/src/localization"],
-      "@dbeaver/core/root": ["packages/core/src/root"],
-      "@dbeaver/core/sdk": ["packages/core/src/sdk"],
-      "@dbeaver/core/settings": ["packages/core/src/settings"],
-      "@dbeaver/core/theming": ["packages/core/src/theming"],
-      "@dbeaver/core/utils": ["packages/core/src/utils"],
-      "@dbeaver/core/extensions": ["packages/core/src/extensions"],
-      "@dbeaver/core/plugin": ["packages/core/src/plugin"],
-      "@dbeaver/core/product": ["packages/core/src/product"],
-      "@dbeaver/core/placeholder": ["packages/core/src/placeholder"]
-    }
+    "declaration": true,
+    "noEmit": false,
+    "moduleResolution": "node",
+    "target": "es2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "isolatedModules": true,
+    "types": ["reflect-metadata", "node"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "."
   }
 }

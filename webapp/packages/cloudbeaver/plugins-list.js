@@ -1,5 +1,5 @@
 /**
- * Don't mention "@dbeaver/core" here. It will be included by default
+ * You may omit "@dbeaver/core" here. It will be included by default
  */
 
 module.exports = [

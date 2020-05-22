@@ -89,13 +89,8 @@ module.exports = (env, argv) => {
           test: /\.js$/,
           use: [
             {
-              loader: 'babel-loader',
-              options: {
-                configFile: path.join(__dirname, 'babel-app.config.js')
-              },
-            },
-            {
               loader: StringReplacePlugin.replace({
+              exclude: /node_modules/,
                 /**
                  * This replacement allows to put into the build the plugins that were mentioned in package.json
                  */
@@ -111,7 +106,6 @@ module.exports = (env, argv) => {
             },
             'source-map-loader'
           ],
-          exclude: /node_modules/,
         },
       ],
     },
@@ -125,9 +119,9 @@ module.exports = (env, argv) => {
       }),
       new CircularDependencyPlugin({
         // exclude detection of files based on a RegExp
-        // exclude: /\.js|node_modules/,
+        exclude: /node_modules/,
         // include specific files based on a RegExp
-        // include: /dir/,
+        include: /@dbeaver/,
         // add errors to webpack instead of warnings
         failOnError: false,
         // allow import cycles that include an asyncronous import,
