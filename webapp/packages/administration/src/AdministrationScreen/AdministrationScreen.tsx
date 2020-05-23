@@ -6,12 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
+
+import { usePermission } from '@dbeaver/core/root';
+
+import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
 
-export function AdministrationScreen() {
+export const AdministrationScreen = observer(function AdministrationScreen() {
+  if (!usePermission(EAdminPermission.admin)) {
+    return <>You has no permission</>;
+  }
+
   return (
     <>
       <AdministrationTopAppBar />
     </>
   );
-}
+});

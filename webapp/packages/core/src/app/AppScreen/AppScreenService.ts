@@ -27,6 +27,6 @@ export class AppScreenService {
   }
 
   register() {
-    this.screenService.add({ name: AppScreenService.screenName, path: '/', component: AppScreen });
+    this.screenService.create({ name: AppScreenService.screenName, path: '/', component: AppScreen });
   }
 }

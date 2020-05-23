@@ -28,13 +28,21 @@ export class ScreenService {
     this.routerService.subscribe(this.onRouteChange.bind(this));
   }
 
-  add(screen: IScreen) {
+  create(screen: IScreen) {
     if (this.screens.has(screen.name)) {
       return;
     }
 
     this.screens.set(screen.name, screen);
     this.routerService.router.add({ name: screen.name, path: screen.path });
+  }
+
+  isActive(name: string, strict = false): boolean {
+    if (strict) {
+      return this.screen?.name === name;
+    }
+
+    return this.screen?.name.startsWith(name) || false;
   }
 
   buildUrl(screen: string) {

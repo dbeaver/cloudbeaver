@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ScreenService, RouterService } from '@dbeaver/core/app';
+import { ScreenService, RouterService, AppScreenService } from '@dbeaver/core/app';
 import { injectable, Bootstrap } from '@dbeaver/core/di';
+import { PermissionsService } from '@dbeaver/core/root';
 
+import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationScreen } from './AdministrationScreen';
 
 @injectable()
@@ -19,8 +21,11 @@ export class AdministrationScreenService extends Bootstrap {
   constructor(
     private screenService: ScreenService,
     private routerService: RouterService,
+    private permissionsService: PermissionsService,
+    private appScreenService: AppScreenService
   ) {
     super();
+    this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
   }
 
   navigateToRoot() {
@@ -28,6 +33,17 @@ export class AdministrationScreenService extends Bootstrap {
   }
 
   bootstrap() {
-    this.screenService.add({ name: AdministrationScreenService.screenName, path: '/admin', component: AdministrationScreen });
+    this.screenService.create({
+      name: AdministrationScreenService.screenName,
+      path: '/admin',
+      component: AdministrationScreen,
+      onActivate: this.handleActivate.bind(this),
+    });
+  }
+
+  private handleActivate() {
+    if (!this.permissionsService.has(EAdminPermission.admin)) {
+      this.appScreenService.navigateToRoot();
+    }
   }
 }
