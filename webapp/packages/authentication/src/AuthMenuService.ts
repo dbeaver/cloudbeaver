@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopAppBarService } from '@dbeaver/administration';
+import { AdministrationTopAppBarService } from '@dbeaver/administration';
 import { SettingsMenuService, TopNavService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ServerService } from '@dbeaver/core/root';
@@ -25,7 +25,7 @@ export class AuthMenuService {
     private settingsMenuService: SettingsMenuService,
     private authenticationService: AuthenticationService,
     private topNavService: TopNavService,
-    private topAppBarService: TopAppBarService,
+    private administrationTopAppBarService: AdministrationTopAppBarService,
   ) { }
 
   register() {
@@ -52,7 +52,7 @@ export class AuthMenuService {
     );
 
     this.topNavService.placeholder.add(UserInfo, 4);
-    this.topAppBarService.placeholder.add(UserInfo, 4);
+    this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
   }
 
   private async logout() {

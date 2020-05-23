@@ -13,7 +13,7 @@ import { injectable } from '@dbeaver/core/di';
 import { Fill } from './Fill';
 
 @injectable()
-export class TopAppBarService {
+export class AdministrationTopAppBarService {
   readonly placeholder = new PlaceholderContainer();
 
   constructor() {
