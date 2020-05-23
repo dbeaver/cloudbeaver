@@ -10,8 +10,10 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@dbeaver/core/di';
+import { DialogsPortal } from '@dbeaver/core/dialogs';
 import { useStyles, useTheme } from '@dbeaver/core/theming';
 
+import { Notifications } from './Notifications/Notifications';
 import { ScreenService } from './Screen/ScreenService';
 
 const bodyStyles = css`
@@ -31,6 +33,8 @@ export const Body = observer(function Body() {
   return styled(useStyles(bodyStyles))(
     <container as="div">
       {Screen && <Screen />}
+      <DialogsPortal />
+      <Notifications />
     </container>
   );
 });

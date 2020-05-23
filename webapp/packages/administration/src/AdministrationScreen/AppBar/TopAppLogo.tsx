@@ -6,15 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavBar } from '../TopNavBar/TopNavBar';
-import { Main } from './Main';
+import { Logo } from '@dbeaver/core/app';
 
-export function AppScreen() {
+export function TopAppLogo() {
 
-  return (
-    <>
-      <TopNavBar />
-      <Main />
-    </>
-  );
+  return <Logo />;
 }

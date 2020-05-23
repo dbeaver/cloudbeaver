@@ -9,14 +9,14 @@
 import { Placeholder, TopAppBar } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 
-import { TopNavService } from './TopNavBarService';
+import { TopAppBarService } from './TopAppBarService';
 
-export function TopNavBar() {
-  const topNavBarService = useService(TopNavService);
+export function AppBar() {
+  const topAppBarService = useService(TopAppBarService);
 
   return (
     <TopAppBar>
-      <Placeholder container={topNavBarService.placeholder} />
+      <Placeholder container={topAppBarService.placeholder} />
     </TopAppBar>
   );
 }

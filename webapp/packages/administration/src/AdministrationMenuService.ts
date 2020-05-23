@@ -7,7 +7,7 @@
  */
 
 import { SettingsMenuService } from '@dbeaver/core/app';
-import { injectable } from '@dbeaver/core/di';
+import { injectable, Bootstrap } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
 
 import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
@@ -15,15 +15,17 @@ import { AdministrationScreenService } from './AdministrationScreen/Administrati
 export const ADMINISTRATION_PERMISSION = 'admin';
 
 @injectable()
-export class AdministrationMenuService {
+export class AdministrationMenuService extends Bootstrap {
   static administrationMenuToken = 'administrationMenu';
   constructor(
     private settingsMenuService: SettingsMenuService,
     private permissionsService: PermissionsService,
     private administrationScreenService: AdministrationScreenService,
-  ) { }
+  ) {
+    super();
+  }
 
-  register() {
+  bootstrap() {
     this.settingsMenuService.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {

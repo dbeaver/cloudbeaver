@@ -6,6 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AppBar } from './AppBar/AppBar';
+
 export function AdministrationScreen() {
-  return <>Hello</>;
+  return (
+    <>
+      <AppBar />
+    </>
+  );
 }

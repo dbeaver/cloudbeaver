@@ -7,25 +7,27 @@
  */
 
 import { ScreenService, RouterService } from '@dbeaver/core/app';
-import { injectable } from '@dbeaver/core/di';
+import { injectable, Bootstrap } from '@dbeaver/core/di';
 
 import { AdministrationScreen } from './AdministrationScreen';
 
 @injectable()
-export class AdministrationScreenService {
+export class AdministrationScreenService extends Bootstrap {
 
   static screenName = 'administration'
 
   constructor(
     private screenService: ScreenService,
     private routerService: RouterService,
-  ) {}
-
-  navigateToRoot() {
-    return this.routerService.router.navigate(AdministrationScreenService.screenName);
+  ) {
+    super();
   }
 
-  register() {
+  navigateToRoot() {
+    this.routerService.router.navigate(AdministrationScreenService.screenName);
+  }
+
+  bootstrap() {
     this.screenService.add({ name: AdministrationScreenService.screenName, path: '/admin', component: AdministrationScreen });
   }
 }
