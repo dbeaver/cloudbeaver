@@ -8,17 +8,25 @@
 
 import { injectable } from '@dbeaver/core/di';
 
+import { RouterService } from '../RouterService';
 import { ScreenService } from '../Screen/ScreenService';
 import { AppScreen } from './AppScreen';
 
 @injectable()
 export class AppScreenService {
 
+  static screenName = 'app'
+
   constructor(
-    private screenService: ScreenService
+    private screenService: ScreenService,
+    private routerService: RouterService,
   ) {}
 
+  navigateToRoot() {
+    this.routerService.router.navigate(AppScreenService.screenName);
+  }
+
   register() {
-    this.screenService.add({ name: 'app', path: '/', component: AppScreen });
+    this.screenService.create({ name: AppScreenService.screenName, path: '/', component: AppScreen });
   }
 }

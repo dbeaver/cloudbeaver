@@ -44,6 +44,8 @@ export * from './shared/InlineEditor/InlineEditor';
 // components
 export * from './Body';
 export * from './Notifications/NotificationsItem/ErrorDetailsDialog/ErrorDetailsDialog';
+export * from './TopNavBar/SettingsMenu/SettingsMenu';
+export * from './TopNavBar/Logo';
 
 // Interfaces
 export * from './shared/Navigation/INavigator';

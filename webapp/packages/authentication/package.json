@@ -12,10 +12,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@dbeaver/core": "^0.1.0",
-    "@dbeaver/builder": "^0.1.0"
+    "@dbeaver/administration": "^0.1.0",
+    "@dbeaver/builder": "^0.1.0",
+    "@dbeaver/core": "^0.1.0"
   },
   "peerDependencies": {
+    "@dbeaver/administration": "^0.1.0",
     "@dbeaver/core": "^0.1.0"
   }
 }

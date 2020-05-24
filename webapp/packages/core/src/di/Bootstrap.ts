@@ -6,15 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavBar } from '../TopNavBar/TopNavBar';
-import { Main } from './Main';
+import { injectable } from './injectable';
 
-export function AppScreen() {
-
-  return (
-    <>
-      <TopNavBar />
-      <Main />
-    </>
-  );
+@injectable()
+export abstract class Bootstrap {
+  abstract bootstrap(): void | Promise<void>;
 }

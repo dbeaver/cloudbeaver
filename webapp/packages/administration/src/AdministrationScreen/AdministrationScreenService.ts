@@ -6,26 +6,44 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ScreenService, RouterService } from '@dbeaver/core/app';
-import { injectable } from '@dbeaver/core/di';
+import { ScreenService, RouterService, AppScreenService } from '@dbeaver/core/app';
+import { injectable, Bootstrap } from '@dbeaver/core/di';
+import { PermissionsService } from '@dbeaver/core/root';
 
+import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationScreen } from './AdministrationScreen';
 
 @injectable()
-export class AdministrationScreenService {
+export class AdministrationScreenService extends Bootstrap {
 
   static screenName = 'administration'
 
   constructor(
     private screenService: ScreenService,
     private routerService: RouterService,
-  ) {}
-
-  navigateToRoot() {
-    return this.routerService.router.navigate(AdministrationScreenService.screenName);
+    private permissionsService: PermissionsService,
+    private appScreenService: AppScreenService
+  ) {
+    super();
+    this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
   }
 
-  register() {
-    this.screenService.add({ name: AdministrationScreenService.screenName, path: '/admin', component: AdministrationScreen });
+  navigateToRoot() {
+    this.routerService.router.navigate(AdministrationScreenService.screenName);
+  }
+
+  bootstrap() {
+    this.screenService.create({
+      name: AdministrationScreenService.screenName,
+      path: '/admin',
+      component: AdministrationScreen,
+      onActivate: this.handleActivate.bind(this),
+    });
+  }
+
+  private handleActivate() {
+    if (!this.permissionsService.has(EAdminPermission.admin)) {
+      this.appScreenService.navigateToRoot();
+    }
   }
 }

@@ -6,15 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavBar } from '../TopNavBar/TopNavBar';
-import { Main } from './Main';
-
-export function AppScreen() {
-
-  return (
-    <>
-      <TopNavBar />
-      <Main />
-    </>
-  );
+export enum EAdminPermission {
+  admin = 'admin'
 }

@@ -22,7 +22,7 @@ export type PlaceholderElement<T = unknown> = {
   order?: number;
 }
 
-export class PlaceholderContainer<T = unknown> {
+export class PlaceholderContainer<T = any> {
   private placeholders = observable<PlaceholderElement<T>>([], { deep: false });
 
   get() {

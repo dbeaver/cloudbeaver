@@ -41,6 +41,7 @@ module.exports = {
   data_transfer_exporting_sql: 'SQL:',
 
   administration_menu_enter: 'Администрирование',
+  administration_menu_back: 'Вернуться в приложение',
 
   authentication_login_dialog_title: 'Авторизация',
   authentication_login: 'Войти',

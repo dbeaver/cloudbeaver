@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Bootstrap } from './Bootstrap';
 import { DIContainer } from './DIContainer';
 import { RootContainerService } from './entities/RootContainerService';
 import { IServiceCollection, IServiceInjector } from './IApp';
@@ -51,6 +52,18 @@ export class App {
           // console.log('provider', provider.name);
           this.diWrapper.collection.addServiceByClass(provider);
         });
+      }
+    }
+  }
+
+  async initializeServices() {
+    for (const plugin of this.plugins) {
+      for (const service of plugin.providers) {
+        if (service.prototype instanceof Bootstrap) {
+          const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+
+          await serviceInstance.bootstrap();
+        }
       }
     }
   }

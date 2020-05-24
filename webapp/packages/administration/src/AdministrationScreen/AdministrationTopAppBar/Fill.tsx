@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TopNavBar } from '../TopNavBar/TopNavBar';
-import { Main } from './Main';
+import styled, { css } from 'reshadow';
 
-export function AppScreen() {
+const styles = css`
+  fill {
+    flex: 1;
+  }
+`;
 
-  return (
-    <>
-      <TopNavBar />
-      <Main />
-    </>
-  );
+export function Fill() {
+  return styled(styles)(<fill as='div' />);
 }

@@ -42,6 +42,7 @@ module.exports = {
   data_transfer_exporting_sql: 'SQL:',
 
   administration_menu_enter: 'Administration',
+  administration_menu_back: 'Back to app',
 
   authentication_login_dialog_title: 'Authentication',
   authentication_login: 'Login',
