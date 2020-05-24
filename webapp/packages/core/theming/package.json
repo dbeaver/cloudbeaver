@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/theming",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/theming",
-  "module": "../dist/theming",
-  "types": "../dist/types/theming"
+  "main": "../dist/theming/index.js",
+  "module": "../dist/theming/index.js"
 }

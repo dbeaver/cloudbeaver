@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/product",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/product",
-  "module": "../dist/product",
-  "types": "../dist/types/product"
+  "main": "../dist/product/index.js",
+  "module": "../dist/product/index.js"
 }
