@@ -41,9 +41,6 @@ export class LocalizationService {
               private serverService: ServerService,
               private graphQLService: GraphQLService,
               private settingsService: SettingsService) {
-
-    // note that the default locale is always embedded in the build
-    this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
   }
 
   readonly translate = (token: TLocalizationToken): string => {
@@ -83,6 +80,7 @@ export class LocalizationService {
   async init() {
     const session = await this.sessionService.session.load();
     const config = await this.serverService.config.load();
+    await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
 
     if (!session || !config) {
       return;
