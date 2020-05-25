@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.admin.impl;
+package io.cloudbeaver.service.admin;
 
 /**
  * Web service implementation

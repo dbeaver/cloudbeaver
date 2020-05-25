@@ -17,6 +17,7 @@
 package io.cloudbeaver;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebPermission;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -42,9 +43,13 @@ public interface DBWSecurityController {
 
     void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException;
 
+    @NotNull
     WebRole[] getUserRoles(String userId) throws DBCException;
 
     WebUser getUserById(String userId) throws DBCException;
+
+    @NotNull
+    WebUser[] findUsers(String userNameMask) throws DBCException;
 
     ///////////////////////////////////////////
     // Credentials
@@ -69,7 +74,10 @@ public interface DBWSecurityController {
     ///////////////////////////////////////////
     // Roles
 
+    @NotNull
     WebRole[] readAllRoles() throws DBCException;
+
+    WebRole[] findRoles(String roleName) throws DBCException;
 
     void createRole(WebRole role) throws DBCException;
 
@@ -80,9 +88,14 @@ public interface DBWSecurityController {
 
     void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException;
 
+    @NotNull
     Set<String> getSubjectPermissions(String subjectId) throws DBCException;
 
+    @NotNull
     Set<String> getUserPermissions(String userId) throws DBCException;
+
+    @NotNull
+    WebPermission[] getAllPermissions();
 
     ///////////////////////////////////////////
     // Sessions
@@ -94,7 +107,8 @@ public interface DBWSecurityController {
     void updateSession(WebSession session) throws DBCException;
 
     ///////////////////////////////////////////
-    // Meta info
+    // Permissions
+
 
     ///////////////////////////////////////////
     // Utils

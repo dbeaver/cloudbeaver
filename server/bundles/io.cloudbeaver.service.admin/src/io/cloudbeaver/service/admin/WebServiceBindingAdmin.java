@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.admin;
 
-import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -35,9 +34,16 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("listUsers", env -> {
-            throw new DBWebException("Not implemented");
-        });
+        model.getQueryType().dataFetcher("listUsers",
+            env -> getService(env).listUsers(getWebSession(env), env.getArgument("userName")));
+        model.getQueryType().dataFetcher("listRoles",
+            env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleName")));
+        model.getQueryType().dataFetcher("listPermissions",
+            env -> getService(env).listPermissions(getWebSession(env)));
+        model.getQueryType().dataFetcher("createUser",
+            env -> getService(env).createUser(getWebSession(env), env.getArgument("userId")));
+        model.getQueryType().dataFetcher("deleteUser",
+            env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")));
 
     }
 

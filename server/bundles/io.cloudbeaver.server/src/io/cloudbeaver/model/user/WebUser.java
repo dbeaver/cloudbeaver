@@ -35,7 +35,7 @@ public class WebUser implements WebAuthSubject {
     private Map<String, Object> metaParameters = new LinkedHashMap<>();
     private Map<String, Object> configurationParameters = new LinkedHashMap<>();
 
-    private Set<WebRole> roles = new LinkedHashSet<>();
+    private WebRole[] roles = null;
 
     private String activeAuthModel;
     private Map<String, Map<String, Object>> authCredentials = new HashMap<>();
@@ -61,7 +61,7 @@ public class WebUser implements WebAuthSubject {
     }
 
     public String[] getGrantedRoles() {
-        return roles.stream().map(WebRole::getRoleId).toArray(String[]::new);
+        return Arrays.stream(roles).map(WebRole::getRoleId).toArray(String[]::new);
     }
 
     public Map<String, Object> getMetaParameters() {
@@ -72,8 +72,12 @@ public class WebUser implements WebAuthSubject {
         return Collections.unmodifiableMap(configurationParameters);
     }
 
-    public Set<WebRole> getRoles() {
-        return Collections.unmodifiableSet(roles);
+    public WebRole[] getRoles() {
+        return roles;
+    }
+
+    public void setRoles(WebRole[] roles) {
+        this.roles = roles;
     }
 
     @Override

@@ -16,18 +16,21 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.model.user.WebPermission;
+
 /**
  * Web permission ID
  */
 public class AdminPermissionInfo {
 
-    private String id;
+    private final WebPermission permission;
+
+    public AdminPermissionInfo(WebPermission permission) {
+        this.permission = permission;
+    }
 
     public String getId() {
-        return id;
+        return permission.getId();
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 }

@@ -99,6 +99,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env));
     }
 
+    protected static WebSession getWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
+        return CBPlatform.getInstance().getSessionManager().getWebSession(
+            getServletRequest(env), errorOnNotFound);
+    }
+
     protected static WebSession findWebSession(DataFetchingEnvironment env) {
         return CBPlatform.getInstance().getSessionManager().findWebSession(
             getServletRequest(env));

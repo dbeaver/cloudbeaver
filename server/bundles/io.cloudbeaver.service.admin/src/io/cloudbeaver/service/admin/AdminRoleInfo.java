@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.model.user.WebRole;
+
 import java.util.List;
 
 /**
@@ -23,15 +25,19 @@ import java.util.List;
  */
 public class AdminRoleInfo {
 
-    private String roleName;
+    private final WebRole role;
     private List<String> rolePermissions;
 
-    public String getRoleName() {
-        return roleName;
+    public AdminRoleInfo(WebRole role) {
+        this.role = role;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public String getRoleId() {
+        return role.getRoleId();
+    }
+
+    public String getRoleName() {
+        return role.getName();
     }
 
     public List<String> getRolePermissions() {

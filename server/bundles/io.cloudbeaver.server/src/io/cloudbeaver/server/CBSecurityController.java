@@ -18,6 +18,7 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebPermission;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -102,6 +103,7 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public WebRole[] getUserRoles(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -130,6 +132,28 @@ class CBSecurityController implements DBWSecurityController {
                         return new WebUser(dbResult.getString(1));
                     }
                     return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while searching credentials", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public WebUser[] findUsers(String userNameMask) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER" +
+                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    List<WebUser> result = new ArrayList<>();
+                    while (dbResult.next()) {
+                        result.add(new WebUser(dbResult.getString(1)));
+                    }
+                    return result.toArray(new WebUser[0]);
                 }
             }
         } catch (SQLException e) {
@@ -273,6 +297,7 @@ class CBSecurityController implements DBWSecurityController {
     ///////////////////////////////////////////
     // Roles
 
+    @NotNull
     @Override
     public WebRole[] readAllRoles() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -299,6 +324,11 @@ class CBSecurityController implements DBWSecurityController {
         } catch (SQLException e) {
             throw new DBCException("Error reading roles from database", e);
         }
+    }
+
+    @Override
+    public WebRole[] findRoles(String roleName) throws DBCException {
+        return readAllRoles();
     }
 
     @NotNull
@@ -357,6 +387,7 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -375,6 +406,7 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public Set<String> getUserPermissions(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -402,6 +434,12 @@ class CBSecurityController implements DBWSecurityController {
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public WebPermission[] getAllPermissions() {
+        return new WebPermission[0];
     }
 
     ///////////////////////////////////////////

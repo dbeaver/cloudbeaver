@@ -1,6 +1,6 @@
 
 type AdminUserInfo {
-    userName: ID!
+    userId: ID!
 
     metaParameters: Object!
     configurationParameters: Object!
@@ -8,7 +8,8 @@ type AdminUserInfo {
 }
 
 type AdminRoleInfo {
-    roleName: ID!
+    roleId: ID!
+    roleName: String
 
     rolePermissions: [ID]!
 }
@@ -24,15 +25,15 @@ type AdminPermissionInfo {
 
 extend type Query {
 
-    listUsers(userName: ID): [AdminUserInfo]!
-    listRoles(roleName: ID): [AdminRoleInfo]!
-    listPermissions(permissionId: ID): [AdminPermissionInfo]!
+    listUsers(userId: ID): [AdminUserInfo]!
+    listRoles(roleId: ID): [AdminRoleInfo]!
+    listPermissions: [AdminPermissionInfo]!
 
-    createUser(userName: ID!): AdminUserInfo!
-    deleteUser(userName: ID!): Boolean
+    createUser(userId: ID!): AdminUserInfo!
+    deleteUser(userId: ID!): Boolean
 
-    createRole(roleName: ID!): AdminRoleInfo!
-    deleteRole(roleName: ID!): Boolean
+    createRole(roleId: ID!): AdminRoleInfo!
+    deleteRole(roleId: ID!): Boolean
 
     grantUserRole(user: ID!, role: ID!): Boolean
     revokeUserRole(user: ID!, role: ID!): Boolean

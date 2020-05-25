@@ -16,7 +16,11 @@
  */
 package io.cloudbeaver.service.admin;
 
-import java.util.List;
+import io.cloudbeaver.model.user.WebRole;
+import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.dbeaver.model.exec.DBCException;
+
 import java.util.Map;
 
 /**
@@ -24,42 +28,33 @@ import java.util.Map;
  */
 public class AdminUserInfo {
 
-    private String userName;
+    private final WebUser user;
 
     private Map<String, Object> metaParameters;
     private Map<String, Object> configurationParameters;
 
-    private List<String> grantedRoles;
-
-    public String getUserName() {
-        return userName;
+    public AdminUserInfo(WebUser user) {
+        this.user = user;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public String getUserId() {
+        return user.getUserId();
     }
 
     public Map<String, Object> getMetaParameters() {
         return metaParameters;
     }
 
-    public void setMetaParameters(Map<String, Object> metaParameters) {
-        this.metaParameters = metaParameters;
-    }
-
     public Map<String, Object> getConfigurationParameters() {
         return configurationParameters;
     }
 
-    public void setConfigurationParameters(Map<String, Object> configurationParameters) {
-        this.configurationParameters = configurationParameters;
+    public String[] getGrantedRoles() throws DBCException {
+        if (user.getRoles() == null) {
+            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(getUserId());
+            user.setRoles(userRoles);
+        }
+        return user.getGrantedRoles();
     }
 
-    public List<String> getGrantedRoles() {
-        return grantedRoles;
-    }
-
-    public void setGrantedRoles(List<String> grantedRoles) {
-        this.grantedRoles = grantedRoles;
-    }
 }

@@ -18,6 +18,10 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.List;
 
@@ -26,19 +30,39 @@ import java.util.List;
  */
 public interface DBWServiceAdmin extends DBWService {
 
-    List<AdminUserInfo> listUsers(String userName) throws DBWebException;
-    List<AdminRoleInfo> listRoles(String roleName) throws DBWebException;
-    List<AdminPermissionInfo> listPermissions(String permissionId) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    @NotNull
+    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @Nullable String userName) throws DBWebException;
 
-    AdminUserInfo createUser(String userName) throws DBWebException;
-    boolean deleteUser(String userName) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    @NotNull
+    List<AdminRoleInfo> listRoles(@NotNull WebSession webSession, @Nullable String roleName) throws DBWebException;
 
-    AdminRoleInfo createRole(String roleName) throws DBWebException;
-    boolean deleteRole(String roleName) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    @NotNull
+    List<AdminPermissionInfo> listPermissions(@NotNull WebSession webSession) throws DBWebException;
 
-    boolean grantUserRole(String user, String role) throws DBWebException;
-    boolean revokeUserRole(String user, String role) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    @NotNull
+    AdminUserInfo createUser(@NotNull WebSession webSession, String userName) throws DBWebException;
 
-    boolean setRolePermissions(String roleID, String[] permissions) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    @NotNull
+    AdminRoleInfo createRole(@NotNull WebSession webSession, String roleName) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean deleteRole(@NotNull WebSession webSession, String roleName) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean grantUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
 
 }
