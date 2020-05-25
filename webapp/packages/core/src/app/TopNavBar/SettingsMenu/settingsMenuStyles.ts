@@ -11,7 +11,6 @@ import { css } from 'reshadow';
 export const settingsMenuStyles = css`
   MenuTrigger {
     padding: 0 16px !important;
-    margin-left: auto;
     height: 48px;
     cursor: pointer;
     background: none;
@@ -20,6 +19,9 @@ export const settingsMenuStyles = css`
     font-weight: 700;
     outline: none !important;
   }
+  box {
+    width: 100%;
+  }
   Icon {
     height: 24px;
   }
@@ -27,6 +29,7 @@ export const settingsMenuStyles = css`
     flex-direction: row-reverse;
     & menu-item-text  {
       text-align: right;
+      margin-left: auto;
     }
     & Icon {
       transform: rotate(-180deg);

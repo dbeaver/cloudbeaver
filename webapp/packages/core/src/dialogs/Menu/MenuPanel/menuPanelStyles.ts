@@ -30,8 +30,13 @@ export const menuPanelStyles = composes(
       outline: none !important;
       color: inherit;
       cursor: pointer;
-      display: flex;
       padding: 12px 0;
+
+      & box {
+        display: flex;
+        align-items: center;
+        height: inherit;
+      }
     }
     Menu {
       composes: theme-typography--body2 theme-elevation-z5 from global;

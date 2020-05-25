@@ -1,6 +1,7 @@
+export * from './flat';
 export * from './OrderedMap';
-export * from './uuid_';
 export * from './parseJSONFlat';
+export * from './uuid_';
 
 export * from './Promises/CancellablePromise';
 export * from './Promises/Deferred';
