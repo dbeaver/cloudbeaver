@@ -1,16 +1,5 @@
 {
   "name" : "ru",
-  "basicConnection_connectionDialog_newConnection" : "Новое подключение",
-  "basicConnection_connectionDialog_title" : "Подключение к базе данных",
-  "basicConnection_connectionDialog_listTitle" : "Базы данных:",
-  "basicConnection_connectionDialog_username" : "Имя пользователя:",
-  "basicConnection_connectionDialog_usernamePlaceholder" : "user",
-  "basicConnection_connectionDialog_password" : "Пароль пользователя:",
-  "basicConnection_connectionDialog_passwordPlaceholder" : "password",
-  "basicConnection_connectionDialog_connecting" : "Подключение...",
-  "basicConnection_connectionDialog_connect" : "Подключиться",
-  "basicConnection_connectionDialog_connecting_message" : "Подключение к базе...",
-  "basicConnection_main_menu_item" : "Подключиться",
 
   "customConnection_connectionType_custom" : "Параметры",
   "customConnection_connectionType_url" : "URL",
