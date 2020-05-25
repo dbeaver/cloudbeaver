@@ -41,12 +41,10 @@ const buttonStyle = composes(
       outline: none !important;
       color: inherit;
       cursor: pointer;
-      display: flex;
-      align-items: center;
  
-      & > span > Icon {
-        height: 16px;
-        transform: rotate(90deg);
+      & div {
+        display: flex;
+        align-items: center;
       }
     }
   `

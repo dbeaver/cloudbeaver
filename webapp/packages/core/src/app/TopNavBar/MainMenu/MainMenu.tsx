@@ -23,6 +23,7 @@ const styles = css`
   TopMenuItem {
     text-transform: uppercase;
     font-weight: 700;
+    height: 100%;
   }
 `;
 

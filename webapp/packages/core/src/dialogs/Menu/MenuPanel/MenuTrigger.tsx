@@ -38,7 +38,9 @@ export function MenuTrigger({
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
       <MenuDisclosure {...menu} {...props}>
-        {children}
+        <box as='div'>
+          {children}
+        </box>
       </MenuDisclosure>
       <MenuPanel panel={panel} menu={menu} style={style}/>
     </>
@@ -143,7 +145,9 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
       <MenuDisclosure ref={ref} {...menu} {...rest}>
-        <MenuPanelItem menuItem={menuItem} style={style}/>
+        <box as='div'>
+          <MenuPanelItem menuItem={menuItem} style={style}/>
+        </box>
       </MenuDisclosure>
       <MenuPanel panel={panel!} menu={menu} style={style}/>
     </>

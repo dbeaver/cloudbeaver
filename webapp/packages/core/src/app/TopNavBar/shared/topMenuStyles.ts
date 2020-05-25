@@ -23,18 +23,16 @@ export const topMenuStyles = composes(
     MenuTrigger {
       height: 100%;
       padding: 0 16px !important;
-      display: flex;
-      align-items: center;
       padding-right: 0!important;
 
       &:before {
         display: none;
       }
   
-      & > div {
+      & box > div {
         display: block;
       }
-      & > Icon {
+      & box > Icon {
         background: #47a0dd;
         margin-left: 16px;
         width: 16px;
@@ -48,7 +46,7 @@ export const topMenuStyles = composes(
       & menu-trigger-icon {
         margin-right: 8px;
       }
-      &:hover > Icon {
+      &:hover box > Icon {
         background: #236ea0;
       }
     }
