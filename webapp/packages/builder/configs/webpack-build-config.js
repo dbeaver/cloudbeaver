@@ -8,7 +8,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   mode: argv.mode,
   entry: './index.js',
   output: {
-    filename: 'js/bundle.[hash].js',
+    filename: 'bundle.[hash].js',
     path: path.resolve(argv.currentDir, './dist'),
     publicPath: '',
   },

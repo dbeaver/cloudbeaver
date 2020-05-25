@@ -7,37 +7,20 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
 
-import { Icon } from '@dbeaver/core/blocks';
+import { AppLogo } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { ServerService } from '@dbeaver/core/root';
 
+import { AppScreenService } from '../AppScreen/AppScreenService';
+
 declare const version: string; // declared in webpack DefinePlugin // todo move to enviroment?
-
-const styles = css`
-  logo {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    margin-right: 16px;
-    width: 250px;
-  }
-
-  Icon {
-    height: 24px;
-    width: auto;
-    margin-bottom: 2px;
-  }
-`;
 
 export const Logo = observer(function Logo() {
   const serverService = useService(ServerService);
+  const appScreenService = useService(AppScreenService);
+
   const title = `Frontend: ${version}\nBackend: ${serverService.config.data?.version}`;
 
-  return styled(styles)(
-    <logo as="div" title={title}>
-      <Icon name="logo" viewBox="0 0 361 73" />
-    </logo>
-  );
+  return <AppLogo title={title} onClick={() => appScreenService.navigateToRoot()}/>;
 });

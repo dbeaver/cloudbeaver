@@ -6,28 +6,45 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SettingsMenuService } from '@dbeaver/core/app';
-import { injectable } from '@dbeaver/core/di';
+import { SettingsMenuService, ScreenService, AppScreenService } from '@dbeaver/core/app';
+import { injectable, Bootstrap } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
 
-export const ADMINISTRATION_PERMISSION = 'admin';
+import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
+import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
-export class AdministrationMenuService {
-  static administrationMenuToken = 'administrationMenu';
+export class AdministrationMenuService extends Bootstrap {
   constructor(
     private settingsMenuService: SettingsMenuService,
     private permissionsService: PermissionsService,
-  ) { }
+    private screenService: ScreenService,
+    private administrationScreenService: AdministrationScreenService,
+    private appScreenService: AppScreenService
+  ) {
+    super();
+  }
 
-  register() {
+  bootstrap() {
     this.settingsMenuService.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {
-        id: AdministrationMenuService.administrationMenuToken,
+        id: 'administrationMenuEnter',
         order: 0,
-        isHidden: () => !this.permissionsService.has(ADMINISTRATION_PERMISSION),
+        isHidden: () => !this.permissionsService.has(EAdminPermission.admin)
+          || this.screenService.isActive(AdministrationScreenService.screenName),
         title: 'administration_menu_enter',
+        onClick: () => this.administrationScreenService.navigateToRoot(),
+      }
+    );
+    this.settingsMenuService.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: 'administrationMenuBack',
+        order: 0,
+        isHidden: () => !this.screenService.isActive(AdministrationScreenService.screenName),
+        title: 'administration_menu_back',
+        onClick: () => this.appScreenService.navigateToRoot(),
       }
     );
   }

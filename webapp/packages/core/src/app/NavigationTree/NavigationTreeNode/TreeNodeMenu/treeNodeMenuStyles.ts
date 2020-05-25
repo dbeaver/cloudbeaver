@@ -12,19 +12,18 @@ export const treeNodeMenuStyles = css`
   MenuTrigger {
     margin-left: 16px;
     padding: 0;
-    height: 16px;
-    display: flex;
+    height: 20px;
 
-    & > Icon {
+    & Icon {
       cursor: pointer;
       width: 16px;
       height: 10px;
       fill: #dedede;
     }
 
-    &[use|isSelected] > Icon, 
-    &:hover > Icon, 
-    &:focus > Icon {
+    &[use|isSelected] Icon, 
+    &:hover Icon, 
+    &:focus Icon {
       fill: #338fcc;
     }
   }

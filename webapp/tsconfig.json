@@ -20,6 +20,7 @@
     "types": ["reflect-metadata", "node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "declarationMap": true,
     "baseUrl": "."
   }
 }

@@ -60,11 +60,11 @@ export class ThemeService {
 
   constructor(private notificationService: NotificationService,
               private settingsService: SettingsService) {
+    this.loadAllThemes();
   }
 
   async init() {
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
-    await this.loadAllThemesAsync();
     await this.changeThemeAsync(this.currentThemeId);
   }
 
@@ -95,7 +95,7 @@ export class ThemeService {
     this.settings.currentThemeId = themeId;
   }
 
-  private async loadAllThemesAsync(): Promise<void> {
+  private loadAllThemes(): void {
     for (const theme of themes) {
       this.themeMap.set(theme.id, theme);
     }

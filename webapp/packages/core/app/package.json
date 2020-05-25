@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/app",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/app",
-  "module": "../dist/app",
-  "types": "../dist/types/app"
+  "main": "../dist/app/index.js",
+  "module": "../dist/app/index.js"
 }

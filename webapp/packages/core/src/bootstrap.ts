@@ -13,6 +13,7 @@ export async function bootstrap(plugins: PluginManifest[]) {
 
   try {
     await appBootstrap.init();
+    await app.initializeServices();
     await app.initializePlugins();
     await appBootstrap.doAfterPluginsInit();
     await app.load();

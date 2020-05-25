@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/settings",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/settings",
-  "module": "../dist/settings",
-  "types": "../dist/types/settings"
+  "main": "../dist/settings/index.js",
+  "module": "../dist/settings/index.js"
 }

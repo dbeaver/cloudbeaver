@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { composes } from '@dbeaver/core/theming';
+import { useStyles, composes } from '@dbeaver/core/theming';
 
-export const topNavBarStyles = composes(
+export const topAppBarStyles = composes(
   css`
     header {
       composes: theme-background-primary theme-text-on-primary from global;
@@ -27,3 +27,11 @@ export const topNavBarStyles = composes(
     }
   `
 );
+
+export function TopAppBar({ children }: React.PropsWithChildren<{}>) {
+  return styled(useStyles(topAppBarStyles))(
+    <header>
+      {children}
+    </header>
+  );
+}
