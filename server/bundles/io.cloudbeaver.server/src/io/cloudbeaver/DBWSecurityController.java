@@ -17,7 +17,6 @@
 package io.cloudbeaver;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebPermission;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -93,9 +92,6 @@ public interface DBWSecurityController {
 
     @NotNull
     Set<String> getUserPermissions(String userId) throws DBCException;
-
-    @NotNull
-    WebPermission[] getAllPermissions();
 
     ///////////////////////////////////////////
     // Sessions

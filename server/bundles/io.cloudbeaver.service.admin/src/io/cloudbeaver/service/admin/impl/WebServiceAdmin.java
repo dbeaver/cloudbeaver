@@ -18,17 +18,21 @@ package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebPermission;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebPermissionDescriptor;
+import io.cloudbeaver.registry.WebServiceDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.admin.AdminRoleInfo;
 import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
+import org.jkiss.utils.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,8 +74,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<AdminPermissionInfo> listPermissions(@NotNull WebSession webSession) throws DBWebException {
         try {
             List<AdminPermissionInfo> permissionInfos = new ArrayList<>();
-            for (WebPermission permission : CBPlatform.getInstance().getApplication().getSecurityController().getAllPermissions()) {
-                permissionInfos.add(new AdminPermissionInfo(permission));
+            for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
+                for (WebPermissionDescriptor pd : wsd.getPermissions()) {
+                    permissionInfos.add(new AdminPermissionInfo(pd));
+                }
             }
             return permissionInfos;
         } catch (Exception e) {
@@ -87,7 +93,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             CBPlatform.getInstance().getApplication().getSecurityController().createUser(newUser);
             return new AdminUserInfo(newUser);
         } catch (Exception e) {
-            throw new DBWebException("Error reading users", e);
+            throw new DBWebException("Error creating new user", e);
         }
     }
 
@@ -97,33 +103,85 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             CBPlatform.getInstance().getApplication().getSecurityController().deleteUser(userName);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error reading users", e);
+            throw new DBWebException("Error deleting user", e);
         }
     }
 
     @NotNull
     @Override
-    public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleName) throws DBWebException {
-        throw new DBWebException("Feature not supported");
+    public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
+        try {
+            WebRole newRole = new WebRole(roleId);
+            CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole);
+            return new AdminRoleInfo(newRole);
+        } catch (Exception e) {
+            throw new DBWebException("Error creating new role", e);
+        }
     }
 
     @Override
-    public boolean deleteRole(@NotNull WebSession webSession, String roleName) throws DBWebException {
-        throw new DBWebException("Feature not supported");
+    public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
+        try {
+            CBPlatform.getInstance().getApplication().getSecurityController().deleteRole(roleId);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error deleting role", e);
+        }
     }
 
     @Override
     public boolean grantUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException {
-        throw new DBWebException("Feature not supported");
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant role in anonymous mode");
+        }
+        try {
+            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
+            String[] roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).toArray(String[]::new);
+            if (!ArrayUtils.contains(roleIds, role)) {
+                roleIds = ArrayUtils.add(String.class, roleIds, role);
+                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds, grantor.getUserId());
+            } else {
+                throw new DBWebException("User '" + user + "' already has role '" + role + "'");
+            }
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error granting role", e);
+        }
     }
 
     @Override
     public boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException {
-        throw new DBWebException("Feature not supported");
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant role in anonymous mode");
+        }
+        try {
+            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
+            String[] roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).toArray(String[]::new);
+            if (ArrayUtils.contains(roleIds, role)) {
+                roleIds = ArrayUtils.remove(String.class, roleIds, role);
+                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds, grantor.getUserId());
+            } else {
+                throw new DBWebException("User '" + user + "' doesn't have role '" + role + "'");
+            }
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error revoking role", e);
+        }
     }
 
     @Override
     public boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
-        throw new DBWebException("Feature not supported");
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot change permissions in anonymous mode");
+        }
+        try {
+            CBPlatform.getInstance().getApplication().getSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error setting role permissions", e);
+        }
     }
 }

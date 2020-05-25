@@ -18,7 +18,6 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebPermission;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -434,12 +433,6 @@ class CBSecurityController implements DBWSecurityController {
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
         }
-    }
-
-    @NotNull
-    @Override
-    public WebPermission[] getAllPermissions() {
-        return new WebPermission[0];
     }
 
     ///////////////////////////////////////////

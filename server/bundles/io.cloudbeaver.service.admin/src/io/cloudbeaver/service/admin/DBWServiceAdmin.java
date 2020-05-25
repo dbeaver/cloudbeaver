@@ -51,10 +51,10 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     @NotNull
-    AdminRoleInfo createRole(@NotNull WebSession webSession, String roleName) throws DBWebException;
+    AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean deleteRole(@NotNull WebSession webSession, String roleName) throws DBWebException;
+    boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean grantUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;

@@ -16,21 +16,33 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.model.user.WebPermission;
+import io.cloudbeaver.registry.WebPermissionDescriptor;
 
 /**
  * Web permission ID
  */
 public class AdminPermissionInfo {
 
-    private final WebPermission permission;
+    private final WebPermissionDescriptor permission;
 
-    public AdminPermissionInfo(WebPermission permission) {
+    public AdminPermissionInfo(WebPermissionDescriptor permission) {
         this.permission = permission;
     }
 
     public String getId() {
         return permission.getId();
+    }
+
+    public String getLabel() {
+        return permission.getLabel();
+    }
+
+    public String getDescription() {
+        return permission.getDescription();
+    }
+
+    public String getCategory() {
+        return permission.getCategory();
     }
 
 }
