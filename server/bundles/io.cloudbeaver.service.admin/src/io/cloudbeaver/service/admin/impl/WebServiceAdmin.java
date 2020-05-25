@@ -16,7 +16,13 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.service.admin.AdminPermissionInfo;
+import io.cloudbeaver.service.admin.AdminRoleInfo;
+import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
+
+import java.util.List;
 
 /**
  * Web service implementation
@@ -24,4 +30,53 @@ import io.cloudbeaver.service.admin.DBWServiceAdmin;
 public class WebServiceAdmin implements DBWServiceAdmin {
 
 
+    @Override
+    public List<AdminUserInfo> listUsers(String userName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public List<AdminRoleInfo> listRoles(String roleName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public List<AdminPermissionInfo> listPermissions(String permissionId) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public AdminUserInfo createUser(String userName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public boolean deleteUser(String userName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public AdminRoleInfo createRole(String roleName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public boolean deleteRole(String roleName) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public boolean grantUserRole(String user, String role) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public boolean revokeUserRole(String user, String role) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
+
+    @Override
+    public boolean setRolePermissions(String roleID, String[] permissions) throws DBWebException {
+        throw new DBWebException("Feature not supported");
+    }
 }

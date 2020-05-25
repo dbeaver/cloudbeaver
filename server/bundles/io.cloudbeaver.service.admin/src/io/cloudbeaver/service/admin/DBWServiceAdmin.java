@@ -17,11 +17,28 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
+
+import java.util.List;
 
 /**
  * Web service API
  */
 public interface DBWServiceAdmin extends DBWService {
 
+    List<AdminUserInfo> listUsers(String userName) throws DBWebException;
+    List<AdminRoleInfo> listRoles(String roleName) throws DBWebException;
+    List<AdminPermissionInfo> listPermissions(String permissionId) throws DBWebException;
+
+    AdminUserInfo createUser(String userName) throws DBWebException;
+    boolean deleteUser(String userName) throws DBWebException;
+
+    AdminRoleInfo createRole(String roleName) throws DBWebException;
+    boolean deleteRole(String roleName) throws DBWebException;
+
+    boolean grantUserRole(String user, String role) throws DBWebException;
+    boolean revokeUserRole(String user, String role) throws DBWebException;
+
+    boolean setRolePermissions(String roleID, String[] permissions) throws DBWebException;
 
 }

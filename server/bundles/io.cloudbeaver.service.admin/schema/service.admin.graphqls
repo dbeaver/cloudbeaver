@@ -26,14 +26,13 @@ extend type Query {
 
     listUsers(userName: ID): [AdminUserInfo]!
     listRoles(roleName: ID): [AdminRoleInfo]!
-    listPermissions(permissionId: ID): [AdminPermissionInfo]
+    listPermissions(permissionId: ID): [AdminPermissionInfo]!
 
     createUser(userName: ID!): AdminUserInfo!
     deleteUser(userName: ID!): Boolean
 
-    getUserAdminCredentials(userName: ID!): Object
-
-    setUserAdminCredentials(userName: ID!, credentials: Object): Boolean
+    createRole(roleName: ID!): AdminRoleInfo!
+    deleteRole(roleName: ID!): Boolean
 
     grantUserRole(user: ID!, role: ID!): Boolean
     revokeUserRole(user: ID!, role: ID!): Boolean
