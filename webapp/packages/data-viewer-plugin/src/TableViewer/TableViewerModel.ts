@@ -8,7 +8,9 @@
 
 import { action, observable } from 'mobx';
 
-import { IAgGridModel, IRequestedData, IRequestDataOptions } from '@dbeaver/ag-grid-plugin';
+import {
+  IAgGridModel, IRequestedData, IRequestDataOptions, IColumnSorting
+} from '@dbeaver/ag-grid-plugin';
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { GQLError } from '@dbeaver/core/sdk';
@@ -30,6 +32,7 @@ export const fetchingSettings = {
 
 export interface IRequestDataResultOptions extends IRequestDataOptions {
   // to be extended, now just reexport to avoid ag-grid-plugin dependency
+  sorting?: IColumnSorting[];
 }
 
 export interface ITableViewerModelOptions {

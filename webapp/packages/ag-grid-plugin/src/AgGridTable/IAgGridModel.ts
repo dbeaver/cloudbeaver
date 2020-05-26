@@ -15,6 +15,7 @@ export type SortMode = 'asc' | 'desc' | null;
 export interface IColumnSorting {
   colId: string;
   sortMode: SortMode;
+  sortOrder: number;
 }
 
 export interface IRequestDataOptions {

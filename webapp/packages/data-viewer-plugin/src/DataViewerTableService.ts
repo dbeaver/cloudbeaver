@@ -13,6 +13,7 @@ import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
 import { IRequestDataResult, IRequestDataResultOptions, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { RequestDataOptionsToConstrains } from './DataViewerUtils';
 
 
 @injectable()
@@ -112,19 +113,6 @@ export class DataViewerTableService {
       data.executionContext = executionContext;
     }
 
-    const constraints = (options?.sorting || [])
-      .reduce<SqlDataFilterConstraint[]>((accumulator, columnSorting, ind) => {
-        if (columnSorting.sortMode !== undefined) {
-          const constrain: SqlDataFilterConstraint = {
-            attribute: columnSorting.colId,
-            orderPosition: ind,
-            orderAsc: columnSorting.sortMode === 'asc',
-          };
-          accumulator.push(constrain);
-        }
-        return accumulator;
-      }, []);
-
     const { readDataFromContainer } = await this.graphQLService.gql.readDataFromContainer({
       connectionId: data.executionContext.connectionId,
       contextId: data.executionContext.contextId,
@@ -132,7 +120,7 @@ export class DataViewerTableService {
       filter: {
         offset: rowOffset,
         limit: count,
-        constraints: constraints.length ? constraints : undefined,
+        constraints: RequestDataOptionsToConstrains(options),
       },
     });
     const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table

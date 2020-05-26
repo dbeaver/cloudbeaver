@@ -145,8 +145,8 @@ export class AgGridTableController implements IInitializableController, IDestruc
         }
       );
       // update columns only once after first data fetching
-      if (!this.columns.length) {
-        this.columns = mapDataToColumns(requestedData.columns || []);
+      if (isColumnsChanged(this.columns, requestedData.columns)) {
+        this.columns = mapDataToColumns(requestedData.columns);
       }
       successCallback(
         this.cloneRows(requestedData.rows),
@@ -206,10 +206,10 @@ export class AgGridTableController implements IInitializableController, IDestruc
       const columnSorting: IColumnSorting = {
         colId: col.getColId(),
         sortMode: col.getSort() as SortMode || null,
+        sortOrder: col.getSortedAt(),
       };
       return columnSorting;
     });
-    this.sortingOrder.shift(); // remove index column
     if (this.gridModel.onSortChanged) {
       this.gridModel.onSortChanged(this.sortingOrder);
     }
@@ -224,7 +224,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       // probably it thinks that nothing to delete - nothing to refresh
       this.api.refreshInfiniteCache(); // it will mark internal state for reload
       this.api.purgeInfiniteCache(); // it will reset internal state
-      this.columns = columns ? mapDataToColumns(columns) : [];
+      this.columns = columns ? mapDataToColumns(columns) : this.columns;
       this.setInitialRow(rows);
     }
   }
@@ -286,8 +286,8 @@ export const INDEX_COLUMN_DEF: ColDef = {
   cellRenderer: row => row.rowIndex + 1,
 };
 
-function mapDataToColumns(columns: IAgGridCol[]): ColDef[] {
-  if (!columns.length) {
+function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
+  if (!columns || !columns.length) {
     return [];
   }
   return [
@@ -306,4 +306,12 @@ function mapDataToColumns(columns: IAgGridCol[]): ColDef[] {
 
 function getObjectValue({ data, colDef }: ValueGetterParams) {
   return data[colDef.field || 'node.id'].value;
+}
+
+function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {
+  const [indexColumn, ...withoutIndexColumn] = oldColumns;
+  if (withoutIndexColumn.length !== newColumns.length) {
+    return true;
+  }
+  return withoutIndexColumn.some((col, ind) => col.colId !== newColumns[ind].name);
 }
