@@ -7,36 +7,23 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { composes, useStyles } from '@dbeaver/core/theming';
+import { useStyles, Style } from '@dbeaver/core/theming';
 
 import { ITab } from '../ITab';
 import { TabPanel } from '../TabPanel';
+import { verticalTabStyles } from './verticalTabStyles';
 
-const styles = composes(
-  css`
-    TabPanel {
-      composes: theme-border-color-background from global;
-    }
-  `,
-  css`
-    TabPanel {
-      outline: none;
-      overflow: auto !important;
-      border-top: 1px solid;
-    }
-  `,
-);
-
-type VerticalTabPanelProps = React.HTMLAttributes<HTMLDivElement> & {
+type VerticalTabPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
   tab: ITab;
+  style: Style[];
 }
 
-export const VerticalTabPanel = observer(function VerticalTabPanel({ tab }: VerticalTabPanelProps) {
+export const VerticalTabPanel = observer(function VerticalTabPanel({ tab, style }: VerticalTabPanelProps) {
   const Panel = tab.panel;
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(verticalTabStyles, ...style))(
     <TabPanel tabId={tab.tabId}>
       <Panel/>
     </TabPanel>

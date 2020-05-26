@@ -90,14 +90,14 @@ export const AuthDialog: DialogComponent<null, null> = observer(
           title={translate('authentication_login_dialog_title')}
           noBodyPadding
           header={(
-            <TabList>
+            <TabList aria-label='Auth providers'>
               {controller.providers.map(provider => (
                 <Tab
                   key={provider.id}
                   tabId={provider.id}
                   onOpen={() => controller.selectProvider(provider.id)}
                 >
-                  <TabTitle title={provider.label} />
+                  <TabTitle>{provider.label}</TabTitle>
                 </Tab>
               ))}
             </TabList>

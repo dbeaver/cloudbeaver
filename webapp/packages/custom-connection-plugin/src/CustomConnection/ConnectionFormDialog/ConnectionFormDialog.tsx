@@ -101,10 +101,10 @@ export const ConnectionFormDialog = observer(
           header={(
             <TabList>
               <Tab tabId='options' >
-                <TabTitle title={translate('customConnection_options')} />
+                <TabTitle>{translate('customConnection_options')}</TabTitle>
               </Tab>
               <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} >
-                <TabTitle title={translate('customConnection_properties')} />
+                <TabTitle>{translate('customConnection_properties')}</TabTitle>
               </Tab>
             </TabList>
           )}

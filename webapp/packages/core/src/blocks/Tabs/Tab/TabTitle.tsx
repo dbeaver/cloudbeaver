@@ -10,15 +10,14 @@ import styled from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
 
-type TabTitleProps = {
-  title?: string;
+type TabTitleProps = React.PropsWithChildren<{
   className?: string;
-}
+}>
 
-export function TabTitle({ title, className }: TabTitleProps) {
+export function TabTitle({ children, className }: TabTitleProps) {
   return styled(useStyles())(
     <tab-title as="div" className={className}>
-      {title || <placeholder as="div" />}
+      {children || <placeholder as="div" />}
     </tab-title>
   );
 }

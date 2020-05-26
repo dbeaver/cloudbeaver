@@ -13,12 +13,16 @@ import { TabsContext } from './TabsContext';
 
 type Props = React.PropsWithChildren<{
   selectedId?: string;
+  orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
 }>
 
-export function TabsState({ selectedId, currentTabId, children }: Props) {
+export function TabsState({
+  selectedId, orientation, currentTabId, children,
+}: Props) {
   const state = useTabState({
     selectedId: selectedId || currentTabId,
+    orientation,
     manual: true,
   });
   if (currentTabId) {

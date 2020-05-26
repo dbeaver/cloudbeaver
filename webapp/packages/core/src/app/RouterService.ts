@@ -21,9 +21,14 @@ export class RouterService {
     return this.currentRoute;
   }
 
+  get params() {
+    return this.currentParams;
+  }
+
   readonly router: Router;
 
   @observable private currentRoute = '';
+  @observable private currentParams: Record<string, any> = {};
 
   constructor() {
     this.router = createRouter();
@@ -49,5 +54,6 @@ export class RouterService {
 
   private onRouteChange(state: SubscribeState) {
     this.currentRoute = state.route.name;
+    this.currentParams = state.route.params;
   }
 }
