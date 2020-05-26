@@ -28,8 +28,6 @@
   "data_transfer_exporting_table" : "Таблица:",
   "data_transfer_exporting_sql" : "SQL:",
 
-  "administration_menu_enter" : "Администрирование",
-
   "authentication_login_dialog_title" : "Авторизация",
   "authentication_login" : "Войти",
   "authentication_logout" : "Выйти",

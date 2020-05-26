@@ -1,5 +1,6 @@
 {
   "name" : "en",
+
   "customConnection_connectionType_custom" : "Parameters",
   "customConnection_connectionType_url" : "URL",
   "customConnection_options" : "Options",
@@ -14,6 +15,7 @@
   "customConnection_Password" : "Password",
   "customConnection_test" : "Test Connection",
   "customConnection_create" : "Create",
+
   "data_transfer_dialog_title" : "Export data",
   "data_transfer_dialog_export" : "Export",
   "data_transfer_dialog_configuration_title" : "Export configuration",
@@ -25,10 +27,11 @@
   "data_transfer_notification_delete" : "Delete",
   "data_transfer_exporting_table" : "Table:",
   "data_transfer_exporting_sql" : "SQL:",
-  "administration_menu_enter" : "Administration",
+
   "authentication_login_dialog_title" : "Authentication",
   "authentication_login" : "Login",
   "authentication_logout" : "Logout",
+  
   "ui_stepper_back" : "Back",
   "ui_processing_loading" : "Loading...",
   "ui_processing_cancel" : "Cancel",
@@ -41,9 +44,11 @@
   "block_properties_table_name" : "Name",
   "block_properties_table_value" : "Value",
   "block_properties_table_add" : "Add",
+
   "app_root_session_expired_title" : "Session expired",
   "app_root_session_expired_message" : "Session has been expired. Do you want to reload?",
   "app_root_session_expired_reload" : "Reload",
+
   "app_shared_connectionMenu_newConnection" : "New connection",
   "app_shared_connectionMenu_connection" : "Connection",
   "app_shared_connectionMenu_custom" : "Custom",
@@ -53,10 +58,13 @@
   "app_shared_settingsMenu_config" : "Configuration",
   "app_shared_settingsMenu_theme" : "Theme",
   "app_shared_settingsMenu_lang" : "Language",
+
   "core_eventsLog_dbeaverErrorDetails" : "Error details",
+
   "app_shared_inlineEditor_dialog_title" : "Edit mode",
   "app_shared_inlineEditor_dialog_apply" : "Apply",
   "app_shared_inlineEditor_dialog_cancel" : "Cancel",
+  
   "app_log_view_clear_log" : "Clear logs",
   "app_log_view_entry_type" : "Type",
   "app_log_view_entry_timestamp" : "Timestamp",
