@@ -10,6 +10,12 @@ import { RowSelection } from './TableSelection/RowSelection';
 
 export type AgGridRow = any[];
 
+export type SortMode = 'asc' | 'desc' | null;
+
+export interface IRequestDataOptions {
+  sortMode?: SortMode[];
+}
+
 
 export interface IAgGridModel {
   initialRows: AgGridRow[];
@@ -19,7 +25,7 @@ export interface IAgGridModel {
 
   actions: IAgGridActions | null;
   // hooks
-  onRequestData(rowOffset: number, count: number): Promise<IRequestedData>;
+  onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
   onCellEditingStopped?(rowNumber: number, colNumber: number, value: any): void;
   onEditSave(): void;
   onEditCancel(): void;

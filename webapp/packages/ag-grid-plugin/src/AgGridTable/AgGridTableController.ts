@@ -17,6 +17,7 @@ import {
   GridOptions,
   CellEditingStoppedEvent,
 } from 'ag-grid-community';
+import { SortChangedEvent } from 'ag-grid-community/dist/lib/events';
 import { RowDataTransaction } from 'ag-grid-community/dist/lib/interfaces/rowDataTransaction';
 import { computed, observable } from 'mobx';
 
@@ -24,14 +25,16 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 
 import { AgGridContext } from './AgGridContext';
 import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel,
+  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortMode,
 } from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
 
+
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
   @observable refreshId = 0;
+  @observable sortingOrder: SortMode[] = [];
 
   private readonly datasource: IDatasource = {
     getRows: this.getRows.bind(this),
@@ -68,6 +71,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onBodyScroll: this.handleBodyScroll.bind(this),
 
     onCellEditingStopped: this.handleCellEditingStopped.bind(this),
+    onSortChanged: this.handleSortChanged.bind(this),
   };
 
   @observable columns: ColDef[] = [];
@@ -75,9 +79,10 @@ export class AgGridTableController implements IInitializableController, IDestruc
   /**
    * use this object to dynamically change ag-grid properties
    */
-  @computed get dynamicOptions() {
+  @computed get dynamicOptions(): GridOptions {
     return {
       enableRangeSelection: !!this.selection,
+      sortingOrder: this.sortingOrder,
     };
   }
 
@@ -103,6 +108,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.gridOptions.cacheBlockSize = gridModel.chunkSize;
     if (gridModel.initialColumns?.length) {
       this.columns = mapDataToColumns(gridModel.initialColumns);
+      this.sortingOrder = this.columns.map(() => null);
     }
   }
 
@@ -190,6 +196,11 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.setInitialRow(this.gridModel.initialRows);
   }
 
+  private handleSortChanged(event: SortChangedEvent) {
+    console.log(event);
+    this.sortingOrder = event.columnApi.getAllGridColumns().map(col => col.getSort() as SortMode || null);
+  }
+
   /* Actions */
 
   private resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void {
@@ -257,6 +268,7 @@ export const INDEX_COLUMN_DEF: ColDef = {
   suppressNavigable: true,
   suppressMenu: true,
   editable: false,
+  sortable: false,
   cellRenderer: row => row.rowIndex + 1,
 };
 
