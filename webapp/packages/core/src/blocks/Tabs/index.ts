@@ -10,3 +10,4 @@ export * from './TabsBox/TabsBox';
 export * from './TabsBox/TabsBoxFromArray';
 
 export * from './VerticalTabs/VerticalTabs';
+export * from './VerticalTabs/verticalTabStyles';

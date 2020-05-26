@@ -12,18 +12,36 @@ import styled, { css } from 'reshadow';
 import { ITab } from '@dbeaver/core/app';
 import { VerticalTabs } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
-import { useStyles } from '@dbeaver/core/theming';
+import { useStyles, composes } from '@dbeaver/core/theming';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectFoldersController } from './ObjectFoldersController';
 
-const styles = css`
-  folders {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-`;
+const styles = composes(
+  css`
+    TabList {
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+    }
+    VerticalTabs {
+      composes: theme-border-color-background from global;
+    }
+    Tab {
+      composes: theme-ripple theme-background-background theme-ripple-selectable from global;
+    }
+  `,
+  css`
+    Tab {
+      color: inherit;
+    }
+    VerticalTabs {
+      border-top: 1px solid;
+      flex: 1;
+    }
+    TabPanel {
+      overflow: auto !important;
+    }
+  `
+);
 
 type ObjectFoldersProps = {
   tab: ITab<IObjectViewerTabState>;
@@ -32,9 +50,5 @@ type ObjectFoldersProps = {
 export const ObjectFolders = observer(function ObjectFolders({ tab }: ObjectFoldersProps) {
   const controller = useController(ObjectFoldersController, tab);
 
-  return styled(useStyles(styles))(
-    <folders as="div">
-      <VerticalTabs tabContainer={controller.getTabContainer()}/>
-    </folders>
-  );
+  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={[styles]}/>);
 });

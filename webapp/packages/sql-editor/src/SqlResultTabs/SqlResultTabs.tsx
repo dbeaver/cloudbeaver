@@ -70,7 +70,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         currentTabId={currentId}
         tabs={tab.handlerState.resultTabs.map(result => (
           <Tab key={result.resultTabId} tabId={result.resultTabId} onOpen={handleOpen} onClose={handleClose}>
-            <TabTitle title={result.name}/>
+            <TabTitle>{result.name}</TabTitle>
           </Tab>
         ))}
         style={[styles]}

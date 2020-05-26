@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
+
 import { ScreenService, RouterService, AppScreenService } from '@dbeaver/core/app';
 import { injectable, Bootstrap } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
@@ -17,6 +19,14 @@ import { AdministrationScreen } from './AdministrationScreen';
 export class AdministrationScreenService extends Bootstrap {
 
   static screenName = 'administration'
+  static itemRouteName = 'administration.item'
+
+  @computed get activeItem(): string | null {
+    if (!this.screenService.isActive(AdministrationScreenService.screenName)) {
+      return null;
+    }
+    return this.routerService.params.item || null;
+  }
 
   constructor(
     private screenService: ScreenService,
@@ -32,10 +42,21 @@ export class AdministrationScreenService extends Bootstrap {
     this.routerService.router.navigate(AdministrationScreenService.screenName);
   }
 
+  navigateToItem(item: string) {
+    this.routerService.router.navigate(AdministrationScreenService.itemRouteName, { item });
+  }
+
   bootstrap() {
     this.screenService.create({
       name: AdministrationScreenService.screenName,
       path: '/admin',
+      component: AdministrationScreen,
+      onActivate: this.handleActivate.bind(this),
+    });
+
+    this.screenService.create({
+      name: AdministrationScreenService.itemRouteName,
+      path: '/:item',
       component: AdministrationScreen,
       onActivate: this.handleActivate.bind(this),
     });

@@ -7,77 +7,32 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css, use } from 'reshadow';
+import styled from 'reshadow';
 
-import { composes, useStyles } from '@dbeaver/core/theming';
+import { useStyles, Style } from '@dbeaver/core/theming';
 
-import { IconOrImage } from '../../IconOrImage';
 import { ITab } from '../ITab';
 import { Tab } from '../Tab/Tab';
+import { TabIcon } from '../Tab/TabIcon';
+import { TabTitle } from '../Tab/TabTitle';
+import { verticalTabStyles } from './verticalTabStyles';
 
-
-const styles = composes(
-  css`
-    Tab {
-      composes: theme-ripple theme-ripple-selectable from global;
-    }
-  `,
-  css`
-    tab-icon {
-      padding-right: 16px;
-      
-      & IconOrImage {
-        display: block;
-        width: 22px;
-        height: 22px;
-      }
-    }
-
-    Tab[|vertical] {
-      border: none !important;
-      display: flex;
-      flex-shrink: 0;
-      text-align: left;
-      align-items: center;
-      outline: none;
-      font-weight: 500;
-  
-      height: 36px;
-      padding: 0 16px;
-      background: transparent;
-      color: inherit;
-  
-      &:global([aria-selected=true]):before {
-        display: block;
-      }
-      &:not(:global([aria-selected=true])) {
-        cursor: pointer;
-        font-weight: normal;
-      }
-    }
-  `
-);
-
-type VerticalTabHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
+type VerticalTabHeaderProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
   tab: ITab;
+  style: Style[];
 }
 
-export const VerticalTabHeader = observer(function VerticalTabHeader({ tab, ...props }: VerticalTabHeaderProps) {
+export const VerticalTabHeader = observer(function VerticalTabHeader({ tab, style, ...props }: VerticalTabHeaderProps) {
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(verticalTabStyles, ...style))(
     <Tab
-      {...use({ vertical: true })}
       tabId={tab.tabId}
       onOpen={tab.onActivate}
       onClose={tab.onClose}
       {...props}
     >
-      {tab.icon && (
-        <tab-icon as="div">
-          <IconOrImage icon={tab.icon} />
-        </tab-icon>
-      )}
-      <div>{tab.title}</div>
+      {tab.icon && <TabIcon icon={tab.icon} />}
+      <TabTitle>{tab.title}</TabTitle>
     </Tab>
   );
 });

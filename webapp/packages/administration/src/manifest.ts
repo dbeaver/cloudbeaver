@@ -8,6 +8,7 @@
 
 import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
+import { AdministrationItemService } from './AdministrationItem/AdministrationItemService';
 import { AdministrationMenuService } from './AdministrationMenuService';
 import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
@@ -21,6 +22,7 @@ export const manifest: PluginManifest = {
     AdministrationMenuService,
     AdministrationScreenService,
     AdministrationTopAppBarService,
+    AdministrationItemService,
   ],
 
   async initialize(services: IServiceInjector) {
