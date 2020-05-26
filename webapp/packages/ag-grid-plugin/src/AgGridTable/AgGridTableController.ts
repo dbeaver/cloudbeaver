@@ -25,7 +25,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 
 import { AgGridContext } from './AgGridContext';
 import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortMode,
+  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, IColumnSorting, SortMode,
 } from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
@@ -34,13 +34,13 @@ import { TableSelection } from './TableSelection/TableSelection';
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
   @observable refreshId = 0;
-  @observable sortingOrder: SortMode[] = [];
 
   private readonly datasource: IDatasource = {
     getRows: this.getRows.bind(this),
   };
 
   private readonly selection = new TableSelection();
+  private sortingOrder: IColumnSorting[] = []; // sort mode of all columns except index column
 
   /**
    * contains properties to pass to ag-grid
@@ -82,7 +82,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
   @computed get dynamicOptions(): GridOptions {
     return {
       enableRangeSelection: !!this.selection,
-      sortingOrder: this.sortingOrder,
     };
   }
 
@@ -108,7 +107,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.gridOptions.cacheBlockSize = gridModel.chunkSize;
     if (gridModel.initialColumns?.length) {
       this.columns = mapDataToColumns(gridModel.initialColumns);
-      this.sortingOrder = this.columns.map(() => null);
     }
   }
 
@@ -139,7 +137,13 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
     try {
       const length = endRow - startRow;
-      const requestedData = await this.gridModel.onRequestData(startRow, length);
+      const requestedData = await this.gridModel.onRequestData(
+        startRow,
+        length,
+        {
+          sorting: this.sortingOrder,
+        }
+      );
       // update columns only once after first data fetching
       if (!this.columns.length) {
         this.columns = mapDataToColumns(requestedData.columns || []);
@@ -198,7 +202,17 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private handleSortChanged(event: SortChangedEvent) {
     console.log(event);
-    this.sortingOrder = event.columnApi.getAllGridColumns().map(col => col.getSort() as SortMode || null);
+    this.sortingOrder = event.columnApi.getAllGridColumns().map((col) => {
+      const columnSorting: IColumnSorting = {
+        colId: col.getColId(),
+        sortMode: col.getSort() as SortMode || null,
+      };
+      return columnSorting;
+    });
+    this.sortingOrder.shift(); // remove index column
+    if (this.gridModel.onSortChanged) {
+      this.gridModel.onSortChanged(this.sortingOrder);
+    }
   }
 
   /* Actions */
@@ -279,6 +293,7 @@ function mapDataToColumns(columns: IAgGridCol[]): ColDef[] {
   return [
     INDEX_COLUMN_DEF,
     ...columns.map(v => ({
+      colId: v.name,
       headerName: v.label,
       field: `${v.position}`,
       valueGetter: v.dataKind === 'OBJECT' ? getObjectValue : undefined,

@@ -8,7 +8,7 @@
 
 import { action, observable } from 'mobx';
 
-import { IAgGridModel, IRequestedData } from '@dbeaver/ag-grid-plugin';
+import { IAgGridModel, IRequestedData, IRequestDataOptions } from '@dbeaver/ag-grid-plugin';
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { GQLError } from '@dbeaver/core/sdk';
@@ -28,6 +28,10 @@ export const fetchingSettings = {
   fetchDefault: 200,
 };
 
+export interface IRequestDataResultOptions extends IRequestDataOptions {
+  // to be extended, now just reexport to avoid ag-grid-plugin dependency
+}
+
 export interface ITableViewerModelOptions {
   tableId?: string;
   connectionId: string;
@@ -37,7 +41,11 @@ export interface ITableViewerModelOptions {
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
-  requestDataAsync(model: TableViewerModel, rowOffset: number, count: number): Promise<IRequestDataResult>;
+  requestDataAsync(
+    model: TableViewerModel,
+    rowOffset: number,
+    count: number,
+    options?: IRequestDataResultOptions): Promise<IRequestDataResult>;
   saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult>;
 }
 
@@ -58,7 +66,11 @@ export class TableViewerModel implements ITableViewerModelOptions {
   sourceName?: string;
   initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
-  requestDataAsync: (model: TableViewerModel, rowOffset: number, count: number) => Promise<IRequestDataResult>;
+  requestDataAsync: (
+    model: TableViewerModel,
+    rowOffset: number,
+    count: number,
+    options?: IRequestDataResultOptions) => Promise<IRequestDataResult>;
   saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   agGridModel: IAgGridModel = {
@@ -69,6 +81,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     onRequestData: this.onRequestData.bind(this),
     onCellEditingStopped: this.onCellEditingStopped.bind(this),
     onEditSave: this.onSaveChanges.bind(this),
+    onSortChanged: this.onSortChanged.bind(this),
     onEditCancel: this.onEditCancel.bind(this),
     actions: null, // to be set by ag-grid-plugin
   };
@@ -142,7 +155,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.tableEditor.editCellValue(rowNumber, colNumber, value);
   }
 
-  private async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
+  private async onRequestData(rowOffset: number, count: number, options: IRequestDataOptions): Promise<IRequestedData> {
     // try to return data from cache
     if (this.tableDataModel.isChunkLoaded(rowOffset, count) || this.isFullyLoaded) {
       const data: IRequestedData = {
@@ -156,7 +169,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
 
     try {
-      const response = await this.requestDataAsync(this, rowOffset, count);
+      const response = await this.requestDataAsync(this, rowOffset, count, options);
 
       this.insertRows(rowOffset, response.rows, !response.isFullyLoaded);
       if (!this.tableDataModel.getColumns().length) {
@@ -261,6 +274,10 @@ export class TableViewerModel implements ITableViewerModelOptions {
         }
       }
     }
+  }
+
+  private onSortChanged() {
+    this.resetData();
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {

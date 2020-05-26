@@ -7,12 +7,13 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { GraphQLService } from '@dbeaver/core/sdk';
+import { GraphQLService, SqlDataFilterConstraint } from '@dbeaver/core/sdk';
 
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
+import { IRequestDataResult, IRequestDataResultOptions, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+
 
 @injectable()
 export class DataViewerTableService {
@@ -98,7 +99,8 @@ export class DataViewerTableService {
   private async requestDataAsync(
     data: TableViewerModel,
     rowOffset: number,
-    count: number
+    count: number,
+    options: IRequestDataResultOptions,
   ): Promise<IRequestDataResult> {
     if (!data.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
@@ -110,6 +112,19 @@ export class DataViewerTableService {
       data.executionContext = executionContext;
     }
 
+    const constraints = (options?.sorting || [])
+      .reduce<SqlDataFilterConstraint[]>((accumulator, columnSorting, ind) => {
+        if (columnSorting.sortMode !== undefined) {
+          const constrain: SqlDataFilterConstraint = {
+            attribute: columnSorting.colId,
+            orderPosition: ind,
+            orderAsc: columnSorting.sortMode === 'asc',
+          };
+          accumulator.push(constrain);
+        }
+        return accumulator;
+      }, []);
+
     const { readDataFromContainer } = await this.graphQLService.gql.readDataFromContainer({
       connectionId: data.executionContext.connectionId,
       contextId: data.executionContext.contextId,
@@ -117,6 +132,7 @@ export class DataViewerTableService {
       filter: {
         offset: rowOffset,
         limit: count,
+        constraints: constraints.length ? constraints : undefined,
       },
     });
     const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table
