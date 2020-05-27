@@ -44,12 +44,26 @@ export class NavigationTreeContextMenuService {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType;
       },
       order: 1,
-      title: 'Open',
+      title: 'app_navigationTree_openNodeTab',
       onClick: (context: IMenuContext<NodeWithParent>) => {
         const node = context.data;
         this.nodesManagerService.navToNode(node.id);
       },
     };
     this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), openNodeTab);
+
+    const refreshNode: IContextMenuItem<NodeWithParent> = {
+      id: 'refreshNode',
+      isPresent(context) {
+        return context.contextType === NavigationTreeContextMenuService.nodeContextType;
+      },
+      order: 1000,
+      title: 'app_navigationTree_refreshNode',
+      onClick: (context: IMenuContext<NodeWithParent>) => {
+        const node = context.data;
+        this.nodesManagerService.refreshNode(node.id);
+      },
+    };
+    this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), refreshNode);
   }
 }

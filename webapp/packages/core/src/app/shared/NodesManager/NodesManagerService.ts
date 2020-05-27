@@ -80,6 +80,10 @@ export class NodesManagerService {
     });
   }
 
+  refreshNode(nodeId: string) {
+    console.log('refresh', nodeId);
+  }
+
   getDatabaseObjectInfo(nodeId: string): DatabaseObjectInfoWithId | undefined {
     return this.nodesStore.getDatabaseObjectInfo(nodeId);
   }
