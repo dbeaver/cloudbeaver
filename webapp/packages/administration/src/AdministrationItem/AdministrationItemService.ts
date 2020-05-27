@@ -24,10 +24,10 @@ export class AdministrationItemService {
     return this.items[0].name;
   }
 
-  getItem(name: string): IAdministrationItem {
+  getItem(name: string): IAdministrationItem | null {
     const item = this.items.find(item => item.name === name);
     if (!item) {
-      throw new Error(`Administration item ${name} not found`);
+      return null;
     }
 
     return item;
@@ -43,5 +43,12 @@ export class AdministrationItemService {
       order: options.order || Number.MAX_SAFE_INTEGER,
     };
     this.items.push(item);
+  }
+
+  async activate(name: string) {
+    const item = this.getItem(name);
+    if (item && item.onActivate) {
+      await item.onActivate();
+    }
   }
 }

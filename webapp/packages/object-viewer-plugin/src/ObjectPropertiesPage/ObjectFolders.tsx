@@ -40,6 +40,9 @@ const styles = composes(
     TabPanel {
       overflow: auto !important;
     }
+    TabList {
+      border-right: 1px solid;
+    }
   `
 );
 

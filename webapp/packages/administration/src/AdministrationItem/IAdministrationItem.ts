@@ -27,7 +27,7 @@ export interface IAdministrationItemOptions {
   order?: number;
   getDrawerComponent(): AdministrationItemDrawerComponent;
   getContentComponent(): AdministrationItemContentComponent;
-  onSelect?: AdministrationItemEvent;
+  onActivate?: AdministrationItemEvent;
 }
 
 export interface IAdministrationItem extends IAdministrationItemOptions {

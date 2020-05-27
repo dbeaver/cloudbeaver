@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
 import { useService } from '@dbeaver/core/di';
+import { Translate } from '@dbeaver/core/localization';
 import { usePermission } from '@dbeaver/core/root';
 
 import { Administration } from '../Administration/Administration';
@@ -20,7 +21,7 @@ import { AdministrationTopAppBar } from './AdministrationTopAppBar/Administratio
 export const AdministrationScreen = observer(function AdministrationScreen() {
   const administrationScreenService = useService(AdministrationScreenService);
   if (!usePermission(EAdminPermission.admin)) {
-    return <>You has no permission</>;
+    return <Translate token='root_permission_denied'/>;
   }
 
   const handleSelect = useCallback(

@@ -11,16 +11,17 @@ import { SubscribeState } from 'router5';
 import { injectable } from '@dbeaver/core/di';
 
 import { RouterService } from '../RouterService';
-import { IScreen } from './IScreen';
+import { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
 export class ScreenService {
 
   get screen() {
-    return this.screens.get(this.routerService.route);
+    return this.getScreenByRoute(this.routerService.route);
   }
 
   private screens = new Map<string, IScreen>();
+  private routeScreenMap = new Map<string, string>();
 
   constructor(
     private routerService: RouterService
@@ -34,30 +35,42 @@ export class ScreenService {
     }
 
     this.screens.set(screen.name, screen);
-    this.routerService.router.add({ name: screen.name, path: screen.path });
+    this.addRoutes(screen.name, screen.routes);
   }
 
-  isActive(name: string, strict = false): boolean {
-    if (strict) {
-      return this.screen?.name === name;
+  addRoutes(screen: string, routes: ScreenRoute[]) {
+    for (const route of routes) {
+      this.routerService.router.add(route);
+      this.routeScreenMap.set(route.name, screen);
     }
+  }
 
-    return this.screen?.name.startsWith(name) || false;
+  isActive(name: string): boolean {
+    return this.screen?.name === name;
   }
 
   buildUrl(screen: string) {
     return this.routerService.router.buildUrl(screen);
   }
 
+  getScreenByRoute(route: string) {
+    const screen = this.routeScreenMap.get(route);
+    if (!screen) {
+      return undefined;
+    }
+
+    return this.screens.get(screen);
+  }
+
   private async onRouteChange(state: SubscribeState) {
     if (state.previousRoute) {
-      const previousScreen = this.screens.get(state.previousRoute.name);
+      const previousScreen = this.getScreenByRoute(state.previousRoute.name);
       if (previousScreen && previousScreen.onDeactivate) {
         await previousScreen.onDeactivate();
       }
     }
 
-    const nextScreen = this.screens.get(state.route.name);
+    const nextScreen = this.getScreenByRoute(state.route.name);
 
     if (nextScreen && nextScreen.onActivate) {
       await nextScreen.onActivate();
