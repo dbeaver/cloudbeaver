@@ -9,13 +9,15 @@
 import { AdministrationItemService } from '@dbeaver/administration';
 import { injectable, Bootstrap } from '@dbeaver/core/di';
 
+import { UsersManagerService } from '../UsersManagerService';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersDrawerItem } from './UsersDrawerItem';
 
 @injectable()
-export class AuthUsersAdministrationService extends Bootstrap {
+export class UsersAdministrationService extends Bootstrap {
   constructor(
-    private administrationItemService: AdministrationItemService
+    private administrationItemService: AdministrationItemService,
+    private usersManagerService: UsersManagerService,
   ) {
     super();
   }
@@ -25,6 +27,11 @@ export class AuthUsersAdministrationService extends Bootstrap {
       name: 'users',
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
+      onActivate: this.loadUsers.bind(this),
     });
+  }
+
+  private async loadUsers() {
+    await this.usersManagerService.users.load();
   }
 }

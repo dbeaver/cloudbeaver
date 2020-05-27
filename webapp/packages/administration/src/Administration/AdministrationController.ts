@@ -21,10 +21,6 @@ export class AdministrationController {
       .sort((a, b) => a.order - b.order);
   }
 
-  @computed get defaultItem() {
-    return this.administrationItemService.getDefaultItem();
-  }
-
   constructor(
     private administrationItemService: AdministrationItemService
   ) {}

@@ -96,5 +96,8 @@ export const SNACKBAR_STYLES = composes(
         }
       }
     }
+    IconButton {
+      color: rgba(0, 0, 0, 0.45);
+    }
   `
 );
