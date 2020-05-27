@@ -80,8 +80,11 @@ export class NodesManagerService {
     });
   }
 
-  refreshNode(nodeId: string) {
+  async refreshNode(nodeId: string) {
     console.log('refresh', nodeId);
+    await this.purgeServerCache(nodeId);
+    this.nodesStore.removeNode(nodeId);
+    await this.updateNodeInfo(nodeId);
   }
 
   getDatabaseObjectInfo(nodeId: string): DatabaseObjectInfoWithId | undefined {
