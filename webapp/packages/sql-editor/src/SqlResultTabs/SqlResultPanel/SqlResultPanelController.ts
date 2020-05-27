@@ -17,6 +17,7 @@ import { PromiseCancelledError } from '@dbeaver/core/utils';
 import {
   fetchingSettings,
   IRequestDataResult,
+  IRequestDataResultOptions,
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
@@ -155,9 +156,11 @@ implements IInitializableController, IDestructibleController {
     model: TableViewerModel,
     rowOffset: number,
     count: number,
+    options: IRequestDataResultOptions,
   ): Promise<IRequestDataResult> {
 
-    const queryExecutionProcess = this.sqlResultService.asyncSqlQuery(this.panelInit.sqlQueryParams, rowOffset, count);
+    const queryExecutionProcess = this.sqlResultService
+      .asyncSqlQuery(this.panelInit.sqlQueryParams, rowOffset, count, options);
     sqlExecutingState.setCurrentlyExecutingQuery(queryExecutionProcess);
     const response = await queryExecutionProcess.promise;
     const dataResults = this.sqlResultService.sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, count);

@@ -137,4 +137,10 @@
       </g>
   </symbol>
 
+  <symbol id="sort-arrow" viewBox="0 0 6 6">
+      <g>
+          <path d="M2.564 0L0 2.383 1.832 2.383 1.832 4.582 3.297 4.582 3.297 2.383 5.128 2.383z" transform="translate(-5 -.222) translate(5 .389)"/>
+      </g>
+  </symbol>
+
 </svg>
