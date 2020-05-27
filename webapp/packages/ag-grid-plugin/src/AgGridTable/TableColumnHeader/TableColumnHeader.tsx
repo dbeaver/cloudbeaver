@@ -113,7 +113,7 @@ export function TableColumnHeader(props: HeaderProps) {
         default:
           nextSort = 'asc';
       }
-      props.setSort(nextSort, e.shiftKey);
+      props.setSort(nextSort, e.ctrlKey);
     },
     []
   );
