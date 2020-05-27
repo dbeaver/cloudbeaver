@@ -118,7 +118,6 @@ export function TableColumnHeader(props: HeaderProps) {
     []
   );
 
-  console.log(props.displayName, props.column.getSort(), props);
   return styled(headerStyles)(
     <table-header as="div" onClick={handleClick}>
       <icon as="div">

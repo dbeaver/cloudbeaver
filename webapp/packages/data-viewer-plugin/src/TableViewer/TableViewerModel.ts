@@ -9,7 +9,7 @@
 import { action, observable } from 'mobx';
 
 import {
-  IAgGridModel, IRequestedData, IRequestDataOptions, IColumnSorting
+  IAgGridModel, IRequestedData, IRequestDataOptions, SortModel
 } from '@dbeaver/ag-grid-plugin';
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
@@ -32,7 +32,7 @@ export const fetchingSettings = {
 
 export interface IRequestDataResultOptions extends IRequestDataOptions {
   // to be extended, now just reexport to avoid ag-grid-plugin dependency
-  sorting?: IColumnSorting[];
+  sorting?: SortModel;
 }
 
 export interface ITableViewerModelOptions {
@@ -280,7 +280,8 @@ export class TableViewerModel implements ITableViewerModelOptions {
   }
 
   private onSortChanged() {
-    this.resetData();
+    this.tableDataModel.resetData();
+    this._hasMoreRows = true;
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {

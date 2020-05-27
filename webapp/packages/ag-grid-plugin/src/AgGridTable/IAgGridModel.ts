@@ -12,14 +12,14 @@ export type AgGridRow = any[];
 
 export type SortMode = 'asc' | 'desc' | null;
 
-export interface IColumnSorting {
+export type SortModel = {
   colId: string;
-  sortMode: SortMode;
-  sortOrder: number;
-}
+  sort: SortMode;
+}[];
+
 
 export interface IRequestDataOptions {
-  sorting?: IColumnSorting[];
+  sorting?: SortModel;
 }
 
 
@@ -33,7 +33,7 @@ export interface IAgGridModel {
   // hooks
   onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
   onCellEditingStopped?(rowNumber: number, colNumber: number, value: any): void;
-  onSortChanged?(sorting: IColumnSorting[]): void;
+  onSortChanged?(sorting: SortModel): void;
   onEditSave(): void;
   onEditCancel(): void;
 }

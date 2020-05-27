@@ -25,7 +25,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 
 import { AgGridContext } from './AgGridContext';
 import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, IColumnSorting, SortMode,
+  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortMode, SortModel,
 } from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
@@ -40,7 +40,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
   };
 
   private readonly selection = new TableSelection();
-  private sortingOrder: IColumnSorting[] = []; // sort mode of all columns except index column
 
   /**
    * contains properties to pass to ag-grid
@@ -132,6 +131,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       startRow,
       endRow,
       successCallback,
+      sortModel,
       failCallback,
     } = params;
 
@@ -141,7 +141,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
         startRow,
         length,
         {
-          sorting: this.sortingOrder,
+          sorting: sortModel as SortModel,
         }
       );
       // update columns only once after first data fetching
@@ -201,17 +201,9 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private handleSortChanged(event: SortChangedEvent) {
-    console.log(event);
-    this.sortingOrder = event.columnApi.getAllGridColumns().map((col) => {
-      const columnSorting: IColumnSorting = {
-        colId: col.getColId(),
-        sortMode: col.getSort() as SortMode || null,
-        sortOrder: col.getSortedAt(),
-      };
-      return columnSorting;
-    });
     if (this.gridModel.onSortChanged) {
-      this.gridModel.onSortChanged(this.sortingOrder);
+      const sortModel = event.api.getSortModel() as SortModel;
+      this.gridModel.onSortChanged(sortModel);
     }
   }
 
@@ -220,11 +212,10 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void {
     this.selection.clear();
     if (this.api) {
-      // only purgeInfiniteCache() doesn't work when cache is empty.
-      // probably it thinks that nothing to delete - nothing to refresh
-      this.api.refreshInfiniteCache(); // it will mark internal state for reload
       this.api.purgeInfiniteCache(); // it will reset internal state
-      this.columns = columns ? mapDataToColumns(columns) : this.columns;
+      if (columns) {
+        this.columns = mapDataToColumns(columns);
+      }
       this.setInitialRow(rows);
     }
   }
@@ -237,7 +228,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       addIndex: 0,
       add: initialRows || [],
     };
-    this.api!.updateRowData(transaction);
+    this.api!.applyTransaction(transaction);
   }
 
   private updateCellValue(rowNumber: number, colNumber: number, value: any): void {
