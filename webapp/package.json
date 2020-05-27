@@ -24,6 +24,13 @@
     "@babel/runtime": "7.8.4"
   },
   "devDependencies": {
+    "@graphql-codegen/add": "^1.8.1",
+    "@graphql-codegen/cli": "^1.8.1",
+    "@graphql-codegen/near-operation-file-preset": "^1.8.0",
+    "@graphql-codegen/typescript": "^1.8.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.8.0",
+    "@graphql-codegen/typescript-graphql-request": "^1.8.1",
+    "@graphql-codegen/typescript-operations": "^1.8.1",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.8.0",
     "eslint": "^6.6.0",

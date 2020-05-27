@@ -14,122 +14,189 @@ export type Scalars = {
   DateTime: any;
 };
 
-
-export type Query = {
-  authLogin: UserAuthInfo;
-  authLogout?: Maybe<Scalars['Boolean']>;
-  authProviders: Array<AuthProviderInfo>;
-  connectionState: ConnectionInfo;
-  dataSourceList: Array<DataSourceInfo>;
-  dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
-  dataTransferExportDataFromContainer: AsyncTaskInfo;
-  dataTransferExportDataFromResults: AsyncTaskInfo;
-  dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
-  driverList: Array<DriverInfo>;
-  metadataGetNodeDDL?: Maybe<Scalars['String']>;
-  navGetStructContainers: DatabaseStructContainers;
-  navNodeChildren: Array<NavigatorNodeInfo>;
-  navNodeInfo: NavigatorNodeInfo;
-  navRefreshNode?: Maybe<Scalars['Boolean']>;
-  readSessionLog: Array<LogEntry>;
-  serverConfig: ServerConfig;
-  sessionPermissions: Array<Maybe<Scalars['ID']>>;
-  sessionState: SessionInfo;
-  sessionUser?: Maybe<UserAuthInfo>;
-  sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
-  sqlDialectInfo?: Maybe<SqlDialectInfo>;
-  sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
-};
-
-
-export type QueryAuthLoginArgs = {
-  provider: Scalars['ID'];
-  credentials: Scalars['Object'];
-};
-
-
-export type QueryConnectionStateArgs = {
+export type AdminPermissionInfo = {
   id: Scalars['ID'];
+  label?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  provider: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+};
+
+export type AdminRoleInfo = {
+  roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  rolePermissions: Array<Maybe<Scalars['ID']>>;
+};
+
+export type AdminUserInfo = {
+  userId: Scalars['ID'];
+  metaParameters: Scalars['Object'];
+  configurationParameters: Scalars['Object'];
+  grantedRoles: Array<Maybe<Scalars['ID']>>;
+};
+
+export type AsyncTaskInfo = {
+  id: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  running: Scalars['Boolean'];
+  status?: Maybe<Scalars['String']>;
+  error?: Maybe<ServerError>;
+  result?: Maybe<SqlExecuteInfo>;
+  taskResult?: Maybe<Scalars['Object']>;
+};
+
+export enum AuthCredentialEncryption {
+  None = 'none',
+  Plain = 'plain',
+  Hash = 'hash'
+}
+
+export type AuthCredentialInfo = {
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  admin?: Maybe<Scalars['Boolean']>;
+  user?: Maybe<Scalars['Boolean']>;
+  possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
+  encryption?: Maybe<AuthCredentialEncryption>;
+};
+
+export type AuthProviderInfo = {
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  icon?: Maybe<Scalars['ID']>;
+  description?: Maybe<Scalars['String']>;
+  defaultProvider?: Maybe<Scalars['Boolean']>;
+  credentialParameters: Array<AuthCredentialInfo>;
+};
+
+export type ConnectionConfig = {
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  dataSourceId?: Maybe<Scalars['ID']>;
+  driverId?: Maybe<Scalars['ID']>;
+  host?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['String']>;
+  databaseName?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  userName?: Maybe<Scalars['String']>;
+  userPassword?: Maybe<Scalars['String']>;
+};
+
+export type ConnectionInfo = {
+  id: Scalars['ID'];
+  driverId: Scalars['ID'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['String']>;
+  connected: Scalars['Boolean'];
+  provided: Scalars['Boolean'];
+  connectTime?: Maybe<Scalars['String']>;
+  connectionError?: Maybe<ServerError>;
+  serverVersion?: Maybe<Scalars['String']>;
+  clientVersion?: Maybe<Scalars['String']>;
+  features: Array<Scalars['String']>;
+};
+
+export type DatabaseObjectInfo = {
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  ordinalPosition?: Maybe<Scalars['Int']>;
+  fullyQualifiedName?: Maybe<Scalars['String']>;
+  overloadedName?: Maybe<Scalars['String']>;
+  uniqueName?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  features?: Maybe<Array<Maybe<Scalars['String']>>>;
+  editors?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
-export type QueryDataTransferExportDataFromContainerArgs = {
-  connectionId: Scalars['ID'];
-  containerNodePath: Scalars['ID'];
-  parameters: DataTransferParameters;
+export type DatabaseObjectInfoPropertiesArgs = {
+  filter?: Maybe<ObjectPropertyFilter>;
+};
+
+export type DatabaseStructContainers = {
+  catalogList: Array<DatabaseObjectInfo>;
+  schemaList: Array<DatabaseObjectInfo>;
+};
+
+export type DataSourceInfo = {
+  id: Scalars['ID'];
+  driverId: Scalars['ID'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  host?: Maybe<Scalars['String']>;
+  server?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['String']>;
+};
+
+export type DataTransferParameters = {
+  processorId: Scalars['ID'];
+  settings?: Maybe<Scalars['Object']>;
+  processorProperties: Scalars['Object'];
+  filter?: Maybe<SqlDataFilter>;
+};
+
+export type DataTransferProcessorInfo = {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  fileExtension?: Maybe<Scalars['String']>;
+  appFileExtension?: Maybe<Scalars['String']>;
+  appName?: Maybe<Scalars['String']>;
+  order: Scalars['Int'];
+  icon?: Maybe<Scalars['String']>;
+  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  isBinary?: Maybe<Scalars['Boolean']>;
+  isHTML?: Maybe<Scalars['Boolean']>;
 };
 
 
-export type QueryDataTransferExportDataFromResultsArgs = {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  parameters: DataTransferParameters;
+export type DriverInfo = {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  iconBig?: Maybe<Scalars['String']>;
+  providerId?: Maybe<Scalars['ID']>;
+  driverClassName?: Maybe<Scalars['String']>;
+  defaultPort?: Maybe<Scalars['String']>;
+  sampleURL?: Maybe<Scalars['String']>;
+  driverInfoURL?: Maybe<Scalars['String']>;
+  driverPropertiesURL?: Maybe<Scalars['String']>;
+  embedded?: Maybe<Scalars['Boolean']>;
+  anonymousAccess?: Maybe<Scalars['Boolean']>;
+  allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
+  licenseRequired?: Maybe<Scalars['Boolean']>;
+  license?: Maybe<Scalars['String']>;
+  custom?: Maybe<Scalars['Boolean']>;
+  promotedScore?: Maybe<Scalars['Int']>;
+  connectionProperties?: Maybe<Scalars['Object']>;
+  defaultConnectionProperties?: Maybe<Scalars['Object']>;
+  driverProperties?: Maybe<Array<Maybe<DriverPropertyInfo>>>;
+  driverParameters?: Maybe<Scalars['Object']>;
 };
 
-
-export type QueryDataTransferRemoveDataFileArgs = {
-  dataFileId: Scalars['String'];
+export type DriverPropertyInfo = {
+  id: Scalars['ID'];
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  category?: Maybe<Scalars['String']>;
+  dataType?: Maybe<Scalars['String']>;
+  defaultValue?: Maybe<Scalars['Object']>;
+  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
 };
 
-
-export type QueryDriverListArgs = {
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryMetadataGetNodeDdlArgs = {
-  nodeId: Scalars['ID'];
-  options?: Maybe<Scalars['Object']>;
-};
-
-
-export type QueryNavGetStructContainersArgs = {
-  connectionId: Scalars['ID'];
-  catalog?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryNavNodeChildrenArgs = {
-  parentPath: Scalars['ID'];
-  offset?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  onlyFolders?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type QueryNavNodeInfoArgs = {
-  nodePath: Scalars['ID'];
-};
-
-
-export type QueryNavRefreshNodeArgs = {
-  nodePath: Scalars['ID'];
-};
-
-
-export type QueryReadSessionLogArgs = {
-  maxEntries?: Maybe<Scalars['Int']>;
-  clearEntries?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type QuerySqlCompletionProposalsArgs = {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  query: Scalars['String'];
-  position: Scalars['Int'];
-  maxResults?: Maybe<Scalars['Int']>;
-};
-
-
-export type QuerySqlDialectInfoArgs = {
-  connectionId: Scalars['ID'];
-};
-
-
-export type QuerySqlListContextsArgs = {
-  connectionId: Scalars['ID'];
+export type LogEntry = {
+  time?: Maybe<Scalars['DateTime']>;
+  type: Scalars['String'];
+  message?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -249,39 +316,230 @@ export type MutationUpdateResultsDataArgs = {
   updateValues?: Maybe<Scalars['Object']>;
 };
 
-export type AsyncTaskInfo = {
-  id: Scalars['String'];
+export type NavigatorNodeInfo = {
+  id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
-  running: Scalars['Boolean'];
-  status?: Maybe<Scalars['String']>;
-  error?: Maybe<ServerError>;
-  result?: Maybe<SqlExecuteInfo>;
-  taskResult?: Maybe<Scalars['Object']>;
+  icon?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  nodeType?: Maybe<Scalars['String']>;
+  hasChildren?: Maybe<Scalars['Boolean']>;
+  object?: Maybe<DatabaseObjectInfo>;
+  features?: Maybe<Array<Maybe<Scalars['String']>>>;
+  folder?: Maybe<Scalars['Boolean']>;
+  inline?: Maybe<Scalars['Boolean']>;
+  navigable?: Maybe<Scalars['Boolean']>;
 };
 
-export type ServerError = {
-  message?: Maybe<Scalars['String']>;
-  errorCode?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
-  causedBy?: Maybe<ServerError>;
-};
 
-export type ServerMessage = {
-  time?: Maybe<Scalars['String']>;
-  message?: Maybe<Scalars['String']>;
-};
-
-export type ServerLanguage = {
-  isoCode: Scalars['String'];
+export type ObjectDescriptor = {
+  id?: Maybe<Scalars['Int']>;
   displayName?: Maybe<Scalars['String']>;
-  nativeName?: Maybe<Scalars['String']>;
+  fullName?: Maybe<Scalars['String']>;
+  uniqueName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
 };
 
-export type WebServiceConfig = {
-  id: Scalars['String'];
-  name: Scalars['String'];
-  description: Scalars['String'];
-  bundleVersion: Scalars['String'];
+export type ObjectPropertyFilter = {
+  ids?: Maybe<Array<Maybe<Scalars['String']>>>;
+  features?: Maybe<Array<Maybe<Scalars['String']>>>;
+  categories?: Maybe<Array<Maybe<Scalars['String']>>>;
+  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+export type ObjectPropertyInfo = {
+  id?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  category?: Maybe<Scalars['String']>;
+  dataType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
+  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  defaultValue?: Maybe<Scalars['Object']>;
+  features: Array<Scalars['String']>;
+};
+
+export type Query = {
+  authLogin: UserAuthInfo;
+  authLogout?: Maybe<Scalars['Boolean']>;
+  authProviders: Array<AuthProviderInfo>;
+  connectionState: ConnectionInfo;
+  createRole: AdminRoleInfo;
+  createUser: AdminUserInfo;
+  dataSourceList: Array<DataSourceInfo>;
+  dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
+  dataTransferExportDataFromContainer: AsyncTaskInfo;
+  dataTransferExportDataFromResults: AsyncTaskInfo;
+  dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
+  deleteRole?: Maybe<Scalars['Boolean']>;
+  deleteUser?: Maybe<Scalars['Boolean']>;
+  driverList: Array<DriverInfo>;
+  grantUserRole?: Maybe<Scalars['Boolean']>;
+  listPermissions: Array<Maybe<AdminPermissionInfo>>;
+  listRoles: Array<Maybe<AdminRoleInfo>>;
+  listUsers: Array<Maybe<AdminUserInfo>>;
+  metadataGetNodeDDL?: Maybe<Scalars['String']>;
+  navGetStructContainers: DatabaseStructContainers;
+  navNodeChildren: Array<NavigatorNodeInfo>;
+  navNodeInfo: NavigatorNodeInfo;
+  navRefreshNode?: Maybe<Scalars['Boolean']>;
+  readSessionLog: Array<LogEntry>;
+  revokeUserRole?: Maybe<Scalars['Boolean']>;
+  serverConfig: ServerConfig;
+  sessionPermissions: Array<Maybe<Scalars['ID']>>;
+  sessionState: SessionInfo;
+  sessionUser?: Maybe<UserAuthInfo>;
+  setRolePermissions?: Maybe<Scalars['Boolean']>;
+  setUserCredentials?: Maybe<Scalars['Boolean']>;
+  sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
+  sqlDialectInfo?: Maybe<SqlDialectInfo>;
+  sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
+};
+
+
+export type QueryAuthLoginArgs = {
+  provider: Scalars['ID'];
+  credentials: Scalars['Object'];
+};
+
+
+export type QueryConnectionStateArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryCreateRoleArgs = {
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryCreateUserArgs = {
+  userId: Scalars['ID'];
+};
+
+
+export type QueryDataTransferExportDataFromContainerArgs = {
+  connectionId: Scalars['ID'];
+  containerNodePath: Scalars['ID'];
+  parameters: DataTransferParameters;
+};
+
+
+export type QueryDataTransferExportDataFromResultsArgs = {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  parameters: DataTransferParameters;
+};
+
+
+export type QueryDataTransferRemoveDataFileArgs = {
+  dataFileId: Scalars['String'];
+};
+
+
+export type QueryDeleteRoleArgs = {
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryDeleteUserArgs = {
+  userId: Scalars['ID'];
+};
+
+
+export type QueryDriverListArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryGrantUserRoleArgs = {
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryListRolesArgs = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryListUsersArgs = {
+  userId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryMetadataGetNodeDdlArgs = {
+  nodeId: Scalars['ID'];
+  options?: Maybe<Scalars['Object']>;
+};
+
+
+export type QueryNavGetStructContainersArgs = {
+  connectionId: Scalars['ID'];
+  catalog?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryNavNodeChildrenArgs = {
+  parentPath: Scalars['ID'];
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  onlyFolders?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryNavNodeInfoArgs = {
+  nodePath: Scalars['ID'];
+};
+
+
+export type QueryNavRefreshNodeArgs = {
+  nodePath: Scalars['ID'];
+};
+
+
+export type QueryReadSessionLogArgs = {
+  maxEntries?: Maybe<Scalars['Int']>;
+  clearEntries?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryRevokeUserRoleArgs = {
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+};
+
+
+export type QuerySetRolePermissionsArgs = {
+  roleId: Scalars['ID'];
+  permissions: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type QuerySetUserCredentialsArgs = {
+  userId: Scalars['ID'];
+  providerId: Scalars['ID'];
+  credentials: Scalars['Object'];
+};
+
+
+export type QuerySqlCompletionProposalsArgs = {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  position: Scalars['Int'];
+  maxResults?: Maybe<Scalars['Int']>;
+};
+
+
+export type QuerySqlDialectInfoArgs = {
+  connectionId: Scalars['ID'];
+};
+
+
+export type QuerySqlListContextsArgs = {
+  connectionId: Scalars['ID'];
 };
 
 export type ServerConfig = {
@@ -299,6 +557,24 @@ export type ServerConfig = {
   productConfiguration: Scalars['Object'];
 };
 
+export type ServerError = {
+  message?: Maybe<Scalars['String']>;
+  errorCode?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
+  causedBy?: Maybe<ServerError>;
+};
+
+export type ServerLanguage = {
+  isoCode: Scalars['String'];
+  displayName?: Maybe<Scalars['String']>;
+  nativeName?: Maybe<Scalars['String']>;
+};
+
+export type ServerMessage = {
+  time?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+};
+
 export type SessionInfo = {
   createTime: Scalars['String'];
   lastAccessTime: Scalars['String'];
@@ -306,168 +582,6 @@ export type SessionInfo = {
   cacheExpired: Scalars['Boolean'];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
   connections: Array<ConnectionInfo>;
-};
-
-export type DriverInfo = {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  iconBig?: Maybe<Scalars['String']>;
-  providerId?: Maybe<Scalars['ID']>;
-  driverClassName?: Maybe<Scalars['String']>;
-  defaultPort?: Maybe<Scalars['String']>;
-  sampleURL?: Maybe<Scalars['String']>;
-  driverInfoURL?: Maybe<Scalars['String']>;
-  driverPropertiesURL?: Maybe<Scalars['String']>;
-  embedded?: Maybe<Scalars['Boolean']>;
-  anonymousAccess?: Maybe<Scalars['Boolean']>;
-  allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
-  licenseRequired?: Maybe<Scalars['Boolean']>;
-  license?: Maybe<Scalars['String']>;
-  custom?: Maybe<Scalars['Boolean']>;
-  promotedScore?: Maybe<Scalars['Int']>;
-  connectionProperties?: Maybe<Scalars['Object']>;
-  defaultConnectionProperties?: Maybe<Scalars['Object']>;
-  driverProperties?: Maybe<Array<Maybe<DriverPropertyInfo>>>;
-  driverParameters?: Maybe<Scalars['Object']>;
-};
-
-export type DriverPropertyInfo = {
-  id: Scalars['ID'];
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  category?: Maybe<Scalars['String']>;
-  dataType?: Maybe<Scalars['String']>;
-  defaultValue?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
-};
-
-export type DataSourceInfo = {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  host?: Maybe<Scalars['String']>;
-  server?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['String']>;
-};
-
-export type ConnectionConfig = {
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  dataSourceId?: Maybe<Scalars['ID']>;
-  driverId?: Maybe<Scalars['ID']>;
-  host?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  databaseName?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['Object']>;
-  userName?: Maybe<Scalars['String']>;
-  userPassword?: Maybe<Scalars['String']>;
-};
-
-export type ConnectionInfo = {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['String']>;
-  connected: Scalars['Boolean'];
-  provided: Scalars['Boolean'];
-  connectTime?: Maybe<Scalars['String']>;
-  connectionError?: Maybe<ServerError>;
-  serverVersion?: Maybe<Scalars['String']>;
-  clientVersion?: Maybe<Scalars['String']>;
-  features: Array<Scalars['String']>;
-};
-
-export type LogEntry = {
-  time?: Maybe<Scalars['DateTime']>;
-  type: Scalars['String'];
-  message?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
-};
-
-export type ObjectDescriptor = {
-  id?: Maybe<Scalars['Int']>;
-  displayName?: Maybe<Scalars['String']>;
-  fullName?: Maybe<Scalars['String']>;
-  uniqueName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-};
-
-export type ObjectPropertyInfo = {
-  id?: Maybe<Scalars['String']>;
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  category?: Maybe<Scalars['String']>;
-  dataType?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
-  defaultValue?: Maybe<Scalars['Object']>;
-  features: Array<Scalars['String']>;
-};
-
-export type ObjectPropertyFilter = {
-  ids?: Maybe<Array<Maybe<Scalars['String']>>>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  categories?: Maybe<Array<Maybe<Scalars['String']>>>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type DatabaseObjectInfo = {
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
-  ordinalPosition?: Maybe<Scalars['Int']>;
-  fullyQualifiedName?: Maybe<Scalars['String']>;
-  overloadedName?: Maybe<Scalars['String']>;
-  uniqueName?: Maybe<Scalars['String']>;
-  state?: Maybe<Scalars['String']>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  editors?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-
-export type DatabaseObjectInfoPropertiesArgs = {
-  filter?: Maybe<ObjectPropertyFilter>;
-};
-
-export type NavigatorNodeInfo = {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  icon?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  nodeType?: Maybe<Scalars['String']>;
-  hasChildren?: Maybe<Scalars['Boolean']>;
-  object?: Maybe<DatabaseObjectInfo>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  folder?: Maybe<Scalars['Boolean']>;
-  inline?: Maybe<Scalars['Boolean']>;
-  navigable?: Maybe<Scalars['Boolean']>;
-};
-
-export type DatabaseStructContainers = {
-  catalogList: Array<DatabaseObjectInfo>;
-  schemaList: Array<DatabaseObjectInfo>;
-};
-
-export type SqlDialectInfo = {
-  name?: Maybe<Scalars['String']>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
-  functions?: Maybe<Array<Maybe<Scalars['String']>>>;
-  reservedWords?: Maybe<Array<Maybe<Scalars['String']>>>;
-  quoteStrings?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  singleLineComments?: Maybe<Array<Maybe<Scalars['String']>>>;
-  multiLineComments?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  catalogSeparator?: Maybe<Scalars['String']>;
-  structSeparator?: Maybe<Scalars['String']>;
-  scriptDelimiter?: Maybe<Scalars['String']>;
 };
 
 export type SqlCompletionProposal = {
@@ -488,6 +602,14 @@ export type SqlContextInfo = {
   defaultSchema?: Maybe<Scalars['String']>;
 };
 
+export type SqlDataFilter = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
+  where?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<Scalars['String']>;
+};
+
 export type SqlDataFilterConstraint = {
   attribute: Scalars['String'];
   orderPosition?: Maybe<Scalars['Int']>;
@@ -497,11 +619,30 @@ export type SqlDataFilterConstraint = {
   value?: Maybe<Scalars['Object']>;
 };
 
-export type SqlDataFilter = {
-  offset?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
-  where?: Maybe<Scalars['String']>;
+export type SqlDialectInfo = {
+  name?: Maybe<Scalars['String']>;
+  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
+  functions?: Maybe<Array<Maybe<Scalars['String']>>>;
+  reservedWords?: Maybe<Array<Maybe<Scalars['String']>>>;
+  quoteStrings?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
+  singleLineComments?: Maybe<Array<Maybe<Scalars['String']>>>;
+  multiLineComments?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
+  catalogSeparator?: Maybe<Scalars['String']>;
+  structSeparator?: Maybe<Scalars['String']>;
+  scriptDelimiter?: Maybe<Scalars['String']>;
+};
+
+export type SqlExecuteInfo = {
+  statusMessage?: Maybe<Scalars['String']>;
+  duration?: Maybe<Scalars['Int']>;
+  results: Array<SqlQueryResults>;
+};
+
+export type SqlQueryResults = {
+  title?: Maybe<Scalars['String']>;
+  updateRowCount?: Maybe<Scalars['Int']>;
+  sourceQuery?: Maybe<Scalars['String']>;
+  resultSet?: Maybe<SqlResultSet>;
 };
 
 export type SqlResultColumn = {
@@ -525,44 +666,6 @@ export type SqlResultSet = {
   hasMoreData?: Maybe<Scalars['Boolean']>;
 };
 
-export type SqlQueryResults = {
-  title?: Maybe<Scalars['String']>;
-  updateRowCount?: Maybe<Scalars['Int']>;
-  sourceQuery?: Maybe<Scalars['String']>;
-  resultSet?: Maybe<SqlResultSet>;
-};
-
-export type SqlExecuteInfo = {
-  statusMessage?: Maybe<Scalars['String']>;
-  duration?: Maybe<Scalars['Int']>;
-  results: Array<SqlQueryResults>;
-};
-
-export enum AuthCredentialEncryption {
-  None = 'none',
-  Plain = 'plain',
-  Hash = 'hash'
-}
-
-export type AuthCredentialInfo = {
-  id: Scalars['ID'];
-  displayName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  admin?: Maybe<Scalars['Boolean']>;
-  user?: Maybe<Scalars['Boolean']>;
-  possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
-  encryption?: Maybe<AuthCredentialEncryption>;
-};
-
-export type AuthProviderInfo = {
-  id: Scalars['ID'];
-  label: Scalars['String'];
-  icon?: Maybe<Scalars['ID']>;
-  description?: Maybe<Scalars['String']>;
-  defaultProvider?: Maybe<Scalars['Boolean']>;
-  credentialParameters: Array<AuthCredentialInfo>;
-};
-
 export type UserAuthInfo = {
   userId: Scalars['String'];
   displayName?: Maybe<Scalars['String']>;
@@ -571,25 +674,11 @@ export type UserAuthInfo = {
   message?: Maybe<Scalars['String']>;
 };
 
-export type DataTransferProcessorInfo = {
-  id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  fileExtension?: Maybe<Scalars['String']>;
-  appFileExtension?: Maybe<Scalars['String']>;
-  appName?: Maybe<Scalars['String']>;
-  order: Scalars['Int'];
-  icon?: Maybe<Scalars['String']>;
-  properties?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
-  isBinary?: Maybe<Scalars['Boolean']>;
-  isHTML?: Maybe<Scalars['Boolean']>;
-};
-
-export type DataTransferParameters = {
-  processorId: Scalars['ID'];
-  settings?: Maybe<Scalars['Object']>;
-  processorProperties: Scalars['Object'];
-  filter?: Maybe<SqlDataFilter>;
+export type WebServiceConfig = {
+  id: Scalars['String'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+  bundleVersion: Scalars['String'];
 };
 
 export type NavGetStructContainersQueryVariables = {
@@ -724,6 +813,43 @@ export type ChangeSessionLanguageMutationVariables = {
 
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
+
+export type DeleteUserQueryVariables = {
+  userId: Scalars['ID'];
+};
+
+
+export type DeleteUserQuery = Pick<Query, 'deleteUser'>;
+
+export type GetPermissionsListQueryVariables = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetPermissionsListQuery = { permissions: Array<Maybe<Pick<AdminPermissionInfo, 'id' | 'label' | 'description' | 'provider' | 'category'>>> };
+
+export type GetRolesListQueryVariables = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetRolesListQuery = { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'rolePermissions'>>> };
+
+export type GetUsersListQueryVariables = {
+  userId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId'>>> };
+
+export type SetUserCredentialsQueryVariables = {
+  userId: Scalars['ID'];
+  providerId: Scalars['ID'];
+  credentials: Scalars['Object'];
+};
+
+
+export type SetUserCredentialsQuery = Pick<Query, 'setUserCredentials'>;
 
 export type AuthLoginQueryVariables = {
   provider: Scalars['ID'];
@@ -1199,6 +1325,43 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
+export const DeleteUserDocument = `
+    query deleteUser($userId: ID!) {
+  deleteUser(userId: $userId)
+}
+    `;
+export const GetPermissionsListDocument = `
+    query getPermissionsList($roleId: ID) {
+  permissions: listPermissions {
+    id
+    label
+    description
+    provider
+    category
+  }
+}
+    `;
+export const GetRolesListDocument = `
+    query getRolesList($roleId: ID) {
+  roles: listRoles(roleId: $roleId) {
+    roleId
+    roleName
+    rolePermissions
+  }
+}
+    `;
+export const GetUsersListDocument = `
+    query getUsersList($userId: ID) {
+  users: listUsers(userId: $userId) {
+    userId
+  }
+}
+    `;
+export const SetUserCredentialsDocument = `
+    query setUserCredentials($userId: ID!, $providerId: ID!, $credentials: Object!) {
+  setUserCredentials(userId: $userId, providerId: $providerId, credentials: $credentials)
+}
+    `;
 export const AuthLoginDocument = `
     query authLogin($provider: ID!, $credentials: Object!) {
   user: authLogin(provider: $provider, credentials: $credentials) {
@@ -1656,6 +1819,21 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
+    },
+    deleteUser(variables: DeleteUserQueryVariables): Promise<DeleteUserQuery> {
+      return withWrapper(() => client.request<DeleteUserQuery>(DeleteUserDocument, variables));
+    },
+    getPermissionsList(variables?: GetPermissionsListQueryVariables): Promise<GetPermissionsListQuery> {
+      return withWrapper(() => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables));
+    },
+    getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
+      return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
+    },
+    getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
+      return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
+    },
+    setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
+      return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
       return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));

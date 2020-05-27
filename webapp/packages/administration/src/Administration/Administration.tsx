@@ -47,6 +47,7 @@ const administrationStyles = composes(
       display: flex;
       flex-direction: row;
       flex: 1;
+      overflow: hidden;
     }
     drawer {
       width: 250px;
@@ -68,11 +69,10 @@ type Props = {
 
 export const Administration = observer(function Administration({ activeItem, onItemSelect }: Props) {
   const controller = useController(AdministrationController);
-  const activeItemName = activeItem || controller.defaultItem;
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
     <container as='div'>
-      <TabsState currentTabId={activeItemName} orientation='vertical'>
+      <TabsState currentTabId={activeItem} orientation='vertical'>
         <drawer as='div'>
           <TabList aria-label="Administration items">
             {controller.items.map(item => (
@@ -81,7 +81,7 @@ export const Administration = observer(function Administration({ activeItem, onI
           </TabList>
         </drawer>
         <content as='div'>
-          <ItemContent activeItemName={activeItemName}/>
+          <ItemContent activeItemName={activeItem}/>
         </content>
       </TabsState>
     </container>

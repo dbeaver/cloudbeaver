@@ -10,10 +10,12 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { AdministrationTools } from '@dbeaver/administration';
-import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue
-} from '@dbeaver/core/blocks';
+import { Loader, IconButton } from '@dbeaver/core/blocks';
+import { useService } from '@dbeaver/core/di';
 import { useStyles, composes } from '@dbeaver/core/theming';
+
+import { UsersManagerService } from '../UsersManagerService';
+import { UsersTable } from './UsersTable/UsersTable';
 
 const styles = composes(
   css`
@@ -23,58 +25,39 @@ const styles = composes(
   `,
   css`
     content {
+      position: relative;
       padding-top: 16px;
+      flex: 1;
+      overflow: auto;
     }
     TableColumnHeader {
       border-top: solid 1px;
+    }
+    AdministrationTools {
+      display: flex;
+      padding: 0 16px;
+      align-items: center;
+    }
+    IconButton {
+      height: 32px;
+      width: 32px;
+      margin-right: 16px;
     }
   `
 );
 
 export const UsersAdministration = observer(function UsersAdministration() {
+  const usersManagerService = useService(UsersManagerService);
+
   return styled(useStyles(styles))(
     <>
-      <AdministrationTools></AdministrationTools>
+      <AdministrationTools>
+        <IconButton name="add" viewBox="0 0 28 28" />
+        <IconButton name="trash" viewBox="0 0 28 28" />
+      </AdministrationTools>
       <content as='div'>
-        <Table>
-          <TableHeader>
-            <TableColumnHeader>User login</TableColumnHeader>
-            <TableColumnHeader>User first name</TableColumnHeader>
-            <TableColumnHeader>User last name</TableColumnHeader>
-            <TableColumnHeader>User last name</TableColumnHeader>
-            <TableColumnHeader></TableColumnHeader>
-          </TableHeader>
-          <TableBody>
-            <TableItem item={0}>
-              <TableColumnValue>a</TableColumnValue>
-              <TableColumnValue>b</TableColumnValue>
-              <TableColumnValue>c</TableColumnValue>
-              <TableColumnValue>d</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
-            </TableItem>
-            <TableItem item={1}>
-              <TableColumnValue>a</TableColumnValue>
-              <TableColumnValue>b</TableColumnValue>
-              <TableColumnValue>c</TableColumnValue>
-              <TableColumnValue>d</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
-            </TableItem>
-            <TableItem item={2}>
-              <TableColumnValue>a</TableColumnValue>
-              <TableColumnValue>b</TableColumnValue>
-              <TableColumnValue>c</TableColumnValue>
-              <TableColumnValue>d</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
-            </TableItem>
-            <TableItem item={3}>
-              <TableColumnValue>a</TableColumnValue>
-              <TableColumnValue>b</TableColumnValue>
-              <TableColumnValue>c</TableColumnValue>
-              <TableColumnValue>d</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
-            </TableItem>
-          </TableBody>
-        </Table>
+        <UsersTable users={usersManagerService.users.data}/>
+        {usersManagerService.users.isLoading() && <Loader overlay/>}
       </content>
     </>
   );
