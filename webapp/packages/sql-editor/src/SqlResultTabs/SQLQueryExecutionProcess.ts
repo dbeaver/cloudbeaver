@@ -13,6 +13,7 @@ import {
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState,
 } from '@dbeaver/core/utils';
+import { IRequestDataResultOptions, RequestDataOptionsToConstrains } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
 
@@ -31,10 +32,11 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
 
   async start(sqlQueryParams: ISqlQueryParams,
               rowOffset: number,
-              count: number): Promise<void> {
+              count: number,
+              options?: IRequestDataResultOptions): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(sqlQueryParams, rowOffset, count);
+      const taskInfo = await this.executeQueryAsync(sqlQueryParams, rowOffset, count, options);
       this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -104,7 +106,8 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
 
   private async executeQueryAsync(sqlQueryParams: ISqlQueryParams,
                                   rowOffset: number,
-                                  count: number): Promise<AsyncTaskInfo> {
+                                  count: number,
+                                  options?: IRequestDataResultOptions): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.gql.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
@@ -113,6 +116,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
       filter: {
         offset: rowOffset,
         limit: count,
+        constraints: RequestDataOptionsToConstrains(options),
       },
     });
     return taskInfo;

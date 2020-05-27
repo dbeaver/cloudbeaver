@@ -12,7 +12,12 @@ import {
   GraphQLService,
   SqlExecuteInfo,
 } from '@dbeaver/core/sdk';
-import { IRequestDataResult, RowDiff } from '@dbeaver/data-viewer-plugin';
+import {
+  IRequestDataResult,
+  RowDiff,
+  IRequestDataResultOptions,
+  RequestDataOptionsToConstrains,
+} from '@dbeaver/data-viewer-plugin';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
 import { SQLQueryExecutionProcess } from './SQLQueryExecutionProcess';
@@ -28,7 +33,8 @@ export class SqlResultService {
    */
   async fetchData(sqlQueryParams: ISqlQueryParams,
                   rowOffset: number,
-                  count: number): Promise<SqlExecuteInfo> {
+                  count: number,
+                  options: IRequestDataResultOptions): Promise<SqlExecuteInfo> {
     const response = await this.graphQLService.gql.executeSqlQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
@@ -37,6 +43,7 @@ export class SqlResultService {
       filter: {
         offset: rowOffset,
         limit: count,
+        constraints: RequestDataOptionsToConstrains(options),
       },
     });
     return response.result!;
@@ -44,10 +51,11 @@ export class SqlResultService {
 
   asyncSqlQuery(sqlQueryParams: ISqlQueryParams,
                 rowOffset: number,
-                count: number): SQLQueryExecutionProcess {
+                count: number,
+                options?: IRequestDataResultOptions): SQLQueryExecutionProcess {
 
     const cancellableSqlQuery = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
-    cancellableSqlQuery.start(sqlQueryParams, rowOffset, count);
+    cancellableSqlQuery.start(sqlQueryParams, rowOffset, count, options);
     return cancellableSqlQuery;
   }
 

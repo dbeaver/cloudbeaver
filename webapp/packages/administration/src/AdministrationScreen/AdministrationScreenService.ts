@@ -12,6 +12,7 @@ import { ScreenService, RouterService, AppScreenService } from '@dbeaver/core/ap
 import { injectable, Bootstrap } from '@dbeaver/core/di';
 import { PermissionsService } from '@dbeaver/core/root';
 
+import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationScreen } from './AdministrationScreen';
 
@@ -32,7 +33,8 @@ export class AdministrationScreenService extends Bootstrap {
     private screenService: ScreenService,
     private routerService: RouterService,
     private permissionsService: PermissionsService,
-    private appScreenService: AppScreenService
+    private appScreenService: AppScreenService,
+    private administrationItemService: AdministrationItemService
   ) {
     super();
     this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
@@ -49,22 +51,29 @@ export class AdministrationScreenService extends Bootstrap {
   bootstrap() {
     this.screenService.create({
       name: AdministrationScreenService.screenName,
-      path: '/admin',
-      component: AdministrationScreen,
-      onActivate: this.handleActivate.bind(this),
-    });
-
-    this.screenService.create({
-      name: AdministrationScreenService.itemRouteName,
-      path: '/:item',
+      routes: [
+        {
+          name: AdministrationScreenService.screenName,
+          path: '/admin',
+        },
+        {
+          name: AdministrationScreenService.itemRouteName,
+          path: '/:item',
+        },
+      ],
       component: AdministrationScreen,
       onActivate: this.handleActivate.bind(this),
     });
   }
 
-  private handleActivate() {
+  private async handleActivate() {
     if (!this.permissionsService.has(EAdminPermission.admin)) {
       this.appScreenService.navigateToRoot();
+      return;
+    }
+
+    if (this.activeItem) {
+      await this.administrationItemService.activate(this.activeItem);
     }
   }
 }

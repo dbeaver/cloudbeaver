@@ -17,6 +17,7 @@ import {
   GridOptions,
   CellEditingStoppedEvent,
 } from 'ag-grid-community';
+import { SortChangedEvent } from 'ag-grid-community/dist/lib/events';
 import { RowDataTransaction } from 'ag-grid-community/dist/lib/interfaces/rowDataTransaction';
 import { computed, observable } from 'mobx';
 
@@ -24,10 +25,11 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 
 import { AgGridContext } from './AgGridContext';
 import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel,
+  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortMode, SortModel,
 } from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
+
 
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
@@ -68,6 +70,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onBodyScroll: this.handleBodyScroll.bind(this),
 
     onCellEditingStopped: this.handleCellEditingStopped.bind(this),
+    onSortChanged: this.handleSortChanged.bind(this),
   };
 
   @observable columns: ColDef[] = [];
@@ -75,7 +78,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   /**
    * use this object to dynamically change ag-grid properties
    */
-  @computed get dynamicOptions() {
+  @computed get dynamicOptions(): GridOptions {
     return {
       enableRangeSelection: !!this.selection,
     };
@@ -128,15 +131,22 @@ export class AgGridTableController implements IInitializableController, IDestruc
       startRow,
       endRow,
       successCallback,
+      sortModel,
       failCallback,
     } = params;
 
     try {
       const length = endRow - startRow;
-      const requestedData = await this.gridModel.onRequestData(startRow, length);
+      const requestedData = await this.gridModel.onRequestData(
+        startRow,
+        length,
+        {
+          sorting: sortModel as SortModel,
+        }
+      );
       // update columns only once after first data fetching
-      if (!this.columns.length) {
-        this.columns = mapDataToColumns(requestedData.columns || []);
+      if (isColumnsChanged(this.columns, requestedData.columns)) {
+        this.columns = mapDataToColumns(requestedData.columns);
       }
       successCallback(
         this.cloneRows(requestedData.rows),
@@ -190,16 +200,22 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.setInitialRow(this.gridModel.initialRows);
   }
 
+  private handleSortChanged(event: SortChangedEvent) {
+    if (this.gridModel.onSortChanged) {
+      const sortModel = event.api.getSortModel() as SortModel;
+      this.gridModel.onSortChanged(sortModel);
+    }
+  }
+
   /* Actions */
 
   private resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void {
     this.selection.clear();
     if (this.api) {
-      // only purgeInfiniteCache() doesn't work when cache is empty.
-      // probably it thinks that nothing to delete - nothing to refresh
-      this.api.refreshInfiniteCache(); // it will mark internal state for reload
       this.api.purgeInfiniteCache(); // it will reset internal state
-      this.columns = columns ? mapDataToColumns(columns) : [];
+      if (columns) {
+        this.columns = mapDataToColumns(columns);
+      }
       this.setInitialRow(rows);
     }
   }
@@ -212,7 +228,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       addIndex: 0,
       add: initialRows || [],
     };
-    this.api!.updateRowData(transaction);
+    this.api!.applyTransaction(transaction);
   }
 
   private updateCellValue(rowNumber: number, colNumber: number, value: any): void {
@@ -257,16 +273,18 @@ export const INDEX_COLUMN_DEF: ColDef = {
   suppressNavigable: true,
   suppressMenu: true,
   editable: false,
+  sortable: false,
   cellRenderer: row => row.rowIndex + 1,
 };
 
-function mapDataToColumns(columns: IAgGridCol[]): ColDef[] {
-  if (!columns.length) {
+function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
+  if (!columns || !columns.length) {
     return [];
   }
   return [
     INDEX_COLUMN_DEF,
     ...columns.map(v => ({
+      colId: v.name,
       headerName: v.label,
       field: `${v.position}`,
       valueGetter: v.dataKind === 'OBJECT' ? getObjectValue : undefined,
@@ -279,4 +297,12 @@ function mapDataToColumns(columns: IAgGridCol[]): ColDef[] {
 
 function getObjectValue({ data, colDef }: ValueGetterParams) {
   return data[colDef.field || 'node.id'].value;
+}
+
+function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {
+  const [indexColumn, ...withoutIndexColumn] = oldColumns;
+  if (withoutIndexColumn.length !== newColumns.length) {
+    return true;
+  }
+  return withoutIndexColumn.some((col, ind) => col.colId !== newColumns[ind].name);
 }

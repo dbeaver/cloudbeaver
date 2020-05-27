@@ -24,6 +24,11 @@ export const ItemContent = observer(function ItemContent({ activeItemName }: Pro
   }
 
   const item = administrationItemService.getItem(activeItemName);
+
+  if (!item) {
+    return null;
+  }
+
   const Component = item.getContentComponent();
 
   return <Component item={item} />;

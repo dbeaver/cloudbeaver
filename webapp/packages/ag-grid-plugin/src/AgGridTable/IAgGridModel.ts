@@ -10,6 +10,18 @@ import { RowSelection } from './TableSelection/RowSelection';
 
 export type AgGridRow = any[];
 
+export type SortMode = 'asc' | 'desc' | null;
+
+export type SortModel = {
+  colId: string;
+  sort: SortMode;
+}[];
+
+
+export interface IRequestDataOptions {
+  sorting?: SortModel;
+}
+
 
 export interface IAgGridModel {
   initialRows: AgGridRow[];
@@ -19,8 +31,9 @@ export interface IAgGridModel {
 
   actions: IAgGridActions | null;
   // hooks
-  onRequestData(rowOffset: number, count: number): Promise<IRequestedData>;
+  onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
   onCellEditingStopped?(rowNumber: number, colNumber: number, value: any): void;
+  onSortChanged?(sorting: SortModel): void;
   onEditSave(): void;
   onEditCancel(): void;
 }
@@ -36,6 +49,7 @@ export interface IAgGridActions {
 export interface IAgGridCol {
   icon?: string;
   label?: string;
+  name?: string;
   position?: number;
   dataKind?: string;
 }
