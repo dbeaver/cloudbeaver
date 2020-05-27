@@ -127,6 +127,12 @@ export class NodesManagerService {
     return info;
   }
 
+  async purgeServerCache(nodeId: string) {
+    await this.graphQLService.gql.navRefreshNode({
+      nodePath: nodeId,
+    });
+  }
+
   async updateChildren(parentId: string) {
     const { navNodeChildren } = await this.graphQLService.gql.navNodeChildren({
       parentPath: parentId,
