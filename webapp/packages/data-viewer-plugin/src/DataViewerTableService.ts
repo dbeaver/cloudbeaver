@@ -7,12 +7,14 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { GraphQLService } from '@dbeaver/core/sdk';
+import { GraphQLService, SqlDataFilterConstraint } from '@dbeaver/core/sdk';
 
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
+import { IRequestDataResult, IRequestDataResultOptions, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { RequestDataOptionsToConstrains } from './DataViewerUtils';
+
 
 @injectable()
 export class DataViewerTableService {
@@ -98,7 +100,8 @@ export class DataViewerTableService {
   private async requestDataAsync(
     data: TableViewerModel,
     rowOffset: number,
-    count: number
+    count: number,
+    options: IRequestDataResultOptions,
   ): Promise<IRequestDataResult> {
     if (!data.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
@@ -117,6 +120,7 @@ export class DataViewerTableService {
       filter: {
         offset: rowOffset,
         limit: count,
+        constraints: RequestDataOptionsToConstrains(options),
       },
     });
     const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table

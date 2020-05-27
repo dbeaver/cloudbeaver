@@ -130,7 +130,11 @@ require('yargs')
       const watcher = rollup.watch(watchOptions);
 
       watcher.on('event', event => {
-        console.log(event.code, event.input)
+        if (event.code === 'ERROR') {
+          console.error(event.error);
+        } else {
+          console.log(event.code, event.input)
+        }
       });
 
     }
