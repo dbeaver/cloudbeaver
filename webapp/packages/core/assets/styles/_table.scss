@@ -8,6 +8,7 @@
 
 @mixin table($query: mdc-feature-all()) {
   table {
+    composes: theme-typography--body2 from global;
     min-width: 100%;
     text-align: left;
     border-collapse: collapse;
