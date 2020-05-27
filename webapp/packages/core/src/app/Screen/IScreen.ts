@@ -6,9 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Route } from 'router5';
+
+export type ScreenRoute = Omit<Route, 'children'>
+
 export interface IScreen {
   name: string;
-  path: string;
+  routes: ScreenRoute[];
   component: ScreenComponent;
   onActivate?: () => void | Promise<void>;
   onDeactivate?: () => void | Promise<void>;

@@ -23,7 +23,6 @@ export const verticalTabStyles = css`
     flex-direction: column;
     flex: 0 0 auto;
     min-width: 150px;
-    border-right: 1px solid;
     overflow: auto;
   }
 `;
