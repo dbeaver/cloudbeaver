@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -34,6 +35,7 @@ import org.jkiss.utils.ArrayUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web service implementation
@@ -182,6 +184,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting role permissions", e);
+        }
+    }
+
+    @Override
+    public boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException {
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        if (authProvider == null) {
+            throw new DBWebException("Invalid auth provider '" + providerId + "'");
+        }
+        try {
+            CBPlatform.getInstance().getApplication().getSecurityController().setUserCredentials(userID, authProvider, credentials);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error setting user credentials", e);
         }
     }
 }

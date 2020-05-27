@@ -40,4 +40,6 @@ extend type Query {
 
     setRolePermissions(roleId: ID!, permissions: [ID]!): Boolean
 
+    setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
+
 }

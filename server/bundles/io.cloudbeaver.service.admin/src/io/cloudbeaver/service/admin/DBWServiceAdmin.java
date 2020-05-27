@@ -24,6 +24,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web service API
@@ -64,5 +65,8 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
 
 }
