@@ -53,6 +53,8 @@
   "app_shared_settingsMenu_config": "Настройки",
   "app_shared_settingsMenu_theme": "Тема",
   "app_shared_settingsMenu_lang": "Язык",
+  "app_navigationTree_openNodeTab": "Открыть",
+  "app_navigationTree_refreshNode": "Обновить",
   "core_eventsLog_dbeaverErrorDetails": "Детали ошибки",
   "app_shared_inlineEditor_dialog_title": "Редактирование",
   "app_shared_inlineEditor_dialog_apply": "Применить",

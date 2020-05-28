@@ -53,6 +53,8 @@
   "app_shared_settingsMenu_config": "Configuration",
   "app_shared_settingsMenu_theme": "Theme",
   "app_shared_settingsMenu_lang": "Language",
+  "app_navigationTree_openNodeTab": "Open",
+  "app_navigationTree_refreshNode": "Refresh",
   "core_eventsLog_dbeaverErrorDetails": "Error details",
   "app_shared_inlineEditor_dialog_title": "Edit mode",
   "app_shared_inlineEditor_dialog_apply": "Apply",
