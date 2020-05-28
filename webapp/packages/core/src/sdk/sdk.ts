@@ -771,6 +771,13 @@ export type NavNodeInfoQuery = { navNodeInfo: (
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
   ); };
 
+export type NavRefreshNodeQueryVariables = {
+  nodePath: Scalars['ID'];
+};
+
+
+export type NavRefreshNodeQuery = Pick<Query, 'navRefreshNode'>;
+
 export type QueryChildrenDatabaseObjectInfoQueryVariables = {
   nodePath: Scalars['ID'];
   filter?: Maybe<ObjectPropertyFilter>;
@@ -1270,6 +1277,11 @@ export const NavNodeInfoDocument = `
       features
     }
   }
+}
+    `;
+export const NavRefreshNodeDocument = `
+    query navRefreshNode($nodePath: ID!) {
+  navRefreshNode(nodePath: $nodePath)
 }
     `;
 export const QueryChildrenDatabaseObjectInfoDocument = `
@@ -1807,6 +1819,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navNodeInfo(variables: NavNodeInfoQueryVariables): Promise<NavNodeInfoQuery> {
       return withWrapper(() => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables));
+    },
+    navRefreshNode(variables: NavRefreshNodeQueryVariables): Promise<NavRefreshNodeQuery> {
+      return withWrapper(() => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables));
     },
     queryChildrenDatabaseObjectInfo(variables: QueryChildrenDatabaseObjectInfoQueryVariables): Promise<QueryChildrenDatabaseObjectInfoQuery> {
       return withWrapper(() => client.request<QueryChildrenDatabaseObjectInfoQuery>(QueryChildrenDatabaseObjectInfoDocument, variables));
