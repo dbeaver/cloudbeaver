@@ -11,10 +11,10 @@ import styled, { css } from 'reshadow';
 
 import { AdministrationTools } from '@dbeaver/administration';
 import { Loader, IconButton } from '@dbeaver/core/blocks';
-import { useService } from '@dbeaver/core/di';
+import { useController } from '@dbeaver/core/di';
 import { useStyles, composes } from '@dbeaver/core/theming';
 
-import { UsersManagerService } from '../UsersManagerService';
+import { UsersAdministrationController } from './UsersAdministrationController';
 import { UsersTable } from './UsersTable/UsersTable';
 
 const styles = composes(
@@ -47,17 +47,17 @@ const styles = composes(
 );
 
 export const UsersAdministration = observer(function UsersAdministration() {
-  const usersManagerService = useService(UsersManagerService);
+  const controller = useController(UsersAdministrationController);
 
   return styled(useStyles(styles))(
     <>
       <AdministrationTools>
-        <IconButton name="add" viewBox="0 0 28 28" />
-        <IconButton name="trash" viewBox="0 0 28 28" />
+        <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
+        <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
       </AdministrationTools>
       <content as='div'>
-        <UsersTable users={usersManagerService.users.data}/>
-        {usersManagerService.users.isLoading() && <Loader overlay/>}
+        <UsersTable users={controller.users} selectedItems={controller.selectedItems} />
+        {controller.isLoading && <Loader overlay/>}
       </content>
     </>
   );

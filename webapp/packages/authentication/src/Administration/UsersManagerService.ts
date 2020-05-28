@@ -28,9 +28,19 @@ export class UsersManagerService {
     return user as AdminUserInfo;
   }
 
+  async grantRole(userId: string, roleId: string) {
+    await this.graphQLService.gql.grantUserRole({ userId, roleId });
+  }
+
+  async delete(userId: string) {
+    await this.graphQLService.gql.deleteUser({ userId });
+    // TODO: maybe better to do refresh
+    this.users.data.splice(this.users.data.findIndex(user => user.userId === userId), 1);
+  }
+
   async updateCredentials(userId: string, credentials: Record<string, any>) {
     const provider = 'local';
-    const processedCredentials = this.authProviderService.processCredentials(provider, credentials);
+    const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
     await this.graphQLService.gql.setUserCredentials({
       providerId: provider,

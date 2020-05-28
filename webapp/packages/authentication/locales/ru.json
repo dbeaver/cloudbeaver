@@ -1,0 +1,8 @@
+{
+  "authentication_administration_item": "Пользователи",
+  "authentication_create_user_dialog_title": "Создание нового пользователя",
+  "authentication_create_user_dialog_create": "Создать",
+  "authentication_user_name": "Имя",
+  "authentication_user_password": "Пароль",
+  "authentication_user_role": "Роль"
+}
