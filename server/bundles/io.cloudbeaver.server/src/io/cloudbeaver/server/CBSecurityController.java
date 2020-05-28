@@ -106,7 +106,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public WebRole[] getUserRoles(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER_ROLE WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 List<WebRole> roles = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
