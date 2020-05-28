@@ -76,6 +76,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteUser(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            deleteAuthSubject(dbCon, userId);
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER WHERE USER_ID=?", userId);
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
@@ -106,7 +107,9 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public WebRole[] getUserRoles(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER_ROLE WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
+                "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
                 dbStat.setString(1, userId);
                 List<WebRole> roles = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -357,6 +360,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteRole(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            deleteAuthSubject(dbCon, roleId);
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE WHERE ROLE_ID=?", roleId);
         } catch (SQLException e) {
             throw new DBCException("Error deleting role from database", e);
@@ -558,5 +562,11 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    private void deleteAuthSubject(Connection dbCon, String subjectId) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subjectId);
+            dbStat.execute();
+        }
+    }
 
 }
