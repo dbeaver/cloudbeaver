@@ -90,6 +90,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @NotNull
     @Override
     public AdminUserInfo createUser(@NotNull WebSession webSession, String userName) throws DBWebException {
+        if (userName.isEmpty()) {
+            throw new DBWebException("Empty user name");
+        }
         try {
             WebUser newUser = new WebUser(userName);
             CBPlatform.getInstance().getApplication().getSecurityController().createUser(newUser);
@@ -112,6 +115,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @NotNull
     @Override
     public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
+        if (roleId.isEmpty()) {
+            throw new DBWebException("Empty role ID");
+        }
         try {
             WebRole newRole = new WebRole(roleId);
             CBPlatform.getInstance().getApplication().getSecurityController().createRole(newRole);
