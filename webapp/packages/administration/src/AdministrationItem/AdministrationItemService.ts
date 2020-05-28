@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@dbeaver/core/di';
 
-import { IAdministrationItem, IAdministrationItemOptions } from './IAdministrationItem';
+import { IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem } from './IAdministrationItem';
 
 @injectable()
 export class AdministrationItemService {
@@ -33,6 +33,15 @@ export class AdministrationItemService {
     return item;
   }
 
+  getItemSub(item: IAdministrationItem, subItem: string): IAdministrationItemSubItem | null {
+    const sub = item.sub.find(sub => sub.name === subItem);
+    if (!sub) {
+      return null;
+    }
+
+    return sub;
+  }
+
   create(options: IAdministrationItemOptions) {
     if (this.items.some(item => item.name === options.name)) {
       throw new Error(`Administration item "${options.name}" already exists`);
@@ -40,15 +49,27 @@ export class AdministrationItemService {
 
     const item: IAdministrationItem = {
       ...options,
+      sub: options.sub || [],
       order: options.order || Number.MAX_SAFE_INTEGER,
     };
     this.items.push(item);
   }
 
-  async activate(name: string) {
+  async activate(name: string, itemSub: string | null, param: string | null) {
     const item = this.getItem(name);
-    if (item && item.onActivate) {
+    if (!item) {
+      return;
+    }
+
+    if (item.onActivate) {
       await item.onActivate();
+    }
+
+    if (itemSub) {
+      const sub = this.getItemSub(item, itemSub);
+      if (sub && sub.onActivate) {
+        await sub.onActivate(param);
+      }
     }
   }
 }

@@ -21,12 +21,28 @@ export class AdministrationScreenService extends Bootstrap {
 
   static screenName = 'administration'
   static itemRouteName = 'administration.item'
+  static itemSubRouteName = 'administration.item.sub'
+  static itemSubParamRouteName = 'administration.item.sub.param'
 
   @computed get activeItem(): string | null {
     if (!this.screenService.isActive(AdministrationScreenService.screenName)) {
       return null;
     }
     return this.routerService.params.item || this.administrationItemService.getDefaultItem();
+  }
+
+  @computed get activeItemSub(): string | null {
+    if (!this.screenService.isActive(AdministrationScreenService.screenName)) {
+      return null;
+    }
+    return this.routerService.params.sub || null;
+  }
+
+  @computed get activeItemSubParam(): string | null {
+    if (!this.screenService.isActive(AdministrationScreenService.screenName)) {
+      return null;
+    }
+    return this.routerService.params.param || null;
   }
 
   constructor(
@@ -48,6 +64,14 @@ export class AdministrationScreenService extends Bootstrap {
     this.routerService.router.navigate(AdministrationScreenService.itemRouteName, { item });
   }
 
+  navigateToItemSub(item: string, sub: string, param?: string) {
+    if (!param) {
+      this.routerService.router.navigate(AdministrationScreenService.itemSubRouteName, { item, sub });
+      return;
+    }
+    this.routerService.router.navigate(AdministrationScreenService.itemSubParamRouteName, { item, sub, param });
+  }
+
   bootstrap() {
     this.screenService.create({
       name: AdministrationScreenService.screenName,
@@ -59,6 +83,14 @@ export class AdministrationScreenService extends Bootstrap {
         {
           name: AdministrationScreenService.itemRouteName,
           path: '/:item',
+        },
+        {
+          name: AdministrationScreenService.itemSubRouteName,
+          path: '/:sub',
+        },
+        {
+          name: AdministrationScreenService.itemSubParamRouteName,
+          path: '/:param',
         },
       ],
       component: AdministrationScreen,
@@ -73,7 +105,7 @@ export class AdministrationScreenService extends Bootstrap {
     }
 
     if (this.activeItem) {
-      await this.administrationItemService.activate(this.activeItem);
+      await this.administrationItemService.activate(this.activeItem, this.activeItemSub, this.activeItemSubParam);
     }
   }
 }
