@@ -34,7 +34,7 @@ export const UsersTable = observer(function UsersTable({ users }: Props) {
   return styled(useStyles(styles))(
     <Table>
       <TableHeader>
-        <TableColumnHeader>User login</TableColumnHeader>
+        <TableColumnHeader>User name</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>
       <TableBody>

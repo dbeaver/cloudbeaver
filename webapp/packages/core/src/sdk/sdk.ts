@@ -821,6 +821,13 @@ export type ChangeSessionLanguageMutationVariables = {
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
+export type CreateUserQueryVariables = {
+  userId: Scalars['ID'];
+};
+
+
+export type CreateUserQuery = { user: Pick<AdminUserInfo, 'userId'> };
+
 export type DeleteUserQueryVariables = {
   userId: Scalars['ID'];
 };
@@ -1337,6 +1344,13 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
+export const CreateUserDocument = `
+    query createUser($userId: ID!) {
+  user: createUser(userId: $userId) {
+    userId
+  }
+}
+    `;
 export const DeleteUserDocument = `
     query deleteUser($userId: ID!) {
   deleteUser(userId: $userId)
@@ -1834,6 +1848,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
+    },
+    createUser(variables: CreateUserQueryVariables): Promise<CreateUserQuery> {
+      return withWrapper(() => client.request<CreateUserQuery>(CreateUserDocument, variables));
     },
     deleteUser(variables: DeleteUserQueryVariables): Promise<DeleteUserQuery> {
       return withWrapper(() => client.request<DeleteUserQuery>(DeleteUserDocument, variables));

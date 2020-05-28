@@ -9,12 +9,34 @@
 import { injectable } from '@dbeaver/core/di';
 import { CachedResource, GraphQLService, AdminUserInfo } from '@dbeaver/core/sdk';
 
+import { AuthProviderService } from '../AuthProviderService';
+
 @injectable()
 export class UsersManagerService {
   readonly users = new CachedResource([], this.refreshAsync.bind(this), data => !!data.length)
   constructor(
-    private graphQLService: GraphQLService
+    private graphQLService: GraphQLService,
+    private authProviderService: AuthProviderService,
   ) {
+  }
+
+  async create(userId: string): Promise<AdminUserInfo> {
+    const { user } = await this.graphQLService.gql.createUser({ userId });
+
+    // TODO: maybe better to do refresh
+    this.users.data.push(user as AdminUserInfo);
+    return user as AdminUserInfo;
+  }
+
+  async updateCredentials(userId: string, credentials: Record<string, any>) {
+    const provider = 'local';
+    const processedCredentials = this.authProviderService.processCredentials(provider, credentials);
+
+    await this.graphQLService.gql.setUserCredentials({
+      providerId: provider,
+      userId,
+      credentials: processedCredentials,
+    });
   }
 
   private async refreshAsync(data: AdminUserInfo[]): Promise<AdminUserInfo[]> {

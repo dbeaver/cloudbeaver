@@ -8,11 +8,11 @@
 
 import { observable, computed } from 'mobx';
 
+import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { injectable, IInitializableController, IDestructibleController } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GQLErrorCatcher } from '@dbeaver/core/sdk';
-import { ErrorDetailsDialog } from '@dbeaver/core/app';
 
 import { AuthInfoService } from '../AuthInfoService';
 import { AuthProviderService, AuthProvider } from '../AuthProviderService';

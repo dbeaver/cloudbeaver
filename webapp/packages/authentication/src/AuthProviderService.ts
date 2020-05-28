@@ -23,7 +23,7 @@ export class AuthProviderService {
     private graphQLService: GraphQLService,
   ) { }
 
-  processCredentials(providerId: string, credentials: any) {
+  processCredentials(providerId: string, credentials: Record<string, any>) {
     const provider = this.providers.data.find(provider => provider.id === providerId);
 
     if (!provider) {
