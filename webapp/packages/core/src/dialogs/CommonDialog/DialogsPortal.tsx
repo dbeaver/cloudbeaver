@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useRef, useLayoutEffect } from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -58,6 +58,7 @@ type NestedDialogType = {
 function NestedDialog(props: NestedDialogType) {
   const dialogState = useDialogState();
   const styles = useStyles(dialogStyles);
+  const refToDialog = useRef<any>();
   dialogState.visible = props.visible;
   const handleReject = useCallback(() => props.rejectDialog(props.dialog), [props.dialog, props.rejectDialog]);
   const handleResolve = useCallback(
@@ -71,12 +72,15 @@ function NestedDialog(props: NestedDialogType) {
   }, [props.dialog.options?.persistent, handleReject]);
 
   const DialogComponent = props.dialog.component;
+  useLayoutEffect(() => {
+    refToDialog.current?.removeAttribute('tabIndex');
+  }, [refToDialog.current]);
 
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
     <>
       <Portal><DialogBackdrop {...dialogState} onClick={backdropClickCallback} /></Portal>
-      <Dialog {...dialogState} aria-label="can't be provided" tabIndex={0} >
+      <Dialog {...dialogState} ref={refToDialog} aria-label="can't be provided">
         <DialogComponent
           payload={props.dialog.payload}
           options={props.dialog.options}
