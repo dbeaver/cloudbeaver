@@ -57,7 +57,7 @@ export class NavigationTreeContextMenuService {
       isPresent(context) {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType;
       },
-      order: 1000,
+      order: Number.MAX_SAFE_INTEGER,
       title: 'app_navigationTree_refreshNode',
       onClick: (context: IMenuContext<NodeWithParent>) => {
         const node = context.data;

@@ -81,7 +81,6 @@ export class NodesManagerService {
   }
 
   async refreshNode(nodeId: string) {
-    console.log('refresh', nodeId);
     await this.purgeServerCache(nodeId);
     this.nodesStore.removeNode(nodeId);
     await this.updateNodeInfo(nodeId);
