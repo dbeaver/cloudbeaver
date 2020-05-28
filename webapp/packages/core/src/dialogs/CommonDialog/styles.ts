@@ -29,5 +29,6 @@ export const dialogStyles = css`
       max-height: calc(100vh);
       transform: translate(-50%, -50%);
       z-index: 999;
+      outline: none;
     }
   `;
