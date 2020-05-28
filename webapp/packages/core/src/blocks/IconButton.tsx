@@ -5,7 +5,7 @@ import { Icon } from './Icons/Icon';
 
 const styles = css`
   Button {
-    color: rgba(0, 0, 0, 0.45);
+    color: inherit;
     outline: none;
     border: none;
     background: none;
@@ -13,10 +13,11 @@ const styles = css`
     padding: 0;
     margin: 4px;
     height: 16px;
+    width: 16px;
 
     & Icon {
-      width: 16px;
-      height: 16px;
+      width: 100%;
+      height: 100%;
     }
   }
 `;

@@ -15,7 +15,7 @@ import { useStyles } from '@dbeaver/core/theming';
 export function UsersDrawerItem({ item, onSelect, style }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
     <Tab tabId={item.name} onOpen={() => onSelect(item.name)}>
-      <TabIcon icon='/icons/grid.png' />
+      <TabIcon icon='/icons/account.svg' />
       <TabTitle>Users</TabTitle>
     </Tab>
   );

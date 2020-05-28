@@ -14,6 +14,27 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type AdminPermissionInfo = {
+  id: Scalars['ID'];
+  label?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  provider: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+};
+
+export type AdminRoleInfo = {
+  roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  rolePermissions: Array<Maybe<Scalars['ID']>>;
+};
+
+export type AdminUserInfo = {
+  userId: Scalars['ID'];
+  metaParameters: Scalars['Object'];
+  configurationParameters: Scalars['Object'];
+  grantedRoles: Array<Maybe<Scalars['ID']>>;
+};
+
 export type AsyncTaskInfo = {
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -343,22 +364,33 @@ export type Query = {
   authLogout?: Maybe<Scalars['Boolean']>;
   authProviders: Array<AuthProviderInfo>;
   connectionState: ConnectionInfo;
+  createRole: AdminRoleInfo;
+  createUser: AdminUserInfo;
   dataSourceList: Array<DataSourceInfo>;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
+  deleteRole?: Maybe<Scalars['Boolean']>;
+  deleteUser?: Maybe<Scalars['Boolean']>;
   driverList: Array<DriverInfo>;
+  grantUserRole?: Maybe<Scalars['Boolean']>;
+  listPermissions: Array<Maybe<AdminPermissionInfo>>;
+  listRoles: Array<Maybe<AdminRoleInfo>>;
+  listUsers: Array<Maybe<AdminUserInfo>>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
   navNodeChildren: Array<NavigatorNodeInfo>;
   navNodeInfo: NavigatorNodeInfo;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   readSessionLog: Array<LogEntry>;
+  revokeUserRole?: Maybe<Scalars['Boolean']>;
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
   sessionUser?: Maybe<UserAuthInfo>;
+  setRolePermissions?: Maybe<Scalars['Boolean']>;
+  setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
@@ -373,6 +405,16 @@ export type QueryAuthLoginArgs = {
 
 export type QueryConnectionStateArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryCreateRoleArgs = {
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryCreateUserArgs = {
+  userId: Scalars['ID'];
 };
 
 
@@ -396,8 +438,34 @@ export type QueryDataTransferRemoveDataFileArgs = {
 };
 
 
+export type QueryDeleteRoleArgs = {
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryDeleteUserArgs = {
+  userId: Scalars['ID'];
+};
+
+
 export type QueryDriverListArgs = {
   id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryGrantUserRoleArgs = {
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+};
+
+
+export type QueryListRolesArgs = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryListUsersArgs = {
+  userId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -434,6 +502,25 @@ export type QueryNavRefreshNodeArgs = {
 export type QueryReadSessionLogArgs = {
   maxEntries?: Maybe<Scalars['Int']>;
   clearEntries?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryRevokeUserRoleArgs = {
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+};
+
+
+export type QuerySetRolePermissionsArgs = {
+  roleId: Scalars['ID'];
+  permissions: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type QuerySetUserCredentialsArgs = {
+  userId: Scalars['ID'];
+  providerId: Scalars['ID'];
+  credentials: Scalars['Object'];
 };
 
 
@@ -684,13 +771,6 @@ export type NavNodeInfoQuery = { navNodeInfo: (
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
   ); };
 
-export type NavRefreshNodeQueryVariables = {
-  nodePath: Scalars['ID'];
-};
-
-
-export type NavRefreshNodeQuery = Pick<Query, 'navRefreshNode'>;
-
 export type QueryChildrenDatabaseObjectInfoQueryVariables = {
   nodePath: Scalars['ID'];
   filter?: Maybe<ObjectPropertyFilter>;
@@ -733,6 +813,43 @@ export type ChangeSessionLanguageMutationVariables = {
 
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
+
+export type DeleteUserQueryVariables = {
+  userId: Scalars['ID'];
+};
+
+
+export type DeleteUserQuery = Pick<Query, 'deleteUser'>;
+
+export type GetPermissionsListQueryVariables = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetPermissionsListQuery = { permissions: Array<Maybe<Pick<AdminPermissionInfo, 'id' | 'label' | 'description' | 'provider' | 'category'>>> };
+
+export type GetRolesListQueryVariables = {
+  roleId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetRolesListQuery = { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'rolePermissions'>>> };
+
+export type GetUsersListQueryVariables = {
+  userId?: Maybe<Scalars['ID']>;
+};
+
+
+export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId'>>> };
+
+export type SetUserCredentialsQueryVariables = {
+  userId: Scalars['ID'];
+  providerId: Scalars['ID'];
+  credentials: Scalars['Object'];
+};
+
+
+export type SetUserCredentialsQuery = Pick<Query, 'setUserCredentials'>;
 
 export type AuthLoginQueryVariables = {
   provider: Scalars['ID'];
@@ -1155,11 +1272,6 @@ export const NavNodeInfoDocument = `
   }
 }
     `;
-export const NavRefreshNodeDocument = `
-    query navRefreshNode($nodePath: ID!) {
-  navRefreshNode(nodePath: $nodePath)
-}
-    `;
 export const QueryChildrenDatabaseObjectInfoDocument = `
     query queryChildrenDatabaseObjectInfo($nodePath: ID!, $filter: ObjectPropertyFilter) {
   childrenDatabaseObjectInfo: navNodeChildren(parentPath: $nodePath) {
@@ -1211,6 +1323,43 @@ export const ReadSessionLogDocument = `
 export const ChangeSessionLanguageDocument = `
     mutation changeSessionLanguage($locale: String!) {
   changeSessionLanguage(locale: $locale)
+}
+    `;
+export const DeleteUserDocument = `
+    query deleteUser($userId: ID!) {
+  deleteUser(userId: $userId)
+}
+    `;
+export const GetPermissionsListDocument = `
+    query getPermissionsList($roleId: ID) {
+  permissions: listPermissions {
+    id
+    label
+    description
+    provider
+    category
+  }
+}
+    `;
+export const GetRolesListDocument = `
+    query getRolesList($roleId: ID) {
+  roles: listRoles(roleId: $roleId) {
+    roleId
+    roleName
+    rolePermissions
+  }
+}
+    `;
+export const GetUsersListDocument = `
+    query getUsersList($userId: ID) {
+  users: listUsers(userId: $userId) {
+    userId
+  }
+}
+    `;
+export const SetUserCredentialsDocument = `
+    query setUserCredentials($userId: ID!, $providerId: ID!, $credentials: Object!) {
+  setUserCredentials(userId: $userId, providerId: $providerId, credentials: $credentials)
 }
     `;
 export const AuthLoginDocument = `
@@ -1659,9 +1808,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navNodeInfo(variables: NavNodeInfoQueryVariables): Promise<NavNodeInfoQuery> {
       return withWrapper(() => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables));
     },
-    navRefreshNode(variables: NavRefreshNodeQueryVariables): Promise<NavRefreshNodeQuery> {
-      return withWrapper(() => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables));
-    },
     queryChildrenDatabaseObjectInfo(variables: QueryChildrenDatabaseObjectInfoQueryVariables): Promise<QueryChildrenDatabaseObjectInfoQuery> {
       return withWrapper(() => client.request<QueryChildrenDatabaseObjectInfoQuery>(QueryChildrenDatabaseObjectInfoDocument, variables));
     },
@@ -1673,6 +1819,21 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
+    },
+    deleteUser(variables: DeleteUserQueryVariables): Promise<DeleteUserQuery> {
+      return withWrapper(() => client.request<DeleteUserQuery>(DeleteUserDocument, variables));
+    },
+    getPermissionsList(variables?: GetPermissionsListQueryVariables): Promise<GetPermissionsListQuery> {
+      return withWrapper(() => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables));
+    },
+    getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
+      return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
+    },
+    getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
+      return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
+    },
+    setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
+      return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
       return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));

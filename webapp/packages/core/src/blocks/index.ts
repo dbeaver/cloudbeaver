@@ -9,6 +9,7 @@ export * from './Placeholder/PlaceholderContainer';
 export * from './PropertiesTable';
 export * from './SanitizedHTML/SanitizedHTML';
 export * from './Split';
+export * from './Table';
 export * from './Tabs';
 export * from './Button';
 export * from './ErrorMessage';

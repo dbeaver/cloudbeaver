@@ -8,10 +8,10 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { NodesManagerService, useDatabaseObjectInfo, useNode } from '@dbeaver/core/app';
-import { StaticImage } from '@dbeaver/core/blocks';
+import { StaticImage, TableItem, TableColumnValue } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
@@ -32,10 +32,10 @@ const itemStyles = css`
       height: 16px;
       width: 180px;
     }
-    tr {
+    TableItem {
       position: relative;
     }
-    td:nth-child(2) {
+    TableColumnValue:nth-child(2) {
       cursor: pointer;
       user-select: none;
     }
@@ -44,51 +44,45 @@ const itemStyles = css`
 type ItemProps = {
   objectId: string;
   columns: number;
-  isSelected: boolean;
-  onClick: (objectId: string, isMultiple: boolean) => void;
 }
 
 export const Item = observer(function Item({
-  objectId, columns, isSelected, onClick,
+  objectId, columns,
 }: ItemProps) {
   const nodesManagerService = useService(NodesManagerService);
   const object = useNode(objectId);
   const databaseObjectInfo = useDatabaseObjectInfo(objectId);
   const handleOpen = useCallback(() => nodesManagerService.navToNode(objectId), [objectId]);
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLTableRowElement>) => onClick(objectId, e.ctrlKey),
-    [objectId, onClick]
-  );
 
   if (!object || !databaseObjectInfo?.properties) {
     return styled(useStyles(itemStyles))(
-      <tr tabIndex={0} onDoubleClick={handleOpen} onClick={handleClick} {...use({ isSelected })}>
-        <td>
+      <TableItem item={objectId} onDoubleClick={handleOpen}>
+        <TableColumnValue>
           <icon as="div">
             <placeholder as="div" />
           </icon>
-        </td>
+        </TableColumnValue>
         {Array(columns)
           .fill(0)
           .map((_, i) => (
-            <td key={i}>
+            <TableColumnValue key={i}>
               <placeholder as="div" />
-            </td>
+            </TableColumnValue>
           ))}
-      </tr>
+      </TableItem>
     );
   }
 
   return styled(useStyles(itemStyles))(
-    <tr tabIndex={0} onDoubleClick={handleOpen} onClick={handleClick} {...use({ isSelected })}>
-      <td>
+    <TableItem item={objectId} onDoubleClick={handleOpen}>
+      <TableColumnValue>
         <icon as="div">
           <StaticImage icon={object.icon} />
         </icon>
-      </td>
+      </TableColumnValue>
       {databaseObjectInfo.properties.map(property => (
-        <td key={property.id}>{getValue(property.value)}</td>
+        <TableColumnValue key={property.id}>{getValue(property.value)}</TableColumnValue>
       ))}
-    </tr>
+    </TableItem>
   );
 });

@@ -26,7 +26,7 @@ export class AdministrationScreenService extends Bootstrap {
     if (!this.screenService.isActive(AdministrationScreenService.screenName)) {
       return null;
     }
-    return this.routerService.params.item || null;
+    return this.routerService.params.item || this.administrationItemService.getDefaultItem();
   }
 
   constructor(
