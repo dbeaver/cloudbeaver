@@ -35,7 +35,7 @@ export class AuthInfoService {
       throw new Error('User already logged in');
     }
 
-    const processedCredentials = this.authProviderService.processCredentials(provider, credentials);
+    const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
     const { user } = await this.graphQLService.gql.authLogin({
       provider,

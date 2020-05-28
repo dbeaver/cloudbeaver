@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationItemService } from '@dbeaver/administration';
+import { AdministrationItemService, AdministrationScreenService } from '@dbeaver/administration';
 import { injectable, Bootstrap } from '@dbeaver/core/di';
 
 import { UsersManagerService } from '../UsersManagerService';
+import { CreateUser } from './CreateUser/CreateUser';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersDrawerItem } from './UsersDrawerItem';
 
@@ -17,6 +18,7 @@ import { UsersDrawerItem } from './UsersDrawerItem';
 export class UsersAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
+    private administrationScreenService: AdministrationScreenService,
     private usersManagerService: UsersManagerService,
   ) {
     super();
@@ -25,10 +27,32 @@ export class UsersAdministrationService extends Bootstrap {
   bootstrap() {
     this.administrationItemService.create({
       name: 'users',
+      sub: [
+        {
+          name: 'create',
+          getComponent: () => CreateUser,
+        },
+        {
+          name: 'edit',
+          getComponent: () => UsersAdministration,
+        },
+      ],
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
       onActivate: this.loadUsers.bind(this),
     });
+  }
+
+  navToRoot() {
+    this.administrationScreenService.navigateToItem('users');
+  }
+
+  navToCreate() {
+    this.administrationScreenService.navigateToItemSub('users', 'create');
+  }
+
+  navToEdit(userId: string) {
+    this.administrationScreenService.navigateToItemSub('users', 'edit', userId);
   }
 
   private async loadUsers() {

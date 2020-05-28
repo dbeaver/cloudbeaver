@@ -1,5 +1,5 @@
-query getUsersList($userId: ID) {
-  users: listUsers(userId: $userId) {
+query createUser($userId: ID!) {
+  user: createUser(userId: $userId) {
     userId
 
     #metaParameters

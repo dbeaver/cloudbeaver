@@ -23,8 +23,9 @@ export class AuthProviderService {
     private graphQLService: GraphQLService,
   ) { }
 
-  processCredentials(providerId: string, credentials: any) {
-    const provider = this.providers.data.find(provider => provider.id === providerId);
+  async processCredentials(providerId: string, credentials: Record<string, any>) {
+    const providers = await this.providers.load();
+    const provider = providers.find(provider => provider.id === providerId);
 
     if (!provider) {
       return credentials;

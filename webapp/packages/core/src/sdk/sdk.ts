@@ -821,6 +821,13 @@ export type ChangeSessionLanguageMutationVariables = {
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
+export type CreateUserQueryVariables = {
+  userId: Scalars['ID'];
+};
+
+
+export type CreateUserQuery = { user: Pick<AdminUserInfo, 'userId' | 'grantedRoles'> };
+
 export type DeleteUserQueryVariables = {
   userId: Scalars['ID'];
 };
@@ -847,7 +854,15 @@ export type GetUsersListQueryVariables = {
 };
 
 
-export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId'>>> };
+export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId' | 'grantedRoles'>>> };
+
+export type GrantUserRoleQueryVariables = {
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+};
+
+
+export type GrantUserRoleQuery = Pick<Query, 'grantUserRole'>;
 
 export type SetUserCredentialsQueryVariables = {
   userId: Scalars['ID'];
@@ -1337,6 +1352,14 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
+export const CreateUserDocument = `
+    query createUser($userId: ID!) {
+  user: createUser(userId: $userId) {
+    userId
+    grantedRoles
+  }
+}
+    `;
 export const DeleteUserDocument = `
     query deleteUser($userId: ID!) {
   deleteUser(userId: $userId)
@@ -1366,7 +1389,13 @@ export const GetUsersListDocument = `
     query getUsersList($userId: ID) {
   users: listUsers(userId: $userId) {
     userId
+    grantedRoles
   }
+}
+    `;
+export const GrantUserRoleDocument = `
+    query grantUserRole($userId: ID!, $roleId: ID!) {
+  grantUserRole(userId: $userId, roleId: $roleId)
 }
     `;
 export const SetUserCredentialsDocument = `
@@ -1835,6 +1864,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
     },
+    createUser(variables: CreateUserQueryVariables): Promise<CreateUserQuery> {
+      return withWrapper(() => client.request<CreateUserQuery>(CreateUserDocument, variables));
+    },
     deleteUser(variables: DeleteUserQueryVariables): Promise<DeleteUserQuery> {
       return withWrapper(() => client.request<DeleteUserQuery>(DeleteUserDocument, variables));
     },
@@ -1846,6 +1878,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
       return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
+    },
+    grantUserRole(variables: GrantUserRoleQueryVariables): Promise<GrantUserRoleQuery> {
+      return withWrapper(() => client.request<GrantUserRoleQuery>(GrantUserRoleDocument, variables));
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
       return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));

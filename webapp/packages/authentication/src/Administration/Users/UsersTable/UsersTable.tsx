@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   Table, TableHeader, TableColumnHeader, TableBody
 } from '@dbeaver/core/blocks';
+import { useTranslate } from '@dbeaver/core/localization';
 import { AdminUserInfo } from '@dbeaver/core/sdk';
 import { useStyles, composes } from '@dbeaver/core/theming';
 
@@ -28,13 +29,16 @@ const styles = composes(
 
 type Props = {
   users: AdminUserInfo[];
+  selectedItems: Map<string, boolean>;
 }
 
-export const UsersTable = observer(function UsersTable({ users }: Props) {
+export const UsersTable = observer(function UsersTable({ users, selectedItems }: Props) {
+  const translate = useTranslate();
   return styled(useStyles(styles))(
-    <Table>
+    <Table selectedItems={selectedItems}>
       <TableHeader>
-        <TableColumnHeader>User login</TableColumnHeader>
+        <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+        <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>
       <TableBody>

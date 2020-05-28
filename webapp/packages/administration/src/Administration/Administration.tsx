@@ -64,10 +64,14 @@ const administrationStyles = composes(
 
 type Props = {
   activeItem: string | null;
+  activeItemSub: string | null;
+  activeItemSubParam: string | null;
   onItemSelect(name: string): void;
 }
 
-export const Administration = observer(function Administration({ activeItem, onItemSelect }: Props) {
+export const Administration = observer(function Administration({
+  activeItem, activeItemSub, activeItemSubParam, onItemSelect,
+}: Props) {
   const controller = useController(AdministrationController);
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
@@ -81,7 +85,11 @@ export const Administration = observer(function Administration({ activeItem, onI
           </TabList>
         </drawer>
         <content as='div'>
-          <ItemContent activeItemName={activeItem}/>
+          <ItemContent
+            activeItemName={activeItem}
+            activeItemSub={activeItemSub}
+            activeItemSubParam={activeItemSubParam}
+          />
         </content>
       </TabsState>
     </container>

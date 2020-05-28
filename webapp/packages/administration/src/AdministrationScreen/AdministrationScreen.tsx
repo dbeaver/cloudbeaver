@@ -32,7 +32,12 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
   return (
     <>
       <AdministrationTopAppBar />
-      <Administration activeItem={administrationScreenService.activeItem} onItemSelect={handleSelect} />
+      <Administration
+        activeItem={administrationScreenService.activeItem}
+        activeItemSub={administrationScreenService.activeItemSub}
+        activeItemSubParam={administrationScreenService.activeItemSubParam}
+        onItemSelect={handleSelect}
+      />
     </>
   );
 });

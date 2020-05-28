@@ -1,0 +1,8 @@
+{
+  "authentication_administration_item": "Users",
+  "authentication_create_user_dialog_title": "Create new user",
+  "authentication_create_user_dialog_create": "Create",
+  "authentication_user_name": "User name",
+  "authentication_user_password": "User password",
+  "authentication_user_role": "User role"
+}

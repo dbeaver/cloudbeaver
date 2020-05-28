@@ -14,9 +14,11 @@ import { AdministrationItemService } from '../AdministrationItem/AdministrationI
 
 type Props = {
   activeItemName: string | null;
+  activeItemSub: string | null;
+  activeItemSubParam: string | null;
 }
 
-export const ItemContent = observer(function ItemContent({ activeItemName }: Props) {
+export const ItemContent = observer(function ItemContent({ activeItemName, activeItemSub, activeItemSubParam }: Props) {
   const administrationItemService = useService(AdministrationItemService);
 
   if (!activeItemName) {
@@ -27,6 +29,15 @@ export const ItemContent = observer(function ItemContent({ activeItemName }: Pro
 
   if (!item) {
     return null;
+  }
+
+  if (activeItemSub) {
+    const sub = administrationItemService.getItemSub(item, activeItemSub);
+    if (sub) {
+      const Component = sub.getComponent();
+
+      return <Component item={item} sub={sub} param={activeItemSubParam} />;
+    }
   }
 
   const Component = item.getContentComponent();
