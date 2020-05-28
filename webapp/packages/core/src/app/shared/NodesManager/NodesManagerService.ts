@@ -80,6 +80,12 @@ export class NodesManagerService {
     });
   }
 
+  async refreshNode(nodeId: string) {
+    await this.purgeServerCache(nodeId);
+    this.nodesStore.removeNode(nodeId);
+    await this.updateNodeInfo(nodeId);
+  }
+
   getDatabaseObjectInfo(nodeId: string): DatabaseObjectInfoWithId | undefined {
     return this.nodesStore.getDatabaseObjectInfo(nodeId);
   }
@@ -121,6 +127,12 @@ export class NodesManagerService {
     const info = { ...objectInfo.object, id: objectInfo.id };
     this.nodesStore.updateDatabaseObjectInfo(info);
     return info;
+  }
+
+  async purgeServerCache(nodeId: string) {
+    await this.graphQLService.gql.navRefreshNode({
+      nodePath: nodeId,
+    });
   }
 
   async updateChildren(parentId: string) {
