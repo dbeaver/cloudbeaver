@@ -4,6 +4,6 @@ query createUser($userId: ID!) {
 
     #metaParameters
     #configurationParameters
-    #grantedRoles
+    grantedRoles
   } 
 }

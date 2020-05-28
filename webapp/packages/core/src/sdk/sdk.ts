@@ -826,7 +826,7 @@ export type CreateUserQueryVariables = {
 };
 
 
-export type CreateUserQuery = { user: Pick<AdminUserInfo, 'userId'> };
+export type CreateUserQuery = { user: Pick<AdminUserInfo, 'userId' | 'grantedRoles'> };
 
 export type DeleteUserQueryVariables = {
   userId: Scalars['ID'];
@@ -854,7 +854,7 @@ export type GetUsersListQueryVariables = {
 };
 
 
-export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId'>>> };
+export type GetUsersListQuery = { users: Array<Maybe<Pick<AdminUserInfo, 'userId' | 'grantedRoles'>>> };
 
 export type GrantUserRoleQueryVariables = {
   userId: Scalars['ID'];
@@ -1356,6 +1356,7 @@ export const CreateUserDocument = `
     query createUser($userId: ID!) {
   user: createUser(userId: $userId) {
     userId
+    grantedRoles
   }
 }
     `;
@@ -1388,6 +1389,7 @@ export const GetUsersListDocument = `
     query getUsersList($userId: ID) {
   users: listUsers(userId: $userId) {
     userId
+    grantedRoles
   }
 }
     `;

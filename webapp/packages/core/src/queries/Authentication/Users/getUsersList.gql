@@ -4,6 +4,6 @@ query getUsersList($userId: ID) {
 
     #metaParameters
     #configurationParameters
-    #grantedRoles
+    grantedRoles
   } 
 }
