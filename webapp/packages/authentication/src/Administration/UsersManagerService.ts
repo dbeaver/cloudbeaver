@@ -36,9 +36,11 @@ export class UsersManagerService {
     return user as AdminUserInfo;
   }
 
-  async grantRole(userId: string, roleId: string) {
+  async grantRole(userId: string, roleId: string, update?: boolean) {
     await this.graphQLService.gql.grantUserRole({ userId, roleId });
-    await this.users.refresh(userId);
+    if (update) {
+      await this.users.refresh(userId);
+    }
   }
 
   async delete(userId: string, update?: boolean) {
