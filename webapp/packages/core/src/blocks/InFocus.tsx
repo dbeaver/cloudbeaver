@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useRef, ReactElement, MutableRefObject
+  useLayoutEffect, useRef, ReactElement, MutableRefObject
 } from 'react';
 
 type InFocusProps = {
@@ -10,7 +10,7 @@ export function InFocus({ children }: InFocusProps) {
   const isFirstRender: MutableRefObject<boolean> = useRef(true);
   const childRef: MutableRefObject<HTMLElement | null> = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (childRef.current !== null) {
