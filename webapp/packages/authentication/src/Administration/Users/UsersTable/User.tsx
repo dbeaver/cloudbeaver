@@ -23,7 +23,7 @@ export const User = observer(function User({ user }: Props) {
   return styled(useStyles())(
     <TableItem item={user.userId}>
       <TableColumnValue>{user.userId}</TableColumnValue>
-      <TableColumnValue>{user.grantedRoles?.join(', ')}</TableColumnValue>
+      <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
       <TableColumnValue></TableColumnValue>
     </TableItem>
   );

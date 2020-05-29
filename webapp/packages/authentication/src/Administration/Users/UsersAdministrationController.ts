@@ -40,6 +40,16 @@ export class UsersAdministrationController {
     this.commonDialogService.open(CreateUserDialog, null);
   }
 
+  update = async () => {
+    try {
+      await this.usersManagerService.users.refresh(undefined);
+    } catch (exception) {
+      if (!this.error.catch(exception)) {
+        this.notificationService.logException(exception, 'Users update failed');
+      }
+    }
+  }
+
   delete = async () => {
     if (this.isDeleting) {
       return;
@@ -52,7 +62,8 @@ export class UsersAdministrationController {
           await this.usersManagerService.delete(userId);
         }
       }
-      await this.usersManagerService.users.refresh();
+      this.selectedItems.clear();
+      await this.usersManagerService.users.refresh(undefined);
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'User delete failed');

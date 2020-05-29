@@ -8,6 +8,7 @@
 
 import { AdministrationItemService, AdministrationScreenService } from '@dbeaver/administration';
 import { injectable, Bootstrap } from '@dbeaver/core/di';
+import { NotificationService } from '@dbeaver/core/eventsLog';
 
 import { UsersManagerService } from '../UsersManagerService';
 import { CreateUser } from './CreateUser/CreateUser';
@@ -19,6 +20,7 @@ export class UsersAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
+    private notificationService: NotificationService,
     private usersManagerService: UsersManagerService,
   ) {
     super();
@@ -56,6 +58,10 @@ export class UsersAdministrationService extends Bootstrap {
   }
 
   private async loadUsers() {
-    await this.usersManagerService.users.load();
+    try {
+      await this.usersManagerService.users.load(undefined);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Error occurred while loading users');
+    }
   }
 }

@@ -54,6 +54,7 @@ export const UsersAdministration = observer(function UsersAdministration() {
       <AdministrationTools>
         <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
         <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
+        <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
       </AdministrationTools>
       <content as='div'>
         <UsersTable users={controller.users} selectedItems={controller.selectedItems} />
