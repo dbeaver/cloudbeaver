@@ -31,6 +31,7 @@ import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,6 +105,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException {
+        if (CommonUtils.equalObjects(userName, webSession.getUser().getUserId())) {
+            throw new DBWebException("You cannot delete yourself");
+        }
         try {
             CBPlatform.getInstance().getApplication().getSecurityController().deleteUser(userName);
             return true;
@@ -130,6 +134,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
         try {
+            WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(webSession.getUser().getUserId());
+            if (Arrays.stream(userRoles).anyMatch(webRole -> webRole.getRoleId().equals(roleId))) {
+                throw new DBWebException("You can not delete your own role");
+            }
             CBPlatform.getInstance().getApplication().getSecurityController().deleteRole(roleId);
             return true;
         } catch (Exception e) {
