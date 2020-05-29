@@ -71,7 +71,7 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
       []
     );
     const handleRoleChange = useCallback(
-      (value: string) => controller.credentials.role = value,
+      (value: string) => controller.credentials.roles = value,
       []
     );
 
@@ -117,8 +117,8 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
               <InputField
                 type='role'
                 name='text'
-                value={controller.credentials.role}
-                placeholder={controller.roles.join(', ')}
+                value={controller.credentials.roles}
+                placeholder={controller.roles.join(' ')}
                 onChange={handleRoleChange}
                 disabled={controller.isCreating}
                 mod='surface'

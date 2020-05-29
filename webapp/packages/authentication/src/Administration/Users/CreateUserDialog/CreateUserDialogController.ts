@@ -24,7 +24,7 @@ export class CreateUserDialogController implements IInitializableController, IDe
   @observable credentials = {
     login: '',
     password: '',
-    role: '',
+    roles: '',
   };
 
   @computed get roles() {
@@ -61,7 +61,17 @@ export class CreateUserDialogController implements IInitializableController, IDe
       const user = await this.usersManagerService.create(this.credentials.login, false);
       isUserCreated = !!user;
       await this.usersManagerService.updateCredentials(user.userId, { password: this.credentials.password });
-      await this.usersManagerService.grantRole(user.userId, this.credentials.role);
+      if (this.credentials.roles) {
+        const roles = this.credentials.roles
+          .trim()
+          .replace(/\s+/g, ' ')
+          .split(' ');
+
+        for (const role of roles) {
+          await this.usersManagerService.grantRole(user.userId, role);
+        }
+      }
+      await this.usersManagerService.users.refresh(user.userId);
       this.close();
     } catch (exception) {
       if (isUserCreated) {
