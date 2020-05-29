@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useEffect } from 'react';
+import { observer } from 'mobx-react';
+import { useCallback, useLayoutEffect } from 'react';
 import {
   useMenuState,
   Menu,
@@ -42,6 +43,7 @@ const styles = composes(
       width: 420px;
       outline: none;
       padding: 4px 0;
+      z-index: 999;
 
       & MenuItem {
         background: transparent;
@@ -56,20 +58,20 @@ const styles = composes(
   `
 );
 
-type DriverPropertyValueSelectorProps = React.PropsWithChildren<{
+type Props = React.PropsWithChildren<{
   propertyName?: string;
   values: string[];
   onSelect(value: string): void;
   onSwitch(state: boolean): void;
 }>
 
-export function DriverPropertyValueSelector({
+export const PropertyValueSelector = observer(function PropertyValueSelector({
   propertyName,
   values,
   children,
   onSelect,
   onSwitch,
-}: DriverPropertyValueSelectorProps) {
+}: Props) {
   const menu = useMenuState();
   const handleMenuSelect = useCallback(
     (value: string) => {
@@ -78,7 +80,7 @@ export function DriverPropertyValueSelector({
     },
     [menu, onSelect]
   );
-  useEffect(() => onSwitch(menu.visible), [menu.visible]);
+  useLayoutEffect(() => onSwitch(menu.visible), [menu.visible]);
 
   return styled(useStyles(styles))(
     <>
@@ -94,4 +96,4 @@ export function DriverPropertyValueSelector({
       </Portal>
     </>
   );
-}
+});
