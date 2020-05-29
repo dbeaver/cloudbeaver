@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { InputField } from '@dbeaver/core/blocks';
+import { InputField, InFocus } from '@dbeaver/core/blocks';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { AuthProvider } from '../../AuthProviderService';
@@ -32,21 +32,23 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   }, [credentials]);
 
   return styled(useStyles(formStyles))(
-    <login-form as='div'>
-      {provider.credentialParameters.map(parameter => parameter.user && (
-        <group as="div" key={parameter.id}>
-          <InputField
-            type={parameter.encryption === 'none' ? 'text' : 'password'}
-            name={parameter.id}
-            value={credentials[parameter.id]}
-            onChange={value => handleChange(parameter.id, value)}
-            disabled={authenticate}
-            mod='surface'
-          >
-            {parameter.displayName}
-          </InputField>
-        </group>
-      ))}
-    </login-form>
+    <InFocus>
+      <login-form as='div'>
+        {provider.credentialParameters.map(parameter => parameter.user && (
+          <group as="div" key={parameter.id}>
+            <InputField
+              type={parameter.encryption === 'none' ? 'text' : 'password'}
+              name={parameter.id}
+              value={credentials[parameter.id]}
+              onChange={value => handleChange(parameter.id, value)}
+              disabled={authenticate}
+              mod='surface'
+            >
+              {parameter.displayName}
+            </InputField>
+          </group>
+        ))}
+      </login-form>
+    </InFocus>
   );
 });
