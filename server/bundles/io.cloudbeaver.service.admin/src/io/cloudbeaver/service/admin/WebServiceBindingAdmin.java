@@ -35,9 +35,9 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType().dataFetcher("listUsers",
-            env -> getService(env).listUsers(getWebSession(env), env.getArgument("userName")));
+            env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")));
         model.getQueryType().dataFetcher("listRoles",
-            env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleName")));
+            env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleId")));
         model.getQueryType().dataFetcher("listPermissions",
             env -> getService(env).listPermissions(getWebSession(env)));
         model.getQueryType().dataFetcher("createUser",
