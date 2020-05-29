@@ -59,7 +59,7 @@ export class UsersAdministrationService extends Bootstrap {
 
   private async loadUsers() {
     try {
-      await this.usersManagerService.users.load();
+      await this.usersManagerService.users.load(undefined);
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading users');
     }

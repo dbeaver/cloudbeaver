@@ -118,6 +118,7 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
                 type='role'
                 name='text'
                 value={controller.credentials.role}
+                placeholder={controller.roles.join(', ')}
                 onChange={handleRoleChange}
                 disabled={controller.isCreating}
                 mod='surface'
