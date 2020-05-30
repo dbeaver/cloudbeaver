@@ -465,7 +465,7 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT) VALUES(?,?,?,?,?,?)")) {
-                dbStat.setString(1, session.getId());
+                dbStat.setString(1, session.getSessionId());
                 WebUser user = session.getUser();
                 if (user == null) {
                     dbStat.setNull(2, Types.VARCHAR);
@@ -515,7 +515,7 @@ class CBSecurityController implements DBWSecurityController {
                     dbStat.setNull(4, Types.VARCHAR);
                 }
 
-                dbStat.setString(5, session.getId());
+                dbStat.setString(5, session.getSessionId());
                 if (dbStat.executeUpdate() == 0) {
                     throw new DBCException("Session not exists in database");
                 }

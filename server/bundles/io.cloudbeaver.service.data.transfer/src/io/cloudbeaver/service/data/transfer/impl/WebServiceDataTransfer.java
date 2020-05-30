@@ -17,13 +17,12 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
-import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
-import io.cloudbeaver.service.sql.WebSQLQueryDataContainer;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -102,7 +101,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     @NotNull
     private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
-        return sqlProcessor.getWebSession().getId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
+        return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
     @Override
