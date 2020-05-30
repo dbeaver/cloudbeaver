@@ -46,12 +46,8 @@ const styles = composes(
       flex-direction: column;
     }
     create-form {
-      flex: 2;
       flex-direction: column;
       padding: 18px 24px;
-    }
-    fill {
-      flex: 1;
     }
     ErrorMessage {
       position: sticky;
@@ -149,7 +145,6 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
               </group>
             ))}
           </create-form>
-          <fill as="div"/>
         </SubmittingForm>
         {controller.error.responseMessage && (
           <ErrorMessage
