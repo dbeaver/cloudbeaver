@@ -33,26 +33,35 @@ const styles = css`
       margin: 0 12px;
       height: 26px;
     }
+    & checkbox {
+      display: flex;
+      align-items: center;
+    }
   }
 `;
 
-type InputFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
+  checkboxLabel: string;
   mod?: 'surface';
-  onChange?(value: string): any;
+  onChange?(value: boolean): any;
 }
 
-export function InputField({
+export function Checkbox({
+  checkboxLabel,
   children,
   className,
   mod,
   onChange = () => {},
   ...rest
-}: InputFieldProps) {
+}: Props) {
 
   return styled(useStyles(styles))(
     <field as="div" className={className}>
       <label>{children}</label>
-      <input onChange={e => onChange(e.target.value)} {...rest} {...use({ mod })} />
+      <checkbox as='div'>
+        <input onChange={e => onChange(e.target.checked)} {...rest} {...use({ mod })} />
+        <checkbox-label as='div'>{checkboxLabel}</checkbox-label>
+      </checkbox>
     </field>
   );
 }

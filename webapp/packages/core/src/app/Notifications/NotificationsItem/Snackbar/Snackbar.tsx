@@ -63,7 +63,7 @@ export function Snackbar({
     <notification as="div" {...use({ mounted, closing })} >
       <notification-header as="div">
         {type && <NotificationMark type={type} />}
-        <message as="div">{text}</message>
+        <message as="div">{translate(text)}</message>
         {!closeAfter && onClose && (
           <IconButton onClick={onClose} name="cross" viewBox="0 0 16 16" />
         )}
