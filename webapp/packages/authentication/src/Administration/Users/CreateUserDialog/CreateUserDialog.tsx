@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, InputField
+  SubmittingForm, ErrorMessage, InputField, Checkbox
 } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
 import { DialogComponent, CommonDialogWrapper } from '@dbeaver/core/dialogs';
@@ -37,7 +37,6 @@ const styles = composes(
     }
     SubmittingForm {
       overflow: auto;
-      margin: auto;
       margin-top: 20px;
       margin-bottom: 20px;
     }
@@ -47,8 +46,12 @@ const styles = composes(
       flex-direction: column;
     }
     create-form {
+      flex: 2;
       flex-direction: column;
       padding: 18px 24px;
+    }
+    fill {
+      flex: 1;
     }
     ErrorMessage {
       position: sticky;
@@ -70,8 +73,12 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
       (value: string) => controller.credentials.password = value,
       []
     );
+    const handlePasswordRepeatChange = useCallback(
+      (value: string) => controller.credentials.passwordRepeat = value,
+      []
+    );
     const handleRoleChange = useCallback(
-      (value: string) => controller.credentials.roles = value,
+      (roleId: string, value: boolean) => controller.credentials.roles.set(roleId, value),
       []
     );
 
@@ -82,6 +89,7 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
         footer={(
           <CreateUserDialogFooter
             isCreating={controller.isCreating}
+            onCancel={props.rejectDialog}
             onCreate={controller.create}
           />
         )}
@@ -115,18 +123,33 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
             </group>
             <group as="div">
               <InputField
-                type='role'
-                name='text'
-                value={controller.credentials.roles}
-                placeholder={controller.roles.join(' ')}
-                onChange={handleRoleChange}
+                type='password'
+                name='password_repeat'
+                value={controller.credentials.passwordRepeat}
+                onChange={handlePasswordRepeatChange}
                 disabled={controller.isCreating}
                 mod='surface'
               >
-                {translate('authentication_user_role')}
+                {translate('authentication_user_password_repeat')}
               </InputField>
             </group>
+            {controller.roles.map((role, i) => (
+              <group as="div" key={role.roleId}>
+                <Checkbox
+                  type='checkbox'
+                  name='role'
+                  checkboxLabel={role.roleName || role.roleId}
+                  onChange={checked => handleRoleChange(role.roleId, checked)}
+                  checked={controller.credentials.roles.get(role.roleId)}
+                  disabled={controller.isCreating}
+                  mod='surface'
+                >
+                  {i === 0 && translate('authentication_user_role')}
+                </Checkbox>
+              </group>
+            ))}
           </create-form>
+          <fill as="div"/>
         </SubmittingForm>
         {controller.error.responseMessage && (
           <ErrorMessage

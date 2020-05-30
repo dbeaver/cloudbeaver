@@ -24,11 +24,12 @@ export class CreateUserDialogController implements IInitializableController, IDe
   @observable credentials = {
     login: '',
     password: '',
-    roles: '',
+    passwordRepeat: '',
+    roles: new Map<string, boolean>(),
   };
 
   @computed get roles() {
-    return this.rolesManagerService.roles.data.map(role => role.roleId);
+    return this.rolesManagerService.roles.data;
   }
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
@@ -54,6 +55,10 @@ export class CreateUserDialogController implements IInitializableController, IDe
     if (this.isCreating) {
       return;
     }
+    if (this.credentials.password !== this.credentials.passwordRepeat) {
+      this.notificationService.logError({ title: 'authentication_user_passwords_not_match' });
+      return;
+    }
 
     this.isCreating = true;
     let isUserCreated = false;
@@ -61,17 +66,13 @@ export class CreateUserDialogController implements IInitializableController, IDe
       const user = await this.usersManagerService.create(this.credentials.login, false);
       isUserCreated = !!user;
       await this.usersManagerService.updateCredentials(user.userId, { password: this.credentials.password });
-      if (this.credentials.roles) {
-        const roles = this.credentials.roles
-          .trim()
-          .replace(/\s+/g, ' ')
-          .split(' ');
-
-        for (const role of roles) {
-          await this.usersManagerService.grantRole(user.userId, role);
+      for (const [roleId, checked] of this.credentials.roles) {
+        if (checked) {
+          await this.usersManagerService.grantRole(user.userId, roleId);
         }
       }
       await this.usersManagerService.users.refresh(user.userId);
+      this.notificationService.logInfo({ title: 'authentication_user_user_created' });
       this.close();
     } catch (exception) {
       if (isUserCreated) {

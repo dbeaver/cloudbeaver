@@ -12,6 +12,7 @@ export * from './Split';
 export * from './Table';
 export * from './Tabs';
 export * from './Button';
+export * from './Checkbox';
 export * from './ErrorMessage';
 export * from './IconButton';
 export * from './IconOrImage';
