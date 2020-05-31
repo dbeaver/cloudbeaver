@@ -13,7 +13,7 @@ import { ObjectPropertyInfo } from '@dbeaver/core/sdk';
 import { useStyles } from '@dbeaver/core/theming';
 
 const styles = css`
-  TableColumnHeader:first-child {
+  TableColumnHeader:nth-child(2) {
     width:16px;
     border-right: none;
   }
@@ -36,6 +36,7 @@ export function Header({ properties }: HeaderProps) {
 
   return styled(useStyles(styles))(
     <>
+      <TableColumnHeader min></TableColumnHeader>
       <TableColumnHeader></TableColumnHeader>
       {properties.map(property => (
         <TableColumnHeader key={property.id} title={property.description}>

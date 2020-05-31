@@ -11,7 +11,9 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { NodesManagerService, useDatabaseObjectInfo, useNode } from '@dbeaver/core/app';
-import { StaticImage, TableItem, TableColumnValue } from '@dbeaver/core/blocks';
+import {
+  StaticImage, TableItem, TableColumnValue, TableItemSelect
+} from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
 
@@ -35,7 +37,7 @@ const itemStyles = css`
     TableItem {
       position: relative;
     }
-    TableColumnValue:nth-child(2) {
+    TableColumnValue:nth-child(3) {
       cursor: pointer;
       user-select: none;
     }
@@ -57,6 +59,7 @@ export const Item = observer(function Item({
   if (!object || !databaseObjectInfo?.properties) {
     return styled(useStyles(itemStyles))(
       <TableItem item={objectId} onDoubleClick={handleOpen}>
+        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
           <icon as="div">
             <placeholder as="div" />
@@ -75,6 +78,7 @@ export const Item = observer(function Item({
 
   return styled(useStyles(itemStyles))(
     <TableItem item={objectId} onDoubleClick={handleOpen}>
+      <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>
         <icon as="div">
           <StaticImage icon={object.icon} />

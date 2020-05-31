@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import {
-  TableItem, TableColumnValue
+  TableItem, TableColumnValue, TableItemSelect
 } from '@dbeaver/core/blocks';
 import { AdminUserInfo } from '@dbeaver/core/sdk';
 import { useStyles } from '@dbeaver/core/theming';
@@ -22,6 +22,7 @@ type Props = {
 export const User = observer(function User({ user }: Props) {
   return styled(useStyles())(
     <TableItem item={user.userId}>
+      <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
       <TableColumnValue></TableColumnValue>
