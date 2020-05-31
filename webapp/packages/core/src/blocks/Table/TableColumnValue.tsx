@@ -7,16 +7,17 @@
  */
 
 import { observer } from 'mobx-react';
-import styled from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
 
 type Props = React.PropsWithChildren<{
   className?: string;
+  centerContent?: boolean;
 }>
 
-export const TableColumnValue = observer(function TableColumnValue({ children, className }: Props) {
+export const TableColumnValue = observer(function TableColumnValue({ children, centerContent, className }: Props) {
   return styled(useStyles())(
-    <td className={className}>{children}</td>
+    <td className={className} {...use({ centerContent })}>{children}</td>
   );
 });

@@ -37,6 +37,7 @@ export const UsersTable = observer(function UsersTable({ users, selectedItems }:
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems}>
       <TableHeader>
+        <TableColumnHeader min/>
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>

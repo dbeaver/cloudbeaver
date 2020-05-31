@@ -30,7 +30,7 @@
 
   tbody tr[use|isSelected] {
     @include stripes-background($mdc-theme-secondary);
-    @include mdc-theme-prop(border-color, $color-positive, false);
+    // @include mdc-theme-prop(border-color, $color-positive, false);
   }
 
   th {
@@ -50,8 +50,23 @@
     border-right: none;
   }
 
+  th[use|min] {
+    width: 1%;
+  }
+
   td {
     height: 24px;
     padding: 0 16px;
+  }
+
+  td[use|centerContent] {
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  td > input[type="checkbox"] {
+    display: block;
+    height: 16px;
+    width: 16px;
   }
 }

@@ -5,3 +5,5 @@ export * from './TableColumnValue';
 export * from './TableContext';
 export * from './TableHeader';
 export * from './TableItem';
+export * from './TableItemContext';
+export * from './TableItemSelect';
