@@ -110,4 +110,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return instance;
     }
 
+    @Override
+    public String toString() {
+        return getId();
+    }
 }

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -206,6 +207,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
+        }
+        // Check userId credential.
+        // FIXME: It is actually a hack. All crdentials must be passed from client
+        if (LocalAuthProvider.PROVIDER_ID.equals(providerId)) {
+            credentials.put(LocalAuthProvider.CRED_USER, userID);
         }
         try {
             CBPlatform.getInstance().getApplication().getSecurityController().setUserCredentials(userID, authProvider, credentials);
