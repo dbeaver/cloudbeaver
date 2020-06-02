@@ -1,5 +1,6 @@
+export * from './CommonDialog/CommonDialog/CommonDialogWrapper';
 export * from './CommonDialog/CommonDialogService';
-export * from './CommonDialog/CommonDialogWrapper';
+export * from './CommonDialog/ConfirmationDialog';
 export * from './CommonDialog/DialogsPortal';
 
 export * from './Menu/IMenuPanel';

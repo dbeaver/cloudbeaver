@@ -91,7 +91,7 @@ export const CreateUserDialog: DialogComponent<null, null> = observer(
         )}
         onReject={props.rejectDialog}
       >
-        <SubmittingForm onSubmit={controller.create}>
+        <SubmittingForm onSubmit={controller.create} autoComplete="disabled">
           <create-form as='div'>
             <group as="div">
               <InputField

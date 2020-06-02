@@ -19,6 +19,7 @@ export type DialogComponentProps<TPayload, TResult> = {
   options?: DialogOptions;
   resolveDialog(result: TResult | null): void;
   rejectDialog(): void; // the dialog was closed by cancel button or backdrop click
+  className?: string;
 }
 
 export type DialogComponent<TPayload, TResult> = React.ElementType<

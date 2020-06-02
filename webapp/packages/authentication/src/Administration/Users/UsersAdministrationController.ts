@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
-import { CommonDialogService } from '@dbeaver/core/dialogs';
+import { CommonDialogService, ConfirmationDialog } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { GQLErrorCatcher } from '@dbeaver/core/sdk';
 
@@ -56,11 +56,27 @@ export class UsersAdministrationController {
     }
 
     this.isDeleting = true;
+
     try {
-      for (const [userId, selected] of this.selectedItems) {
-        if (selected) {
-          await this.usersManagerService.delete(userId);
-        }
+      const deletionList = Array
+        .from(this.selectedItems)
+        .filter(([_, value]) => value)
+        .map(([userId]) => userId);
+      if (deletionList.length === 0) {
+        return;
+      }
+
+      const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+        title: 'authentication_administration_confirm_user_deletion',
+        message: `Would you like to delete users: ${deletionList.join(', ')}`,
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      for (const userId of deletionList) {
+        await this.usersManagerService.delete(userId);
       }
       this.selectedItems.clear();
       await this.usersManagerService.users.refresh(undefined);

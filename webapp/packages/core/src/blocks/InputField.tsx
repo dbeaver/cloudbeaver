@@ -22,7 +22,7 @@ const styles = css`
     padding: 12px 0;
 
     & label {
-      width: 230px;
+      width: 150px;
       text-align: right;
       padding: 0 12px;
       line-height: 16px;

@@ -33,6 +33,7 @@
   "ui_processing_cancel": "Отменить",
   "ui_processing_canceling": "Отмена...",
   "ui_processing_retry": "Повторить",
+  "ui_processing_ok": "Принять",
   "ui_error_message": "Ошибка:",
   "ui_errors_details": "Информация",
   "ui_search": "Поиск...",

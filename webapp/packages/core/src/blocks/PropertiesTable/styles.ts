@@ -28,7 +28,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
     properties-header {
       box-sizing: border-box;
       display: inline-flex;
-      padding: 5px 1px;
+      padding: 2px;
       position: sticky;
       z-index: 1;
       top: 0;

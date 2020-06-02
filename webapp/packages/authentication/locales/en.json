@@ -1,5 +1,6 @@
 {
   "authentication_administration_item": "Users",
+  "authentication_administration_confirm_user_deletion": "Confirm user deletion",
   "authentication_create_user_dialog_title": "Create new user",
   "authentication_create_user_dialog_create": "Create",
   "authentication_user_name": "User name",
