@@ -33,6 +33,7 @@
   "ui_processing_cancel": "Cancel",
   "ui_processing_canceling": "Canceling...",
   "ui_processing_retry": "Retry",
+  "ui_processing_ok": "Ok",
   "ui_error_message": "Error:",
   "ui_errors_details": "Details",
   "ui_search": "Search...",

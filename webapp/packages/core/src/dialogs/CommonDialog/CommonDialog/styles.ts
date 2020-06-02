@@ -6,22 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css, use } from 'reshadow';
 
-import { Icon } from '@dbeaver/core/blocks';
-import { composes, useStyles } from '@dbeaver/core/theming';
+import { css } from 'reshadow';
 
-export type CommonDialogWrapperProps = {
-  title: string;
-  onReject?: () => void;
-  className?: string;
-  noBodyPadding?: boolean;
-  footer?: JSX.Element | boolean;
-  header?: JSX.Element | boolean;
-  children?: React.ReactNode;
-}
+import { composes } from '@dbeaver/core/theming';
 
-const style = composes(
+export const commonDialogStyle = composes(
   css`
   dialog {
     composes: theme-background-surface theme-text-on-surface from global;
@@ -91,34 +81,3 @@ const style = composes(
   }
 `
 );
-
-export function CommonDialogWrapper({
-  title,
-  header,
-  footer,
-  noBodyPadding,
-  className,
-  onReject,
-  children,
-}: CommonDialogWrapperProps) {
-
-  return styled(useStyles(style))(
-    <dialog className={className}>
-      <header>
-        <header-title as="div">
-          <h1>{title}</h1>
-          {onReject && (
-            <reject as="div">
-              <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
-            </reject>
-          )}
-        </header-title>
-        {header}
-      </header>
-      <dialog-body as="div" {...use({ noPadding: noBodyPadding })}>{children}</dialog-body>
-      <footer>
-        {footer}
-      </footer>
-    </dialog>
-  );
-}

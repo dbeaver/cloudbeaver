@@ -7,11 +7,12 @@
  */
 
 import { observer } from 'mobx-react';
-import { useContext } from 'react';
+import { useContext, useCallback } from 'react';
 import styled from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
 
+import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
 type Props = {
@@ -19,12 +20,17 @@ type Props = {
 }
 
 export const TableItemSelect = observer(function TableItemSelect({ className }: Props) {
+  const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   if (!context) {
     return null;
   }
+  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+    event.stopPropagation();
+    tableContext?.setItemSelect(context.item, !context.isSelected());
+  }, [tableContext, context]);
 
   return styled(useStyles())(
-    <input type='checkbox' checked={context.isSelected()} className={className}/>
+    <input type='checkbox' checked={context.isSelected()} onClick={handleClick} className={className}/>
   );
 });
