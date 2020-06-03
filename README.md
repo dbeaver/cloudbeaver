@@ -24,6 +24,14 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 1.0.3 - 2020-06-02
+
+- Administrative panel
+- User management
+- Authentication model redesign
+- Build artifacts minimization
+- Many minor UI improvements
+
 ### CloudBeaver 1.0.2 - 2020-05-19
 
 - Data export feature UI was improved
