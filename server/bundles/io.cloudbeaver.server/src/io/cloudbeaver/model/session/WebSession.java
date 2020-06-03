@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
@@ -53,7 +54,7 @@ import java.util.function.Function;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession {
+public class WebSession implements DBASession {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -104,8 +105,13 @@ public class WebSession {
     }
 
     @Property
-    public String getId() {
+    public String getSessionId() {
         return id;
+    }
+
+    @Override
+    public boolean isApplicationSession() {
+        return false;
     }
 
     @Property

@@ -95,7 +95,7 @@ public class WebSessionManager {
                     }
                 }
 
-                log.debug("> New web session '" + webSession.getId() + "'");
+                log.debug("> New web session '" + webSession.getSessionId() + "'");
             } else {
                 if (updateInfo) {
                     // Update only once per request
@@ -132,7 +132,7 @@ public class WebSessionManager {
         }
 
         for (WebSession session : expiredList) {
-            log.debug("> Expire session '" + session.getId() + "'");
+            log.debug("> Expire session '" + session.getSessionId() + "'");
             session.close();
         }
     }

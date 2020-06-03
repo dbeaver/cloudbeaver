@@ -1,0 +1,3 @@
+query deleteUser($userId: ID!) {
+  deleteUser(userId: $userId)
+}

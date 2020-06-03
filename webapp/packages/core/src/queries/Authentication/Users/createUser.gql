@@ -1,0 +1,9 @@
+query createUser($userId: ID!) {
+  user: createUser(userId: $userId) {
+    userId
+
+    #metaParameters
+    #configurationParameters
+    grantedRoles
+  } 
+}

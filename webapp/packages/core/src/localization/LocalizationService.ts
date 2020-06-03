@@ -8,7 +8,6 @@
 
 import { action, observable } from 'mobx';
 
-import defaultLocale from '@dbeaver/core/assets/locales/en';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { SessionService, ServerService } from '@dbeaver/core/root';
@@ -42,9 +41,6 @@ export class LocalizationService {
               private serverService: ServerService,
               private graphQLService: GraphQLService,
               private settingsService: SettingsService) {
-
-    // note that the default locale is always embedded in the build
-    this.localeMap.set(DEFAULT_LOCALE_NAME, defaultLocale);
   }
 
   readonly translate = (token: TLocalizationToken): string => {
@@ -84,6 +80,7 @@ export class LocalizationService {
   async init() {
     const session = await this.sessionService.session.load();
     const config = await this.serverService.config.load();
+    await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
 
     if (!session || !config) {
       return;
@@ -126,8 +123,9 @@ export class LocalizationService {
       return;
     }
     try {
-      const locale = await import(`@dbeaver/core/assets/locales/${key}`);
-      this.localeMap.set(key, locale.default);
+      const response = await fetch(`locales/${key}.json`);
+      const locale = await response.json() as Locale;
+      this.localeMap.set(key, locale);
     } catch (error) {
       this.notificationService.logException(error, 'Locale is not found', true);
     }

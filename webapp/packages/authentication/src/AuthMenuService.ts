@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationTopAppBarService } from '@dbeaver/administration';
 import { SettingsMenuService, TopNavService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
+import { NotificationService } from '@dbeaver/core/eventsLog';
 import { ServerService } from '@dbeaver/core/root';
 
 import { AuthenticationService } from './AuthenticationService';
@@ -23,7 +25,9 @@ export class AuthMenuService {
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
     private authenticationService: AuthenticationService,
+    private notificationService: NotificationService,
     private topNavService: TopNavService,
+    private administrationTopAppBarService: AdministrationTopAppBarService,
   ) { }
 
   register() {
@@ -50,10 +54,15 @@ export class AuthMenuService {
     );
 
     this.topNavService.placeholder.add(UserInfo, 4);
+    this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
   }
 
   private async logout() {
-    await this.authInfoService.logout();
-    await this.authenticationService.auth();
+    try {
+      await this.authInfoService.logout();
+      await this.authenticationService.auth();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t logout');
+    }
   }
 }

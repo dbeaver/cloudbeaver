@@ -76,6 +76,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteUser(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            deleteAuthSubject(dbCon, userId);
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER WHERE USER_ID=?", userId);
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
@@ -102,10 +103,13 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public WebRole[] getUserRoles(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
+                "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
                 dbStat.setString(1, userId);
                 List<WebRole> roles = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -130,6 +134,28 @@ class CBSecurityController implements DBWSecurityController {
                         return new WebUser(dbResult.getString(1));
                     }
                     return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while searching credentials", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public WebUser[] findUsers(String userNameMask) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER" +
+                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    List<WebUser> result = new ArrayList<>();
+                    while (dbResult.next()) {
+                        result.add(new WebUser(dbResult.getString(1)));
+                    }
+                    return result.toArray(new WebUser[0]);
                 }
             }
         } catch (SQLException e) {
@@ -273,6 +299,7 @@ class CBSecurityController implements DBWSecurityController {
     ///////////////////////////////////////////
     // Roles
 
+    @NotNull
     @Override
     public WebRole[] readAllRoles() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -299,6 +326,11 @@ class CBSecurityController implements DBWSecurityController {
         } catch (SQLException e) {
             throw new DBCException("Error reading roles from database", e);
         }
+    }
+
+    @Override
+    public WebRole[] findRoles(String roleName) throws DBCException {
+        return readAllRoles();
     }
 
     @NotNull
@@ -328,6 +360,7 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteRole(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            deleteAuthSubject(dbCon, roleId);
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE WHERE ROLE_ID=?", roleId);
         } catch (SQLException e) {
             throw new DBCException("Error deleting role from database", e);
@@ -357,6 +390,7 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public Set<String> getSubjectPermissions(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -375,6 +409,7 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @NotNull
     @Override
     public Set<String> getUserPermissions(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -430,7 +465,7 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "INSERT INTO CB_SESSION(SESSION_ID,USER_ID,CREATE_TIME,LAST_ACCESS_TIME,LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT) VALUES(?,?,?,?,?,?)")) {
-                dbStat.setString(1, session.getId());
+                dbStat.setString(1, session.getSessionId());
                 WebUser user = session.getUser();
                 if (user == null) {
                     dbStat.setNull(2, Types.VARCHAR);
@@ -480,7 +515,7 @@ class CBSecurityController implements DBWSecurityController {
                     dbStat.setNull(4, Types.VARCHAR);
                 }
 
-                dbStat.setString(5, session.getId());
+                dbStat.setString(5, session.getSessionId());
                 if (dbStat.executeUpdate() == 0) {
                     throw new DBCException("Session not exists in database");
                 }
@@ -527,5 +562,11 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    private void deleteAuthSubject(Connection dbCon, String subjectId) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subjectId);
+            dbStat.execute();
+        }
+    }
 
 }

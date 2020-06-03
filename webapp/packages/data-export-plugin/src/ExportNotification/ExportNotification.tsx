@@ -34,6 +34,9 @@ const styles = css`
       margin: 0;
     }
   }
+  IconButton {
+    color: rgba(0, 0, 0, 0.45);
+  }
 `;
 
 export const ExportNotification = observer(function ExportNotification({

@@ -1,0 +1,9 @@
+query getUsersList($userId: ID) {
+  users: listUsers(userId: $userId) {
+    userId
+
+    #metaParameters
+    #configurationParameters
+    grantedRoles
+  } 
+}

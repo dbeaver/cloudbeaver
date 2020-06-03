@@ -13,4 +13,6 @@ export * from './TableViewer/TableDataModel/TableColumn';
 export * from './TableViewer/TableDataModel/TableRow';
 export * from './TableViewer/TableDataModel/EditedRow';
 
+export * from './DataViewerUtils';
+
 export * from './IExecutionContext';

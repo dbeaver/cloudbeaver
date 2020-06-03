@@ -8,15 +8,15 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   mode: argv.mode,
   entry: './index.js',
   output: {
-    filename: 'js/bundle.[hash].js',
+    filename: 'bundle.[hash].js',
     path: path.resolve(argv.currentDir, './dist'),
     publicPath: '',
   },
-  devtool: 'source-map',
+  devtool: argv.mode === 'production' ? false : 'source-map',
   plugins: [],
   optimization: {
-    minimize: false,
-    namedModules: true,
-    concatenateModules: false,
+    minimize: argv.mode === 'production',
+    namedModules: argv.mode !== 'production',
+    concatenateModules: argv.mode === 'production',
   },
 });

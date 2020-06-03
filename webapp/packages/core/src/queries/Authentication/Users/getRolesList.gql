@@ -1,0 +1,8 @@
+query getRolesList($roleId: ID) {
+  roles: listRoles(roleId: $roleId) {
+    roleId
+    roleName
+
+    #rolePermissions
+  } 
+}

@@ -57,6 +57,22 @@
     </g>
   </symbol>
 
+  <symbol id="add" width="28" height="28" viewBox="0 0 28 28">
+    <g fill="none" fill-rule="evenodd">
+        <path d="M0 0L36 0 36 36 0 36z" transform="translate(-4 -4)"/>
+        <path fill-rule="nonzero" stroke="currentColor" stroke-width="2" d="M28.5 5.5h-21c-1.107 0-2 .896-2 2v21c0 1.104.893 2 2 2h21c1.107 0 2-.896 2-2v-21c0-1.104-.893-2-2-2z" transform="translate(-4 -4)"/>
+        <path fill="currentColor" fill-rule="nonzero" d="M22.297 12.293L18 16.59 13.703 12.293 12.293 13.703 16.59 18 12.293 22.297 13.703 23.707 18 19.41 22.297 23.707 23.707 22.297 19.41 18 23.707 13.703z" transform="translate(-4 -4) rotate(-45 18 18)"/>
+    </g>
+  </symbol>
+
+  <symbol id="trash" width="28" height="28" viewBox="0 0 28 28">
+    <g fill="none" fill-rule="evenodd">
+        <path d="M0 0L36 0 36 36 0 36z" transform="translate(-4 -4)"/>
+        <path fill-rule="nonzero" stroke="currentColor" stroke-width="2" d="M28.5 5.5h-21c-1.107 0-2 .896-2 2v21c0 1.104.893 2 2 2h21c1.107 0 2-.896 2-2v-21c0-1.104-.893-2-2-2z" transform="translate(-4 -4)"/>
+        <path fill="currentColor" fill-rule="nonzero" d="M12 25.071v-12h12v12c0 1.1-.9 2-2 2h-8c-1.1 0-2-.9-2-2zm2-10v10h8v-10h-8zm7.5-5H25v2H11v-2h3.5l1-1h5l1 1z" transform="translate(-4 -4)"/>
+    </g>
+  </symbol>
+
   <symbol id="angle" viewBox="0 0 15 8">
     <path class="icon-fill" fill-rule="evenodd" d="M14.5.954l-.875-.88L7.5 6.238 1.375 0 .5.88 7.5 8z"/>
   </symbol>
@@ -134,6 +150,12 @@
           <polygon points="21 23.6851 25.404 23.6851 25.404 21.2501 21 21.2501"></polygon>
           <polygon points="21 2.4361 25.404 2.4361 25.404 0.0011 21 0.0011"></polygon>
           <polygon points="23.793 23.6991 26.229 23.6991 26.229 0.1291 23.793 0.1291"></polygon>
+      </g>
+  </symbol>
+
+  <symbol id="sort-arrow" viewBox="0 0 6 6">
+      <g>
+          <path d="M2.564 0L0 2.383 1.832 2.383 1.832 4.582 3.297 4.582 3.297 2.383 5.128 2.383z" transform="translate(-5 -.222) translate(5 .389)"/>
       </g>
   </symbol>
 

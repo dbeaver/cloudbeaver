@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useRef, useState, useLayoutEffect
 } from 'react';
 import styled, { css, use } from 'reshadow';
 
@@ -16,8 +16,8 @@ import { composes, useStyles } from '@dbeaver/core/theming';
 
 import { Icon } from '../Icons';
 import { ShadowInput } from '../ShadowInput';
-import { DriverPropertyValueSelector } from './DriverPropertyValueSelector';
 import { IProperty } from './IProperty';
+import { PropertyValueSelector } from './PropertyValueSelector';
 
 const styles = composes(
   css`
@@ -133,7 +133,7 @@ export const PropertyItem = observer(function PropertyItem({
   );
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (keyInputRef.current && isKeyEditable) {
       keyInputRef.current.focus();
     }
@@ -166,14 +166,14 @@ export const PropertyItem = observer(function PropertyItem({
       </property-value>
       {(property.validValues && property.validValues.length > 0) && (
         <property-select as="div">
-          <DriverPropertyValueSelector
+          <PropertyValueSelector
             propertyName={property.id}
             values={property.validValues}
             onSelect={handleValueChange}
             onSwitch={setFocus}
           >
             <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
-          </DriverPropertyValueSelector>
+          </PropertyValueSelector>
         </property-select>
       )}
       {isKeyEditable && (

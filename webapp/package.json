@@ -16,6 +16,7 @@
     "build": "lerna run build --stream",
     "serve": "lerna run serve --stream",
     "serve-plugin": "lerna run serve-plugin --stream --parallel",
+    "builder-help": "builder help",
     "clean-dist": "lerna run clean-dist --stream",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,10 +24,13 @@
     "@babel/runtime": "7.8.4"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "@types/node": "^12.7.8",
-    "@types/react": "^16.9.34",
-    "@types/react-dom": "^16.9.6",
+    "@graphql-codegen/add": "^1.8.1",
+    "@graphql-codegen/cli": "^1.8.1",
+    "@graphql-codegen/near-operation-file-preset": "^1.8.0",
+    "@graphql-codegen/typescript": "^1.8.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.8.0",
+    "@graphql-codegen/typescript-graphql-request": "^1.8.1",
+    "@graphql-codegen/typescript-operations": "^1.8.1",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.8.0",
     "eslint": "^6.6.0",

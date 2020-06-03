@@ -14,8 +14,8 @@ import { Button } from '@dbeaver/core/blocks';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
+import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper';
 import { DialogComponent } from '../CommonDialog/CommonDialogService';
-import { CommonDialogWrapper } from '../CommonDialog/CommonDialogWrapper';
 
 const styles = css`
   dialog-content {

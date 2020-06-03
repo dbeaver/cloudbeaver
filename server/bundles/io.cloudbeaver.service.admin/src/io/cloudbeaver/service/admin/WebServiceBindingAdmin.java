@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.admin;
 
-import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -35,10 +34,29 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("listUsers", env -> {
-            throw new DBWebException("Not implemented");
-        });
+        model.getQueryType().dataFetcher("listUsers",
+            env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")));
+        model.getQueryType().dataFetcher("listRoles",
+            env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleId")));
+        model.getQueryType().dataFetcher("listPermissions",
+            env -> getService(env).listPermissions(getWebSession(env)));
+        model.getQueryType().dataFetcher("createUser",
+            env -> getService(env).createUser(getWebSession(env), env.getArgument("userId")));
+        model.getQueryType().dataFetcher("deleteUser",
+            env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")));
+        model.getQueryType().dataFetcher("createRole",
+            env -> getService(env).createRole(getWebSession(env), env.getArgument("roleId")));
+        model.getQueryType().dataFetcher("deleteRole",
+            env -> getService(env).deleteRole(getWebSession(env), env.getArgument("roleId")));
 
+        model.getQueryType().dataFetcher("grantUserRole",
+            env -> getService(env).grantUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
+        model.getQueryType().dataFetcher("revokeUserRole",
+            env -> getService(env).revokeUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
+        model.getQueryType().dataFetcher("setRolePermissions",
+            env -> getService(env).setRolePermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")));
+        model.getQueryType().dataFetcher("setUserCredentials",
+            env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")));
     }
 
 }

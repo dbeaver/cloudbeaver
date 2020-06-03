@@ -7,8 +7,8 @@ module.exports = [
   // The order of modules is important.
   // The module must be built before it is used in another module
   'extensions',
-  'di',
   'utils',
+  'di',
   'eventsLog',
 
   'settings',

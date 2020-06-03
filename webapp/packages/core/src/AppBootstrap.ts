@@ -8,7 +8,12 @@
 
 import {
   ConnectionDialogsService,
-  NavigationTabsService, NavigationTreeContextMenuService, LogViewerMenuService, ConnectionSchemaManagerService,
+  NavigationTabsService,
+  NavigationTreeContextMenuService,
+  LogViewerMenuService,
+  ConnectionSchemaManagerService,
+  RouterService,
+  AppScreenService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { SessionExpireService } from '@dbeaver/core/dialogs';
@@ -30,6 +35,8 @@ export class AppBootstrap {
     private exceptionsCatcherService: ExceptionsCatcherService,
     private localizationService: LocalizationService,
     private themeService: ThemeService,
+    private routerService: RouterService,
+    private appScreenService: AppScreenService,
     private connectionDialogService: ConnectionDialogsService,
     private logViewerMenuService: LogViewerMenuService,
     private sessionExpireService: SessionExpireService,
@@ -42,6 +49,7 @@ export class AppBootstrap {
     this.exceptionsCatcherService.subscribe();
     this.sessionExpireService.subscribe();
 
+    this.appScreenService.register();
     await this.localizationService.init();
     await this.themeService.init();
 
@@ -54,5 +62,6 @@ export class AppBootstrap {
   async doAfterPluginsInit() {
     // todo this should be moved to the NavigationTabs component creation phase but now it leads to bugs
     await this.navigationTabsService.restoreTabs();
+    this.routerService.start();
   }
 }

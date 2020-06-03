@@ -25,7 +25,7 @@ export function SqlEditorTab({
   return styled(useStyles(...style))(
     <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >
       <TabIcon icon='/icons/sql_script.png' />
-      <TabTitle title={name} />
+      <TabTitle>{name}</TabTitle>
     </Tab>
   );
 }

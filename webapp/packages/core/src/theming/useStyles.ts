@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@dbeaver/core/di';
+import { flat } from '@dbeaver/core/utils';
 
 import { ThemeService } from './ThemeService';
 import { applyComposes, ClassCollection, Composes } from './themeUtils';
@@ -41,7 +42,7 @@ export function useStyles(
           style => ((typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId))
         )
       )
-      .then(styles => setLoadedStyles(styles.flat()));
+      .then(styles => setLoadedStyles(flat(styles)));
   }, [currentThemeId]);
 
   const styles = useMemo(() => {

@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/root",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/root",
-  "module": "../dist/root",
-  "types": "../dist/types/root"
+  "main": "../dist/root/index.js",
+  "module": "../dist/root/index.js"
 }

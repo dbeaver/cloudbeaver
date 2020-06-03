@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/eventsLog",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/eventsLog",
-  "module": "../dist/eventsLog",
-  "types": "../dist/types/eventsLog"
+  "main": "../dist/eventsLog/index.js",
+  "module": "../dist/eventsLog/index.js"
 }

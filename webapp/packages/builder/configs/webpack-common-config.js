@@ -11,6 +11,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MergeJsonWebpackPlugin = require("merge-jsons-webpack-plugin");
 const StringReplacePlugin = require("string-replace-webpack-plugin");
 const resolve = require('resolve');
 const path = require('path');
@@ -71,9 +72,57 @@ function copyPublic(currentDir, pluginsList) {
   return pathsToCopy;
 }
 
+/**
+  * Search for locales in plugins and combine them together
+  */
+function combineLocales(contextPath, pluginsList) {
+  const locales = new Map(); // { locale: array of paths}
+  pluginsList.forEach(plugin => {
+    try {
+      const pathToPlugin = resolve.sync(plugin);
+      const dir = path.parse(pathToPlugin).dir;
+      const pathToLocales = path.resolve(dir, '../locales');
+      if (dirExists(pathToLocales)) {
+        fs.readdirSync(pathToLocales).forEach(file => {
+          const fileParse = path.parse(file)
+          if (fileParse.ext !== '.json') {
+            return;
+          }
+          const fullFileName = path.join(pathToLocales, file);
+          let relativeName = path.relative(contextPath, fullFileName);
+
+          if (locales.has(fileParse.base)) {
+            const pathList = locales.get(fileParse.base);
+            pathList.push(relativeName)
+          } else {
+            locales.set(fileParse.base, [relativeName])
+          }
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
+  const mergeJsonWebpackPluginGroupBy = [];
+  locales.forEach((pathsList, name) => {
+    const pattern = pathsList.length > 1
+      ? `{${pathsList.join(',')}}`
+      : pathsList[0];
+    mergeJsonWebpackPluginGroupBy.push({
+      pattern,
+      fileName: `locales/${name}`,
+    })
+  })
+  console.log('Locales');
+  console.log(mergeJsonWebpackPluginGroupBy);
+  return mergeJsonWebpackPluginGroupBy;
+}
+
+const contextPath = path.resolve(__dirname, '../src');
+
 module.exports = (env, argv) => {
   return {
-    context: path.resolve(__dirname, '../src'),
+    context: contextPath,
     resolve: {
       extensions: ['.js'],
       alias: {
@@ -89,13 +138,8 @@ module.exports = (env, argv) => {
           test: /\.js$/,
           use: [
             {
-              loader: 'babel-loader',
-              options: {
-                configFile: path.join(__dirname, 'babel-app.config.js')
-              },
-            },
-            {
               loader: StringReplacePlugin.replace({
+              exclude: /node_modules/,
                 /**
                  * This replacement allows to put into the build the plugins that were mentioned in package.json
                  */
@@ -111,7 +155,6 @@ module.exports = (env, argv) => {
             },
             'source-map-loader'
           ],
-          exclude: /node_modules/,
         },
       ],
     },
@@ -120,14 +163,24 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: path.resolve(argv.currentDir, './index.html.ejs'),
       }),
+      new MergeJsonWebpackPlugin({
+        debug: true,
+        output: {
+          groupBy: combineLocales(contextPath, argv.pluginsList),
+        },
+        globOptions: {
+          debug: false,
+          cwd: contextPath,
+        }
+      }),
       new webpack.DefinePlugin({
         version: JSON.stringify(require(path.resolve(argv.currentDir, './package.json')).buildVersion),
       }),
       new CircularDependencyPlugin({
         // exclude detection of files based on a RegExp
-        // exclude: /\.js|node_modules/,
+        exclude: /node_modules/,
         // include specific files based on a RegExp
-        // include: /dir/,
+        include: /@dbeaver/,
         // add errors to webpack instead of warnings
         failOnError: false,
         // allow import cycles that include an asyncronous import,

@@ -36,14 +36,14 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("authLogin", env -> getService(env).authLogin(
-                getWebSession(env),
+                getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("credentials")))
             .dataFetcher("authLogout", env -> {
                 getService(env).authLogout(getWebSession(env));
                 return true;
             })
-            .dataFetcher("sessionUser", env -> getService(env).sessionUser(getWebSession(env)))
+            .dataFetcher("sessionUser", env -> getService(env).sessionUser(getWebSession(env, false)))
             .dataFetcher("authProviders", env -> getService(env).getAuthProviders(getWebSession(env)))
         ;
 

@@ -1,0 +1,10 @@
+query getPermissionsList($roleId: ID) {
+  permissions: listPermissions {
+    id
+    label
+    description
+
+    provider
+    category
+  } 
+}

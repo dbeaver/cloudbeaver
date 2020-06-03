@@ -18,6 +18,10 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Application configuration
  */
@@ -33,6 +37,7 @@ public class CBAppConfig {
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
     private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
+    private Map<String, Object> plugins = new LinkedHashMap<>();
 
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
@@ -77,4 +82,18 @@ public class CBAppConfig {
     public String getDefaultAuthProvider() {
         return defaultAuthProvider;
     }
+
+    public Map<String, Object> getPluginConfig(String pluginId) {
+        Object config = plugins.get(pluginId);
+        if (config instanceof Map) {
+            return (Map<String, Object>) config;
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    public <T> T getPluginOption(String pluginId, String option) {
+        return (T)getPluginConfig(pluginId).get(option);
+    }
+
 }

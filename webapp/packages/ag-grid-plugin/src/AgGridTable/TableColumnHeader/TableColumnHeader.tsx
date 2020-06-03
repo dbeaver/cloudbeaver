@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import { useCallback, useEffect, useState } from 'react';
+import styled, { css, use } from 'reshadow';
 
 import { AgEvent, GridApi, Column } from '@ag-grid-community/core';
-import { StaticImage } from '@dbeaver/core/blocks';
+import { StaticImage, Icon } from '@dbeaver/core/blocks';
+
+import { SortMode } from '../IAgGridModel';
 
 type HeaderProps = {
   api: GridApi;
@@ -21,7 +23,7 @@ type HeaderProps = {
   menuIcon: string;
   displayName: string;
   showColumnMenu: (button?: HTMLDivElement) => void;
-  setSort: (order: string, shiftKey: boolean) => void;
+  setSort: (order: SortMode, shiftKey: boolean) => void;
   icon?: string;
 }
 
@@ -42,6 +44,28 @@ const headerStyles = css`
     margin-left: 8px;
     text-transform: uppercase;
     font-weight: 400;
+    flex-grow: 1;
+  }
+  
+  sort-icon {
+    margin-left: 4px;
+    display: flex;
+    padding: 2px 4px;
+    flex-direction: column;
+    align-content: center;
+  }
+  sort-icon > Icon {
+    width: 8px;
+    fill: #cbcbcb;
+  }
+  sort-icon > Icon:last-child {
+    transform: scaleY(-1);
+  }
+  sort-icon > Icon[|active] {
+    fill: #338ECC;
+  }
+  sort-icon:hover > Icon {
+    width: 9px;
   }
 `;
 
@@ -63,12 +87,47 @@ export function TableColumnHeader(props: HeaderProps) {
     props.api.dispatchEvent(event);
   }, []);
 
+  const [sortMode, setSortMode] = useState<SortMode>(() => props.column.getSort() as SortMode);
+  useEffect(() => {
+    function onSortChanged() {
+      setSortMode(props.column.getSort() as SortMode);
+    }
+
+    props.column.addEventListener('sortChanged', onSortChanged);
+    return function cleanup() {
+      props.column.removeEventListener('sortChanged', onSortChanged);
+    };
+  });
+
+  const handleSort = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const sort = props.column.getSort() as SortMode;
+      let nextSort: SortMode;
+      switch (sort) {
+        case 'asc':
+          nextSort = 'desc';
+          break;
+        case 'desc':
+          nextSort = null;
+          break;
+        default:
+          nextSort = 'asc';
+      }
+      props.setSort(nextSort, e.ctrlKey);
+    },
+    []
+  );
+
   return styled(headerStyles)(
     <table-header as="div" onClick={handleClick}>
       <icon as="div">
         <StaticImage icon={props.icon} />
       </icon>
       <name as="div">{props.displayName}</name>
+      {props.enableSorting && <sort-icon as="div" onClick={handleSort}>
+        <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'asc' })} />
+        <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'desc' })} />
+      </sort-icon>}
     </table-header>
   );
 }

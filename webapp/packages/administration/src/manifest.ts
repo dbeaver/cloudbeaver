@@ -8,8 +8,10 @@
 
 import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
+import { AdministrationItemService } from './AdministrationItem/AdministrationItemService';
 import { AdministrationMenuService } from './AdministrationMenuService';
-import { Bootstrap } from './Bootstrap';
+import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
+import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -18,11 +20,11 @@ export const manifest: PluginManifest = {
 
   providers: [
     AdministrationMenuService,
+    AdministrationScreenService,
+    AdministrationTopAppBarService,
+    AdministrationItemService,
   ],
 
   async initialize(services: IServiceInjector) {
-    services
-      .resolveServiceByClass(Bootstrap)
-      .bootstrap();
   },
 };

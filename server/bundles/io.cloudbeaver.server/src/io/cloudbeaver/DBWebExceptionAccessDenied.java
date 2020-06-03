@@ -21,8 +21,6 @@ package io.cloudbeaver;
  */
 public class DBWebExceptionAccessDenied extends DBWebException {
 
-    public static final String ERROR_CODE_ACCESS_DENIED = "accessDenied";
-
     public DBWebExceptionAccessDenied(String message) {
         super(message, ERROR_CODE_ACCESS_DENIED);
     }

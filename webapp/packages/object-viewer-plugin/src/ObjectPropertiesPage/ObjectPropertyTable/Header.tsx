@@ -8,11 +8,12 @@
 
 import styled, { css } from 'reshadow';
 
+import { TableColumnHeader } from '@dbeaver/core/blocks';
 import { ObjectPropertyInfo } from '@dbeaver/core/sdk';
 import { useStyles } from '@dbeaver/core/theming';
 
 const styles = css`
-  th:first-child {
+  TableColumnHeader:nth-child(2) {
     width:16px;
     border-right: none;
   }
@@ -34,13 +35,14 @@ type HeaderProps = {
 export function Header({ properties }: HeaderProps) {
 
   return styled(useStyles(styles))(
-    <tr>
-      <th></th>
+    <>
+      <TableColumnHeader min></TableColumnHeader>
+      <TableColumnHeader></TableColumnHeader>
       {properties.map(property => (
-        <th key={property.id} title={property.description}>
+        <TableColumnHeader key={property.id} title={property.description}>
           {property.displayName}
-        </th>
+        </TableColumnHeader>
       ))}
-    </tr>
+    </>
   );
 }

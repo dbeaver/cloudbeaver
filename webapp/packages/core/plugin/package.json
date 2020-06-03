@@ -2,7 +2,6 @@
   "name": "@dbeaver/core/plugin",
   "private": true,
   "sideEffects": false,
-  "main": "../dist/plugin",
-  "module": "../dist/plugin",
-  "types": "../dist/types/plugin"
+  "main": "../dist/plugin/index.js",
+  "module": "../dist/plugin/index.js"
 }

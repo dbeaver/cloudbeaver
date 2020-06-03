@@ -106,7 +106,9 @@ module.exports = {
     'import/export': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'import/no-extraneous-dependencies': 'warn',
+    // import/no-extraneous-dependencies off because peer dependencies are moved to builder
+    // todo probably there is a way to tune this (see packageDir option in documentation)
+    'import/no-extraneous-dependencies': 'off',
     'import/prefer-default-export': 'off',
     'import/no-cycle': 'off',
     'import-helpers/order-imports': [

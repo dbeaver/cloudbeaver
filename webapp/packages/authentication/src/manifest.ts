@@ -8,6 +8,9 @@
 
 import { IServiceInjector, PluginManifest } from '@dbeaver/core/di';
 
+import { RolesManagerService } from './Administration/RolesManagerService';
+import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
+import { UsersManagerService } from './Administration/UsersManagerService';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthMenuService } from './AuthMenuService';
@@ -26,6 +29,9 @@ export const manifest: PluginManifest = {
     AuthProviderService,
     AuthDialogService,
     AuthMenuService,
+    UsersAdministrationService,
+    UsersManagerService,
+    RolesManagerService,
   ],
 
   async initialize(services: IServiceInjector) {
