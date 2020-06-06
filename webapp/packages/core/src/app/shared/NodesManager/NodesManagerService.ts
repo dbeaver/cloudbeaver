@@ -312,11 +312,3 @@ export class NodesManagerService {
       || info.features.includes(ENodeFeature.container);
   }
 }
-
-export function isDatabaseObject(objectId: string) {
-  return /^database:\/\//.test(objectId);
-}
-
-export function concatSchemaAndCatalog(catalogId?: string, schemaId?: string) {
-  return `${schemaId || ''}${schemaId && catalogId ? '@' : ''}${catalogId || ''}`;
-}

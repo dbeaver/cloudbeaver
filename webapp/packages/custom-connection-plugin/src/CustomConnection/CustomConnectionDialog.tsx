@@ -9,41 +9,41 @@
 import { observer } from 'mobx-react';
 
 import { useController } from '@dbeaver/core/di';
-import { DialogComponent } from '@dbeaver/core/dialogs';
+import { DialogComponentProps } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 
 import { ConnectionFormDialog } from './ConnectionFormDialog/ConnectionFormDialog';
 import { CustomConnectionController, ConnectionStep } from './CustomConnectionController';
 import { DriverSelectorDialog } from './DriverSelectorDialog/DriverSelectorDialog';
 
-export const CustomConnectionDialog: DialogComponent<null, null> = observer(
-  function CustomConnectionDialog(props) {
-    const controller = useController(CustomConnectionController);
-    let title = useTranslate('basicConnection_connectionDialog_newConnection');
+export const CustomConnectionDialog = observer(function CustomConnectionDialog({
+  rejectDialog,
+}: DialogComponentProps<null, null>) {
+  const controller = useController(CustomConnectionController);
+  let title = useTranslate('basicConnection_connectionDialog_newConnection');
 
-    if (controller.step === ConnectionStep.Connection && controller.driver?.name) {
-      title = controller.driver.name;
-    }
+  if (controller.step === ConnectionStep.Connection && controller.driver?.name) {
+    title = controller.driver.name;
+  }
 
-    if (controller.step === ConnectionStep.Connection && controller.driver) {
-      return (
-        <ConnectionFormDialog
-          title={title}
-          driver={controller.driver}
-          onBack={() => controller.onStep(ConnectionStep.Driver)}
-          onClose={props.rejectDialog}
-        />
-      );
-    }
-
+  if (controller.step === ConnectionStep.Connection && controller.driver) {
     return (
-      <DriverSelectorDialog
+      <ConnectionFormDialog
         title={title}
-        drivers={controller.drivers}
-        onSelect={controller.onDriverSelect}
-        isLoading={controller.isLoading}
-        onClose={props.rejectDialog}
+        driver={controller.driver}
+        onBack={() => controller.onStep(ConnectionStep.Driver)}
+        onClose={rejectDialog}
       />
     );
   }
-);
+
+  return (
+    <DriverSelectorDialog
+      title={title}
+      drivers={controller.drivers}
+      onSelect={controller.onDriverSelect}
+      isLoading={controller.isLoading}
+      onClose={rejectDialog}
+    />
+  );
+});

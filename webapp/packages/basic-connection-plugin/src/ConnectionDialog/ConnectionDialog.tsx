@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { ErrorMessage, SubmittingForm, Loader } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
-import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponentProps } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
@@ -37,59 +37,59 @@ const styles = css`
   }
 `;
 
-export const ConnectionDialog: DialogComponent<null, null> = observer(
-  function ConnectionDialog(props: DialogComponentProps<null, null>) {
-    const controller = useController(ConnectionController, props.rejectDialog);
-    const translate = useTranslate();
-    let title = translate('basicConnection_connectionDialog_newConnection');
+export const ConnectionDialog = observer(function ConnectionDialog({
+  rejectDialog,
+}: DialogComponentProps<null, null>) {
+  const controller = useController(ConnectionController, rejectDialog);
+  const translate = useTranslate();
+  let title = translate('basicConnection_connectionDialog_newConnection');
 
-    if (controller.step === ConnectionStep.Connection && controller.dbSource?.name) {
-      title = controller.dbSource.name;
-    }
-
-    return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={title}
-        noBodyPadding={controller.step === ConnectionStep.DBSource}
-        footer={controller.step === ConnectionStep.Connection && (
-          <ConnectionDialogFooter
-            isConnecting={controller.isConnecting}
-            onBack={() => controller.onStep(ConnectionStep.DBSource)}
-            onConnect={controller.onConnect}
-          />
-        )}
-        onReject={props.rejectDialog}
-      >
-        {controller.isLoading && <Loader />}
-        {!controller.isLoading && controller.step === ConnectionStep.DBSource && (
-          <DBSourceSelector
-            dbSources={controller.dbSources}
-            dbDrivers={controller.dbDrivers}
-            onSelect={controller.onDBSourceSelect}
-          />
-        )}
-        {controller.step === ConnectionStep.Connection && (controller.dbDriver?.anonymousAccess ? (
-          <center as="div">
-            {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
-          </center>
-        ) : (
-          <SubmittingForm onSubmit={controller.onConnect}>
-            <Connection
-              userName={controller.config.userName}
-              userPassword={controller.config.userPassword}
-              isConnecting={controller.isConnecting}
-              onChange={controller.onChange}
-            />
-          </SubmittingForm>
-        ))}
-        {controller.responseMessage && (
-          <ErrorMessage
-            text={controller.responseMessage}
-            hasDetails={controller.hasDetails}
-            onShowDetails={controller.onShowDetails}
-          />
-        )}
-      </CommonDialogWrapper>
-    );
+  if (controller.step === ConnectionStep.Connection && controller.dbSource?.name) {
+    title = controller.dbSource.name;
   }
-);
+
+  return styled(useStyles(styles))(
+    <CommonDialogWrapper
+      title={title}
+      noBodyPadding={controller.step === ConnectionStep.DBSource}
+      footer={controller.step === ConnectionStep.Connection && (
+        <ConnectionDialogFooter
+          isConnecting={controller.isConnecting}
+          onBack={() => controller.onStep(ConnectionStep.DBSource)}
+          onConnect={controller.onConnect}
+        />
+      )}
+      onReject={rejectDialog}
+    >
+      {controller.isLoading && <Loader />}
+      {!controller.isLoading && controller.step === ConnectionStep.DBSource && (
+        <DBSourceSelector
+          dbSources={controller.dbSources}
+          dbDrivers={controller.dbDrivers}
+          onSelect={controller.onDBSourceSelect}
+        />
+      )}
+      {controller.step === ConnectionStep.Connection && (controller.dbDriver?.anonymousAccess ? (
+        <center as="div">
+          {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
+        </center>
+      ) : (
+        <SubmittingForm onSubmit={controller.onConnect}>
+          <Connection
+            userName={controller.config.userName}
+            userPassword={controller.config.userPassword}
+            isConnecting={controller.isConnecting}
+            onChange={controller.onChange}
+          />
+        </SubmittingForm>
+      ))}
+      {controller.responseMessage && (
+        <ErrorMessage
+          text={controller.responseMessage}
+          hasDetails={controller.hasDetails}
+          onShowDetails={controller.onShowDetails}
+        />
+      )}
+    </CommonDialogWrapper>
+  );
+});

@@ -14,7 +14,7 @@ import {
   SubmittingForm, ErrorMessage, InputField, Checkbox
 } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
-import { DialogComponent, CommonDialogWrapper } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponentProps } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
@@ -57,103 +57,103 @@ const styles = composes(
   `
 );
 
-export const CreateUserDialog: DialogComponent<null, null> = observer(
-  function CreateUserDialog(props) {
-    const controller = useController(CreateUserDialogController, props.rejectDialog);
-    const translate = useTranslate();
-    const handleLoginChange = useCallback(
-      (value: string) => controller.credentials.login = value,
-      []
-    );
-    const handlePasswordChange = useCallback(
-      (value: string) => controller.credentials.password = value,
-      []
-    );
-    const handlePasswordRepeatChange = useCallback(
-      (value: string) => controller.credentials.passwordRepeat = value,
-      []
-    );
-    const handleRoleChange = useCallback(
-      (roleId: string, value: boolean) => controller.credentials.roles.set(roleId, value),
-      []
-    );
+export const CreateUserDialog = observer(function CreateUserDialog({
+  rejectDialog,
+}: DialogComponentProps<null, null>) {
+  const controller = useController(CreateUserDialogController, rejectDialog);
+  const translate = useTranslate();
+  const handleLoginChange = useCallback(
+    (value: string) => controller.credentials.login = value,
+    []
+  );
+  const handlePasswordChange = useCallback(
+    (value: string) => controller.credentials.password = value,
+    []
+  );
+  const handlePasswordRepeatChange = useCallback(
+    (value: string) => controller.credentials.passwordRepeat = value,
+    []
+  );
+  const handleRoleChange = useCallback(
+    (roleId: string, value: boolean) => controller.credentials.roles.set(roleId, value),
+    []
+  );
 
-    return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title={translate('authentication_create_user_dialog_title')}
-        noBodyPadding
-        footer={(
-          <CreateUserDialogFooter
-            isCreating={controller.isCreating}
-            onCancel={props.rejectDialog}
-            onCreate={controller.create}
-          />
-        )}
-        onReject={props.rejectDialog}
-      >
-        <SubmittingForm onSubmit={controller.create} autoComplete="disabled">
-          <create-form as='div'>
-            <group as="div">
-              <InputField
-                type='text'
-                name='login'
-                value={controller.credentials.login}
-                onChange={handleLoginChange}
+  return styled(useStyles(styles))(
+    <CommonDialogWrapper
+      title={translate('authentication_create_user_dialog_title')}
+      noBodyPadding
+      footer={(
+        <CreateUserDialogFooter
+          isCreating={controller.isCreating}
+          onCancel={rejectDialog}
+          onCreate={controller.create}
+        />
+      )}
+      onReject={rejectDialog}
+    >
+      <SubmittingForm onSubmit={controller.create} autoComplete="disabled">
+        <create-form as='div'>
+          <group as="div">
+            <InputField
+              type='text'
+              name='login'
+              value={controller.credentials.login}
+              onChange={handleLoginChange}
+              disabled={controller.isCreating}
+              mod='surface'
+            >
+              {translate('authentication_user_name')}
+            </InputField>
+          </group>
+          <group as="div">
+            <InputField
+              type='password'
+              name='password'
+              value={controller.credentials.password}
+              onChange={handlePasswordChange}
+              disabled={controller.isCreating}
+              mod='surface'
+            >
+              {translate('authentication_user_password')}
+            </InputField>
+          </group>
+          <group as="div">
+            <InputField
+              type='password'
+              name='password_repeat'
+              value={controller.credentials.passwordRepeat}
+              onChange={handlePasswordRepeatChange}
+              disabled={controller.isCreating}
+              mod='surface'
+            >
+              {translate('authentication_user_password_repeat')}
+            </InputField>
+          </group>
+          {controller.roles.map((role, i) => (
+            <group as="div" key={role.roleId}>
+              <Checkbox
+                type='checkbox'
+                name='role'
+                checkboxLabel={role.roleName || role.roleId}
+                onChange={checked => handleRoleChange(role.roleId, checked)}
+                checked={controller.credentials.roles.get(role.roleId)}
                 disabled={controller.isCreating}
                 mod='surface'
               >
-                {translate('authentication_user_name')}
-              </InputField>
+                {i === 0 && translate('authentication_user_role')}
+              </Checkbox>
             </group>
-            <group as="div">
-              <InputField
-                type='password'
-                name='password'
-                value={controller.credentials.password}
-                onChange={handlePasswordChange}
-                disabled={controller.isCreating}
-                mod='surface'
-              >
-                {translate('authentication_user_password')}
-              </InputField>
-            </group>
-            <group as="div">
-              <InputField
-                type='password'
-                name='password_repeat'
-                value={controller.credentials.passwordRepeat}
-                onChange={handlePasswordRepeatChange}
-                disabled={controller.isCreating}
-                mod='surface'
-              >
-                {translate('authentication_user_password_repeat')}
-              </InputField>
-            </group>
-            {controller.roles.map((role, i) => (
-              <group as="div" key={role.roleId}>
-                <Checkbox
-                  type='checkbox'
-                  name='role'
-                  checkboxLabel={role.roleName || role.roleId}
-                  onChange={checked => handleRoleChange(role.roleId, checked)}
-                  checked={controller.credentials.roles.get(role.roleId)}
-                  disabled={controller.isCreating}
-                  mod='surface'
-                >
-                  {i === 0 && translate('authentication_user_role')}
-                </Checkbox>
-              </group>
-            ))}
-          </create-form>
-        </SubmittingForm>
-        {controller.error.responseMessage && (
-          <ErrorMessage
-            text={controller.error.responseMessage}
-            hasDetails={controller.error.hasDetails}
-            onShowDetails={controller.showDetails}
-          />
-        )}
-      </CommonDialogWrapper>
-    );
-  }
-);
+          ))}
+        </create-form>
+      </SubmittingForm>
+      {controller.error.responseMessage && (
+        <ErrorMessage
+          text={controller.error.responseMessage}
+          hasDetails={controller.error.hasDetails}
+          onShowDetails={controller.showDetails}
+        />
+      )}
+    </CommonDialogWrapper>
+  );
+});

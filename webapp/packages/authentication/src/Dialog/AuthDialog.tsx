@@ -13,7 +13,7 @@ import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle
 } from '@dbeaver/core/blocks';
 import { useController } from '@dbeaver/core/di';
-import { DialogComponent, CommonDialogWrapper } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponentProps } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
@@ -79,56 +79,57 @@ const styles = composes(
   `
 );
 
-export const AuthDialog: DialogComponent<null, null> = observer(
-  function AuthDialog(props) {
-    const controller = useController(AuthDialogController, props.rejectDialog);
-    const translate = useTranslate();
+export const AuthDialog = observer(function AuthDialog({
+  options,
+  rejectDialog,
+}: DialogComponentProps<null, null>) {
+  const controller = useController(AuthDialogController, rejectDialog);
+  const translate = useTranslate();
 
-    return styled(useStyles(styles))(
-      <TabsState currentTabId={controller.provider?.id || null}>
-        <CommonDialogWrapper
-          title={translate('authentication_login_dialog_title')}
-          noBodyPadding
-          header={(
-            <TabList aria-label='Auth providers'>
-              {controller.providers.map(provider => (
-                <Tab
-                  key={provider.id}
-                  tabId={provider.id}
-                  onOpen={() => controller.selectProvider(provider.id)}
-                >
-                  <TabTitle>{provider.label}</TabTitle>
-                </Tab>
-              ))}
-            </TabList>
-          )}
-          footer={(
-            <AuthDialogFooter
-              isAuthenticating={controller.isAuthenticating}
-              onLogin={controller.login}
+  return styled(useStyles(styles))(
+    <TabsState currentTabId={controller.provider?.id || null}>
+      <CommonDialogWrapper
+        title={translate('authentication_login_dialog_title')}
+        noBodyPadding
+        header={(
+          <TabList aria-label='Auth providers'>
+            {controller.providers.map(provider => (
+              <Tab
+                key={provider.id}
+                tabId={provider.id}
+                onOpen={() => controller.selectProvider(provider.id)}
+              >
+                <TabTitle>{provider.label}</TabTitle>
+              </Tab>
+            ))}
+          </TabList>
+        )}
+        footer={(
+          <AuthDialogFooter
+            isAuthenticating={controller.isAuthenticating}
+            onLogin={controller.login}
+          />
+        )}
+        onReject={options?.persistent ? undefined : rejectDialog}
+      >
+        <SubmittingForm onSubmit={controller.login}>
+          {controller.provider && (
+            <AuthProviderForm
+              provider={controller.provider}
+              credentials={controller.credentials}
+              authenticate={controller.isAuthenticating}
             />
           )}
-          onReject={props.options?.persistent ? undefined : props.rejectDialog}
-        >
-          <SubmittingForm onSubmit={controller.login}>
-            {controller.provider && (
-              <AuthProviderForm
-                provider={controller.provider}
-                credentials={controller.credentials}
-                authenticate={controller.isAuthenticating}
-              />
-            )}
-            {!controller.provider && <>Select available provider</>}
-          </SubmittingForm>
-          {controller.error.responseMessage && (
-            <ErrorMessage
-              text={controller.error.responseMessage}
-              hasDetails={controller.error.hasDetails}
-              onShowDetails={controller.showDetails}
-            />
-          )}
-        </CommonDialogWrapper>
-      </TabsState>
-    );
-  }
-);
+          {!controller.provider && <>Select available provider</>}
+        </SubmittingForm>
+        {controller.error.responseMessage && (
+          <ErrorMessage
+            text={controller.error.responseMessage}
+            hasDetails={controller.error.hasDetails}
+            onShowDetails={controller.showDetails}
+          />
+        )}
+      </CommonDialogWrapper>
+    </TabsState>
+  );
+});

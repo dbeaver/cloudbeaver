@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import React, { PropsWithChildren } from 'react';
 
-import { useChildren } from '../../../shared/useChildren';
+import { useChildren } from '../../shared/useChildren';
 
 type NavigationNodeChildrenProps = PropsWithChildren<{
   parentId: string;
@@ -29,7 +29,7 @@ export const NavigationNodeChildren = observer(function NavigationNodeChildren({
   const NavigationNodeChild = component;
   return (
     <>
-      {nodeChildren.children.map(id => (
+      {nodeChildren.children!.map(id => (
         <NavigationNodeChild id={id} key={id} />
       ))}
     </>

@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, SanitizedHTML } from '@dbeaver/core/blocks';
-import { CommonDialogWrapper, DialogComponent } from '@dbeaver/core/dialogs';
+import { CommonDialogWrapper, DialogComponentProps } from '@dbeaver/core/dialogs';
 import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
@@ -44,9 +44,9 @@ export type ErrorDialogPayload = {
   onShowDetails?: () => void;
 }
 
-export const ErrorDialog: DialogComponent<ErrorDialogPayload, boolean> = observer(function ErrorDialog({
+export const ErrorDialog = observer(function ErrorDialog({
   rejectDialog, resolveDialog, payload,
-}) {
+}: DialogComponentProps<ErrorDialogPayload, boolean>) {
   const handleRetry = useCallback(() => resolveDialog(true), [resolveDialog]);
   const translate = useTranslate();
 

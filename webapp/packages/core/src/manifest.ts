@@ -73,7 +73,7 @@ export const coreManifest: PluginManifest = {
     ServerService,
   ],
 
-  async initialize(services) {
+  async initialize() {
     // Note that the initialization of the core occurs in AppBootstrap
     // and it is called before the initialization phase of all manifests
   },

@@ -7,13 +7,13 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import { GraphQLService, SqlDataFilterConstraint } from '@dbeaver/core/sdk';
+import { GraphQLService } from '@dbeaver/core/sdk';
 
+import { RequestDataOptionsToConstrains } from './DataViewerUtils';
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
 import { IRequestDataResult, IRequestDataResultOptions, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
-import { RequestDataOptionsToConstrains } from './DataViewerUtils';
 
 
 @injectable()

@@ -15,12 +15,12 @@ import {
   IContextProvider,
   ITab,
   TabHandler,
-  isDatabaseObject,
   NavigationType,
   NodeManagerUtils,
   connectionProvider,
   objectCatalogProvider,
   objectSchemaProvider,
+  NavNodeManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
@@ -115,7 +115,7 @@ export class ObjectViewerTabService {
       const propertiesTabLoadingKey = `${tab.handlerState.objectId}_${folderId}`;
 
       try {
-        if (children.length === 0 || !isDatabaseObject(folderId)) {
+        if (children.length === 0 || !NodeManagerUtils.isDatabaseObject(folderId)) {
           return;
         }
 

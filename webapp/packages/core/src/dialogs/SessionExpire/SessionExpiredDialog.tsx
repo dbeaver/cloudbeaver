@@ -15,7 +15,7 @@ import { useTranslate } from '@dbeaver/core/localization';
 import { useStyles } from '@dbeaver/core/theming';
 
 import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper';
-import { DialogComponent } from '../CommonDialog/CommonDialogService';
+import { DialogComponentProps } from '../CommonDialog/CommonDialogService';
 
 const styles = css`
   dialog-content {
@@ -34,9 +34,9 @@ const styles = css`
   }
 `;
 
-export const SessionExpiredDialog: DialogComponent<null, null> = observer(function SessionExpiredDialog({
+export const SessionExpiredDialog = observer(function SessionExpiredDialog({
   rejectDialog,
-}) {
+}: DialogComponentProps<null, null>) {
   const translate = useTranslate();
   const title = translate('app_root_session_expired_title');
   const reload = useCallback(() => window.location.reload(), []);

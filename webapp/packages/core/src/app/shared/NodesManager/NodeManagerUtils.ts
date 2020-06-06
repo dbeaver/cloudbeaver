@@ -25,5 +25,11 @@ export class NodeManagerUtils {
 
     return matches[1];
   }
+  static isDatabaseObject(objectId: string) {
+    return /^database:\/\//.test(objectId);
+  }
 
+  static concatSchemaAndCatalog(catalogId?: string, schemaId?: string) {
+    return `${schemaId || ''}${schemaId && catalogId ? '@' : ''}${catalogId || ''}`;
+  }
 }
