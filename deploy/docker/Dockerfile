@@ -1,4 +1,4 @@
-FROM adoptopenjdk:11-jre-hotspot
+FROM x86_64-ubuntu-jdk-11.0.7_10
 
 RUN apt-get install -y supervisor
 
