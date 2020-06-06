@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { NavigationNode } from './NavigationNode/NavigationNode';
-import { NavigationNodeChildren } from './NavigationNodeChildren/NavigationNodeChildren';
+import { NavigationNodeChildren } from './NavigationNodeChildren';
 import { TreeNodeMenu } from './TreeNodeMenu/TreeNodeMenu';
 import { useNavigationTree } from './useNavigationTree';
 

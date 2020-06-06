@@ -9,41 +9,42 @@
 import { observer } from 'mobx-react';
 
 import { useController } from '@dbeaver/core/di';
-import { DialogComponent } from '@dbeaver/core/dialogs';
+import { DialogComponentProps } from '@dbeaver/core/dialogs';
 
 import { IExportContext } from '../IExportContext';
 import { DataExportController, DataExportStep } from './DataExportController';
 import { ProcessorConfigureDialog } from './ProcessorConfigureDialog';
 import { ProcessorSelectDialog } from './ProcessorSelectDialog';
 
-export const DataExportDialog: DialogComponent<IExportContext, null> = observer(
-  function DataExportDialog(props) {
-    const controller = useController(DataExportController, props.payload, props.rejectDialog);
+export const DataExportDialog = observer(function DataExportDialog({
+  payload,
+  rejectDialog,
+}: DialogComponentProps<IExportContext, null>) {
+  const controller = useController(DataExportController, payload, rejectDialog);
 
-    if (controller.step === DataExportStep.Configure && controller.processor) {
-      return (
-        <ProcessorConfigureDialog
-          processor={controller.processor}
-          properties={controller.properties}
-          processorProperties={controller.processorProperties}
-          error={controller.error}
-          isExporting={controller.isExporting}
-          onShowDetails={controller.showDetails}
-          onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
-          onClose={props.rejectDialog}
-          onExport={controller.prepareExport}
-        />
-      );
-    }
-
+  if (controller.step === DataExportStep.Configure && controller.processor) {
     return (
-      <ProcessorSelectDialog
-        context={props.payload}
-        processors={controller.processors}
-        onSelect={controller.selectProcessor}
-        isLoading={controller.isLoading}
-        onClose={props.rejectDialog}
+      <ProcessorConfigureDialog
+        processor={controller.processor}
+        properties={controller.properties}
+        processorProperties={controller.processorProperties}
+        error={controller.error}
+        isExporting={controller.isExporting}
+        onShowDetails={controller.showDetails}
+        onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
+        onClose={rejectDialog}
+        onExport={controller.prepareExport}
       />
     );
   }
-);
+
+  return (
+    <ProcessorSelectDialog
+      context={payload}
+      processors={controller.processors}
+      onSelect={controller.selectProcessor}
+      isLoading={controller.isLoading}
+      onClose={rejectDialog}
+    />
+  );
+});

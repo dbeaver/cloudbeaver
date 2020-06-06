@@ -82,63 +82,61 @@ type ConnectionFormDialogProps = React.PropsWithChildren<{
   onBack(): void;
 }>
 
-export const ConnectionFormDialog = observer(
-  function ConnectionFormDialog({
-    title,
-    driver,
-    onClose,
-    onBack,
-  }: ConnectionFormDialogProps) {
-    const translate = useTranslate();
-    const controller = useController(ConnectionFormDialogController, driver, onClose);
-    const [loadProperties, setLoadProperties] = useState(false);
+export const ConnectionFormDialog = observer(function ConnectionFormDialog({
+  title,
+  driver,
+  onClose,
+  onBack,
+}: ConnectionFormDialogProps) {
+  const translate = useTranslate();
+  const controller = useController(ConnectionFormDialogController, driver, onClose);
+  const [loadProperties, setLoadProperties] = useState(false);
 
-    return styled(useStyles(styles))(
-      <TabsState selectedId='options'>
-        <CommonDialogWrapper
-          title={title}
-          noBodyPadding
-          header={(
-            <TabList>
-              <Tab tabId='options' >
-                <TabTitle>{translate('customConnection_options')}</TabTitle>
-              </Tab>
-              <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} >
-                <TabTitle>{translate('customConnection_properties')}</TabTitle>
-              </Tab>
-            </TabList>
-          )}
-          footer={(
-            <ConnectionFormDialogFooter
-              isConnecting={controller.isConnecting}
-              onConnectionTest={controller.onTestConnection}
-              onCreateConnection={controller.onCreateConnection}
-              onBack={onBack}
+  return styled(useStyles(styles))(
+    <TabsState selectedId='options'>
+      <CommonDialogWrapper
+        title={title}
+        noBodyPadding
+        header={(
+          <TabList>
+            <Tab tabId='options' >
+              <TabTitle>{translate('customConnection_options')}</TabTitle>
+            </Tab>
+            <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} >
+              <TabTitle>{translate('customConnection_properties')}</TabTitle>
+            </Tab>
+          </TabList>
+        )}
+        footer={(
+          <ConnectionFormDialogFooter
+            isConnecting={controller.isConnecting}
+            onConnectionTest={controller.onTestConnection}
+            onCreateConnection={controller.onCreateConnection}
+            onBack={onBack}
+          />
+        )}
+        onReject={onClose}
+      >
+        <SubmittingForm onSubmit={controller.onCreateConnection}>
+          <TabPanel tabId='options'>
+            <ConnectionForm driver={driver} controller={controller} />
+          </TabPanel>
+          <TabPanel tabId='driver_properties'>
+            <DriverProperties
+              driver={driver}
+              state={controller.config.properties!}
+              loadProperties={loadProperties}
             />
-          )}
-          onReject={onClose}
-        >
-          <SubmittingForm onSubmit={controller.onCreateConnection}>
-            <TabPanel tabId='options'>
-              <ConnectionForm driver={driver} controller={controller} />
-            </TabPanel>
-            <TabPanel tabId='driver_properties'>
-              <DriverProperties
-                driver={driver}
-                state={controller.config.properties!}
-                loadProperties={loadProperties}
-              />
-            </TabPanel>
-          </SubmittingForm>
-          {controller.error.responseMessage && (
-            <ErrorMessage
-              text={controller.error.responseMessage}
-              hasDetails={controller.error.hasDetails}
-              onShowDetails={controller.onShowDetails}
-            />
-          )}
-        </CommonDialogWrapper>
-      </TabsState>
-    );
-  }
-);
+          </TabPanel>
+        </SubmittingForm>
+        {controller.error.responseMessage && (
+          <ErrorMessage
+            text={controller.error.responseMessage}
+            hasDetails={controller.error.hasDetails}
+            onShowDetails={controller.onShowDetails}
+          />
+        )}
+      </CommonDialogWrapper>
+    </TabsState>
+  );
+});

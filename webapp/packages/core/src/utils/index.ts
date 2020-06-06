@@ -1,4 +1,5 @@
 export * from './flat';
+export * from './MetadataMap';
 export * from './OrderedMap';
 export * from './parseJSONFlat';
 export * from './uuid_';

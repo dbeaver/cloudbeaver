@@ -13,7 +13,7 @@ import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@dbeav
 
 import { ConnectionsManagerService, Connection } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
-import { concatSchemaAndCatalog } from '../../../shared/NodesManager/NodesManagerService';
+import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
 
 @injectable()
@@ -54,7 +54,7 @@ export class ConnectionSelectorController {
   }
 
   private get currentObjectContainerTitle(): string | undefined {
-    return concatSchemaAndCatalog(
+    return NodeManagerUtils.concatSchemaAndCatalog(
       this.connectionSelectorService.currentObjectCatalogId,
       this.connectionSelectorService.currentObjectSchemaId
     );
@@ -116,7 +116,10 @@ export class ConnectionSelectorController {
       .filter(item => !!item.name)
       .map((item) => {
         if (item.features?.includes(EObjectFeature.catalog)) {
-          const title = concatSchemaAndCatalog(item.name, this.connectionSelectorService.currentObjectSchemaId);
+          const title = NodeManagerUtils.concatSchemaAndCatalog(
+            item.name,
+            this.connectionSelectorService.currentObjectSchemaId
+          );
           const handler = item.features?.includes(EObjectFeature.catalog)
             ? () => this.connectionSelectorService.selectCatalog(item.name!)
             : () => this.connectionSelectorService.selectSchema(item.name!);
@@ -129,7 +132,10 @@ export class ConnectionSelectorController {
           return menuItem;
         }
 
-        const title = concatSchemaAndCatalog(this.connectionSelectorService.currentObjectCatalogId, item.name);
+        const title = NodeManagerUtils.concatSchemaAndCatalog(
+          this.connectionSelectorService.currentObjectCatalogId,
+          item.name
+        );
         const handler = item.features?.includes(EObjectFeature.catalog)
           ? () => this.connectionSelectorService.selectCatalog(item.name!)
           : () => this.connectionSelectorService.selectSchema(item.name!);
