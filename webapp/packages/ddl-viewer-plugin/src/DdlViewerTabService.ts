@@ -7,7 +7,7 @@
  */
 
 import {
-  EObjectFeature, NodesManagerService, IContextProvider, INodeNavigationData
+  EObjectFeature, NavNodeManagerService, IContextProvider, INodeNavigationData
 } from '@dbeaver/core/app';
 import { ITab } from '@dbeaver/core/blocks';
 import { injectable } from '@dbeaver/core/di';
@@ -22,16 +22,18 @@ const ddlViewerTabId = 'ddl-viewer';
 @injectable()
 export class DdlViewerTabService {
 
-  constructor(private nodesManagerService: NodesManagerService,
-              private objectViewerTabService: ObjectViewerTabService,
-              private notificationService: NotificationService,
-              private ddlViewerService: DdlViewerService) {
-    this.nodesManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+  constructor(
+    private navNodeManagerService: NavNodeManagerService,
+    private objectViewerTabService: ObjectViewerTabService,
+    private notificationService: NotificationService,
+    private ddlViewerService: DdlViewerService
+  ) {
+    this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
   buildTab(nodeId: string): ITab | null {
-    const node = this.nodesManagerService.getNode(nodeId);
-    const isDdlRequired = node?.object?.features?.includes(EObjectFeature.script);
+    const node = this.navNodeManagerService.getNode(nodeId);
+    const isDdlRequired = node?.objectFeatures.includes(EObjectFeature.script);
     if (!isDdlRequired) {
       return null;
     }
@@ -39,7 +41,7 @@ export class DdlViewerTabService {
       tabId: ddlViewerTabId,
       title: 'DDL',
       icon: 'sql-text',
-      onActivate: () => this.activateDDLTab(nodeId),
+      onActivate: () => this.activateDDLTab(nodeId, node?.parentId!),
       panel: () => ddlViewer(nodeId),
     };
     return ddlTab;
@@ -57,7 +59,7 @@ export class DdlViewerTabService {
     }
   }
 
-  private activateDDLTab(nodeId: string) {
-    this.nodesManagerService.navToNode(nodeId, ddlViewerTabId);
+  private activateDDLTab(nodeId: string, parentId: string) {
+    this.navNodeManagerService.navToNode(nodeId, parentId, ddlViewerTabId);
   }
 }

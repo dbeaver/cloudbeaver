@@ -21,13 +21,13 @@ type NodeProps = PropsWithChildren<{
   title?: string;
   icon?: string;
   isExpanded: boolean;
-  isLoaded?: boolean;
+  isLoading: boolean;
   isSelected: boolean;
   portal?: JSX.Element;
   isExpandable?: boolean;
-  onExpand?: (id: string) => void;
-  onDoubleClick?: (id: string) => void;
-  onClick?: (id: string, isMultiple?: boolean) => void;
+  onExpand?: () => void;
+  onDoubleClick?: () => void;
+  onClick?: (isMultiple?: boolean) => void;
 }>
 
 const KEYCODE = {
@@ -36,23 +36,19 @@ const KEYCODE = {
   DOWN: 40,
 };
 
-export function NavigationNode(
-  props: NodeProps
-) {
-  const {
-    id,
-    title,
-    icon,
-    children,
-    isLoaded,
-    isExpanded,
-    isSelected,
-    portal,
-    isExpandable,
-    onExpand,
-    onDoubleClick,
-    onClick,
-  } = props;
+export function NavigationNode({
+  title,
+  icon,
+  children,
+  isLoading,
+  isExpanded,
+  isSelected,
+  portal,
+  isExpandable,
+  onExpand,
+  onDoubleClick,
+  onClick,
+}: NodeProps) {
 
   const styles = useStyles(navigationNodeStyles);
 
@@ -60,28 +56,19 @@ export function NavigationNode(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       if (onExpand) {
-        onExpand(id);
+        onExpand();
       }
     },
-    [id, onExpand]
-  );
-
-  const handleDoubleClick = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      if (onDoubleClick) {
-        onDoubleClick(id);
-      }
-    },
-    [id, onDoubleClick]
+    [onExpand]
   );
 
   const handleClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       if (onClick) {
-        onClick(id, e.ctrlKey);
+        onClick(e.ctrlKey);
       }
     },
-    [id, onClick]
+    [onClick]
   );
 
   const handleEnter = useCallback(
@@ -89,29 +76,29 @@ export function NavigationNode(
       switch (event.keyCode) {
         case KEYCODE.ENTER:
           if (onClick) {
-            onClick(id, event.ctrlKey);
+            onClick(event.ctrlKey);
           }
           break;
       }
       return true;
     },
-    [id, onClick]
+    [onClick]
   );
 
   return styled(styles)(
     <>
-      <node as="div" {...use({ isExpanded: isExpanded && isLoaded })}>
+      <node as="div" {...use({ isExpanded: isExpanded && isExpandable })}>
         <control
           tabIndex={0}
           aria-selected={isSelected}
           onClick={handleClick}
           onKeyDown={handleEnter}
-          onDoubleClick={handleDoubleClick}
+          onDoubleClick={onDoubleClick}
           as="div"
         >
           <arrow as="div" hidden={!isExpandable} onClick={handleExpand}>
-            {!isLoaded && isExpanded && <Loader small />}
-            {(isLoaded || !isExpanded) && <Icon name="arrow" viewBox="0 0 16 16" />}
+            {isLoading && <Loader small />}
+            {!isLoading && <Icon name="arrow" viewBox="0 0 16 16" />}
           </arrow>
           <icon as="div"><StaticImage icon={icon} /></icon>
           <name as="div">{title}</name>

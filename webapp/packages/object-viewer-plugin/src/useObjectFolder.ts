@@ -6,14 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { NavNodeManagerService, DBObjectService } from '@dbeaver/core/app';
 import { useService } from '@dbeaver/core/di';
 
-import { ObjectViewerTabService } from './ObjectViewerTabService';
 
-export function useObjectFolder(objectId: string, folderId: string) {
-  const objectViewerTabService = useService(ObjectViewerTabService);
+export function useObjectFolder(objectId: string) {
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const dbObjectService = useService(DBObjectService);
 
-  const isLoading = objectViewerTabService.isTabLoading(`${objectId}_${folderId}`);
+  const children = navNodeManagerService.getTree(objectId) || [];
+
+  const isLoading = children.some(navNodeId => !dbObjectService.getDBObject(navNodeId))
+      && dbObjectService.dbObject.isDataLoading({ navNodeId: children });
 
   return { isLoading };
 }

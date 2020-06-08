@@ -14,4 +14,5 @@ export interface ITabOptions<T = any> {
 
 export interface ITab<T = any> extends ITabOptions<T> {
   id: string;
+  restored: boolean;
 }

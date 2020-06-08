@@ -15,32 +15,31 @@ import { Icon } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { MenuTrigger } from '@dbeaver/core/dialogs';
 
-import { useNode } from '../../../shared/NodesManager/useNode';
+import { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { NavigationTreeContextMenuService } from '../../NavigationTreeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
 
 type TreeNodeMenuProps = {
-  nodeId: string;
+  node: NavNode;
   isSelected: boolean;
 }
 
 export const TreeNodeMenu = observer(function TreeNodeMenu({
-  nodeId,
+  node,
   isSelected,
 }: TreeNodeMenuProps) {
 
   const navigationTreeContextMenuService = useService(NavigationTreeContextMenuService);
-  const node = useNode(nodeId)!;
 
   const menuPanel = useMemo(
     () => navigationTreeContextMenuService.constructMenuWithContext(node),
-    [nodeId]
+    [node]
   );
   const isHidden = useMemo(
     () => computed(() => !menuPanel.menuItems.length
       || menuPanel.menuItems.every(item => item.isHidden)),
-    [nodeId]
+    [menuPanel]
   );
 
   if (isHidden.get()) {

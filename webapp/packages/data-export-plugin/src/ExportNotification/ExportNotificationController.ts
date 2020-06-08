@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { ErrorDetailsDialog, NodesManagerService } from '@dbeaver/core/app';
+import { ErrorDetailsDialog, NavNodeManagerService } from '@dbeaver/core/app';
 import { IInitializableController, injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { INotification } from '@dbeaver/core/eventsLog';
@@ -46,7 +46,7 @@ export class ExportNotificationController implements IInitializableController {
       return '';
     }
     if (this.task.context.containerNodePath) {
-      const node = this.nodesManagerService.getNode(this.task.context.containerNodePath);
+      const node = this.navNodeManagerService.getNode(this.task.context.containerNodePath);
 
       return `${this.localization.translate('data_transfer_exporting_table')} ${node?.name}`;
     }
@@ -76,7 +76,7 @@ export class ExportNotificationController implements IInitializableController {
   constructor(
     private commonDialogService: CommonDialogService,
     private dataExportProcessService: DataExportProcessService,
-    private nodesManagerService: NodesManagerService,
+    private navNodeManagerService: NavNodeManagerService,
     private localization: LocalizationService,
   ) {}
 

@@ -35,9 +35,9 @@ const viewerStyles = composes(
 export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPagePanel({
   tab,
 }: ObjectPagePanelProps) {
-  const children = useChildren(tab.handlerState.objectId);
+  const { children, isLoading } = useChildren(tab.handlerState.objectId);
 
-  if (!children?.isLoaded) {
+  if (!children || isLoading) {
     return <Loader />;
   }
 

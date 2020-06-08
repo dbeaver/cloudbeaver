@@ -15,15 +15,16 @@ export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';
 export * from './shared/NodesManager/extensions/IObjectSchemaProvider';
 export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
+export * from './shared/NodesManager/DBObjectService';
+export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/Navigation/NavigationService';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
-export * from './shared/NodesManager/NodesManagerService';
-export * from './NavigationTree/NavigationTreeService';
-export * from './NavigationTree/NavigationTreeContextMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
+export * from './NavigationTree/NavigationTreeService';
+export * from './NavigationTree/NavigationTreeContextMenuService';
 export * from './Notifications/NotificationsItem/Snackbar/styles';
 export * from './Notifications/NotificationsItem/Snackbar/NotificationMark';
 
@@ -33,7 +34,8 @@ export * from './shared/NavigationTabs/TabHandler';
 export * from './shared/Navigation/NavigationContext';
 export * from './shared/TabEntity/TabEntity';
 // Enums
-// export * from '';
+export * from './shared/NodesManager/ENodeFeature';
+export * from './shared/NodesManager/EObjectFeature';
 
 // hooks
 export * from './shared/useChildren';
@@ -50,10 +52,8 @@ export * from './TopNavBar/Logo';
 
 // Interfaces
 export * from './shared/Navigation/INavigator';
-export * from './shared/NodesManager/ENodeFeature';
-export * from './shared/NodesManager/EObjectFeature';
 export * from './shared/NodesManager/NodeManagerUtils';
-export * from './shared/NodesManager/NodeWithParent';
+export * from './shared/NodesManager/EntityTypes';
 
 // tab entity
 export * from './shared/TabEntity/TabContainerEntity';

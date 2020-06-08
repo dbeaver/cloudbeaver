@@ -1,5 +1,8 @@
-query queryDatabaseObjectInfo($nodeId: ID!, $filter: ObjectPropertyFilter) {
-  objectInfo: navNodeInfo(nodePath: $nodeId) {
+query getChildrenDBObjectInfo(
+  $navNodeId: ID!
+  $filter: ObjectPropertyFilter
+) {
+  dbObjects: navNodeChildren(parentPath: $navNodeId) {
     id
     object {
       features

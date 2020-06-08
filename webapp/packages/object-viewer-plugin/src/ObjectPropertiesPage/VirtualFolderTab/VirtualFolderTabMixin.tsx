@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 
-import { NodesManagerService } from '@dbeaver/core/app';
+import { DBObjectService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 
 import { VirtualFolderTabData } from './VirtualFolderTabData';
@@ -18,9 +18,10 @@ export class VirtualFolderTabMixin {
 
   @observable isActivated = false;
 
-  constructor(private virtualFolderTabData: VirtualFolderTabData,
-              private nodesManagerService: NodesManagerService) {
-  }
+  constructor(
+    private virtualFolderTabData: VirtualFolderTabData,
+    private dbObjectService: DBObjectService
+  ) {}
 
   getChildrenId() {
     return this.virtualFolderTabData.childrenIds;
@@ -37,7 +38,7 @@ export class VirtualFolderTabMixin {
 
     try {
       for (const nodeId of this.getChildrenId()) {
-        await this.nodesManagerService.loadDatabaseObjectInfo(nodeId);
+        await this.dbObjectService.load(nodeId);
       }
     }
     finally {

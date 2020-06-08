@@ -18,7 +18,7 @@ import { IObjectViewerTabState } from './IObjectViewerTabState';
 export const ObjectViewerTab = observer(function ObjectViewerTab({
   tab, handler, onSelect, onClose, style,
 }: TabHandlerTabProps<IObjectViewerTabState>) {
-  const node = useNode(tab.handlerState.objectId);
+  const { node } = useNode(tab.handlerState.objectId);
 
   return styled(useStyles(...style))(
     <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >

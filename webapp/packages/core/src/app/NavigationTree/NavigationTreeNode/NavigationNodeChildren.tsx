@@ -13,24 +13,27 @@ import { useChildren } from '../../shared/useChildren';
 
 type NavigationNodeChildrenProps = PropsWithChildren<{
   parentId: string;
-  component: React.ElementType<{id: string}>;
+  component: React.ElementType<{
+    id: string;
+    parentId: string;
+  }>;
 }>
 
 export const NavigationNodeChildren = observer(function NavigationNodeChildren({
   parentId,
   component,
 }: NavigationNodeChildrenProps) {
-  const nodeChildren = useChildren(parentId);
+  const { children } = useChildren(parentId);
 
-  if (!nodeChildren?.isLoaded) {
+  if (!children) {
     return null;
   }
 
   const NavigationNodeChild = component;
   return (
     <>
-      {nodeChildren.children!.map(id => (
-        <NavigationNodeChild id={id} key={id} />
+      {children.map(id => (
+        <NavigationNodeChild id={id} parentId={parentId} key={id} />
       ))}
     </>
   );

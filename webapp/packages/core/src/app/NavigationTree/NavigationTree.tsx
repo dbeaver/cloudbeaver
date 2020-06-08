@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { usePermission, EPermission } from '@dbeaver/core/root';
 
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
 import { useChildren } from '../shared/useChildren';
 import { NavigationTreeNode } from './NavigationTreeNode/NavigationTreeNode';
 
@@ -46,7 +47,7 @@ export const NavigationTree = observer(function NavigationTree() {
     return null;
   }
 
-  if (!nodeChildren || nodeChildren.children.length === 0) {
+  if (!nodeChildren.children || nodeChildren.children.length === 0) {
     return styled(navigationTreeStyles)(
       <center as="div">
         <tree as="div">
@@ -62,7 +63,7 @@ export const NavigationTree = observer(function NavigationTree() {
   return styled(navigationTreeStyles)(
     <tree as="div">
       {nodeChildren.children.map(id => (
-        <NavigationTreeNode id={id} key={id} />
+        <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH}/>
       ))}
     </tree>
   );

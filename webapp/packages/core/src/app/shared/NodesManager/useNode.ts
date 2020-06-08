@@ -8,10 +8,19 @@
 
 import { useService } from '@dbeaver/core/di';
 
-import { NodesManagerService } from './NodesManagerService';
+import { NavNodeManagerService } from './NavNodeManagerService';
 
-export function useNode(nodeId: string) {
-  const nodesManagerService = useService(NodesManagerService);
+export function useNode(navNodeId: string) {
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const node = navNodeManagerService.getNode(navNodeId);
+  const isLoading = navNodeManagerService.navNode.isDataLoading({
+    navNodeId: [navNodeId],
+  });
+  const isLoaded = navNodeManagerService.navNode.isLoaded({
+    navNodeId: [navNodeId],
+  });
 
-  return nodesManagerService.getNode(nodeId);
+  return {
+    node, isLoading, isLoaded,
+  };
 }

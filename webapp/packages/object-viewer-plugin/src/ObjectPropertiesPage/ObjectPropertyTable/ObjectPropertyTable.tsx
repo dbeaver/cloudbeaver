@@ -22,15 +22,18 @@ const styles = css`
 `;
 
 type ObjectPropertyTableProps = {
-  parentId: string;
   objectId: string;
+  parentId: string;
 }
 
-export const ObjectPropertyTable = observer(function ObjectPropertyTable(props: ObjectPropertyTableProps) {
-  const children = useChildren(props.objectId);
-  const { isLoading } = useObjectFolder(props.parentId, props.objectId);
+export const ObjectPropertyTable = observer(function ObjectPropertyTable({
+  objectId,
+  parentId,
+}: ObjectPropertyTableProps) {
+  const children = useChildren(objectId);
+  const { isLoading } = useObjectFolder(parentId);
 
-  if (!children?.isLoaded || isLoading) {
+  if (!children.children || children.isLoading || isLoading) {
     return <Loader />;
   }
 

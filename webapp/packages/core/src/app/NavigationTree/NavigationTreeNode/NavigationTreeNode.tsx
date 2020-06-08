@@ -15,12 +15,14 @@ import { useNavigationTree } from './useNavigationTree';
 
 type NavigationTreeNodeProps = {
   id: string;
+  parentId: string;
 }
 
 export const NavigationTreeNode = observer(function NavigationTreeNodeFn({
   id,
+  parentId,
 }: NavigationTreeNodeProps) {
-  const node = useNavigationTree(id);
+  const node = useNavigationTree(id, parentId);
 
   if (!node) {
     return null;
@@ -33,12 +35,12 @@ export const NavigationTreeNode = observer(function NavigationTreeNodeFn({
       icon={node.icon}
       isSelected={node.isSelected}
       isExpanded={node.isExpanded}
-      isLoaded={node.isLoaded}
-      isExpandable={node.hasChildren && node.isExpandable}
+      isLoading={node.isLoading}
+      isExpandable={node.isExpandable}
       onExpand={node.handleExpand}
       onClick={node.handleSelect}
       onDoubleClick={node.handleDoubleClick}
-      portal={<TreeNodeMenu nodeId={id} isSelected={node?.isSelected} />}
+      portal={<TreeNodeMenu node={node.node} isSelected={node.isSelected} />}
     >
       <NavigationNodeChildren
         parentId={id}

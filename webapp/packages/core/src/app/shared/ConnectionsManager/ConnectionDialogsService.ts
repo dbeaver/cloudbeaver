@@ -15,9 +15,9 @@ import {
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
+import { NavNode } from '../NodesManager/EntityTypes';
 import { EObjectFeature } from '../NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
-import { NodeWithParent } from '../NodesManager/NodeWithParent';
 import { ConnectionsManagerService } from './ConnectionsManagerService';
 
 
@@ -52,20 +52,20 @@ export class ConnectionDialogsService {
       }
     );
 
-    const closeConnection: IContextMenuItem<NodeWithParent> = {
+    const closeConnection: IContextMenuItem<NavNode> = {
       id: 'closeConnection',
       isPresent(context) {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType
-          && !!context.data.object?.features?.includes(EObjectFeature.dataSource);
+        && !!context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'Disconnect',
-      onClick: (context: IMenuContext<NodeWithParent>) => {
+      onClick: (context: IMenuContext<NavNode>) => {
         const node = context.data;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
         this.connectionsManagerService.closeConnectionAsync(connectionId);
       },
     };
 
-    this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), closeConnection);
+    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), closeConnection);
   }
 }

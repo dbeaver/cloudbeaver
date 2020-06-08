@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { NodesManagerService, useDatabaseObjectInfo, useNode } from '@dbeaver/core/app';
+import { NavNodeManagerService, useDatabaseObjectInfo, useNode } from '@dbeaver/core/app';
 import {
   StaticImage, TableItem, TableColumnValue, TableItemSelect
 } from '@dbeaver/core/blocks';
@@ -51,12 +51,12 @@ type ItemProps = {
 export const Item = observer(function Item({
   objectId, columns,
 }: ItemProps) {
-  const nodesManagerService = useService(NodesManagerService);
-  const object = useNode(objectId);
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const { node } = useNode(objectId);
   const databaseObjectInfo = useDatabaseObjectInfo(objectId);
-  const handleOpen = useCallback(() => nodesManagerService.navToNode(objectId), [objectId]);
+  const handleOpen = useCallback(() => navNodeManagerService.navToNode(node!.id, node!.parentId), [node]);
 
-  if (!object || !databaseObjectInfo?.properties) {
+  if (!node || !databaseObjectInfo?.properties) {
     return styled(useStyles(itemStyles))(
       <TableItem item={objectId} onDoubleClick={handleOpen}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
@@ -81,7 +81,7 @@ export const Item = observer(function Item({
       <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>
         <icon as="div">
-          <StaticImage icon={object.icon} />
+          <StaticImage icon={node.icon} />
         </icon>
       </TableColumnValue>
       {databaseObjectInfo.properties.map(property => (

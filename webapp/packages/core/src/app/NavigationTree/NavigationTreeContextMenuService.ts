@@ -7,63 +7,65 @@
  */
 
 import { injectable } from '@dbeaver/core/di';
-import {
-  ContextMenuService, IContextMenuItem, IMenuContext, IMenuPanel,
-} from '@dbeaver/core/dialogs';
+import { ContextMenuService, IMenuPanel } from '@dbeaver/core/dialogs';
 
-import { NodesManagerService } from '../shared/NodesManager/NodesManagerService';
-import { NodeWithParent } from '../shared/NodesManager/NodeWithParent';
+import { NavNode } from '../shared/NodesManager/EntityTypes';
+import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 
 @injectable()
 export class NavigationTreeContextMenuService {
   static nodeContextType = 'NodeWithParent';
   private static menuToken = 'navTreeMenu';
 
-  constructor(private contextMenuService: ContextMenuService,
-              private nodesManagerService: NodesManagerService) {
-  }
+  constructor(
+    private contextMenuService: ContextMenuService,
+    private navNodeManagerService: NavNodeManagerService
+  ) { }
 
   getMenuToken() {
     return NavigationTreeContextMenuService.menuToken;
   }
 
-  constructMenuWithContext(node: NodeWithParent): IMenuPanel {
-    const context: IMenuContext<NodeWithParent> = {
+  constructMenuWithContext(node: NavNode): IMenuPanel {
+    return this.contextMenuService.createContextMenu<NavNode>({
       menuId: this.getMenuToken(),
       contextId: node.id,
       contextType: NavigationTreeContextMenuService.nodeContextType,
       data: node,
-    };
-    return this.contextMenuService.createContextMenu(context);
+    });
   }
 
   registerMenuItems() {
-    const openNodeTab: IContextMenuItem<NodeWithParent> = {
-      id: 'openNodeTab',
-      isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType;
-      },
-      order: 1,
-      title: 'app_navigationTree_openNodeTab',
-      onClick: (context: IMenuContext<NodeWithParent>) => {
-        const node = context.data;
-        this.nodesManagerService.navToNode(node.id);
-      },
-    };
-    this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), openNodeTab);
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'openNodeTab',
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType;
+        },
+        order: 1,
+        title: 'app_navigationTree_openNodeTab',
+        onClick: (context) => {
+          const node = context.data;
+          this.navNodeManagerService.navToNode(node.id, node.parentId);
+        },
+      }
+    );
 
-    const refreshNode: IContextMenuItem<NodeWithParent> = {
-      id: 'refreshNode',
-      isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType;
-      },
-      order: Number.MAX_SAFE_INTEGER,
-      title: 'app_navigationTree_refreshNode',
-      onClick: (context: IMenuContext<NodeWithParent>) => {
-        const node = context.data;
-        this.nodesManagerService.refreshNode(node.id);
-      },
-    };
-    this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), refreshNode);
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'refreshNode',
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType;
+        },
+        order: Number.MAX_SAFE_INTEGER,
+        title: 'app_navigationTree_refreshNode',
+        onClick: (context) => {
+          const node = context.data;
+          this.navNodeManagerService.refresh(node.id);
+        },
+      }
+    );
   }
 }

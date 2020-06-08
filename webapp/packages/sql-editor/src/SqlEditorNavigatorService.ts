@@ -14,7 +14,7 @@ import {
   NavigationService,
   IContextProvider,
   ITabOptions,
-  NodesManagerService,
+  NavNodeManagerService,
   INodeNavigationData,
   NavigationType,
 } from '@dbeaver/core/app';
@@ -57,19 +57,21 @@ export interface SQLEditorAction extends SQLEditorActionContext {
 export class SqlEditorNavigatorService {
 
   private readonly navigator: INavigator<SQLCreateAction | SQLEditorAction>;
-  constructor(private navigationTabsService: NavigationTabsService,
-              private connectionsManagerService: ConnectionsManagerService,
-              private notificationService: NotificationService,
-              private gql: GraphQLService,
-              private sqlDialectInfoService: SqlDialectInfoService,
-              private nodesManagerService: NodesManagerService,
-              private navigationService: NavigationService) {
+  constructor(
+    private navigationTabsService: NavigationTabsService,
+    private connectionsManagerService: ConnectionsManagerService,
+    private notificationService: NotificationService,
+    private gql: GraphQLService,
+    private sqlDialectInfoService: SqlDialectInfoService,
+    private navNodeManagerService: NavNodeManagerService,
+    private navigationService: NavigationService
+  ) {
 
     this.navigator = this.navigationService.createNavigator<SQLCreateAction | SQLEditorAction>(
       null,
       this.navigateHandler.bind(this)
     );
-    this.nodesManagerService.navigator.addHandler(this.nodeNavigationHandler.bind(this));
+    this.navNodeManagerService.navigator.addHandler(this.nodeNavigationHandler.bind(this));
   }
 
   registerTabHandler() {
@@ -100,7 +102,7 @@ export class SqlEditorNavigatorService {
 
   private async nodeNavigationHandler(contexts: IContextProvider<INodeNavigationData>) {
     try {
-      const nodeInfo = await contexts.getContext(this.nodesManagerService.navigationNodeContext);
+      const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
 
       if (nodeInfo.type === NavigationType.closeConnection) {
         for (const tab of this.navigationTabsService.findTabs(

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NodesManagerService, TabEntity } from '@dbeaver/core/app';
+import { NavNodeManagerService, TabEntity } from '@dbeaver/core/app';
 import { ITab } from '@dbeaver/core/blocks';
 import { injectable } from '@dbeaver/core/di';
 
@@ -15,7 +15,7 @@ import { ObjectFolderTabModel } from './ObjectFolderTabModel';
 @injectable()
 export class ObjectFoldersTabService {
 
-  constructor(private nodesManagerService: NodesManagerService) {
+  constructor(private navNodeManagerService: NavNodeManagerService) {
   }
 
   createTabEntities(nodeId: string): TabEntity[] {
@@ -24,22 +24,22 @@ export class ObjectFoldersTabService {
 
 
   private tabBuilder(nodeId: string): ITab[] {
-    const children = this.nodesManagerService.getChildren(nodeId)?.children || [];
+    const children = this.navNodeManagerService.getTree(nodeId) || [];
 
     const folderTabs = children.filter((nodeId) => {
-      const node = this.nodesManagerService.getNode(nodeId);
+      const node = this.navNodeManagerService.getNode(nodeId);
       return node ? node.folder : false;
     });
 
     const tabList: ITab[] = folderTabs.map((nodeId) => {
-      const node = this.nodesManagerService.getNode(nodeId);
+      const node = this.navNodeManagerService.getNode(nodeId);
       if (!node) {
         throw Error(`node not found: ${nodeId}`);
       }
 
       return new ObjectFolderTabModel(
         node,
-        () => this.nodesManagerService.navToNode(node.id)
+        () => this.navNodeManagerService.navToNode(node.id, node.parentId)
       );
     });
     return tabList;

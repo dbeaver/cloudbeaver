@@ -8,7 +8,7 @@
 
 import { observable, when } from 'mobx';
 
-import { NodeManagerUtils, NodesManagerService } from '@dbeaver/core/app';
+import { NodeManagerUtils, NavNodeManagerService } from '@dbeaver/core/app';
 import { IDestructibleController, IInitializableController, injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { SqlDialectInfo } from '@dbeaver/core/sdk';
@@ -25,11 +25,12 @@ export class DdlViewerController implements IInitializableController, IDestructi
 
   private nodeId!: string;
 
-  constructor(private ddlViewerService: DdlViewerService,
-              private nodesManagerService: NodesManagerService,
-              private sqlDialectInfoService: SqlDialectInfoService,
-              private notificationService: NotificationService) {
-  }
+  constructor(
+    private ddlViewerService: DdlViewerService,
+    private navNodeManagerService: NavNodeManagerService,
+    private sqlDialectInfoService: SqlDialectInfoService,
+    private notificationService: NotificationService
+  ) { }
 
   init(nodeId: string) {
     this.nodeId = nodeId;
@@ -55,7 +56,7 @@ export class DdlViewerController implements IInitializableController, IDestructi
   }
 
   private async loadDialect(nodeId: string): Promise<void> {
-    const { connectionId } = this.nodesManagerService.getNodeContainerInfo(nodeId);
+    const { connectionId } = this.navNodeManagerService.getNodeContainerInfo(nodeId);
     if (!connectionId) {
       return;
     }
