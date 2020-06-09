@@ -8,7 +8,7 @@
 
 import { ReactElement } from 'react';
 
-import { NodeWithParent } from '@dbeaver/core/app';
+import { NavNode } from '@dbeaver/core/app';
 import { ITab } from '@dbeaver/core/blocks';
 
 import { objectPropertyTablePanel } from '../ObjectPropertyTable/ObjectPropertyTable';
@@ -25,7 +25,7 @@ export class ObjectFolderTabModel implements ITab {
 
   panel: () => ReactElement | null;
 
-  constructor(private node: NodeWithParent,
+  constructor(private node: NavNode,
               public onActivate: () => void) {
     this.tabId = node.id;
     this.panel = () => objectPropertyTablePanel(node.parentId, node.id);
