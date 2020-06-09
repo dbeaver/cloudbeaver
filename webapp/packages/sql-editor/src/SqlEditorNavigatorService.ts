@@ -77,10 +77,12 @@ export class SqlEditorNavigatorService {
   registerTabHandler() {
   }
 
-  openNewEditor(connectionId?: string) {
+  openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
     this.navigator.navigateTo({
       type: SQLEditorNavigationAction.create,
       connectionId,
+      catalogId,
+      schemaId,
     });
   }
 
@@ -125,7 +127,7 @@ export class SqlEditorNavigatorService {
       const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
 
       if (data.type === SQLEditorNavigationAction.create) {
-        const tabOptions = await this.createNewEditor(data.connectionId);
+        const tabOptions = await this.createNewEditor(data.connectionId, data.catalogId, data.schemaId);
         if (tabOptions) {
           tabInfo.openNewTab(tabOptions);
         } else {
@@ -159,19 +161,20 @@ export class SqlEditorNavigatorService {
     }
   }
 
-  private async createNewEditor(connectionId?: string): Promise<ITabOptions<ISqlEditorTabState> | null> {
+  private async createNewEditor(
+    connectionId?: string,
+    catalogId?: string,
+    schemaId?: string
+  ): Promise<ITabOptions<ISqlEditorTabState> | null> {
     const order = this.getFreeEditorId();
 
-    const connection = connectionId
-      ? this.connectionsManagerService.getConnectionById(connectionId)
-      : this.connectionsManagerService.connections[0];
-
-    if (!connection) {
-      return null;
+    if (!connectionId) {
+      connectionId = this.connectionsManagerService.connections[0].id;
     }
-    await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
 
-    const context = await this.createSqlContext(connection.id);
+    await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
+
+    const context = await this.createSqlContext(connectionId, catalogId, schemaId);
 
     return {
       handlerId: sqlEditorTabHandlerKey,
@@ -179,7 +182,7 @@ export class SqlEditorNavigatorService {
         query: '',
         order,
         contextId: context.contextId,
-        connectionId: connection.id,
+        connectionId,
         objectCatalogId: context.objectCatalogId,
         objectSchemaId: context.objectSchemaId,
         sqlExecutionState: new SqlExecutionState(),

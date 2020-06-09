@@ -7,6 +7,7 @@
  */
 
 import { observable } from 'mobx';
+import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
@@ -15,13 +16,18 @@ import { NavNodeManagerService, ROOT_NODE_PATH } from '../shared/NodesManager/Na
 
 @injectable()
 export class NavigationTreeService {
+  readonly selectedNodes = observable.array<string>([]);
+  readonly onNodeSelect: Observable<[string, boolean]>;
 
-  selectedNodes = observable.array<string>([]);
+  private nodeSelectSubject: Subject<[string, boolean]>;
 
   constructor(
     private NavNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService
-  ) { }
+  ) {
+    this.nodeSelectSubject = new Subject();
+    this.onNodeSelect = this.nodeSelectSubject.asObservable();
+  }
 
   async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
@@ -35,13 +41,22 @@ export class NavigationTreeService {
 
   selectNode(id: string, isMultiple?: boolean) {
     if (!isMultiple) {
+      for (const id of this.selectedNodes) {
+        this.nodeSelectSubject.next([id, false]);
+      }
       this.selectedNodes.clear();
     }
-    if (!this.selectedNodes.includes(id)) {
+    if (!this.isNodeSelected(id)) {
       this.selectedNodes.push(id);
+      this.nodeSelectSubject.next([id, true]);
       return true;
     }
     this.selectedNodes.remove(id);
+    this.nodeSelectSubject.next([id, false]);
     return false;
+  }
+
+  isNodeSelected(navNodeId: string) {
+    return this.selectedNodes.includes(navNodeId);
   }
 }

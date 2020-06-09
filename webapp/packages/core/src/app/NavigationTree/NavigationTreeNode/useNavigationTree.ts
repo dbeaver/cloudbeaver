@@ -75,9 +75,15 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   }, [isExpanded, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
 
   // Here we subscribe to selected nodes if current node selected (mobx)
-  if (isSelected && !navigationTreeService.selectedNodes.includes(nodeId)) {
+  if (isSelected && !navigationTreeService.isNodeSelected(nodeId)) {
     switchSelect(false);
   }
+
+  useEffect(() => () => {
+    if (navigationTreeService.isNodeSelected(nodeId)) {
+      navigationTreeService.selectNode(nodeId, true);
+    }
+  }, [navigationTreeService]);
 
   return {
     name,
