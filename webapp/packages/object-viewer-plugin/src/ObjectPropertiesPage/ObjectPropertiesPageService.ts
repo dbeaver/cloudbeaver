@@ -7,7 +7,7 @@
  */
 
 import {
-  NodesManagerService, ITab, IContextProvider, INodeNavigationData
+  NavNodeManagerService, ITab, IContextProvider, INodeNavigationData
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
@@ -24,7 +24,7 @@ export class ObjectPropertiesPageService {
   page?: ObjectPage;
 
   constructor(
-    private nodesManagerService: NodesManagerService,
+    private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
     private objectViewerTabService: ObjectViewerTabService,
     private dbObjectPageService: DBObjectPageService
@@ -41,7 +41,7 @@ export class ObjectPropertiesPageService {
       getPanelComponent: () => ObjectPropertiesPagePanel,
       onSelect: this.handlePageSelect.bind(this),
     });
-    this.nodesManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+    this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
   private async handlePageSelect(tab: ITab<IObjectViewerTabState>) {

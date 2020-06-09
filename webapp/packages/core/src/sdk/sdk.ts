@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { GraphQLClient } from 'graphql-request';
+
 export type Maybe<T> = T;
 
 /** All built-in and custom scalars, mapped to their actual values */
@@ -686,7 +687,7 @@ export type NavGetStructContainersQueryVariables = {
 };
 
 
-export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>, schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
+export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
 
 export type CloseConnectionMutationVariables = {
   id: Scalars['ID'];
@@ -727,7 +728,7 @@ export type DriverPropertiesQueryVariables = {
 export type DriverPropertiesQuery = { driver: Array<(
     Pick<DriverInfo, 'driverParameters'>
     & { driverProperties?: Maybe<Array<Maybe<Pick<DriverPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>>> }
-  )> };
+  )>; };
 
 export type GetDriverByIdQueryVariables = {
   driverId: Scalars['ID'];
@@ -750,6 +751,31 @@ export type TestConnectionMutationVariables = {
 
 export type TestConnectionMutation = { testConnection: Pick<ConnectionInfo, 'id'> };
 
+export type GetChildrenDbObjectInfoQueryVariables = {
+  navNodeId: Scalars['ID'];
+  filter?: Maybe<ObjectPropertyFilter>;
+};
+
+
+export type GetChildrenDbObjectInfoQuery = { dbObjects: Array<(
+    Pick<NavigatorNodeInfo, 'id'>
+    & { object?: Maybe<(
+      Pick<DatabaseObjectInfo, 'features'>
+      & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
+    )>; }
+  )>; };
+
+export type GetDbObjectInfoQueryVariables = {
+  navNodeId: Scalars['ID'];
+  filter?: Maybe<ObjectPropertyFilter>;
+};
+
+
+export type GetDbObjectInfoQuery = { objectInfo: { object?: Maybe<(
+      Pick<DatabaseObjectInfo, 'features'>
+      & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
+    )>; }; };
+
 export type NavNodeChildrenQueryVariables = {
   parentPath: Scalars['ID'];
 };
@@ -758,7 +784,7 @@ export type NavNodeChildrenQueryVariables = {
 export type NavNodeChildrenQuery = { navNodeChildren: Array<(
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  )> };
+  )>; };
 
 export type NavNodeInfoQueryVariables = {
   nodePath: Scalars['ID'];
@@ -768,7 +794,7 @@ export type NavNodeInfoQueryVariables = {
 export type NavNodeInfoQuery = { navNodeInfo: (
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  ) };
+  ); };
 
 export type NavRefreshNodeQueryVariables = {
   nodePath: Scalars['ID'];
@@ -776,34 +802,6 @@ export type NavRefreshNodeQueryVariables = {
 
 
 export type NavRefreshNodeQuery = Pick<Query, 'navRefreshNode'>;
-
-export type QueryChildrenDatabaseObjectInfoQueryVariables = {
-  nodePath: Scalars['ID'];
-  filter?: Maybe<ObjectPropertyFilter>;
-};
-
-
-export type QueryChildrenDatabaseObjectInfoQuery = { childrenDatabaseObjectInfo: Array<(
-    Pick<NavigatorNodeInfo, 'id'>
-    & { object?: Maybe<(
-      Pick<DatabaseObjectInfo, 'features'>
-      & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
-    )> }
-  )> };
-
-export type QueryDatabaseObjectInfoQueryVariables = {
-  nodeId: Scalars['ID'];
-  filter?: Maybe<ObjectPropertyFilter>;
-};
-
-
-export type QueryDatabaseObjectInfoQuery = { objectInfo: (
-    Pick<NavigatorNodeInfo, 'id'>
-    & { object?: Maybe<(
-      Pick<DatabaseObjectInfo, 'features'>
-      & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
-    )> }
-  ) };
 
 export type ReadSessionLogQueryVariables = {
   maxEntries: Scalars['Int'];
@@ -891,7 +889,7 @@ export type GetAuthProvidersQueryVariables = {};
 export type GetAuthProvidersQuery = { providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
     & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
-  )> };
+  )>; };
 
 export type GetSessionUserQueryVariables = {};
 
@@ -906,7 +904,7 @@ export type AsyncExportTaskStatusMutationVariables = {
 export type AsyncExportTaskStatusMutation = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ) };
+  ); };
 
 export type ExportDataFromContainerQueryVariables = {
   connectionId: Scalars['ID'];
@@ -918,7 +916,7 @@ export type ExportDataFromContainerQueryVariables = {
 export type ExportDataFromContainerQuery = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ) };
+  ); };
 
 export type ExportDataFromResultsQueryVariables = {
   connectionId: Scalars['ID'];
@@ -931,7 +929,7 @@ export type ExportDataFromResultsQueryVariables = {
 export type ExportDataFromResultsQuery = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ) };
+  ); };
 
 export type GetDataTransferProcessorsQueryVariables = {};
 
@@ -939,7 +937,7 @@ export type GetDataTransferProcessorsQueryVariables = {};
 export type GetDataTransferProcessorsQuery = { processors: Array<(
     Pick<DataTransferProcessorInfo, 'id' | 'name' | 'description' | 'fileExtension' | 'appFileExtension' | 'appName' | 'order' | 'icon' | 'isBinary' | 'isHTML'>
     & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features'>>>> }
-  )> };
+  )>; };
 
 export type RemoveDataTransferFileQueryVariables = {
   dataFileId: Scalars['String'];
@@ -965,10 +963,10 @@ export type AsyncSqlExecuteQueryMutation = { taskInfo: (
         & { resultSet?: Maybe<(
           Pick<SqlResultSet, 'id' | 'rows'>
           & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )> }
-      )> }
-    )>, error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ) };
+        )>; }
+      )>; }
+    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
+  ); };
 
 export type AsyncTaskCancelMutationVariables = {
   taskId: Scalars['String'];
@@ -991,10 +989,10 @@ export type AsyncTaskStatusMutation = { taskInfo: (
         & { resultSet?: Maybe<(
           Pick<SqlResultSet, 'id' | 'rows'>
           & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )> }
-      )> }
-    )>, error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ) };
+        )>; }
+      )>; }
+    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
+  ); };
 
 export type ExecuteSqlQueryMutationVariables = {
   connectionId: Scalars['ID'];
@@ -1011,9 +1009,9 @@ export type ExecuteSqlQueryMutation = { result?: Maybe<(
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-      )> }
-    )> }
-  )> };
+      )>; }
+    )>; }
+  )>; };
 
 export type MetadataGetNodeDdlQueryVariables = {
   nodeId: Scalars['ID'];
@@ -1055,9 +1053,9 @@ export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-      )> }
-    )> }
-  )> };
+      )>; }
+    )>; }
+  )>; };
 
 export type SqlContextCreateMutationVariables = {
   connectionId: Scalars['ID'];
@@ -1109,8 +1107,8 @@ export type UpdateResultsDataMutation = { result?: Maybe<(
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )> }
-  )> };
+    )>; }
+  )>; };
 
 export type OpenSessionMutationVariables = {};
 
@@ -1118,7 +1116,7 @@ export type OpenSessionMutationVariables = {};
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
     & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'>> }
-  ) };
+  ); };
 
 export type ServerConfigQueryVariables = {};
 
@@ -1126,7 +1124,7 @@ export type ServerConfigQueryVariables = {};
 export type ServerConfigQuery = { serverConfig: (
     Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsPredefinedConnections' | 'supportsProvidedConnections' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>> }
-  ) };
+  ); };
 
 export type SessionPermissionsQueryVariables = {};
 
@@ -1139,7 +1137,7 @@ export type SessionStateQueryVariables = {};
 export type SessionStateQuery = { sessionState: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
     & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'>> }
-  ) };
+  ); };
 
 export type TouchSessionMutationVariables = {};
 
@@ -1257,6 +1255,43 @@ export const TestConnectionDocument = `
   }
 }
     `;
+export const GetChildrenDbObjectInfoDocument = `
+    query getChildrenDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
+  dbObjects: navNodeChildren(parentPath: $navNodeId) {
+    id
+    object {
+      features
+      properties(filter: $filter) {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+      }
+    }
+  }
+}
+    `;
+export const GetDbObjectInfoDocument = `
+    query getDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
+  objectInfo: navNodeInfo(nodePath: $navNodeId) {
+    object {
+      features
+      properties(filter: $filter) {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+      }
+    }
+  }
+}
+    `;
 export const NavNodeChildrenDocument = `
     query navNodeChildren($parentPath: ID!) {
   navNodeChildren(parentPath: $parentPath) {
@@ -1296,44 +1331,6 @@ export const NavNodeInfoDocument = `
 export const NavRefreshNodeDocument = `
     query navRefreshNode($nodePath: ID!) {
   navRefreshNode(nodePath: $nodePath)
-}
-    `;
-export const QueryChildrenDatabaseObjectInfoDocument = `
-    query queryChildrenDatabaseObjectInfo($nodePath: ID!, $filter: ObjectPropertyFilter) {
-  childrenDatabaseObjectInfo: navNodeChildren(parentPath: $nodePath) {
-    id
-    object {
-      features
-      properties(filter: $filter) {
-        id
-        category
-        dataType
-        description
-        displayName
-        features
-        value
-      }
-    }
-  }
-}
-    `;
-export const QueryDatabaseObjectInfoDocument = `
-    query queryDatabaseObjectInfo($nodeId: ID!, $filter: ObjectPropertyFilter) {
-  objectInfo: navNodeInfo(nodePath: $nodeId) {
-    id
-    object {
-      features
-      properties(filter: $filter) {
-        id
-        category
-        dataType
-        description
-        displayName
-        features
-        value
-      }
-    }
-  }
 }
     `;
 export const ReadSessionLogDocument = `
@@ -1841,6 +1838,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));
     },
+    getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables): Promise<GetChildrenDbObjectInfoQuery> {
+      return withWrapper(() => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables));
+    },
+    getDBObjectInfo(variables: GetDbObjectInfoQueryVariables): Promise<GetDbObjectInfoQuery> {
+      return withWrapper(() => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables));
+    },
     navNodeChildren(variables: NavNodeChildrenQueryVariables): Promise<NavNodeChildrenQuery> {
       return withWrapper(() => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables));
     },
@@ -1849,12 +1852,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navRefreshNode(variables: NavRefreshNodeQueryVariables): Promise<NavRefreshNodeQuery> {
       return withWrapper(() => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables));
-    },
-    queryChildrenDatabaseObjectInfo(variables: QueryChildrenDatabaseObjectInfoQueryVariables): Promise<QueryChildrenDatabaseObjectInfoQuery> {
-      return withWrapper(() => client.request<QueryChildrenDatabaseObjectInfoQuery>(QueryChildrenDatabaseObjectInfoDocument, variables));
-    },
-    queryDatabaseObjectInfo(variables: QueryDatabaseObjectInfoQueryVariables): Promise<QueryDatabaseObjectInfoQuery> {
-      return withWrapper(() => client.request<QueryDatabaseObjectInfoQuery>(QueryDatabaseObjectInfoDocument, variables));
     },
     readSessionLog(variables: ReadSessionLogQueryVariables): Promise<ReadSessionLogQuery> {
       return withWrapper(() => client.request<ReadSessionLogQuery>(ReadSessionLogDocument, variables));
@@ -1963,7 +1960,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     touchSession(variables?: TouchSessionMutationVariables): Promise<TouchSessionMutation> {
       return withWrapper(() => client.request<TouchSessionMutation>(TouchSessionDocument, variables));
-    }
+    },
   };
 }
 export type Sdk = ReturnType<typeof getSdk>;

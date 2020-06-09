@@ -8,10 +8,10 @@
 
 import { useService } from '@dbeaver/core/di';
 
-import { NodesManagerService } from './NodesManagerService';
+import { DBObjectService } from './DBObjectService';
 
-export function useDatabaseObjectInfo(nodeId: string) {
-  const nodesManagerService = useService(NodesManagerService);
+export function useDatabaseObjectInfo(navNodeId: string) {
+  const dbObjectService = useService(DBObjectService);
 
-  return nodesManagerService.getDatabaseObjectInfo(nodeId);
+  return dbObjectService.getDBObject(navNodeId);
 }

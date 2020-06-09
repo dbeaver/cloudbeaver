@@ -39,7 +39,7 @@ export class UsersManagerService {
   async grantRole(userId: string, roleId: string, update?: boolean) {
     await this.graphQLService.gql.grantUserRole({ userId, roleId });
     if (update) {
-      await this.users.refresh(userId);
+      await this.users.refresh(true, userId);
     }
   }
 
@@ -50,7 +50,7 @@ export class UsersManagerService {
     await this.graphQLService.gql.deleteUser({ userId });
 
     if (update) {
-      await this.users.refresh(userId);
+      await this.users.refresh(true, userId);
     }
   }
 

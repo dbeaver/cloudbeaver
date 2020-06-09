@@ -67,6 +67,7 @@ export class NavigationTabsService {
             typeof value.id === 'string'
             && typeof value.handlerId === 'string'
           ) {
+            value.restored = false;
             map[key] = value;
           }
         }
@@ -86,7 +87,7 @@ export class NavigationTabsService {
     }
   }
 
-  @action selectTab(tabId: string, skipHandlers?: boolean) {
+  @action async selectTab(tabId: string, skipHandlers?: boolean) {
     const tab = this.tabsMap.get(tabId);
     if (!tab) {
       return;
@@ -99,7 +100,7 @@ export class NavigationTabsService {
     }
 
     if (!skipHandlers) {
-      this.callHandlerCallback(tab, handler => handler.onSelect);
+      await this.callHandlerCallback(tab, handler => handler.onSelect);
     }
 
     this.tabSelectSubject.next(tab);
@@ -177,7 +178,6 @@ export class NavigationTabsService {
   // must be executed with low priority, because this call runs many requests to backend and blocks others
   async restoreTabs() {
     const removedTabs: string[] = [];
-    const restoreTasks: Promise<void>[] = [];
     const session = await this.sessionService.session.load();
 
     for (const tabId of this.state.tabs) {
@@ -192,10 +192,9 @@ export class NavigationTabsService {
         continue;
       }
 
-      restoreTasks.push(this.restoreTab(tab, removedTabs));
+      await this.restoreTab(tab, removedTabs);
     }
 
-    await Promise.all(restoreTasks);
 
     if (removedTabs.length > 0) {
       this.notificationService.logError({ title: 'Some tabs cannot be restored properly', isSilent: true });
@@ -237,6 +236,8 @@ export class NavigationTabsService {
 
     if (restoreFail) {
       removedTabs.push(tab.id);
+    } else {
+      tab.restored = true;
     }
   }
 }

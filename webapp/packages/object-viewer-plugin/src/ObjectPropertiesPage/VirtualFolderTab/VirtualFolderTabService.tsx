@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NodesManagerService, NodeWithParent, TabEntity } from '@dbeaver/core/app';
+import { NavNodeManagerService, NavNode, TabEntity } from '@dbeaver/core/app';
 import { injectable, MixinProvider } from '@dbeaver/core/di';
 
 import { VirtualFolderTabData } from './VirtualFolderTabData';
@@ -17,15 +17,14 @@ import { VirtualFolderTabModel } from './VirtualFolderTabModel';
 @injectable()
 export class VirtualFolderTabService {
 
-  constructor(private nodesManagerService: NodesManagerService) {
-  }
+  constructor(private navNodeManagerService: NavNodeManagerService) { }
 
   createTabEntities(nodeId: string): TabEntity[] {
-    const children = this.nodesManagerService.getChildren(nodeId)?.children || [];
+    const children = this.navNodeManagerService.getTree(nodeId) || [];
 
-    const notFolderNodes = children.reduce<NodeWithParent[]>(
+    const notFolderNodes = children.reduce<NavNode[]>(
       (nodes, nodeId) => {
-        const node = this.nodesManagerService.getNode(nodeId);
+        const node = this.navNodeManagerService.getNode(nodeId);
         if (node && !node.folder) {
           nodes.push(node);
         }

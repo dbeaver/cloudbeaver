@@ -7,7 +7,7 @@
  */
 
 import {
-  NodesManagerService,
+  NavNodeManagerService,
   INodeNavigationData,
   IContextProvider,
   ITab,
@@ -29,11 +29,13 @@ import { DataViewerTableService } from './DataViewerTableService';
 export class DataViewerTabService {
   page: ObjectPage;
 
-  constructor(private nodesManagerService: NodesManagerService,
-              private dataViewerTableService: DataViewerTableService,
-              private objectViewerTabService: ObjectViewerTabService,
-              private dbObjectPageService: DBObjectPageService,
-              private notificationService: NotificationService) {
+  constructor(
+    private navNodeManagerService: NavNodeManagerService,
+    private dataViewerTableService: DataViewerTableService,
+    private objectViewerTabService: ObjectViewerTabService,
+    private dbObjectPageService: DBObjectPageService,
+    private notificationService: NotificationService
+  ) {
 
     this.page = this.dbObjectPageService.register({
       key: dataViewerHandlerKey,
@@ -49,7 +51,7 @@ export class DataViewerTabService {
   }
 
   registerTabHandler() {
-    this.nodesManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+    this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
   private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
@@ -60,14 +62,12 @@ export class DataViewerTabService {
         trySwitchPage,
       } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
-
       if (nodeInfo.type === NavigationType.closeConnection) {
         return;
       }
-      // const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
-      const objectInfo = await this.nodesManagerService.loadDatabaseObjectInfo(nodeInfo.nodeId);
+      const node = await this.navNodeManagerService.loadNode(nodeInfo);
 
-      if (!this.nodesManagerService.isNodeHasData(objectInfo)) {
+      if (!this.navNodeManagerService.isNodeHasData(node)) {
         return;
       }
 
@@ -83,9 +83,12 @@ export class DataViewerTabService {
   }
 
   private async handleTabSelect(tab: ITab<IObjectViewerTabState>) {
-    const objectInfo = await this.nodesManagerService.loadDatabaseObjectInfo(tab.handlerState.objectId);
+    const node = await this.navNodeManagerService.loadNode({
+      nodeId: tab.handlerState.objectId,
+      parentId: tab.handlerState.parentId,
+    });
 
-    if (!this.nodesManagerService.isNodeHasData(objectInfo)) {
+    if (!this.navNodeManagerService.isNodeHasData(node)) {
       return;
     }
 
@@ -93,7 +96,7 @@ export class DataViewerTabService {
       return;
     }
 
-    const nodeInfo = this.nodesManagerService
+    const nodeInfo = this.navNodeManagerService
       .getNodeContainerInfo(tab.handlerState.objectId);
 
     if (!nodeInfo.connectionId) {
@@ -111,11 +114,12 @@ export class DataViewerTabService {
     // if (!this.nodesManagerService.isNodeHasData(tab.handlerState.objectId)) {
     //   return;
     // }
-    const info = await this.nodesManagerService.loadDatabaseObjectInfo(tab.handlerState.objectId);
-    if (info) {
-      return true;
-    }
-    return false;
+    await this.navNodeManagerService.loadNode({
+      nodeId: tab.handlerState.objectId,
+      parentId: tab.handlerState.parentId,
+    });
+    // await this.dbObjectService.load(tab.handlerState.objectId);
+    return true;
   }
 
   private handleTabClose(tab: ITab<IObjectViewerTabState>) {

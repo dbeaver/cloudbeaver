@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { NodesManagerService } from '@dbeaver/core/app';
+import { NavNodeManagerService } from '@dbeaver/core/app';
 import { TabIcon, Tab, TabTitle } from '@dbeaver/core/blocks';
 import { useService } from '@dbeaver/core/di';
 import { useStyles } from '@dbeaver/core/theming';
@@ -18,9 +18,9 @@ import { ObjectPageTabProps } from '@dbeaver/object-viewer-plugin';
 export const DataViewerTab = observer(function DataViewerTab({
   tab, page, onSelect, style,
 }: ObjectPageTabProps) {
-  const nodesManagerService = useService(NodesManagerService);
+  const navNodeManagerService = useService(NavNodeManagerService);
 
-  if (!nodesManagerService.isNodeHasData(tab.handlerState.objectId)) {
+  if (!navNodeManagerService.isNodeHasData(tab.handlerState.objectId)) {
     return null;
   }
 

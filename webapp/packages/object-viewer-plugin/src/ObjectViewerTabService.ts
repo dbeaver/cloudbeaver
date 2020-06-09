@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-
 import {
-  NodesManagerService,
   NavigationTabsService,
   INodeNavigationData,
   IContextProvider,
@@ -21,6 +18,9 @@ import {
   objectCatalogProvider,
   objectSchemaProvider,
   NavNodeManagerService,
+  DBObjectService,
+  ROOT_NODE_PATH,
+  NavNode,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
@@ -35,13 +35,15 @@ import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
 @injectable()
 export class ObjectViewerTabService {
-  @observable private propertiesTabLoadingState: Map<string, boolean> = new Map();
   readonly tabHandler: TabHandler<IObjectViewerTabState>
 
-  constructor(private nodesManagerService: NodesManagerService,
-              private dbObjectPageService: DBObjectPageService,
-              private notificationService: NotificationService,
-              private navigationTabsService: NavigationTabsService) {
+  constructor(
+    private navNodeManagerService: NavNodeManagerService,
+    private dbObjectService: DBObjectService,
+    private dbObjectPageService: DBObjectPageService,
+    private notificationService: NotificationService,
+    private navigationTabsService: NavigationTabsService
+  ) {
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -60,95 +62,9 @@ export class ObjectViewerTabService {
       });
   }
 
-  getConnection(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.nodesManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
-
-    if (!nodeInfo.connectionId) {
-      return;
-    }
-    // connection node id differs from connection id
-    return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
-  }
-
-  getDBObjectCatalog(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.nodesManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
-
-    if (nodeInfo.catalogId) {
-      return;
-    }
-    return nodeInfo.catalogId;
-  }
-
-  getDBObjectSchema(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.nodesManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
-
-    if (!nodeInfo.schemaId) {
-      return;
-    }
-    return nodeInfo.schemaId;
-  }
-
   registerTabHandler() {
-    this.nodesManagerService.navigator.addHandler(this.navigationHandler.bind(this));
-  }
-
-  isTabLoading(id: string): boolean {
-    return !this.propertiesTabLoadingState.get(id);
-  }
-
-  async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
-    try {
-      const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
-      if (currentPage) {
-        await this.dbObjectPageService.selectPage(tab, currentPage);
-      }
-
-      // TODO: must be loaded by info folder?
-      await this.nodesManagerService.loadDatabaseObjectInfo(tab.handlerState.objectId);
-      await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
-
-      const children = await this.nodesManagerService.loadChildren(tab.handlerState.objectId);
-      const folderId = tab.handlerState.folderId;
-      const propertiesTabLoadingKey = `${tab.handlerState.objectId}_${folderId}`;
-
-      try {
-        if (children.length === 0 || !NodeManagerUtils.isDatabaseObject(folderId)) {
-          return;
-        }
-
-        this.propertiesTabLoadingState.set(propertiesTabLoadingKey, false);
-        await this.nodesManagerService.loadChildrenDatabaseObjectInfo(folderId);
-      } finally {
-        this.propertiesTabLoadingState.set(propertiesTabLoadingKey, true);
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Object Viewer while tab selecting');
-    }
-  }
-
-  async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
-    if (
-      typeof tab.handlerState?.folderId === 'string'
-      && typeof tab.handlerState?.objectId === 'string'
-      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
-      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
-    ) {
-      const node = await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
-      if (node) {
-        tab.handlerState.tabIcon = node.icon;
-        tab.handlerState.tabTitle = node.name;
-
-        return this.dbObjectPageService.restorePages(tab);
-      }
-    }
-    return false;
-  }
-
-  async closeObjectTab(tab: ITab<IObjectViewerTabState>) {
-    await this.dbObjectPageService.closePages(tab);
+    this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+    this.navNodeManagerService.navNode.onDataUpdate.subscribe(this.updateTabs.bind(this));
   }
 
   objectViewerTabContext = async (
@@ -156,7 +72,7 @@ export class ObjectViewerTabService {
     data: INodeNavigationData
   ): Promise<IObjectViewerTabContext> => {
     const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
-    const nodeInfo = await contexts.getContext(this.nodesManagerService.navigationNodeContext);
+    const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
 
     if (data.type !== NavigationType.closeConnection) {
     // check if tab already exist for object
@@ -173,6 +89,8 @@ export class ObjectViewerTabService {
           handlerId: objectViewerTabHandlerKey,
           handlerState: {
             objectId: nodeInfo.nodeId,
+            parentId: nodeInfo.parentId,
+            parents: await nodeInfo.getParents(),
             folderId: nodeInfo.folderId,
             pageId: '',
             pagesState: new Map(),
@@ -212,6 +130,115 @@ export class ObjectViewerTabService {
       tabInfo,
       nodeInfo,
     };
+  }
+
+  private async updateTabs(data: Map<string, NavNode>) {
+    for (const tab of this.navigationTabsService.findTabs(isObjectViewerTab(tab => tab.restored))) {
+      if (!data.has(tab.handlerState.objectId)) {
+        await this.navigationTabsService.closeTab(tab.id, true);
+      } else if (tab.id === this.navigationTabsService.currentTabId) {
+        const loaded = this.navNodeManagerService.navNode.isLoaded({
+          nodes: [{ nodeId: tab.handlerState.objectId, parentId: tab.handlerState.parentId }],
+        });
+        const loading = this.navNodeManagerService.navNode.isDataLoading({
+          nodes: [{ nodeId: tab.handlerState.objectId, parentId: tab.handlerState.parentId }],
+        });
+
+        if (!loaded && !loading) {
+          await this.navigationTabsService.selectTab(tab.id);
+        }
+      }
+    }
+  }
+
+  private getConnection(context: ITab<IObjectViewerTabState>) {
+    const nodeInfo = this.navNodeManagerService
+      .getNodeContainerInfo(context.handlerState.objectId);
+
+    if (!nodeInfo.connectionId) {
+      return;
+    }
+    // connection node id differs from connection id
+    return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
+  }
+
+  private getDBObjectCatalog(context: ITab<IObjectViewerTabState>) {
+    const nodeInfo = this.navNodeManagerService
+      .getNodeContainerInfo(context.handlerState.objectId);
+
+    if (nodeInfo.catalogId) {
+      return;
+    }
+    return nodeInfo.catalogId;
+  }
+
+  private getDBObjectSchema(context: ITab<IObjectViewerTabState>) {
+    const nodeInfo = this.navNodeManagerService
+      .getNodeContainerInfo(context.handlerState.objectId);
+
+    if (!nodeInfo.schemaId) {
+      return;
+    }
+    return nodeInfo.schemaId;
+  }
+
+  private async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
+    try {
+      const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
+      if (currentPage) {
+        await this.dbObjectPageService.selectPage(tab, currentPage);
+      }
+
+      // TODO: must be loaded by info folder?
+      await this.navNodeManagerService.loadNode({
+        nodeId: tab.handlerState.objectId,
+        parentId: tab.handlerState.parentId,
+      });
+      const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
+      await this.dbObjectService.load(tab.handlerState.objectId);
+
+      const folderId = tab.handlerState.folderId;
+
+      if (children.length === 0 || !NodeManagerUtils.isDatabaseObject(folderId)) {
+        return;
+      }
+      const folderChildren = await this.navNodeManagerService.loadTree(folderId);
+
+      await this.dbObjectService.load(folderChildren);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Error in Object Viewer while tab selecting');
+    }
+  }
+
+  private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
+    if (
+      typeof tab.handlerState?.folderId === 'string'
+      && typeof tab.handlerState.parentId === 'string'
+      && Array.isArray(tab.handlerState.parents)
+      && typeof tab.handlerState.objectId === 'string'
+      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
+      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
+    ) {
+      for (const nodeId of tab.handlerState.parents) {
+        await this.navNodeManagerService.loadTree(nodeId);
+      }
+
+      const node = await this.navNodeManagerService.loadNode({
+        nodeId: tab.handlerState.objectId,
+        parentId: tab.handlerState.parentId,
+      });
+      if (node) {
+        tab.handlerState.tabIcon = node.icon;
+        tab.handlerState.tabTitle = node.name;
+
+        return this.dbObjectPageService.restorePages(tab);
+      }
+    }
+    return false;
+  }
+
+  private async closeObjectTab(tab: ITab<IObjectViewerTabState>) {
+    await this.dbObjectPageService.closePages(tab);
   }
 
   private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {

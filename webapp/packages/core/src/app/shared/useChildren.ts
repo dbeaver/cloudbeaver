@@ -8,10 +8,17 @@
 
 import { useService } from '@dbeaver/core/di';
 
-import { NodesManagerService } from './NodesManager/NodesManagerService';
+import { NavNodeManagerService, ROOT_NODE_PATH } from './NodesManager/NavNodeManagerService';
 
-export function useChildren(parentId = '/') {
-  const nodesManagerService = useService(NodesManagerService);
+export function useChildren(navNodeId = ROOT_NODE_PATH) {
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const children = navNodeManagerService.getTree(navNodeId);
+  const isLoading = navNodeManagerService.navTree.isDataLoading(navNodeId, false);
+  const isLoaded = navNodeManagerService.navTree.isLoaded(navNodeId, false);
 
-  return nodesManagerService.getChildren(parentId);
+  return {
+    children,
+    isLoaded,
+    isLoading,
+  };
 }

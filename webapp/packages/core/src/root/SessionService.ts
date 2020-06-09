@@ -33,7 +33,7 @@ export class SessionService {
   }
 
   async update() {
-    await this.session.refresh();
+    await this.session.refresh(true);
   }
 
   private async refreshSessionStateAsync(data: SessionState | undefined): Promise<SessionState> {

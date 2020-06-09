@@ -20,7 +20,7 @@ import {
   DatabaseObjectInfo,
 } from '@dbeaver/core/sdk';
 
-import { NodesManagerService } from '../NodesManager/NodesManagerService';
+import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
 
 export type DBDriver = Pick<
   DriverInfo,
@@ -67,7 +67,7 @@ export class ConnectionsManagerService {
 
   constructor(
     private graphQLService: GraphQLService,
-    private nodesManagerService: NodesManagerService,
+    private navNodeManagerService: NavNodeManagerService,
     private sessionService: SessionService
   ) {
     this.sessionService.onUpdate.subscribe(this.restoreConnections.bind(this));
@@ -81,10 +81,10 @@ export class ConnectionsManagerService {
     return this.dbDrivers.load();
   }
 
-  addOpenedConnection(connection: Connection) {
+  async addOpenedConnection(connection: Connection) {
     this.connectionsMap.set(connection.id, connection);
     this.onOpenConnection.next(connection);
-    this.nodesManagerService.updateRootChildren(); // Update connections list, probably here we must also request node info and add it to nodes manager
+    await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must also request node info and add it to nodes manager
   }
 
   getConnectionById(connectionId: string): Connection | undefined {
@@ -113,7 +113,7 @@ export class ConnectionsManagerService {
     for (const connection of this.connections) {
       await this.closeConnectionAsync(connection.id, true);
     }
-    await this.nodesManagerService.updateRootChildren();
+    await this.navNodeManagerService.updateRootChildren();
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
@@ -122,7 +122,7 @@ export class ConnectionsManagerService {
     this.connectionsMap.delete(id);
 
     if (!skipNodesRefresh) {
-      await this.nodesManagerService.updateRootChildren(); // Update connections list, probably here we must just remove nodes from nodes manager
+      await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must just remove nodes from nodes manager
     }
   }
 
@@ -132,7 +132,7 @@ export class ConnectionsManagerService {
   }
 
   private async afterConnectionClose(id: string) {
-    await this.nodesManagerService.closeConnection(id);
+    await this.navNodeManagerService.remove(id);
     this.onCloseConnection.next(id);
   }
 
@@ -154,7 +154,7 @@ export class ConnectionsManagerService {
       this.connectionsMap.delete(connection.id);
     }
 
-    await this.nodesManagerService.updateRootChildren();
+    await this.navNodeManagerService.updateRootChildren();
   }
 
   private isObjectContainersLoaded(

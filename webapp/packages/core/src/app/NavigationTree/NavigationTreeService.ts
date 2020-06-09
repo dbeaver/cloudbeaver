@@ -11,23 +11,22 @@ import { observable } from 'mobx';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 
-import { NodesManagerService } from '../shared/NodesManager/NodesManagerService';
+import { NavNodeManagerService, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
 
 @injectable()
 export class NavigationTreeService {
 
   selectedNodes = observable.array<string>([]);
 
-  constructor(private nodesManagerService: NodesManagerService,
-              private notificationService: NotificationService) {
-  }
+  constructor(
+    private NavNodeManagerService: NavNodeManagerService,
+    private notificationService: NotificationService
+  ) { }
 
-  async loadNestedNodes(id = '/') {
+  async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
-      const children = await this.nodesManagerService.loadChildren(id);
-      if (children) {
-        return true;
-      }
+      await this.NavNodeManagerService.loadTree(id);
+      return true;
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load tree node: ${id}`);
     }

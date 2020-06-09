@@ -7,7 +7,7 @@
  */
 
 import {
-  NavigationTreeContextMenuService, NodeManagerUtils, NodeWithParent, EObjectFeature
+  NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import {
@@ -39,13 +39,13 @@ export class DataExportMenuService {
     };
     this.tableFooterMenuService.registerMenuItem(exportData);
 
-    this.contextMenuService.addMenuItem<NodeWithParent>(
+    this.contextMenuService.addMenuItem<NavNode>(
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'export',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
-           && !!context.data.object?.features?.includes(EObjectFeature.dataContainer);
+            && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
         order: 2,
         title: 'Export',

@@ -8,6 +8,8 @@
 
 export interface IObjectViewerTabState {
   objectId: string;
+  parentId: string;
+  parents: string[];
   folderId: string;
   tabIcon?: string;
   tabTitle?: string;

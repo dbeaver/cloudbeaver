@@ -52,7 +52,7 @@ export class PermissionsService {
   }
 
   async update() {
-    await this.permissions.refresh();
+    await this.permissions.refresh(true);
     this.updateSubject.next();
   }
 

@@ -10,49 +10,52 @@ import { useState, useCallback, useEffect } from 'react';
 
 import { useService } from '@dbeaver/core/di';
 
+import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { NodesManagerService } from '../../shared/NodesManager/NodesManagerService';
-import { NodeWithParent } from '../../shared/NodesManager/NodeWithParent';
+import { NavNodeManagerService } from '../../shared/NodesManager/NavNodeManagerService';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
 import { NavigationTreeService } from '../NavigationTreeService';
 
 
-export function useNavigationTree(nodeId: string) {
+export function useNavigationTree(nodeId: string, parentId: string) {
   const navigationTreeService = useService(NavigationTreeService);
-  const nodesManagerService = useService(NodesManagerService);
+  const navNodeManagerService = useService(NavNodeManagerService);
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
-  const node = useNode(nodeId);
+  const { node, isLoaded: nodeLoaded } = useNode(nodeId);
   const children = useChildren(nodeId);
 
   if (!node) {
     return undefined;
   }
 
-  const isLoaded = children?.isLoaded;
-  const isExpandable = isExpandableFilter(node) && (!children?.isLoaded || children.children.length > 0);
+  const isLoaded = children.isLoaded;
+  const isExpandable = isExpandableFilter(node) && (!isLoaded || children.children!.length > 0);
 
   const handleDoubleClick = useCallback(
-    (nodeId: string) => nodesManagerService.navToNode(nodeId),
-    [nodesManagerService]
+    () => navNodeManagerService.navToNode(nodeId, parentId),
+    [navNodeManagerService, nodeId, parentId]
   );
 
   const handleExpand = useCallback(
-    (id: string) => {
+    async () => {
       if (!isExpanded) {
-        navigationTreeService.loadNestedNodes(id).then(state => !state && switchExpand(false));
+        const state = await navigationTreeService.loadNestedNodes(nodeId);
+        if (!state) {
+          switchExpand(false);
+        }
       }
       switchExpand(!isExpanded);
     },
-    [isExpanded]
+    [isExpanded, nodeId]
   );
 
   const handleSelect = useCallback(
-    (id: string, isMultiple?: boolean) => {
-      switchSelect(navigationTreeService.selectNode(id, isMultiple));
+    (isMultiple?: boolean) => {
+      switchSelect(navigationTreeService.selectNode(nodeId, isMultiple));
     },
-    [isSelected]
+    [isSelected, nodeId]
   );
 
   const {
@@ -65,17 +68,25 @@ export function useNavigationTree(nodeId: string) {
     }
   }, [isExpandable && hasChildren]);
 
+  useEffect(() => {
+    if (isExpanded && !children.isLoaded && !children.isLoading && !!children.children && nodeLoaded) {
+      navigationTreeService.loadNestedNodes(nodeId);
+    }
+  }, [isExpanded, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
+
   // Here we subscribe to selected nodes if current node selected (mobx)
-  if (isSelected && !navigationTreeService.selectedNodes.includes(node.id)) {
+  if (isSelected && !navigationTreeService.selectedNodes.includes(nodeId)) {
     switchSelect(false);
   }
 
   return {
     name,
+    node,
     nodeType,
     icon,
     isExpanded,
     isLoaded,
+    isLoading: children.isLoading,
     isExpandable,
     isSelected,
     hasChildren,
@@ -85,6 +96,6 @@ export function useNavigationTree(nodeId: string) {
   };
 }
 
-export function isExpandableFilter(node: NodeWithParent) {
-  return !node.object?.features?.find(feature => feature === EObjectFeature.entity);
+export function isExpandableFilter(node: NavNode) {
+  return node.hasChildren && !node.objectFeatures.includes(EObjectFeature.entity);
 }

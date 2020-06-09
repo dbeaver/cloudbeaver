@@ -11,7 +11,7 @@ import {
   NavigationTreeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NodeWithParent, ConnectionsManagerService,
+  NavNode, ConnectionsManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@dbeaver/core/dialogs';
@@ -21,11 +21,13 @@ import { SqlEditorTabService } from './SqlEditorTabService';
 
 @injectable()
 export class SqlEditorBootstrap {
-  constructor(private mainMenuService: MainMenuService,
-              private contextMenuService: ContextMenuService,
-              private connectionsManagerService: ConnectionsManagerService,
-              private sqlEditorTabService: SqlEditorTabService,
-              private sqlEditorNavigatorService: SqlEditorNavigatorService) {}
+  constructor(
+    private mainMenuService: MainMenuService,
+    private contextMenuService: ContextMenuService,
+    private connectionsManagerService: ConnectionsManagerService,
+    private sqlEditorTabService: SqlEditorTabService,
+    private sqlEditorNavigatorService: SqlEditorNavigatorService
+  ) {}
 
   async bootstrap() {
     this.sqlEditorTabService.registerTabHandler();
@@ -40,20 +42,20 @@ export class SqlEditorBootstrap {
       }
     );
 
-    const openSqlEditor: IContextMenuItem<NodeWithParent> = {
+    const openSqlEditor: IContextMenuItem<NavNode> = {
       id: 'open-sql-editor',
       isPresent(context) {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType
-          && Boolean((context.data as NodeWithParent)?.object?.features?.includes(EObjectFeature.dataSource));
+          && context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'SQL',
       order: 2,
-      onClick: (context: IMenuContext<NodeWithParent>) => {
+      onClick: (context: IMenuContext<NavNode>) => {
         const node = context.data;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
         this.sqlEditorNavigatorService.openNewEditor(connectionId);
       },
     };
-    this.contextMenuService.addMenuItem<NodeWithParent>(this.contextMenuService.getRootMenuToken(), openSqlEditor);
+    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), openSqlEditor);
   }
 }
