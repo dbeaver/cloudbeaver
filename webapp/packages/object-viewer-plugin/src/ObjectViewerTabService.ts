@@ -19,7 +19,6 @@ import {
   objectSchemaProvider,
   NavNodeManagerService,
   DBObjectService,
-  ROOT_NODE_PATH,
   NavNode,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';

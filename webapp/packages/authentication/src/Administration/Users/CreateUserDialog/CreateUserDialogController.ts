@@ -71,7 +71,7 @@ export class CreateUserDialogController implements IInitializableController, IDe
           await this.usersManagerService.grantRole(user.userId, roleId);
         }
       }
-      await this.usersManagerService.users.refresh(user.userId);
+      await this.usersManagerService.users.refresh(true, user.userId);
       this.notificationService.logInfo({ title: 'authentication_user_user_created' });
       this.close();
     } catch (exception) {
