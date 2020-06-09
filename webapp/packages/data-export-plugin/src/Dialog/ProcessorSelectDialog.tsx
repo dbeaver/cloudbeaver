@@ -56,7 +56,7 @@ export const ProcessorSelectDialog = observer(
     onClose,
   }: ProcessorSelectDialogProps) {
     const translate = useTranslate();
-    const node = useNode(context.containerNodePath || '');
+    const { node } = useNode(context.containerNodePath || '');
 
     return styled(styles)(
       <CommonDialogWrapper
