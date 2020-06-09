@@ -15,6 +15,13 @@ import { DBObject } from './EntityTypes';
 export interface IDBObjectParams {
   navNodeId: string[];
   remove?: boolean;
+  parentId?: never;
+}
+
+export interface IDBObjectValueParams {
+  parentId: string;
+  navNodeId: string[];
+  remove?: never;
 }
 
 interface IDBObjectMetadata {
@@ -39,9 +46,12 @@ export class DBObjectService {
   }
 
   async load(navNodeId: string): Promise< DBObject>
-  async load(navNodeId: string[]): Promise<DBObject[]>
-  async load(navNodeId: string | string[]): Promise<DBObject | DBObject[]> {
-    const dbObject = await this.dbObject.load({ navNodeId: Array.isArray(navNodeId) ? navNodeId : [navNodeId] });
+  async load(navNodeId: string[], parentId?: string): Promise<DBObject[]>
+  async load(navNodeId: string | string[], parentId?: string): Promise<DBObject | DBObject[]> {
+    const dbObject = await this.dbObject.load({
+      navNodeId: Array.isArray(navNodeId) ? navNodeId : [navNodeId],
+      parentId,
+    });
 
     if (!Array.isArray(navNodeId)) {
       return dbObject.get(navNodeId)!;
@@ -57,8 +67,44 @@ export class DBObjectService {
     dbObject: Map<string, DBObject>,
     metadata: MetadataMap<string, IDBObjectMetadata>,
     load: boolean,
-    data: IDBObjectParams
+    data: IDBObjectParams | IDBObjectValueParams
   ) {
+
+    if (data.parentId) {
+      for (const navNodeId of data.navNodeId) {
+        const itemMetadata = metadata.get(navNodeId);
+        itemMetadata.loaded = false;
+        if (load) {
+          itemMetadata.loading = true;
+        }
+      }
+
+      if (load) {
+        try {
+          const { dbObjects } = await this.graphQLService.gql.getChildrenDBObjectInfo({
+            navNodeId: data.parentId,
+          });
+
+          for (const navNodeId of data.navNodeId) {
+            const data = dbObjects.find(dbObject => dbObject.id === navNodeId);
+
+            if (data) {
+              const itemMetadata = metadata.get(navNodeId);
+              dbObject.set(navNodeId, { navNodeId, ...data.object } as DBObject);
+              itemMetadata.loaded = true;
+            }
+          }
+        } finally {
+          for (const navNodeId of data.navNodeId) {
+            const itemMetadata = metadata.get(navNodeId);
+            itemMetadata.loading = false;
+          }
+        }
+      }
+
+      return dbObject;
+    }
+
     for (const navNodeId of data.navNodeId) {
       if (data.remove) {
         dbObject.delete(navNodeId);

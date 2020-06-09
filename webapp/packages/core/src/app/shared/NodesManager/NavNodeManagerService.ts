@@ -423,7 +423,9 @@ export class NavNodeManagerService {
       }
     }
 
-    await this.dbObjectService.dbObject.refresh(false, { navNodeId: nodesId });
+    if (load) {
+      await this.dbObjectService.dbObject.refresh(false, { navNodeId: nodesId });
+    }
 
     return navNode;
   }

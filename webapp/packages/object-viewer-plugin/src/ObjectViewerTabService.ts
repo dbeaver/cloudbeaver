@@ -204,7 +204,7 @@ export class ObjectViewerTabService {
       }
       const folderChildren = await this.navNodeManagerService.loadTree(folderId);
 
-      await this.dbObjectService.load(folderChildren);
+      await this.dbObjectService.load(folderChildren, folderId);
     } catch (exception) {
       this.notificationService.logException(exception, 'Error in Object Viewer while tab selecting');
     }

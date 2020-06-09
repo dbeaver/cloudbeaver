@@ -31,7 +31,7 @@ export const ObjectPropertyTable = observer(function ObjectPropertyTable({
   parentId,
 }: ObjectPropertyTableProps) {
   const children = useChildren(objectId);
-  const { isLoading } = useObjectFolder(parentId);
+  const { isLoading } = useObjectFolder(objectId);
 
   if (!children.children || children.isLoading || isLoading) {
     return <Loader />;
