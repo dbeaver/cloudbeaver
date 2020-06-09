@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 echo "Clone and build Cloudbeaver"
 
 rm -rf ./drivers
