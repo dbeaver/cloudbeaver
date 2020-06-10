@@ -141,7 +141,7 @@ export class ConnectionSchemaManagerService {
     if (!this.activeItem?.changeConnectionId) {
       return;
     }
-    this.activeItem.changeConnectionId(connectionId, this.activeItem);
+    this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
     this.loadConnection(connectionId);
   }
 
@@ -152,7 +152,7 @@ export class ConnectionSchemaManagerService {
     if (!this.activeItem?.changeCatalogId) {
       throw new Error('The try to change catalog without connection');
     }
-    this.activeItem.changeCatalogId(catalogId, this.activeItem);
+    this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
     this.loadConnection(this.currentConnectionId!, catalogId);
   }
 
@@ -163,7 +163,7 @@ export class ConnectionSchemaManagerService {
     if (!this.activeItem?.changeSchemaId) {
       throw new Error('The try to change schema without connection');
     }
-    this.activeItem.changeSchemaId(schemaId, this.activeItem);
+    this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
   }
 
   private onNodeSelect([navNodeId, selected]: [string, boolean]) {

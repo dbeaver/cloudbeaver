@@ -114,18 +114,22 @@ export class SqlEditorTabService {
       await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
       return true;
     } catch (exception) {
-      this.notificationService.logError({ title: 'Failed to change SQL-editor connection' });
+      this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
       return false;
     }
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {
     try {
-      await this.updateSqlContext(tab.handlerState.connectionId, tab.handlerState.contextId, containerId);
+      await this.updateSqlContext(
+        tab.handlerState.connectionId,
+        tab.handlerState.contextId,
+        containerId
+      );
       tab.handlerState.objectCatalogId = containerId;
       return true;
     } catch (exception) {
-      this.notificationService.logError({ title: 'Failed to change SQL-editor schema' });
+      this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
       return false;
     }
   }
@@ -141,7 +145,7 @@ export class SqlEditorTabService {
       tab.handlerState.objectSchemaId = containerId;
       return true;
     } catch (exception) {
-      this.notificationService.logError({ title: 'Failed to change SQL-editor schema' });
+      this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
       return false;
     }
   }
@@ -158,8 +162,8 @@ export class SqlEditorTabService {
     }
     try {
       await this.gql.gql.sqlContextDestroy({ connectionId, contextId });
-    } catch (e) {
-      this.notificationService.logError({ title: `Failed to destroy SQL-context ${contextId}` });
+    } catch (exception) {
+      this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`);
     }
   }
 
