@@ -11,7 +11,7 @@ import {
   NavigationTreeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NavNode, ConnectionsManagerService,
+  NavNode, ConnectionsManagerService, ConnectionSchemaManagerService,
 } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@dbeaver/core/dialogs';
@@ -26,7 +26,8 @@ export class SqlEditorBootstrap {
     private contextMenuService: ContextMenuService,
     private connectionsManagerService: ConnectionsManagerService,
     private sqlEditorTabService: SqlEditorTabService,
-    private sqlEditorNavigatorService: SqlEditorNavigatorService
+    private sqlEditorNavigatorService: SqlEditorNavigatorService,
+    private connectionSchemaManagerService: ConnectionSchemaManagerService,
   ) {}
 
   async bootstrap() {
@@ -37,7 +38,18 @@ export class SqlEditorBootstrap {
         id: 'sql-editor',
         title: 'SQL',
         order: 2,
-        onClick: () => this.sqlEditorNavigatorService.openNewEditor(),
+        onClick: () => {
+          console.log(
+            this.connectionSchemaManagerService.currentConnectionId,
+            this.connectionSchemaManagerService.currentObjectCatalogId,
+            this.connectionSchemaManagerService.currentObjectSchemaId
+          );
+          this.sqlEditorNavigatorService.openNewEditor(
+            this.connectionSchemaManagerService.currentConnectionId,
+            this.connectionSchemaManagerService.currentObjectCatalogId,
+            this.connectionSchemaManagerService.currentObjectSchemaId,
+          );
+        },
         isDisabled: () => !this.connectionsManagerService.hasAnyConnection(),
       }
     );

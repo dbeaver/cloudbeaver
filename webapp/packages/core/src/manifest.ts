@@ -8,7 +8,8 @@
 
 import {
   ConnectionDialogsService, ConnectionsManagerService,
-  MainMenuService, NavigationService, NavigationTreeService, NavNodeManagerService, DBObjectService,
+  MainMenuService, NavigationService, NavigationTreeService,
+  NavNodeManagerService, DBObjectService, NavNodeExtensionsService,
   ConnectionSchemaManagerService, NavigationTabsService,
   NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
@@ -65,6 +66,7 @@ export const coreManifest: PluginManifest = {
     NavigationTreeContextMenuService,
     NavigationTreeService,
     NavNodeManagerService,
+    NavNodeExtensionsService,
     DBObjectService,
     NotificationService,
     SessionService,

@@ -17,6 +17,7 @@ export * from './shared/NodesManager/extensions/IObjectSchemaProvider';
 export * from './shared/NodesManager/extensions/IObjectSchemaSetter';
 export * from './shared/NodesManager/DBObjectService';
 export * from './shared/NodesManager/NavNodeManagerService';
+export * from './shared/NodesManager/NavNodeExtensionsService';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/Navigation/NavigationService';
 export * from './shared/NavigationTabs/NavigationTabsService';
