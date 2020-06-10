@@ -19,7 +19,7 @@
 
     <properties>
         <dbeaver-product>CloudBeaver CE</dbeaver-product>
-        <dbeaver-version>1.0.2</dbeaver-version>
+        <dbeaver-version>1.0.4</dbeaver-version>
     </properties>
 
     <modules>
