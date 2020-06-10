@@ -13,9 +13,7 @@ echo Pull dbeaver platform
 
 cd ../..
 IF NOT EXIST dbeaver git clone --depth 1 https://github.com/dbeaver/dbeaver.git
-cd dbeaver
-git pull
-cd ..\cloudbeaver\deploy
+cd cloudbeaver\deploy
 
 echo Build cloudbeaver server
 
