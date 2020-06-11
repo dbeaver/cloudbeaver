@@ -142,7 +142,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
     this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
-    this.loadConnection(connectionId);
+    this.updateContainer(connectionId);
   }
 
   /**
@@ -153,7 +153,7 @@ export class ConnectionSchemaManagerService {
       throw new Error('The try to change catalog without connection');
     }
     this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
-    this.loadConnection(this.currentConnectionId!, catalogId);
+    this.updateContainer(this.currentConnectionId, catalogId);
   }
 
   /**
@@ -164,6 +164,35 @@ export class ConnectionSchemaManagerService {
       throw new Error('The try to change schema without connection');
     }
     this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
+  }
+
+  async updateContainer(connectionId?: string, catalogId?: string) {
+    if (!connectionId) {
+      connectionId = this.currentConnectionId;
+    }
+    if (!catalogId) {
+      catalogId = this.currentObjectCatalogId;
+    }
+    if (!connectionId) {
+      return;
+    }
+
+    try {
+      await this.connectionsManagerService.dbDrivers.load();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
+    }
+
+    if (this.activeItem?.changeCatalogId || this.activeItem?.changeSchemaId) {
+      try {
+        await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
+      } catch (exception) {
+        this.notificationService.logException(
+          exception,
+          `Can't load objectContainers for ${connectionId}@${catalogId}`,
+        );
+      }
+    }
   }
 
   private onNodeSelect([navNodeId, selected]: [string, boolean]) {
@@ -238,31 +267,10 @@ export class ConnectionSchemaManagerService {
     this.activeItem = item;
     this.activeItemHistory.push(item);
 
-    if (this.currentConnectionId) {
-      this.loadConnection(this.currentConnectionId, this.currentObjectCatalogId);
-    }
+    this.updateContainer();
   }
 
   private clearHistory(id: string) {
     this.activeItemHistory = this.activeItemHistory.filter(item => item.id !== id);
-  }
-
-  private async loadConnection(connectionId: string, catalogId?: string) {
-    try {
-      await this.connectionsManagerService.dbDrivers.load();
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
-    }
-
-    if (this.activeItem?.changeCatalogId || this.activeItem?.changeSchemaId) {
-      try {
-        await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
-      } catch (exception) {
-        this.notificationService.logException(
-          exception,
-          `Can't load objectContainers for ${connectionId}@${catalogId}`,
-        );
-      }
-    }
   }
 }
