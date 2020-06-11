@@ -71,8 +71,10 @@ export class ConnectionSelectorController {
     return 'database';
   }
 
-  constructor(private connectionSelectorService: ConnectionSchemaManagerService,
-    private connectionsManagerService: ConnectionsManagerService) {
+  constructor(
+    private connectionSelectorService: ConnectionSchemaManagerService,
+    private connectionsManagerService: ConnectionsManagerService,
+  ) {
 
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',

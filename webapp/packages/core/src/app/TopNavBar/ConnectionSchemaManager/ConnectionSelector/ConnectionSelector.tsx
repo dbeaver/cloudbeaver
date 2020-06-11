@@ -55,7 +55,10 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     <connection-selector as="div" {...use({ isVisible: controller.isConnectionSelectorVisible })}>
       <ConnectionMenu menuItem={controller.connectionMenu} style={[menuStyles, connectionMenu]}/>
       {controller.isObjectContainerSelectorVisible && (
-        <SchemaOrCatalogMenu menuItem={controller.objectContainerMenu} style={[menuStyles]}/>
+        <SchemaOrCatalogMenu
+          menuItem={controller.objectContainerMenu}
+          style={[menuStyles]}
+        />
       )}
     </connection-selector>
   );
