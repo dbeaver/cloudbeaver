@@ -42,7 +42,6 @@ export interface ITableViewerModelOptions {
   resultId?: string | null; // will be filled after fist data fetch
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
-  initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
   requestDataAsync(
     model: TableViewerModel,
@@ -67,7 +66,6 @@ export class TableViewerModel implements ITableViewerModelOptions {
   resultId: string | null;
   executionContext: IExecutionContext | null;
   sourceName?: string;
-  initialState?: IRequestDataResult;
   noLoaderWhileRequestingDataAsync?: boolean;
   requestDataAsync: (
     model: TableViewerModel,
@@ -77,8 +75,6 @@ export class TableViewerModel implements ITableViewerModelOptions {
   saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   agGridModel: IAgGridModel = {
-    initialRows: [],
-    initialColumns: [],
     chunkSize: this.getDefaultRowsCount(),
     enableRangeSelection: true,
     onRequestData: this.onRequestData.bind(this),
@@ -127,12 +123,9 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.resultId = options.resultId || null;
     this.executionContext = options.executionContext || null;
     this.sourceName = options.sourceName;
-    this.initialState = options.initialState;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
     this.requestDataAsync = options.requestDataAsync;
     this.saveChanges = options.saveChanges;
-
-    this.init();
   }
 
   cancelFetch = () => {
@@ -144,14 +137,22 @@ export class TableViewerModel implements ITableViewerModelOptions {
     }
   }
 
-  private init() {
-    if (this.initialState) {
-      this.insertRows(0, this.initialState.rows, !this.initialState.isFullyLoaded);
-      this.tableDataModel.overWrite(this.initialState.columns);
-      this.updateInfo(this.initialState.statusMessage, this.initialState.duration);
-      this.agGridModel.initialRows = this.tableDataModel.getRows();
-      this.agGridModel.initialColumns = this.tableDataModel.getColumns();
-    }
+  @action
+  insertRows(position: number, rows: TableRow[], hasMore: boolean) {
+    const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
+    this.tableDataModel.insertRows(position, rows);
+    this._hasMoreRows = isRowsAddition ? hasMore : this._hasMoreRows;
+  }
+
+  @action
+  setColumns(columns: TableColumn[]) {
+    this.tableDataModel.setColumns(columns);
+  }
+
+  @action
+  updateInfo(status: string, duration?: number) {
+    this.queryDuration = duration || 0;
+    this.requestStatusMessage = status;
   }
 
   private async onCellEditingStopped(rowNumber: number, colNumber: number, value: any): Promise<void> {
@@ -176,7 +177,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
 
       this.insertRows(rowOffset, response.rows, !response.isFullyLoaded);
       if (!this.tableDataModel.getColumns().length) {
-        this.tableDataModel.overWrite(response.columns);
+        this.tableDataModel.setColumns(response.columns);
       }
       this.clearErrors();
       this.updateInfo(response.statusMessage, response.duration);
@@ -209,25 +210,6 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.queryDuration = 0;
     this._hasMoreRows = true;
     this.errorMessage = '';
-  }
-
-  @action
-  private updateInfo(status: string, duration?: number) {
-    this.queryDuration = duration || 0;
-    this.requestStatusMessage = status;
-  }
-
-  @action
-  private pushRows(rows: TableRow[], hasMore: boolean) {
-    this.tableDataModel.pushRows(rows);
-    this._hasMoreRows = hasMore;
-  }
-
-  @action
-  private insertRows(position: number, rows: TableRow[], hasMore: boolean) {
-    const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
-    this.tableDataModel.insertRows(position, rows);
-    this._hasMoreRows = isRowsAddition ? hasMore : this._hasMoreRows;
   }
 
   private updateAgGridRows(rows: SomeTableRows) {
@@ -280,8 +262,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
   }
 
   private onSortChanged() {
-    this.tableDataModel.resetData();
-    this._hasMoreRows = true;
+    this.resetData();
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {

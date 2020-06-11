@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Icon } from '@dbeaver/core/blocks';
+import { IconButton } from '@dbeaver/core/blocks';
 import { composes, useStyles } from '@dbeaver/core/theming';
 
 import { TableViewerModel } from '../TableViewerModel';
@@ -21,7 +21,7 @@ const tableFooterStyles = composes(
     table-footer {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-    button {
+    reload {
       composes: theme-text-primary theme-ripple from global;
     }
   `,
@@ -31,19 +31,6 @@ const tableFooterStyles = composes(
       flex: 0 0 auto;
       display: flex;
       align-items: center;
-    }
-    button {
-      outline: none;
-      padding: 0 8px;
-      display: flex;
-      cursor: pointer;
-      background: transparent;
-
-      & Icon,
-      & placeholder {
-        height: 24px;
-        width: 24px;
-      }
     }
     count input,
     count placeholder {
@@ -55,9 +42,16 @@ const tableFooterStyles = composes(
       font-size: 13px;
       line-height: 24px;
     }
-    reload,
-    reload button {
+    reload {
       height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    IconButton {
+      position: relative;
+      height: 24px;
+      width: 24px;
+      display: block;
     }
     reload,
     count,
@@ -87,9 +81,7 @@ export const TableFooter = observer(function TableFooter({
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <button type="button" onClick={model.handleRefresh}>
-          <Icon name="reload" />
-        </button>
+        <IconButton type="button" name='reload' onClick={model.handleRefresh} viewBox=""/>
       </reload>
       <count as="div">
         <input type="number" value={model.getChunkSize()} onBlur={handleChange} {...use({ mod: 'surface' })} />

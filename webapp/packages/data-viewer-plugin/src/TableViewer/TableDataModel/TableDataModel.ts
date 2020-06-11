@@ -101,7 +101,7 @@ export class TableDataModel {
   }
 
   @action
-  overWrite(columns: TableColumn[]) {
+  setColumns(columns: TableColumn[]) {
     this.columns = [...columns];
   }
 }

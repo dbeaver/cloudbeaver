@@ -72,14 +72,21 @@ implements IInitializableController, IDestructibleController {
         this.state = EPanelState.TABLE_RESULT;
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
-        this.createTableModel(
-          panelInit.sqlQueryParams.query,
-          panelInit.sqlQueryParams,
-          initialState,
-          panelInit.sqlQueryParams.connectionId,
-          dataSet.resultSet.id,
-          panelInit.sqlExecutionState
-        );
+
+        const tableModel = this.tableViewerStorageService.create({
+          tableId: this.getTableId(),
+          connectionId: panelInit.sqlQueryParams.connectionId,
+          executionContext: panelInit.sqlQueryParams,
+          resultId: dataSet.resultSet.id,
+          sourceName: panelInit.sqlQueryParams.query,
+          requestDataAsync: this.requestDataAsync.bind(this, panelInit.sqlExecutionState),
+          noLoaderWhileRequestingDataAsync: true,
+          saveChanges: this.saveChanges.bind(this),
+        });
+
+        tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
+        tableModel.setColumns(initialState.columns);
+        tableModel.updateInfo(initialState.statusMessage, initialState.duration);
       }
 
     } catch (exception) {
@@ -128,27 +135,6 @@ implements IInitializableController, IDestructibleController {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
-
-  private createTableModel(
-    sourceName: string,
-    executionContext: IExecutionContext,
-    initialState: IRequestDataResult,
-    connectionId: string,
-    resultId: string,
-    sqlExecutingState: SqlExecutionState
-  ) {
-    return this.tableViewerStorageService.create({
-      tableId: this.getTableId(),
-      connectionId,
-      executionContext,
-      resultId,
-      sourceName,
-      initialState,
-      requestDataAsync: this.requestDataAsync.bind(this, sqlExecutingState),
-      noLoaderWhileRequestingDataAsync: true,
-      saveChanges: this.saveChanges.bind(this),
-    });
   }
 
   private async requestDataAsync(
