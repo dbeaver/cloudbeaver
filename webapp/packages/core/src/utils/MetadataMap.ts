@@ -12,9 +12,31 @@ export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap
 
 export class MetadataMap<TKey, TValue> {
   private data: Map<TKey, TValue>;
+  private length: number;
 
   constructor(private defaultValueGetter: DefaultValueGetter<TKey, TValue>) {
     this.data = observable(new Map());
+    this.length = 0;
+  }
+
+  [Symbol.iterator]() {
+    return this.data[Symbol.iterator]();
+  }
+
+  entries() {
+    return this.data.entries();
+  }
+
+  keys() {
+    return this.data.keys();
+  }
+
+  values() {
+    return this.data.values();
+  }
+
+  count() {
+    return this.length;
   }
 
   get(key: TKey): TValue {
@@ -23,10 +45,19 @@ export class MetadataMap<TKey, TValue> {
     }
     const value = this.defaultValueGetter(key, this);
     this.data.set(key, value);
-    return value;
+    this.length++;
+    return this.data.get(key)!;
   }
 
   delete(key: TKey) {
-    this.data.delete(key);
+    if (this.data.has(key)) {
+      this.data.delete(key);
+      this.length--;
+    }
+  }
+
+  clear() {
+    this.data.clear();
+    this.length = 0;
   }
 }

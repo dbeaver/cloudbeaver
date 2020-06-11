@@ -24,8 +24,6 @@ export interface IRequestDataOptions {
 
 
 export interface IAgGridModel {
-  initialRows: AgGridRow[];
-  initialColumns: IAgGridCol[];
   chunkSize: number;
   enableRangeSelection?: boolean;
 

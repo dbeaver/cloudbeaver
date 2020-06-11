@@ -18,7 +18,6 @@ import {
   CellEditingStoppedEvent,
 } from 'ag-grid-community';
 import { SortChangedEvent } from 'ag-grid-community/dist/lib/events';
-import { RowDataTransaction } from 'ag-grid-community/dist/lib/interfaces/rowDataTransaction';
 import { computed, observable } from 'mobx';
 
 import { injectable, IInitializableController, IDestructibleController } from '@dbeaver/core/di';
@@ -59,6 +58,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     rowHeight: 24,
     headerHeight: 28,
     rowModelType: 'infinite',
+    infiniteInitialRowCount: 0,
     cacheBlockSize: undefined, // to be set during init phase
 
     datasource: this.datasource,
@@ -104,9 +104,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     gridModel.actions = this.actions;
     this.gridModel = gridModel;
     this.gridOptions.cacheBlockSize = gridModel.chunkSize;
-    if (gridModel.initialColumns?.length) {
-      this.columns = mapDataToColumns(gridModel.initialColumns);
-    }
   }
 
   destruct(): void {
@@ -197,7 +194,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private handleGridReady(params: GridReadyEvent) {
     this.api = params.api;
     this.columnApi = params.columnApi;
-    this.setInitialRow(this.gridModel.initialRows);
   }
 
   private handleSortChanged(event: SortChangedEvent) {
@@ -209,26 +205,12 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   /* Actions */
 
-  private resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void {
+  private resetData(): void {
     this.selection.clear();
     if (this.api) {
+      this.api.setInfiniteRowCount(0, false);
       this.api.purgeInfiniteCache(); // it will reset internal state
-      if (columns) {
-        this.columns = mapDataToColumns(columns);
-      }
-      this.setInitialRow(rows);
     }
-  }
-
-  private setInitialRow(initialRows?: AgGridRow[]): void {
-    if (!initialRows || !initialRows.length) {
-      return;
-    }
-    const transaction: RowDataTransaction = {
-      addIndex: 0,
-      add: initialRows || [],
-    };
-    this.api!.applyTransaction(transaction);
   }
 
   private updateCellValue(rowNumber: number, colNumber: number, value: any): void {
