@@ -17,11 +17,9 @@ import { PromiseCancelledError } from '@dbeaver/core/utils';
 import {
   fetchingSettings,
   IRequestDataResult,
-  IRequestDataResultOptions,
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
-  IExecutionContext,
 } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
@@ -149,6 +147,7 @@ implements IInitializableController, IDestructibleController {
         offset,
         limit: count,
         constraints: Array.from(model.getSortedColumns()),
+        where: model.getQueryWhereFilter() || undefined,
       });
     sqlExecutingState.setCurrentlyExecutingQuery(queryExecutionProcess);
     const response = await queryExecutionProcess.promise;

@@ -108,6 +108,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
   @observable private _hasMoreRows = true
   @observable private _isLoaderVisible = false;
   @observable private _chunkSize: number = this.getDefaultRowsCount();
+  @observable private queryWhereFilter: string | null = null;
 
   private exception: GQLError | null = null;
   private tableDataModel = new TableDataModel();
@@ -138,6 +139,15 @@ export class TableViewerModel implements ITableViewerModelOptions {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
+  }
+
+  getQueryWhereFilter() {
+    return this.queryWhereFilter;
+  }
+
+  setQueryWhereFilter(where: string | null) {
+    this.queryWhereFilter = where;
+    this.resetData();
   }
 
   getSortedColumns() {

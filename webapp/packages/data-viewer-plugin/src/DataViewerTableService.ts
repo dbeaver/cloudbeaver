@@ -97,32 +97,33 @@ export class DataViewerTableService {
   }
 
   private async requestDataAsync(
-    data: TableViewerModel,
+    model: TableViewerModel,
     offset: number,
     count: number
   ): Promise<IRequestDataResult> {
-    if (!data.containerNodePath) {
+    if (!model.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
     }
-    if (!data.executionContext) {
+    if (!model.executionContext) {
 
       // it is first data request
-      const executionContext: IExecutionContext = await this.createExecutionContext(data.connectionId);
-      data.executionContext = executionContext;
+      const executionContext: IExecutionContext = await this.createExecutionContext(model.connectionId);
+      model.executionContext = executionContext;
     }
 
     const { readDataFromContainer } = await this.graphQLService.gql.readDataFromContainer({
-      connectionId: data.executionContext.connectionId,
-      contextId: data.executionContext.contextId,
-      containerNodePath: data.containerNodePath,
+      connectionId: model.executionContext.connectionId,
+      contextId: model.executionContext.contextId,
+      containerNodePath: model.containerNodePath,
       filter: {
         offset,
         limit: count,
-        constraints: Array.from(data.getSortedColumns()),
+        constraints: Array.from(model.getSortedColumns()),
+        where: model.getQueryWhereFilter() || undefined,
       },
     });
     const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table
-    data.resultId = dataSet.id; // server generates new resultId on each fetch
+    model.resultId = dataSet.id; // server generates new resultId on each fetch
 
     const result: IRequestDataResult = {
       rows: dataSet.rows!,
