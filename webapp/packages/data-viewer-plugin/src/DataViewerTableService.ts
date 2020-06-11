@@ -9,10 +9,9 @@
 import { injectable } from '@dbeaver/core/di';
 import { GraphQLService } from '@dbeaver/core/sdk';
 
-import { RequestDataOptionsToConstrains } from './DataViewerUtils';
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, IRequestDataResultOptions, TableViewerModel } from './TableViewer/TableViewerModel';
+import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 
@@ -99,9 +98,8 @@ export class DataViewerTableService {
 
   private async requestDataAsync(
     data: TableViewerModel,
-    rowOffset: number,
-    count: number,
-    options: IRequestDataResultOptions,
+    offset: number,
+    count: number
   ): Promise<IRequestDataResult> {
     if (!data.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
@@ -118,9 +116,9 @@ export class DataViewerTableService {
       contextId: data.executionContext.contextId,
       containerNodePath: data.containerNodePath,
       filter: {
-        offset: rowOffset,
+        offset,
         limit: count,
-        constraints: RequestDataOptionsToConstrains(options),
+        constraints: Array.from(data.getSortedColumns()),
       },
     });
     const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table

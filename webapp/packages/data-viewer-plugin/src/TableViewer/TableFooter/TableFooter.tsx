@@ -81,7 +81,7 @@ export const TableFooter = observer(function TableFooter({
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <IconButton type="button" name='reload' onClick={model.handleRefresh} viewBox=""/>
+        <IconButton type="button" name='reload' onClick={model.refresh} viewBox=""/>
       </reload>
       <count as="div">
         <input type="number" value={model.getChunkSize()} onBlur={handleChange} {...use({ mod: 'surface' })} />

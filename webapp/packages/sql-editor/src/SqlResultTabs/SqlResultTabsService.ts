@@ -34,7 +34,13 @@ export class SqlResultTabsService {
     };
 
     // we should first render table, because we expect that table request first data portion
-    const queryExecutionProcess = this.sqlResultService.asyncSqlQuery(sqlQueryParams, 0, fetchingSettings.fetchDefault);
+    const queryExecutionProcess = this.sqlResultService.asyncSqlQuery(
+      sqlQueryParams,
+      {
+        offset: 0,
+        limit: fetchingSettings.fetchDefault,
+      }
+    );
 
     editorState.sqlExecutionState.setCurrentlyExecutingQuery(queryExecutionProcess);
 

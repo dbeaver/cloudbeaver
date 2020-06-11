@@ -13,8 +13,8 @@ import {
 } from '@dbeaver/ag-grid-plugin';
 import { ErrorDetailsDialog } from '@dbeaver/core/app';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
-import { GQLError } from '@dbeaver/core/sdk';
-import { uuid } from '@dbeaver/core/utils';
+import { GQLError, SqlDataFilterConstraint } from '@dbeaver/core/sdk';
+import { uuid, MetadataMap } from '@dbeaver/core/utils';
 
 import { IExecutionContext } from '../IExecutionContext';
 import { ErrorDialog } from './ErrorDialog';
@@ -46,8 +46,8 @@ export interface ITableViewerModelOptions {
   requestDataAsync(
     model: TableViewerModel,
     rowOffset: number,
-    count: number,
-    options?: IRequestDataResultOptions): Promise<IRequestDataResult>;
+    count: number
+  ): Promise<IRequestDataResult>;
   saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult>;
 }
 
@@ -70,8 +70,8 @@ export class TableViewerModel implements ITableViewerModelOptions {
   requestDataAsync: (
     model: TableViewerModel,
     rowOffset: number,
-    count: number,
-    options?: IRequestDataResultOptions) => Promise<IRequestDataResult>;
+    count: number
+  ) => Promise<IRequestDataResult>;
   saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   agGridModel: IAgGridModel = {
@@ -97,7 +97,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
 
   getChunkSize = () => this._chunkSize;
   setChunkSize = (count: number) => this.updateChunkSize(count);
-  handleRefresh = () => this.resetData();
+  refresh = () => this.resetData();
 
   @observable queryDuration = 0;
   @observable requestStatusMessage = '';
@@ -112,6 +112,9 @@ export class TableViewerModel implements ITableViewerModelOptions {
   private exception: GQLError | null = null;
   private tableDataModel = new TableDataModel();
   private tableEditor = new TableEditor(this.tableDataModel);
+  private sortedColumns = new MetadataMap<string, SqlDataFilterConstraint>(
+    (colId, metadata) => ({ attribute: colId, orderPosition: metadata.count(), orderAsc: false })
+  );
 
   constructor(
     options: ITableViewerModelOptions,
@@ -137,6 +140,23 @@ export class TableViewerModel implements ITableViewerModelOptions {
     }
   }
 
+  getSortedColumns() {
+    return this.sortedColumns.values();
+  }
+
+  setColumnSorting(colId: string, orderAsc?: boolean, multiple?: boolean) {
+    if (!multiple) {
+      this.sortedColumns.clear();
+    }
+
+    const sorting = this.sortedColumns.get(colId);
+    sorting.orderAsc = orderAsc;
+  }
+
+  removeColumnSorting(colId: string) {
+    this.sortedColumns.delete(colId);
+  }
+
   @action
   insertRows(position: number, rows: TableRow[], hasMore: boolean) {
     const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
@@ -159,7 +179,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.tableEditor.editCellValue(rowNumber, colNumber, value);
   }
 
-  private async onRequestData(rowOffset: number, count: number, options: IRequestDataOptions): Promise<IRequestedData> {
+  private async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
     // try to return data from cache
     if (this.tableDataModel.isChunkLoaded(rowOffset, count) || this.isFullyLoaded) {
       const data: IRequestedData = {
@@ -173,7 +193,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
 
     try {
-      const response = await this.requestDataAsync(this, rowOffset, count, options);
+      const response = await this.requestDataAsync(this, rowOffset, count);
 
       this.insertRows(rowOffset, response.rows, !response.isFullyLoaded);
       if (!this.tableDataModel.getColumns().length) {
@@ -261,7 +281,11 @@ export class TableViewerModel implements ITableViewerModelOptions {
     }
   }
 
-  private onSortChanged() {
+  private onSortChanged(sorting: SortModel) {
+    this.sortedColumns.clear();
+    for (const sort of sorting) {
+      this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
+    }
     this.resetData();
   }
 
