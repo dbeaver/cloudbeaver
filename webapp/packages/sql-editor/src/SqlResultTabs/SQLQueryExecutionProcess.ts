@@ -8,12 +8,11 @@
 
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import {
-  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo,
+  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter,
 } from '@dbeaver/core/sdk';
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState,
 } from '@dbeaver/core/utils';
-import { IRequestDataResultOptions, RequestDataOptionsToConstrains } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
 
@@ -25,18 +24,20 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
 
-  constructor(private graphQLService: GraphQLService,
-              private notificationService: NotificationService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService
+  ) {
     super();
   }
 
-  async start(sqlQueryParams: ISqlQueryParams,
-              rowOffset: number,
-              count: number,
-              options?: IRequestDataResultOptions): Promise<void> {
+  async start(
+    sqlQueryParams: ISqlQueryParams,
+    filter: SqlDataFilter
+  ): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(sqlQueryParams, rowOffset, count, options);
+      const taskInfo = await this.executeQueryAsync(sqlQueryParams, filter);
       this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -104,20 +105,15 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     }
   }
 
-  private async executeQueryAsync(sqlQueryParams: ISqlQueryParams,
-                                  rowOffset: number,
-                                  count: number,
-                                  options?: IRequestDataResultOptions): Promise<AsyncTaskInfo> {
+  private async executeQueryAsync(
+    sqlQueryParams: ISqlQueryParams,
+    filter: SqlDataFilter,
+  ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.gql.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       query: sqlQueryParams.query,
-
-      filter: {
-        offset: rowOffset,
-        limit: count,
-        constraints: RequestDataOptionsToConstrains(options),
-      },
+      filter,
     });
     return taskInfo;
   }
