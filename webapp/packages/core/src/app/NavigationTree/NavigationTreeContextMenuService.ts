@@ -63,7 +63,7 @@ export class NavigationTreeContextMenuService {
         title: 'app_navigationTree_refreshNode',
         onClick: (context) => {
           const node = context.data;
-          this.navNodeManagerService.refresh(node.id);
+          this.navNodeManagerService.refreshTree(node.id);
         },
       }
     );
