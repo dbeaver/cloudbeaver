@@ -32,6 +32,11 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   const isLoaded = children.isLoaded;
   const isExpandable = isExpandableFilter(node) && (!isLoaded || children.children!.length > 0);
+  const isExpandedFiltered = isExpanded
+    && (
+      !node.objectFeatures.includes(EObjectFeature.dataSource)
+    || node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
+    );
 
   const handleDoubleClick = useCallback(
     () => navNodeManagerService.navToNode(nodeId, parentId),
@@ -40,16 +45,16 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   const handleExpand = useCallback(
     async () => {
-      if (!isExpanded) {
+      if (!isExpandedFiltered) {
         const state = await navigationTreeService.loadNestedNodes(nodeId);
         if (!state) {
           switchExpand(false);
           return;
         }
       }
-      switchExpand(!isExpanded);
+      switchExpand(!isExpandedFiltered);
     },
-    [isExpanded, nodeId]
+    [isExpandedFiltered, nodeId]
   );
 
   const handleSelect = useCallback(
@@ -70,12 +75,12 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   }, [isExpandable && hasChildren]);
 
   useEffect(() => {
-    if (isExpanded && !children.isLoaded && !children.isLoading && !!children.children && nodeLoaded) {
+    if (isExpandedFiltered && !children.isLoaded && !children.isLoading && !!children.children && nodeLoaded) {
       navigationTreeService
         .loadNestedNodes(nodeId)
         .then(state => !state && switchExpand(false));
     }
-  }, [isExpanded, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
+  }, [isExpandedFiltered, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
 
   // Here we subscribe to selected nodes if current node selected (mobx)
   if (isSelected && !navigationTreeService.isNodeSelected(nodeId)) {
@@ -93,7 +98,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
     node,
     nodeType,
     icon,
-    isExpanded,
+    isExpanded: isExpandedFiltered,
     isLoaded,
     isLoading: children.isLoading,
     isExpandable,

@@ -784,7 +784,10 @@ export type NavNodeChildrenQueryVariables = {
 export type NavNodeChildrenQuery = { navNodeChildren: Array<(
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  )>; };
+  )>; navNodeInfo: (
+    Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
+    & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
+  ); };
 
 export type NavNodeInfoQueryVariables = {
   nodePath: Scalars['ID'];
@@ -1295,6 +1298,20 @@ export const GetDbObjectInfoDocument = `
 export const NavNodeChildrenDocument = `
     query navNodeChildren($parentPath: ID!) {
   navNodeChildren(parentPath: $parentPath) {
+    id
+    name
+    hasChildren
+    nodeType
+    icon
+    folder
+    inline
+    navigable
+    features
+    object {
+      features
+    }
+  }
+  navNodeInfo(nodePath: $parentPath) {
     id
     name
     hasChildren

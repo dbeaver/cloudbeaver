@@ -10,6 +10,7 @@ import { computed, observable } from 'mobx';
 import { Subject } from 'rxjs';
 
 import { injectable } from '@dbeaver/core/di';
+import { NotificationService } from '@dbeaver/core/eventsLog';
 import { SessionService } from '@dbeaver/core/root';
 import {
   ConnectionInfo,
@@ -21,6 +22,7 @@ import {
 } from '@dbeaver/core/sdk';
 
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
+import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 
 export type DBDriver = Pick<
   DriverInfo,
@@ -68,7 +70,8 @@ export class ConnectionsManagerService {
   constructor(
     private graphQLService: GraphQLService,
     private navNodeManagerService: NavNodeManagerService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private notificationService: NotificationService
   ) {
     this.sessionService.onUpdate.subscribe(this.restoreConnections.bind(this));
   }
@@ -126,13 +129,36 @@ export class ConnectionsManagerService {
     }
   }
 
+  async closeNavNodeConnectionAsync(navNodeId: string): Promise<void> {
+    const node = this.navNodeManagerService.getNode(navNodeId);
+    if (!node) {
+      return;
+    }
+
+    try {
+      const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId);
+      await this.graphQLService.gql.closeConnection({ id: connectionId });
+      await this.afterConnectionClose(connectionId);
+      this.connectionsMap.delete(connectionId);
+
+      if (node.objectFeatures.includes('dataSourceTemporary')) {
+        await this.navNodeManagerService.removeNode(navNodeId);
+      } else {
+        await this.navNodeManagerService.refreshNode(navNodeId);
+      }
+      await this.navNodeManagerService.removeTree(navNodeId);
+    } catch (exception) {
+      this.notificationService.logException(exception, `Can't close connection: ${navNodeId}`);
+    }
+  }
+
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
     const data = await this.connectionObjectContainers.load(connectionId, catalogId);
     return data.get(connectionId)!;
   }
 
   private async afterConnectionClose(id: string) {
-    await this.navNodeManagerService.remove(id);
+    await this.navNodeManagerService.removeTree(id);
     this.onCloseConnection.next(id);
   }
 

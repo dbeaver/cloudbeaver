@@ -32,7 +32,7 @@ export interface NavNodeKey {
 
 export interface NavNodeValue {
   node: NavNodeInfo;
-  parentId: string;
+  parentId?: string;
 }
 
 export interface INodeContainerInfo {
@@ -157,7 +157,7 @@ export class NavNodeManagerService {
     });
   }
 
-  async refresh(navNodeId: string) {
+  async refreshTree(navNodeId: string) {
     await this.graphQLService.gql.navRefreshNode({
       nodePath: navNodeId,
     });
@@ -189,6 +189,14 @@ export class NavNodeManagerService {
   async loadTree(navNodeId: string) {
     await this.navTree.load(navNodeId, false);
     return this.getTree(navNodeId)!;
+  }
+
+  async removeTree(path = ROOT_NODE_PATH) {
+    await this.navTree.refresh(true, path, true);
+  }
+
+  async refreshNode(navNodeId: string) {
+    await this.navNode.refresh(true, { navNodeId: [navNodeId] });
   }
 
   getNode(navNodeId: string): NavNode | undefined
@@ -239,6 +247,13 @@ export class NavNodeManagerService {
     return this.getNode(nodes);
   }
 
+  async removeNode(navNodeId = ROOT_NODE_PATH) {
+    await this.navNode.refresh(true, {
+      navNodeId: [navNodeId],
+      remove: true,
+    });
+  }
+
   getParent(node: NavNode) {
     return this.navNode.data.get(node.parentId);
   }
@@ -281,10 +296,6 @@ export class NavNodeManagerService {
     };
 
     return scanParents(initial, nodeId);
-  }
-
-  async remove(path = ROOT_NODE_PATH) {
-    await this.navTree.refresh(true, path, true);
   }
 
   navigationNavNodeContext = async (
@@ -369,10 +380,12 @@ export class NavNodeManagerService {
     if (data.nodesValue) {
       for (const nodeValue of data.nodesValue) {
         const itemMetadata = metadata.get(nodeValue.node.id);
+        const parentId = navNode.get(nodeValue.node.id)?.parentId || nodeValue.parentId || ROOT_NODE_PATH;
+
         navNode.set(nodeValue.node.id, {
           ...nodeValue.node,
           objectFeatures: nodeValue.node.object?.features || [],
-          parentId: nodeValue.parentId,
+          parentId,
         });
         itemMetadata.loaded = true;
       }
@@ -448,12 +461,12 @@ export class NavNodeManagerService {
         if (load) {
           itemMetadata.loading = true;
 
-          const { navNodeChildren } = await this.graphQLService.gql.navNodeChildren({
+          const { navNodeChildren, navNodeInfo } = await this.graphQLService.gql.navNodeChildren({
             parentPath: parentId,
           });
 
           await this.navNode.refresh(true, {
-            nodesValue: navNodeChildren.map(node => ({ node, parentId })),
+            nodesValue: [{ node: navNodeInfo }, ...navNodeChildren.map(node => ({ node, parentId }))],
           });
           navTree.set(parentId, navNodeChildren.map(node => node.id));
           itemMetadata.loaded = true;
@@ -480,7 +493,10 @@ export class NavNodeManagerService {
     }
 
     const nestedChildren = this.getNestedChildren(childrenToRemove);
-    await this.navNode.refresh(true, { navNodeId: nestedChildren, remove: true });
+    await this.navNode.refresh(true, {
+      navNodeId: nestedChildren.filter(navNodeId => navNodeId !== parentId),
+      remove: true,
+    });
     for (const navNodeId of nestedChildren) {
       navTree.delete(navNodeId);
       metadata.delete(navNodeId);

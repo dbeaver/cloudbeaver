@@ -61,8 +61,7 @@ export class ConnectionDialogsService {
       title: 'Disconnect',
       onClick: (context: IMenuContext<NavNode>) => {
         const node = context.data;
-        const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-        this.connectionsManagerService.closeConnectionAsync(connectionId);
+        this.connectionsManagerService.closeNavNodeConnectionAsync(node.id);
       },
     };
 

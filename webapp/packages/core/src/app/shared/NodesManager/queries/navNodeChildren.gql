@@ -13,4 +13,19 @@ query navNodeChildren($parentPath: ID!) {
       features
     }
   }
+
+  navNodeInfo(nodePath: $parentPath) {
+    id
+    name
+    hasChildren
+    nodeType
+    icon
+    folder
+    inline
+    navigable
+    features
+    object {
+      features
+    }
+  }
 }

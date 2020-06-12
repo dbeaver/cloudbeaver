@@ -16,4 +16,6 @@ export enum EObjectFeature {
   'schema' = 'schema',
   'catalog' = 'catalog',
   'dataSource' = 'dataSource', // connection
+  'dataSourceTemporary' = 'dataSourceTemporary',
+  'dataSourceConnected' = 'dataSourceConnected',
 }
