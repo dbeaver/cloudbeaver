@@ -11,13 +11,10 @@ import { NotificationService } from '@dbeaver/core/eventsLog';
 import {
   GraphQLService,
   SqlExecuteInfo,
+  SqlDataFilter,
+  SqlDataFilterConstraint,
 } from '@dbeaver/core/sdk';
-import {
-  IRequestDataResult,
-  RowDiff,
-  IRequestDataResultOptions,
-  RequestDataOptionsToConstrains,
-} from '@dbeaver/data-viewer-plugin';
+import { IRequestDataResult, RowDiff } from '@dbeaver/data-viewer-plugin';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
 import { SQLQueryExecutionProcess } from './SQLQueryExecutionProcess';
@@ -31,10 +28,12 @@ export class SqlResultService {
   /**
    * @deprecated use asyncSqlQuery
    */
-  async fetchData(sqlQueryParams: ISqlQueryParams,
-                  rowOffset: number,
-                  count: number,
-                  options: IRequestDataResultOptions): Promise<SqlExecuteInfo> {
+  async fetchData(
+    sqlQueryParams: ISqlQueryParams,
+    rowOffset: number,
+    count: number,
+    constraints?: SqlDataFilterConstraint[]
+  ): Promise<SqlExecuteInfo> {
     const response = await this.graphQLService.gql.executeSqlQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
@@ -43,25 +42,27 @@ export class SqlResultService {
       filter: {
         offset: rowOffset,
         limit: count,
-        constraints: RequestDataOptionsToConstrains(options),
+        constraints,
       },
     });
     return response.result!;
   }
 
-  asyncSqlQuery(sqlQueryParams: ISqlQueryParams,
-                rowOffset: number,
-                count: number,
-                options?: IRequestDataResultOptions): SQLQueryExecutionProcess {
+  asyncSqlQuery(
+    sqlQueryParams: ISqlQueryParams,
+    filter: SqlDataFilter
+  ): SQLQueryExecutionProcess {
 
     const cancellableSqlQuery = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
-    cancellableSqlQuery.start(sqlQueryParams, rowOffset, count, options);
+    cancellableSqlQuery.start(sqlQueryParams, filter);
     return cancellableSqlQuery;
   }
 
-  async saveChanges(sqlQueryParams: ISqlQueryParams,
-                    resultId: string,
-                    diffs: RowDiff[]): Promise<SqlExecuteInfo> {
+  async saveChanges(
+    sqlQueryParams: ISqlQueryParams,
+    resultId: string,
+    diffs: RowDiff[]
+  ): Promise<SqlExecuteInfo> {
 
     const firstRow = diffs[0]; // todo multiple row to be implemented later
 
