@@ -44,6 +44,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
         const state = await navigationTreeService.loadNestedNodes(nodeId);
         if (!state) {
           switchExpand(false);
+          return;
         }
       }
       switchExpand(!isExpanded);
@@ -70,7 +71,9 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   useEffect(() => {
     if (isExpanded && !children.isLoaded && !children.isLoading && !!children.children && nodeLoaded) {
-      navigationTreeService.loadNestedNodes(nodeId);
+      navigationTreeService
+        .loadNestedNodes(nodeId)
+        .then(state => !state && switchExpand(false));
     }
   }, [isExpanded, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
 
