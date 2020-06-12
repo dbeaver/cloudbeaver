@@ -701,14 +701,14 @@ export type ConnectionStateQueryVariables = {
 };
 
 
-export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'> };
+export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
 
 export type CreateConnectionMutationVariables = {
   config: ConnectionConfig;
 };
 
 
-export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'> };
+export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
 
 export type DataSourceListQueryVariables = {};
 
@@ -742,7 +742,7 @@ export type OpenConnectionMutationVariables = {
 };
 
 
-export type OpenConnectionMutation = { openConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'> };
+export type OpenConnectionMutation = { openConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
 
 export type TestConnectionMutationVariables = {
   config: ConnectionConfig;
@@ -1118,7 +1118,7 @@ export type OpenSessionMutationVariables = {};
 
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'>> }
   ); };
 
 export type ServerConfigQueryVariables = {};
@@ -1139,7 +1139,7 @@ export type SessionStateQueryVariables = {};
 
 export type SessionStateQuery = { sessionState: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'>> }
   ); };
 
 export type TouchSessionMutationVariables = {};
@@ -1178,6 +1178,7 @@ export const ConnectionStateDocument = `
     name
     driverId
     connected
+    features
   }
 }
     `;
@@ -1188,6 +1189,7 @@ export const CreateConnectionDocument = `
     name
     driverId
     connected
+    features
   }
 }
     `;
@@ -1248,6 +1250,7 @@ export const OpenConnectionDocument = `
     name
     driverId
     connected
+    features
   }
 }
     `;
@@ -1766,6 +1769,7 @@ export const OpenSessionDocument = `
       name
       driverId
       connected
+      features
     }
   }
 }
@@ -1809,6 +1813,7 @@ export const SessionStateDocument = `
       name
       driverId
       connected
+      features
     }
   }
 }

@@ -4,5 +4,6 @@ query connectionState($id: ID!) {
     name
     driverId
     connected
+    features
   }
 }

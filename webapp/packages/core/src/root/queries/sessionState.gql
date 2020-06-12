@@ -9,6 +9,7 @@ query sessionState {
       name
       driverId
       connected
+      features
     }
   }
 }

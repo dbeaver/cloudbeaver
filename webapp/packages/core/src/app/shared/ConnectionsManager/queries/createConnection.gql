@@ -4,5 +4,6 @@ mutation createConnection($config: ConnectionConfig!) {
     name
     driverId
     connected
+    features
   }
 }

@@ -10,6 +10,8 @@ import { useState, useCallback, useEffect } from 'react';
 
 import { useService } from '@dbeaver/core/di';
 
+import { EConnectionFeature } from '../../shared/ConnectionsManager/EConnectionFeature';
+import { useConnectionInfo } from '../../shared/ConnectionsManager/useConnectionInfo';
 import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService } from '../../shared/NodesManager/NavNodeManagerService';
@@ -32,11 +34,14 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   const isLoaded = children.isLoaded;
   const isExpandable = isExpandableFilter(node) && (!isLoaded || children.children!.length > 0);
-  const isExpandedFiltered = isExpanded
-    && (
-      !node.objectFeatures.includes(EObjectFeature.dataSource)
-    || node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
-    );
+  let isExpandedFiltered = isExpanded;
+
+  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
+    const { connectionInfo } = useConnectionInfo(nodeId);
+    if (!connectionInfo?.features.includes(EConnectionFeature.connected)) {
+      isExpandedFiltered = false;
+    }
+  }
 
   const handleDoubleClick = useCallback(
     () => navNodeManagerService.navToNode(nodeId, parentId),
