@@ -177,7 +177,11 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    await this.connectionsManagerService.loadConnectionInfoAsync(connectionId);
+    try {
+      await this.connectionsManagerService.loadConnectionInfoAsync(connectionId);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load connection info');
+    }
 
     try {
       await this.connectionsManagerService.dbDrivers.load();
