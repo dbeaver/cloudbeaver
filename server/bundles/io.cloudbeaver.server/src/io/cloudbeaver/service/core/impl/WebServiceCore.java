@@ -216,8 +216,10 @@ public class WebServiceCore implements DBWServiceCore {
             // Disconnect in async mode?
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
-        webSession.getDatabasesNode().getDataSourceRegistry().removeDataSource(connectionInfo.getDataSourceContainer());
-        webSession.removeConnection(connectionInfo);
+        if (connectionInfo.getDataSourceContainer().isTemporary()) {
+            webSession.getDatabasesNode().getDataSourceRegistry().removeDataSource(connectionInfo.getDataSourceContainer());
+            webSession.removeConnection(connectionInfo);
+        }
 
         return disconnected;
     }

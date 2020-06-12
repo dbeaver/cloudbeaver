@@ -19,6 +19,7 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -35,6 +36,8 @@ import java.util.List;
  * Web connection info
  */
 public class WebDatabaseObjectInfo {
+
+    private static final Log log = Log.getLog(WebDatabaseObjectInfo.class);
 
     private final WebSession session;
     private final DBSObject object;
@@ -136,7 +139,16 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSEntity) features.add("entity");
         if (object instanceof DBSSchema) features.add("schema");
         if (object instanceof DBSCatalog) features.add("catalog");
-        if (object instanceof DBPDataSourceContainer) features.add("dataSource");
+        if (object instanceof DBPDataSourceContainer) {
+            features.add("dataSource");
+            DBPDataSourceContainer dbpDataSourceContainer = (DBPDataSourceContainer) this.object;
+            if (dbpDataSourceContainer.isConnected()) {
+                features.add("dataSourceConnected");
+            }
+            if (dbpDataSourceContainer.isTemporary()) {
+                features.add("dataSourceTemporary");
+            }
+        }
         return features.toArray(new String[0]);
     }
 
