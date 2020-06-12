@@ -124,6 +124,11 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    public WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException {
+        return webSession.getWebConnectionInfo(connectionId);
+    }
+
+    @Override
     public WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig config) throws DBWebException {
         String dataSourceId = config.getDataSourceId();
         if (CommonUtils.isEmpty(dataSourceId)) {
