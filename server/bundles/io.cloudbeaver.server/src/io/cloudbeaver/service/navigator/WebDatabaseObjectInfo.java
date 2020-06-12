@@ -145,9 +145,7 @@ public class WebDatabaseObjectInfo {
             if (dbpDataSourceContainer.isConnected()) {
                 features.add("dataSourceConnected");
             }
-            if (dbpDataSourceContainer.isHidden()) {
-                features.add("dataSourceVirtual");
-            } else if (dbpDataSourceContainer.isTemporary()) {
+            if (dbpDataSourceContainer.isTemporary()) {
                 features.add("dataSourceTemporary");
             }
         }

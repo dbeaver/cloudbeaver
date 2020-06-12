@@ -21,7 +21,11 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Web connection info
@@ -120,6 +124,29 @@ public class WebConnectionInfo {
 
     public void setClientVersion(String clientVersion) {
         this.clientVersion = clientVersion;
+    }
+
+    @Association
+    public String[] getFeatures() {
+        List<String> features = new ArrayList<>();
+
+        if (dataSourceContainer.isConnected()) {
+            features.add("connected");
+        }
+        if (dataSourceContainer.isHidden()) {
+            features.add("virtual");
+        }
+        if (dataSourceContainer.isTemporary()) {
+            features.add("temporary");
+        }
+        if (dataSourceContainer.isConnectionReadOnly()) {
+            features.add("readOnly");
+        }
+        if (dataSourceContainer.isProvided()) {
+            features.add("provided");
+        }
+
+        return features.toArray(new String[0]);
     }
 
 }
