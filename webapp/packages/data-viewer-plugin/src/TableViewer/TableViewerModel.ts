@@ -147,6 +147,9 @@ export class TableViewerModel implements ITableViewerModelOptions {
 
   setQueryWhereFilter(where: string | null) {
     this.queryWhereFilter = where;
+  }
+
+  applyQueryFilters() {
     this.resetData();
   }
 
