@@ -12,6 +12,7 @@ import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
 import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
+import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 export const manifest: PluginManifest = {
@@ -24,6 +25,7 @@ export const manifest: PluginManifest = {
     DataViewerTableService,
     TableViewerStorageService,
     TableFooterMenuService,
+    TableHeaderService,
   ],
 
   async initialize(services: IServiceInjector) {

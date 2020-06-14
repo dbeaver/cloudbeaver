@@ -27,6 +27,10 @@ const styles = css`
       padding: 0 12px;
       line-height: 16px;
       font-weight: 500;
+
+      &:empty {
+        display: none;
+      }
     }
     & input {
       flex: 1;
