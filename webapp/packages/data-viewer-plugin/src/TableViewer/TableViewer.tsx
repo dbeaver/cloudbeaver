@@ -15,6 +15,7 @@ import { useService } from '@dbeaver/core/di';
 
 import { TableFooter } from './TableFooter/TableFooter';
 import { TableGrid } from './TableGrid';
+import { TableHeader } from './TableHeader/TableHeader';
 import { TableViewerStorageService } from './TableViewerStorageService';
 
 const viewerStyles = css`
@@ -45,6 +46,7 @@ export const TableViewer = observer(function TableViewer({
 
   return styled(viewerStyles)(
     <table-viewer as="div" className={className}>
+      <TableHeader model={tableViewerModel} />
       <TableGrid model={tableViewerModel} />
       <TableFooter model={tableViewerModel} />
       <Loader loading={tableViewerModel.isLoaderVisible} overlay/>
