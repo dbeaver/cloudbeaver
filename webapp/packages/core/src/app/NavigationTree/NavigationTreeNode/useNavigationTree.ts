@@ -15,6 +15,7 @@ import { useConnectionInfo } from '../../shared/ConnectionsManager/useConnection
 import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService } from '../../shared/NodesManager/NavNodeManagerService';
+import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
 import { NavigationTreeService } from '../NavigationTreeService';
@@ -37,7 +38,8 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   let isExpandedFiltered = isExpanded;
 
   if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
-    const { connectionInfo } = useConnectionInfo(nodeId);
+    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
+    const { connectionInfo } = useConnectionInfo(connectionId);
     if (!connectionInfo?.features.includes(EConnectionFeature.connected)) {
       isExpandedFiltered = false;
     }

@@ -15,6 +15,7 @@ import { NotificationService } from '@dbeaver/core/eventsLog';
 import { ConnectionsManagerService } from '../shared/ConnectionsManager/ConnectionsManagerService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
+import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 
 @injectable()
 export class NavigationTreeService {
@@ -38,7 +39,9 @@ export class NavigationTreeService {
       const node = this.navNodeManagerService.getNode(id);
 
       if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
-        await this.connectionsManagerService.refreshConnectionInfoAsync(id);
+        await this.connectionsManagerService.refreshConnectionInfoAsync(
+          NodeManagerUtils.connectionNodeIdToConnectionId(id)
+        );
       }
       return true;
     } catch (exception) {
