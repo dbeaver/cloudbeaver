@@ -9,6 +9,7 @@ mutation openSession {
       name
       driverId
       connected
+      features
     }
   }
 }

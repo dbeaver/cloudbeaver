@@ -166,6 +166,7 @@ export class NavNodeManagerService {
 
   async updateRootChildren() {
     if (!await this.permissionsService.hasAsync(EPermission.public)) {
+      await this.navTree.refresh(true, ROOT_NODE_PATH, true);
       return;
     }
     await this.navTree.refresh(true, ROOT_NODE_PATH, false);

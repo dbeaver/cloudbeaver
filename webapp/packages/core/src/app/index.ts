@@ -37,9 +37,11 @@ export * from './shared/TabEntity/TabEntity';
 // Enums
 export * from './shared/NodesManager/ENodeFeature';
 export * from './shared/NodesManager/EObjectFeature';
+export * from './shared/ConnectionsManager/EConnectionFeature';
 
 // hooks
 export * from './shared/useChildren';
+export * from './shared/ConnectionsManager/useConnectionInfo';
 export * from './shared/NavigationTabs/NavigationTabsBar/Tabs/useTab';
 export * from './shared/NodesManager/useDatabaseObjectInfo';
 export * from './shared/NodesManager/useNode';

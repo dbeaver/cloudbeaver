@@ -12,7 +12,10 @@ import { Subject, Observable } from 'rxjs';
 import { injectable } from '@dbeaver/core/di';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 
+import { ConnectionsManagerService } from '../shared/ConnectionsManager/ConnectionsManagerService';
+import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
+import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 
 @injectable()
 export class NavigationTreeService {
@@ -22,8 +25,9 @@ export class NavigationTreeService {
   private nodeSelectSubject: Subject<[string, boolean]>;
 
   constructor(
-    private NavNodeManagerService: NavNodeManagerService,
-    private notificationService: NotificationService
+    private navNodeManagerService: NavNodeManagerService,
+    private notificationService: NotificationService,
+    private connectionsManagerService: ConnectionsManagerService
   ) {
     this.nodeSelectSubject = new Subject();
     this.onNodeSelect = this.nodeSelectSubject.asObservable();
@@ -31,7 +35,14 @@ export class NavigationTreeService {
 
   async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
-      await this.NavNodeManagerService.loadTree(id);
+      await this.navNodeManagerService.loadTree(id);
+      const node = this.navNodeManagerService.getNode(id);
+
+      if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
+        await this.connectionsManagerService.refreshConnectionInfoAsync(
+          NodeManagerUtils.connectionNodeIdToConnectionId(id)
+        );
+      }
       return true;
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load tree node: ${id}`);
