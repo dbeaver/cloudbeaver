@@ -41,7 +41,7 @@ export class ConnectionSelectorController {
   }
 
   get isConnectionSelectorVisible() {
-    return !!this.connectionSelectorService.currentConnectionId;
+    return !!this.currentConnection;
   }
   get isObjectContainerSelectorVisible() {
     return !!this.connectionSelectorService.currentObjectCatalogId
