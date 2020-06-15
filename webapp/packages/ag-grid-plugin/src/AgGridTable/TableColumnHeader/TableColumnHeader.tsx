@@ -70,7 +70,7 @@ const headerStyles = css`
 `;
 
 export interface IAgColumnClickEvent extends AgEvent{
-  columnIndex: number;
+  columnId: string;
   isMultiple: boolean;
 }
 
@@ -80,7 +80,7 @@ export function TableColumnHeader(props: HeaderProps) {
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const event: IAgColumnClickEvent = Object.freeze({
       type: COLUMN_CLICK_EVENT_TYPE,
-      columnIndex: parseInt(props.column.getColId()),
+      columnId: props.column.getColId(),
       isMultiple: e.ctrlKey,
     });
 

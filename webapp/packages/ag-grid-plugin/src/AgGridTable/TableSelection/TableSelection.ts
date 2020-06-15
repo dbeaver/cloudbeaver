@@ -22,28 +22,28 @@ export class TableSelection {
     this.selectedMap.clear();
   }
 
-  selectCell(rowId: number, columnIndex: number, isMultiple: boolean, ignoreSelected = false) {
+  selectCell(rowId: number, columnId: string, isMultiple: boolean, ignoreSelected = false) {
     if (!isMultiple) {
       this.clear();
     }
 
     const rowSelection = this.selectedMap.get(rowId);
 
-    if (!ignoreSelected && rowSelection?.isSelected(columnIndex)) {
+    if (!ignoreSelected && rowSelection?.isSelected(columnId)) {
       this.unselectColumn(
         this.selectedMap,
         rowSelection,
-        [columnIndex]
+        [columnId]
       );
     } else {
-      this.selectColumn(rowId, rowSelection, [columnIndex]);
+      this.selectColumn(rowId, rowSelection, [columnId]);
     }
   }
 
   selectRange(
     startPosition: number,
     endPosition: number,
-    columns: number[],
+    columns: string[],
     isMultiple: boolean
   ) {
     const firstRow = Math.min(startPosition, endPosition);
@@ -70,13 +70,13 @@ export class TableSelection {
     }
   }
 
-  isCellSelected(rowId: number, columnIndex: number): boolean {
+  isCellSelected(rowId: number, columnId: string): boolean {
     const current = this.selectedMap.get(rowId);
 
-    return current?.isSelected(columnIndex) || false;
+    return current?.isSelected(columnId) || false;
   }
 
-  isRangeSelected(startPosition: number, endPosition: number, columns: number[]): boolean {
+  isRangeSelected(startPosition: number, endPosition: number, columns: string[]): boolean {
     const start = Math.min(startPosition, endPosition);
     const end = Math.max(startPosition, endPosition);
 
@@ -89,19 +89,19 @@ export class TableSelection {
     return true;
   }
 
-  private unselectColumn(source: Map<number, RowSelection>, rowSelection: RowSelection, columnIndexList: number[]) {
-    rowSelection.remove(columnIndexList);
+  private unselectColumn(source: Map<number, RowSelection>, rowSelection: RowSelection, columns: string[]) {
+    rowSelection.remove(columns);
     if (rowSelection.columns.size === 0) {
       source.delete(rowSelection.rowId);
     }
   }
 
-  private selectColumn(rowId: number, rowSelection: RowSelection | undefined = undefined, columnIndexList: number[]) {
+  private selectColumn(rowId: number, rowSelection: RowSelection | undefined = undefined, columns: string[]) {
     if (!rowSelection) {
       rowSelection = new RowSelection(rowId);
       this.selectedMap.set(rowId, rowSelection);
     }
 
-    rowSelection.add(columnIndexList);
+    rowSelection.add(columns);
   }
 }

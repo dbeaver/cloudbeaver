@@ -165,7 +165,7 @@ export class ObjectViewerTabService {
     const nodeInfo = this.navNodeManagerService
       .getNodeContainerInfo(context.handlerState.objectId);
 
-    if (nodeInfo.catalogId) {
+    if (!nodeInfo.catalogId) {
       return;
     }
     return nodeInfo.catalogId;
