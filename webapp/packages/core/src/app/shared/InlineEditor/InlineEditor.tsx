@@ -20,22 +20,28 @@ import { useStyles } from '@dbeaver/core/theming';
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
-export type InlineEditorControls = 'right' | 'top' | 'bottom'
+export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside'
 
 export type InlineEditorProps = {
   value: string;
+  placeholder?: string;
   controlsPosition?: InlineEditorControls;
+  simple?: boolean;
   onChange(value: string): void;
   onSave(): void;
   onReject(): void;
+  className?: string;
 }
 
 export const InlineEditor = observer(function InlineEditor({
   value,
+  placeholder,
   controlsPosition = 'right',
+  simple,
   onChange,
   onSave,
   onReject,
+  className,
 }: InlineEditorProps) {
   const commonDialogService = useService(CommonDialogService);
 
@@ -66,14 +72,21 @@ export const InlineEditor = observer(function InlineEditor({
   }, []);
 
   return styled(useStyles(InlineEditorStyles))(
-    <editor as="div">
+    <editor as="div" className={className}>
       <editor-container as="div">
-        <input type="text" value={value} onChange={handleChange} onKeyDown={handleKeyDown} ref={inputRef}/>
+        <input
+          type="text"
+          value={value}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          ref={inputRef}
+          placeholder={placeholder}
+        />
       </editor-container>
       <editor-actions as="div" {...use({ position: controlsPosition })}>
         <editor-action as="div" onClick={onSave}><Icon name="apply" viewBox="0 0 12 10" /></editor-action>
         <editor-action as="div" onClick={onReject}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>
-        <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>
+        {!simple && <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>}
       </editor-actions>
     </editor>
   );
