@@ -33,7 +33,7 @@ const styles = composes(
       flex: 1;
     }
     IconButton {
-      margin-right: 18px;
+      margin-right: 14px;
       position: relative;
       height: 24px;
       width: 24px;
@@ -54,6 +54,13 @@ export const TableWhereFilter = observer(function TableWhereFilter({
     (value: string) => context.setQueryWhereFilter(value),
     [context]
   );
+  const resetFilter = useCallback(
+    () => {
+      context.setQueryWhereFilter('');
+      context.applyQueryFilters();
+    },
+    [context]
+  );
 
   return styled(useStyles(styles))(
     <SubmittingForm onSubmit={() => context.applyQueryFilters()}>
@@ -66,6 +73,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
         mod='surface'
       />
       <IconButton name='apply' viewBox='' onClick={() => context.applyQueryFilters()}/>
+      <IconButton name='reject' viewBox='' onClick={resetFilter}/>
     </SubmittingForm>
   );
 });
