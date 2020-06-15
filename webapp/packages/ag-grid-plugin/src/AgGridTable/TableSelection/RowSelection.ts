@@ -7,31 +7,31 @@
  */
 
 export class RowSelection {
-  columns = new Set<number>()
+  columns = new Set<string>()
   constructor(readonly rowId: number) {}
 
-  add(columnIndexList: number[]) {
+  add(columnIndexList: string[]) {
     for (const columnId of columnIndexList) {
       this.columns.add(columnId);
     }
   }
 
-  remove(columnIndexList: number[]) {
+  remove(columnIndexList: string[]) {
     for (const columnId of columnIndexList) {
       this.columns.delete(columnId);
     }
   }
 
-  replace(columnIndexList: number[]) {
+  replace(columnIndexList: string[]) {
     this.columns.clear();
     this.add(columnIndexList);
   }
 
-  isSelected(columnIndex: number) {
+  isSelected(columnIndex: string) {
     return this.columns.has(columnIndex);
   }
 
-  isRangeSelected(columnIndexList: number[]) {
+  isRangeSelected(columnIndexList: string[]) {
     return columnIndexList.every(column => this.columns.has(column));
   }
 }
