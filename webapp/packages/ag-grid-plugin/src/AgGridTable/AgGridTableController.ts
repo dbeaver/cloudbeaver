@@ -248,6 +248,7 @@ const defaultColumnDef: ColDef = {
 
 export const INDEX_COLUMN_DEF: ColDef = {
   headerName: '#',
+  colId: `${Number.MAX_SAFE_INTEGER}`,
   field: `${Number.MAX_SAFE_INTEGER}`,
   valueGetter: 'node.id',
   width: 70,
