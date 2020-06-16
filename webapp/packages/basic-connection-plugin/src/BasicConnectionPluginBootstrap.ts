@@ -10,7 +10,7 @@ import { MainMenuService, ConnectionDialogsService } from '@dbeaver/core/app';
 import { injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
-import { PermissionsService, EPermission } from '@dbeaver/core/root';
+import { PermissionsService, EPermission, SessionService } from '@dbeaver/core/root';
 
 import { BasicConnectionService } from './BasicConnectionService';
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
@@ -24,12 +24,13 @@ export class BasicConnectionPluginBootstrap {
     private basicConnectionService: BasicConnectionService,
     private commonDialogService: CommonDialogService,
     private notificationService: NotificationService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private sessionService: SessionService
   ) {
   }
 
   bootstrap() {
-    this.loadDbSources();
+    this.sessionService.onUpdate.subscribe(this.loadDbSources.bind(this));
     this.mainMenuService.registerMenuItem(
       this.connectionDialogsService.newConnectionMenuToken,
       {
@@ -49,7 +50,7 @@ export class BasicConnectionPluginBootstrap {
 
   private async loadDbSources() {
     try {
-      await this.basicConnectionService.dbSources.load();
+      await this.basicConnectionService.dbSources.refresh(true);
     } catch (error) {
       this.notificationService.logException(error, 'DBSources loading failed');
     }
