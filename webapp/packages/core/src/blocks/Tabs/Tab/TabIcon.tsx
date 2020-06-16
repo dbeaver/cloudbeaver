@@ -10,7 +10,7 @@ import styled from 'reshadow';
 
 import { useStyles } from '@dbeaver/core/theming';
 
-import { StaticImage } from '../../StaticImage';
+import { IconOrImage } from '../../IconOrImage';
 
 type TabIconProps = {
   icon?: string;
@@ -20,7 +20,7 @@ type TabIconProps = {
 export function TabIcon({ icon, className }: TabIconProps) {
   return styled(useStyles())(
     <tab-icon as="div" className={className}>
-      {icon ? <StaticImage icon={icon} /> : <placeholder as="div" />}
+      {icon ? <IconOrImage icon={icon} /> : <placeholder as="div" />}
     </tab-icon>
   );
 }
