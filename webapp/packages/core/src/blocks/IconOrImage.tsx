@@ -20,7 +20,7 @@ export type IconOrImageProps = {
 export const IconOrImage = function IconOrImage({ icon, className, viewBox }: IconOrImageProps) {
 
   const isStaticIcon = useMemo(
-    () => icon && icon.startsWith('platform:'),
+    () => icon && (icon.startsWith('platform:') || icon.startsWith('/')),
     [icon]
   );
 
