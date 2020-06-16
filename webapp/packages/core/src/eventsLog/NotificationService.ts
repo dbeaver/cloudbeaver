@@ -61,7 +61,7 @@ export class NotificationService {
   logException(exception: Error, message?: string, silent?: boolean) {
     if (!silent) {
       this.logError({
-        title: message || exception.name,
+        title: message || exception.message || exception.name,
         details: this.hasDetails(exception) ? exception : undefined,
         isSilent: silent,
       });
