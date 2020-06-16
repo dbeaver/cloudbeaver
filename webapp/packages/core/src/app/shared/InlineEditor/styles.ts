@@ -12,6 +12,10 @@ import { composes } from '@dbeaver/core/theming';
 
 export const InlineEditorStyles = composes(
   css`
+  editor {
+    composes: theme-border-color-background from global;
+  }
+
   editor-actions {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   }
@@ -31,7 +35,11 @@ export const InlineEditorStyles = composes(
     display: flex;
     width: 100%;
     height: 100%;
-    border: solid 1px #01cca3;
+    border: solid 1px;
+  }
+
+  editor:focus-within {
+    border-color: #01cca3;
   }
 
   editor-container {
@@ -63,9 +71,14 @@ export const InlineEditorStyles = composes(
     flex-direction: row;
 
     border: solid 1px;
-    border-top-color:  #01cca3 !important;
-    border-right-color: #01cca3 !important;
-    border-bottom-color: #01cca3 !important;
+  }
+
+  editor:focus-within {
+    & editor-actions {
+      border-top-color:  #01cca3;
+      border-right-color: #01cca3;
+      border-bottom-color: #01cca3;
+    }
   }
 
   editor-actions[|position=inside] {
@@ -80,11 +93,17 @@ export const InlineEditorStyles = composes(
   editor-actions[|position=top] {
     right: -1px;
     left: auto;
-    border-left-color: #01cca3;
+  }
+
+  editor:focus-within {
+    & editor-actions[|position=bottom],
+    & editor-actions[|position=top] {
+      border-left-color: #01cca3;
+    }
   }
 
   editor-actions[|position=bottom] {
-    top: auto;
+    top: 100%;
   }
 
   editor-actions[|position=top] {
