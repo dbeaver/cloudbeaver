@@ -51,7 +51,7 @@ const EVENT_KEY_CODE = {
 interface TemporarySelectionRange {
   firstRow: number;
   lastRow: number;
-  columns: number[];
+  columns: string[];
   isMultiple: boolean;
 }
 
@@ -110,7 +110,7 @@ export class RangeController implements IRangeController {
 
     private copySelectedData() {
       const selectedRows = this.selection!.getSelectedRows();
-      const selectedColumns = new Set<number>();
+      const selectedColumns = new Set<string>();
 
       for (const selectedRow of selectedRows) {
         for (const columnId of selectedRow.columns) {
@@ -120,7 +120,7 @@ export class RangeController implements IRangeController {
 
       const columns = this.columnController
         .getAllDisplayedColumns()
-        .filter(column => selectedColumns.has(parseInt(column.getColId())));
+        .filter(column => selectedColumns.has(column.getColId()));
 
       let data = '';
       for (const selectedRow of selectedRows) {
@@ -128,7 +128,7 @@ export class RangeController implements IRangeController {
           if (column !== columns[0]) {
             data += '\t';
           }
-          if (selectedRow.isSelected(parseInt(column.getColId()))) {
+          if (selectedRow.isSelected(column.getColId())) {
             const rowNode = this.rowPositionUtils.getRowNode({
               rowIndex: selectedRow.rowId,
               rowPinned: undefined,
@@ -164,7 +164,7 @@ export class RangeController implements IRangeController {
         return;
       }
       const lastRowId = this.gridApi.getInfiniteRowCount() - 1 - (this.rowModel.isLastRowFound() ? 0 : 1);
-      if (event.columnIndex === parseInt(INDEX_COLUMN_DEF.field!)) {
+      if (event.columnId === INDEX_COLUMN_DEF.colId!) {
         this.selection.selectRange(
           0,
           lastRowId,
@@ -172,7 +172,7 @@ export class RangeController implements IRangeController {
           event.isMultiple
         );
       } else {
-        this.selection.selectRange(0, lastRowId, [event.columnIndex], event.isMultiple);
+        this.selection.selectRange(0, lastRowId, [event.columnId], event.isMultiple);
       }
       this.restoreFocus();
       this.dispatchChangedEvent(false, true);
@@ -183,7 +183,7 @@ export class RangeController implements IRangeController {
         return;
       }
 
-      if (event.column.getColId() === INDEX_COLUMN_DEF.field) {
+      if (event.column.getColId() === INDEX_COLUMN_DEF.colId) {
         this.selection.selectRange(
           event.rowIndex,
           event.rowIndex,
@@ -201,16 +201,16 @@ export class RangeController implements IRangeController {
       this.lastSelectedCell = cell;
       this.lastFocus = cell;
       if (!this.gridOptionsWrapper.isEnableRangeSelection()
-        || cell.column.getColDef().field === INDEX_COLUMN_DEF.field) {
+        || cell.column.getColId() === INDEX_COLUMN_DEF.colId) {
         return;
       }
-      this.selection.selectCell(cell.rowIndex, parseInt(cell.column.getColId()), appendRange);
+      this.selection.selectCell(cell.rowIndex, cell.column.getColId(), appendRange);
       this.dispatchChangedEvent(false, true);
     }
 
     getCellRangeCount(cell: CellPosition): number {
-      const columnIndex = parseInt(cell.column.getColId());
-      if (this.isCellInTemporaryRange(cell.rowIndex, columnIndex)) {
+      const columnId = cell.column.getColId();
+      if (this.isCellInTemporaryRange(cell.rowIndex, columnId)) {
         const isRangeSelected = this.selection?.isRangeSelected(
           this.temporaryRange!.firstRow,
           this.temporaryRange!.lastRow,
@@ -218,7 +218,7 @@ export class RangeController implements IRangeController {
         );
         return isRangeSelected ? 0 : 1;
       }
-      if (this.selection?.isCellSelected(cell.rowIndex, parseInt(cell.column.getColId()))) {
+      if (this.selection?.isCellSelected(cell.rowIndex, cell.column.getColId())) {
         return 1;
       }
 
@@ -232,7 +232,7 @@ export class RangeController implements IRangeController {
       const startRow = this.lastSelectedCell !== undefined ? this.lastSelectedCell.rowIndex : position.rowIndex;
       const endRow = position.rowIndex;
       let columns = this.getColumnsBetween((this.lastSelectedCell || position).column, position.column);
-      const isRowsSelection = columns.includes(parseInt(INDEX_COLUMN_DEF.field!));
+      const isRowsSelection = columns.includes(INDEX_COLUMN_DEF.colId!);
 
       if (isRowsSelection) {
         columns = this.getColumnsWithoutIndex();
@@ -293,9 +293,9 @@ export class RangeController implements IRangeController {
       this.eventService.dispatchEvent(event);
     }
 
-    private getColumnsBetween(firstColumn: Column, secondColumn: Column): number[] {
+    private getColumnsBetween(firstColumn: Column, secondColumn: Column): string[] {
       if (firstColumn === secondColumn) {
-        return [parseInt(firstColumn.getColId())];
+        return [firstColumn.getColId()];
       }
 
       const columns = this.columnController.getAllDisplayedColumns();
@@ -309,14 +309,14 @@ export class RangeController implements IRangeController {
       const firstIndex = Math.min(firstOffset, secondOffset);
       const lastIndex = Math.max(firstOffset, secondOffset);
 
-      return columns.slice(firstIndex, lastIndex + 1).map(column => parseInt(column.getColId()));
+      return columns.slice(firstIndex, lastIndex + 1).map(column => column.getColId());
     }
 
     private getColumnsWithoutIndex() {
       return this.columnController
         .getAllDisplayedColumns()
-        .map(column => parseInt(column.getColId()))
-        .filter(column => column !== parseInt(INDEX_COLUMN_DEF.field!));
+        .map(column => column.getColId())
+        .filter(column => column !== INDEX_COLUMN_DEF.colId!);
     }
 
     getRangeStartRow(cellRange: CellRange): RowPosition {
@@ -338,10 +338,10 @@ export class RangeController implements IRangeController {
         return;
       }
 
-      if (startDraggingCell.column.getColId() !== INDEX_COLUMN_DEF.field) {
+      if (startDraggingCell.column.getColId() !== INDEX_COLUMN_DEF.colId) {
         this.selection.selectCell(
           startDraggingCell.rowIndex,
-          parseInt(startDraggingCell.column.getColId()),
+          startDraggingCell.column.getColId(),
           true,
           true
         );
@@ -404,7 +404,7 @@ export class RangeController implements IRangeController {
       }
 
       let columns = this.getColumnsBetween(this.startDraggingCell.column, this.endDraggingCell.column);
-      const isRowsSelection = columns.includes(parseInt(INDEX_COLUMN_DEF.field!));
+      const isRowsSelection = columns.includes(INDEX_COLUMN_DEF.colId!);
       const startRow = this.startDraggingCell.rowIndex;
       const endRow = this.endDraggingCell.rowIndex;
 
@@ -438,7 +438,7 @@ export class RangeController implements IRangeController {
       this.temporaryRange = null;
     }
 
-    private isCellInTemporaryRange(rowId: number, column: number) {
+    private isCellInTemporaryRange(rowId: number, column: string) {
       if (!this.temporaryRange
         || this.temporaryRange.firstRow > rowId || this.temporaryRange.lastRow < rowId
         || !this.temporaryRange.columns.includes(column)

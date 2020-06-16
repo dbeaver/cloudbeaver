@@ -173,22 +173,27 @@ export class ConnectionsManagerService {
   }
 
   async closeNavNodeConnectionAsync(navNodeId: string): Promise<void> {
-    const node = this.navNodeManagerService.getNode(navNodeId);
-    if (!node) {
+    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId);
+    const connection = this.getConnectionById(connectionId);
+    if (!connection) {
       return;
     }
 
     try {
-      const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId);
       await this.graphQLService.gql.closeConnection({ id: connectionId });
       await this.afterConnectionClose(connectionId);
       await this.connectionInfo.refresh(true, { connectionId, close: true });
 
-      if (node.objectFeatures.includes('dataSourceTemporary')) {
+      if (connection.features.includes(EConnectionFeature.temporary)) {
+        const node = this.navNodeManagerService.getNode(navNodeId);
+        if (!node) {
+          return;
+        }
+        await this.navNodeManagerService.refreshTree(node.parentId);
       } else {
         await this.navNodeManagerService.refreshNode(navNodeId);
+        await this.navNodeManagerService.removeTree(navNodeId);
       }
-      await this.navNodeManagerService.removeTree(navNodeId);
     } catch (exception) {
       this.notificationService.logException(exception, `Can't close connection: ${navNodeId}`);
     }

@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
+import { InlineEditor } from '@dbeaver/core/app';
 import { InputField, IconButton, SubmittingForm } from '@dbeaver/core/blocks';
 import { useTranslate } from '@dbeaver/core/localization';
 import { composes, useStyles } from '@dbeaver/core/theming';
@@ -18,8 +19,8 @@ import { TableViewerModel } from '../TableViewerModel';
 
 const styles = composes(
   css`
-    IconButton {
-      composes: theme-text-primary theme-ripple from global;
+    InlineEditor {
+      composes: theme-background-surface theme-text-on-surface from global;
     }
   `,
   css`
@@ -29,15 +30,10 @@ const styles = composes(
       display: flex;
       align-items: center;
     }
-    InputField {
+    InlineEditor {
       flex: 1;
-    }
-    IconButton {
-      margin-right: 14px;
-      position: relative;
       height: 24px;
-      width: 24px;
-      display: block;
+      margin: 0 12px;
     }
   `
 );
@@ -64,16 +60,15 @@ export const TableWhereFilter = observer(function TableWhereFilter({
 
   return styled(useStyles(styles))(
     <SubmittingForm onSubmit={() => context.applyQueryFilters()}>
-      <InputField
-        type='text'
-        name='whereFilter'
-        placeholder={translate('table_header_sql_expression')}
+      <InlineEditor
         value={context.getQueryWhereFilter() || ''}
+        onSave={() => context.applyQueryFilters()}
+        onReject={resetFilter}
         onChange={handleChange}
-        mod='surface'
+        placeholder={translate('table_header_sql_expression')}
+        controlsPosition='inside'
+        simple
       />
-      <IconButton name='apply' viewBox='' onClick={() => context.applyQueryFilters()}/>
-      <IconButton name='reject' viewBox='' onClick={resetFilter}/>
     </SubmittingForm>
   );
 });

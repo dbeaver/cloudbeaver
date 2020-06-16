@@ -180,7 +180,7 @@ export class ConnectionSchemaManagerService {
     try {
       await this.connectionsManagerService.loadConnectionInfoAsync(connectionId);
     } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load connection info');
+      this.notificationService.logException(exception, 'Can\'t load connection info', true);
     }
 
     try {

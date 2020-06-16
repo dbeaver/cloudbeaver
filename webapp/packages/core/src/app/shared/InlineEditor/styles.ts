@@ -28,6 +28,7 @@ export const InlineEditorStyles = composes(
   editor {
     position: relative;
     box-sizing: border-box;
+    display: flex;
     width: 100%;
     height: 100%;
     border: solid 1px #01cca3;
@@ -36,6 +37,7 @@ export const InlineEditorStyles = composes(
   editor-container {
     position: relative;
     height: 100%;
+    flex: 1;
 
     & input {
       color: inherit;
@@ -64,6 +66,14 @@ export const InlineEditorStyles = composes(
     border-top-color:  #01cca3 !important;
     border-right-color: #01cca3 !important;
     border-bottom-color: #01cca3 !important;
+  }
+
+  editor-actions[|position=inside] {
+    position: relative;
+    flex: 0 0 auto;
+    bottom: auto;
+    left: auto;
+    border-right: none !important;
   }
 
   editor-actions[|position=bottom],
