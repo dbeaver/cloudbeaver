@@ -45,7 +45,7 @@ export class NavigationTreeService {
       }
       return true;
     } catch (exception) {
-      this.notificationService.logException(exception, `Can't load tree node: ${id}`);
+      this.notificationService.logException(exception);
     }
     return false;
   }

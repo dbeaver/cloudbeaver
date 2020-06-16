@@ -24,7 +24,7 @@ export const SNACKBAR_STYLES = composes(
       flex-direction: column;
       box-sizing: border-box;
       overflow: hidden;
-      width: 400px;
+      width: 500px;
       margin-bottom: 16px;
       margin-left: 16px;
       padding: 18px 24px;
