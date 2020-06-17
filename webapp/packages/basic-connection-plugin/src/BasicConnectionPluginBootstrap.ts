@@ -30,6 +30,7 @@ export class BasicConnectionPluginBootstrap {
   }
 
   bootstrap() {
+    this.loadDbSources();
     this.sessionService.onUpdate.subscribe(this.loadDbSources.bind(this));
     this.mainMenuService.registerMenuItem(
       this.connectionDialogsService.newConnectionMenuToken,
