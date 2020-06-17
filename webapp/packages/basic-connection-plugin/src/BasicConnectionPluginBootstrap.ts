@@ -7,7 +7,7 @@
  */
 
 import { MainMenuService, ConnectionDialogsService } from '@dbeaver/core/app';
-import { injectable, Bootstrap } from '@dbeaver/core/di';
+import { injectable } from '@dbeaver/core/di';
 import { CommonDialogService } from '@dbeaver/core/dialogs';
 import { NotificationService } from '@dbeaver/core/eventsLog';
 import { PermissionsService, EPermission, SessionService } from '@dbeaver/core/root';
@@ -16,7 +16,7 @@ import { BasicConnectionService } from './BasicConnectionService';
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 
 @injectable()
-export class BasicConnectionPluginBootstrap extends Bootstrap {
+export class BasicConnectionPluginBootstrap {
 
   constructor(
     private connectionDialogsService: ConnectionDialogsService,
@@ -27,7 +27,6 @@ export class BasicConnectionPluginBootstrap extends Bootstrap {
     private permissionsService: PermissionsService,
     private sessionService: SessionService
   ) {
-    super();
   }
 
   bootstrap() {

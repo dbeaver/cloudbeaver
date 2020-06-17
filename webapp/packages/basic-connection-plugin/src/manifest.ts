@@ -8,6 +8,7 @@
 
 import { PluginManifest } from '@dbeaver/core/di';
 
+import { BasicConnectionPluginBootstrap } from './BasicConnectionPluginBootstrap';
 import { BasicConnectionService } from './BasicConnectionService';
 
 export const basicConnectionPluginManifest: PluginManifest = {
@@ -18,4 +19,10 @@ export const basicConnectionPluginManifest: PluginManifest = {
   providers: [
     BasicConnectionService,
   ],
+
+  initialize(services): void {
+    services
+      .resolveServiceByClass(BasicConnectionPluginBootstrap)
+      .bootstrap();
+  },
 };
