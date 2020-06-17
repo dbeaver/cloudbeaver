@@ -24,6 +24,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 1.0.4 - 2020-06-16
+
+- Database navigator refresh
+- Data viewer: filters support
+- Many minor UI improvements
+
 ### CloudBeaver 1.0.3 - 2020-06-02
 
 - Administrative panel
