@@ -1,0 +1,35 @@
+{
+  "name": "@cloudbeaver/core-sdk",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config",
+    "postbuild": "tsc",
+    "gql:gen": "graphql-codegen",
+    "gql:gen:dev": "graphql-codegen --watch",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "graphql-request": "^1.8.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/add": "^1.8.1",
+    "@graphql-codegen/cli": "^1.8.1",
+    "@graphql-codegen/near-operation-file-preset": "^1.8.0",
+    "@graphql-codegen/typescript": "^1.8.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.8.0",
+    "@graphql-codegen/typescript-graphql-request": "^1.8.1",
+    "@graphql-codegen/typescript-operations": "^1.8.1",
+    "graphql": "^15.x.x"
+  },
+  "peerDependencies": {
+    "@cloudbeaver/core-di": "^0.1.0",
+    "mobx": "^5.x.x",
+    "rxjs": "^6.x.x"
+  }
+}

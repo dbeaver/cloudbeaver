@@ -1,0 +1,29 @@
+{
+  "name": "@cloudbeaver/product-default",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib/*",
+    "build": "webpack --config ../../configs/webpack.product.config",
+    "dev": "webpack-dev-server --progress --config=../../configs/webpack.product.dev.config --port=3100",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-bootstrap": "0.1.0",
+    "@cloudbeaver/plugin-administration": "0.1.0",
+    "@cloudbeaver/plugin-ag-grid": "0.1.0",
+    "@cloudbeaver/plugin-authentication": "0.1.0",
+    "@cloudbeaver/plugin-connection-custom": "0.1.0",
+    "@cloudbeaver/plugin-connection-preconfigured": "0.1.0",
+    "@cloudbeaver/plugin-data-export": "0.1.0",
+    "@cloudbeaver/plugin-data-viewer": "0.1.0",
+    "@cloudbeaver/plugin-ddl-viewer": "0.1.0",
+    "@cloudbeaver/plugin-object-viewer": "0.1.0",
+    "@cloudbeaver/plugin-sql-editor": "0.1.0"
+  },
+  "buildVersion": "0.13.0"
+}

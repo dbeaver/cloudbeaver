@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/dialogs",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/dialogs/index.js",
-  "module": "../dist/dialogs/index.js"
-}

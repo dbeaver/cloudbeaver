@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/di",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/di/index.js",
-  "module": "../dist/di/index.js"
-}

@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/theming",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/theming/index.js",
-  "module": "../dist/theming/index.js"
-}

@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/sdk",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/sdk/index.js",
-  "module": "../dist/sdk/index.js"
-}

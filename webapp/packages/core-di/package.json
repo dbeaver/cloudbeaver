@@ -1,0 +1,22 @@
+{
+  "name": "@cloudbeaver/core-di",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "inversify": "^5.0.1"
+  },
+  "peerDependencies": {
+    "@cloudbeaver/core-utils": "^0.1.0",
+    "react": "^16.x.x"
+  }
+}
