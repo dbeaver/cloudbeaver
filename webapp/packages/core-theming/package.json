@@ -1,0 +1,33 @@
+{
+  "name": "@cloudbeaver/core-theming",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "@material/button": "^4.0.0",
+    "@material/elevation": "^4.0.0",
+    "@material/radio": "^4.0.0",
+    "@material/ripple": "^4.0.0",
+    "@material/theme": "^4.0.0",
+    "@material/typography": "^4.0.0"
+  },
+  "peerDependencies": {
+    "@cloudbeaver/core-di": "^0.1.0",
+    "@cloudbeaver/core-utils": "^0.1.0",
+    "@cloudbeaver/core-events": "^0.1.0",
+    "@cloudbeaver/core-settings": "^0.1.0",
+    "react": "^16.x.x",
+    "reshadow": "^0.0.1-alpha.78",
+    "mobx": "^5.x.x",
+    "mobx-react": "^6.x.x"
+  }
+}

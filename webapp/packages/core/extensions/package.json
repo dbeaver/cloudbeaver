@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/extensions",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/extensions/index.js",
-  "module": "../dist/extensions/index.js"
-}

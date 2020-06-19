@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/localization",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/localization/index.js",
-  "module": "../dist/localization/index.js"
-}

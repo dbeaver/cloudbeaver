@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "lib"
+  },
+  "exclude": [
+    "node_modules",
+    "@cloudbeaver/**"
+  ],
+  "include": ["src/**/*"]
+}

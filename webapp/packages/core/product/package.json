@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/product",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/product/index.js",
-  "module": "../dist/product/index.js"
-}

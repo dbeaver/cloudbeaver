@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/blocks",
-  "private": true,
-  "sideEffects": false,
-  "main": "../dist/blocks/index.js",
-  "module": "../dist/blocks/index.js"
-}

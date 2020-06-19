@@ -1,0 +1,63 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { observer } from 'mobx-react';
+import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
+
+import {
+  TextPlaceholder, TabsBox, TabPanel
+} from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { useStyles, composes } from '@cloudbeaver/core-theming';
+
+import { NavigationTabsService } from '../NavigationTabsService';
+import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
+import { TabHandlerTab } from './Tabs/TabHandlerTab';
+
+const styles = composes(
+  css`
+    Tab {
+      composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
+    }
+    tabs {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+  `
+);
+const stylesArray = [styles];
+
+export const NavigationTabsBar = observer(function NavigationTabsBar() {
+  const navigation = useService(NavigationTabsService);
+  const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
+  const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
+
+  if (navigation.tabIdList.length === 0) {
+    return (
+      <TextPlaceholder>
+        There are no objects to show. Double click on an object in the navigation tree to open it.
+      </TextPlaceholder>
+    );
+  }
+
+  return styled(useStyles(styles))(
+    <TabsBox
+      currentTabId={navigation.currentTabId}
+      tabs={navigation.tabIdList.map(tabId => (
+        <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} style={stylesArray}/>
+      ))}
+      style={stylesArray}
+    >
+      {navigation.tabIdList.map(tabId => (
+        <TabPanel key={tabId} tabId={tabId}>
+          <TabHandlerPanel tabId={tabId} />
+        </TabPanel>
+      ))}
+    </TabsBox>
+  );
+});

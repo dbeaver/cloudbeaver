@@ -1,7 +1,0 @@
-{
-  "name": "@dbeaver/core/assets",
-  "private": true,
-  "sideEffects": false,
-  "main": ".",
-  "module": "."
-}
