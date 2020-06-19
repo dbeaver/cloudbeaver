@@ -41,12 +41,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         concatenateModules: true,
     },
     plugins: [
-        // new CopyWebpackPlugin({
-        //     patterns: [
-        //         { from: './public', to: '', force: true },
-        //         ...deps
-        //     ].filter(Boolean)
-        // }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './public', to: '', force: true },
+            ].filter(Boolean)
+        }),
         new webpack.DefinePlugin({
             version: JSON.stringify(package.buildVersion),
         }),

@@ -35,12 +35,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     },
     devtool: 'cheap-module-eval-source-map',
     plugins: [
-        // new CopyWebpackPlugin({
-        //     patterns: [
-        //         { from: './public', to: '', force: true },
-        //         ...deps
-        //     ].filter(Boolean)
-        // }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './public', to: '', force: true },
+            ].filter(Boolean)
+        }),
         new webpack.DefinePlugin({
             dbeaverPlugins: JSON.stringify(packageJson.dbeaverPlugins),
             version: JSON.stringify(packageJson.buildVersion),

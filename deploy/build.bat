@@ -35,14 +35,15 @@ echo Build static content
 
 cd ..\webapp
 
-call yarn run bootstrap
-call yarn run build
+call yarn
+call lerna bootstrap
+call lerna run build --stream --scope=@cloudbeaver/product-default
 
 cd ..\deploy
 
 echo Copy static content
 
-xcopy /E /Q ..\webapp\packages\cloudbeaver\dist cloudbeaver\web >NUL
+xcopy /E /Q ..\webapp\packages\product-default\lib cloudbeaver\web >NUL
 
 echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.
 
