@@ -12,9 +12,12 @@ export async function bootstrap(plugins: PluginManifest[]) {
   const appBootstrap = app.getServiceInjector().resolveServiceByClass(AppBootstrap);
 
   try {
-    await appBootstrap.init();
     await app.initializeServices();
+    await appBootstrap.register();
+    await app.loadServices();
+    await app.load();
     await app.initializePlugins();
+    await appBootstrap.load();
     await appBootstrap.doAfterPluginsInit();
     await app.load();
 

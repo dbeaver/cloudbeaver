@@ -62,7 +62,23 @@ export class App {
         if (service.prototype instanceof Bootstrap) {
           const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
-          await serviceInstance.bootstrap();
+          if ('register' in serviceInstance) {
+            await serviceInstance.register();
+          }
+        }
+      }
+    }
+  }
+
+  async loadServices() {
+    for (const plugin of this.plugins) {
+      for (const service of plugin.providers) {
+        if (service.prototype instanceof Bootstrap) {
+          const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+
+          if ('load' in serviceInstance) {
+            await serviceInstance.load();
+          }
         }
       }
     }

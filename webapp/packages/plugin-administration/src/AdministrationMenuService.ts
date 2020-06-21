@@ -25,7 +25,7 @@ export class AdministrationMenuService extends Bootstrap {
     super();
   }
 
-  bootstrap() {
+  register() {
     this.settingsMenuService.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {
@@ -48,4 +48,6 @@ export class AdministrationMenuService extends Bootstrap {
       }
     );
   }
+
+  load(): void | Promise<void> { }
 }

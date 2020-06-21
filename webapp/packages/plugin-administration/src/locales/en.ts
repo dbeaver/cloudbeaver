@@ -1,0 +1,4 @@
+export default [
+  ['administration_menu_enter', 'Administration'],
+  ['administration_menu_back', 'Back to app'],
+];

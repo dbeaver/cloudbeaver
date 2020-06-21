@@ -9,6 +9,7 @@
 import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from './AdministrationItem/AdministrationItemService';
+import { AdministrationLocaleService } from './AdministrationLocaleService';
 import { AdministrationMenuService } from './AdministrationMenuService';
 import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
@@ -23,6 +24,7 @@ export const manifest: PluginManifest = {
     AdministrationScreenService,
     AdministrationTopAppBarService,
     AdministrationItemService,
+    AdministrationLocaleService,
   ],
 
   async initialize(services: IServiceInjector) {

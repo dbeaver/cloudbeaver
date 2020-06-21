@@ -16,7 +16,8 @@ import { TableWhereFilter } from './TableWhereFilter';
 export class TableHeaderService extends Bootstrap {
   readonly tableHeaderPlaceholder = new PlaceholderContainer<TableViewerModel>()
 
-  bootstrap() {
+  register() {
     this.tableHeaderPlaceholder.add(TableWhereFilter, 1);
   }
+  load(): void | Promise<void> { }
 }

@@ -10,6 +10,7 @@ import { PluginManifest } from '@cloudbeaver/core-di';
 
 import { BasicConnectionPluginBootstrap } from './BasicConnectionPluginBootstrap';
 import { BasicConnectionService } from './BasicConnectionService';
+import { LocaleService } from './LocaleService';
 
 export const basicConnectionPluginManifest: PluginManifest = {
   info: {
@@ -18,6 +19,7 @@ export const basicConnectionPluginManifest: PluginManifest = {
 
   providers: [
     BasicConnectionService,
+    LocaleService,
   ],
 
   initialize(services): void {
