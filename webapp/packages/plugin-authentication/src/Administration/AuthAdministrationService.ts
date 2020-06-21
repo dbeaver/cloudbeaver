@@ -17,6 +17,8 @@ export class AuthAdministrationService extends Bootstrap {
     super();
   }
 
-  bootstrap() {
+  register() {
+  }
+  load(): void | Promise<void> {
   }
 }

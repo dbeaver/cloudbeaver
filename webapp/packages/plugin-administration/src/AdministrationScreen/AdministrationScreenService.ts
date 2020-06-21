@@ -72,7 +72,7 @@ export class AdministrationScreenService extends Bootstrap {
     this.routerService.router.navigate(AdministrationScreenService.itemSubParamRouteName, { item, sub, param });
   }
 
-  bootstrap() {
+  register() {
     this.screenService.create({
       name: AdministrationScreenService.screenName,
       routes: [
@@ -97,6 +97,8 @@ export class AdministrationScreenService extends Bootstrap {
       onActivate: this.handleActivate.bind(this),
     });
   }
+
+  load(): void | Promise<void> { }
 
   private async handleActivate() {
     if (!this.permissionsService.has(EAdminPermission.admin)) {

@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from './injectable';
-
-@injectable()
-export abstract class Bootstrap {
-  abstract register(): void | Promise<void>;
-  abstract load(): void | Promise<void>;
+export interface ILocaleProvider {
+  (locale: string): Promise<string[][]> | string[][];
 }

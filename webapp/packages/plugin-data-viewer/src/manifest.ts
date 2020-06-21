@@ -11,6 +11,7 @@ import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
+import { LocaleService } from './LocaleService';
 import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
@@ -26,6 +27,7 @@ export const manifest: PluginManifest = {
     TableViewerStorageService,
     TableFooterMenuService,
     TableHeaderService,
+    LocaleService,
   ],
 
   async initialize(services: IServiceInjector) {

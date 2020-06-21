@@ -6,25 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { IComputedMenuItemOptions, StaticMenu } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ServerService } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 @injectable()
-export class SettingsMenuService {
+export class SettingsMenuService extends Bootstrap {
   static settingsMenuToken = 'settingsMenu';
 
   private menu = new StaticMenu();
   private langMenuToken = 'langMenu';
   private themeMenuToken = 'themeMenu';
 
-  constructor(private localizationService: LocalizationService,
-              private themeService: ThemeService) {
+  constructor(
+    private localizationService: LocalizationService,
+    private themeService: ThemeService,
+    private serverService: ServerService
+  ) {
+    super();
+  }
 
+  register(): void | Promise<void> {
     this.menu.addRootPanel(SettingsMenuService.settingsMenuToken);
+  }
+
+  async load(): Promise<void> {
     this.addThemes();
-    this.addLocales();
+    await this.addLocales();
   }
 
   getMenu() {
@@ -59,7 +69,13 @@ export class SettingsMenuService {
     });
   }
 
-  private addLocales() {
+  private async addLocales() {
+    const config = await this.serverService.config.load();
+
+    if (!config) {
+      return;
+    }
+
     this.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {
@@ -70,7 +86,7 @@ export class SettingsMenuService {
       }
     );
 
-    this.localizationService.getSupportedLanguages().forEach((lang) => {
+    config.supportedLanguages.forEach((lang) => {
       this.addMenuItem(
         this.langMenuToken,
         {

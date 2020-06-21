@@ -29,10 +29,8 @@ import { ThemeService } from '@cloudbeaver/core-theming';
  */
 @injectable()
 export class AppBootstrap {
-
   constructor(
     private exceptionsCatcherService: ExceptionsCatcherService,
-    private localizationService: LocalizationService,
     private themeService: ThemeService,
     private routerService: RouterService,
     private appScreenService: AppScreenService,
@@ -44,18 +42,20 @@ export class AppBootstrap {
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
   ) { }
 
-  async init() {
+  register(): void | Promise<void> {
     this.exceptionsCatcherService.subscribe();
     this.sessionExpireService.subscribe();
 
     this.appScreenService.register();
-    await this.localizationService.init();
-    await this.themeService.init();
-
     this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
     this.connectionDialogService.registerMenuItems();
     this.logViewerMenuService.registerMenuItems();
+  }
+
+  async load() {
+    await this.themeService.init();
+
   }
 
   async doAfterPluginsInit() {

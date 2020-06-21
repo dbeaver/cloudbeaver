@@ -26,7 +26,7 @@ export class UsersAdministrationService extends Bootstrap {
     super();
   }
 
-  bootstrap() {
+  register() {
     this.administrationItemService.create({
       name: 'users',
       sub: [
@@ -44,6 +44,8 @@ export class UsersAdministrationService extends Bootstrap {
       onActivate: this.loadUsers.bind(this),
     });
   }
+
+  load(): void | Promise<void> { }
 
   navToRoot() {
     this.administrationScreenService.navigateToItem('users');
