@@ -10,16 +10,14 @@
     "allowJs": true,
     "lib": [
       "dom",
-      "es2015",
-      "es2016",
-      "ESNext"
+      "ES2019"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
     "jsx": "preserve",
-    "target": "esnext",
-    "module": "ESNext",
+    "target": "ES6",
+    "module": "none",
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,

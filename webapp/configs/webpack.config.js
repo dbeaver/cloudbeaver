@@ -1,5 +1,4 @@
 const { resolve, join } = require('path');
-var PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -33,12 +32,6 @@ module.exports = (env, argv) => {
 
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
-      // require('@csstools/postcss-sass')({
-      //   sassOptions: {
-      //     implementation: require('node-sass'),
-      //     includePaths: ['node_modules', resolve('../../node_modules')]
-      //   },
-      // }),
       require('postcss-discard-comments'),
       require('reshadow/postcss')({ scopeBehaviour: moduleScope })
     ];
@@ -93,9 +86,8 @@ module.exports = (env, argv) => {
     mode: argv.mode || 'development',
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
-      modules: [join(__dirname, '../node_modules')],
+      modules: [resolve('node_modules'), join(__dirname, '../node_modules')],
       alias: {
-        // "@cloudbeaver": resolve('../../node_modules/@cloudbeaver/'),
         react: 'preact/compat',
         react$: 'preact/compat',
         'react-dom': 'preact/compat',
@@ -150,7 +142,6 @@ module.exports = (env, argv) => {
     // ],
     devtool: 'cheap-module-source-map',
     plugins: [
-      new PeerDepsExternalsPlugin(),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
