@@ -15,16 +15,18 @@ console.warn = (...args) => {
 };
 
 module.exports = {
+  compact: prod,
   presets: [
-    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
     "@babel/preset-react",
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
     [
       "@babel/preset-env",
       {
-        "targets": {
-          // "esmodules": true,
-          browsers: ["last 2 chrome version", "last 2 firefox version"]
-        }
+        targets: {
+          esmodules: true,
+        },
+        modules: false,
+        // "useBuiltIns": "usage"
       }
     ]
   ],
@@ -34,10 +36,10 @@ module.exports = {
     '@babel/plugin-proposal-optional-chaining',
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
+    ["@babel/plugin-proposal-object-rest-spread", { loose: true, useBuiltIns: true }],
     'react-require',
-    "@babel/proposal-object-rest-spread",
     'reshadow/babel',
-    !prod && [
+    /*!prod &&*/ [
       "babel-plugin-module-resolver",
       {
         alias: {

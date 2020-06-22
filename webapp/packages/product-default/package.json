@@ -9,6 +9,8 @@
     "prebuild": "rimraf lib/*",
     "build": "webpack --config ../../configs/webpack.product.config",
     "dev": "webpack-dev-server --progress --config=../../configs/webpack.product.dev.config --port=3100",
+    "analyse": "webpack --config ../../configs/webpack.product.config --profile --json > ./lib/stats.json",
+    "postanalyse": "webpack-bundle-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },

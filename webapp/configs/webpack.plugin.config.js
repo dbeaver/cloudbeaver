@@ -1,5 +1,6 @@
 const merge = require('webpack-merge');
 const { resolve, join } = require('path');
+var PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const commonConfig = require('./webpack.config.js');
 
 var main = resolve('src/index.ts');
@@ -11,7 +12,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     filename: 'index.js',
     chunkFilename: '[name].bundle.js',
     library: package.name,
-    libraryTarget: 'umd',
+    libraryTarget: 'commonjs',
     path: outputDir,
   },
   optimization: {
@@ -22,5 +23,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     // namedModules: false,
     // concatenateModules: false,
   },
-  plugins: [],
+  plugins: [
+    new PeerDepsExternalsPlugin(),
+  ],
 });
