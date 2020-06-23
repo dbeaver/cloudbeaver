@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabEntity } from '@cloudbeaver/core-app';
+import { TabEntity, NavNodeManagerService, ENodeFeature } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { ObjectInfoTabModel } from './ObjectInfoTabModel';
@@ -14,7 +14,19 @@ import { ObjectInfoTabModel } from './ObjectInfoTabModel';
 @injectable()
 export class ObjectInfoTabService {
 
-  createTabEntity(): TabEntity {
+  constructor(
+    private navNodeManagerService: NavNodeManagerService,
+  )
+  {}
+
+  createTabEntity(navNodeId: string): TabEntity | null {
+    const node = this.navNodeManagerService.getNode(navNodeId);
+    const isDatabaseObject = node?.features?.includes(ENodeFeature.item)
+      || node?.features?.includes(ENodeFeature.container);
+    if (!isDatabaseObject) {
+      return null;
+    }
+
     return new TabEntity(ObjectInfoTabModel);
   }
 

@@ -53,10 +53,10 @@ export const Item = observer(function Item({
 }: ItemProps) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const { node } = useNode(objectId);
-  const databaseObjectInfo = useDatabaseObjectInfo(objectId);
+  const { dbObject } = useDatabaseObjectInfo(objectId);
   const handleOpen = useCallback(() => navNodeManagerService.navToNode(node!.id, node!.parentId), [node]);
 
-  if (!node || !databaseObjectInfo?.properties) {
+  if (!node) {
     return styled(useStyles(itemStyles))(
       <TableItem item={objectId} onDoubleClick={handleOpen}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
@@ -76,6 +76,20 @@ export const Item = observer(function Item({
     );
   }
 
+  if (!dbObject?.properties) {
+    return styled(useStyles(itemStyles))(
+      <TableItem item={objectId} onDoubleClick={handleOpen}>
+        <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
+        <TableColumnValue>
+          <icon as="div">
+            <StaticImage icon={node.icon} />
+          </icon>
+        </TableColumnValue>
+        <TableColumnValue>{node.name}</TableColumnValue>
+      </TableItem>
+    );
+  }
+
   return styled(useStyles(itemStyles))(
     <TableItem item={objectId} onDoubleClick={handleOpen}>
       <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
@@ -84,7 +98,7 @@ export const Item = observer(function Item({
           <StaticImage icon={node.icon} />
         </icon>
       </TableColumnValue>
-      {databaseObjectInfo.properties.map(property => (
+      {dbObject.properties.map(property => (
         <TableColumnValue key={property.id}>{getValue(property.value)}</TableColumnValue>
       ))}
     </TableItem>

@@ -15,19 +15,15 @@ import { Header } from './Header';
 import { Item } from './Item';
 
 type ObjectChildrenPropertyTableProps = {
-  nodeIds?: string[];
+  nodeIds: string[];
 }
 
 export const ObjectChildrenPropertyTable = observer(function ObjectPropertyTable({
   nodeIds,
 }: ObjectChildrenPropertyTableProps) {
 
-  if (!nodeIds) {
-    return null;
-  }
-
   const firstChild = nodeIds[0] || '';
-  const properties = useDatabaseObjectInfo(firstChild)?.properties;
+  const properties = useDatabaseObjectInfo(firstChild).dbObject?.properties;
 
   return (
     <Table>

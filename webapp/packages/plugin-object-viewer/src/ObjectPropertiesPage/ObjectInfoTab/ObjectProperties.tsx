@@ -16,6 +16,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ObjectProperty } from './ObjectProperty';
 
+const styles = css`
+  center {
+    margin: auto;
+  }
+`;
+
 const tabStyles = css`
   properties {
     display: flex;
@@ -36,16 +42,22 @@ type ObjectPropertiesProps = PropsWithChildren<{
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,
 }: ObjectPropertiesProps) {
-  const object = useDatabaseObjectInfo(objectId);
+  const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
 
-  if (!object?.properties) {
+  if (!dbObject?.properties && isLoading) {
     return <Loader />;
+  }
+
+  if (!dbObject?.properties) {
+    return styled(styles)(
+      <center as="div">There are no items to show</center>
+    );
   }
 
   return styled(useStyles(tabStyles))(
     <properties as="div">
       <container as="div">
-        {object.properties.map(v => (
+        {dbObject.properties.map(v => (
           <ObjectProperty key={v.id} objectProperty={v} />
         ))}
       </container>
