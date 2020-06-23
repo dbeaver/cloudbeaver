@@ -28,6 +28,7 @@ const styles = css`
 `;
 
 export type Props = {
+  isFormFilled: boolean;
   isCreating: boolean;
   onCancel(): void;
   onCreate(): void;
@@ -35,6 +36,7 @@ export type Props = {
 
 export const CreateUserDialogFooter = observer(
   function CreateUserDialogFooter({
+    isFormFilled,
     isCreating,
     onCancel,
     onCreate,
@@ -56,7 +58,7 @@ export const CreateUserDialogFooter = observer(
           type="button"
           mod={['unelevated']}
           onClick={onCreate}
-          disabled={isCreating}
+          disabled={!isFormFilled || isCreating}
         >
           {translate('authentication_create_user_dialog_create')}
         </Button>

@@ -27,6 +27,16 @@ export class CreateUserDialogController implements IInitializableController, IDe
     roles: new Map<string, boolean>(),
   };
 
+  @computed get isFormFilled() {
+    const rolesState = Array.from(this.credentials.roles.values())
+      .filter(Boolean);
+
+    return rolesState.length > 0
+      && !!this.credentials.login
+      && !!this.credentials.password
+      && this.credentials.password === this.credentials.passwordRepeat;
+  }
+
   @computed get roles() {
     return this.rolesManagerService.roles.data;
   }
