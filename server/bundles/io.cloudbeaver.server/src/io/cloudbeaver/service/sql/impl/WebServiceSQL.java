@@ -143,6 +143,11 @@ public class WebServiceSQL implements DBWServiceSQL {
         return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues);
     }
 
+    @Override
+    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues) throws DBWebException {
+        throw new DBWebException("Not supported");
+    }
+
     @NotNull
     public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException {
         DBRRunnableWithResult<WebSQLExecuteInfo> runnable = new DBRRunnableWithResult<WebSQLExecuteInfo>() {

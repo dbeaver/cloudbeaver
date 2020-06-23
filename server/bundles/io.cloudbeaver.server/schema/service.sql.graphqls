@@ -103,6 +103,11 @@ type SQLExecuteInfo {
     results: [ SQLQueryResults! ]!
 }
 
+input SQLResultRow {
+    data: [ Object ]!
+    updateValues: [ Object ]
+}
+
 extend type Query {
 
     sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
@@ -150,6 +155,16 @@ extend type Mutation {
         updateRow: [ Object ]!,
         # Map<Int,Object>
         updateValues: Object
+    ): SQLExecuteInfo
+
+    updateResultsDataBatch(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updatedRows: [ SQLResultRow ],
+        deletedRows: [ SQLResultRow ],
+        addedRows: [ SQLResultRow ],
     ): SQLExecuteInfo
 
     ### Async API

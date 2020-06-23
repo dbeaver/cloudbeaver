@@ -23,8 +23,6 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
 import java.util.List;
 import java.util.Map;
@@ -61,6 +59,13 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLExecuteInfo updateResultsData(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull List<Object> updateRow,
+        @NotNull Map<String, Object> updateValues) throws DBWebException;
+
+    @WebAction
+    WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull List<Object> updateRow,
