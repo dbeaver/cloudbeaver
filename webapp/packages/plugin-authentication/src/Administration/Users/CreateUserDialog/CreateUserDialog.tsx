@@ -85,6 +85,7 @@ export const CreateUserDialog = observer(function CreateUserDialog({
       noBodyPadding
       footer={(
         <CreateUserDialogFooter
+          isFormFilled={controller.isFormFilled}
           isCreating={controller.isCreating}
           onCancel={rejectDialog}
           onCreate={controller.create}
