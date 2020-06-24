@@ -30,10 +30,12 @@ export class ObjectFoldersService {
   // later it will be integrated in common lifecycle of nested entities
   private tabContainersStorage = new Entity();
 
-  constructor(private objectInfoTabService: ObjectInfoTabService,
-              private virtualFolderTabService: VirtualFolderTabService,
-              private objectFoldersTabService: ObjectFoldersTabService,
-              private rootContainerService: RootContainerService) {
+  constructor(
+    private objectInfoTabService: ObjectInfoTabService,
+    private virtualFolderTabService: VirtualFolderTabService,
+    private objectFoldersTabService: ObjectFoldersTabService,
+    private rootContainerService: RootContainerService
+  ) {
     this.rootContainerService.registerEntityInRootContainer(this.tabContainersStorage);
   }
 
@@ -42,7 +44,10 @@ export class ObjectFoldersService {
     const tabContainer = new ObjectFoldersTabContainer(nodeId);
     this.tabContainersStorage.addChild(tabContainer);
 
-    tabContainer.addTabEntity(this.objectInfoTabService.createTabEntity());
+    const infoTab = this.objectInfoTabService.createTabEntity(nodeId);
+    if (infoTab) {
+      tabContainer.addTabEntity(infoTab);
+    }
 
     this.objectFoldersTabService.createTabEntities(nodeId)
       .forEach(tabEntity => tabContainer.addTabEntity(tabEntity));

@@ -43,8 +43,12 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   const dbObjectPagesService = useService(DBObjectPageService);
   const pages = dbObjectPagesService.orderedPages;
 
-  if (!children || isLoading) {
+  if (!children && isLoading) {
     return <Loader />;
+  }
+
+  if (!children) {
+    return <>Nothing to show</>;
   }
 
   return styled(useStyles(styles))(

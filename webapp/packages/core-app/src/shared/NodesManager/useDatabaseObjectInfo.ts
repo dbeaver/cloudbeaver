@@ -12,6 +12,9 @@ import { DBObjectService } from './DBObjectService';
 
 export function useDatabaseObjectInfo(navNodeId: string) {
   const dbObjectService = useService(DBObjectService);
+  const dbObject = dbObjectService.getDBObject(navNodeId);
+  const isLoading = dbObjectService.dbObject.isDataLoading({ navNodeId: [navNodeId] })
+  const isLoaded = dbObjectService.dbObject.isLoaded({ navNodeId: [navNodeId] })
 
-  return dbObjectService.getDBObject(navNodeId);
+  return { dbObject, isLoading, isLoaded };
 }

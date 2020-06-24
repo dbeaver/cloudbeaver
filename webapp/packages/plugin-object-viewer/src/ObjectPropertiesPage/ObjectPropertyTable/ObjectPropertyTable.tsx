@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useChildren } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { useObjectFolder } from '../../useObjectFolder';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
@@ -30,20 +31,21 @@ export const ObjectPropertyTable = observer(function ObjectPropertyTable({
   objectId,
   parentId,
 }: ObjectPropertyTableProps) {
+  const translate = useTranslate();
   const children = useChildren(objectId);
   const { isLoading } = useObjectFolder(objectId);
 
-  if (!children.children || children.isLoading || isLoading) {
+  if ((!children.children && children.isLoading) || isLoading) {
     return <Loader />;
   }
 
-  if (children.isLoaded && children.children.length === 0) {
+  if (!children?.children || !children.children.length) {
     return styled(styles)(
-      <center as="div">There are no items to show</center>
+      <center as="div">{translate('plugin_object_viewer_table_no_items')}</center>
     );
   }
 
-  return <ObjectChildrenPropertyTable nodeIds={children?.children}/>;
+  return <ObjectChildrenPropertyTable nodeIds={children.children}/>;
 });
 
 export const objectPropertyTablePanel = (parentId: string, objectId: string) => (

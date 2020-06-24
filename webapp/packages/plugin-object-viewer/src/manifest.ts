@@ -8,6 +8,7 @@
 
 import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { ObjectFoldersService } from './ObjectPropertiesPage/ObjectFoldersService';
 import { ObjectFoldersTabService } from './ObjectPropertiesPage/ObjectFoldersTab/ObjectFoldersTabService';
@@ -28,6 +29,7 @@ export const manifest: PluginManifest = {
     ObjectFoldersTabService,
     VirtualFolderTabService,
     DBObjectPageService,
+    LocaleService,
   ],
 
   async initialize(injector: IServiceInjector) {
