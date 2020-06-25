@@ -10,16 +10,15 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  'app.logViewer.refreshInterval': 3000,
-  'app.logViewer.maxLogEntries': 1000,
+  notificationsPool: 5,
 };
 
-export type CoreSettings = typeof defaultSettings
+export type EventsSettings = typeof defaultSettings
 
 @injectable()
-export class CoreSettingsService {
+export class EventsSettingsService {
 
-  readonly settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
+  readonly settings = this.pluginManagerService.getPluginSettings('core_events', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }
 }

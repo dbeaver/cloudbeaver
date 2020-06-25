@@ -12,9 +12,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { CoreSettingsService } from '@cloudbeaver/core-settings';
 import { uuid } from '@cloudbeaver/core-utils';
 
+import { CoreSettingsService } from '../../../CoreSettingsService';
 import { ILogEntry } from './ILogEntry';
 
 @injectable()
@@ -28,6 +28,8 @@ export class LogViewerService {
 
   @observable private log: ILogEntry[] = [];
   private interval: any = null;
+  private failedRequestsCount = 0;
+  private maxFailedRequests = 0;
 
   constructor(
     private graphQLService: GraphQLService,
@@ -60,6 +62,7 @@ export class LogViewerService {
     this._isActive = true;
     await this.updateLog();
     const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshInterval');
+    this.maxFailedRequests = this.coreSettingsService.settings.getValue('app.logViewer.maxFailedRequests');
     this.interval = setInterval(() => {
       this.updateLog();
     }, refreshInterval);
@@ -110,6 +113,11 @@ export class LogViewerService {
       this.addNewEntries(newEntries);
     } catch (e) {
       this.notificationService.logException(e, 'Failed to load log');
+
+      this.failedRequestsCount++;
+      if (this.failedRequestsCount === this.maxFailedRequests) {
+        this.stopLog();
+      }
     }
   }
 

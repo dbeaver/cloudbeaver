@@ -8,9 +8,9 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, ServerConfig, CachedResource } from '@cloudbeaver/core-sdk';
-import { ServerSettingsService } from '@cloudbeaver/core-settings';
 import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
+import { ServerSettingsService } from './ServerSettingsService';
 import { SessionService } from './SessionService';
 
 @injectable()

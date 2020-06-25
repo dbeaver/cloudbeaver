@@ -10,6 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
+import { EventsSettingsService } from './EventsSettingsService';
 import {
   ENotificationType, INotification, INotificationOptions, NotificationComponent
 } from './INotification';
@@ -18,6 +19,10 @@ import {
 export class NotificationService {
   readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0
+
+  constructor(
+    private settings: EventsSettingsService,
+  ) {}
 
   notify<T = never>(options: INotificationOptions<T>, type: ENotificationType) {
     const id = this.notificationNextId++;
@@ -35,6 +40,10 @@ export class NotificationService {
       showDetails: this.showDetails.bind(this, id),
     };
     this.notificationList.addValue(notification);
+
+    if (this.notificationList.values.length > this.settings.settings.getValue('notificationsPool')) {
+      this.notificationList.remove(this.notificationList.keys[0]);
+    }
   }
 
   customNotification<T = never>(

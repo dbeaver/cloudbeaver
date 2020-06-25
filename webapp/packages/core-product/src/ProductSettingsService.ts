@@ -7,26 +7,19 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-
-import { ISettingsSource } from './ISettingsSource';
-import { SettingsSource } from './SettingsSource';
+import { ISettingsSource, SettingsSource } from '@cloudbeaver/core-settings';
 
 @injectable()
-export class ServerSettingsService extends SettingsSource {
-
+export class ProductSettingsService extends SettingsSource {
   constructor(fallback: ISettingsSource) {
     super(fallback);
   }
 
-  setValue(key: string, value: string) {
+  setValue(key: string, value: any) {
     this.fallback?.setValue(key, value);
   }
 
   setSelfValue(key: string, value: string) {
     super.setValue(key, value);
-  }
-
-  clear() {
-    this.store.clear();
   }
 }

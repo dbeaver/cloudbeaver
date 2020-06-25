@@ -8,8 +8,9 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
-import { ProductSettingsService } from '@cloudbeaver/core-settings';
 import { parseJSONFlat } from '@cloudbeaver/core-utils';
+
+import { ProductSettingsService } from './ProductSettingsService';
 
 @injectable()
 export class ProductManagerService {

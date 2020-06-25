@@ -12,6 +12,10 @@ export class OrderedMap<K, V> {
   private indexes = observable.array<K>([], { deep: false });
   @observable.shallow private map: Map<K, V> = new Map<K, V>();
 
+  @computed get keys(): K[] {
+    return this.indexes;
+  }
+
   @computed get values(): V[] {
     return this.indexes.map(i => this.map.get(i)!);
   }

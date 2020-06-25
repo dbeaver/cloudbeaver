@@ -15,6 +15,7 @@
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
     "@cloudbeaver/core-sdk": "^0.1.0",
+    "@cloudbeaver/core-plugin": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0"
   }
 }
