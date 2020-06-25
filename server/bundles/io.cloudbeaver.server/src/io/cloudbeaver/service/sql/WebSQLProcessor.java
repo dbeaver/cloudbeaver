@@ -294,6 +294,106 @@ public class WebSQLProcessor {
         return result;
     }
 
+    @WebAction
+    public WebSQLExecuteInfo updateResultsDataBatch(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException
+    {
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        if (rowIdentifier == null) {
+            throw new DBWebException("Can't detect row identifier for results '" + resultsId + "'");
+        }
+        DBSEntity dataContainer = rowIdentifier.getEntity();
+        if (!(dataContainer instanceof DBSDataManipulator)) {
+            throw new DBWebException("Data container '" + dataContainer.getName() + "' is not editable");
+        }
+        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
+
+        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
+        List<WebSQLQueryResults> queryResults = new ArrayList<>();
+
+        try {
+            DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+                try {
+                    DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+                    try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update rows in container")) {
+                        WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
+
+                        DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
+                        DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+
+                        if (!CommonUtils.isEmpty(updatedRows)) {
+                            for (WebSQLResultsRow row : updatedRows) {
+                                Map<String, Object> updateValues = row.getUpdateValues();
+                                if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
+                                    continue;
+                                }
+                                DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
+                                // Final row is what we return back
+                                Object[] finalRow = row.getData().toArray();
+
+                                int index = 0;
+                                for (String indexStr : updateValues.keySet()) {
+                                    int attrIndex = CommonUtils.toInt(indexStr, -1);
+                                    updateAttributes[index++] = allAttributes[attrIndex];
+                                }
+
+                                Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
+                                for (int i = 0; i < updateAttributes.length; i++) {
+                                    DBDAttributeBinding updateAttribute = updateAttributes[i];
+                                    Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
+                                    Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                    rowValues[i] = realCellValue;
+                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue);
+                                }
+                                for (int i = 0; i < keyAttributes.length; i++) {
+                                    DBDAttributeBinding keyAttribute = keyAttributes[i];
+                                    Object cellValueRaw = finalRow[keyAttribute.getOrdinalPosition()];
+                                    rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
+                                }
+
+                                DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
+                                updateBatch.add(rowValues);
+                                DBCStatistics statistics = updateBatch.execute(session);
+
+                                WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+                                updatedResultSet.setResultsInfo(resultsInfo);
+                                updatedResultSet.setColumns(resultsInfo.getAttributes());
+                                updatedResultSet.setRows(new Object[][]{finalRow});
+
+                                WebSQLQueryResults updateResults = new WebSQLQueryResults();
+                                updateResults.setUpdateRowCount((int) statistics.getRowsUpdated());
+                                updateResults.setResultSet(updatedResultSet);
+                                queryResults.add(updateResults);
+                                result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                            }
+                        }
+
+                        if (!CommonUtils.isEmpty(updatedRows)) {
+                            throw new DBCException("New row add is not supported");
+                        }
+
+                        if (!CommonUtils.isEmpty(deletedRows)) {
+                            throw new DBCException("Row delete is not supported");
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+                }
+            });
+        } catch (DBException e) {
+            throw new DBWebException("Error updating data", e);
+        }
+        result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
+        return result;
+    }
+
     @NotNull
     public <T> T getDataContainerByNodePath(DBRProgressMonitor monitor, @NotNull String containerPath, Class<T> type) throws DBException {
         DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, containerPath);

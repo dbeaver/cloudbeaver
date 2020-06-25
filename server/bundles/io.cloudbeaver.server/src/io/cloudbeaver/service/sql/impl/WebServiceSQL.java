@@ -144,8 +144,8 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues) throws DBWebException {
-        throw new DBWebException("Not supported");
+    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException {
+        return contextInfo.getProcessor().updateResultsDataBatch(contextInfo, resultsId, updatedRows, deletedRows, addedRows);
     }
 
     @NotNull

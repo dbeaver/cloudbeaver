@@ -68,8 +68,9 @@ public interface DBWServiceSQL extends DBWService {
     WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        @NotNull List<Object> updateRow,
-        @NotNull Map<String, Object> updateValues) throws DBWebException;
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException;
 
     @WebAction
     WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException;

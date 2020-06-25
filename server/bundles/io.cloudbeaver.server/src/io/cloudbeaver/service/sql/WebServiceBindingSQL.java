@@ -24,9 +24,12 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -89,6 +92,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     env.getArgument("resultsId"),
                     env.getArgument("updateRow"),
                     env.getArgument("updateValues")
+                ))
+            .dataFetcher("updateResultsDataBatch", env ->
+                getService(env).updateResultsDataBatch(
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    getResultsRow(env, "updatedRows"),
+                    getResultsRow(env, "deletedRows"),
+                    getResultsRow(env, "addedRows")
                 ))
             .dataFetcher("asyncSqlExecuteQuery", env ->
                 getService(env).asyncExecuteQuery(
@@ -154,4 +165,13 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
         Map<String, Object> filterProps = env.getArgument("filter");
         return filterProps == null ? null : new WebSQLDataFilter(filterProps);
     }
+
+    private static List<WebSQLResultsRow> getResultsRow(DataFetchingEnvironment env, String param) {
+        List<Map<String, Object>> mapList = env.getArgument("param");
+        if (CommonUtils.isEmpty(mapList)) {
+            return null;
+        }
+        return mapList.stream().map(WebSQLResultsRow::new).collect(Collectors.toList());
+    }
+
 }
