@@ -192,6 +192,7 @@ export type Mutation = {
   testConnection: ConnectionInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
   updateResultsData?: Maybe<SqlExecuteInfo>;
+  updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
 };
 
 export type MutationAsyncSqlExecuteQueryArgs = {
@@ -273,6 +274,15 @@ export type MutationUpdateResultsDataArgs = {
   resultsId: Scalars['ID'];
   updateRow: Array<Maybe<Scalars['Object']>>;
   updateValues?: Maybe<Scalars['Object']>;
+};
+
+export type MutationUpdateResultsDataBatchArgs = {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  updatedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
+  deletedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
+  addedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
 };
 
 export type AsyncTaskInfo = {
@@ -531,7 +541,7 @@ export type SqlDataFilter = {
 };
 
 export type SqlResultColumn = {
-  position?: Maybe<Scalars['Int']>;
+  position: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   label?: Maybe<Scalars['String']>;
   icon?: Maybe<Scalars['String']>;
@@ -562,6 +572,11 @@ export type SqlExecuteInfo = {
   statusMessage?: Maybe<Scalars['String']>;
   duration?: Maybe<Scalars['Int']>;
   results: Array<SqlQueryResults>;
+};
+
+export type SqlResultRow = {
+  data: Array<Maybe<Scalars['Object']>>;
+  updateValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
 };
 
 export type AdminUserInfo = {

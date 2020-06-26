@@ -22,9 +22,17 @@ export class TableEditor {
   /**
    * this method doesn't modify TableRow but create a diff that can be applied later
    */
-  editCellValue(rowId: number, columnIndex: number, value: any) {
-    const editedRow = this.getOrCreateEditedRow(rowId);
-    editedRow.setValue(columnIndex, value);
+  editCellValue(rowId: number, columnKey: string, value: any) {
+    const column = this.dataModel
+      .getColumns()
+      .find(column => column.name === columnKey);
+
+    if (!column) {
+      return;
+    }
+
+    this.getOrCreateEditedRow(rowId)
+      .setValue(column.position, value);
   }
 
   getChanges(): RowDiff[] {

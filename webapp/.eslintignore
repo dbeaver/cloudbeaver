@@ -1,3 +1,4 @@
 node_modules
+lib
 **/*.js
 **/next-env.d.ts

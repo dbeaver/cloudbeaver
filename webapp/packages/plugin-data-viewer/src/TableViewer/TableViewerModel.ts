@@ -188,8 +188,8 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.requestStatusMessage = status;
   }
 
-  private async onCellEditingStopped(rowNumber: number, colNumber: number, value: any): Promise<void> {
-    this.tableEditor.editCellValue(rowNumber, colNumber, value);
+  private async onCellEditingStopped(rowNumber: number, column: string, value: any): Promise<void> {
+    this.tableEditor.editCellValue(rowNumber, column, value);
   }
 
   private async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {

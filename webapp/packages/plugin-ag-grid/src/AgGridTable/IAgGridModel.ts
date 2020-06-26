@@ -28,7 +28,7 @@ export interface IAgGridModel {
   actions: IAgGridActions | null;
   // hooks
   onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
-  onCellEditingStopped?(rowNumber: number, colNumber: number, value: any): void;
+  onCellEditingStopped?(rowNumber: number, column: string, value: any): void;
   onSortChanged?(sorting: SortModel): void;
   onEditSave(): void;
   onEditCancel(): void;
@@ -37,7 +37,7 @@ export interface IAgGridModel {
 export interface IAgGridActions {
   changeChunkSize(chunkSize: number): void;
   resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void;
-  updateCellValue(rowNumber: number, colNumber: number, value: any): void;
+  updateCellValue(rowNumber: number, column: string, value: any): void;
   updateRowValue(rowNumber: number, value: any[]): void;
   getSelectedRows(): RowSelection[];
 }
