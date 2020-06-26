@@ -3,6 +3,10 @@
   "files": [
     "typings.d.ts"
   ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "allowUnreachableCode": false,
@@ -34,7 +38,7 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "paths": {
-      "@cloudbeaver/*": ["./node_modules/@cloudbeaver/*/src"],
+      "@cloudbeaver/*": ["./node_modules/@cloudbeaver/*/src"]
     },
     "types": [
       "reflect-metadata",

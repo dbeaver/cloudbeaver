@@ -4,8 +4,7 @@
     "outDir": "lib"
   },
   "exclude": [
-    "node_modules",
-    // "@cloudbeaver/**"
+    "node_modules"
   ],
   "include": ["src/**/*"]
 }

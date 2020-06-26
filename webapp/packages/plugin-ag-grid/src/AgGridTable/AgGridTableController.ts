@@ -161,7 +161,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
     if (this.gridModel.onCellEditingStopped) {
-      this.gridModel.onCellEditingStopped(event.rowIndex, parseInt(event.column.getColId()), event.value);
+      this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
     }
   }
 
@@ -212,11 +212,11 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  private updateCellValue(rowNumber: number, colNumber: number, value: any): void {
+  private updateCellValue(rowNumber: number, column: string, value: any): void {
     if (this.api) {
       this.api
         .getRowNode(`${rowNumber}`)
-        .setDataValue(`${colNumber}`, value);
+        .setDataValue(column, value);
     }
   }
 
