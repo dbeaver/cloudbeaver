@@ -1,5 +1,6 @@
 // Services
 export * from './RouterService';
+export * from './CoreSettingsService';
 export * from './Screen/IScreen';
 export * from './Screen/ScreenService';
 export * from './AppScreen/AppScreenService';

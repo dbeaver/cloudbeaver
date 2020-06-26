@@ -7,8 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-
-import { SettingsSource } from './SettingsSource';
+import { SettingsSource } from '@cloudbeaver/core-settings';
 
 @injectable()
 export class SessionSettingsService extends SettingsSource {

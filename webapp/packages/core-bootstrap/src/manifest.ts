@@ -13,26 +13,19 @@ import {
   ConnectionSchemaManagerService, NavigationTabsService,
   NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
-  RouterService, ScreenService, AppScreenService
+  RouterService, ScreenService, AppScreenService, CoreSettingsService
 } from '@cloudbeaver/core-app';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
-import { NotificationService, ExceptionsCatcherService } from '@cloudbeaver/core-events';
+import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
-import { ProductManagerService } from '@cloudbeaver/core-product';
+import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
 import {
-  SessionService, ServerService, PermissionsService
+  SessionService, ServerService, PermissionsService, SessionSettingsService, ServerSettingsService
 } from '@cloudbeaver/core-root';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
-import {
-  LocalStorageSaveService,
-  SettingsService,
-  CoreSettingsService,
-  SessionSettingsService,
-  ServerSettingsService,
-  ProductSettingsService
-} from '@cloudbeaver/core-settings';
+import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 export const coreManifest: PluginManifest = {
@@ -60,6 +53,7 @@ export const coreManifest: PluginManifest = {
     ContextMenuService,
     EnvironmentService,
     ExceptionsCatcherService,
+    EventsSettingsService,
     GraphQLService,
     LocalStorageSaveService,
     LocalizationService,
