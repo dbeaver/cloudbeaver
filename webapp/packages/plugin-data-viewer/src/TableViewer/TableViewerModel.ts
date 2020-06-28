@@ -237,7 +237,6 @@ export class TableViewerModel {
         );
 
         if (!tryAgain) {
-          this.revertChanges(diffs);
           return;
         }
       }
@@ -354,12 +353,13 @@ export class TableViewerModel {
    * @param newRows
    */
   private zipDiffAndResults(diff: RowDiff[], newRows: TableRow[]): SomeTableRows {
+    const length = Math.min(diff.length, newRows.length);
     if (diff.length !== newRows.length) {
-      throw new Error('expected that new rows have same length as diff');
+      console.warn('Expected that new rows have same length as diff');
     }
     const newRowsMap: SomeTableRows = new Map();
 
-    for (let i = 0; i < diff.length; i++) {
+    for (let i = 0; i < length; i++) {
       newRowsMap.set(diff[i].rowIndex, newRows[i]);
     }
 
