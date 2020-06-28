@@ -23,15 +23,15 @@ import org.jkiss.dbeaver.model.meta.Property;
  */
 public class WebSQLQueryResults {
 
-    private Integer updateRowCount;
+    private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;
 
     @Property
-    public Integer getUpdateRowCount() {
+    public Long getUpdateRowCount() {
         return updateRowCount;
     }
 
-    public void setUpdateRowCount(int updateRowCount) {
+    public void setUpdateRowCount(long updateRowCount) {
         this.updateRowCount = updateRowCount;
     }
 

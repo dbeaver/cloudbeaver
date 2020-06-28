@@ -167,7 +167,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
     }
 
     private static List<WebSQLResultsRow> getResultsRow(DataFetchingEnvironment env, String param) {
-        List<Map<String, Object>> mapList = env.getArgument("param");
+        List<Map<String, Object>> mapList = env.getArgument(param);
         if (CommonUtils.isEmpty(mapList)) {
             return null;
         }
