@@ -26,7 +26,7 @@ export class EditedRow {
 
   setValue(columnIndex: number, value: any) {
 
-    if (this.newRow[columnIndex] !== value) {
+    if (this.source[columnIndex] !== value) {
       this.editedCells.add(columnIndex);
     } else {
       this.editedCells.delete(columnIndex);

@@ -32,7 +32,6 @@ const styles = css`
 export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorParams>(
   function PlainTextEditor(props, ref) {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [, forceUpdate] = useState();
     const [initValue] = useState(() => {
       if (props.keyPress === KEY_BACKSPACE || props.keyPress === KEY_DELETE) {
         return '';
@@ -45,25 +44,20 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
     });
 
     const value = useRef(initValue);
-    const special = useRef(value.current);
 
     useImperativeHandle(ref, () => ({
-      getValue: () => special.current,
+      getValue: () => value.current,
     }), []);
 
     useEffect(() => inputRef.current?.focus(), []);
 
     const context: AgGridContext = props.context;
 
-    const handleSave = useCallback(() => {
-      special.current = value.current;
-      props.stopEditing();
-    }, [props.stopEditing]);
+    const handleSave = useCallback(() => props.stopEditing(), [props.stopEditing]);
 
     const handleReject = useCallback(() => props.api?.stopEditing(true), [props.api?.stopEditing]);
     const handleChange = useCallback((newValue: string) => {
       value.current = newValue;
-      forceUpdate(newValue);
     }, []);
 
     const isLastColumn = props.columnApi?.getAllGridColumns().slice(-1)[0] === props.column;

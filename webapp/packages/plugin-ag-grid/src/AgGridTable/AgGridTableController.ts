@@ -173,7 +173,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private updateRows(rows: number[]) {
-
     this.api?.redrawRows({
       rowNodes: rows.map(rowIndex => this.api!.getRowNode(`${rowIndex}`)),
     });
