@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { TableRow, RowValues } from './TableRow';
 
 export type RowDiff = {
@@ -16,7 +18,7 @@ export type RowDiff = {
 
 export class EditedRow {
   private newRow: TableRow
-  private editedCells = new Set<number>()
+  @observable private editedCells = new Set<number>()
 
   constructor(readonly rowIndex: number, readonly source: TableRow) {
     this.newRow = [...source];
@@ -35,6 +37,10 @@ export class EditedRow {
 
   isEdited(): boolean {
     return !!this.editedCells.size;
+  }
+
+  isCellEdited(columnIndex: number): boolean {
+    return this.editedCells.has(columnIndex);
   }
 
   getDiff(): RowDiff {

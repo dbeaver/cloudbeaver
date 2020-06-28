@@ -61,17 +61,14 @@ export class SqlResultService {
   async saveChanges(
     sqlQueryParams: ISqlQueryParams,
     resultId: string,
-    diffs: RowDiff[]
+    diff: RowDiff[]
   ): Promise<SqlExecuteInfo> {
 
-    const firstRow = diffs[0]; // todo multiple row to be implemented later
-
-    const response = await this.graphQLService.gql.updateResultsData({
+    const response = await this.graphQLService.gql.updateResultsDataBatch({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       resultsId: resultId,
-      sourceRowValues: firstRow.source,
-      values: firstRow.values,
+      updatedRows: diff.map(row => ({ data: row.source, updateValues: row.values })),
     });
 
     return response.result!;

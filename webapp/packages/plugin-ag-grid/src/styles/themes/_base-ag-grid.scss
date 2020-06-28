@@ -21,7 +21,8 @@
         @include mdc-theme-prop(color, on-surface, false);
       }
 
-      .ag-row, .ag-row:not(.ag-row-first) {
+      .ag-row,
+      .ag-row:not(.ag-row-first) {
         border-top: none;
         border-bottom: solid 1px;
         @include mdc-theme-prop(color, on-surface, false);
@@ -36,6 +37,10 @@
 
       .ag-cell-range-selected-1 {
         background-color: rgba(0, 145, 234, 0.3);
+      }
+
+      .cell-edited {
+        background-color: #ff99006b;
       }
 
       .ag-row.ag-row-hover {

@@ -65,8 +65,6 @@ export class DataViewerTableService {
   }
 
   private async saveChanges(data: TableViewerModel, rows: RowDiff[]): Promise<IRequestDataResult> {
-    const firstRow = rows[0]; // we support updating only one value
-
     if (!data.resultId) {
       throw new Error('It is expected that resultId was set after first fetch');
     }
@@ -75,12 +73,11 @@ export class DataViewerTableService {
       throw new Error('It is expected that data.sqlContextParams was set after first fetch');
     }
 
-    const response = await this.graphQLService.gql.updateResultsData({
+    const response = await this.graphQLService.gql.updateResultsDataBatch({
       connectionId: data.executionContext.connectionId,
       contextId: data.executionContext.contextId,
       resultsId: data.resultId,
-      sourceRowValues: firstRow.source,
-      values: firstRow.values,
+      updatedRows: rows.map(row => ({ data: row.source, updateValues: row.values })),
     });
 
     const dataSet = response.result!.results[0].resultSet!; // we expect only one dataset for a table

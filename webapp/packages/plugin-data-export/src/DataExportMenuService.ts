@@ -31,7 +31,7 @@ export class DataExportMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
-      order: 1,
+      order: 5,
       title: 'Export',
       icon: 'export',
       onClick: this.exportData.bind(this),

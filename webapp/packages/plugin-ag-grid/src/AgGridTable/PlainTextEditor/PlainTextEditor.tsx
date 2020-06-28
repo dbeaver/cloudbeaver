@@ -58,11 +58,6 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
     const handleSave = useCallback(() => {
       special.current = value.current;
       props.stopEditing();
-
-      // we use this setTimeout to update changes before saving
-      setTimeout(() => {
-        context.onEditSave();
-      }, 1);
     }, [props.stopEditing]);
 
     const handleReject = useCallback(() => props.api?.stopEditing(true), [props.api?.stopEditing]);

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { EditedRow, RowDiff } from './EditedRow';
 import { TableDataModel } from './TableDataModel';
 
@@ -14,7 +16,7 @@ import { TableDataModel } from './TableDataModel';
  */
 export class TableEditor {
 
-  private editedRows = new Map<number, EditedRow>();
+  @observable private editedRows = new Map<number, EditedRow>();
 
   constructor(private dataModel: TableDataModel) {
   }
@@ -33,6 +35,28 @@ export class TableEditor {
 
     this.getOrCreateEditedRow(rowId)
       .setValue(column.position, value);
+  }
+
+  isEdited(): boolean {
+    return Array.from(this.editedRows.values())
+      .some(row => row.isEdited());
+  }
+
+  isCellEdited(rowId: number, columnKey: string) {
+    const editedRow = this.editedRows.get(rowId);
+    if (!editedRow) {
+      return false;
+    }
+
+    const column = this.dataModel
+      .getColumns()
+      .find(column => column.name === columnKey);
+
+    if (!column) {
+      return false;
+    }
+
+    return editedRow.isCellEdited(column.position);
   }
 
   getChanges(): RowDiff[] {
