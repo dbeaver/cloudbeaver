@@ -21,6 +21,33 @@ export class TableFooterMenuService {
 
   constructor(private contextMenuService: ContextMenuService) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
+
+    this.registerMenuItem({
+      id: 'save ',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isDisabled(context) {
+        return !context.data.isEdited();
+      },
+      order: 1,
+      title: 'Save',
+      icon: 'apply',
+      onClick: context => context.data.saveChanges(),
+    });
+    this.registerMenuItem({
+      id: 'cancel ',
+      isPresent(context) {
+        return context.contextType === TableFooterMenuService.nodeContextType;
+      },
+      isDisabled(context) {
+        return !context.data.isEdited();
+      },
+      order: 2,
+      title: 'Cancel',
+      icon: 'reject',
+      onClick: context => context.data.cancelChanges(),
+    });
   }
 
   constructMenuWithContext(model: TableViewerModel): IMenuItem[] {

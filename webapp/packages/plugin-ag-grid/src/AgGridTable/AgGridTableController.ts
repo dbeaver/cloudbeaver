@@ -24,7 +24,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 
 import { AgGridContext } from './AgGridContext';
 import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortMode, SortModel,
+  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortModel,
 } from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
@@ -44,6 +44,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
    */
   private readonly context: AgGridContext = {
     selection: this.selection,
+    isCellEdited: this.isCellEdited.bind(this),
     onEditSave: this.onEditSave.bind(this),
     onEditCancel: this.onEditCancel.bind(this),
   }
@@ -92,6 +93,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
    * this actions will be passed outside data grid to ba called
    */
   private actions: IAgGridActions = {
+    updateRows: this.updateRows.bind(this),
     changeChunkSize: this.changeChunkSize.bind(this),
     resetData: this.resetData.bind(this),
     updateCellValue: this.updateCellValue.bind(this),
@@ -162,7 +164,18 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
     if (this.gridModel.onCellEditingStopped) {
       this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
+
     }
+  }
+
+  private isCellEdited(rowIndex: number, column: string) {
+    return this.gridModel.isCellEdited(rowIndex, column);
+  }
+
+  private updateRows(rows: number[]) {
+    this.api?.redrawRows({
+      rowNodes: rows.map(rowIndex => this.api!.getRowNode(`${rowIndex}`)),
+    });
   }
 
   private onEditSave() {
@@ -272,6 +285,14 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       valueGetter: v.dataKind === 'OBJECT' ? getObjectValue : undefined,
       headerComponentParams: {
         icon: v.icon,
+      },
+      cellClass: (params: any) => {
+        const context: AgGridContext = params.context;
+        if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
+          return 'cell-edited';
+        }
+        return '';
+
       },
     })),
   ];

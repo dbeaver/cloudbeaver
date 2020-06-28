@@ -280,9 +280,9 @@ export type MutationUpdateResultsDataBatchArgs = {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  updatedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
-  deletedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
-  addedRows?: Maybe<Array<Maybe<SqlResultRow>>>;
+  updatedRows?: Maybe<Array<SqlResultRow>>;
+  deletedRows?: Maybe<Array<SqlResultRow>>;
+  addedRows?: Maybe<Array<SqlResultRow>>;
 };
 
 export type AsyncTaskInfo = {
@@ -576,7 +576,7 @@ export type SqlExecuteInfo = {
 
 export type SqlResultRow = {
   data: Array<Maybe<Scalars['Object']>>;
-  updateValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  updateValues?: Maybe<Scalars['Object']>;
 };
 
 export type AdminUserInfo = {
@@ -654,50 +654,11 @@ export type DataTransferParameters = {
   filter?: Maybe<SqlDataFilter>;
 };
 
-export type AsyncSqlExecuteQueryMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  query: Scalars['String'];
-  filter?: Maybe<SqlDataFilter>;
-}>;
-
-export type AsyncSqlExecuteQueryMutation = { taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running'>
-    & { result?: Maybe<(
-      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-      & { results: Array<(
-        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
-        & { resultSet?: Maybe<(
-          Pick<SqlResultSet, 'id' | 'rows'>
-          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )>; }
-      )>; }
-    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
-  ); };
-
 export type AsyncTaskCancelMutationVariables = Exact<{
   taskId: Scalars['String'];
 }>;
 
 export type AsyncTaskCancelMutation = { result: Mutation['asyncTaskCancel'] };
-
-export type AsyncTaskStatusMutationVariables = Exact<{
-  taskId: Scalars['String'];
-}>;
-
-export type AsyncTaskStatusMutation = { taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running'>
-    & { result?: Maybe<(
-      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-      & { results: Array<(
-        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
-        & { resultSet?: Maybe<(
-          Pick<SqlResultSet, 'id' | 'rows'>
-          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )>; }
-      )>; }
-    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
-  ); };
 
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
@@ -871,6 +832,45 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
 
+export type AsyncSqlExecuteQueryMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  filter?: Maybe<SqlDataFilter>;
+}>;
+
+export type AsyncSqlExecuteQueryMutation = { taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'running'>
+    & { result?: Maybe<(
+      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
+      & { results: Array<(
+        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
+        & { resultSet?: Maybe<(
+          Pick<SqlResultSet, 'id' | 'rows'>
+          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
+        )>; }
+      )>; }
+    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
+  ); };
+
+export type AsyncTaskStatusMutationVariables = Exact<{
+  taskId: Scalars['String'];
+}>;
+
+export type AsyncTaskStatusMutation = { taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'running'>
+    & { result?: Maybe<(
+      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
+      & { results: Array<(
+        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
+        & { resultSet?: Maybe<(
+          Pick<SqlResultSet, 'id' | 'rows'>
+          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
+        )>; }
+      )>; }
+    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
+  ); };
+
 export type ExecuteSqlQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -886,6 +886,57 @@ export type ExecuteSqlQueryMutation = { result?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
       )>; }
+    )>; }
+  )>; };
+
+export type ReadDataFromContainerMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  containerNodePath: Scalars['ID'];
+  filter?: Maybe<SqlDataFilter>;
+}>;
+
+export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
+    Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
+    & { results: Array<(
+      Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
+      & { resultSet?: Maybe<(
+        Pick<SqlResultSet, 'id' | 'rows'>
+        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
+      )>; }
+    )>; }
+  )>; };
+
+export type UpdateResultsDataMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  sourceRowValues: Array<Maybe<Scalars['Object']>>;
+  values?: Maybe<Scalars['Object']>;
+}>;
+
+export type UpdateResultsDataMutation = { result?: Maybe<(
+    Pick<SqlExecuteInfo, 'duration'>
+    & { results: Array<(
+      Pick<SqlQueryResults, 'updateRowCount'>
+      & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
+    )>; }
+  )>; };
+
+export type UpdateResultsDataBatchMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  updatedRows?: Maybe<Array<SqlResultRow>>;
+  deletedRows?: Maybe<Array<SqlResultRow>>;
+  addedRows?: Maybe<Array<SqlResultRow>>;
+}>;
+
+export type UpdateResultsDataBatchMutation = { result?: Maybe<(
+    Pick<SqlExecuteInfo, 'duration'>
+    & { results: Array<(
+      Pick<SqlQueryResults, 'updateRowCount'>
+      & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
     )>; }
   )>; };
 
@@ -961,24 +1012,6 @@ export type QuerySqlDialectInfoQueryVariables = Exact<{
 
 export type QuerySqlDialectInfoQuery = { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter'>> };
 
-export type ReadDataFromContainerMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  containerNodePath: Scalars['ID'];
-  filter?: Maybe<SqlDataFilter>;
-}>;
-
-export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
-      & { resultSet?: Maybe<(
-        Pick<SqlResultSet, 'id' | 'rows'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-      )>; }
-    )>; }
-  )>; };
-
 export type ChangeSessionLanguageMutationVariables = Exact<{
   locale: Scalars['String'];
 }>;
@@ -1053,103 +1086,9 @@ export type SqlResultCloseMutationVariables = Exact<{
 
 export type SqlResultCloseMutation = { result: Mutation['sqlResultClose'] };
 
-export type UpdateResultsDataMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  resultsId: Scalars['ID'];
-  sourceRowValues: Array<Maybe<Scalars['Object']>>;
-  values?: Maybe<Scalars['Object']>;
-}>;
-
-export type UpdateResultsDataMutation = { result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount'>
-      & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )>; }
-  )>; };
-
-export const AsyncSqlExecuteQueryDocument = `
-    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
-  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
-    id
-    running
-    result {
-      duration
-      statusMessage
-      results {
-        updateRowCount
-        sourceQuery
-        title
-        resultSet {
-          id
-          columns {
-            dataKind
-            entityName
-            fullTypeName
-            icon
-            label
-            maxLength
-            name
-            position
-            precision
-            scale
-            typeName
-          }
-          rows
-        }
-      }
-    }
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-  }
-}
-    `;
 export const AsyncTaskCancelDocument = `
     mutation asyncTaskCancel($taskId: String!) {
   result: asyncTaskCancel(id: $taskId)
-}
-    `;
-export const AsyncTaskStatusDocument = `
-    mutation asyncTaskStatus($taskId: String!) {
-  taskInfo: asyncTaskStatus(id: $taskId) {
-    id
-    running
-    result {
-      duration
-      statusMessage
-      results {
-        updateRowCount
-        sourceQuery
-        title
-        resultSet {
-          id
-          columns {
-            dataKind
-            entityName
-            fullTypeName
-            icon
-            label
-            maxLength
-            name
-            position
-            precision
-            scale
-            typeName
-          }
-          rows
-        }
-      }
-    }
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-  }
 }
     `;
 export const AuthLoginDocument = `
@@ -1437,6 +1376,84 @@ export const NavGetStructContainersDocument = `
   }
 }
     `;
+export const AsyncSqlExecuteQueryDocument = `
+    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
+  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
+    id
+    running
+    result {
+      duration
+      statusMessage
+      results {
+        updateRowCount
+        sourceQuery
+        title
+        resultSet {
+          id
+          columns {
+            dataKind
+            entityName
+            fullTypeName
+            icon
+            label
+            maxLength
+            name
+            position
+            precision
+            scale
+            typeName
+          }
+          rows
+        }
+      }
+    }
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+  }
+}
+    `;
+export const AsyncTaskStatusDocument = `
+    mutation asyncTaskStatus($taskId: String!) {
+  taskInfo: asyncTaskStatus(id: $taskId) {
+    id
+    running
+    result {
+      duration
+      statusMessage
+      results {
+        updateRowCount
+        sourceQuery
+        title
+        resultSet {
+          id
+          columns {
+            dataKind
+            entityName
+            fullTypeName
+            icon
+            label
+            maxLength
+            name
+            position
+            precision
+            scale
+            typeName
+          }
+          rows
+        }
+      }
+    }
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+  }
+}
+    `;
 export const ExecuteSqlQueryDocument = `
     mutation executeSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
   result: sqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
@@ -1461,6 +1478,64 @@ export const ExecuteSqlQueryDocument = `
           scale
           typeName
         }
+        rows
+      }
+    }
+  }
+}
+    `;
+export const ReadDataFromContainerDocument = `
+    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter) {
+  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter) {
+    duration
+    statusMessage
+    results {
+      updateRowCount
+      sourceQuery
+      title
+      resultSet {
+        id
+        columns {
+          dataKind
+          entityName
+          fullTypeName
+          icon
+          label
+          maxLength
+          name
+          position
+          precision
+          scale
+          typeName
+        }
+        rows
+      }
+    }
+  }
+}
+    `;
+export const UpdateResultsDataDocument = `
+    mutation updateResultsData($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $sourceRowValues: [Object]!, $values: Object) {
+  result: updateResultsData(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, updateRow: $sourceRowValues, updateValues: $values) {
+    duration
+    results {
+      updateRowCount
+      resultSet {
+        id
+        rows
+      }
+    }
+  }
+}
+    `;
+export const UpdateResultsDataBatchDocument = `
+    mutation updateResultsDataBatch($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $updatedRows: [SQLResultRow!], $deletedRows: [SQLResultRow!], $addedRows: [SQLResultRow!]) {
+  result: updateResultsDataBatch(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, updatedRows: $updatedRows, deletedRows: $deletedRows, addedRows: $addedRows) {
+    duration
+    results {
+      updateRowCount
+      resultSet {
+        id
         rows
       }
     }
@@ -1595,36 +1670,6 @@ export const QuerySqlDialectInfoDocument = `
   }
 }
     `;
-export const ReadDataFromContainerDocument = `
-    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter) {
-  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter) {
-    duration
-    statusMessage
-    results {
-      updateRowCount
-      sourceQuery
-      title
-      resultSet {
-        id
-        columns {
-          dataKind
-          entityName
-          fullTypeName
-          icon
-          label
-          maxLength
-          name
-          position
-          precision
-          scale
-          typeName
-        }
-        rows
-      }
-    }
-  }
-}
-    `;
 export const ChangeSessionLanguageDocument = `
     mutation changeSessionLanguage($locale: String!) {
   changeSessionLanguage(locale: $locale)
@@ -1730,34 +1775,14 @@ export const SqlResultCloseDocument = `
   result: sqlResultClose(connectionId: $connectionId, contextId: $contextId, resultId: $resultId)
 }
     `;
-export const UpdateResultsDataDocument = `
-    mutation updateResultsData($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $sourceRowValues: [Object]!, $values: Object) {
-  result: updateResultsData(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, updateRow: $sourceRowValues, updateValues: $values) {
-    duration
-    results {
-      updateRowCount
-      resultSet {
-        id
-        rows
-      }
-    }
-  }
-}
-    `;
 
 export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 
 const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
-      return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
-    },
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables): Promise<AsyncTaskCancelMutation> {
       return withWrapper(() => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables));
-    },
-    asyncTaskStatus(variables: AsyncTaskStatusMutationVariables): Promise<AsyncTaskStatusMutation> {
-      return withWrapper(() => client.request<AsyncTaskStatusMutation>(AsyncTaskStatusDocument, variables));
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
       return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));
@@ -1837,8 +1862,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navGetStructContainers(variables: NavGetStructContainersQueryVariables): Promise<NavGetStructContainersQuery> {
       return withWrapper(() => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables));
     },
+    asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
+      return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
+    },
+    asyncTaskStatus(variables: AsyncTaskStatusMutationVariables): Promise<AsyncTaskStatusMutation> {
+      return withWrapper(() => client.request<AsyncTaskStatusMutation>(AsyncTaskStatusDocument, variables));
+    },
     executeSqlQuery(variables: ExecuteSqlQueryMutationVariables): Promise<ExecuteSqlQueryMutation> {
       return withWrapper(() => client.request<ExecuteSqlQueryMutation>(ExecuteSqlQueryDocument, variables));
+    },
+    readDataFromContainer(variables: ReadDataFromContainerMutationVariables): Promise<ReadDataFromContainerMutation> {
+      return withWrapper(() => client.request<ReadDataFromContainerMutation>(ReadDataFromContainerDocument, variables));
+    },
+    updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
+      return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));
+    },
+    updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables): Promise<UpdateResultsDataBatchMutation> {
+      return withWrapper(() => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables));
     },
     metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables): Promise<MetadataGetNodeDdlQuery> {
       return withWrapper(() => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables));
@@ -1863,9 +1903,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables): Promise<QuerySqlDialectInfoQuery> {
       return withWrapper(() => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables));
-    },
-    readDataFromContainer(variables: ReadDataFromContainerMutationVariables): Promise<ReadDataFromContainerMutation> {
-      return withWrapper(() => client.request<ReadDataFromContainerMutation>(ReadDataFromContainerDocument, variables));
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
@@ -1899,9 +1936,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     sqlResultClose(variables: SqlResultCloseMutationVariables): Promise<SqlResultCloseMutation> {
       return withWrapper(() => client.request<SqlResultCloseMutation>(SqlResultCloseDocument, variables));
-    },
-    updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
-      return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));
     },
   };
 }

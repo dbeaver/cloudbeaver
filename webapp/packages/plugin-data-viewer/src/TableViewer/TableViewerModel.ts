@@ -59,7 +59,7 @@ export interface IRequestDataResult {
   statusMessage: string;
 }
 
-export class TableViewerModel implements ITableViewerModelOptions {
+export class TableViewerModel {
   tableId: string;
   connectionId: string;
   containerNodePath?: string;
@@ -72,16 +72,17 @@ export class TableViewerModel implements ITableViewerModelOptions {
     rowOffset: number,
     count: number
   ) => Promise<IRequestDataResult>;
-  saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
+  _saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   agGridModel: IAgGridModel = {
     chunkSize: this.getDefaultRowsCount(),
     enableRangeSelection: true,
     onRequestData: this.onRequestData.bind(this),
-    onCellEditingStopped: this.onCellEditingStopped.bind(this),
-    onEditSave: this.onSaveChanges.bind(this),
     onSortChanged: this.onSortChanged.bind(this),
-    onEditCancel: this.onEditCancel.bind(this),
+    onCellEditingStopped: this.onCellEditingStopped.bind(this),
+    onEditSave: this.saveChanges.bind(this),
+    onEditCancel: this.cancelChanges.bind(this),
+    isCellEdited: this.isCellEdited.bind(this),
     actions: null, // to be set by ag-grid-plugin
   };
 
@@ -129,7 +130,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.sourceName = options.sourceName;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
     this.requestDataAsync = options.requestDataAsync;
-    this.saveChanges = options.saveChanges;
+    this._saveChanges = options.saveChanges;
   }
 
   cancelFetch = () => {
@@ -188,8 +189,64 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this.requestStatusMessage = status;
   }
 
+  isEdited(): boolean {
+    return this.tableEditor.isEdited();
+  }
+
+  isCellEdited(rowIndex: number, column: string) {
+    return this.tableEditor.isCellEdited(rowIndex, column);
+  }
+
+  updateRows(rows: number[]) {
+    this.agGridModel.actions.updateRows(rows);
+  }
+
+  cancelChanges() {
+    const diffs = this.tableEditor.getChanges();
+    this.revertChanges(diffs);
+  }
+
+  async saveChanges(): Promise<void> {
+    const diffs = this.tableEditor.getChanges();
+
+    if (!diffs.length) {
+      return;
+    }
+
+    while (true) {
+      try {
+        await this.trySaveChanges(diffs);
+        return;
+      } catch (exception) {
+        let hasDetails = false;
+        let message = `${exception.name}: ${exception.message}`;
+
+        if (exception instanceof GQLError) {
+          hasDetails = exception.hasDetails();
+          message = exception.errorText;
+        }
+
+        const tryAgain = await this.commonDialogService.open(
+          ErrorDialog,
+          {
+            message,
+            onShowDetails: hasDetails
+              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
+              : undefined,
+          }
+        );
+
+        if (!tryAgain) {
+          return;
+        }
+      }
+    }
+  }
+
   private async onCellEditingStopped(rowNumber: number, column: string, value: any): Promise<void> {
     this.tableEditor.editCellValue(rowNumber, column, value);
+
+    this.updateRows([rowNumber]);
   }
 
   private async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
@@ -251,49 +308,6 @@ export class TableViewerModel implements ITableViewerModelOptions {
     });
   }
 
-  private onEditCancel() {
-    const diffs = this.tableEditor.getChanges();
-    this.revertChanges(diffs);
-  }
-
-  private async onSaveChanges(): Promise<void> {
-    const diffs = this.tableEditor.getChanges();
-
-    if (!diffs.length) {
-      return;
-    }
-
-    while (true) {
-      try {
-        await this.trySaveChanges(diffs);
-        return;
-      } catch (exception) {
-        let hasDetails = false;
-        let message = `${exception.name}: ${exception.message}`;
-
-        if (exception instanceof GQLError) {
-          hasDetails = exception.hasDetails();
-          message = exception.errorText;
-        }
-
-        const tryAgain = await this.commonDialogService.open(
-          ErrorDialog,
-          {
-            message,
-            onShowDetails: hasDetails
-              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
-              : undefined,
-          }
-        );
-
-        if (!tryAgain) {
-          this.revertChanges(diffs);
-          return;
-        }
-      }
-    }
-  }
-
   private onSortChanged(sorting: SortModel) {
     this.sortedColumns.clear();
     for (const sort of sorting) {
@@ -306,7 +320,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
     this._isLoaderVisible = true;
 
     try {
-      const data = await this.saveChanges(this, diffs);
+      const data = await this._saveChanges(this, diffs);
 
       const someRows = this.zipDiffAndResults(diffs, data.rows);
       this.tableEditor.cancelChanges();
@@ -314,6 +328,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
       this.updateAgGridRows(someRows);
       this.clearErrors();
       this.updateInfo(data.statusMessage, data.duration);
+      this.updateRows(diffs.map(r => r.rowIndex));
 
     } finally {
       this._isLoaderVisible = false;
@@ -328,6 +343,7 @@ export class TableViewerModel implements ITableViewerModelOptions {
       initialRows.set(diff.rowIndex, diff.source);
     }
     this.updateAgGridRows(initialRows);
+    this.updateRows(diffs.map(r => r.rowIndex));
   }
 
   /**
@@ -337,12 +353,13 @@ export class TableViewerModel implements ITableViewerModelOptions {
    * @param newRows
    */
   private zipDiffAndResults(diff: RowDiff[], newRows: TableRow[]): SomeTableRows {
+    const length = Math.min(diff.length, newRows.length);
     if (diff.length !== newRows.length) {
-      throw new Error('expected that new rows have same length as diff');
+      console.warn('Expected that new rows have same length as diff');
     }
     const newRowsMap: SomeTableRows = new Map();
 
-    for (let i = 0; i < diff.length; i++) {
+    for (let i = 0; i < length; i++) {
       newRowsMap.set(diff[i].rowIndex, newRows[i]);
     }
 

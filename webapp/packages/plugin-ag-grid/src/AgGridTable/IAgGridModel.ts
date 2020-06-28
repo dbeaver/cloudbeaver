@@ -30,11 +30,13 @@ export interface IAgGridModel {
   onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
   onCellEditingStopped?(rowNumber: number, column: string, value: any): void;
   onSortChanged?(sorting: SortModel): void;
+  isCellEdited(rowId: number, column: string): boolean;
   onEditSave(): void;
   onEditCancel(): void;
 }
 
 export interface IAgGridActions {
+  updateRows(rows: number[]): void;
   changeChunkSize(chunkSize: number): void;
   resetData(columns?: IAgGridCol[], rows?: AgGridRow[]): void;
   updateCellValue(rowNumber: number, column: string, value: any): void;

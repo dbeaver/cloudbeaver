@@ -35,7 +35,7 @@ export const tableFooterMenuStyles = composes(
   css`
     MenuTrigger, Button {
       height: 100%;
-      padding: 0 8px !important;
+      padding: 0 16px;
       display: flex;
       align-items: center;
       cursor: pointer;
