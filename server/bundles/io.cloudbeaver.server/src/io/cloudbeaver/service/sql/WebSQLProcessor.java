@@ -279,7 +279,7 @@ public class WebSQLProcessor {
                         updatedResultSet.setRows(new Object[][]{finalRow});
 
                         WebSQLQueryResults updateResults = new WebSQLQueryResults();
-                        updateResults.setUpdateRowCount((int) statistics.getRowsUpdated());
+                        updateResults.setUpdateRowCount(statistics.getRowsUpdated());
                         updateResults.setResultSet(updatedResultSet);
                         result.setDuration(statistics.getExecuteTime());
                         result.setResults(new WebSQLQueryResults[]{updateResults});
@@ -329,6 +329,13 @@ public class WebSQLProcessor {
                         DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
                         if (!CommonUtils.isEmpty(updatedRows)) {
+                            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+                            updatedResultSet.setResultsInfo(resultsInfo);
+                            updatedResultSet.setColumns(resultsInfo.getAttributes());
+                            long totalUpdateCount = 0;
+
+                            List <Object[]> resultRows = new ArrayList<>();
+
                             for (WebSQLResultsRow row : updatedRows) {
                                 Map<String, Object> updateValues = row.getUpdateValues();
                                 if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
@@ -362,20 +369,20 @@ public class WebSQLProcessor {
                                 updateBatch.add(rowValues);
                                 DBCStatistics statistics = updateBatch.execute(session);
 
-                                WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-                                updatedResultSet.setResultsInfo(resultsInfo);
-                                updatedResultSet.setColumns(resultsInfo.getAttributes());
-                                updatedResultSet.setRows(new Object[][]{finalRow});
-
-                                WebSQLQueryResults updateResults = new WebSQLQueryResults();
-                                updateResults.setUpdateRowCount((int) statistics.getRowsUpdated());
-                                updateResults.setResultSet(updatedResultSet);
-                                queryResults.add(updateResults);
+                                totalUpdateCount += statistics.getRowsUpdated();
                                 result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                                resultRows.add(finalRow);
                             }
+
+                            WebSQLQueryResults updateResults = new WebSQLQueryResults();
+                            updateResults.setUpdateRowCount(totalUpdateCount);
+                            updateResults.setResultSet(updatedResultSet);
+                            updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
+
+                            queryResults.add(updateResults);
                         }
 
-                        if (!CommonUtils.isEmpty(updatedRows)) {
+                        if (!CommonUtils.isEmpty(addedRows)) {
                             throw new DBCException("New row add is not supported");
                         }
 
