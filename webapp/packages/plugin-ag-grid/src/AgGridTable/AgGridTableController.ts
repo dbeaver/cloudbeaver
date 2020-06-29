@@ -16,6 +16,7 @@ import {
   ValueGetterParams,
   GridOptions,
   CellEditingStoppedEvent,
+  CellClassParams,
 } from 'ag-grid-community';
 import { SortChangedEvent } from 'ag-grid-community/dist/lib/events';
 import { computed, observable } from 'mobx';
@@ -303,15 +304,17 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
           return getObjectValue(params);
         }
 
-        const value = params.data[params.colDef.field || 'node.id'];
-        if (typeof value === 'string' && value.length > 1000) {
-          return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
-        }
-
-        return value;
+        return params.data[params.colDef.field || 'node.id'];
       },
       headerComponentParams: {
         icon: v.icon,
+      },
+      cellRenderer: (params: CellClassParams) => {
+        if (typeof params.value === 'string' && params.value.length > 1000) {
+          return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
+        }
+
+        return params.value;
       },
       cellClass: (params: any) => {
         const context: AgGridContext = params.context;
