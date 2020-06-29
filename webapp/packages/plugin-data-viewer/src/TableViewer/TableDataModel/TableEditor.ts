@@ -33,8 +33,21 @@ export class TableEditor {
       return;
     }
 
-    this.getOrCreateEditedRow(rowId)
+    return this.getOrCreateEditedRow(rowId)
       .setValue(column.position, value);
+  }
+
+  revertCellValue(rowId: number, columnKey: string) {
+    const column = this.dataModel
+      .getColumns()
+      .find(column => column.name === columnKey);
+
+    if (!column) {
+      return;
+    }
+
+    return this.getOrCreateEditedRow(rowId)
+      .revert(column.position);
   }
 
   isEdited(): boolean {
@@ -75,14 +88,13 @@ export class TableEditor {
   }
 
   private getOrCreateEditedRow(rowId: number): EditedRow {
-    let editedRow = this.editedRows.get(rowId);
-
-    if (!editedRow) {
-      editedRow = new EditedRow(rowId, this.dataModel.getRowByNumber(rowId));
-      this.editedRows.set(rowId, editedRow);
+    if (!this.editedRows.has(rowId)) {
+      this.editedRows.set(
+        rowId,
+        new EditedRow(rowId, this.dataModel.getRowByNumber(rowId))
+      );
     }
 
-    return editedRow;
+    return this.editedRows.get(rowId)!;
   }
-
 }

@@ -80,6 +80,7 @@ export class TableViewerModel {
     onRequestData: this.onRequestData.bind(this),
     onSortChanged: this.onSortChanged.bind(this),
     onCellEditingStopped: this.onCellEditingStopped.bind(this),
+    onRevertCellValue: this.revertCellValue.bind(this),
     onEditSave: this.saveChanges.bind(this),
     onEditCancel: this.cancelChanges.bind(this),
     isCellEdited: this.isCellEdited.bind(this),
@@ -201,6 +202,14 @@ export class TableViewerModel {
     this.agGridModel.actions.updateRows(rows);
   }
 
+  revertCellValue(rowNumber: number, column: string) {
+    this.agGridModel.actions?.updateRowValue(
+      rowNumber,
+      this.tableEditor.revertCellValue(rowNumber, column)!
+    );
+    this.updateRows([rowNumber]);
+  }
+
   cancelChanges() {
     const diffs = this.tableEditor.getChanges();
     this.revertChanges(diffs);
@@ -243,7 +252,7 @@ export class TableViewerModel {
     }
   }
 
-  private async onCellEditingStopped(rowNumber: number, column: string, value: any): Promise<void> {
+  private onCellEditingStopped(rowNumber: number, column: string, value: any) {
     this.tableEditor.editCellValue(rowNumber, column, value);
 
     this.updateRows([rowNumber]);

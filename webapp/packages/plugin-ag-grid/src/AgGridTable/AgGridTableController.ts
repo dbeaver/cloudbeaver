@@ -45,6 +45,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private readonly context: AgGridContext = {
     selection: this.selection,
     isCellEdited: this.isCellEdited.bind(this),
+    revertCellValue: this.revertCellValue.bind(this),
     onEditSave: this.onEditSave.bind(this),
     onEditCancel: this.onEditCancel.bind(this),
   }
@@ -161,10 +162,15 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.refresh();
   }
 
+  private revertCellValue(rowIndex: number, colId: string) {
+    if (this.gridModel.onRevertCellValue) {
+      this.gridModel.onRevertCellValue(rowIndex, colId);
+    }
+  }
+
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
     if (this.gridModel.onCellEditingStopped) {
       this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
-
     }
   }
 
@@ -269,7 +275,12 @@ export const INDEX_COLUMN_DEF: ColDef = {
   suppressMenu: true,
   editable: false,
   sortable: false,
-  cellRenderer: row => row.rowIndex + 1,
+  cellRenderer: (params) => {
+    if (!params.data) {
+      return 'Loading...';
+    }
+    return params.rowIndex + 1;
+  },
 };
 
 function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
@@ -282,7 +293,23 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       colId: v.name,
       headerName: v.label,
       field: `${v.position}`,
-      valueGetter: v.dataKind === 'OBJECT' ? getObjectValue : undefined,
+      type: v.dataKind,
+      valueGetter: (params: ValueGetterParams) => {
+        if (!params.data) {
+          return '';
+        }
+
+        if (v.dataKind === 'OBJECT') {
+          return getObjectValue(params);
+        }
+
+        const value = params.data[params.colDef.field || 'node.id'];
+        if (typeof value === 'string' && value.length > 1000) {
+          return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
+        }
+
+        return value;
+      },
       headerComponentParams: {
         icon: v.icon,
       },
