@@ -25,7 +25,6 @@ export class EditedRow {
   }
 
   setValue(columnIndex: number, value: any) {
-
     if (this.source[columnIndex] !== value) {
       this.editedCells.add(columnIndex);
     } else {
@@ -33,6 +32,14 @@ export class EditedRow {
     }
 
     this.newRow[columnIndex] = value;
+    return this.newRow;
+  }
+
+  revert(columnIndex: number) {
+    this.editedCells.delete(columnIndex);
+    this.newRow[columnIndex] = this.source[columnIndex];
+
+    return this.newRow;
   }
 
   isEdited(): boolean {

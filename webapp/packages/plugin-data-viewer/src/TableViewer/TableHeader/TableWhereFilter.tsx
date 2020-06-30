@@ -63,10 +63,11 @@ export const TableWhereFilter = observer(function TableWhereFilter({
       <InlineEditor
         value={context.getQueryWhereFilter() || ''}
         onSave={() => context.applyQueryFilters()}
-        onReject={resetFilter}
+        onUndo={resetFilter}
         onChange={handleChange}
         placeholder={translate('table_header_sql_expression')}
         controlsPosition='inside'
+        edited={!!context.getQueryWhereFilter()}
         simple
       />
     </SubmittingForm>

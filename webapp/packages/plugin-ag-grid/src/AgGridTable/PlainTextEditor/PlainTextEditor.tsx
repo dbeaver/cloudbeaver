@@ -31,6 +31,7 @@ const styles = css`
 
 export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorParams>(
   function PlainTextEditor(props, ref) {
+    const [_, forceUpdate] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
     const [initValue] = useState(() => {
       if (props.keyPress === KEY_BACKSPACE || props.keyPress === KEY_DELETE) {
@@ -55,11 +56,25 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
 
     const handleSave = useCallback(() => props.stopEditing(), [props.stopEditing]);
 
-    const handleReject = useCallback(() => props.api?.stopEditing(true), [props.api?.stopEditing]);
+    const handleReject = useCallback(() => {
+      props.api?.stopEditing(true);
+    }, [props.api?.stopEditing]);
+
+    const handleUndo = useCallback(() => {
+      props.api?.stopEditing(true);
+
+      setTimeout(
+        () => context.revertCellValue(props.rowIndex, props.column.getColId()),
+        1
+      );
+    }, [props.api?.stopEditing]);
+
     const handleChange = useCallback((newValue: string) => {
       value.current = newValue;
+      forceUpdate(value.current);
     }, []);
 
+    const isEdited = context.isCellEdited(props.rowIndex, props.column.getColId()) || value.current !== initValue;
     const isLastColumn = props.columnApi?.getAllGridColumns().slice(-1)[0] === props.column;
     const isLastRow = props.rowIndex > 0 && ((props.api?.getInfiniteRowCount() || -1) - 1 === props.rowIndex);
     let controlsPosition: InlineEditorControls = 'right';
@@ -71,11 +86,16 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
     return styled(styles)(
       <editor as="div">
         <InlineEditor
+          type={props.colDef.type === 'NUMERIC' ? 'number' : 'text'}
           value={value.current}
           onSave={handleSave}
           onReject={handleReject}
           onChange={handleChange}
+          onUndo={handleUndo}
           controlsPosition={controlsPosition}
+          edited={isEdited}
+          hideSave
+          hideCancel
         />
       </editor>
     );

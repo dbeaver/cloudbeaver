@@ -122,6 +122,15 @@ export const InlineEditorStyles = composes(
       display: block;
       width: 100%;
     }
+
+    &[use|disabled] {
+      cursor: default;
+      opacity: 0.65;
+
+      &:before {
+        display: none;
+      }
+    }
   }
 `
 );

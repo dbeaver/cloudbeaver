@@ -24,22 +24,32 @@ export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside'
 
 export type InlineEditorProps = {
   value: string;
+  type?: string;
   placeholder?: string;
   controlsPosition?: InlineEditorControls;
   simple?: boolean;
+  hideSave?: boolean;
+  hideCancel?: boolean;
+  edited?: boolean;
   onChange(value: string): void;
   onSave(): void;
-  onReject(): void;
+  onReject?(): void;
+  onUndo(): void;
   className?: string;
 }
 
 export const InlineEditor = observer(function InlineEditor({
   value,
+  type = 'text',
   placeholder,
   controlsPosition = 'right',
   simple,
+  hideSave,
+  hideCancel,
+  edited = false,
   onChange,
   onSave,
+  onUndo,
   onReject,
   className,
 }: InlineEditorProps) {
@@ -55,7 +65,7 @@ export const InlineEditor = observer(function InlineEditor({
     if (typeof newValue === 'string') {
       handleChange(newValue);
       onSave();
-    } else {
+    } else if (onReject) {
       onReject();
     }
   }, [value, commonDialogService, onSave, onReject, handleChange]);
@@ -64,7 +74,10 @@ export const InlineEditor = observer(function InlineEditor({
     if (event.key === 'Enter') {
       onSave();
     }
-  }, [onSave]);
+    if (event.key === 'Esc' && onReject) {
+      onReject();
+    }
+  }, [onSave, onReject]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -75,7 +88,7 @@ export const InlineEditor = observer(function InlineEditor({
     <editor as="div" className={className}>
       <editor-container as="div">
         <input
-          type="text"
+          type={type}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -84,8 +97,9 @@ export const InlineEditor = observer(function InlineEditor({
         />
       </editor-container>
       <editor-actions as="div" {...use({ position: controlsPosition })}>
-        <editor-action as="div" onClick={onSave}><Icon name="apply" viewBox="0 0 12 10" /></editor-action>
-        <editor-action as="div" onClick={onReject}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>
+        {!hideSave && <editor-action as="div" onClick={onSave}><Icon name="apply" viewBox="0 0 12 10" /></editor-action>}
+        {!hideCancel && onReject && <editor-action as="div" onClick={onReject}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>}
+        {onUndo && <editor-action as="div" onClick={edited ? onUndo : () => {}} {...use({ disabled: !edited })}><Icon name="reject" viewBox="0 0 11 11" /></editor-action>}
         {!simple && <editor-action as="div" onClick={handlePopup}><Icon name="edit" viewBox="0 0 13 13" /></editor-action>}
       </editor-actions>
     </editor>

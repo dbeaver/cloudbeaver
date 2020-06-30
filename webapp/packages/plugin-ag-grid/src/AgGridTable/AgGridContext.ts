@@ -11,6 +11,7 @@ import { TableSelection } from './TableSelection/TableSelection';
 export type AgGridContext = {
   selection: TableSelection;
   isCellEdited(rowId: number, column: string): boolean;
+  revertCellValue(rowNumber: number, column: string): void;
   onEditSave(): void;
   onEditCancel(): void;
 }

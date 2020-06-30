@@ -29,6 +29,7 @@ export interface IAgGridModel {
   // hooks
   onRequestData(rowOffset: number, count: number, options?: IRequestDataOptions): Promise<IRequestedData>;
   onCellEditingStopped?(rowNumber: number, column: string, value: any): void;
+  onRevertCellValue?(rowNumber: number, column: string): void;
   onSortChanged?(sorting: SortModel): void;
   isCellEdited(rowId: number, column: string): boolean;
   onEditSave(): void;
