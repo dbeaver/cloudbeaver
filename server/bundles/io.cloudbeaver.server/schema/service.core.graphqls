@@ -96,21 +96,30 @@ type DriverInfo {
     driverInfoURL: String
     driverPropertiesURL: String
     embedded: Boolean
-    anonymousAccess: Boolean
-    allowsEmptyPassword: Boolean
+
+    # this fields must be removed and be replaced by DriverAuthModel
+    anonymousAccess: Boolean @deprecated
+    allowsEmptyPassword: Boolean @deprecated
+
     licenseRequired: Boolean
     license: String
     custom: Boolean
     # Driver score for ordering, biggest first
     promotedScore: Int
 
+    # Never used?
     connectionProperties: Object
     defaultConnectionProperties: Object
+
     # Driver properties.
     # Note: it is expensive property and it may produce database server roundtrips.
     # Call it only when you really need it.
     driverProperties: [DriverPropertyInfo]
     driverParameters: Object
+
+    authModels: [DriverAuthModel!]!
+    # Can be null? (only anonymous access)
+    defaultAuthModelId: ID
 }
 
 type DriverPropertyInfo {
@@ -124,7 +133,7 @@ type DriverPropertyInfo {
 }
 
 # Data source info is a description of some remote database. Doesn't include user credentials
-type DataSourceInfo {
+type DataSourceInfo  @deprecated {
     id: ID!
     driverId: ID!
     name: String!
@@ -139,31 +148,52 @@ type DataSourceInfo {
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
 input ConnectionConfig {
+    driverId: ID
     name: String
     description: String
 
     # ID of predefined datasource
-    dataSourceId: ID
+    dataSourceId: ID @deprecated
 
     # Custom connection parameters (all optional)
 
-    # Driver ID
-    driverId: ID
-    # Host
     host: String
-    # Port
     port: String
-    # Databae name
     databaseName: String
-    # Databae name
+    # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
     # Properties
     properties: Object
 
     # User credentials
 
-    userName: String
-    userPassword: String
+    userName: String @deprecated
+    userPassword: String @deprecated
+
+    authModelId: ID
+    credentials: Object
+}
+
+type DriverAuthParameter {
+    id: ID!
+    displayName: String!
+    description: String
+    
+    # if true and possibleValues not empty field must be shown as combo box
+    customValue: Boolean!
+    # if array not empty field must be shown as selector
+    possibleValues: [String!]!
+    # field must be encrypted somehow
+    encrypted: Boolean!
+    # field can't be null or not set
+    requred: Boolean!
+}
+
+type DriverAuthModel {
+    authModelId: ID!
+    # By default auth requred
+    authRequred: Boolean!
+    parameters: [DriverAuthParameter!]!
 }
 
 # Connection instance
@@ -181,6 +211,11 @@ type ConnectionInfo {
     connectionError: ServerError
     serverVersion: String
     clientVersion: String
+
+    # Overrides authRequred parameter of DriverAuthModel
+    authRequred: Boolean!
+    # Can be null? (anonymous access)
+    authModelId: ID
 
     # Supported features (provided etc)
     features: [ String! ]!
@@ -211,10 +246,16 @@ extend type Query {
     driverList( id: ID ): [ DriverInfo! ]!
 
     # Get list of predefined data sources
-    dataSourceList: [ DataSourceInfo! ]!
+    dataSourceList: [ DataSourceInfo! ]! @deprecated
+
+    # Get predefined connections 
+    predefinedConnections: [ ConnectionInfo! ]!
 
     # Return connection state
-    connectionState( id: ID! ): ConnectionInfo!
+    connectionState( id: ID! ): ConnectionInfo! @deprecated
+
+    # Return connection info
+    connectionInfo( id: ID! ): ConnectionInfo!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 
@@ -240,10 +281,19 @@ extend type Mutation {
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Connect to database
-    openConnection( config: ConnectionConfig! ): ConnectionInfo!
+    openConnection( config: ConnectionConfig! ): ConnectionInfo! @deprecated
+
+    # Connect to database
+    openConnectionNew( id: ID!, authModelId: ID, credentials: Object ): ConnectionInfo!
 
     # Disconnect from database
-    closeConnection( id: ID! ): Boolean!
+    closeConnection( id: ID! ): Boolean! @deprecated
+
+    # Disconnect from database
+    closeConnectionNew( id: ID! ): ConnectionInfo!
+
+    # Remove connection and disconnects from the database if needed
+    deleteConnection( id: ID! ): Boolean!
 
     #### Generic async functions
 
