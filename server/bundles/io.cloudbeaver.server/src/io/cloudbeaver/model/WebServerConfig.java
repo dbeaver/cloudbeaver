@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -102,6 +103,11 @@ public class WebServerConfig {
     @Property
     public Map<String, Object> getProductConfiguration() {
         return CBPlatform.getInstance().getApplication().getProductConfiguration();
+    }
+
+    @Property
+    public DBNBrowseSettings getNavigatorSettings() {
+        return application.getDefaultNavigatorSettings();
     }
 
 }

@@ -21,8 +21,8 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +126,7 @@ public class WebConnectionInfo {
         this.clientVersion = clientVersion;
     }
 
-    @Association
+    @Property
     public String[] getFeatures() {
         List<String> features = new ArrayList<>();
 
@@ -147,6 +147,11 @@ public class WebConnectionInfo {
         }
 
         return features.toArray(new String[0]);
+    }
+
+    @Property
+    public DBNBrowseSettings getNavigatorSettings() {
+        return dataSourceContainer.getNavigatorSettings();
     }
 
 }

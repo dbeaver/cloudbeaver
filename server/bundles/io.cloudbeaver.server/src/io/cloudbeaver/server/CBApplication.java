@@ -28,7 +28,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
@@ -68,6 +70,8 @@ public class CBApplication extends BaseApplicationImpl {
     private CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
     private CBDatabase database;
     private CBSecurityController securityController;
+
+    private DBNBrowseSettings defaultNavigatorSettings = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -339,5 +343,13 @@ public class CBApplication extends BaseApplicationImpl {
 
     public boolean isDevelMode() {
         return develMode;
+    }
+
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
+        return defaultNavigatorSettings;
+    }
+
+    public void setDefaultNavigatorSettings(DBNBrowseSettings defaultNavigatorSettings) {
+        this.defaultNavigatorSettings = defaultNavigatorSettings;
     }
 }

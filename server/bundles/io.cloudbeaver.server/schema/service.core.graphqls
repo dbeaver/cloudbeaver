@@ -63,6 +63,7 @@ type ServerConfig {
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
+    defaultNavigatorSettings: NavigatorSettings!
 }
 
 type SessionInfo {
@@ -133,7 +134,8 @@ type DriverPropertyInfo {
 }
 
 # Data source info is a description of some remote database. Doesn't include user credentials
-type DataSourceInfo  @deprecated {
+# Deprectaed. Use ConnectionInfo instead
+type DataSourceInfo {
     id: ID!
     driverId: ID!
     name: String!
@@ -153,7 +155,7 @@ input ConnectionConfig {
     description: String
 
     # ID of predefined datasource
-    dataSourceId: ID @deprecated
+    dataSourceId: ID # deprecated
 
     # Custom connection parameters (all optional)
 
@@ -167,8 +169,8 @@ input ConnectionConfig {
 
     # User credentials
 
-    userName: String @deprecated
-    userPassword: String @deprecated
+    userName: String # deprecated
+    userPassword: String # deprecated
 
     authModelId: ID
     credentials: Object
@@ -196,6 +198,26 @@ type DriverAuthModel {
     parameters: [DriverAuthParameter!]!
 }
 
+type NavigatorSettings {
+    showSystemObjects: Boolean!
+    showUtilityObjects: Boolean!
+    showOnlyEntities: Boolean!
+    mergeEntities: Boolean!
+    hideFolders: Boolean!
+    hideSchemas: Boolean!
+    hideVirtualModel: Boolean!
+}
+
+input NavigatorSettingsInput {
+    showSystemObjects: Boolean!
+    showUtilityObjects: Boolean!
+    showOnlyEntities: Boolean!
+    mergeEntities: Boolean!
+    hideFolders: Boolean!
+    hideSchemas: Boolean!
+    hideVirtualModel: Boolean!
+}
+
 # Connection instance
 type ConnectionInfo {
     id: ID!
@@ -219,6 +241,7 @@ type ConnectionInfo {
 
     # Supported features (provided etc)
     features: [ String! ]!
+    navigatorSettings: NavigatorSettings!
 }
 
 type LogEntry {
@@ -294,6 +317,12 @@ extend type Mutation {
 
     # Remove connection and disconnects from the database if needed
     deleteConnection( id: ID! ): Boolean!
+
+    # Changes navigator settings for connection
+    setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): Boolean!
+
+    # Changes default navigator settings
+    setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
 
     #### Generic async functions
 

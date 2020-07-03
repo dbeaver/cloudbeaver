@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -82,6 +83,13 @@ public interface DBWServiceCore extends DBWService {
     boolean closeConnection(WebSession webSession, String connectionId) throws DBWebException;
 
     ///////////////////////////////////////////
+    // Navigator settings
+
+    boolean setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException;
+
+    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings);
+
+    ///////////////////////////////////////////
     // Async tasks
 
     @WebAction
@@ -89,4 +97,5 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException;
+
 }

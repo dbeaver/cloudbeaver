@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
@@ -228,6 +229,19 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         return disconnected;
+    }
+
+    @Override
+    public boolean setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException {
+        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(id);
+        ((DataSourceDescriptor)connectionInfo.getDataSourceContainer()).setNavigatorSettings(settings);
+        return true;
+    }
+
+    @Override
+    public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
+        CBApplication.getInstance().setDefaultNavigatorSettings(settings);
+        return true;
     }
 
     @NotNull
