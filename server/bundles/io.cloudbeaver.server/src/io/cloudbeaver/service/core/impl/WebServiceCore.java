@@ -155,6 +155,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(config.getDescription())) {
             newDataSource.setDescription(config.getDescription());
         }
+        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
         try {
             newDataSource.connect(webSession.getProgressMonitor(), true, false);
         } catch (DBException e) {
