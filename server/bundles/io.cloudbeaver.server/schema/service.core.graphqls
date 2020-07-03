@@ -118,7 +118,7 @@ type DriverInfo {
     driverProperties: [DriverPropertyInfo]
     driverParameters: Object
 
-    authModels: [DriverAuthModel!]!
+    authModels: [DatabaseAuthModel!]!
     # Can be null? (only anonymous access)
     defaultAuthModelId: ID
 }
@@ -176,26 +176,29 @@ input ConnectionConfig {
     credentials: Object
 }
 
-type DriverAuthParameter {
+type DatabaseAuthParameter {
     id: ID!
     displayName: String!
     description: String
     
-    # if true and possibleValues not empty field must be shown as combo box
-    customValue: Boolean!
     # if array not empty field must be shown as selector
     possibleValues: [String!]!
+    # if true and possibleValues not empty field must be shown as combo box
+    editable: Boolean!
     # field must be encrypted somehow
     encrypted: Boolean!
-    # field can't be null or not set
+    # field can't be null or empty
     requred: Boolean!
 }
 
-type DriverAuthModel {
-    authModelId: ID!
+type DatabaseAuthModel {
+    id: ID!
+    displayName: String!
+    description: String
+    icon: String
+
     # By default auth requred
-    authRequred: Boolean!
-    parameters: [DriverAuthParameter!]!
+    parameters: [DatabaseAuthParameter!]!
 }
 
 type NavigatorSettings {
@@ -235,7 +238,7 @@ type ConnectionInfo {
     clientVersion: String
 
     # Overrides authRequred parameter of DriverAuthModel
-    authRequred: Boolean!
+    authRequired: Boolean!
     # Can be null? (anonymous access)
     authModelId: ID
 

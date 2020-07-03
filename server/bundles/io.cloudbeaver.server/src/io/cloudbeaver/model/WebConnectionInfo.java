@@ -154,4 +154,13 @@ public class WebConnectionInfo {
         return dataSourceContainer.getNavigatorSettings();
     }
 
+    @Property
+    public String getAuthModelId() {
+        return dataSourceContainer.getConnectionConfiguration().getAuthModelId();
+    }
+
+    public boolean getAuthRequired() {
+        return false;
+    }
+
 }

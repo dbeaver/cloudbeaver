@@ -22,11 +22,16 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web driver configuration
@@ -160,11 +165,8 @@ public class WebDatabaseDriverConfig {
                 properties,
                 cfg.getProperties());
 
-            WebPropertyInfo[] result = new WebPropertyInfo[properties.length];
-            for (int i = 0; i < properties.length; i++) {
-                result[i] = new WebPropertyInfo(webSession, properties[i], propertySource);
-            }
-            return result;
+            return Arrays.stream(properties)
+                .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error reading driver properties", e);
         }
@@ -173,6 +175,17 @@ public class WebDatabaseDriverConfig {
     @Property
     public Map<String, Object> getDriverParameters() {
         return driver.getDriverParameters();
+    }
+
+    @Property
+    public List<WebDatabaseAuthModel> getAuthModels() {
+        return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
+            .map(WebDatabaseAuthModel::new).collect(Collectors.toList());
+    }
+
+    @Property
+    public String getDefaultAuthModelId() {
+        return AuthModelDatabaseNative.ID;
     }
 
 }
