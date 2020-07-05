@@ -112,7 +112,7 @@ type DatabaseAuthModel {
     description: String
     icon: String
 
-    properties: [ObjectPropertyInfo!]
+    properties: [ObjectPropertyInfo!]!
 }
 
 type DriverInfo {
@@ -297,17 +297,17 @@ extend type Mutation {
     # Refreshes session on server and returns its state
     changeSessionLanguage(locale: String): Boolean
 
-    # Create new connection
+    # Create new custom connection
     createConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
-    # Connect to database
+    # Create connection from template
     openConnection( config: ConnectionConfig! ): ConnectionInfo! @deprecated
 
-    # Connect to database
-    openConnectionNew( id: ID!, authModelId: ID, credentials: Object ): ConnectionInfo!
+    # Initiate existing connection
+    initConnection( id: ID!, credentials: Object ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID! ): Boolean! @deprecated

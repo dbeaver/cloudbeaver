@@ -17,6 +17,8 @@
 package io.cloudbeaver.service.core.impl;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
@@ -29,6 +31,8 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -52,6 +56,8 @@ import java.util.stream.Collectors;
 public class WebServiceCore implements DBWServiceCore {
 
     private static final Log log = Log.getLog(WebServiceCore.class);
+
+    private static final Gson gson = new GsonBuilder().create();
 
     @Override
     public WebServerConfig getServerConfig() {
@@ -173,6 +179,34 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
+
+        return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties) throws DBWebException {
+        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
+
+        DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
+        if (dataSourceContainer.isConnected()) {
+            throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
+        }
+
+        if (!CommonUtils.isEmpty(authProperties)) {
+            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
+            DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+
+            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
+
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        }
+
+        try {
+            dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
+        } catch (DBException e) {
+            throw new DBWebException("Error connecting to database", e);
+        }
 
         return connectionInfo;
     }

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -59,7 +60,7 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
-    public WebPropertyInfo[] getProperties() {
+    public WebPropertyInfo[] getProperties() throws DBWebException {
         DBPPropertySource credentialsSource = model.createCredentialsSource(null);
         return Arrays.stream(credentialsSource.getProperties())
             .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))

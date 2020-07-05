@@ -114,6 +114,7 @@ public class WebConnectionInfo {
         this.connectTime = connectTime;
     }
 
+    @Property
     public String getServerVersion() {
         return serverVersion;
     }
@@ -122,6 +123,7 @@ public class WebConnectionInfo {
         this.serverVersion = serverVersion;
     }
 
+    @Property
     public String getClientVersion() {
         return clientVersion;
     }
@@ -160,7 +162,8 @@ public class WebConnectionInfo {
 
     @Property
     public boolean isAuthNeeded() {
-        return !dataSourceContainer.isSavePassword() &&
+        return !dataSourceContainer.isConnected() &&
+            !dataSourceContainer.isSavePassword() &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
     }
 
