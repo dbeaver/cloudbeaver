@@ -82,16 +82,18 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDataSourceConfig> getGlobalDataSources() throws DBWebException {
+    public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
 
         List<WebDataSourceConfig> result = new ArrayList<>();
         DBPDataSourceRegistry dsRegistry = WebServiceUtils.getDataSourceRegistry();
 
         for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
-            if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver()) && !ds.isProvided()) {
-                result.add(new WebDataSourceConfig(ds));
-            } else {
-                log.debug("Global datasource '" + ds.getName() + "' ignored - driver is not applicable");
+            if (ds.isTemplate()) {
+                if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                    result.add(new WebDataSourceConfig(ds));
+                } else {
+                    log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
+                }
             }
         }
 

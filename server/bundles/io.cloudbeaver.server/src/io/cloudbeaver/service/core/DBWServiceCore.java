@@ -42,7 +42,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebDatabaseAuthModel> getAuthModels(WebSession webSession);
 
     @WebAction
-    List<WebDataSourceConfig> getGlobalDataSources() throws DBWebException;
+    List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
 
     @WebAction(requirePermissions = {})
     String[] getSessionPermissions(WebSession webSession) throws DBWebException;

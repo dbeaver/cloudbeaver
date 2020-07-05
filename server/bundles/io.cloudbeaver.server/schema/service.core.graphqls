@@ -79,8 +79,8 @@ type ServerConfig {
 
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean
-    supportsPredefinedConnections: Boolean
-    supportsProvidedConnections: Boolean
+    supportsPredefinedConnections: Boolean @deprecated # Supported always
+    supportsProvidedConnections: Boolean @deprecated # Supported always
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
@@ -269,8 +269,10 @@ extend type Query {
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
 
-    # Get list of predefined data sources
+    # Get list of predefined data sources. Replaced with templateDataSources
     dataSourceList: [ DataSourceInfo! ]! @deprecated
+
+    templateDataSources: [ DataSourceInfo! ]!
 
     authModels: [DatabaseAuthModel!]!
 
