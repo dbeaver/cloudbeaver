@@ -106,6 +106,15 @@ type SessionInfo {
 # Drivers and connections
 ####################################################
 
+type DatabaseAuthModel {
+    id: ID!
+    displayName: String!
+    description: String
+    icon: String
+
+    properties: [ObjectPropertyInfo!]
+}
+
 type DriverInfo {
     id: ID!
     name: String
@@ -191,16 +200,6 @@ input ConnectionConfig {
     credentials: Object
 }
 
-type DatabaseAuthModel {
-    id: ID!
-    displayName: String!
-    description: String
-    icon: String
-
-    # By default auth requred
-    parameters: [ObjectPropertyInfo!]!
-}
-
 type NavigatorSettings {
     showSystemObjects: Boolean!
     showUtilityObjects: Boolean!
@@ -237,10 +236,9 @@ type ConnectionInfo {
     serverVersion: String
     clientVersion: String
 
-    # Overrides authRequred parameter of DriverAuthModel
-    authRequired: Boolean!
     # Can be null? (anonymous access)
     authModelId: ID
+    authProperties: [ObjectPropertyInfo!]
 
     # Supported features (provided etc)
     features: [ String! ]!

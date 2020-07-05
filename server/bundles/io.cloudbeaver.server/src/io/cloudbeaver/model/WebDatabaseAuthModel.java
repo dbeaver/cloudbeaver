@@ -54,7 +54,8 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
-    public Map<String, Object> getParameters() {
+    public Map<String, Object> getProperties() {
+
         return null;
     }
 
