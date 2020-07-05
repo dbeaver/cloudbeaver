@@ -159,6 +159,12 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isAuthNeeded() {
+        return !dataSourceContainer.isSavePassword() &&
+            !dataSourceContainer.getDriver().isAnonymousAccess();
+    }
+
+    @Property
     public String getAuthModel() {
         return dataSourceContainer.getConnectionConfiguration().getAuthModelId();
     }

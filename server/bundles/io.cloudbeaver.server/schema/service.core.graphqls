@@ -236,7 +236,7 @@ type ConnectionInfo {
     serverVersion: String
     clientVersion: String
 
-    # Can be null? (anonymous access)
+    authNeeded: Boolean!
     authModel: ID
     authProperties: [ObjectPropertyInfo!]
 
@@ -273,9 +273,6 @@ extend type Query {
     dataSourceList: [ DataSourceInfo! ]! @deprecated
 
     authModels: [DatabaseAuthModel!]!
-
-    # Get predefined connections
-    predefinedConnections: [ ConnectionInfo! ]!
 
     # Return connection state
     connectionState( id: ID! ): ConnectionInfo! @deprecated
