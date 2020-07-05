@@ -180,7 +180,7 @@ public class WebDatabaseDriverConfig {
     @Property
     public List<WebDatabaseAuthModel> getAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
-            .map(WebDatabaseAuthModel::new).collect(Collectors.toList());
+            .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
     }
 
     @Property

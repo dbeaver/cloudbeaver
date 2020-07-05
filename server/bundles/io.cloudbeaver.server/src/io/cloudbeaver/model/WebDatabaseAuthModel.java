@@ -17,19 +17,22 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * WebDatabaseAuthModel
  */
 public class WebDatabaseAuthModel {
 
+    private WebSession webSession;
     private DBPAuthModelDescriptor model;
 
-    public WebDatabaseAuthModel(DBPAuthModelDescriptor model) {
+    public WebDatabaseAuthModel(WebSession webSession, DBPAuthModelDescriptor model) {
+        this.webSession = webSession;
         this.model = model;
     }
 
@@ -54,9 +57,9 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
-    public Map<String, Object> getProperties() {
-
-        return null;
+    public WebPropertyInfo[] getProperties() {
+        return Arrays.stream(model.getAuthProperties())
+            .map(p -> new WebPropertyInfo(webSession, p)).toArray(WebPropertyInfo[]::new);
     }
 
 
