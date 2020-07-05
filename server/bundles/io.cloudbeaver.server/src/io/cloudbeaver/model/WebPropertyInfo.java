@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
-import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Array;
@@ -122,60 +121,12 @@ public class WebPropertyInfo {
 
     @Property
     public String[] getFeatures() {
-        List<String> features = new ArrayList<>();
-        if (property instanceof ObjectPropertyDescriptor) {
-            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor)property;
-            if (opd.isRequired()) features.add("required");
-            if (opd.isSpecific()) features.add("specific");
-            if (opd.isOptional()) features.add("optional");
-            if (opd.isHidden()) features.add("hidden");
-            if (opd.isRemote()) features.add("remote");
-
-            if (opd.isDateTime()) features.add("datetme");
-            if (opd.isNumeric()) features.add("numeric");
-            if (opd.isNameProperty()) features.add("name");
-
-            if (opd.isMultiLine()) features.add("multiline");
-            if (opd.isExpensive()) features.add("expensive");
-            if (opd.isEditPossible()) features.add("editPossible");
-            if (opd.isLinkPossible()) features.add("linkPossible");
-            if (opd.isViewable()) features.add("viewable");
-        }
-        return features.toArray(new String[0]);
+        String[] features = property.getFeatures();
+        return features == null ? new String[0] : features;
     }
 
     public boolean hasFeature(@NotNull String feature) {
-        if (property instanceof ObjectPropertyDescriptor) {
-            switch (feature) {
-                case "required":
-                    return property.isRequired();
-                case "specific":
-                    return ((ObjectPropertyDescriptor) property).isSpecific();
-                case "optional":
-                    return ((ObjectPropertyDescriptor) property).isOptional();
-                case "hidden":
-                    return ((ObjectPropertyDescriptor) property).isHidden();
-
-                case "datetme":
-                    return ((ObjectPropertyDescriptor) property).isDateTime();
-                case "numeric":
-                    return ((ObjectPropertyDescriptor) property).isNumeric();
-                case "name":
-                    return ((ObjectPropertyDescriptor) property).isNameProperty();
-
-                case "multiline":
-                    return ((ObjectPropertyDescriptor) property).isMultiLine();
-                case "expensive":
-                    return ((ObjectPropertyDescriptor) property).isExpensive();
-                case "editPossible":
-                    return ((ObjectPropertyDescriptor) property).isEditPossible();
-                case "linkPossible":
-                    return ((ObjectPropertyDescriptor) property).isLinkPossible();
-                case "viewable":
-                    return ((ObjectPropertyDescriptor) property).isViewable();
-            }
-        }
-        return false;
+        return property.hasFeature(feature);
     }
 
     public boolean hasAnyFeature(@NotNull List<String> features) {
