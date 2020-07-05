@@ -167,7 +167,6 @@
         <setEntry value="com.dbeaver.db.mongodb@default:default"/>
         <setEntry value="com.dbeaver.db.postgresql.krb5@default:default"/>
         <setEntry value="com.dbeaver.db.prestodb.krb5@default:default"/>
-        <setEntry value="com.dbeaver.db.prestosql.krb5@default:default"/>
         <setEntry value="com.dbeaver.db.redis@default:default"/>
         <setEntry value="com.dbeaver.db.sqlite.crypt@default:default"/>
         <setEntry value="com.dbeaver.ee.runtime.net@default:default"/>
