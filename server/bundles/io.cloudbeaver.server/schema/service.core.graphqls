@@ -3,6 +3,31 @@
 # General stuff
 ####################################################
 
+# Property
+
+type ObjectPropertyInfo {
+    # ID
+    id: String
+    # Human readable name
+    displayName: String
+    # Property description
+    description: String
+    # Property category (may be used if object has a lot of properties)
+    category: String
+    # Property data type (int, String, etc)
+    dataType: String
+
+    # Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables)
+    value: Object
+
+    # List of values this property can take. Makes sense only for enumerable properties
+    validValues: [ Object ]
+    # Default property value
+    defaultValue: Object
+    # Supported features (system, hidden, inherited, foreign, expensive, etc)
+    features: [ String! ]!
+}
+
 # Async types
 
 type AsyncTaskInfo {
@@ -115,22 +140,12 @@ type DriverInfo {
     # Driver properties.
     # Note: it is expensive property and it may produce database server roundtrips.
     # Call it only when you really need it.
-    driverProperties: [DriverPropertyInfo]
+    driverProperties: [ObjectPropertyInfo!]
     driverParameters: Object
 
     authModels: [DatabaseAuthModel!]!
     # Can be null? (only anonymous access)
     defaultAuthModelId: ID
-}
-
-type DriverPropertyInfo {
-    id: ID!
-    displayName: String
-    description: String
-    category: String
-    dataType: String
-    defaultValue: Object
-    validValues: [ Object ]
 }
 
 # Data source info is a description of some remote database. Doesn't include user credentials
@@ -176,21 +191,6 @@ input ConnectionConfig {
     credentials: Object
 }
 
-type DatabaseAuthParameter {
-    id: ID!
-    displayName: String!
-    description: String
-    
-    # if array not empty field must be shown as selector
-    possibleValues: [String!]!
-    # if true and possibleValues not empty field must be shown as combo box
-    editable: Boolean!
-    # field must be encrypted somehow
-    encrypted: Boolean!
-    # field can't be null or empty
-    requred: Boolean!
-}
-
 type DatabaseAuthModel {
     id: ID!
     displayName: String!
@@ -198,7 +198,7 @@ type DatabaseAuthModel {
     icon: String
 
     # By default auth requred
-    parameters: [DatabaseAuthParameter!]!
+    parameters: [ObjectPropertyInfo!]!
 }
 
 type NavigatorSettings {

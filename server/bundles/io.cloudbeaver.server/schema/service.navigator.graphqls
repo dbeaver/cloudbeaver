@@ -9,29 +9,6 @@ type ObjectDescriptor {
     value: String
 }
 
-type ObjectPropertyInfo {
-    # ID
-    id: String
-    # Human readable name
-    displayName: String
-    # Property description
-    description: String
-    # Property category (may be used if object has a lot of properties)
-    category: String
-    # Property data type (int, String, etc)
-    dataType: String
-
-    # Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables)
-    value: Object
-
-    # List of values this property can take. Makes sense only for enumerable properties
-    validValues: [ Object ]
-    # Default property value
-    defaultValue: Object
-    # Supported features (system, hidden, inherited, foreign, expensive, etc)
-    features: [ String! ]!
-}
-
 input ObjectPropertyFilter {
     ids: [String]
     features: [String]
