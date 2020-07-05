@@ -312,10 +312,7 @@ extend type Mutation {
     initConnection( id: ID!, credentials: Object ): ConnectionInfo!
 
     # Disconnect from database
-    closeConnection( id: ID! ): Boolean! @deprecated
-
-    # Disconnect from database
-    closeConnectionNew( id: ID! ): ConnectionInfo!
+    closeConnection( id: ID! ): ConnectionInfo!
 
     # Remove connection and disconnects from the database if needed
     deleteConnection( id: ID! ): Boolean!

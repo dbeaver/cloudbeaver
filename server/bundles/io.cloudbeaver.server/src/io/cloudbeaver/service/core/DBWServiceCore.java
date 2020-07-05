@@ -87,7 +87,10 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
-    boolean closeConnection(WebSession webSession, String connectionId) throws DBWebException;
+    WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException;
+
+    @WebAction
+    WebConnectionInfo deleteConnection(WebSession webSession, String connectionId) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings

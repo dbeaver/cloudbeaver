@@ -253,7 +253,17 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean closeConnection(WebSession webSession, String connectionId) throws DBWebException {
+    public WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException {
+        return closeAndDeleteConnection(webSession, connectionId, false);
+    }
+
+    @Override
+    public WebConnectionInfo deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
+        return closeAndDeleteConnection(webSession, connectionId, true);
+    }
+
+    @NotNull
+    private WebConnectionInfo closeAndDeleteConnection(WebSession webSession, String connectionId, boolean forceDelete) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
 
         boolean disconnected = false;
@@ -268,12 +278,12 @@ public class WebServiceCore implements DBWServiceCore {
             // Disconnect in async mode?
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
-        if (dataSourceContainer.isTemporary()) {
+        if (forceDelete) {
             webSession.getDatabasesNode().getDataSourceRegistry().removeDataSource(dataSourceContainer);
             webSession.removeConnection(connectionInfo);
         }
 
-        return disconnected;
+        return connectionInfo;
     }
 
     @Override
