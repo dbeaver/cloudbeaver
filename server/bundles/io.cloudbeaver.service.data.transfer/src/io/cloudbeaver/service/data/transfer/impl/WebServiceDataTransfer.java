@@ -185,7 +185,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         settings.setOutputFolder(exportFile.getParentFile().getAbsolutePath());
         settings.setOutputFilePattern(exportFile.getName());
 
-        Map<Object, Object> properties = new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
 
         Map<String, Object> processorProperties = parameters.getProcessorProperties();
         if (processorProperties == null) processorProperties = Collections.emptyMap();

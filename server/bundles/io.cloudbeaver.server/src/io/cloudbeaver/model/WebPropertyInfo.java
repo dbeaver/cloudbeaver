@@ -155,8 +155,6 @@ public class WebPropertyInfo {
                     return ((ObjectPropertyDescriptor) property).isOptional();
                 case "hidden":
                     return ((ObjectPropertyDescriptor) property).isHidden();
-                case "remote":
-                    return property.isRemote();
 
                 case "datetme":
                     return ((ObjectPropertyDescriptor) property).isDateTime();
