@@ -20,6 +20,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 
 import java.util.Arrays;
 
@@ -58,8 +59,9 @@ public class WebDatabaseAuthModel {
 
     @Property
     public WebPropertyInfo[] getProperties() {
-        return Arrays.stream(model.getAuthProperties())
-            .map(p -> new WebPropertyInfo(webSession, p)).toArray(WebPropertyInfo[]::new);
+        DBPPropertySource credentialsSource = model.createCredentialsSource(null);
+        return Arrays.stream(credentialsSource.getProperties())
+            .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
 

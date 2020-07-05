@@ -21,10 +21,14 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -155,12 +159,21 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public String getAuthModelId() {
+    public String getAuthModel() {
         return dataSourceContainer.getConnectionConfiguration().getAuthModelId();
     }
 
-    public boolean getAuthRequired() {
-        return false;
+    @Property
+    public WebPropertyInfo[] getAuthProperties() {
+        String authModelId = dataSourceContainer.getConnectionConfiguration().getAuthModelId();
+        DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
+        if (authModel == null) {
+            return new WebPropertyInfo[0];
+        }
+
+        DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer);
+        return Arrays.stream(credentialsSource.getProperties())
+            .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
 }

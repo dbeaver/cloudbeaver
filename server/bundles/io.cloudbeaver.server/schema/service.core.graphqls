@@ -152,9 +152,9 @@ type DriverInfo {
     driverProperties: [ObjectPropertyInfo!]
     driverParameters: Object
 
-    authModels: [DatabaseAuthModel!]!
     # Can be null? (only anonymous access)
-    defaultAuthModelId: ID
+    defaultAuthModel: ID
+    applicableAuthModel: [ID!]!
 }
 
 # Data source info is a description of some remote database. Doesn't include user credentials
@@ -237,7 +237,7 @@ type ConnectionInfo {
     clientVersion: String
 
     # Can be null? (anonymous access)
-    authModelId: ID
+    authModel: ID
     authProperties: [ObjectPropertyInfo!]
 
     # Supported features (provided etc)
@@ -272,7 +272,9 @@ extend type Query {
     # Get list of predefined data sources
     dataSourceList: [ DataSourceInfo! ]! @deprecated
 
-    # Get predefined connections 
+    authModels: [DatabaseAuthModel!]!
+
+    # Get predefined connections
     predefinedConnections: [ ConnectionInfo! ]!
 
     # Return connection state

@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
@@ -29,9 +30,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Web driver configuration
@@ -178,13 +177,13 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
-    public List<WebDatabaseAuthModel> getAuthModels() {
+    public String[] getApplicableAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
-            .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
+            .map(DBPAuthModelDescriptor::getId).toArray(String[]::new);
     }
 
     @Property
-    public String getDefaultAuthModelId() {
+    public String getDefaultAuthModel() {
         return AuthModelDatabaseNative.ID;
     }
 

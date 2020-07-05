@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -65,6 +67,12 @@ public class WebServiceCore implements DBWServiceCore {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<WebDatabaseAuthModel> getAuthModels(WebSession webSession) {
+        return DataSourceProviderRegistry.getInstance().getAllAuthModels().stream()
+            .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
     }
 
     @Override
