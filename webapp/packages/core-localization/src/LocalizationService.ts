@@ -70,7 +70,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    const session = await this.sessionService.session.load();
+    const session = await this.sessionService.session.load(null);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
 
     if (!session) {
@@ -113,7 +113,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   private async setLocale(key: string) {
-    const config = await this.serverService.config.load();
+    const config = await this.serverService.config.load(null);
 
     if (!config) {
       throw new Error('Cant\'t get server settings');

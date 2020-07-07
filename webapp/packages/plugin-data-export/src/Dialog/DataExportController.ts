@@ -123,7 +123,7 @@ export class DataExportController implements IInitializableController, IDestruct
 
   private async loadProcessors() {
     try {
-      await this.dataExportService.processors.load();
+      await this.dataExportService.processors.load(null);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load data export processors');
     }

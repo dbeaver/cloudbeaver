@@ -14,9 +14,6 @@ import {
   NavigationService,
   IContextProvider,
   ITabOptions,
-  NavNodeManagerService,
-  INodeNavigationData,
-  NavigationType,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -63,7 +60,6 @@ export class SqlEditorNavigatorService {
     private notificationService: NotificationService,
     private gql: GraphQLService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private navNodeManagerService: NavNodeManagerService,
     private navigationService: NavigationService
   ) {
 
@@ -71,7 +67,7 @@ export class SqlEditorNavigatorService {
       null,
       this.navigateHandler.bind(this)
     );
-    this.navNodeManagerService.navigator.addHandler(this.nodeNavigationHandler.bind(this));
+    this.connectionsManagerService.onCloseConnection.subscribe(this.nodeNavigationHandler.bind(this));
   }
 
   registerTabHandler() {
@@ -102,18 +98,14 @@ export class SqlEditorNavigatorService {
     });
   }
 
-  private async nodeNavigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async nodeNavigationHandler(connectionId: string) {
     try {
-      const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
-
-      if (nodeInfo.type === NavigationType.closeConnection) {
-        for (const tab of this.navigationTabsService.findTabs(
-          isSQLEditorTab(tab => tab.handlerState.connectionId.includes(nodeInfo.nodeId))
-        )) {
-          await this.navigationTabsService.closeTab(tab.id);
-        }
-        return;
+      for (const tab of this.navigationTabsService.findTabs(
+        isSQLEditorTab(tab => tab.handlerState.connectionId.includes(connectionId))
+      )) {
+        await this.navigationTabsService.closeTab(tab.id);
       }
+      return;
     } catch (exception) {
       this.notificationService.logException(exception, 'Error in Object Viewer while processing action with database node');
     }

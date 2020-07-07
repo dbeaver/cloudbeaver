@@ -12,6 +12,7 @@ import { Bootstrap } from './Bootstrap';
 import { DataExportMenuService } from './DataExportMenuService';
 import { DataExportProcessService } from './DataExportProcessService';
 import { DataExportService } from './DataExportService';
+import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
 
 export const manifest: PluginManifest = {
   info: {
@@ -22,6 +23,7 @@ export const manifest: PluginManifest = {
     DataExportMenuService,
     DataExportService,
     DataExportProcessService,
+    DataTransferProcessorsResource,
   ],
 
   async initialize(services: IServiceInjector) {

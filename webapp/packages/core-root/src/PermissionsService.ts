@@ -9,13 +9,9 @@
 import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedResource } from '@cloudbeaver/core-sdk';
 
-import { SessionService } from './SessionService';
-
-type PermissionsMetadata = {
-  loaded: boolean;
-}
+import { PermissionsResource } from './PermissionsResource';
+import { SessionResource } from './SessionResource';
 
 export enum EPermission {
   public = 'public'
@@ -26,47 +22,27 @@ export class PermissionsService {
   readonly onUpdate: Observable<unknown>;
 
   private updateSubject: Subject<unknown>;
-  private permissions = new CachedResource(
-    new Map(),
-    this.refreshAsync.bind(this),
-    (_, { loaded }) => loaded
-  );
 
   constructor(
-    private graphQLService: GraphQLService,
-    private sessionService: SessionService,
+    private sessionResource: SessionResource,
+    private permissions: PermissionsResource,
   ) {
     this.updateSubject = new Subject();
     this.onUpdate = this.updateSubject.asObservable();
-    this.sessionService.onUpdate.subscribe(this.update.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(this.update.bind(this));
   }
 
   has(id: string): boolean {
-    return this.permissions.data.has(id);
+    return this.permissions.has(id);
   }
 
   async hasAsync(id: string): Promise<boolean> {
-    const permissions = await this.permissions.load();
-    return permissions.has(id);
+    await this.permissions.load(null);
+    return this.has(id);
   }
 
   async update() {
-    await this.permissions.refresh(true);
+    await this.permissions.refresh(null);
     this.updateSubject.next();
-  }
-
-  private async refreshAsync(
-    data: Map<string, string>,
-    metadata: PermissionsMetadata
-  ): Promise<Map<string, string>> {
-    const { permissions } = await this.graphQLService.gql.sessionPermissions();
-
-    data.clear();
-    for (const permission of permissions) {
-      data.set(permission, permission);
-    }
-    metadata.loaded = true;
-
-    return data;
   }
 }

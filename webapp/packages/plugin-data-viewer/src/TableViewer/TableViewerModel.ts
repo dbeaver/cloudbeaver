@@ -199,7 +199,7 @@ export class TableViewerModel {
   }
 
   updateRows(rows: number[]) {
-    this.agGridModel.actions.updateRows(rows);
+    this.agGridModel.actions?.updateRows(rows);
   }
 
   revertCellValue(rowNumber: number, column: string) {
