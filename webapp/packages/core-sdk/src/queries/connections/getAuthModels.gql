@@ -1,0 +1,20 @@
+query getAuthModels {
+  models: authModels {
+    id
+    displayName
+    description
+    icon
+
+    properties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
+  }
+}

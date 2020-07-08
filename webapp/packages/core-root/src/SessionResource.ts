@@ -15,7 +15,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
-  connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId' | 'features'>>;
+  connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId' | 'features' | 'authNeeded' | 'authModel'>>;
 };
 
 @injectable()

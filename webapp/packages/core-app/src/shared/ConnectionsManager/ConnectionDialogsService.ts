@@ -7,17 +7,15 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  ContextMenuService,
-  IContextMenuItem,
-  IMenuContext,
-} from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
 import { NavNode } from '../NodesManager/EntityTypes';
 import { EObjectFeature } from '../NodesManager/EObjectFeature';
+import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { ConnectionsManagerService } from './ConnectionsManagerService';
+import { EConnectionFeature } from './EConnectionFeature';
 
 @injectable()
 export class ConnectionDialogsService {
@@ -50,19 +48,44 @@ export class ConnectionDialogsService {
       }
     );
 
-    const closeConnection: IContextMenuItem<NavNode> = {
-      id: 'closeConnection',
-      isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType
-        && !!context.data.objectFeatures.includes(EObjectFeature.dataSource);
-      },
-      title: 'Disconnect',
-      onClick: (context: IMenuContext<NavNode>) => {
-        const node = context.data;
-        this.connectionsManagerService.closeNavNodeConnectionAsync(node.id);
-      },
-    };
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'closeConnection',
+        isPresent: (context: IMenuContext<NavNode>) => {
+          const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
+          const connection = this.connectionsManagerService.getConnectionById(connectionId);
 
-    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), closeConnection);
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)
+          && !!connection?.connected;
+        },
+        title: 'Disconnect',
+        onClick: (context: IMenuContext<NavNode>) => {
+          const node = context.data;
+          this.connectionsManagerService.closeNavNodeConnectionAsync(node.id);
+        },
+      }
+    );
+
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: 'deleteConnection',
+        isPresent: (context: IMenuContext<NavNode>) => {
+          const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
+          const connection = this.connectionsManagerService.getConnectionById(connectionId);
+
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)
+          && !!connection?.features.includes(EConnectionFeature.temporary);
+        },
+        title: 'Delete',
+        onClick: (context: IMenuContext<NavNode>) => {
+          const node = context.data;
+          this.connectionsManagerService.deleteNavNodeConnectionAsync(node.id);
+        },
+      }
+    );
   }
 }

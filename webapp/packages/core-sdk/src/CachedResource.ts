@@ -78,11 +78,11 @@ export abstract class CachedResource<
     this.dataSubject.next(this.data);
   }
 
-  protected async setActivePromise(param: TParam, promise: Promise<any>) {
+  protected async setActivePromise<T>(param: TParam, promise: Promise<T>): Promise<T> {
     this.activePromise = promise;
     this.activePromiseParam = param;
     try {
-      await this.activePromise;
+      return await this.activePromise;
     } finally {
       this.activePromise = null;
       this.activePromiseParam = null;

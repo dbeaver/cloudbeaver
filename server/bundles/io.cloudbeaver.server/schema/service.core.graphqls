@@ -238,7 +238,7 @@ type ConnectionInfo {
 
     authNeeded: Boolean!
     authModel: ID
-    authProperties: [ObjectPropertyInfo!]
+    authProperties: [ObjectPropertyInfo!]!
 
     # Supported features (provided etc)
     features: [ String! ]!

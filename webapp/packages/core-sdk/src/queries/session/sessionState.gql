@@ -10,6 +10,9 @@ query sessionState {
       driverId
       connected
       features
+
+      authNeeded
+      authModel
     }
   }
 }

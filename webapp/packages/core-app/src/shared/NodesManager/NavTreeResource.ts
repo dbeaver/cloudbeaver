@@ -29,6 +29,79 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onDataOutdated.subscribe(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }
 
+  deleteInNode(key: string, value: string[]): void;
+  deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
+  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+    if (isResourceKeyList(keyObject)) {
+      for (let i = 0; i < keyObject.list.length; i++) {
+        const key = keyObject.list[i];
+        const values = (valueObject as string[][])[i];
+        const currentValue = this.data.get(key);
+
+        if (currentValue) {
+          this.data.set(key, currentValue.filter(value => !values.includes(value)));
+          this.delete(resourceKeyList(values));
+        }
+      }
+    } else {
+      const currentValue = this.data.get(keyObject);
+
+      if (currentValue) {
+        this.data.set(keyObject, currentValue.filter(value => !(valueObject as string[]).includes(value)));
+        this.delete(resourceKeyList(valueObject as string[]));
+      }
+    }
+
+    this.markUpdated(keyObject);
+    this.itemAddSubject.next(keyObject);
+  }
+
+  unshiftToNode(key: string, value: string[]): void;
+  unshiftToNode(key: ResourceKeyList<string>, value: string[][]): void;
+  unshiftToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+    if (isResourceKeyList(keyObject)) {
+      for (let i = 0; i < keyObject.list.length; i++) {
+        const key = keyObject.list[i];
+        const values = (valueObject as string[][])[i];
+        const currentValue = this.data.get(key) || [];
+
+        currentValue.unshift(...values);
+        this.data.set(key, currentValue);
+      }
+    } else {
+      const currentValue = this.data.get(keyObject) || [];
+
+      currentValue.unshift(...valueObject as string[]);
+      this.data.set(keyObject, currentValue);
+    }
+
+    this.markUpdated(keyObject);
+    this.itemAddSubject.next(keyObject);
+  }
+
+  pushToNode(key: string, value: string[]): void;
+  pushToNode(key: ResourceKeyList<string>, value: string[][]): void;
+  pushToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+    if (isResourceKeyList(keyObject)) {
+      for (let i = 0; i < keyObject.list.length; i++) {
+        const key = keyObject.list[i];
+        const values = (valueObject as string[][])[i];
+        const currentValue = this.data.get(key) || [];
+
+        currentValue.push(...values);
+        this.data.set(key, currentValue);
+      }
+    } else {
+      const currentValue = this.data.get(keyObject) || [];
+
+      currentValue.push(...valueObject as string[]);
+      this.data.set(keyObject, currentValue);
+    }
+
+    this.markUpdated(keyObject);
+    this.itemAddSubject.next(keyObject);
+  }
+
   set(key: string, value: string[]): void;
   set(key: ResourceKeyList<string>, value: string[][]): void;
   set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
