@@ -20,7 +20,7 @@
 			"provider": "postgresql",
 			"driver": "postgres-jdbc",
 			"name": "PostgreSQL (Template)",
-			"save-password": true,
+			"save-password": false,
 			"show-system-objects": false,
 			"read-only": true,
 			"template": true,
