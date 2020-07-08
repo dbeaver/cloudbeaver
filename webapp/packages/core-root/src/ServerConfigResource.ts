@@ -21,9 +21,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return !!this.data;
   }
 
-  protected async loader(): Promise<ServerConfig> {
+  protected async loader(key: null): Promise<ServerConfig> {
     const { serverConfig } = await this.graphQLService.gql.serverConfig();
 
+    this.markUpdated(key);
     return serverConfig;
   }
 }

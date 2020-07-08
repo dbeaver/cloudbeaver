@@ -31,6 +31,7 @@ export class UsersResource extends CachedDataResource<AdminUserInfo[], string | 
     const { users } = await this.graphQLService.gql.getUsersList({ userId });
 
     if (!userId) {
+      this.markUpdated(userId);
       return users as AdminUserInfo[];
     }
 
@@ -40,6 +41,8 @@ export class UsersResource extends CachedDataResource<AdminUserInfo[], string | 
     } else {
       this.data.push(...users as AdminUserInfo[]);
     }
+
+    this.markUpdated(userId);
 
     return this.data;
   }

@@ -31,6 +31,7 @@ export class RolesResource extends CachedDataResource<AdminRoleInfo[], string | 
     const { roles } = await this.graphQLService.gql.getRolesList({ roleId });
 
     if (!roleId) {
+      this.markUpdated(roleId);
       return roles as AdminRoleInfo[];
     }
 
@@ -40,6 +41,8 @@ export class RolesResource extends CachedDataResource<AdminRoleInfo[], string | 
     } else {
       this.data.push(...roles as AdminRoleInfo[]);
     }
+
+    this.markUpdated(roleId);
 
     return this.data;
   }
