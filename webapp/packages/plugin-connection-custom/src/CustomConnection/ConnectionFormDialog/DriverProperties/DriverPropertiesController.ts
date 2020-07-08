@@ -12,7 +12,7 @@ import { DBDriver } from '@cloudbeaver/core-app';
 import { IProperty } from '@cloudbeaver/core-blocks';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DriverPropertyInfo } from '@cloudbeaver/core-sdk';
+import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { CustomConnectionService } from '../../../CustomConnectionService';
@@ -25,7 +25,7 @@ type StaticId = {
   staticId: string;
 }
 
-export type DriverPropertyInfoWithStaticId = DriverPropertyInfo & StaticId
+export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId
 
 @injectable()
 export class DriverPropertiesController implements IInitializableController {

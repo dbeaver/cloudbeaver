@@ -18,10 +18,14 @@ export type Scalars = {
 export type Query = {
   authLogin: UserAuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
+  authModels: Array<DatabaseAuthModel>;
   authProviders: Array<AuthProviderInfo>;
+  connectionInfo: ConnectionInfo;
+  /** @deprecated Field no longer supported */
   connectionState: ConnectionInfo;
   createRole: AdminRoleInfo;
   createUser: AdminUserInfo;
+  /** @deprecated Field no longer supported */
   dataSourceList: Array<DataSourceInfo>;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
@@ -50,11 +54,16 @@ export type Query = {
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
+  templateDataSources: Array<DataSourceInfo>;
 };
 
 export type QueryAuthLoginArgs = {
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+};
+
+export type QueryConnectionInfoArgs = {
+  id: Scalars['ID'];
 };
 
 export type QueryConnectionStateArgs = {
@@ -178,12 +187,17 @@ export type Mutation = {
   asyncTaskCancel?: Maybe<Scalars['Boolean']>;
   asyncTaskStatus: AsyncTaskInfo;
   changeSessionLanguage?: Maybe<Scalars['Boolean']>;
-  closeConnection: Scalars['Boolean'];
+  closeConnection: ConnectionInfo;
   closeSession?: Maybe<Scalars['Boolean']>;
   createConnection: ConnectionInfo;
+  deleteConnection: Scalars['Boolean'];
+  initConnection: ConnectionInfo;
+  /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
   readDataFromContainer?: Maybe<SqlExecuteInfo>;
+  setConnectionNavigatorSettings: Scalars['Boolean'];
+  setDefaultNavigatorSettings: Scalars['Boolean'];
   sqlContextCreate: SqlContextInfo;
   sqlContextDestroy: Scalars['Boolean'];
   sqlContextSetDefaults: Scalars['Boolean'];
@@ -222,6 +236,15 @@ export type MutationCreateConnectionArgs = {
   config: ConnectionConfig;
 };
 
+export type MutationDeleteConnectionArgs = {
+  id: Scalars['ID'];
+};
+
+export type MutationInitConnectionArgs = {
+  id: Scalars['ID'];
+  credentials?: Maybe<Scalars['Object']>;
+};
+
 export type MutationOpenConnectionArgs = {
   config: ConnectionConfig;
 };
@@ -231,6 +254,15 @@ export type MutationReadDataFromContainerArgs = {
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
   filter?: Maybe<SqlDataFilter>;
+};
+
+export type MutationSetConnectionNavigatorSettingsArgs = {
+  id: Scalars['ID'];
+  settings: NavigatorSettingsInput;
+};
+
+export type MutationSetDefaultNavigatorSettingsArgs = {
+  settings: NavigatorSettingsInput;
 };
 
 export type MutationSqlContextCreateArgs = {
@@ -285,6 +317,18 @@ export type MutationUpdateResultsDataBatchArgs = {
   addedRows?: Maybe<Array<SqlResultRow>>;
 };
 
+export type ObjectPropertyInfo = {
+  id?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  category?: Maybe<Scalars['String']>;
+  dataType?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
+  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  defaultValue?: Maybe<Scalars['Object']>;
+  features: Array<Scalars['String']>;
+};
+
 export type AsyncTaskInfo = {
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -325,7 +369,9 @@ export type ServerConfig = {
   version: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
   supportsPredefinedConnections?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
   supportsProvidedConnections?: Maybe<Scalars['Boolean']>;
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
@@ -333,6 +379,7 @@ export type ServerConfig = {
   supportedLanguages: Array<ServerLanguage>;
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
   productConfiguration: Scalars['Object'];
+  defaultNavigatorSettings: NavigatorSettings;
 };
 
 export type SessionInfo = {
@@ -342,6 +389,14 @@ export type SessionInfo = {
   cacheExpired: Scalars['Boolean'];
   serverMessages?: Maybe<Array<Maybe<ServerMessage>>>;
   connections: Array<ConnectionInfo>;
+};
+
+export type DatabaseAuthModel = {
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  properties: Array<ObjectPropertyInfo>;
 };
 
 export type DriverInfo = {
@@ -357,7 +412,9 @@ export type DriverInfo = {
   driverInfoURL?: Maybe<Scalars['String']>;
   driverPropertiesURL?: Maybe<Scalars['String']>;
   embedded?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
   anonymousAccess?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
   allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
   licenseRequired?: Maybe<Scalars['Boolean']>;
   license?: Maybe<Scalars['String']>;
@@ -365,18 +422,10 @@ export type DriverInfo = {
   promotedScore?: Maybe<Scalars['Int']>;
   connectionProperties?: Maybe<Scalars['Object']>;
   defaultConnectionProperties?: Maybe<Scalars['Object']>;
-  driverProperties?: Maybe<Array<Maybe<DriverPropertyInfo>>>;
+  driverProperties?: Maybe<Array<ObjectPropertyInfo>>;
   driverParameters?: Maybe<Scalars['Object']>;
-};
-
-export type DriverPropertyInfo = {
-  id: Scalars['ID'];
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  category?: Maybe<Scalars['String']>;
-  dataType?: Maybe<Scalars['String']>;
-  defaultValue?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
+  defaultAuthModel?: Maybe<Scalars['ID']>;
+  applicableAuthModel: Array<Scalars['ID']>;
 };
 
 export type DataSourceInfo = {
@@ -392,10 +441,10 @@ export type DataSourceInfo = {
 };
 
 export type ConnectionConfig = {
+  driverId?: Maybe<Scalars['ID']>;
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   dataSourceId?: Maybe<Scalars['ID']>;
-  driverId?: Maybe<Scalars['ID']>;
   host?: Maybe<Scalars['String']>;
   port?: Maybe<Scalars['String']>;
   databaseName?: Maybe<Scalars['String']>;
@@ -403,6 +452,28 @@ export type ConnectionConfig = {
   properties?: Maybe<Scalars['Object']>;
   userName?: Maybe<Scalars['String']>;
   userPassword?: Maybe<Scalars['String']>;
+  authModelId?: Maybe<Scalars['ID']>;
+  credentials?: Maybe<Scalars['Object']>;
+};
+
+export type NavigatorSettings = {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
+};
+
+export type NavigatorSettingsInput = {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
 };
 
 export type ConnectionInfo = {
@@ -417,7 +488,11 @@ export type ConnectionInfo = {
   connectionError?: Maybe<ServerError>;
   serverVersion?: Maybe<Scalars['String']>;
   clientVersion?: Maybe<Scalars['String']>;
+  authNeeded: Scalars['Boolean'];
+  authModel?: Maybe<Scalars['ID']>;
+  authProperties: Array<ObjectPropertyInfo>;
   features: Array<Scalars['String']>;
+  navigatorSettings: NavigatorSettings;
 };
 
 export type LogEntry = {
@@ -434,18 +509,6 @@ export type ObjectDescriptor = {
   uniqueName?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
-
-export type ObjectPropertyInfo = {
-  id?: Maybe<Scalars['String']>;
-  displayName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  category?: Maybe<Scalars['String']>;
-  dataType?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['Object']>;
-  validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
-  defaultValue?: Maybe<Scalars['Object']>;
-  features: Array<Scalars['String']>;
 };
 
 export type ObjectPropertyFilter = {
@@ -731,27 +794,39 @@ export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type CloseConnectionMutation = Pick<Mutation, 'closeConnection'>;
+export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+
+export type ConnectionAuthPropertiesQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type ConnectionAuthPropertiesQuery = { connection: { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> } };
 
 export type ConnectionStateQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
+export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
+export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type DataSourceListQueryVariables = Exact<{ [key: string]: never }>;
 
 export type DataSourceListQuery = { dataSourceList: Array<Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>> };
 
+export type DeleteConnectionMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
+
 export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
 
-export type DriverListQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore'>> };
+export type DriverListQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel'>> };
 
 export type DriverPropertiesQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -759,7 +834,14 @@ export type DriverPropertiesQueryVariables = Exact<{
 
 export type DriverPropertiesQuery = { driver: Array<(
     Pick<DriverInfo, 'driverParameters'>
-    & { driverProperties?: Maybe<Array<Maybe<Pick<DriverPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>>> }
+    & { driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
+  )>; };
+
+export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAuthModelsQuery = { models: Array<(
+    Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
+    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
   )>; };
 
 export type GetDriverByIdQueryVariables = Exact<{
@@ -768,11 +850,18 @@ export type GetDriverByIdQueryVariables = Exact<{
 
 export type GetDriverByIdQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon'>> };
 
+export type InitConnectionMutationVariables = Exact<{
+  id: Scalars['ID'];
+  credentials?: Maybe<Scalars['Object']>;
+}>;
+
+export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+
 export type OpenConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type OpenConnectionMutation = { openConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'> };
+export type OpenConnectionMutation = { openConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1022,7 +1111,7 @@ export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> }
   ); };
 
 export type ReadSessionLogQueryVariables = Exact<{
@@ -1036,7 +1125,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ServerConfigQuery = { serverConfig: (
     Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsPredefinedConnections' | 'supportsProvidedConnections' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled'>
-    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>> }
+    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
   ); };
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1047,7 +1136,7 @@ export type SessionStateQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SessionStateQuery = { sessionState: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> }
   ); };
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
@@ -1190,7 +1279,32 @@ export const SetUserCredentialsDocument = `
     `;
 export const CloseConnectionDocument = `
     mutation closeConnection($id: ID!) {
-  closeConnection(id: $id)
+  connection: closeConnection(id: $id) {
+    id
+    name
+    driverId
+    connected
+    features
+    authNeeded
+    authModel
+  }
+}
+    `;
+export const ConnectionAuthPropertiesDocument = `
+    query connectionAuthProperties($id: ID!) {
+  connection: connectionState(id: $id) {
+    authProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
+  }
 }
     `;
 export const ConnectionStateDocument = `
@@ -1201,6 +1315,8 @@ export const ConnectionStateDocument = `
     driverId
     connected
     features
+    authNeeded
+    authModel
   }
 }
     `;
@@ -1212,6 +1328,8 @@ export const CreateConnectionDocument = `
     driverId
     connected
     features
+    authNeeded
+    authModel
   }
 }
     `;
@@ -1223,6 +1341,11 @@ export const DataSourceListDocument = `
     driverId
     description
   }
+}
+    `;
+export const DeleteConnectionDocument = `
+    mutation deleteConnection($id: ID!) {
+  deleteConnection(id: $id)
 }
     `;
 export const DriverListDocument = `
@@ -1237,6 +1360,7 @@ export const DriverListDocument = `
     embedded
     anonymousAccess
     promotedScore
+    defaultAuthModel
   }
 }
     `;
@@ -1256,12 +1380,46 @@ export const DriverPropertiesDocument = `
   }
 }
     `;
+export const GetAuthModelsDocument = `
+    query getAuthModels {
+  models: authModels {
+    id
+    displayName
+    description
+    icon
+    properties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
+  }
+}
+    `;
 export const GetDriverByIdDocument = `
     query getDriverById($driverId: ID!) {
   driverList(id: $driverId) {
     id
     name
     icon
+  }
+}
+    `;
+export const InitConnectionDocument = `
+    mutation initConnection($id: ID!, $credentials: Object) {
+  connection: initConnection(id: $id, credentials: $credentials) {
+    id
+    name
+    driverId
+    connected
+    features
+    authNeeded
+    authModel
   }
 }
     `;
@@ -1273,6 +1431,8 @@ export const OpenConnectionDocument = `
     driverId
     connected
     features
+    authNeeded
+    authModel
   }
 }
     `;
@@ -1688,6 +1848,8 @@ export const OpenSessionDocument = `
       driverId
       connected
       features
+      authNeeded
+      authModel
     }
   }
 }
@@ -1721,6 +1883,15 @@ export const ServerConfigDocument = `
       nativeName
     }
     productConfiguration
+    defaultNavigatorSettings {
+      showSystemObjects
+      showUtilityObjects
+      showOnlyEntities
+      mergeEntities
+      hideFolders
+      hideSchemas
+      hideVirtualModel
+    }
   }
 }
     `;
@@ -1742,6 +1913,8 @@ export const SessionStateDocument = `
       driverId
       connected
       features
+      authNeeded
+      authModel
     }
   }
 }
@@ -1820,6 +1993,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
       return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));
     },
+    connectionAuthProperties(variables: ConnectionAuthPropertiesQueryVariables): Promise<ConnectionAuthPropertiesQuery> {
+      return withWrapper(() => client.request<ConnectionAuthPropertiesQuery>(ConnectionAuthPropertiesDocument, variables));
+    },
     connectionState(variables: ConnectionStateQueryVariables): Promise<ConnectionStateQuery> {
       return withWrapper(() => client.request<ConnectionStateQuery>(ConnectionStateDocument, variables));
     },
@@ -1829,14 +2005,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     dataSourceList(variables?: DataSourceListQueryVariables): Promise<DataSourceListQuery> {
       return withWrapper(() => client.request<DataSourceListQuery>(DataSourceListDocument, variables));
     },
+    deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
+      return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));
+    },
     driverList(variables?: DriverListQueryVariables): Promise<DriverListQuery> {
       return withWrapper(() => client.request<DriverListQuery>(DriverListDocument, variables));
     },
     driverProperties(variables: DriverPropertiesQueryVariables): Promise<DriverPropertiesQuery> {
       return withWrapper(() => client.request<DriverPropertiesQuery>(DriverPropertiesDocument, variables));
     },
+    getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
+      return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
+    },
     getDriverById(variables: GetDriverByIdQueryVariables): Promise<GetDriverByIdQuery> {
       return withWrapper(() => client.request<GetDriverByIdQuery>(GetDriverByIdDocument, variables));
+    },
+    initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
+      return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
     },
     openConnection(variables: OpenConnectionMutationVariables): Promise<OpenConnectionMutation> {
       return withWrapper(() => client.request<OpenConnectionMutation>(OpenConnectionDocument, variables));

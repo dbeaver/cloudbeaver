@@ -1,0 +1,12 @@
+mutation initConnection($id: ID!, $credentials: Object) {
+  connection: initConnection(id: $id, credentials: $credentials) {
+    id
+    name
+    driverId
+    connected
+    features
+
+    authNeeded
+    authModel
+  }
+}

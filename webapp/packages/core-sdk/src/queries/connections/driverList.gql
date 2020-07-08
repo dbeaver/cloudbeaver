@@ -9,5 +9,8 @@ query driverList {
     embedded
     anonymousAccess
     promotedScore
+
+    defaultAuthModel
+    # applicableAuthModel
   }
 }

@@ -10,7 +10,8 @@ import {
   ConnectionDialogsService, ConnectionsManagerService,
   MainMenuService, NavigationService, NavigationTreeService,
   NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
-  ConnectionSchemaManagerService, ConnectionInfoResource, ContainerResource, DBDriverResource, NavigationTabsService,
+  ConnectionSchemaManagerService, ConnectionInfoResource, ContainerResource,
+  DBDriverResource, NavigationTabsService, DatabaseAuthModelsResource, ConnectionAuthService,
   NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
   RouterService, ScreenService, AppScreenService, CoreSettingsService
@@ -76,6 +77,8 @@ export const coreManifest: PluginManifest = {
     TopNavService,
     NavigationService,
     NavigationTabsService,
+    DatabaseAuthModelsResource,
+    ConnectionAuthService,
     NavigationTreeContextMenuService,
     NavigationTreeService,
     NavNodeManagerService,

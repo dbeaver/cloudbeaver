@@ -1,3 +1,12 @@
 mutation closeConnection($id: ID!) {
-  closeConnection(id: $id)
+  connection: closeConnection(id: $id) {
+    id
+    name
+    driverId
+    connected
+    features
+
+    authNeeded
+    authModel
+  }
 }

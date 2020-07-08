@@ -16,5 +16,14 @@ query serverConfig {
       nativeName
     }
     productConfiguration
+    defaultNavigatorSettings {
+      showSystemObjects
+      showUtilityObjects
+      showOnlyEntities
+      mergeEntities
+      hideFolders
+      hideSchemas
+      hideVirtualModel
+    }
   }
 }

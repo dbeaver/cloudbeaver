@@ -14,6 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { DataSourceInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
+import { ROOT_NODE_PATH } from '../NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
@@ -64,11 +65,15 @@ export class ConnectionsManagerService {
   async addOpenedConnection(connection: Connection) {
     this.connectionInfo.set(connection.id, connection);
     this.onOpenConnection.next(connection);
-    await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must also request node info and add it to nodes manager
+
+    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
+    await this.navNodeManagerService.loadNode({ nodeId, parentId: ROOT_NODE_PATH });
+
+    this.navNodeManagerService.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
   }
 
   getConnectionById(connectionId: string): Connection | undefined {
-    return this.connectionInfo.data.get(connectionId);
+    return this.connectionInfo.get(connectionId);
   }
 
   getObjectContainerById(
@@ -85,8 +90,28 @@ export class ConnectionsManagerService {
     );
   }
 
+  async deleteConnection(id: string) {
+    const connection = this.getConnectionById(id);
+
+    if (!connection?.features.includes(EConnectionFeature.temporary)) {
+      return;
+    }
+
+    await this.graphQLService.gql.deleteConnection({ id });
+    await this.afterConnectionClose(id);
+    this.connectionInfo.delete(id);
+
+    const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+
+    const node = this.navNodeManagerService.getNode(navNodeId);
+    if (!node) {
+      return;
+    }
+    this.navNodeManagerService.navTree.deleteInNode(node.parentId, [navNodeId]);
+  }
+
   hasAnyConnection(): boolean {
-    return Boolean(this.connections.length);
+    return !!this.connections.length;
   }
 
   async closeAllConnections(): Promise<void> {
@@ -97,13 +122,18 @@ export class ConnectionsManagerService {
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    await this.graphQLService.gql.closeConnection({ id });
+    const connectionUpdatedInfo = await this.graphQLService.gql.closeConnection({ id });
+    this.connectionInfo.set(connectionUpdatedInfo.connection.id, connectionUpdatedInfo.connection);
+
     await this.afterConnectionClose(id);
-    this.connectionInfo.delete(id);
 
     if (!skipNodesRefresh) {
       await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must just remove nodes from nodes manager
     }
+  }
+
+  async deleteNavNodeConnectionAsync(navNodeId: string): Promise<void> {
+    await this.deleteConnection(NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId));
   }
 
   async closeNavNodeConnectionAsync(navNodeId: string): Promise<void> {
@@ -114,22 +144,13 @@ export class ConnectionsManagerService {
     }
 
     try {
-      await this.graphQLService.gql.closeConnection({ id: connectionId });
-      await this.afterConnectionClose(connectionId);
-      if (connection?.features.includes(EConnectionFeature.temporary)) {
-        this.connectionInfo.delete(connectionId);
-      }
+      const connectionUpdatedInfo = await this.graphQLService.gql.closeConnection({ id: connectionId });
+      this.connectionInfo.set(connectionUpdatedInfo.connection.id, connectionUpdatedInfo.connection);
 
-      if (connection.features.includes(EConnectionFeature.temporary)) {
-        const node = this.navNodeManagerService.getNode(navNodeId);
-        if (!node) {
-          return;
-        }
-        await this.navNodeManagerService.refreshTree(node.parentId);
-      } else {
-        await this.navNodeManagerService.refreshNode(navNodeId);
-        await this.navNodeManagerService.removeTree(navNodeId);
-      }
+      await this.afterConnectionClose(connectionId);
+
+      this.navNodeManagerService.removeTree(navNodeId);
+      await this.navNodeManagerService.refreshNode(navNodeId);
     } catch (exception) {
       this.notificationService.logException(exception, `Can't close connection: ${navNodeId}`);
     }
@@ -141,7 +162,7 @@ export class ConnectionsManagerService {
   }
 
   private async afterConnectionClose(id: string) {
-    this.navNodeManagerService.removeTree(id);
+    // this.navNodeManagerService.removeTree(id);
     this.onCloseConnection.next(id);
   }
 

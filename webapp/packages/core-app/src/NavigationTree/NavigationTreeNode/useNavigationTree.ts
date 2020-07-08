@@ -25,6 +25,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
+  const [isExpanding, setExpanding] = useState(false);
   const { node, isOutdated } = useNode(nodeId);
   const children = useChildren(nodeId);
 
@@ -52,7 +53,9 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   const handleExpand = useCallback(
     async () => {
       if (!isExpandedFiltered) {
+        setExpanding(true);
         const state = await navigationTreeService.loadNestedNodes(nodeId);
+        setExpanding(false);
         if (!state) {
           switchExpand(false);
           return;
@@ -82,9 +85,15 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   useEffect(() => {
     if (isExpandedFiltered && children.isOutdated && !children.isLoading && children.isLoaded && !isOutdated) {
+      setExpanding(true);
       navigationTreeService
         .loadNestedNodes(nodeId)
-        .then(state => !state && switchExpand(false));
+        .then((state) => {
+          setExpanding(false);
+          if (!state) {
+            switchExpand(false);
+          }
+        });
     }
   }, [isExpandedFiltered, children.isOutdated, children.isLoading, children.children, isOutdated, nodeId]);
 
@@ -106,7 +115,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
     icon,
     isExpanded: isExpandedFiltered,
     isLoaded,
-    isLoading: children.isLoading,
+    isLoading: children.isLoading || isExpanding,
     isExpandable,
     isSelected,
     hasChildren,

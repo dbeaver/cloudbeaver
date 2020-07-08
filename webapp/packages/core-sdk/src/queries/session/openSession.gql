@@ -10,6 +10,9 @@ mutation openSession {
       driverId
       connected
       features
+
+      authNeeded
+      authModel
     }
   }
 }
