@@ -10,31 +10,25 @@ import {
   Connection, DBSource, ConnectionsManagerService
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
-import { ConnectionConfig, GraphQLService, CachedResource } from '@cloudbeaver/core-sdk';
+import { PermissionsService } from '@cloudbeaver/core-root';
+import { ConnectionConfig, GraphQLService } from '@cloudbeaver/core-sdk';
+
+import { DataSourcesResource } from './DataSourcesResource';
 
 @injectable()
 export class BasicConnectionService {
-  readonly dbSources = new CachedResource([], this.loadDBSourcesAsync.bind(this), data => !!data.length)
 
   constructor(
     private graphQLService: GraphQLService,
     private connectionsManagerService: ConnectionsManagerService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    readonly dbSources: DataSourcesResource
   ) {
-    this.permissionsService.onUpdate.subscribe(() => this.dbSources.refresh());
+    this.permissionsService.onUpdate.subscribe(() => this.dbSources.refresh(null));
   }
 
   public getDBSources(): DBSource[] {
     return this.dbSources.data;
-  }
-
-  private async loadDBSourcesAsync(data: DBSource[]): Promise<DBSource[]> {
-    if (!await this.permissionsService.hasAsync(EPermission.public)) {
-      return [];
-    }
-    const { dataSourceList } = await this.graphQLService.gql.dataSourceList();
-    return dataSourceList;
   }
 
   async openConnectionAsync(config: ConnectionConfig): Promise<Connection> {

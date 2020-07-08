@@ -11,7 +11,8 @@ import { computed } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
 
-import { ConnectionsManagerService, Connection } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
+import { Connection } from '../../../shared/ConnectionsManager/ConnectionInfoResource';
+import { ConnectionsManagerService } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';

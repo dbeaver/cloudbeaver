@@ -13,7 +13,7 @@ import styled from 'reshadow';
 import { InputField, InFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AuthProvider } from '../../AuthProviderService';
+import { AuthProvider } from '../../AuthProvidersResource';
 import { formStyles } from './formStyles';
 
 type Props = {

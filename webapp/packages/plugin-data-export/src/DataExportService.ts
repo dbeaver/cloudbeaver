@@ -8,30 +8,19 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  CachedResource, GraphQLService, DataTransferProcessorInfo, DataTransferParameters
-} from '@cloudbeaver/core-sdk';
+import { DataTransferParameters } from '@cloudbeaver/core-sdk';
 
 import { DataExportProcessService } from './DataExportProcessService';
+import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
 import { ExportNotification } from './ExportNotification/ExportNotification';
 import { IExportContext } from './IExportContext';
 
-type ProcessorsResourceMetadata = {
-  loaded: boolean;
-}
-
 @injectable()
 export class DataExportService {
-  readonly processors = new CachedResource(
-    new Map(),
-    this.refreshProcessorsAsync.bind(this),
-    (_, { loaded }) => loaded
-  );
-
   constructor(
-    private graphQLService: GraphQLService,
     private notificationService: NotificationService,
     private dataExportProcessService: DataExportProcessService,
+    readonly processors: DataTransferProcessorsResource
   ) { }
 
   async cancel(exportId: string) {
@@ -61,20 +50,5 @@ export class DataExportService {
 
     this.notificationService.customNotification(() => ExportNotification, taskId);
     return taskId;
-  }
-
-  private async refreshProcessorsAsync(
-    data: Map<string, DataTransferProcessorInfo>,
-    metadata: ProcessorsResourceMetadata,
-  ): Promise<Map<string, DataTransferProcessorInfo>> {
-    const { processors } = await this.graphQLService.gql.getDataTransferProcessors();
-
-    data.clear();
-
-    for (const processor of processors) {
-      data.set(processor.id, processor);
-    }
-    metadata.loaded = true;
-    return data;
   }
 }

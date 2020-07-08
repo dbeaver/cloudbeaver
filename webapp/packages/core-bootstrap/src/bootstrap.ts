@@ -25,5 +25,6 @@ export async function bootstrap(plugins: PluginManifest[]) {
   } catch (e) {
     console.log(e);
     showErrorPage();
+    throw e;
   }
 }

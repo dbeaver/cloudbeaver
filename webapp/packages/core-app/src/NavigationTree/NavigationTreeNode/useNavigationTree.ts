@@ -25,7 +25,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
-  const { node, isLoaded: nodeLoaded } = useNode(nodeId);
+  const { node, isOutdated } = useNode(nodeId);
   const children = useChildren(nodeId);
 
   if (!node) {
@@ -81,12 +81,12 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   }, [isExpandable && hasChildren]);
 
   useEffect(() => {
-    if (isExpandedFiltered && !children.isLoaded && !children.isLoading && !!children.children && nodeLoaded) {
+    if (isExpandedFiltered && children.isOutdated && !children.isLoading && children.isLoaded && !isOutdated) {
       navigationTreeService
         .loadNestedNodes(nodeId)
         .then(state => !state && switchExpand(false));
     }
-  }, [isExpandedFiltered, children.isLoaded, children.isLoading, children.children, nodeLoaded, nodeId]);
+  }, [isExpandedFiltered, children.isOutdated, children.isLoading, children.children, isOutdated, nodeId]);
 
   // Here we subscribe to selected nodes if current node selected (mobx)
   if (isSelected && !navigationTreeService.isNodeSelected(nodeId)) {

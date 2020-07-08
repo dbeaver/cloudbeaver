@@ -21,7 +21,7 @@ export class AuthenticationService {
   ) { }
 
   async auth() {
-    const config = await this.serverService.config.load();
+    const config = await this.serverService.config.load(null);
     if (!config) {
       throw new Error('Can\'t configure Authentication');
     }

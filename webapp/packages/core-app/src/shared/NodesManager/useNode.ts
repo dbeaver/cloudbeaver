@@ -8,19 +8,16 @@
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { NavNodeManagerService } from './NavNodeManagerService';
+import { NavNodeInfoResource } from './NavNodeInfoResource';
 
 export function useNode(navNodeId: string) {
-  const navNodeManagerService = useService(NavNodeManagerService);
-  const node = navNodeManagerService.getNode(navNodeId);
-  const isLoading = navNodeManagerService.navNode.isDataLoading({
-    navNodeId: [navNodeId],
-  });
-  const isLoaded = navNodeManagerService.navNode.isLoaded({
-    navNodeId: [navNodeId],
-  });
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const node = navNodeInfoResource.get(navNodeId);
+  const isLoading = navNodeInfoResource.isDataLoading(navNodeId);
+  const isLoaded = navNodeInfoResource.isLoaded(navNodeId);
+  const isOutdated = navNodeInfoResource.isOutdated(navNodeId);
 
   return {
-    node, isLoading, isLoaded,
+    node, isLoading, isLoaded, isOutdated,
   };
 }

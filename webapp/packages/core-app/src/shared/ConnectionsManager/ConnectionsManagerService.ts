@@ -11,81 +11,20 @@ import { Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionService } from '@cloudbeaver/core-root';
-import {
-  ConnectionInfo,
-  DataSourceInfo,
-  DriverInfo,
-  GraphQLService,
-  CachedResource,
-  DatabaseObjectInfo,
-} from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { SessionResource } from '@cloudbeaver/core-root';
+import { DataSourceInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
+import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
+import { ContainerResource, ObjectContainer } from './ContainerResource';
+import { DBDriverResource, DBDriver } from './DBDriverResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
-export type DBDriver = Pick<
-  DriverInfo,
-  | 'id'
-  | 'name'
-  | 'icon'
-  | 'description'
-  | 'defaultPort'
-  | 'sampleURL'
-  | 'embedded'
-  | 'anonymousAccess'
-  | 'promotedScore'
->
 export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>
-export type Connection = Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId' | 'features'>
-export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>
-
-type ConnectionLoadArgs = {
-  connectionId: string;
-  close?: boolean;
-  remove?: boolean;
-  connection?: never;
-}
-
-type ConnectionSetArgs = {
-  connection: Connection;
-  connectionId?: never;
-  remove?: never;
-  close?: never;
-}
-
-type DBDriversMetadata = {
-  loaded: boolean;
-}
-
-type ConnectionInfoMetadata = {
-  loading: boolean;
-  loaded: boolean;
-}
 
 @injectable()
 export class ConnectionsManagerService {
-  readonly dbDrivers = new CachedResource(
-    new Map(),
-    this.refreshDriversAsync.bind(this),
-    (_, { loaded }) => loaded,
-    { loaded: false }
-  );
-  readonly connectionInfo = new CachedResource(
-    new Map(),
-    this.loadConnectionInfo.bind(this),
-    (_, metadata, args) => metadata.get(args.connectionId || args.connection!.id).loaded,
-    new MetadataMap<string, ConnectionInfoMetadata>(() => ({ loaded: false, loading: false })),
-    (_, metadata, args) => metadata.get(args.connectionId || args.connection!.id).loading
-  );
-  readonly connectionObjectContainers = new CachedResource(
-    new Map(),
-    this.refreshObjectContainersAsync.bind(this),
-    this.isObjectContainersLoaded.bind(this)
-  );
-
   @computed get connections(): Connection[] {
     return Array.from(this.connectionInfo.data.values());
   }
@@ -95,11 +34,14 @@ export class ConnectionsManagerService {
 
   constructor(
     private graphQLService: GraphQLService,
+    readonly connectionInfo: ConnectionInfoResource,
+    readonly connectionObjectContainers: ContainerResource,
+    readonly dbDrivers: DBDriverResource,
     private navNodeManagerService: NavNodeManagerService,
-    private sessionService: SessionService,
+    private sessionResource: SessionResource,
     private notificationService: NotificationService
   ) {
-    this.sessionService.onUpdate.subscribe(this.restoreConnections.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
   }
 
   getDBDrivers(): Map<string, DBDriver> {
@@ -107,28 +49,20 @@ export class ConnectionsManagerService {
   }
 
   async loadConnectionInfoAsync(connectionId: string): Promise<Connection> {
-    const connections = await this.connectionInfo.load({ connectionId });
-
-    return connections.get(connectionId)!;
+    return this.connectionInfo.load(connectionId);
   }
 
   async refreshConnectionInfoAsync(connectionId: string): Promise<Connection> {
-    const connections = await this.connectionInfo.refresh(true, { connectionId });
-
-    return connections.get(connectionId)!;
+    return this.connectionInfo.refresh(connectionId);
   }
 
   async loadDriversAsync(): Promise<Map<string, DBDriver>> {
-    return this.dbDrivers.load();
+    await this.dbDrivers.load('');
+    return this.dbDrivers.data;
   }
 
   async addOpenedConnection(connection: Connection) {
-    await this.connectionInfo.refresh(
-      true,
-      {
-        connection,
-      }
-    );
+    this.connectionInfo.set(connection.id, connection);
     this.onOpenConnection.next(connection);
     await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must also request node info and add it to nodes manager
   }
@@ -165,7 +99,7 @@ export class ConnectionsManagerService {
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
     await this.graphQLService.gql.closeConnection({ id });
     await this.afterConnectionClose(id);
-    await this.connectionInfo.refresh(true, { connectionId: id, close: true });
+    this.connectionInfo.delete(id);
 
     if (!skipNodesRefresh) {
       await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must just remove nodes from nodes manager
@@ -182,7 +116,9 @@ export class ConnectionsManagerService {
     try {
       await this.graphQLService.gql.closeConnection({ id: connectionId });
       await this.afterConnectionClose(connectionId);
-      await this.connectionInfo.refresh(true, { connectionId, close: true });
+      if (connection?.features.includes(EConnectionFeature.temporary)) {
+        this.connectionInfo.delete(connectionId);
+      }
 
       if (connection.features.includes(EConnectionFeature.temporary)) {
         const node = this.navNodeManagerService.getNode(navNodeId);
@@ -200,17 +136,17 @@ export class ConnectionsManagerService {
   }
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
-    const data = await this.connectionObjectContainers.load(connectionId, catalogId);
-    return data.get(connectionId)!;
+    await this.connectionObjectContainers.load({ connectionId, catalogId });
+    return this.connectionObjectContainers.data.get(connectionId)!;
   }
 
   private async afterConnectionClose(id: string) {
-    await this.navNodeManagerService.removeTree(id);
+    this.navNodeManagerService.removeTree(id);
     this.onCloseConnection.next(id);
   }
 
   private async restoreConnections() {
-    const config = await this.sessionService.session.load();
+    const config = await this.sessionResource.load(null);
     if (!config) {
       return;
     }
@@ -224,106 +160,14 @@ export class ConnectionsManagerService {
 
     for (const connection of connectionsToRemove) {
       await this.afterConnectionClose(connection.id);
-      await this.connectionInfo.refresh(true, {
-        connectionId: connection.id,
-        remove: true,
-      });
+      this.connectionInfo.delete(connection.id);
     }
 
     await this.navNodeManagerService.updateRootChildren();
   }
 
-  private isObjectContainersLoaded(
-    data: Map<string, ObjectContainer[]>,
-    metadata: {},
-    connectionId: string,
-    catalogId?: string,
-  ) {
-    return data.has(connectionId);
-  }
-
-  private async refreshObjectContainersAsync(
-    data: Map<string, ObjectContainer[]>,
-    metadata: {},
-    update: boolean,
-    connectionId: string,
-    catalogId?: string,
-  ): Promise<Map<string, ObjectContainer[]>> {
-    const { navGetStructContainers } = await this.graphQLService.gql.navGetStructContainers({
-      connectionId,
-      catalogId,
-    });
-    data.set(connectionId, [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList]);
-
-    return data;
-  }
-
-  private async refreshDriversAsync(
-    data: Map<string, DBDriver>,
-    metadata: DBDriversMetadata,
-    update: boolean
-  ): Promise<Map<string, DBDriver>> {
-    const { driverList } = await this.graphQLService.gql.driverList();
-
-    data.clear();
-
-    for (const driver of driverList) {
-      data.set(driver.id, driver);
-    }
-    metadata.loaded = true;
-    return data;
-  }
-
-  private async loadConnectionInfo(
-    data: Map<string, Connection>,
-    metadata: MetadataMap<string, ConnectionInfoMetadata>,
-    load: boolean,
-    args: ConnectionLoadArgs | ConnectionSetArgs,
-  ): Promise<Map<string, Connection>> {
-    let connectionId: string;
-    if (args.connection) {
-      connectionId = args.connection.id;
-    } else {
-      connectionId = args.connectionId;
-    }
-    const connectionInfo = data.get(connectionId);
-
-    const itemMetadata = metadata.get(connectionId);
-
-    if (args.connection) {
-      data.set(connectionId, args.connection);
-      itemMetadata.loaded = true;
-      return data;
-    }
-
-    if (args.remove || (args.close && connectionInfo?.features.includes(EConnectionFeature.temporary))) {
-      data.delete(connectionId);
-      metadata.delete(connectionId);
-      return data;
-    }
-
-    if (load) {
-      try {
-        itemMetadata.loading = true;
-        const { connection } = await this.graphQLService.gql.connectionState({ id: connectionId });
-
-        data.set(connectionId, connection);
-        itemMetadata.loaded = true;
-      } finally {
-        itemMetadata.loading = false;
-      }
-    }
-
-    return data;
-  }
-
   private async restoreConnection(connection: Connection) {
-    await this.connectionInfo.refresh(
-      true,
-      {
-        connection,
-      }
-    );
+    this.connectionInfo.set(connection.id, connection);
     this.onOpenConnection.next(connection);
   }
 }

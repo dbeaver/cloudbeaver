@@ -9,8 +9,8 @@
 import {
   ConnectionDialogsService, ConnectionsManagerService,
   MainMenuService, NavigationService, NavigationTreeService,
-  NavNodeManagerService, DBObjectService, NavNodeExtensionsService,
-  ConnectionSchemaManagerService, NavigationTabsService,
+  NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
+  ConnectionSchemaManagerService, ConnectionInfoResource, ContainerResource, DBDriverResource, NavigationTabsService,
   NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
   RouterService, ScreenService, AppScreenService, CoreSettingsService
@@ -22,7 +22,14 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
 import {
-  SessionService, ServerService, PermissionsService, SessionSettingsService, ServerSettingsService
+  SessionService,
+  ServerService,
+  PermissionsService,
+  SessionSettingsService,
+  ServerSettingsService,
+  ServerConfigResource,
+  PermissionsResource,
+  SessionResource
 } from '@cloudbeaver/core-root';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
@@ -39,6 +46,9 @@ export const coreManifest: PluginManifest = {
     ProductManagerService,
     PluginManagerService,
     ServerSettingsService,
+    ServerConfigResource,
+    PermissionsResource,
+    SessionResource,
     SessionSettingsService,
     PermissionsService,
     CoreSettingsService,
@@ -46,6 +56,9 @@ export const coreManifest: PluginManifest = {
     SessionExpireService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,
+    ConnectionInfoResource,
+    ContainerResource,
+    DBDriverResource,
     ConnectionsManagerService,
     RouterService,
     ScreenService,
@@ -67,6 +80,8 @@ export const coreManifest: PluginManifest = {
     NavigationTreeService,
     NavNodeManagerService,
     NavNodeExtensionsService,
+    NavNodeInfoResource,
+    NavTreeResource,
     DBObjectService,
     NotificationService,
     SessionService,

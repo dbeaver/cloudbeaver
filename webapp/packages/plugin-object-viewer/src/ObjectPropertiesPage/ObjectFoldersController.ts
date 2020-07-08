@@ -9,7 +9,7 @@
 import { autorun } from 'mobx';
 import { IReactionDisposer } from 'mobx/lib/internal';
 
-import { ITab } from '@cloudbeaver/core-app';
+import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
@@ -23,7 +23,10 @@ export class ObjectFoldersController implements IInitializableController, IDestr
   private navigationTab!: ITab<IObjectViewerTabState>
   private disposer!: IReactionDisposer;
 
-  constructor(private objectFoldersService: ObjectFoldersService) { }
+  constructor(
+    private objectFoldersService: ObjectFoldersService,
+    private navigationTabsService: NavigationTabsService
+  ) { }
 
   getTabContainer() {
     return this.tabContainer;
@@ -36,7 +39,9 @@ export class ObjectFoldersController implements IInitializableController, IDestr
 
     this.disposer = autorun(() => {
       const currentFolderId = tab.handlerState.folderId || null;
-      this.activateTab(currentFolderId);
+      if (this.navigationTabsService.currentTabId === tab.id) {
+        this.activateTab(currentFolderId);
+      }
     });
   }
 

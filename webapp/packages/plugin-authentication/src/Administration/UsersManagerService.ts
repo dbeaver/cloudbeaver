@@ -7,22 +7,19 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedResource, GraphQLService, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { AuthInfoService } from '../AuthInfoService';
 import { AuthProviderService } from '../AuthProviderService';
+import { UsersResource } from './UsersResource';
 
 @injectable()
 export class UsersManagerService {
-  readonly users = new CachedResource(
-    [],
-    this.refreshAsync.bind(this),
-    (data, _, userId) => (userId ? data.some(user => user.userId === userId) : !!data.length)
-  )
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService,
+    readonly users: UsersResource
   ) {
   }
 
@@ -39,7 +36,7 @@ export class UsersManagerService {
   async grantRole(userId: string, roleId: string, update?: boolean) {
     await this.graphQLService.gql.grantUserRole({ userId, roleId });
     if (update) {
-      await this.users.refresh(true, userId);
+      await this.users.refresh(userId);
     }
   }
 
@@ -50,7 +47,7 @@ export class UsersManagerService {
     await this.graphQLService.gql.deleteUser({ userId });
 
     if (update) {
-      await this.users.refresh(true, userId);
+      await this.users.refresh(userId);
     }
   }
 
@@ -63,27 +60,5 @@ export class UsersManagerService {
       userId,
       credentials: processedCredentials,
     });
-  }
-
-  private async refreshAsync(
-    data: AdminUserInfo[],
-    _: any,
-    update: boolean,
-    userId?: string
-  ): Promise<AdminUserInfo[]> {
-    const { users } = await this.graphQLService.gql.getUsersList({ userId });
-
-    if (!userId) {
-      return users as AdminUserInfo[];
-    }
-
-    const index = data.findIndex(user => user.userId === userId);
-    if (index !== -1) {
-      data.splice(index, 1, ...users as AdminUserInfo[]);
-    } else {
-      data.push(...users as AdminUserInfo[]);
-    }
-
-    return data;
   }
 }

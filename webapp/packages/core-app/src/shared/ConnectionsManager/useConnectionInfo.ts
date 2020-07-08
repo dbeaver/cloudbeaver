@@ -18,8 +18,8 @@ export function useConnectionInfo(connectionId: string) {
   const connectionInfo = service.getConnectionById(connectionId);
   const load = useCallback(() => service.loadConnectionInfoAsync(connectionId), [service, connectionId]);
   const refresh = useCallback(() => service.refreshConnectionInfoAsync(connectionId), [service, connectionId]);
-  const isLoading = useCallback(() => service.connectionInfo.isDataLoading({ connectionId }), [service, connectionId]);
-  const isLoaded = useCallback(() => service.connectionInfo.isLoaded({ connectionId }), [service, connectionId]);
+  const isLoading = useCallback(() => service.connectionInfo.isDataLoading(connectionId), [service, connectionId]);
+  const isLoaded = useCallback(() => service.connectionInfo.isLoaded(connectionId), [service, connectionId]);
 
   return {
     connectionInfo,

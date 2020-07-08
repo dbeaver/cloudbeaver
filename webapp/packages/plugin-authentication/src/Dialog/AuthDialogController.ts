@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { AuthInfoService } from '../AuthInfoService';
-import { AuthProviderService, AuthProvider } from '../AuthProviderService';
+import { AuthProvidersResource, AuthProvider } from '../AuthProvidersResource';
 
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {
@@ -24,12 +24,11 @@ export class AuthDialogController implements IInitializableController, IDestruct
   @observable credentials = {};
 
   get isLoading() {
-    return this.authProviderService.providers.isLoading();
+    return this.authProvidersResource.isLoading();
   }
 
   @computed get providers(): AuthProvider[] {
-    return this.authProviderService
-      .providers
+    return this.authProvidersResource
       .data
       .concat()
       .sort(this.compareProviders);
@@ -41,7 +40,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   constructor(
     private notificationService: NotificationService,
-    private authProviderService: AuthProviderService,
+    private authProvidersResource: AuthProvidersResource,
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService,
   ) { }
@@ -77,8 +76,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
     if (providerId === this.provider?.id) {
       return;
     }
-    this.provider = this.authProviderService
-      .providers.data.find(provider => provider.id === providerId) || null;
+    this.provider = this.authProvidersResource
+      .data.find(provider => provider.id === providerId) || null;
     this.credentials = {};
   }
 
@@ -90,7 +89,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   private async loadProviders() {
     try {
-      await this.authProviderService.providers.load();
+      await this.authProvidersResource.load(null);
       if (this.providers.length > 0) {
         this.provider = this.providers[0];
       }

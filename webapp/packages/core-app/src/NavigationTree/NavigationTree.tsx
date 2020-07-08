@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 
-import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { useChildren } from '../shared/useChildren';
 import { NavigationTreeNode } from './NavigationTreeNode/NavigationTreeNode';
 

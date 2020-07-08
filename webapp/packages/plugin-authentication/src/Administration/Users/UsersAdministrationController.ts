@@ -41,7 +41,7 @@ export class UsersAdministrationController {
 
   update = async () => {
     try {
-      await this.usersManagerService.users.refresh(true, undefined);
+      await this.usersManagerService.users.refresh(undefined);
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Users update failed');
@@ -78,7 +78,7 @@ export class UsersAdministrationController {
         await this.usersManagerService.delete(userId);
       }
       this.selectedItems.clear();
-      await this.usersManagerService.users.refresh(true, undefined);
+      await this.usersManagerService.users.refresh(undefined);
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'User delete failed');
