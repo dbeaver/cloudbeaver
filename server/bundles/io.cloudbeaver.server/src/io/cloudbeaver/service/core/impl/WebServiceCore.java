@@ -258,8 +258,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
-        return closeAndDeleteConnection(webSession, connectionId, true);
+    public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
+        closeAndDeleteConnection(webSession, connectionId, true);
+        return true;
     }
 
     @NotNull

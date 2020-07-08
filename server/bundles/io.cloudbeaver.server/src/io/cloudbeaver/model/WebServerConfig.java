@@ -106,7 +106,7 @@ public class WebServerConfig {
     }
 
     @Property
-    public DBNBrowseSettings getNavigatorSettings() {
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
         return application.getDefaultNavigatorSettings();
     }
 
