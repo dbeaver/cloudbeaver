@@ -13,7 +13,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { IExtension } from '@cloudbeaver/core-extensions';
 
 import { NavigationTreeService } from '../../NavigationTree/NavigationTreeService';
-import { ConnectionsManagerService, ObjectContainer } from '../../shared/ConnectionsManager/ConnectionsManagerService';
+import { ConnectionsManagerService } from '../../shared/ConnectionsManager/ConnectionsManagerService';
+import { ObjectContainer } from '../../shared/ConnectionsManager/ContainerResource';
 import { isConnectionProvider, IConnectionProvider } from '../../shared/ConnectionsManager/extensions/IConnectionProvider';
 import { isConnectionSetter, IConnectionSetter } from '../../shared/ConnectionsManager/extensions/IConnectionSetter';
 import { ITab } from '../../shared/NavigationTabs/ITab';
@@ -184,7 +185,7 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-      await this.connectionsManagerService.dbDrivers.load();
+      await this.connectionsManagerService.dbDrivers.load('');
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database drivers', true);
     }

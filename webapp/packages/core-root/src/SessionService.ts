@@ -6,40 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject, Observable } from 'rxjs';
-
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  ConnectionInfo, GraphQLService, SessionInfo, CachedResource,
-} from '@cloudbeaver/core-sdk';
 
+import { SessionResource } from './SessionResource';
 import { SessionSettingsService } from './SessionSettingsService';
-
-export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
-  connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'connected' | 'driverId' | 'features'>>;
-};
 
 @injectable()
 export class SessionService {
-  readonly session = new CachedResource(undefined, this.refreshSessionStateAsync.bind(this), data => !!data);
   readonly settings = new SessionSettingsService('session_settings');
-  readonly onUpdate: Observable<unknown>;
 
-  private updateSubject: Subject<unknown>;
-
-  constructor(private graphQLService: GraphQLService) {
-    this.updateSubject = new Subject();
-    this.onUpdate = this.updateSubject.asObservable();
+  constructor(
+    readonly session: SessionResource
+  ) {
   }
 
   async update() {
-    await this.session.refresh(true);
-  }
-
-  private async refreshSessionStateAsync(data: SessionState | undefined): Promise<SessionState> {
-    const { session } = await this.graphQLService.gql.openSession();
-
-    this.updateSubject.next();
-    return session;
+    await this.session.refresh(null);
   }
 }

@@ -8,6 +8,7 @@
 
 import { NavNodeManagerService, DBObjectService } from '@cloudbeaver/core-app';
 import { useService } from '@cloudbeaver/core-di';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 export function useObjectFolder(objectId: string) {
   const navNodeManagerService = useService(NavNodeManagerService);
@@ -15,8 +16,8 @@ export function useObjectFolder(objectId: string) {
 
   const children = navNodeManagerService.getTree(objectId) || [];
 
-  const isLoading = children.some(navNodeId => !dbObjectService.getDBObject(navNodeId))
-      && dbObjectService.dbObject.isDataLoading({ navNodeId: children });
+  const isLoading = !dbObjectService.isLoaded(resourceKeyList(children))
+      && dbObjectService.isDataLoading(resourceKeyList(children));
 
   return { isLoading };
 }

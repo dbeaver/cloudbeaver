@@ -9,7 +9,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { IComputedMenuItemOptions, StaticMenu } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ServerService } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 @injectable()
@@ -23,7 +23,7 @@ export class SettingsMenuService extends Bootstrap {
   constructor(
     private localizationService: LocalizationService,
     private themeService: ThemeService,
-    private serverService: ServerService
+    private serverConfigResource: ServerConfigResource
   ) {
     super();
   }
@@ -70,7 +70,7 @@ export class SettingsMenuService extends Bootstrap {
   }
 
   private async addLocales() {
-    const config = await this.serverService.config.load();
+    const config = await this.serverConfigResource.load(null);
 
     if (!config) {
       return;

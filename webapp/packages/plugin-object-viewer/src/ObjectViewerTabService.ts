@@ -23,6 +23,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ResourceKey, resourceKeyList, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -63,7 +64,8 @@ export class ObjectViewerTabService {
 
   registerTabHandler() {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
-    this.navNodeManagerService.navNode.onDataUpdate.subscribe(this.updateTabs.bind(this));
+    this.navNodeManagerService.navNodeInfoResource.onItemAdd.subscribe(this.updateTabs.bind(this));
+    this.navNodeManagerService.navNodeInfoResource.onItemDelete.subscribe(this.removeTabs.bind(this));
   }
 
   objectViewerTabContext = async (
@@ -131,21 +133,46 @@ export class ObjectViewerTabService {
     };
   }
 
-  private async updateTabs(data: Map<string, NavNode>) {
-    for (const tab of this.navigationTabsService.findTabs(isObjectViewerTab(tab => tab.restored))) {
-      if (!data.has(tab.handlerState.objectId)) {
-        await this.navigationTabsService.closeTab(tab.id, true);
-      } else if (tab.id === this.navigationTabsService.currentTabId) {
-        const loaded = this.navNodeManagerService.navNode.isLoaded({
-          nodes: [{ nodeId: tab.handlerState.objectId, parentId: tab.handlerState.parentId }],
-        });
-        const loading = this.navNodeManagerService.navNode.isDataLoading({
-          nodes: [{ nodeId: tab.handlerState.objectId, parentId: tab.handlerState.parentId }],
-        });
+  private async updateTabs(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      for (const objectId of key.list) {
+        const tab = this.navigationTabsService.findTab(
+          isObjectViewerTab(tab => tab.handlerState.objectId === objectId)
+        );
 
-        if (!loaded && !loading) {
+        if (tab && tab.restored && this.navigationTabsService.currentTabId === tab.id) {
           await this.navigationTabsService.selectTab(tab.id);
         }
+      }
+    } else {
+      const tab = this.navigationTabsService.findTab(
+        isObjectViewerTab(tab => tab.handlerState.objectId === key)
+      );
+
+      if (tab && tab.restored && this.navigationTabsService.currentTabId === tab.id) {
+        await this.navigationTabsService.selectTab(tab.id);
+      }
+    }
+  }
+
+  private async removeTabs(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      for (const objectId of key.list) {
+        const tab = this.navigationTabsService.findTab(
+          isObjectViewerTab(tab => tab.handlerState.objectId === objectId)
+        );
+
+        if (tab) {
+          await this.navigationTabsService.closeTab(tab.id, true);
+        }
+      }
+    } else {
+      const tab = this.navigationTabsService.findTab(
+        isObjectViewerTab(tab => tab.handlerState.objectId === key)
+      );
+
+      if (tab) {
+        await this.navigationTabsService.closeTab(tab.id, true);
       }
     }
   }
@@ -203,7 +230,7 @@ export class ObjectViewerTabService {
       }
       const folderChildren = await this.navNodeManagerService.loadTree(folderId);
 
-      await this.dbObjectService.load(folderChildren, folderId);
+      await this.dbObjectService.loadChildren(folderId, resourceKeyList(folderChildren));
     } catch (exception) {
       this.notificationService.logException(exception, 'Error in Object Viewer while tab selecting');
     }
@@ -243,15 +270,6 @@ export class ObjectViewerTabService {
   private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
     try {
       const { tab, tabInfo, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
-
-      if (nodeInfo.type === NavigationType.closeConnection) {
-        for (const tab of this.navigationTabsService.findTabs(
-          isObjectViewerTab(tab => tab.handlerState.objectId.includes(nodeInfo.nodeId))
-        )) {
-          await this.navigationTabsService.closeTab(tab.id);
-        }
-        return;
-      }
 
       if (tab) {
         if (!tab.handlerState.folderId || (nodeInfo.folderId && tab.handlerState.folderId !== nodeInfo.folderId)) {

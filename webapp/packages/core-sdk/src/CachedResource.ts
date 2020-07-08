@@ -9,117 +9,98 @@
 import { observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
-export type Loader<TData, TMetadata = {}, TArgs extends any[] = []> = (
-  current: TData,
-  metadata: TMetadata,
-  update: boolean,
-  ...args: TArgs
-) => Promise<TData>
+import { injectable } from '@cloudbeaver/core-di';
 
-export type IsLoaded<TData, TMetadata = {}, TArgs extends any[] = []> = (
-  current: TData,
-  metadata: TMetadata,
-  ...args: TArgs
-) => boolean
-
-export type IsLoading<TData, TMetadata = {}, TArgs extends any[] = []> = (
-  current: TData,
-  metadata: TMetadata,
-  ...args: TArgs
-) => boolean
-
-export class CachedResource<TData, TMetadata = {}, TArgs extends any[] = []> {
+@injectable()
+export abstract class CachedResource<
+  TData,
+  TParam,
+> {
   @observable data: TData;
 
-  @observable private loading = false;
-  @observable private metadata: TMetadata;
-
   readonly onDataUpdate: Observable<TData>;
-  private dataSubject: Subject<TData>;
-  private loader: Loader<TData, TMetadata, TArgs>;
-  private isLoadedCheck: IsLoaded<TData, TMetadata, TArgs>;
-  private isLoadingCheck?: IsLoading<TData, TMetadata, TArgs>;
-  private activePromise: Promise<TData> | null = null;
+  readonly onDataOutdated: Observable<TParam>;
 
-  constructor(
-    defaultValue: TData,
-    loader: Loader<TData, TMetadata, TArgs>,
-    isLoadedCheck: IsLoaded<TData, TMetadata, TArgs>,
-    metadata?: TMetadata,
-    isLoadingCheck?: IsLoading<TData, TMetadata, TArgs>,
-  ) {
+  @observable protected outdated = new Set<TParam>();
+  @observable protected loading = false;
+  protected outdatedSubject: Subject<TParam>;
+  protected dataSubject: Subject<TData>;
+  @observable protected activePromiseParam: TParam | null = null;
+  private activePromise: Promise<any> | null = null;
+
+  constructor(defaultValue: TData) {
     this.data = defaultValue;
-    this.loader = loader;
-    this.isLoadedCheck = isLoadedCheck;
-    this.isLoadingCheck = isLoadingCheck;
-    this.metadata = metadata || {} as TMetadata;
-    this.dataSubject = new Subject<TData>();
+    this.outdatedSubject = new Subject();
+    this.dataSubject = new Subject();
+    this.onDataOutdated = this.outdatedSubject.asObservable();
     this.onDataUpdate = this.dataSubject.asObservable();
   }
 
-  isLoaded(...args: TArgs): boolean {
-    return this.isLoadedCheck(this.data, this.metadata, ...args);
+  abstract isLoaded(param: TParam): boolean;
+
+  isOutdated(param: TParam): boolean {
+    return this.outdated.has(param);
   }
 
   isLoading(): boolean {
     return this.loading;
   }
-  isDataLoading(...args: TArgs): boolean {
-    if (this.isLoadingCheck) {
-      return this.loading && this.isLoadingCheck(this.data, this.metadata, ...args);
+
+  markOutdated(param: TParam): void {
+    this.outdated.add(param);
+    this.outdatedSubject.next(param);
+  }
+
+  markUpdated(param: TParam): void {
+    this.outdated.delete(param);
+  }
+
+  async refresh(param: TParam): Promise<any> {
+    this.markOutdated(param);
+    await this.loadData(param);
+    return this.data;
+  }
+
+  async load(param: TParam): Promise<any> {
+    await this.loadData(param);
+    return this.data;
+  }
+
+  protected abstract loader(param: TParam): Promise<TData>;
+
+  protected async loadData(param: TParam) {
+    if (this.isLoaded(param) && !this.isOutdated(param)) {
+      return;
     }
-    return this.loading;
-  }
 
-  async refresh(load = false, ...args: TArgs): Promise<TData> {
-    return this.loadData(load, true, args);
-  }
-
-  async load(...args: TArgs): Promise<TData> {
-    return this.loadData(true, false, args);
-  }
-
-  async refreshUnblocked(load = false, ...args: TArgs): Promise<TData> {
-    return this.loadData(load, true, args, true);
-  }
-
-  async loadUnblocked(...args: TArgs): Promise<TData> {
-    return this.loadData(true, false, args, true);
-  }
-
-  private async loadData(load: boolean, update: boolean, args: TArgs, unblocked?: boolean) {
-    if (unblocked) {
-      return this.loadingTask(load, update, args);
-    }
     await this.waitActive();
-    this.activePromise = this.loadingTask(load, update, args);
+    await this.setActivePromise(param, this.loadingTask(param));
+    this.dataSubject.next(this.data);
+  }
+
+  protected async setActivePromise(param: TParam, promise: Promise<any>) {
+    this.activePromise = promise;
+    this.activePromiseParam = param;
     try {
-      return await this.activePromise;
+      await this.activePromise;
     } finally {
       this.activePromise = null;
-      this.dataSubject.next(this.data);
+      this.activePromiseParam = null;
     }
   }
 
-  private async loadingTask(load: boolean, update: boolean, args: TArgs): Promise<TData> {
+  private async loadingTask(param: TParam) {
     const prevState = this.loading;
     this.loading = true;
 
     try {
-      // don't load existed data & don't refresh doesn't loaded data
-      if ((this.isLoaded(...args) && !update) || (!this.isLoaded(...args) && update && !load)) {
-        return this.data;
-      }
-
-      this.data = await this.loader(this.data, this.metadata, load, ...args);
+      this.data = await this.loader(param);
     } finally {
       this.loading = prevState;
     }
-
-    return this.data;
   }
 
-  private async waitActive() {
+  protected async waitActive() {
     if (this.activePromise) {
       try {
         await this.activePromise;

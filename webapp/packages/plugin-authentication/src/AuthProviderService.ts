@@ -9,22 +9,18 @@
 import { createHash } from 'crypto';
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  GraphQLService, CachedResource, AuthProviderInfo
-} from '@cloudbeaver/core-sdk';
 
-export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>
+import { AuthProvidersResource } from './AuthProvidersResource';
 
 @injectable()
 export class AuthProviderService {
-  readonly providers = new CachedResource([], this.refreshAsync.bind(this), data => !!data.length)
 
   constructor(
-    private graphQLService: GraphQLService,
+    private providers: AuthProvidersResource,
   ) { }
 
   async processCredentials(providerId: string, credentials: Record<string, any>) {
-    const providers = await this.providers.load();
+    const providers = await this.providers.load(null);
     const provider = providers.find(provider => provider.id === providerId);
 
     if (!provider) {
@@ -43,11 +39,5 @@ export class AuthProviderService {
     }
 
     return credentialsProcessed;
-  }
-
-  private async refreshAsync(data: AuthProvider[]): Promise<AuthProvider[]> {
-    const { providers } = await this.graphQLService.gql.getAuthProviders();
-
-    return providers;
   }
 }

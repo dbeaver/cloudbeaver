@@ -7,41 +7,13 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  CachedResource, GraphQLService, AdminRoleInfo
-} from '@cloudbeaver/core-sdk';
+
+import { RolesResource } from './RolesResource';
 
 @injectable()
 export class RolesManagerService {
-  readonly roles = new CachedResource(
-    [],
-    this.refreshAsync.bind(this),
-    data => !!data.length
-  )
   constructor(
-    private graphQLService: GraphQLService,
+    readonly roles: RolesResource,
   ) {
-  }
-
-  private async refreshAsync(
-    data: AdminRoleInfo[],
-    _: any,
-    update: boolean,
-    roleId?: string
-  ): Promise<AdminRoleInfo[]> {
-    const { roles } = await this.graphQLService.gql.getRolesList({ roleId });
-
-    if (!roleId) {
-      return roles as AdminRoleInfo[];
-    }
-
-    const index = data.findIndex(role => role.roleId === roleId);
-    if (index !== -1) {
-      data.splice(index, 1, ...roles as AdminRoleInfo[]);
-    } else {
-      data.push(...roles as AdminRoleInfo[]);
-    }
-
-    return data;
   }
 }

@@ -14,7 +14,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 import { ConnectionsManagerService } from '../shared/ConnectionsManager/ConnectionsManagerService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
-import { NavNodeManagerService, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeManagerService';
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 
 @injectable()

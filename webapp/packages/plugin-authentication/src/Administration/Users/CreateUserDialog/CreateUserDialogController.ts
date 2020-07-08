@@ -80,7 +80,7 @@ export class CreateUserDialogController implements IInitializableController, IDe
           await this.usersManagerService.grantRole(user.userId, roleId);
         }
       }
-      await this.usersManagerService.users.refresh(true, user.userId);
+      await this.usersManagerService.users.refresh(user.userId);
       this.notificationService.logInfo({ title: 'authentication_user_user_created' });
       this.close();
     } catch (exception) {
@@ -113,7 +113,7 @@ export class CreateUserDialogController implements IInitializableController, IDe
 
   private async loadRoles() {
     try {
-      await this.rolesManagerService.roles.load();
+      await this.rolesManagerService.roles.load(undefined);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load roles');
     }

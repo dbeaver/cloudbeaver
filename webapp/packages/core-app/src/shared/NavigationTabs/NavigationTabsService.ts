@@ -178,7 +178,7 @@ export class NavigationTabsService {
   // must be executed with low priority, because this call runs many requests to backend and blocks others
   async restoreTabs() {
     const removedTabs: string[] = [];
-    const session = await this.sessionService.session.load();
+    const session = await this.sessionService.session.load(null);
 
     for (const tabId of this.state.tabs) {
       if (session?.cacheExpired) {

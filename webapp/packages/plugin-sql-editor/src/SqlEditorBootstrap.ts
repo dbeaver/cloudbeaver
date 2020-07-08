@@ -39,11 +39,6 @@ export class SqlEditorBootstrap {
         title: 'SQL',
         order: 2,
         onClick: () => {
-          console.log(
-            this.connectionSchemaManagerService.currentConnectionId,
-            this.connectionSchemaManagerService.currentObjectCatalogId,
-            this.connectionSchemaManagerService.currentObjectSchemaId
-          );
           this.sqlEditorNavigatorService.openNewEditor(
             this.connectionSchemaManagerService.currentConnectionId,
             this.connectionSchemaManagerService.currentObjectCatalogId,
