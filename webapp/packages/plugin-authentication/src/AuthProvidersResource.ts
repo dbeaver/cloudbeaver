@@ -27,9 +27,10 @@ export class AuthProvidersResource extends CachedDataResource<AuthProvider[], nu
     return !!this.data.length;
   }
 
-  protected async loader(): Promise<AuthProvider[]> {
+  protected async loader(key: null): Promise<AuthProvider[]> {
     const { providers } = await this.graphQLService.gql.getAuthProviders();
 
+    this.markUpdated(key);
     return providers;
   }
 }

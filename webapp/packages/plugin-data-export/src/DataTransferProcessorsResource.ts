@@ -25,7 +25,7 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
     return this.loaded;
   }
 
-  protected async loader() {
+  protected async loader(key: null) {
     const { processors } = await this.graphQLService.gql.getDataTransferProcessors();
 
     this.data.clear();
@@ -34,6 +34,7 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
       this.data.set(processor.id, processor);
     }
     this.loaded = true;
+    this.markUpdated(key);
 
     return this.data;
   }

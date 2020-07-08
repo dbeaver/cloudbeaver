@@ -29,13 +29,14 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
     return this.data.has(id);
   }
 
-  protected async loader(): Promise<Set<string>> {
+  protected async loader(key: null): Promise<Set<string>> {
     const { permissions } = await this.graphQLService.gql.sessionPermissions();
 
     this.data.clear();
     for (const permission of permissions) {
       this.data.add(permission);
     }
+    this.markUpdated(key);
     this.loaded = true;
 
     return this.data;

@@ -24,11 +24,13 @@ export class DataSourcesResource extends CachedDataResource<DBSource[], null> {
     return !!this.data.length;
   }
 
-  protected async loader(): Promise<DBSource[]> {
+  protected async loader(key: null): Promise<DBSource[]> {
     if (!await this.permissionsService.hasAsync(EPermission.public)) {
+      this.markUpdated(key);
       return [];
     }
     const { dataSourceList } = await this.graphQLService.gql.dataSourceList();
+    this.markUpdated(key);
     return dataSourceList;
   }
 }
