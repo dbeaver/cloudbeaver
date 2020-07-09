@@ -19,7 +19,6 @@ import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, ObjectContainer } from './ContainerResource';
-import { DBDriverResource, DBDriver } from './DBDriverResource';
 import { EConnectionFeature } from './EConnectionFeature';
 
 export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>
@@ -37,16 +36,11 @@ export class ConnectionsManagerService {
     private graphQLService: GraphQLService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
-    readonly dbDrivers: DBDriverResource,
     private navNodeManagerService: NavNodeManagerService,
     private sessionResource: SessionResource,
     private notificationService: NotificationService
   ) {
     this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
-  }
-
-  getDBDrivers(): Map<string, DBDriver> {
-    return this.dbDrivers.data;
   }
 
   async loadConnectionInfoAsync(connectionId: string): Promise<Connection> {
@@ -55,11 +49,6 @@ export class ConnectionsManagerService {
 
   async refreshConnectionInfoAsync(connectionId: string): Promise<Connection> {
     return this.connectionInfo.refresh(connectionId);
-  }
-
-  async loadDriversAsync(): Promise<Map<string, DBDriver>> {
-    await this.dbDrivers.load('');
-    return this.dbDrivers.data;
   }
 
   async addOpenedConnection(connection: Connection) {

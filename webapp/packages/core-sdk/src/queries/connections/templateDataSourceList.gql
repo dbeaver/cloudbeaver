@@ -1,0 +1,8 @@
+query templateDataSourceList {
+  sources: templateDataSources {
+    id
+    name
+    driverId
+    description
+  }
+}

@@ -13,6 +13,7 @@ import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloud
 
 import { Connection } from '../../../shared/ConnectionsManager/ConnectionInfoResource';
 import { ConnectionsManagerService } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
+import { DBDriverResource } from '../../../shared/ConnectionsManager/DBDriverResource';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
@@ -37,7 +38,7 @@ export class ConnectionSelectorController {
     if (!this.currentConnection) {
       return;
     }
-    const driverIcon = this.connectionsManagerService.dbDrivers.data.get(this.currentConnection.driverId)?.icon;
+    const driverIcon = this.dbDriverResource.get(this.currentConnection.driverId)?.icon;
     return driverIcon;
   }
 
@@ -75,6 +76,7 @@ export class ConnectionSelectorController {
   constructor(
     private connectionSelectorService: ConnectionSchemaManagerService,
     private connectionsManagerService: ConnectionsManagerService,
+    private dbDriverResource: DBDriverResource,
   ) {
 
     this.connectionMenu = new ComputedMenuItemModel({

@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -26,20 +24,22 @@ export type DBDriver = Pick<
   | 'embedded'
   | 'anonymousAccess'
   | 'promotedScore'
+  | 'defaultAuthModel'
 >
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver> {
-  @observable private loaded = false;
+
   constructor(private graphQLService: GraphQLService) {
     super(new Map());
   }
 
-  isLoaded() {
-    return this.loaded;
+  async loadAll() {
+    await this.load('all');
+    return this.data;
   }
 
-  protected async loader(param: string): Promise<Map<string, DBDriver>> {
+  protected async loader(key: string): Promise<Map<string, DBDriver>> {
     const { driverList } = await this.graphQLService.gql.driverList();
 
     this.data.clear();
@@ -47,7 +47,8 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     for (const driver of driverList) {
       this.data.set(driver.id, driver);
     }
-    this.loaded = true;
+    this.data.set('all', {} as any);
+    this.markUpdated(key);
     return this.data;
   }
 }

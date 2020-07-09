@@ -14,6 +14,7 @@ import {
   NavigationService,
   IContextProvider,
   ITabOptions,
+  ConnectionAuthService,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -60,7 +61,8 @@ export class SqlEditorNavigatorService {
     private notificationService: NotificationService,
     private gql: GraphQLService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private connectionAuthService: ConnectionAuthService
   ) {
 
     this.navigator = this.navigationService.createNavigator<SQLCreateAction | SQLEditorAction>(
@@ -162,6 +164,12 @@ export class SqlEditorNavigatorService {
 
     if (!connectionId) {
       connectionId = this.connectionsManagerService.connections[0].id;
+    }
+
+    const connection = await this.connectionAuthService.auth(connectionId);
+
+    if (!connection?.connected) {
+      return null;
     }
 
     await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);

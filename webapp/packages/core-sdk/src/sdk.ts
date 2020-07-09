@@ -814,10 +814,6 @@ export type CreateConnectionMutationVariables = Exact<{
 
 export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
-export type DataSourceListQueryVariables = Exact<{ [key: string]: never }>;
-
-export type DataSourceListQuery = { dataSourceList: Array<Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>> };
-
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -861,7 +857,11 @@ export type OpenConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type OpenConnectionMutation = { openConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+
+export type TemplateDataSourceListQueryVariables = Exact<{ [key: string]: never }>;
+
+export type TemplateDataSourceListQuery = { sources: Array<Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>> };
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1333,16 +1333,6 @@ export const CreateConnectionDocument = `
   }
 }
     `;
-export const DataSourceListDocument = `
-    query dataSourceList {
-  dataSourceList {
-    id
-    name
-    driverId
-    description
-  }
-}
-    `;
 export const DeleteConnectionDocument = `
     mutation deleteConnection($id: ID!) {
   deleteConnection(id: $id)
@@ -1425,7 +1415,7 @@ export const InitConnectionDocument = `
     `;
 export const OpenConnectionDocument = `
     mutation openConnection($config: ConnectionConfig!) {
-  openConnection(config: $config) {
+  connection: openConnection(config: $config) {
     id
     name
     driverId
@@ -1433,6 +1423,16 @@ export const OpenConnectionDocument = `
     features
     authNeeded
     authModel
+  }
+}
+    `;
+export const TemplateDataSourceListDocument = `
+    query templateDataSourceList {
+  sources: templateDataSources {
+    id
+    name
+    driverId
+    description
   }
 }
     `;
@@ -2002,9 +2002,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
     },
-    dataSourceList(variables?: DataSourceListQueryVariables): Promise<DataSourceListQuery> {
-      return withWrapper(() => client.request<DataSourceListQuery>(DataSourceListDocument, variables));
-    },
     deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
       return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));
     },
@@ -2025,6 +2022,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     openConnection(variables: OpenConnectionMutationVariables): Promise<OpenConnectionMutation> {
       return withWrapper(() => client.request<OpenConnectionMutation>(OpenConnectionDocument, variables));
+    },
+    templateDataSourceList(variables?: TemplateDataSourceListQueryVariables): Promise<TemplateDataSourceListQuery> {
+      return withWrapper(() => client.request<TemplateDataSourceListQuery>(TemplateDataSourceListDocument, variables));
     },
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));

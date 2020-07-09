@@ -15,8 +15,8 @@ import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dia
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { ObjectPropertyInfoForm } from '../../ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 import { useConnectionInfo } from '../useConnectionInfo';
-import { AuthForm } from './AuthForm';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 
@@ -40,14 +40,14 @@ const styles = composes(
       margin-top: 20px;
       margin-bottom: 20px;
     }
-    SubmittingForm, AuthForm {
+    SubmittingForm {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    AuthForm {
-      flex-direction: column;
-      padding: 18px 24px;
+    ObjectPropertyInfoForm {
+      align-items: center;
+      justify-content: center;
     }
     ErrorMessage {
       position: sticky;
@@ -87,10 +87,10 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         ? <Loader />
         : (
           <SubmittingForm onSubmit={controller.login}>
-            <AuthForm
-              authProperties={connection.connectionInfo?.authProperties!}
+            <ObjectPropertyInfoForm
+              properties={connection.connectionInfo?.authProperties!}
               credentials={controller.credentials}
-              authenticate={controller.isAuthenticating}
+              processing={controller.isAuthenticating}
             />
           </SubmittingForm>
         )}

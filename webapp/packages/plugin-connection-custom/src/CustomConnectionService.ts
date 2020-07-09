@@ -13,8 +13,10 @@ import { ConnectionConfig, GraphQLService, ObjectPropertyInfo } from '@cloudbeav
 @injectable()
 export class CustomConnectionService {
 
-  constructor(private graphQLService: GraphQLService,
-    private connectionsManagerService: ConnectionsManagerService) {
+  constructor(
+    private graphQLService: GraphQLService,
+    private connectionsManagerService: ConnectionsManagerService,
+  ) {
   }
 
   async loadDriverProperties(driverId: string): Promise<ObjectPropertyInfo[]> {

@@ -8,11 +8,11 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriver, ErrorDetailsDialog } from '@cloudbeaver/core-app';
+import { DBDriver, ErrorDetailsDialog, DatabaseAuthModelsResource } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ConnectionConfig, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';
 
@@ -27,29 +27,34 @@ implements IInitializableController, IDestructibleController {
   @observable connectionType = ConnectionType.Attributes
   @observable isLoading = true;
   @observable isConnecting = false;
-  @observable driver!: DBDriver
+  @observable driver!: DBDriver;
+  @observable authModel?: DatabaseAuthModel;
   @observable config: ConnectionConfig = {
     name: '',
     driverId: '',
     host: '',
     port: '',
     databaseName: '',
-    userName: '',
-    userPassword: '',
     url: '',
     properties: {},
-  }
+    credentials: {},
+  };
+
   readonly error = new GQLErrorCatcher();
-  private onClose!: () => void
+  private onClose!: () => void;
   private isDistructed = false;
 
-  constructor(private customConnectionService: CustomConnectionService,
+  constructor(
+    private customConnectionService: CustomConnectionService,
     private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService) { }
+    private commonDialogService: CommonDialogService,
+    private dbAuthModelsResource: DatabaseAuthModelsResource
+  ) { }
 
   init(driver: DBDriver, onClose: () => void) {
     this.driver = driver;
     this.onClose = onClose;
+    this.loadDatabaseAuthModel();
     this.setDriverDefaults();
   }
 
@@ -117,9 +122,9 @@ implements IInitializableController, IDestructibleController {
       config.name = this.urlToConnectionName(this.config.name, this.config.url);
       config.url = this.config.url;
     }
-    if (!this.driver?.anonymousAccess) {
-      config.userName = this.config.userName;
-      config.userPassword = this.config.userPassword;
+    if (this.authModel) {
+      config.authModelId = this.config.authModelId;
+      config.credentials = this.config.credentials;
     }
     if (Object.keys(this.config.properties).length > 0) {
       config.properties = this.config.properties;
@@ -136,9 +141,9 @@ implements IInitializableController, IDestructibleController {
     this.config.port = this.driver?.defaultPort || '';
     this.config.databaseName = '';
     this.config.url = this.driver?.sampleURL || '';
-    this.config.userName = '';
-    this.config.userPassword = '';
     this.config.properties = {};
+    this.config.authModelId = this.driver.defaultAuthModel;
+    this.config.credentials = {};
   }
 
   /**
@@ -168,6 +173,19 @@ implements IInitializableController, IDestructibleController {
   private showError(exception: Error, message: string) {
     if (!this.error.catch(exception) || this.isDistructed) {
       this.notificationService.logException(exception, message);
+    }
+  }
+
+  private async loadDatabaseAuthModel() {
+    if (!this.driver.defaultAuthModel) {
+      return;
+    }
+    try {
+      this.authModel = await this.dbAuthModelsResource.load(this.driver.defaultAuthModel);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load driver auth model');
+    } finally {
+      this.isLoading = false;
     }
   }
 }

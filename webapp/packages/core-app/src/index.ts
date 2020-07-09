@@ -30,6 +30,7 @@ export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/Navigation/NavigationService';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
+export * from './shared/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
 export * from './NavigationTree/NavigationTreeService';

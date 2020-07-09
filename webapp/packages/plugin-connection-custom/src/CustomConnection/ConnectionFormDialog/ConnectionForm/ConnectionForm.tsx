@@ -9,13 +9,12 @@
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { DBDriver } from '@cloudbeaver/core-app';
+import { DBDriver, ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
 import { Radio, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionType } from '../ConnectionFormDialogController';
-import { CredentialsForm } from './CredentialsForm';
 import { formStyles } from './formStyles';
 import { IFormController } from './IFormController';
 import { ParametersForm } from './ParametersForm';
@@ -73,7 +72,16 @@ export const ConnectionForm = observer(function ConnectionForm({
           </InputField>
         </group>
       )}
-      {!driver?.anonymousAccess && <CredentialsForm controller={controller}/>}
+      {controller.authModel && (
+        <>
+          <hr/>
+          <ObjectPropertyInfoForm
+            properties={controller.authModel.properties}
+            credentials={controller.config.credentials}
+            processing={controller.isConnecting}
+          />
+        </>
+      )}
     </connection-form>
   );
 });

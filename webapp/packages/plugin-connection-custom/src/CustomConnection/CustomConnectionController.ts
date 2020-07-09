@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { DBDriver, ConnectionsManagerService } from '@cloudbeaver/core-app';
+import { DBDriver, DBDriverResource } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -26,16 +26,14 @@ export class CustomConnectionController implements IInitializableController {
   @computed
   get drivers(): DBDriver[] {
     return Array
-      .from(
-        this.connectionsManagerService
-          .getDBDrivers()
-          .values()
-      )
+      .from(this.dbDriverResource.data.values())
       .sort((a, b) => this.sortDrivers(a, b));
   }
 
-  constructor(private connectionsManagerService: ConnectionsManagerService,
-    private notificationService: NotificationService) { }
+  constructor(
+    private dbDriverResource: DBDriverResource,
+    private notificationService: NotificationService
+  ) { }
 
   init() {
     this.loadDBDrivers();
@@ -46,16 +44,14 @@ export class CustomConnectionController implements IInitializableController {
   }
 
   onDriverSelect = (driverId: string) => {
-    this.driver = this.connectionsManagerService
-      .getDBDrivers()
-      .get(driverId)!;
+    this.driver = this.dbDriverResource.get(driverId)!;
 
     this.step = ConnectionStep.Connection;
   }
 
   private async loadDBDrivers() {
     try {
-      await this.connectionsManagerService.loadDriversAsync();
+      await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database drivers');
     } finally {
