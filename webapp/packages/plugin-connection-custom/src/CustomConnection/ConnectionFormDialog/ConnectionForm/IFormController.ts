@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { ConnectionType } from '../ConnectionFormDialogController';
 
 export interface IFormController {
+  authModel?: DatabaseAuthModel;
   config: ConnectionConfig;
   connectionType: ConnectionType;
   isConnecting: boolean;

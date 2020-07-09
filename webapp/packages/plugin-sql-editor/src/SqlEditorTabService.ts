@@ -17,6 +17,7 @@ import {
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaSetter,
+  ConnectionAuthService,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -34,11 +35,14 @@ import { SqlExecutionState } from './SqlExecutionState';
 export class SqlEditorTabService {
 
   readonly tabHandler: TabHandler<ISqlEditorTabState>
-  constructor(private navigationTabsService: NavigationTabsService,
-              private connectionsManagerService: ConnectionsManagerService,
-              private notificationService: NotificationService,
-              private gql: GraphQLService,
-              private sqlDialectInfoService: SqlDialectInfoService) {
+  constructor(
+    private navigationTabsService: NavigationTabsService,
+    private connectionsManagerService: ConnectionsManagerService,
+    private notificationService: NotificationService,
+    private gql: GraphQLService,
+    private sqlDialectInfoService: SqlDialectInfoService,
+    private connectionAuthService: ConnectionAuthService
+  ) {
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
@@ -102,6 +106,13 @@ export class SqlEditorTabService {
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
     try {
+
+      const connection = await this.connectionAuthService.auth(connectionId);
+
+      if (!connection?.connected) {
+        return false;
+      }
+
       // try to create new context first
       const context = await this.createSqlContext(connectionId);
       // when new context created - destroy old one silently

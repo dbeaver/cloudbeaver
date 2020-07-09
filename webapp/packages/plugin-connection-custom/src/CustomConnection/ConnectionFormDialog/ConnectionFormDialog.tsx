@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { DBDriver } from '@cloudbeaver/core-app';
 import {
-  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel
+  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
@@ -42,9 +42,6 @@ const styles = composes(
     CommonDialogWrapper {
       max-height: 500px;
       min-height: 500px;
-    }
-    SubmittingForm {
-      overflow: auto;
     }
     SubmittingForm, BaseTabPanel {
       flex: 1;
@@ -117,18 +114,23 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
         )}
         onReject={onClose}
       >
-        <SubmittingForm onSubmit={controller.onCreateConnection}>
-          <TabPanel tabId='options'>
-            <ConnectionForm driver={driver} controller={controller} />
-          </TabPanel>
-          <TabPanel tabId='driver_properties'>
-            <DriverProperties
-              driver={driver}
-              state={controller.config.properties!}
-              loadProperties={loadProperties}
-            />
-          </TabPanel>
-        </SubmittingForm>
+        {controller.isLoading
+          ? <Loader />
+          : (
+            <SubmittingForm onSubmit={controller.onCreateConnection}>
+              <TabPanel tabId='options'>
+                <ConnectionForm driver={driver} controller={controller} />
+              </TabPanel>
+              <TabPanel tabId='driver_properties'>
+                <DriverProperties
+                  driver={driver}
+                  state={controller.config.properties!}
+                  loadProperties={loadProperties}
+                />
+              </TabPanel>
+            </SubmittingForm>
+          )
+        }
         {controller.error.responseMessage && (
           <ErrorMessage
             text={controller.error.responseMessage}

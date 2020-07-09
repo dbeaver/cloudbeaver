@@ -67,11 +67,12 @@ export class NotificationService {
     this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error, message?: string, silent?: boolean) {
+  logException(exception: Error | GQLError, message?: string, silent?: boolean) {
+    const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
     if (!silent) {
       this.logError({
-        title: message || exception.message || exception.name,
-        details: this.hasDetails(exception) ? exception : undefined,
+        title: message || exceptionMessage,
+        details: hasDetails(exception) ? exception : undefined,
         isSilent: silent,
       });
     }
@@ -88,8 +89,8 @@ export class NotificationService {
   showDetails(id: number): void {
     // TODO: emit event or something
   }
+}
 
-  private hasDetails(error: Error) {
-    return error instanceof GQLError || error instanceof ServerInternalError;
-  }
+function hasDetails(error: Error): error is GQLError | ServerInternalError {
+  return error instanceof GQLError || error instanceof ServerInternalError;
 }

@@ -8,15 +8,14 @@
 
 import { observable, action } from 'mobx';
 
-import {
-  ConnectionsManagerService, DBSource, ErrorDetailsDialog,
-} from '@cloudbeaver/core-app';
+import { DBDriverResource, DBSource, ErrorDetailsDialog } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ConnectionConfig, GQLError } from '@cloudbeaver/core-sdk';
 
 import { BasicConnectionService } from '../BasicConnectionService';
+import { TemplateDataSourceListResource } from '../DataSourcesResource';
 
 export enum ConnectionStep {
   DBSource,
@@ -50,11 +49,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private isDistructed = false;
 
   get dbSources() {
-    return this.basicConnectionService.getDBSources();
+    return this.templateDataSourceListResource.data;
   }
 
   get dbDrivers() {
-    return this.connectionsManagerService.getDBDrivers();
+    return this.dbDriverResource.data;
   }
 
   get dbDriver() {
@@ -64,10 +63,13 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     return this.dbDrivers.get(this.dbSource.driverId);
   }
 
-  constructor(private connectionsManagerService: ConnectionsManagerService,
+  constructor(
+    private dbDriverResource: DBDriverResource,
+    private templateDataSourceListResource: TemplateDataSourceListResource,
     private basicConnectionService: BasicConnectionService,
     private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService) { }
+    private commonDialogService: CommonDialogService
+  ) { }
 
   init(onClose: () => void) {
     this.onClose = onClose;
@@ -153,8 +155,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   private async loadDBSources() {
     try {
-      await this.basicConnectionService.dbSources.load(null);
-      await this.connectionsManagerService.loadDriversAsync();
+      await this.templateDataSourceListResource.loadAll();
+      await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database sources');
     } finally {

@@ -17,42 +17,44 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { formStyles } from './formStyles';
 
 type Props = {
-  authProperties: ObjectPropertyInfo[] | undefined;
+  properties: ObjectPropertyInfo[] | undefined;
   credentials: any;
-  authenticate: boolean;
+  processing: boolean;
+  className?: string;
 }
 
-export const AuthForm = observer(function AuthForm({
-  authProperties,
+export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
+  properties,
   credentials,
-  authenticate,
+  processing,
+  className,
 }: Props) {
   const handleChange = useCallback((key: string, value: string) => {
     credentials[key] = value;
   }, [credentials]);
 
-  if (!authProperties || authProperties.length === 0) {
+  if (!properties || properties.length === 0) {
     return styled(useStyles(formStyles))(<center as="div">Properties empty</center>);
   }
 
   return styled(useStyles(formStyles))(
     <InFocus>
-      <login-form as='div'>
-        {authProperties.map(property => (
+      <form-body as='div' className={className}>
+        {properties.map(property => (
           <group as="div" key={property.id}>
             <InputField
               type={property.features.includes('password') ? 'password' : 'text'}
               name={property.id}
               value={credentials[property.id!]}
               onChange={value => handleChange(property.id!, value)}
-              disabled={authenticate}
+              disabled={processing}
               mod='surface'
             >
               {property.displayName}
             </InputField>
           </group>
         ))}
-      </login-form>
+      </form-body>
     </InFocus>
   );
 });

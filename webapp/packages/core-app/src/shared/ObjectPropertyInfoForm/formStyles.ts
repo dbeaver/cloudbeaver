@@ -9,13 +9,11 @@
 import { css } from 'reshadow';
 
 export const formStyles = css`
-  login-form {
+  form-body {
     flex: 1;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
   }
   group {
     box-sizing: border-box;

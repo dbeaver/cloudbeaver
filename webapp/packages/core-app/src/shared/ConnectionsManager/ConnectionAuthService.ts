@@ -26,11 +26,11 @@ export class ConnectionAuthService {
     if (!connection?.connected) {
       connection = await this.connectionInfoResource.refresh(connectionId);
     } else {
-      return;
+      return connection;
     }
 
     if (connection.connected) {
-      return;
+      return connection;
     }
 
     if (connection.authNeeded) {
@@ -38,5 +38,7 @@ export class ConnectionAuthService {
     } else {
       await this.connectionInfoResource.init(connectionId);
     }
+
+    return this.connectionInfoResource.get(connectionId)!;
   }
 }

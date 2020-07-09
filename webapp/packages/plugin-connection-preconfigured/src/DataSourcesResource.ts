@@ -12,16 +12,27 @@ import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class DataSourcesResource extends CachedDataResource<DBSource[], null> {
+export class TemplateDataSourceListResource extends CachedDataResource<DBSource[], null> {
   constructor(
     private graphQLService: GraphQLService,
     private permissionsService: PermissionsService
   ) {
     super([]);
+    this.permissionsService.onUpdate.subscribe(() => this.markOutdated(null));
   }
 
   isLoaded() {
     return !!this.data.length;
+  }
+
+  async loadAll() {
+    await this.load(null);
+    return this.data;
+  }
+
+  async refreshAll() {
+    await this.refresh(null);
+    return this.data;
   }
 
   protected async loader(key: null): Promise<DBSource[]> {
@@ -29,8 +40,8 @@ export class DataSourcesResource extends CachedDataResource<DBSource[], null> {
       this.markUpdated(key);
       return [];
     }
-    const { dataSourceList } = await this.graphQLService.gql.dataSourceList();
+    const { sources } = await this.graphQLService.gql.templateDataSourceList();
     this.markUpdated(key);
-    return dataSourceList;
+    return sources;
   }
 }
