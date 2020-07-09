@@ -204,10 +204,15 @@ public class WebServiceCore implements DBWServiceCore {
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         }
 
+        boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
+            // Set "save-password" to true to avoid password requests
+            dataSourceContainer.setSavePassword(true);
             dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);
+        } finally {
+            dataSourceContainer.setSavePassword(oldSavePassword);
         }
 
         return connectionInfo;
