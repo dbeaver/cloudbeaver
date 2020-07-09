@@ -28,7 +28,10 @@ const styles = composes(
   `,
   css`
     connection-name {
-      padding: 8px 16px;
+      composes: theme-typography--body2 from global;
+      padding: 4px 16px;
+      padding-top: 0;
+      text-align: right;
     }
     CommonDialogWrapper {
       min-height: 400px;
