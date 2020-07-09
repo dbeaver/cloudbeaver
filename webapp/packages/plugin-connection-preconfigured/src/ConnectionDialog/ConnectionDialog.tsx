@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
 import { ErrorMessage, SubmittingForm, Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Connection } from './Connection';
 import { ConnectionController, ConnectionStep } from './ConnectionController';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
 import { DBSourceSelector } from './DBSourceSelector/DBSourceSelector';
@@ -32,6 +32,10 @@ const styles = css`
   center {
     box-sizing: border-box;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  ObjectPropertyInfoForm {
     align-items: center;
     justify-content: center;
   }
@@ -69,17 +73,16 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           onSelect={controller.onDBSourceSelect}
         />
       )}
-      {controller.step === ConnectionStep.Connection && (controller.dbDriver?.anonymousAccess ? (
+      {controller.step === ConnectionStep.Connection && (!controller.authModel ? (
         <center as="div">
           {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
         </center>
       ) : (
         <SubmittingForm onSubmit={controller.onConnect}>
-          <Connection
-            userName={controller.config.userName}
-            userPassword={controller.config.userPassword}
-            isConnecting={controller.isConnecting}
-            onChange={controller.onChange}
+          <ObjectPropertyInfoForm
+            properties={controller.authModel.properties}
+            credentials={controller.config.credentials}
+            processing={controller.isConnecting}
           />
         </SubmittingForm>
       ))}

@@ -177,9 +177,10 @@ implements IInitializableController, IDestructibleController {
   }
 
   private async loadDatabaseAuthModel() {
-    if (!this.driver.defaultAuthModel) {
+    if (!this.driver || this.driver.anonymousAccess) {
       return;
     }
+
     try {
       this.authModel = await this.dbAuthModelsResource.load(this.driver.defaultAuthModel);
     } catch (exception) {

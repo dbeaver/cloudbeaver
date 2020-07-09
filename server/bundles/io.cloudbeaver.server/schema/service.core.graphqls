@@ -133,7 +133,6 @@ type DriverInfo {
     embedded: Boolean
 
     # this fields must be removed and be replaced by DriverAuthModel
-    anonymousAccess: Boolean @deprecated
     allowsEmptyPassword: Boolean @deprecated
 
     licenseRequired: Boolean
@@ -152,8 +151,8 @@ type DriverInfo {
     driverProperties: [ObjectPropertyInfo!]
     driverParameters: Object
 
-    # Can be null? (only anonymous access)
-    defaultAuthModel: ID
+    anonymousAccess: Boolean
+    defaultAuthModel: ID!
     applicableAuthModel: [ID!]!
 }
 

@@ -413,8 +413,6 @@ export type DriverInfo = {
   driverPropertiesURL?: Maybe<Scalars['String']>;
   embedded?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
-  anonymousAccess?: Maybe<Scalars['Boolean']>;
-  /** @deprecated Field no longer supported */
   allowsEmptyPassword?: Maybe<Scalars['Boolean']>;
   licenseRequired?: Maybe<Scalars['Boolean']>;
   license?: Maybe<Scalars['String']>;
@@ -424,7 +422,8 @@ export type DriverInfo = {
   defaultConnectionProperties?: Maybe<Scalars['Object']>;
   driverProperties?: Maybe<Array<ObjectPropertyInfo>>;
   driverParameters?: Maybe<Scalars['Object']>;
-  defaultAuthModel?: Maybe<Scalars['ID']>;
+  anonymousAccess?: Maybe<Scalars['Boolean']>;
+  defaultAuthModel: Scalars['ID'];
   applicableAuthModel: Array<Scalars['ID']>;
 };
 

@@ -88,7 +88,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         : (
           <SubmittingForm onSubmit={controller.login}>
             <ObjectPropertyInfoForm
-              properties={connection.connectionInfo?.authProperties!}
+              properties={connection.connectionInfo?.authProperties}
               credentials={controller.credentials}
               processing={controller.isAuthenticating}
             />
