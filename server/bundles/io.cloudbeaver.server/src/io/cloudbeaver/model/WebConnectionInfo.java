@@ -22,10 +22,12 @@ import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -175,6 +177,9 @@ public class WebConnectionInfo {
     @Property
     public WebPropertyInfo[] getAuthProperties() {
         String authModelId = dataSourceContainer.getConnectionConfiguration().getAuthModelId();
+        if (CommonUtils.isEmpty(authModelId)) {
+            authModelId = AuthModelDatabaseNative.ID;
+        }
         DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
         if (authModel == null) {
             return new WebPropertyInfo[0];
