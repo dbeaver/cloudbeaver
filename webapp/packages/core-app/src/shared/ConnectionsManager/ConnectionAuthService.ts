@@ -7,16 +7,17 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import { ConnectionInfoResource } from './ConnectionInfoResource';
-import { ConnectionsManagerService } from './ConnectionsManagerService';
+import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 
 @injectable()
 export class ConnectionAuthService {
 
   constructor(
-    private connectionManagerService: ConnectionsManagerService,
-    private connectionInfoResource: ConnectionInfoResource
+    private connectionInfoResource: ConnectionInfoResource,
+    private commonDialogService: CommonDialogService,
   ) {}
 
   async auth(connectionId: string) {
@@ -33,10 +34,7 @@ export class ConnectionAuthService {
     }
 
     if (connection.authNeeded) {
-      const properties = await this.connectionInfoResource.loadAuthModel(connectionId);
-      // TODO: authorize dialog
-      // init with credentials
-      // await this.connectionInfoResource.init(connectionId);
+      await this.commonDialogService.open(DatabaseAuthDialog, connectionId);
     } else {
       await this.connectionInfoResource.init(connectionId);
     }
