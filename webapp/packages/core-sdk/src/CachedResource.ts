@@ -74,6 +74,12 @@ export abstract class CachedResource<
     }
 
     await this.waitActive();
+
+    // repeated because previous task maybe has been load requested data
+    if (this.isLoaded(param) && !this.isOutdated(param)) {
+      return;
+    }
+
     await this.setActivePromise(param, this.loadingTask(param));
     this.dataSubject.next(this.data);
   }

@@ -27,10 +27,14 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
 
   async loadChildren(parentId: string, key: ResourceKey<string>) {
     if (this.isLoaded(key) && !this.isOutdated(key)) {
-      return;
+      return this.data;
     }
 
     await this.waitActive();
+    if (this.isLoaded(key) && !this.isOutdated(key)) {
+      return this.data;
+    }
+
     await this.setActivePromise(key, this.loadFromChildren(parentId));
     this.dataSubject.next(this.data);
     return this.data;

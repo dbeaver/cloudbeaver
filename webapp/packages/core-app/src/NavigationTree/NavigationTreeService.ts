@@ -13,7 +13,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import { ConnectionAuthService } from '../shared/ConnectionsManager/ConnectionAuthService';
-import { ConnectionsManagerService } from '../shared/ConnectionsManager/ConnectionsManagerService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
@@ -29,20 +28,24 @@ export class NavigationTreeService {
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
-    private connectionsManagerService: ConnectionsManagerService,
     private connectionAuthService: ConnectionAuthService
   ) {
     this.nodeSelectSubject = new Subject();
     this.onNodeSelect = this.nodeSelectSubject.asObservable();
   }
 
+  async navToNode(id: string, parentId: string) {
+    try {
+      await this.ensureConnectionInit(id);
+      await this.navNodeManagerService.navToNode(id, parentId);
+    } catch (exception) {
+      this.notificationService.logException(exception);
+    }
+  }
+
   async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
-      const node = this.navNodeManagerService.getNode(id);
-
-      if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
-        await this.connectionAuthService.auth(NodeManagerUtils.connectionNodeIdToConnectionId(id));
-      }
+      await this.ensureConnectionInit(id);
       await this.navNodeManagerService.refreshTree(id);
       return true;
     } catch (exception) {
@@ -70,5 +73,13 @@ export class NavigationTreeService {
 
   isNodeSelected(navNodeId: string) {
     return this.selectedNodes.includes(navNodeId);
+  }
+
+  private async ensureConnectionInit(navNodeId: string) {
+    const node = this.navNodeManagerService.getNode(navNodeId);
+
+    if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
+      await this.connectionAuthService.auth(NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId));
+    }
   }
 }

@@ -43,7 +43,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   protected async loader(connectionId: string): Promise<Map<string, Connection>> {
     const { connection } = await this.graphQLService.gql.connectionState({ id: connectionId });
-    this.set(connectionId, connection);
+
+    const oldConnection = this.get(connectionId) || {};
+    this.set(connectionId, { ...oldConnection, ...connection });
 
     return this.data;
   }
