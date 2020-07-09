@@ -41,6 +41,9 @@ public class WebConnectionConfig {
     private String userName;
     private String userPassword;
 
+    private String authModelId;
+    private Map<String, Object> credentials;
+
     public WebConnectionConfig() {
     }
 
@@ -60,6 +63,9 @@ public class WebConnectionConfig {
         properties = JSONUtils.getObject(params, "properties");
         userName = JSONUtils.getString(params, "userName");
         userPassword = JSONUtils.getString(params, "userPassword");
+
+        authModelId = JSONUtils.getString(params, "authModelId");
+        credentials = JSONUtils.getObject(params, "credentials");
     }
 
     @Property
@@ -122,4 +128,13 @@ public class WebConnectionConfig {
         return userPassword;
     }
 
+    @Property
+    public String getAuthModelId() {
+        return authModelId;
+    }
+
+    @Property
+    public Map<String, Object> getCredentials() {
+        return credentials;
+    }
 }
