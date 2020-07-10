@@ -51,6 +51,7 @@ export * from './shared/ConnectionsManager/EConnectionFeature';
 // hooks
 export * from './shared/useChildren';
 export * from './shared/ConnectionsManager/useConnectionInfo';
+export * from './shared/ConnectionsManager/useDBDriver';
 export * from './shared/NavigationTabs/NavigationTabsBar/Tabs/useTab';
 export * from './shared/NodesManager/useDatabaseObjectInfo';
 export * from './shared/NodesManager/useNode';

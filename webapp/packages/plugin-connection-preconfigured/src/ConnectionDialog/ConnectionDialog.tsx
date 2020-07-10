@@ -55,6 +55,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={title}
+      icon={controller.dbDriver?.icon}
       noBodyPadding={controller.step === ConnectionStep.DBSource}
       footer={controller.step === ConnectionStep.Connection && (
         <ConnectionDialogFooter

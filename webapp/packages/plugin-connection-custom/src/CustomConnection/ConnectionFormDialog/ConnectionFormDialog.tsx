@@ -93,6 +93,7 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
     <TabsState selectedId='options'>
       <CommonDialogWrapper
         title={title}
+        icon={driver?.icon}
         noBodyPadding
         header={(
           <TabList>

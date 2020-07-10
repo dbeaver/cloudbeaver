@@ -12,11 +12,11 @@ import styled, { css } from 'reshadow';
 import { SubmittingForm, ErrorMessage, Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ObjectPropertyInfoForm } from '../../ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 import { useConnectionInfo } from '../useConnectionInfo';
+import { useDBDriver } from '../useDBDriver';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 
@@ -27,12 +27,6 @@ const styles = composes(
     }
   `,
   css`
-    connection-name {
-      composes: theme-typography--body2 from global;
-      padding: 4px 16px;
-      padding-top: 0;
-      text-align: right;
-    }
     CommonDialogWrapper {
       min-height: 400px;
       min-width: 600px;
@@ -66,18 +60,14 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   rejectDialog,
 }: DialogComponentProps<string, null>) {
   const connection = useConnectionInfo(payload);
+  const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
-  const translate = useTranslate();
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={translate('authentication_login_dialog_title')}
+      title={connection.connectionInfo?.name}
+      icon={driver?.icon}
       noBodyPadding
-      header={(
-        <connection-name as="div">
-          {connection.connectionInfo?.name}
-        </connection-name>
-      )}
       footer={(
         <DBAuthDialogFooter
           isAuthenticating={controller.isAuthenticating}
