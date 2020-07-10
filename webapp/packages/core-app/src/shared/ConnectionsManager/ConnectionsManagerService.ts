@@ -40,7 +40,7 @@ export class ConnectionsManagerService {
     private sessionResource: SessionResource,
     private notificationService: NotificationService
   ) {
-    this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(this.restoredConnections.bind(this));
   }
 
   async loadConnectionInfoAsync(connectionId: string): Promise<Connection> {
@@ -155,7 +155,7 @@ export class ConnectionsManagerService {
     this.onCloseConnection.next(id);
   }
 
-  private async restoreConnections() {
+  private async restoredConnections() {
     const config = await this.sessionResource.load(null);
     if (!config) {
       return;

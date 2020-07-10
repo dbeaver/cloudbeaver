@@ -10,16 +10,16 @@ import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { ConnectionsManagerService } from './ConnectionsManagerService';
+import { ConnectionInfoResource } from './ConnectionInfoResource';
 
 export function useConnectionInfo(connectionId: string) {
-  const service = useService(ConnectionsManagerService);
+  const service = useService(ConnectionInfoResource);
 
-  const connectionInfo = service.getConnectionById(connectionId);
-  const load = useCallback(() => service.loadConnectionInfoAsync(connectionId), [service, connectionId]);
-  const refresh = useCallback(() => service.refreshConnectionInfoAsync(connectionId), [service, connectionId]);
-  const isLoading = useCallback(() => service.connectionInfo.isDataLoading(connectionId), [service, connectionId]);
-  const isLoaded = useCallback(() => service.connectionInfo.isLoaded(connectionId), [service, connectionId]);
+  const connectionInfo = service.get(connectionId);
+  const load = useCallback(() => service.load(connectionId), [service, connectionId]);
+  const refresh = useCallback(() => service.refresh(connectionId), [service, connectionId]);
+  const isLoading = useCallback(() => service.isDataLoading(connectionId), [service, connectionId]);
+  const isLoaded = useCallback(() => service.isLoaded(connectionId), [service, connectionId]);
 
   return {
     connectionInfo,

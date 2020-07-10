@@ -37,7 +37,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       return connection.authProperties;
     }
 
+    this.markOutdated(connectionId);
     connection.authProperties = await this.setActivePromise(connectionId, this.getAuthProperties(connectionId));
+    this.set(connectionId, connection);
     return connection.authProperties!;
   }
 

@@ -8,11 +8,13 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriverResource, DBSource, ErrorDetailsDialog } from '@cloudbeaver/core-app';
+import {
+  DBDriverResource, DBSource, ErrorDetailsDialog, DatabaseAuthModelsResource
+} from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ConnectionConfig, GQLError } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { BasicConnectionService } from '../BasicConnectionService';
 import { TemplateDataSourceListResource } from '../DataSourcesResource';
@@ -26,7 +28,6 @@ export interface IConnectionController {
   dbSource: DBSource | null;
   config: ConnectionConfig;
   isConnecting: boolean;
-  onChange<T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]): void;
   onConnect(): void;
 }
 
@@ -37,9 +38,9 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   @observable isLoading = true;
   @observable isConnecting = false;
   @observable dbSource: DBSource | null = null
+  @observable authModel?: DatabaseAuthModel;
   @observable config: ConnectionConfig = {
-    userName: '',
-    userPassword: '',
+    credentials: {},
   }
   @observable hasDetails = false
   @observable responseMessage: string | null = null
@@ -68,7 +69,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private templateDataSourceListResource: TemplateDataSourceListResource,
     private basicConnectionService: BasicConnectionService,
     private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService
+    private commonDialogService: CommonDialogService,
+    private dbAuthModelsResource: DatabaseAuthModelsResource
   ) { }
 
   init(onClose: () => void) {
@@ -83,10 +85,6 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   onStep = (step: ConnectionStep) => {
     this.step = step;
     this.clearError();
-  }
-
-  onChange = (property: keyof ConnectionConfig, value: any) => {
-    this.config[property] = value;
   }
 
   onConnect = async () => {
@@ -104,13 +102,15 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   }
 
-  onDBSourceSelect = (sourceId: string) => {
+  onDBSourceSelect = async (sourceId: string) => {
     this.dbSource = this.dbSources.find(dbSource => dbSource.id === sourceId)!;
+
+    await this.loadAuthModel();
     this.clearError();
     this.setDBSourceDefaults();
 
     this.step = ConnectionStep.Connection;
-    if (this.dbDriver && this.dbDriver.anonymousAccess) {
+    if (!this.authModel) {
       this.onConnect();
     }
   }
@@ -124,8 +124,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
     config.dataSourceId = this.config.dataSourceId;
-    config.userName = this.config.userName;
-    config.userPassword = this.config.userPassword;
+    config.authModelId = this.config.authModelId;
+    config.credentials = this.config.credentials;
 
     return config;
   }
@@ -133,8 +133,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   @action
   private setDBSourceDefaults() {
     this.config.dataSourceId = this.dbSource?.id;
-    this.config.userName = '';
-    this.config.userPassword = '';
+    this.config.authModelId = this.dbDriver?.defaultAuthModel;
+    this.config.credentials = {};
   }
 
   private clearError() {
@@ -159,6 +159,21 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database sources');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async loadAuthModel() {
+    if (!this.dbDriver || this.dbDriver.anonymousAccess) {
+      return;
+    }
+
+    try {
+      this.isLoading = true;
+      this.authModel = await this.dbAuthModelsResource.load(this.dbDriver.defaultAuthModel);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load driver auth model');
     } finally {
       this.isLoading = false;
     }

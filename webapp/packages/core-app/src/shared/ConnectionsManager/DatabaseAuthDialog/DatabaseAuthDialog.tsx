@@ -28,7 +28,10 @@ const styles = composes(
   `,
   css`
     connection-name {
-      padding: 8px 16px;
+      composes: theme-typography--body2 from global;
+      padding: 4px 16px;
+      padding-top: 0;
+      text-align: right;
     }
     CommonDialogWrapper {
       min-height: 400px;
@@ -88,7 +91,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         : (
           <SubmittingForm onSubmit={controller.login}>
             <ObjectPropertyInfoForm
-              properties={connection.connectionInfo?.authProperties!}
+              properties={connection.connectionInfo?.authProperties}
               credentials={controller.credentials}
               processing={controller.isAuthenticating}
             />
