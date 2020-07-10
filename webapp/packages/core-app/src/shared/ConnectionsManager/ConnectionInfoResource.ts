@@ -23,11 +23,28 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   async init(id: string, credentials?: any): Promise<Connection> {
-    const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
-
-    this.set(id, connection);
+    await this.performUpdate(id, async () => {
+      const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
+      this.set(id, connection);
+    });
 
     return this.get(id)!;
+  }
+
+  async close(connectionId: string) {
+    await this.performUpdate(connectionId, async () => {
+      const connection = await this.setActivePromise(connectionId, this.closeConnection(connectionId));
+      this.set(connectionId, connection);
+    });
+
+    return this.get(connectionId)!;
+  }
+
+  async deleteConnection(connectionId: string) {
+    await this.performUpdate(connectionId, async () => {
+      await this.graphQLService.gql.deleteConnection({ id: connectionId });
+    });
+    this.delete(connectionId);
   }
 
   async loadAuthModel(connectionId: string): Promise<ObjectPropertyInfo[]> {
@@ -37,10 +54,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       return connection.authProperties;
     }
 
-    this.markOutdated(connectionId);
-    connection.authProperties = await this.setActivePromise(connectionId, this.getAuthProperties(connectionId));
-    this.set(connectionId, connection);
-    return connection.authProperties!;
+    return this.performUpdate(connectionId, async () => {
+      connection.authProperties = await this.setActivePromise(connectionId, this.getAuthProperties(connectionId));
+      this.set(connectionId, connection);
+
+      return connection.authProperties!;
+    });
   }
 
   protected async loader(connectionId: string): Promise<Map<string, Connection>> {
@@ -60,6 +79,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   private async initConnection(id: string, credentials?: any): Promise<Connection> {
     const { connection } = await this.graphQLService.gql.initConnection({ id, credentials });
+
+    return connection;
+  }
+
+  private async closeConnection(id: string): Promise<Connection> {
+    const { connection } = await this.graphQLService.gql.closeConnection({ id });
 
     return connection;
   }

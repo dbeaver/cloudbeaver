@@ -10,7 +10,7 @@ import {
   NavigationTabsService,
   TabHandler,
   ITab,
-  ConnectionsManagerService,
+  ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
   objectSchemaProvider,
@@ -37,7 +37,7 @@ export class SqlEditorTabService {
   readonly tabHandler: TabHandler<ISqlEditorTabState>
   constructor(
     private navigationTabsService: NavigationTabsService,
-    private connectionsManagerService: ConnectionsManagerService,
+    private connectionInfoResource: ConnectionInfoResource,
     private notificationService: NotificationService,
     private gql: GraphQLService,
     private sqlDialectInfoService: SqlDialectInfoService,
@@ -79,7 +79,7 @@ export class SqlEditorTabService {
     }
 
     // the connection for this editor was closed
-    if (!this.connectionsManagerService.getConnectionById(tab.handlerState.connectionId)) {
+    if (!this.connectionInfoResource.get(tab.handlerState.connectionId)) {
       return false;
     }
 
@@ -166,7 +166,7 @@ export class SqlEditorTabService {
   }
 
   private async destroySqlContext(connectionId: string, contextId: string): Promise<void> {
-    const connection = this.connectionsManagerService.getConnectionById(connectionId);
+    const connection = this.connectionInfoResource.get(connectionId);
     if (!connection) {
       // connection was closed before, nothing to destroy
       return;

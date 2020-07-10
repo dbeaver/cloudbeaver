@@ -38,7 +38,7 @@ export class BasicConnectionPluginBootstrap {
         title: 'basicConnection_main_menu_item',
         onClick: () => this.openConnectionsDialog(),
         isHidden: () => !this.permissionsService.has(EPermission.public),
-        isDisabled: () => !this.templateDataSourceListResource.data.length,
+        isDisabled: () => this.isDisabled(),
       }
     );
   }
@@ -46,6 +46,11 @@ export class BasicConnectionPluginBootstrap {
   private async openConnectionsDialog() {
     this.loadDbSources();
     await this.commonDialogService.open(ConnectionDialog, null);
+  }
+
+  private isDisabled() {
+    this.loadDbSources();
+    return !this.templateDataSourceListResource.data.length;
   }
 
   private async loadDbSources() {

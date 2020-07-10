@@ -13,6 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { IExtension } from '@cloudbeaver/core-extensions';
 
 import { NavigationTreeService } from '../../NavigationTree/NavigationTreeService';
+import { ConnectionInfoResource } from '../../shared/ConnectionsManager/ConnectionInfoResource';
 import { ConnectionsManagerService } from '../../shared/ConnectionsManager/ConnectionsManagerService';
 import { ObjectContainer } from '../../shared/ConnectionsManager/ContainerResource';
 import { DBDriverResource } from '../../shared/ConnectionsManager/DBDriverResource';
@@ -117,6 +118,7 @@ export class ConnectionSchemaManagerService {
 
   constructor(
     private navigationTabsService: NavigationTabsService,
+    private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService,
@@ -181,7 +183,7 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-      await this.connectionsManagerService.loadConnectionInfoAsync(connectionId);
+      await this.connectionInfo.load(connectionId);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load connection info', true);
     }

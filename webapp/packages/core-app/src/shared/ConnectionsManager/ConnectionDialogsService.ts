@@ -14,6 +14,7 @@ import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuSer
 import { NavNode } from '../NodesManager/EntityTypes';
 import { EObjectFeature } from '../NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
+import { ConnectionInfoResource } from './ConnectionInfoResource';
 import { ConnectionsManagerService } from './ConnectionsManagerService';
 import { EConnectionFeature } from './EConnectionFeature';
 
@@ -21,10 +22,12 @@ import { EConnectionFeature } from './EConnectionFeature';
 export class ConnectionDialogsService {
   newConnectionMenuToken = 'connectionMenu';
 
-  constructor(private mainMenuService: MainMenuService,
-              private contextMenuService: ContextMenuService,
-              private connectionsManagerService: ConnectionsManagerService) {
-  }
+  constructor(
+    private mainMenuService: MainMenuService,
+    private contextMenuService: ContextMenuService,
+    private connectionsManagerService: ConnectionsManagerService,
+    private connectionInfoResource: ConnectionInfoResource
+  ) {}
 
   registerMenuItems() {
     this.mainMenuService.registerMenuItem(
@@ -54,7 +57,7 @@ export class ConnectionDialogsService {
         id: 'closeConnection',
         isPresent: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
-          const connection = this.connectionsManagerService.getConnectionById(connectionId);
+          const connection = this.connectionInfoResource.get(connectionId);
 
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
           && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)
@@ -74,7 +77,7 @@ export class ConnectionDialogsService {
         id: 'deleteConnection',
         isPresent: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
-          const connection = this.connectionsManagerService.getConnectionById(connectionId);
+          const connection = this.connectionInfoResource.get(connectionId);
 
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
           && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)

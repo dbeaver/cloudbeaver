@@ -68,6 +68,17 @@ export abstract class CachedResource<
 
   protected abstract loader(param: TParam): Promise<TData>;
 
+  protected async performUpdate<T>(param: TParam, update: (param: TParam) => Promise<T>): Promise<T> {
+    await this.waitActive();
+    this.markOutdated(param);
+
+    const result = await this.setActivePromise(param, update(param));
+    this.markUpdated(param);
+    this.dataSubject.next(this.data);
+
+    return result;
+  }
+
   protected async loadData(param: TParam) {
     if (this.isLoaded(param) && !this.isOutdated(param)) {
       return;
