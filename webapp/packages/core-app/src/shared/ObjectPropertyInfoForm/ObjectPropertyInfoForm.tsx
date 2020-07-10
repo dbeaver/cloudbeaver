@@ -20,6 +20,8 @@ type Props = {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: any;
   processing: boolean;
+  prefix?: string;
+  autofillToken?: string;
   className?: string;
 }
 
@@ -27,6 +29,8 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
   processing,
+  prefix = '',
+  autofillToken = '',
   className,
 }: Props) {
   const handleChange = useCallback((key: string, value: string) => {
@@ -44,10 +48,11 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
           <group as="div" key={property.id}>
             <InputField
               type={property.features.includes('password') ? 'password' : 'text'}
-              name={property.id}
+              name={`${prefix}_${property.id}`}
               value={credentials[property.id!]}
               onChange={value => handleChange(property.id!, value)}
               disabled={processing}
+              autoComplete={`${autofillToken} ${property.id}`}
               mod='surface'
             >
               {property.displayName}

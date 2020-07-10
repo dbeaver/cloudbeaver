@@ -76,6 +76,8 @@ export const ConnectionForm = observer(function ConnectionForm({
         <>
           <hr/>
           <ObjectPropertyInfoForm
+            prefix={`auth_${driver?.id || ''}`}
+            autofillToken={`section-${driver?.id || ''} section-auth`}
             properties={controller.authModel.properties}
             credentials={controller.config.credentials}
             processing={controller.isConnecting}

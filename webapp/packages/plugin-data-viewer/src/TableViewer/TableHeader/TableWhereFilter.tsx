@@ -61,6 +61,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
   return styled(useStyles(styles))(
     <SubmittingForm onSubmit={() => context.applyQueryFilters()}>
       <InlineEditor
+        name="data_where"
         value={context.getQueryWhereFilter() || ''}
         onSave={() => context.applyQueryFilters()}
         onUndo={resetFilter}
