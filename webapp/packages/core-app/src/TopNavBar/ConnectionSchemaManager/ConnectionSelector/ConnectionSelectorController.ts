@@ -11,8 +11,7 @@ import { computed } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
 
-import { Connection } from '../../../shared/ConnectionsManager/ConnectionInfoResource';
-import { ConnectionsManagerService } from '../../../shared/ConnectionsManager/ConnectionsManagerService';
+import { Connection, ConnectionInfoResource } from '../../../shared/ConnectionsManager/ConnectionInfoResource';
 import { DBDriverResource } from '../../../shared/ConnectionsManager/DBDriverResource';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
@@ -29,7 +28,7 @@ export class ConnectionSelectorController {
       return;
     }
 
-    return this.connectionsManagerService.getConnectionById(
+    return this.connectionInfo.get(
       this.connectionSelectorService.currentConnectionId
     );
   }
@@ -75,8 +74,8 @@ export class ConnectionSelectorController {
 
   constructor(
     private connectionSelectorService: ConnectionSchemaManagerService,
-    private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
+    private connectionInfo: ConnectionInfoResource,
   ) {
 
     this.connectionMenu = new ComputedMenuItemModel({
@@ -103,7 +102,7 @@ export class ConnectionSelectorController {
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return this.connectionsManagerService.connections.map((item) => {
+    return Array.from(this.connectionInfo.data.values()).map((item) => {
       const menuItem: IMenuItem = {
         id: item.id,
         title: item.name || item.id,

@@ -38,10 +38,11 @@ export const AuthProviderForm = observer(function AuthProviderForm({
           <group as="div" key={parameter.id}>
             <InputField
               type={parameter.encryption === 'none' ? 'text' : 'password'}
-              name={parameter.id}
+              name={`authentication_${provider.id}_${parameter.id}`}
               value={credentials[parameter.id]}
               onChange={value => handleChange(parameter.id, value)}
               disabled={authenticate}
+              autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
               mod='surface'
             >
               {parameter.displayName}

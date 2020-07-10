@@ -10,6 +10,7 @@ import {
   NavigationTabsService,
   ITab,
   ConnectionsManagerService,
+  ConnectionInfoResource,
   INavigator,
   NavigationService,
   IContextProvider,
@@ -59,6 +60,7 @@ export class SqlEditorNavigatorService {
     private navigationTabsService: NavigationTabsService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
+    private connectionInfoResource: ConnectionInfoResource,
     private gql: GraphQLService,
     private sqlDialectInfoService: SqlDialectInfoService,
     private navigationService: NavigationService,
@@ -163,7 +165,7 @@ export class SqlEditorNavigatorService {
     const order = this.getFreeEditorId();
 
     if (!connectionId) {
-      connectionId = this.connectionsManagerService.connections[0].id;
+      connectionId = Array.from(this.connectionInfoResource.data.values())[0].id;
     }
 
     const connection = await this.connectionAuthService.auth(connectionId);

@@ -40,7 +40,15 @@ export const commonDialogStyle = composes(
   }
   header-title {
     display: flex;
+    align-items: center;
     position: relative;
+  }
+  IconOrImage {
+    width: 24px;
+    height: 24px;
+    padding: 18px 24px;
+    padding-right: 0;
+    margin-right: -8px;
   }
   dialog-body {
     box-sizing: border-box;

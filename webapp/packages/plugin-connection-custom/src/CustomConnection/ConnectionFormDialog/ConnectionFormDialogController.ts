@@ -178,6 +178,7 @@ implements IInitializableController, IDestructibleController {
 
   private async loadDatabaseAuthModel() {
     if (!this.driver || this.driver.anonymousAccess) {
+      this.isLoading = false;
       return;
     }
 

@@ -8,7 +8,7 @@
 
 import styled from 'reshadow';
 
-import { TabHandlerTabProps, ConnectionsManagerService } from '@cloudbeaver/core-app';
+import { TabHandlerTabProps, ConnectionInfoResource } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -18,8 +18,8 @@ import { ISqlEditorTabState } from './ISqlEditorTabState';
 export function SqlEditorTab({
   tab, handler, onSelect, onClose, style,
 }: TabHandlerTabProps<ISqlEditorTabState>) {
-  const connectionsManagerService = useService(ConnectionsManagerService);
-  const connection = connectionsManagerService.getConnectionById(tab.handlerState.connectionId);
+  const connectionInfo = useService(ConnectionInfoResource);
+  const connection = connectionInfo.get(tab.handlerState.connectionId);
   const name = `sql-${tab.handlerState.order}${connection ? ` (${connection.name})` : ''}`;
 
   return styled(useStyles(...style))(

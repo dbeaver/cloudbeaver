@@ -8,13 +8,15 @@
 
 import styled, { use } from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { commonDialogStyle } from './styles';
 
 export type CommonDialogWrapperProps = {
-  title: string;
+  title?: string;
+  icon?: string;
+  viewBox?: string;
   onReject?: () => void;
   className?: string;
   noBodyPadding?: boolean;
@@ -25,6 +27,8 @@ export type CommonDialogWrapperProps = {
 
 export function CommonDialogWrapper({
   title,
+  icon,
+  viewBox,
   header,
   footer,
   noBodyPadding,
@@ -37,6 +41,7 @@ export function CommonDialogWrapper({
     <dialog className={className}>
       <header>
         <header-title as="div">
+          {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
           <h1>{title}</h1>
           {onReject && (
             <reject as="div">

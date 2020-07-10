@@ -30,13 +30,27 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
       return this.data;
     }
 
-    await this.waitActive();
-    if (this.isLoaded(key) && !this.isOutdated(key)) {
-      return this.data;
+    this.performUpdate(key, async () => {
+      if (this.isLoaded(key) && !this.isOutdated(key)) {
+        return;
+      }
+
+      await this.setActivePromise(key, this.loadFromChildren(parentId));
+    });
+    return this.data;
+  }
+
+  protected async loader(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      const values: DBObject[] = [];
+      for (const navNodeId of key.list) {
+        values.push(await this.loadDBObjectInfo(navNodeId));
+      }
+      this.set(key, values);
+    } else {
+      this.set(key, await this.loadDBObjectInfo(key));
     }
 
-    await this.setActivePromise(key, this.loadFromChildren(parentId));
-    this.dataSubject.next(this.data);
     return this.data;
   }
 
@@ -54,20 +68,6 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
         }
       );
     }
-  }
-
-  protected async loader(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      const values: DBObject[] = [];
-      for (const navNodeId of key.list) {
-        values.push(await this.loadDBObjectInfo(navNodeId));
-      }
-      this.set(key, values);
-    } else {
-      this.set(key, await this.loadDBObjectInfo(key));
-    }
-
-    return this.data;
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {

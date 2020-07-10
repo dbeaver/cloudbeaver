@@ -55,6 +55,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={title}
+      icon={controller.dbDriver?.icon}
       noBodyPadding={controller.step === ConnectionStep.DBSource}
       footer={controller.step === ConnectionStep.Connection && (
         <ConnectionDialogFooter
@@ -80,6 +81,8 @@ export const ConnectionDialog = observer(function ConnectionDialog({
       ) : (
         <SubmittingForm onSubmit={controller.onConnect}>
           <ObjectPropertyInfoForm
+            prefix={`auth_${controller.dbSource?.id || ''}`}
+            autofillToken={`section-${controller.dbSource?.id || ''} section-auth`}
             properties={controller.authModel.properties}
             credentials={controller.config.credentials}
             processing={controller.isConnecting}

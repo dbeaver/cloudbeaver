@@ -14,6 +14,7 @@ export const formStyles = css`
     display: flex;
     flex-direction: column;
     padding: 18px 24px;
+    padding-top: 4px;
   }
   connection-type {
     padding: 12px;

@@ -15,6 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
+import { DBDriverResource } from '../DBDriverResource';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
@@ -31,12 +32,14 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource,
     private commonDialogService: CommonDialogService,
+    private dbDriverResource: DBDriverResource,
   ) { }
 
   init(connectionId: string, onClose: () => void) {
     this.connectionId = connectionId;
     this.close = onClose;
     this.loadAuthModel();
+    this.loadDrivers();
   }
 
   destruct(): void {
@@ -72,6 +75,14 @@ export class DBAuthDialogController implements IInitializableController, IDestru
       await this.connectionInfoResource.loadAuthModel(this.connectionId);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth model');
+    }
+  }
+
+  private async loadDrivers() {
+    try {
+      this.dbDriverResource.loadAll();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
     }
   }
 }

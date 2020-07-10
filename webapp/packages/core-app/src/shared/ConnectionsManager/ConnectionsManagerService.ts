@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { DataSourceInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { DataSourceInfo } from '@cloudbeaver/core-sdk';
 
 import { ROOT_NODE_PATH } from '../NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
@@ -25,44 +24,26 @@ export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'descri
 
 @injectable()
 export class ConnectionsManagerService {
-  @computed get connections(): Connection[] {
-    return Array.from(this.connectionInfo.data.values());
-  }
-
   onOpenConnection = new Subject<Connection>();
   onCloseConnection = new Subject<string>();
 
   constructor(
-    private graphQLService: GraphQLService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
     private navNodeManagerService: NavNodeManagerService,
     private sessionResource: SessionResource,
     private notificationService: NotificationService
   ) {
-    this.sessionResource.onDataUpdate.subscribe(this.restoredConnections.bind(this));
-  }
-
-  async loadConnectionInfoAsync(connectionId: string): Promise<Connection> {
-    return this.connectionInfo.load(connectionId);
-  }
-
-  async refreshConnectionInfoAsync(connectionId: string): Promise<Connection> {
-    return this.connectionInfo.refresh(connectionId);
+    this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
   }
 
   async addOpenedConnection(connection: Connection) {
-    this.connectionInfo.set(connection.id, connection);
-    this.onOpenConnection.next(connection);
+    this.addConnection(connection);
 
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
     await this.navNodeManagerService.loadNode({ nodeId, parentId: ROOT_NODE_PATH });
 
     this.navNodeManagerService.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
-  }
-
-  getConnectionById(connectionId: string): Connection | undefined {
-    return this.connectionInfo.get(connectionId);
   }
 
   getObjectContainerById(
@@ -80,15 +61,14 @@ export class ConnectionsManagerService {
   }
 
   async deleteConnection(id: string) {
-    const connection = this.getConnectionById(id);
+    const connection = this.connectionInfo.get(id);
 
     if (!connection?.features.includes(EConnectionFeature.temporary)) {
       return;
     }
 
-    await this.graphQLService.gql.deleteConnection({ id });
+    await this.connectionInfo.deleteConnection(id);
     await this.afterConnectionClose(id);
-    this.connectionInfo.delete(id);
 
     const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
 
@@ -100,20 +80,18 @@ export class ConnectionsManagerService {
   }
 
   hasAnyConnection(): boolean {
-    return !!this.connections.length;
+    return !!Array.from(this.connectionInfo.data.values()).length;
   }
 
   async closeAllConnections(): Promise<void> {
-    for (const connection of this.connections) {
+    for (const connection of this.connectionInfo.data.values()) {
       await this.closeConnectionAsync(connection.id, true);
     }
     await this.navNodeManagerService.updateRootChildren();
   }
 
   async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    const connectionUpdatedInfo = await this.graphQLService.gql.closeConnection({ id });
-    this.connectionInfo.set(connectionUpdatedInfo.connection.id, connectionUpdatedInfo.connection);
-
+    await this.connectionInfo.close(id);
     await this.afterConnectionClose(id);
 
     if (!skipNodesRefresh) {
@@ -127,15 +105,13 @@ export class ConnectionsManagerService {
 
   async closeNavNodeConnectionAsync(navNodeId: string): Promise<void> {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId);
-    const connection = this.getConnectionById(connectionId);
+    const connection = this.connectionInfo.get(connectionId);
     if (!connection) {
       return;
     }
 
     try {
-      const connectionUpdatedInfo = await this.graphQLService.gql.closeConnection({ id: connectionId });
-      this.connectionInfo.set(connectionUpdatedInfo.connection.id, connectionUpdatedInfo.connection);
-
+      await this.connectionInfo.close(connectionId);
       await this.afterConnectionClose(connectionId);
 
       this.navNodeManagerService.removeTree(navNodeId);
@@ -155,28 +131,32 @@ export class ConnectionsManagerService {
     this.onCloseConnection.next(id);
   }
 
-  private async restoredConnections() {
+  private async restoreConnections() {
     const config = await this.sessionResource.load(null);
     if (!config) {
       return;
     }
 
-    let connectionsToRemove = this.connections.concat();
+    const restoredConnections = new Set<string>();
     // TODO: connections must be string[]
     for (const connection of config.connections) {
-      await this.restoreConnection(connection);
-      connectionsToRemove = connectionsToRemove.filter(({ id }) => id !== connection.id);
+      this.addConnection(connection);
+      restoredConnections.add(connection.id);
     }
 
-    for (const connection of connectionsToRemove) {
-      await this.afterConnectionClose(connection.id);
-      this.connectionInfo.delete(connection.id);
+    const unrestoredConnectionIdList = Array.from(this.connectionInfo.data.values())
+      .map(connection => connection.id)
+      .filter(connectionId => !restoredConnections.has(connectionId));
+
+    for (const connectionId of unrestoredConnectionIdList) {
+      await this.afterConnectionClose(connectionId);
+      this.connectionInfo.delete(connectionId);
     }
 
     await this.navNodeManagerService.updateRootChildren();
   }
 
-  private async restoreConnection(connection: Connection) {
+  private addConnection(connection: Connection) {
     this.connectionInfo.set(connection.id, connection);
     this.onOpenConnection.next(connection);
   }

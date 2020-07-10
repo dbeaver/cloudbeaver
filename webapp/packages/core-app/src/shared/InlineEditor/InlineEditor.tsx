@@ -23,6 +23,7 @@ import { InlineEditorStyles } from './styles';
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside'
 
 export type InlineEditorProps = {
+  name?: string;
   value: string;
   type?: string;
   placeholder?: string;
@@ -39,6 +40,7 @@ export type InlineEditorProps = {
 }
 
 export const InlineEditor = observer(function InlineEditor({
+  name,
   value,
   type = 'text',
   placeholder,
@@ -88,12 +90,14 @@ export const InlineEditor = observer(function InlineEditor({
     <editor as="div" className={className}>
       <editor-container as="div">
         <input
+          name={name}
           type={type}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           ref={inputRef}
           placeholder={placeholder}
+          autoComplete="off"
         />
       </editor-container>
       <editor-actions as="div" {...use({ position: controlsPosition })}>
