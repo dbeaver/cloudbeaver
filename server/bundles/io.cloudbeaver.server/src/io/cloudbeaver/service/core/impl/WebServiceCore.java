@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
-import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -194,15 +193,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
         }
 
-        if (!CommonUtils.isEmpty(authProperties)) {
-            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
-            DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
-            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-
-            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
-
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
-        }
+        initAuthProperties(dataSourceContainer, authProperties);
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
@@ -266,6 +257,18 @@ public class WebServiceCore implements DBWServiceCore {
     public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
         closeAndDeleteConnection(webSession, connectionId, true);
         return true;
+    }
+
+    private void initAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
+        if (!CommonUtils.isEmpty(authProperties)) {
+            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
+            //DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+
+            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
+
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        }
     }
 
     @NotNull
@@ -341,6 +344,8 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
         navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
+
+        initAuthProperties(newDataSource, config.getCredentials());
 
         return newDataSource;
     }
