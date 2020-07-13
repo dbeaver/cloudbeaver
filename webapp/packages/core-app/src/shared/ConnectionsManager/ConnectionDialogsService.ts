@@ -55,13 +55,14 @@ export class ConnectionDialogsService {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'closeConnection',
-        isPresent: (context: IMenuContext<NavNode>) => {
+        isPresent:
+          (context: IMenuContext<NavNode>) => context.contextType === NavigationTreeContextMenuService.nodeContextType,
+        isHidden: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
 
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
-          && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)
-          && !!connection?.connected;
+          return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
+            || !connection?.connected;
         },
         title: 'Disconnect',
         onClick: (context: IMenuContext<NavNode>) => {
@@ -75,13 +76,14 @@ export class ConnectionDialogsService {
       this.contextMenuService.getRootMenuToken(),
       {
         id: 'deleteConnection',
-        isPresent: (context: IMenuContext<NavNode>) => {
+        isPresent:
+          (context: IMenuContext<NavNode>) => context.contextType === NavigationTreeContextMenuService.nodeContextType,
+        isHidden: (context: IMenuContext<NavNode>) => {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
 
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType
-          && !!context.data.objectFeatures.includes(EObjectFeature.dataSource)
-          && !!connection?.features.includes(EConnectionFeature.temporary);
+          return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
+            || !connection?.features.includes(EConnectionFeature.temporary);
         },
         title: 'Delete',
         onClick: (context: IMenuContext<NavNode>) => {

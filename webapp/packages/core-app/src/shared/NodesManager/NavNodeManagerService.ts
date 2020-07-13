@@ -314,7 +314,7 @@ export class NavNodeManagerService {
       let connection: Connection | undefined;
       try {
         connection = await this.connectionAuthService.auth(
-          NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.nodeId)
+          NodeManagerUtils.nodeIdToConnectionId(nodeInfo.nodeId)
         );
       } catch (exception) {
         this.notificationService.logException(exception);

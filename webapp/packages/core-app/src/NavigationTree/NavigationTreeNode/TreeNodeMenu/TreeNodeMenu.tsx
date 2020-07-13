@@ -28,7 +28,6 @@ export const TreeNodeMenu = observer(function TreeNodeMenu({
   node,
   isSelected,
 }: TreeNodeMenuProps) {
-
   const navigationTreeContextMenuService = useService(NavigationTreeContextMenuService);
 
   const menuPanel = useMemo(
