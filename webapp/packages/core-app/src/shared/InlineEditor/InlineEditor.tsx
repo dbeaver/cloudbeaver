@@ -28,10 +28,12 @@ export type InlineEditorProps = {
   type?: string;
   placeholder?: string;
   controlsPosition?: InlineEditorControls;
+  tabIndex?: number;
   simple?: boolean;
   hideSave?: boolean;
   hideCancel?: boolean;
   edited?: boolean;
+  autofocus?: boolean;
   onChange(value: string): void;
   onSave(): void;
   onReject?(): void;
@@ -45,10 +47,12 @@ export const InlineEditor = observer(function InlineEditor({
   type = 'text',
   placeholder,
   controlsPosition = 'right',
+  tabIndex,
   simple,
   hideSave,
   hideCancel,
   edited = false,
+  autofocus,
   onChange,
   onSave,
   onUndo,
@@ -83,7 +87,9 @@ export const InlineEditor = observer(function InlineEditor({
 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 100);
+    if (autofocus) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
   }, []);
 
   return styled(useStyles(InlineEditorStyles))(
@@ -93,6 +99,7 @@ export const InlineEditor = observer(function InlineEditor({
           name={name}
           type={type}
           value={value}
+          tabIndex={tabIndex}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           ref={inputRef}

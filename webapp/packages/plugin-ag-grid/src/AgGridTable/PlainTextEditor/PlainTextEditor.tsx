@@ -96,6 +96,7 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
           edited={isEdited}
           hideSave
           hideCancel
+          autofocus
         />
       </editor>
     );

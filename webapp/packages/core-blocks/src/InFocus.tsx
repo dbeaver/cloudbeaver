@@ -24,6 +24,7 @@ export function InFocus({ children }: InFocusProps) {
       if (childRef.current !== null) {
         const firstFocusable: HTMLElement | null = childRef.current
           .querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+
         if (firstFocusable) {
           firstFocusable.focus();
         }

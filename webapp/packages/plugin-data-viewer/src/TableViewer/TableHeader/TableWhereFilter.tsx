@@ -7,11 +7,11 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import { InputField, IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
+import { SubmittingForm } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -46,29 +46,38 @@ export const TableWhereFilter = observer(function TableWhereFilter({
   context,
 }: Props) {
   const translate = useTranslate();
-  const handleChange = useCallback(
-    (value: string) => context.setQueryWhereFilter(value),
-    [context]
-  );
+  const [filterValue, setValue] = useState(() => context.getQueryWhereFilter() || '');
+
+  const handleApply = useCallback(() => {
+    context.setQueryWhereFilter(filterValue);
+    context.applyQueryFilters();
+  }, [context, filterValue]);
+
   const resetFilter = useCallback(
     () => {
-      context.setQueryWhereFilter('');
-      context.applyQueryFilters();
+      const applyNeeded = context.getQueryWhereFilter() === filterValue;
+
+      setValue('');
+
+      if (applyNeeded) {
+        context.setQueryWhereFilter('');
+        context.applyQueryFilters();
+      }
     },
-    [context]
+    [context, filterValue]
   );
 
   return styled(useStyles(styles))(
-    <SubmittingForm onSubmit={() => context.applyQueryFilters()}>
+    <SubmittingForm onSubmit={handleApply}>
       <InlineEditor
         name="data_where"
-        value={context.getQueryWhereFilter() || ''}
-        onSave={() => context.applyQueryFilters()}
+        value={filterValue}
+        onSave={handleApply}
         onUndo={resetFilter}
-        onChange={handleChange}
+        onChange={setValue}
         placeholder={translate('table_header_sql_expression')}
         controlsPosition='inside'
-        edited={!!context.getQueryWhereFilter()}
+        edited={!!filterValue}
         simple
       />
     </SubmittingForm>
