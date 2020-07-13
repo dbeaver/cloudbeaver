@@ -35,12 +35,7 @@ export class NavigationTreeService {
   }
 
   async navToNode(id: string, parentId: string) {
-    try {
-      await this.ensureConnectionInit(id);
-      await this.navNodeManagerService.navToNode(id, parentId);
-    } catch (exception) {
-      this.notificationService.logException(exception);
-    }
+    await this.navNodeManagerService.navToNode(id, parentId);
   }
 
   async loadNestedNodes(id = ROOT_NODE_PATH) {

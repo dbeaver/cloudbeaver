@@ -7,9 +7,12 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
 import { GraphQLService, resourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { ConnectionAuthService } from '../ConnectionsManager/ConnectionAuthService';
+import { Connection } from '../ConnectionsManager/ConnectionInfoResource';
 import { INavigator } from '../Navigation/INavigator';
 import { IContextProvider } from '../Navigation/NavigationContext';
 import { NavigationService } from '../Navigation/NavigationService';
@@ -89,7 +92,9 @@ export class NavNodeManagerService {
     private navigationService: NavigationService,
     private permissionsService: PermissionsService,
     readonly navTree: NavTreeResource,
-    readonly navNodeInfoResource: NavNodeInfoResource
+    readonly navNodeInfoResource: NavNodeInfoResource,
+    private connectionAuthService: ConnectionAuthService,
+    private notificationService: NotificationService,
   ) {
 
     this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
@@ -303,5 +308,22 @@ export class NavNodeManagerService {
   }
 
   private async navigateHandler(contexts: IContextProvider<INodeNavigationData>) {
+    const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
+
+    if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId)) {
+      let connection: Connection | undefined;
+      try {
+        connection = await this.connectionAuthService.auth(
+          NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.nodeId)
+        );
+      } catch (exception) {
+        this.notificationService.logException(exception);
+        throw exception;
+      }
+
+      if (!connection?.connected) {
+        throw new Error('Connection not established');
+      }
+    }
   }
 }
