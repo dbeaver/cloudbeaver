@@ -86,7 +86,7 @@ export class DataExportController implements IInitializableController, IDestruct
       }
     } finally {
       this.isExporting = false;
-      close();
+      this.close();
     }
   }
 
