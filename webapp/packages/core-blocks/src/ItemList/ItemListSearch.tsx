@@ -41,6 +41,7 @@ export function ItemListSearch({ onSearch, className }: ItemListProps) {
         placeholder={translate('ui_search')}
         value={search}
         onChange={searchHandler}
+        autoComplete="off"
         {...use({ mod: 'surface' })}
       />
     </list-search>
