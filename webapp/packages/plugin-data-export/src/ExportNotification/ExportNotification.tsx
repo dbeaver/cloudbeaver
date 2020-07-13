@@ -75,7 +75,6 @@ export const ExportNotification = observer(function ExportNotification({
                 {translate('data_transfer_notification_delete')}
               </Button>
               <Button
-                type="button"
                 tag='a'
                 href={controller.downloadUrl}
                 mod={['unelevated']}
