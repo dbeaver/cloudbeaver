@@ -121,8 +121,13 @@ export class NavNodeManagerService {
     await this.graphQLService.gql.navRefreshNode({
       nodePath: navNodeId,
     });
-    this.navTree.markOutdated(resourceKeyList(this.navTree.getNestedChildren(navNodeId)));
+    this.markTreeOutdated(navNodeId);
     await this.navTree.refresh(navNodeId);
+  }
+
+  markTreeOutdated(navNodeId: string) {
+    const nodes = [navNodeId, ...this.navTree.getNestedChildren(navNodeId)];
+    this.navTree.markOutdated(resourceKeyList(nodes));
   }
 
   async updateRootChildren() {

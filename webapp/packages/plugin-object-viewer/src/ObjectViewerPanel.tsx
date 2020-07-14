@@ -39,11 +39,11 @@ const stylesArray = [styles];
 export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab, handler,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
-  const { children, isLoading } = useChildren(tab.handlerState.objectId);
+  const { children, isOutdated, isLoading } = useChildren(tab.handlerState.objectId);
   const dbObjectPagesService = useService(DBObjectPageService);
   const pages = dbObjectPagesService.orderedPages;
 
-  if (!children && isLoading) {
+  if (!isOutdated && isLoading) {
     return <Loader />;
   }
 

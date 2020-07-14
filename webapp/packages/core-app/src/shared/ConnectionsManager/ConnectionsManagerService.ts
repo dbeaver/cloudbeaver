@@ -11,7 +11,7 @@ import { Subject } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { DataSourceInfo } from '@cloudbeaver/core-sdk';
+import { DataSourceInfo, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ROOT_NODE_PATH } from '../NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
@@ -35,13 +35,26 @@ export class ConnectionsManagerService {
     private notificationService: NotificationService
   ) {
     this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
+    this.connectionInfo.onItemAdd.subscribe(async (key) => {
+      if (isResourceKeyList(key)) {
+        for (const id of key.list) {
+          const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+          this.navNodeManagerService
+            .markTreeOutdated(nodeId);
+        }
+        return;
+      }
+      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+      this.navNodeManagerService
+        .markTreeOutdated(nodeId);
+    });
   }
 
   async addOpenedConnection(connection: Connection) {
     this.addConnection(connection);
 
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-    await this.navNodeManagerService.loadNode({ nodeId, parentId: ROOT_NODE_PATH });
+    await this.navNodeManagerService.refreshNode(nodeId);
 
     this.navNodeManagerService.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
   }

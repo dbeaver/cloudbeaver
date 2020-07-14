@@ -220,8 +220,8 @@ export class ObjectViewerTabService {
         nodeId: tab.handlerState.objectId,
         parentId: tab.handlerState.parentId,
       });
-      const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
       await this.dbObjectService.load(tab.handlerState.objectId);
+      const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
 
       const folderId = tab.handlerState.folderId;
 

@@ -23,9 +23,10 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   async init(id: string, credentials?: any): Promise<Connection> {
-    await this.performUpdate(id, async () => {
+    const connection = await this.performUpdate(id, async () => {
       const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
       this.set(id, connection);
+      return connection;
     });
 
     return this.get(id)!;

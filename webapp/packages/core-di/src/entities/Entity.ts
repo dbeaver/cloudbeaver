@@ -50,6 +50,19 @@ export class Entity {
     }
   }
 
+  removeAll() {
+    const ids: string[] = [];
+
+    for (const [key, value] of this.children) {
+      ids.push(key);
+      value.destroyEntity();
+    }
+
+    for (const id of ids) {
+      this.children.delete(id);
+    }
+  }
+
   getChild(id: string): Entity | undefined {
     return this.children.get(id);
   }
