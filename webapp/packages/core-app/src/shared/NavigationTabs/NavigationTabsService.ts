@@ -16,6 +16,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionService } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { IActiveView } from '@cloudbeaver/core-view';
 
 import { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
@@ -134,6 +135,25 @@ export class NavigationTabsService {
     if (tab) {
       tab.handlerState = state;
     }
+  }
+
+  getView = (): IActiveView<ITab<any>> | null => {
+    const tab = this.getTab(this.currentTabId);
+
+    if (!tab) {
+      return null;
+    }
+
+    const handler = this.getTabHandler(tab.handlerId);
+
+    if (!handler) {
+      return null;
+    }
+
+    return {
+      context: tab,
+      extensions: handler.extensions || [],
+    };
   }
 
   getTabHandler(handlerId: string): TabHandler | undefined {

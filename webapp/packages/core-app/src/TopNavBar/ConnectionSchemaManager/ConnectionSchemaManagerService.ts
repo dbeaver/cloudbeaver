@@ -12,7 +12,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExtension } from '@cloudbeaver/core-extensions';
 
-import { NavigationTreeService } from '../../NavigationTree/NavigationTreeService';
 import { ConnectionInfoResource } from '../../shared/ConnectionsManager/ConnectionInfoResource';
 import { ConnectionsManagerService } from '../../shared/ConnectionsManager/ConnectionsManagerService';
 import { ObjectContainer } from '../../shared/ConnectionsManager/ContainerResource';
@@ -25,7 +24,6 @@ import { IObjectCatalogProvider, isObjectCatalogProvider } from '../../shared/No
 import { IObjectCatalogSetter, isObjectCatalogSetter } from '../../shared/NodesManager/extensions/IObjectCatalogSetter';
 import { IObjectSchemaProvider, isObjectSchemaProvider } from '../../shared/NodesManager/extensions/IObjectSchemaProvider';
 import { IObjectSchemaSetter, isObjectSchemaSetter } from '../../shared/NodesManager/extensions/IObjectSchemaSetter';
-import { NavNodeExtensionsService } from '../../shared/NodesManager/NavNodeExtensionsService';
 
 export interface IConnectionInfo {
   name?: string;
@@ -122,8 +120,6 @@ export class ConnectionSchemaManagerService {
     private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService,
-    private navigationTreeService: NavigationTreeService,
-    private navNodeExtensionsService: NavNodeExtensionsService,
   ) {
 
   }
@@ -134,9 +130,6 @@ export class ConnectionSchemaManagerService {
 
     this.navigationTabsService.onTabClose
       .subscribe(this.onTabClose.bind(this));
-
-    this.navigationTreeService.onNodeSelect
-      .subscribe(this.onNodeSelect.bind(this));
   }
 
   /**
@@ -203,20 +196,6 @@ export class ConnectionSchemaManagerService {
           `Can't load objectContainers for ${connectionId}@${catalogId}`,
         );
       }
-    }
-  }
-
-  private onNodeSelect([navNodeId, selected]: [string, boolean]) {
-    if (selected) {
-      const item: IActiveItem<string> = {
-        id: navNodeId,
-        context: navNodeId,
-      };
-      this.setExtensions(item, this.navNodeExtensionsService.extensions);
-
-      this.setActiveItem(item);
-    } else {
-      this.removeActiveItem(navNodeId);
     }
   }
 

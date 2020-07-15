@@ -11,9 +11,11 @@ import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IActiveView } from '@cloudbeaver/core-view';
 
 import { ConnectionAuthService } from '../shared/ConnectionsManager/ConnectionAuthService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
+import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
@@ -28,7 +30,8 @@ export class NavigationTreeService {
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
-    private connectionAuthService: ConnectionAuthService
+    private connectionAuthService: ConnectionAuthService,
+    private navNodeExtensionsService: NavNodeExtensionsService
   ) {
     this.nodeSelectSubject = new Subject();
     this.onNodeSelect = this.nodeSelectSubject.asObservable();
@@ -68,6 +71,18 @@ export class NavigationTreeService {
 
   isNodeSelected(navNodeId: string) {
     return this.selectedNodes.includes(navNodeId);
+  }
+
+  getView = (): IActiveView<string> | null => {
+    const context = this.selectedNodes[0];
+    if (!context) {
+      return null;
+    }
+
+    return {
+      context,
+      extensions: this.navNodeExtensionsService.extensions,
+    };
   }
 
   private async ensureConnectionInit(navNodeId: string) {

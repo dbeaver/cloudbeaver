@@ -12,9 +12,11 @@ import {
   EObjectFeature,
   NodeManagerUtils,
   NavNode, ConnectionsManagerService, ConnectionSchemaManagerService,
+  isConnectionProvider, isObjectCatalogProvider, isObjectSchemaProvider,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { ActiveViewService } from '@cloudbeaver/core-view';
 
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
@@ -28,6 +30,7 @@ export class SqlEditorBootstrap {
     private sqlEditorTabService: SqlEditorTabService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private activeViewService: ActiveViewService,
   ) {}
 
   async bootstrap() {
@@ -38,13 +41,7 @@ export class SqlEditorBootstrap {
         id: 'sql-editor',
         title: 'SQL',
         order: 2,
-        onClick: () => {
-          this.sqlEditorNavigatorService.openNewEditor(
-            this.connectionSchemaManagerService.currentConnectionId,
-            this.connectionSchemaManagerService.currentObjectCatalogId,
-            this.connectionSchemaManagerService.currentObjectSchemaId,
-          );
-        },
+        onClick: this.openSQLEditor.bind(this),
         isDisabled: () => !this.connectionsManagerService.hasAnyConnection(),
       }
     );
@@ -64,5 +61,42 @@ export class SqlEditorBootstrap {
       },
     };
     this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), openSqlEditor);
+  }
+
+  private openSQLEditor() {
+    const activeView = this.activeViewService.view;
+
+    if (activeView) {
+      let connectionId: string | undefined;
+      let catalogId: string | undefined;
+      let schemaId: string | undefined;
+
+      for (const extension of activeView.extensions) {
+        if (isConnectionProvider(extension)) {
+          connectionId = extension(activeView.context);
+        }
+        if (isObjectCatalogProvider(extension)) {
+          catalogId = extension(activeView.context);
+        }
+        if (isObjectSchemaProvider(extension)) {
+          schemaId = extension(activeView.context);
+        }
+
+        if (connectionId) {
+          this.sqlEditorNavigatorService.openNewEditor(
+            connectionId,
+            catalogId,
+            schemaId,
+          );
+          return;
+        }
+      }
+
+      this.sqlEditorNavigatorService.openNewEditor(
+        this.connectionSchemaManagerService.currentConnectionId,
+        this.connectionSchemaManagerService.currentObjectCatalogId,
+        this.connectionSchemaManagerService.currentObjectSchemaId,
+      );
+    }
   }
 }

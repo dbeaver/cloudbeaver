@@ -9,17 +9,22 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { useFocus } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
+import { useActiveView } from '@cloudbeaver/core-view';
 
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { useChildren } from '../shared/useChildren';
 import { NavigationTreeNode } from './NavigationTreeNode/NavigationTreeNode';
+import { NavigationTreeService } from './NavigationTreeService';
 
 const navigationTreeStyles = css`
   tree {
     padding-top: 16px;
     min-width: 240px;
     width: 100%;
+    outline: none;
   }
 
   center {
@@ -40,6 +45,9 @@ const navigationTreeStyles = css`
 `;
 
 export const NavigationTree = observer(function NavigationTree() {
+  const navTreeService = useService(NavigationTreeService);
+  const view = useActiveView(navTreeService.getView);
+  const [ref] = useFocus(...view);
   const nodeChildren = useChildren();
   const isEnabled = usePermission(EPermission.public);
 
@@ -61,7 +69,7 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   return styled(navigationTreeStyles)(
-    <tree as="div">
+    <tree as="div" tabIndex={0} ref={ref as React.RefObject<HTMLDivElement>}>
       {nodeChildren.children.map(id => (
         <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH}/>
       ))}

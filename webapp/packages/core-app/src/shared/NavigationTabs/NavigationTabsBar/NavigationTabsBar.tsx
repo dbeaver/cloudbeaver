@@ -11,10 +11,11 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TextPlaceholder, TabsBox, TabPanel
+  TextPlaceholder, TabsBox, TabPanel, useFocus
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useActiveView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
@@ -28,12 +29,20 @@ const styles = composes(
     tabs {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
+  `,
+  css`
+    TabsBox {
+      outline: none;
+    }
   `
 );
 const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const navigation = useService(NavigationTabsService);
+  const view = useActiveView(navigation.getView);
+  const [ref] = useFocus(...view);
+
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
 
@@ -52,6 +61,8 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
         <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} style={stylesArray}/>
       ))}
       style={stylesArray}
+      tabIndex={0}
+      ref={ref as React.RefObject<HTMLDivElement>}
     >
       {navigation.tabIdList.map(tabId => (
         <TabPanel key={tabId} tabId={tabId}>

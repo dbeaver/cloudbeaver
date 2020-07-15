@@ -29,9 +29,9 @@ export class NavNodeExtensionsService {
     ];
   }
 
-  private getConnection(context: string) {
+  getConnection(navNodeId: string) {
     const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context);
+      .getNodeContainerInfo(navNodeId);
 
     if (!nodeInfo.connectionId) {
       return;
@@ -40,16 +40,16 @@ export class NavNodeExtensionsService {
     return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
   }
 
-  private getDBObjectCatalog(context: string) {
+  getDBObjectCatalog(navNodeId: string) {
     const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context);
+      .getNodeContainerInfo(navNodeId);
 
     return nodeInfo.catalogId;
   }
 
-  private getDBObjectSchema(context: string) {
+  getDBObjectSchema(navNodeId: string) {
     const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context);
+      .getNodeContainerInfo(navNodeId);
 
     return nodeInfo.schemaId;
   }
