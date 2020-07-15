@@ -19,7 +19,7 @@ import {
   objectSchemaProvider,
   NavNodeManagerService,
   DBObjectService,
-  NavNode,
+  ConnectionInfoResource,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -38,6 +38,7 @@ export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>
 
   constructor(
+    private connectionInfoResource: ConnectionInfoResource,
     private navNodeManagerService: NavNodeManagerService,
     private dbObjectService: DBObjectService,
     private dbObjectPageService: DBObjectPageService,
@@ -64,6 +65,7 @@ export class ObjectViewerTabService {
 
   registerTabHandler() {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+    this.connectionInfoResource.onItemAdd.subscribe(this.updateConnectionInfoTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.subscribe(this.updateTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.subscribe(this.removeTabs.bind(this));
   }
@@ -131,6 +133,38 @@ export class ObjectViewerTabService {
       tabInfo,
       nodeInfo,
     };
+  }
+
+  private async updateConnectionInfoTabs(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      for (const connectionId of key.list) {
+        const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
+        const connected = this.connectionInfoResource.get(connectionId)?.connected;
+
+        if (!connected) {
+          const tab = this.navigationTabsService.findTab(
+            isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
+          );
+
+          if (tab) {
+            await this.navigationTabsService.closeTab(tab.id, true);
+          }
+        }
+      }
+    } else {
+      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+      const connected = this.connectionInfoResource.get(key)?.connected;
+
+      if (!connected) {
+        const tab = this.navigationTabsService.findTab(
+          isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
+        );
+
+        if (tab) {
+          await this.navigationTabsService.closeTab(tab.id, true);
+        }
+      }
+    }
   }
 
   private async updateTabs(key: ResourceKey<string>) {
