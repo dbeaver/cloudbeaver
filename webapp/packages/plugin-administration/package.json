@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-administration",
+  "sideEffects": false,
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",

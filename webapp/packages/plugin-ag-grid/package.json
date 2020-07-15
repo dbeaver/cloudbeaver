@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-ag-grid",
+  "sideEffects": false,
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
@@ -13,10 +14,9 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@ag-grid-community/all-modules": "^23.1.1",
+    "@ag-grid-community/infinite-row-model": "^23.1.1",
     "@ag-grid-community/core": "^23.1.1",
-    "ag-grid-community": "^23.1.1",
-    "ag-grid-react": "^23.1.1"
+    "@ag-grid-community/react": "^23.1.1"
   },
   "peerDependencies": {
     "@cloudbeaver/core-app": "^0.1.0",

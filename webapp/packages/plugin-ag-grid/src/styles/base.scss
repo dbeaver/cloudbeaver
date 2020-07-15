@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "ag-grid-community/src/styles/ag-grid.scss";
-@import "ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham-mixin.scss";
-@import "ag-grid-community/src/styles/webfont/agGridAlpineFont.scss";
+@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
+@import "@ag-grid-community/core/dist/styles/ag-theme-balham/sass/ag-theme-balham-mixin.scss";
+@import "@ag-grid-community/core/dist/styles/webfont/agGridAlpineFont.scss";
 
 
 .cb-ag-grid-theme {

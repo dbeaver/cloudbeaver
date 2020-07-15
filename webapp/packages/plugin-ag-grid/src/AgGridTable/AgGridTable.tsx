@@ -6,17 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Module } from 'ag-grid-community';
-import { AgGridReactProps } from 'ag-grid-react';
 import { observer, Observer } from 'mobx-react';
 import { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
+import { AgGridReactProps } from '@ag-grid-community/react';
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { RangeSelectionModule } from '../modules/RangeSelection/rangeSelectionModule';
 import { agGridStyles } from '../styles/styles';
 import { AgGridTableController } from './AgGridTableController';
 import { IAgGridModel } from './IAgGridModel';
@@ -32,10 +30,11 @@ export type AgGridTableProps = PropsWithChildren<
 
 async function loader() {
   const styles = await import('../styles/base.scss');
-  const { AgGridReact } = await import('ag-grid-react');
-  const { AllCommunityModules } = await import('@ag-grid-community/all-modules');
+  const { AgGridReact } = await import('@ag-grid-community/react');
+  const { InfiniteRowModelModule } = await import('@ag-grid-community/infinite-row-model');
+  const { RangeSelectionModule } = await import('../modules/RangeSelection/rangeSelectionModule');
 
-  return { AgGridReact, AllCommunityModules: [...AllCommunityModules, RangeSelectionModule] };
+  return { AgGridReact, AllCommunityModules: [InfiniteRowModelModule, RangeSelectionModule] };
 }
 
 const agGridComponents = {
@@ -65,7 +64,7 @@ export const AgGridTable = observer(function AgGridTable({
                 key={controller.refreshId}
                 columnDefs={controller.columns}
                 gridOptions={controller.getGridOptions()}
-                modules={AllCommunityModules as Module[]}
+                modules={AllCommunityModules}
                 frameworkComponents={agGridComponents}
                 loadingCellRenderer="loadingCellRenderer"
                 {...controller.dynamicOptions}

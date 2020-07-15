@@ -2,41 +2,24 @@
 # yarn lockfile v1
 
 
-"@ag-grid-community/all-modules@^23.1.1":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/all-modules/-/all-modules-23.2.1.tgz#f9fdcc1330f904ac2e2df1d66a5c9d617f1b606f"
-  integrity sha512-U07Y9KeTxMd+kuR48FLuk024tYT/XszcuEgIno1+z/qJ5ajvnh960njGjuhqOD/pgqVcDlOgylOFUwQYEuRTWg==
-  dependencies:
-    "@ag-grid-community/client-side-row-model" "~23.2.0"
-    "@ag-grid-community/core" "~23.2.0"
-    "@ag-grid-community/csv-export" "~23.2.0"
-    "@ag-grid-community/infinite-row-model" "~23.2.0"
-
-"@ag-grid-community/client-side-row-model@~23.2.0":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/client-side-row-model/-/client-side-row-model-23.2.1.tgz#b7f77b110f9a40b0e62c8ed486ecdd8fd98af70b"
-  integrity sha512-riL5IIyK+NL+PS5XUTEF3R0wZR8xnOrlp0M5rJJpAa2iiN2KITiu8rJENMNFm5F7o42B0vReLpf4SBkyCefR5w==
-  dependencies:
-    "@ag-grid-community/core" "~23.2.0"
-
 "@ag-grid-community/core@^23.1.1", "@ag-grid-community/core@~23.2.0":
   version "23.2.1"
   resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-23.2.1.tgz#532104da04dcc636bf01364116bcb66804d6de04"
   integrity sha512-ZW4r6mICsCDX3xME2CpXLf+/EsKYO/EO1hq0QInBXJVFp7FC9/VPSpplo2iy8pPFZjkLQ5gb1yg9WcMo50+9CA==
 
-"@ag-grid-community/csv-export@~23.2.0":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/csv-export/-/csv-export-23.2.1.tgz#e74a54da4bb8f9656fb9c20408dc2230a276d454"
-  integrity sha512-pvHw7PBqu3ks2zs8agxYei9vmCa2XlPIZb58k+oSaZvPy7wqjfx58JS9GM0+uR04eyjuEiVYyFUP1KgzJyl43w==
-  dependencies:
-    "@ag-grid-community/core" "~23.2.0"
-
-"@ag-grid-community/infinite-row-model@~23.2.0":
+"@ag-grid-community/infinite-row-model@^23.1.1":
   version "23.2.1"
   resolved "https://registry.yarnpkg.com/@ag-grid-community/infinite-row-model/-/infinite-row-model-23.2.1.tgz#a9087619306aa5767de69142c462974198027843"
   integrity sha512-uIgVeZ5yhZ273EU/h6JsMBmPG4OhMQODxtpiy9d3ipJ8bMX2H6yVtGKIONWuUORCoX+tF1GPFZACAH/rCNxR/g==
   dependencies:
     "@ag-grid-community/core" "~23.2.0"
+
+"@ag-grid-community/react@^23.1.1":
+  version "23.2.1"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/react/-/react-23.2.1.tgz#e47baca884b18a671e468622d4da03c547a38f52"
+  integrity sha512-xvP+ABtDtKADcOQ5dOqOdYN9lT3CYYWSY3yVbWwtAnVzFIaRq6nHvlmIogRp3dzxVA/shOBuRMdmEbPKTYUA4g==
+  dependencies:
+    prop-types "^15.6.2"
 
 "@babel/cli@^7.8.4":
   version "7.10.1"
@@ -3027,18 +3010,6 @@ acorn@^7.1.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.3.1.tgz#85010754db53c3fbaf3b9ea3e083aa5c5d147ffd"
   integrity sha512-tLc0wSnatxAQHVHUapaHdz72pi9KUyHjq5KyHjGg9Y8Ifdc79pTh2XvI6I1/chZbnM7QtNKzh66ooDogPZSleA==
-
-ag-grid-community@^23.1.1:
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-23.2.1.tgz#0cf2beb7ba2fcf66a4865e45faabdbea173d59b6"
-  integrity sha512-WHfDV7mFsd6eQJ5yOu26nnpnW7Gd02zcp9LHHfKQky8lfgTEo382qcja7MibHzB2f5vOCBdQnOPsWrbBNKRzhQ==
-
-ag-grid-react@^23.1.1:
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-23.2.1.tgz#da5d72d50d7fe1c1936860ea4690bc407811d606"
-  integrity sha512-tLbgIyjea5Alt2WsPWVDlfCNkI4gIxg8kWcpl1yTsVboVSwAnagpzFpNpIKsjbf/y4WAuKIQFfA0YXPVw4YRSg==
-  dependencies:
-    prop-types "^15.6.2"
 
 agent-base@4, agent-base@^4.3.0:
   version "4.3.0"
@@ -11782,6 +11753,11 @@ send@0.17.1:
     range-parser "~1.2.1"
     statuses "~1.5.0"
 
+serialize-javascript@^1.7.0:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-1.9.1.tgz#cfc200aef77b600c47da9bb8149c943e798c2fdb"
+  integrity sha512-0Vb/54WJ6k5v8sSWN09S0ora+Hnr+cX40r9F170nT+mSkaxltoE/7R3OrIdBSUv1OoiobH1QoWQbCnAO+e8J1A==
+
 serialize-javascript@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-3.1.0.tgz#8bf3a9170712664ef2561b44b691eafe399214ea"
@@ -12946,6 +12922,26 @@ uglify-js@^3.1.4:
   integrity sha512-8RZBJq5smLOa7KslsNsVcSH+KOXf1uDU8yqLeNuVKwmT0T3FA0ZoXlinQfRad7SDcbZZRZE4ov+2v71EnxNyCA==
   dependencies:
     commander "~2.20.3"
+
+uglify-js@^3.6.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.10.0.tgz#397a7e6e31ce820bfd1cb55b804ee140c587a9e7"
+  integrity sha512-Esj5HG5WAyrLIdYU74Z3JdG2PxdIusvj6IWHMtlyESxc7kcDz7zYlYjpnSokn1UbpV0d/QX9fan7gkCNd/9BQA==
+
+uglifyjs-webpack-plugin@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-2.2.0.tgz#e75bc80e7f1937f725954c9b4c5a1e967ea9d0d7"
+  integrity sha512-mHSkufBmBuJ+KHQhv5H0MXijtsoA1lynJt1lXOaotja8/I0pR4L9oGaPIZw+bQBOFittXZg9OC1sXSGO9D9ZYg==
+  dependencies:
+    cacache "^12.0.2"
+    find-cache-dir "^2.1.0"
+    is-wsl "^1.1.0"
+    schema-utils "^1.0.0"
+    serialize-javascript "^1.7.0"
+    source-map "^0.6.1"
+    uglify-js "^3.6.0"
+    webpack-sources "^1.4.0"
+    worker-farm "^1.7.0"
 
 uid-number@0.0.6:
   version "0.0.6"
