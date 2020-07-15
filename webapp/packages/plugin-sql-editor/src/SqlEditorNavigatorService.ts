@@ -124,11 +124,13 @@ export class SqlEditorNavigatorService {
 
       if (data.type === SQLEditorNavigationAction.create) {
         const tabOptions = await this.createNewEditor(data.connectionId, data.catalogId, data.schemaId);
+        const connectionInfo = this.connectionInfoResource.get(data.connectionId || '');
+
         if (tabOptions) {
           tabInfo.openNewTab(tabOptions);
         } else {
           this.notificationService.logError({
-            title: `Failed to create editor for ${data.connectionId} connection`,
+            title: `Failed to create editor for ${connectionInfo?.name || data.connectionId} connection`,
           });
         }
         return;
@@ -168,10 +170,15 @@ export class SqlEditorNavigatorService {
       connectionId = Array.from(this.connectionInfoResource.data.values())[0].id;
     }
 
-    const connection = await this.connectionAuthService.auth(connectionId);
+    try {
+      const connection = await this.connectionAuthService.auth(connectionId);
 
-    if (!connection?.connected) {
-      return null;
+      if (!connection?.connected) {
+        return null;
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception);
+      throw exception;
     }
 
     await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);

@@ -112,6 +112,12 @@ export class SqlEditorTabService {
       if (!connection?.connected) {
         return false;
       }
+    } catch (exception) {
+      this.notificationService.logException(exception);
+      return false;
+    }
+
+    try {
 
       // try to create new context first
       const context = await this.createSqlContext(connectionId);
