@@ -74,29 +74,27 @@ export class SqlEditorBootstrap {
       for (const extension of activeView.extensions) {
         if (isConnectionProvider(extension)) {
           connectionId = extension(activeView.context);
-        }
-        if (isObjectCatalogProvider(extension)) {
+        } else if (isObjectCatalogProvider(extension)) {
           catalogId = extension(activeView.context);
-        }
-        if (isObjectSchemaProvider(extension)) {
+        } else if (isObjectSchemaProvider(extension)) {
           schemaId = extension(activeView.context);
-        }
-
-        if (connectionId) {
-          this.sqlEditorNavigatorService.openNewEditor(
-            connectionId,
-            catalogId,
-            schemaId,
-          );
-          return;
         }
       }
 
-      this.sqlEditorNavigatorService.openNewEditor(
-        this.connectionSchemaManagerService.currentConnectionId,
-        this.connectionSchemaManagerService.currentObjectCatalogId,
-        this.connectionSchemaManagerService.currentObjectSchemaId,
-      );
+      if (connectionId) {
+        this.sqlEditorNavigatorService.openNewEditor(
+          connectionId,
+          catalogId,
+          schemaId,
+        );
+        return;
+      }
     }
+
+    this.sqlEditorNavigatorService.openNewEditor(
+      this.connectionSchemaManagerService.currentConnectionId,
+      this.connectionSchemaManagerService.currentObjectCatalogId,
+      this.connectionSchemaManagerService.currentObjectSchemaId,
+    );
   }
 }
