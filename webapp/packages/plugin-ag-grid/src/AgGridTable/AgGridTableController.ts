@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
+
 import {
   GridApi,
   ColumnApi,
@@ -17,10 +19,8 @@ import {
   GridOptions,
   CellEditingStoppedEvent,
   CellClassParams,
-} from 'ag-grid-community';
-import { SortChangedEvent } from 'ag-grid-community/dist/lib/events';
-import { computed, observable } from 'mobx';
-
+  SortChangedEvent,
+} from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 
 import { AgGridContext } from './AgGridContext';

@@ -18,12 +18,12 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         libraryTarget: 'umd',
         path: outputDir,
     },
-    devtool: 'cheap-module-eval-source-map',
     optimization: {
         splitChunks: {
             chunks: 'all',
         },
-        sideEffects: false,
+        usedExports: true,
+        sideEffects: true,
         minimize: true,
         namedModules: true,
         concatenateModules: true,
