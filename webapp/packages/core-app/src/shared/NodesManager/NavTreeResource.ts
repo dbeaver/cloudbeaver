@@ -161,11 +161,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     let prevChildren: string[];
     if (isResourceKeyList(navNode)) {
       prevChildren = navNode.list.concat();
-      nestedChildren.push(...navNode.list);
     } else {
-      prevChildren = (this.get(navNode)?.concat() || []);
-      nestedChildren.push(...prevChildren);
+      prevChildren = [navNode, ...(this.get(navNode)?.concat() || [])];
     }
+    nestedChildren.push(...prevChildren);
 
     while (prevChildren.length) {
       const nodeKey = prevChildren.shift()!;

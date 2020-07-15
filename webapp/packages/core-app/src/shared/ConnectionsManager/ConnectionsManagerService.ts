@@ -98,17 +98,26 @@ export class ConnectionsManagerService {
 
   async closeAllConnections(): Promise<void> {
     for (const connection of this.connectionInfo.data.values()) {
-      await this.closeConnectionAsync(connection.id, true);
+      await this.closeConnectionAsync(connection.id);
     }
-    await this.navNodeManagerService.updateRootChildren();
   }
 
-  async closeConnectionAsync(id: string, skipNodesRefresh?: boolean): Promise<void> {
-    await this.connectionInfo.close(id);
-    await this.afterConnectionClose(id);
+  async closeConnectionAsync(id: string): Promise<void> {
+    const connection = this.connectionInfo.get(id);
+    if (!connection) {
+      return;
+    }
 
-    if (!skipNodesRefresh) {
-      await this.navNodeManagerService.updateRootChildren(); // Update connections list, probably here we must just remove nodes from nodes manager
+    try {
+      await this.connectionInfo.close(id);
+      await this.afterConnectionClose(id);
+
+      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+
+      this.navNodeManagerService.removeTree(navNodeId);
+      await this.navNodeManagerService.refreshNode(navNodeId);
+    } catch (exception) {
+      this.notificationService.logException(exception, `Can't close connection: ${connection.name}`);
     }
   }
 
@@ -118,20 +127,7 @@ export class ConnectionsManagerService {
 
   async closeNavNodeConnectionAsync(navNodeId: string): Promise<void> {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId);
-    const connection = this.connectionInfo.get(connectionId);
-    if (!connection) {
-      return;
-    }
-
-    try {
-      await this.connectionInfo.close(connectionId);
-      await this.afterConnectionClose(connectionId);
-
-      this.navNodeManagerService.removeTree(navNodeId);
-      await this.navNodeManagerService.refreshNode(navNodeId);
-    } catch (exception) {
-      this.notificationService.logException(exception, `Can't close connection: ${navNodeId}`);
-    }
+    await this.closeConnectionAsync(connectionId);
   }
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {

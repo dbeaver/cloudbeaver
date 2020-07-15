@@ -10,7 +10,6 @@ import { useState, useCallback, useEffect } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { EConnectionFeature } from '../../shared/ConnectionsManager/EConnectionFeature';
 import { useConnectionInfo } from '../../shared/ConnectionsManager/useConnectionInfo';
 import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
@@ -24,23 +23,27 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
   const [isExpanding, setExpanding] = useState(false);
-  const { node, isOutdated } = useNode(nodeId);
+  const node = useNode(nodeId);
   const children = useChildren(nodeId);
 
-  if (!node) {
+  if (!node.node) {
     return undefined;
   }
 
-  const isLoaded = children.isLoaded;
-  let isExpandable = isExpandableFilter(node) && (!isLoaded || children.children!.length > 0);
-  let isExpandedFiltered = isExpanded;
+  const isLoading = node.isLoading || children.isLoading || isExpanding;
+  const isLoaded = children.isLoaded || node.isLoaded;
+  let isExpandable = isExpandableFilter(node.node) && (
+    !isLoaded || children.isOutdated || !children.children || children.children.length > 0
+  );
+  let isExpandedActually = isExpanded && (children.children?.length || 0) > 0;
 
-  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
+  if (node.node.objectFeatures.includes(EObjectFeature.dataSource)) {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
     const { connectionInfo } = useConnectionInfo(connectionId);
-    if (!connectionInfo?.features.includes(EConnectionFeature.connected)) {
-      isExpandedFiltered = false;
+
+    if (!connectionInfo?.connected) {
       isExpandable = true;
+      isExpandedActually = false;
     }
   }
 
@@ -51,7 +54,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   const handleExpand = useCallback(
     async () => {
-      if (!isExpandedFiltered) {
+      if (!isExpandedActually) {
         setExpanding(true);
         const state = await navigationTreeService.loadNestedNodes(nodeId);
         setExpanding(false);
@@ -60,9 +63,9 @@ export function useNavigationTree(nodeId: string, parentId: string) {
           return;
         }
       }
-      switchExpand(!isExpandedFiltered);
+      switchExpand(!isExpandedActually);
     },
-    [isExpandedFiltered, nodeId]
+    [isExpandedActually, nodeId]
   );
 
   const handleSelect = useCallback(
@@ -74,16 +77,16 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   const {
     name, nodeType, icon, hasChildren,
-  } = node;
+  } = node.node;
 
   useEffect(() => {
     if (!isExpandable || !hasChildren) {
       switchExpand(false);
     }
-  }, [isExpandable && hasChildren]);
+  }, [isExpandable, hasChildren]);
 
   useEffect(() => {
-    if (isExpandedFiltered && children.isOutdated && !children.isLoading && children.isLoaded && !isOutdated) {
+    if (isExpandedActually && children.isOutdated && !children.isLoading && children.isLoaded && !node.isOutdated) {
       setExpanding(true);
       navigationTreeService
         .loadNestedNodes(nodeId)
@@ -94,7 +97,7 @@ export function useNavigationTree(nodeId: string, parentId: string) {
           }
         });
     }
-  }, [isExpandedFiltered, children.isOutdated, children.isLoading, children.children, isOutdated, nodeId]);
+  }, [isExpandedActually, children.isOutdated, children.isLoading, children.isLoaded, node.isOutdated, nodeId]);
 
   // Here we subscribe to selected nodes if current node selected (mobx)
   if (isSelected && !navigationTreeService.isNodeSelected(nodeId)) {
@@ -109,12 +112,12 @@ export function useNavigationTree(nodeId: string, parentId: string) {
 
   return {
     name,
-    node,
+    node: node.node,
     nodeType,
     icon,
-    isExpanded: isExpandedFiltered,
+    isExpanded: isExpandedActually,
     isLoaded,
-    isLoading: children.isLoading || isExpanding,
+    isLoading,
     isExpandable,
     isSelected,
     hasChildren,

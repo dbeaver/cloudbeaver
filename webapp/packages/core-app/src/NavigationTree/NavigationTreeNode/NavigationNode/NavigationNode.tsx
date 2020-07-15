@@ -87,7 +87,7 @@ export function NavigationNode({
 
   return styled(styles)(
     <>
-      <node as="div" {...use({ isExpanded: isExpanded && isExpandable })}>
+      <node as="div" {...use({ isExpanded })}>
         <control
           tabIndex={0}
           aria-selected={isSelected}

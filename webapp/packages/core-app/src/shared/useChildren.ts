@@ -9,14 +9,14 @@
 import { useService } from '@cloudbeaver/core-di';
 
 import { ROOT_NODE_PATH } from './NodesManager/NavNodeInfoResource';
-import { NavNodeManagerService } from './NodesManager/NavNodeManagerService';
+import { NavTreeResource } from './NodesManager/NavTreeResource';
 
 export function useChildren(navNodeId = ROOT_NODE_PATH) {
-  const navNodeManagerService = useService(NavNodeManagerService);
-  const children = navNodeManagerService.getTree(navNodeId);
-  const isLoading = navNodeManagerService.navTree.isDataLoading(navNodeId);
-  const isLoaded = navNodeManagerService.navTree.isLoaded(navNodeId);
-  const isOutdated = navNodeManagerService.navTree.isOutdated(navNodeId);
+  const navTreeResource = useService(NavTreeResource);
+  const children = navTreeResource.get(navNodeId);
+  const isLoading = navTreeResource.isDataLoading(navNodeId);
+  const isLoaded = navTreeResource.isLoaded(navNodeId);
+  const isOutdated = navTreeResource.isOutdated(navNodeId);
 
   return {
     children,
