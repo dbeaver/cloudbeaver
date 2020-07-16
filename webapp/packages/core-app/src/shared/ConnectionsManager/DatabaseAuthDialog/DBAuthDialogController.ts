@@ -8,12 +8,12 @@
 
 import { observable } from 'mobx';
 
-import { ErrorDetailsDialog } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
+import { ErrorDetailsDialog } from '../../../Notifications/NotificationsItem/ErrorDetailsDialog/ErrorDetailsDialog';
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
 

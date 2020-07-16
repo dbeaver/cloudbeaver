@@ -21,6 +21,7 @@
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
     "@cloudbeaver/core-localization": "^0.1.0",
+    "@cloudbeaver/core-product": "^0.1.0",
     "@cloudbeaver/core-sdk": "^0.1.0",
     "@cloudbeaver/core-theming": "^0.1.0",
     "@cloudbeaver/core-dialogs": "^0.1.0",
