@@ -57,6 +57,7 @@ const styles = composes(
       display: inline-flex;
       width: 100%;
       padding-left: 24px;
+      outline: none;
     }
     Tab {
       composes: theme-typography--body2 from global;

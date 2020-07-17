@@ -24,5 +24,6 @@ export const verticalTabStyles = css`
     flex: 0 0 auto;
     min-width: 150px;
     overflow: auto;
+    outline: none;
   }
 `;
