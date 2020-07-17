@@ -4,9 +4,10 @@ const { resolve } = require('path');
 const commonConfig = require('./webpack.config.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const getAssets = require('./webpack.product.utils');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-var packageJson = require(resolve("package.json"))
+var package = require(resolve("package.json"))
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
     entry: [
@@ -24,12 +25,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     devtool: 'cheap-module-eval-source-map',
     plugins: [
         new CopyWebpackPlugin({
-            patterns: [
-                { from: './public', to: '', force: true },
-            ]
+            patterns: getAssets(package, '')
         }),
         new webpack.DefinePlugin({
-            version: JSON.stringify(packageJson.buildVersion),
+            version: JSON.stringify(package.buildVersion),
         }),
         new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), }),
         new webpack.HotModuleReplacementPlugin(), // enable HMR globally
