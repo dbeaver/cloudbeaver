@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import { DBDriver, ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
-import { Radio, InputField } from '@cloudbeaver/core-blocks';
+import { Radio, InputField, useFocus } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -29,10 +29,11 @@ export const ConnectionForm = observer(function ConnectionForm({
   controller,
 }: ConnectionFormProps) {
   const translate = useTranslate();
+  const [focusedRef] = useFocus({ focusFirstChild: true });
 
   return styled(useStyles(formStyles))(
     <connection-form as='div'>
-      <connection-type as="div">
+      <connection-type as="div" ref={focusedRef as React.RefObject<HTMLDivElement>}>
         <Radio
           name="type"
           id="custom"

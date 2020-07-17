@@ -32,6 +32,9 @@ const styles = composes(
     Tab:only-child {
       display: none;
     }
+    center {
+      margin: auto;
+    }
   `,
 );
 const stylesArray = [styles];
@@ -39,16 +42,18 @@ const stylesArray = [styles];
 export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab, handler,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
-  const { children, isOutdated, isLoading } = useChildren(tab.handlerState.objectId);
+  const {
+    children, isOutdated, isLoading, isLoaded,
+  } = useChildren(tab.handlerState.objectId);
   const dbObjectPagesService = useService(DBObjectPageService);
   const pages = dbObjectPagesService.orderedPages;
 
-  if (!isOutdated && isLoading) {
+  if (!isLoaded || (!isOutdated && isLoading)) {
     return <Loader />;
   }
 
   if (!children) {
-    return <>Nothing to show</>;
+    return styled(useStyles(styles))(<center as="div">Nothing to show</center>);
   }
 
   return styled(useStyles(styles))(

@@ -9,7 +9,9 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { SubmittingForm, ErrorMessage, Loader } from '@cloudbeaver/core-blocks';
+import {
+  SubmittingForm, ErrorMessage, Loader, useFocus
+} from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -60,6 +62,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   rejectDialog,
 }: DialogComponentProps<string, null>) {
   const connection = useConnectionInfo(payload);
+  const [focusedRef] = useFocus({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
 
@@ -79,7 +82,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
       {(!connection.isLoaded() || connection.isLoading())
         ? <Loader />
         : (
-          <SubmittingForm onSubmit={controller.login}>
+          <SubmittingForm onSubmit={controller.login} ref={focusedRef as React.RefObject<HTMLFormElement>}>
             <ObjectPropertyInfoForm
               prefix={`auth_${connection.connectionInfo?.id || ''} `}
               autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}

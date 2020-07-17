@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { Portal } from 'reakit';
+import { Portal } from 'reakit/Portal';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';

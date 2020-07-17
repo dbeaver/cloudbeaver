@@ -22,6 +22,5 @@ export * from './ShadowInput';
 export * from './StaticImage';
 export * from './SubmittingForm';
 export * from './TextPlaceholder';
-export * from './InFocus';
 export * from './useClipboard';
 export * from './useFocus';

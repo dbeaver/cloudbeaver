@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { InputField, InFocus } from '@cloudbeaver/core-blocks';
+import { InputField } from '@cloudbeaver/core-blocks';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -42,24 +42,22 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   }
 
   return styled(useStyles(formStyles))(
-    <InFocus>
-      <form-body as='div' className={className}>
-        {properties.map(property => (
-          <group as="div" key={property.id}>
-            <InputField
-              type={property.features.includes('password') ? 'password' : 'text'}
-              name={`${prefix}_${property.id}`}
-              value={credentials[property.id!]}
-              onChange={value => handleChange(property.id!, value)}
-              disabled={processing}
-              autoComplete={`${autofillToken} ${property.id}`}
-              mod='surface'
-            >
-              {property.displayName}
-            </InputField>
-          </group>
-        ))}
-      </form-body>
-    </InFocus>
+    <form-body as='div' className={className}>
+      {properties.map(property => (
+        <group as="div" key={property.id}>
+          <InputField
+            type={property.features.includes('password') ? 'password' : 'text'}
+            name={`${prefix}_${property.id}`}
+            value={credentials[property.id!]}
+            onChange={value => handleChange(property.id!, value)}
+            disabled={processing}
+            autoComplete={`${autofillToken} ${property.id}`}
+            mod='surface'
+          >
+            {property.displayName}
+          </InputField>
+        </group>
+      ))}
+    </form-body>
   );
 });

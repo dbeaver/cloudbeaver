@@ -6,13 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback } from 'react';
+import { useCallback, forwardRef } from 'react';
 
-export function SubmittingForm({
-  children,
-  onSubmit,
-  ...rest
-}: React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>) {
+type FormDetailedProps = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>
+
+export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
+  {
+    children,
+    onSubmit,
+    ...rest
+  },
+  ref
+) {
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (onSubmit) {
@@ -21,9 +26,9 @@ export function SubmittingForm({
   }, [onSubmit]);
 
   return (
-    <form {...rest} onSubmit={handleSubmit}>
+    <form {...rest} onSubmit={handleSubmit} ref={ref}>
       {children}
       <button type="submit" hidden />
     </form>
   );
-}
+});

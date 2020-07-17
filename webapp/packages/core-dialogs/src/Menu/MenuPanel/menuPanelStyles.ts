@@ -16,7 +16,7 @@ export const menuPanelStyles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
     MenuItem,
-    MenuDisclosure {
+    MenuButton {
       composes: theme-ripple from global;
     }
     MenuItemElement {
@@ -24,7 +24,7 @@ export const menuPanelStyles = composes(
     }
   `,
   css`
-    MenuDisclosure {
+    MenuButton {
       background: none;
       border: none;
       outline: none !important;

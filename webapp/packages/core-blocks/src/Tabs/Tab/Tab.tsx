@@ -52,7 +52,7 @@ export function Tab({
   return styled(useStyles())(
     <BaseTab
       {...state}
-      stopId={tabId}
+      id={tabId}
       className={className}
       onClick={handleOpen}
     >

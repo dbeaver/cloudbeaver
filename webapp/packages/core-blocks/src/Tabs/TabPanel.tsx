@@ -31,7 +31,7 @@ export const TabPanel = observer(function TabPanel({
   }
 
   return (
-    <BaseTabPanel {...state} stopId={tabId} className={className}>
+    <BaseTabPanel {...state} tabId={tabId} className={className}>
       {children}
     </BaseTabPanel>
   );

@@ -12,9 +12,8 @@ import {
   useMenuState,
   Menu,
   MenuItem,
-  MenuDisclosure,
+  MenuButton,
 } from 'reakit/Menu';
-import { Portal } from 'reakit/Portal';
 import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -24,12 +23,12 @@ const styles = composes(
     Menu {
       composes: theme-text-on-surface theme-background-surface from global;
     }
-    MenuItem, MenuDisclosure {
+    MenuItem, MenuButton {
       composes: theme-ripple from global;
     }
   `,
   css`
-    MenuDisclosure {
+    MenuButton {
       background: transparent;
       outline: none;
       padding: 4px;
@@ -40,7 +39,7 @@ const styles = composes(
       composes: theme-typography--caption theme-elevation-z3 from global;
       display: flex;
       flex-direction: column;
-      width: 420px;
+      width: 100%;
       outline: none;
       padding: 4px 0;
       z-index: 999;
@@ -84,16 +83,14 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
 
   return styled(useStyles(styles))(
     <>
-      <MenuDisclosure {...menu}>{children}</MenuDisclosure>
-      <Portal>
-        <Menu {...menu} aria-label={propertyName}>
-          {values.map(value => (
-            <MenuItem key={value} {...menu} onClick={() => handleMenuSelect(value)}>
-              {value}
-            </MenuItem>
-          ))}
-        </Menu>
-      </Portal>
+      <MenuButton {...menu}>{children}</MenuButton>
+      <Menu {...menu} aria-label={propertyName}>
+        {values.map(value => (
+          <MenuItem key={value} {...menu} onClick={() => handleMenuSelect(value)}>
+            {value}
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 });

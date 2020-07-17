@@ -6,14 +6,34 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useRef, useEffect, useState } from 'react';
+import {
+  useRef, useEffect, useState, useLayoutEffect
+} from 'react';
 
-export function useFocus(
-  onFocus?: () => void,
-  onBlur?: () => void
-): [React.RefObject<HTMLElement>, boolean] {
+type FocusOptions = {
+  focusFirstChild?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
+}
+
+export function useFocus({
+  focusFirstChild,
+  onFocus,
+  onBlur,
+}: FocusOptions): [React.RefObject<HTMLElement>, boolean] {
   const [focus, setFocus] = useState(false);
   const reference = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    if (reference.current !== null && focusFirstChild) {
+      const firstFocusable = reference.current
+        .querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+    }
+  }, [reference.current, focusFirstChild]);
 
   useEffect(() => {
     if (!reference.current) {

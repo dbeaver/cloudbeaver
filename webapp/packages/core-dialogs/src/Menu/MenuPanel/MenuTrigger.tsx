@@ -11,7 +11,7 @@ import {
   forwardRef, Ref, useCallback
 } from 'react';
 import {
-  MenuDisclosure,
+  MenuButton,
   Menu, MenuItem, MenuStateReturn, useMenuState,
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
@@ -37,11 +37,11 @@ export function MenuTrigger({
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
-      <MenuDisclosure {...menu} {...props}>
+      <MenuButton {...menu} {...props}>
         <box as='div'>
           {children}
         </box>
-      </MenuDisclosure>
+      </MenuButton>
       <MenuPanel panel={panel} menu={menu} style={style}/>
     </>
   );
@@ -143,11 +143,11 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
-      <MenuDisclosure ref={ref} {...menu} {...rest}>
+      <MenuButton ref={ref} {...menu} {...rest}>
         <box as='div'>
           <MenuPanelItem menuItem={menuItem} style={style}/>
         </box>
-      </MenuDisclosure>
+      </MenuButton>
       <MenuPanel panel={panel!} menu={menu} style={style}/>
     </>
   );

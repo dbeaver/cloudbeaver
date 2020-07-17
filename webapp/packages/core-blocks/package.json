@@ -27,7 +27,7 @@
     "@cloudbeaver/core-dialogs": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0",
     "reshadow": "^0.0.1-alpha.78",
-    "reakit": "1.0.0-beta.11",
+    "reakit": "^1.1.1",
     "react": "^16.x.x",
     "mobx": "^5.x.x",
     "mobx-react": "^6.x.x"

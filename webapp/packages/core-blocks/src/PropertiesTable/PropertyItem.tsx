@@ -40,6 +40,7 @@ const styles = composes(
     property-name, property-value {
       composes: theme-typography--caption from global;
       position: relative;
+      display: flex;
       box-sizing: border-box;
       flex: 1;
       margin: 0px 1px;
@@ -61,7 +62,6 @@ const styles = composes(
       opacity: 0;
     }
     property-select {
-      position: relative;
       flex: 0 0 auto;
       align-items: center;
       display: flex;
@@ -163,19 +163,19 @@ export const PropertyItem = observer(function PropertyItem({
         >
           {value !== undefined ? value : property.defaultValue}
         </ShadowInput>
+        {(property.validValues && property.validValues.length > 0) && (
+          <property-select as="div">
+            <PropertyValueSelector
+              propertyName={property.id}
+              values={property.validValues}
+              onSelect={handleValueChange}
+              onSwitch={setFocus}
+            >
+              <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
+            </PropertyValueSelector>
+          </property-select>
+        )}
       </property-value>
-      {(property.validValues && property.validValues.length > 0) && (
-        <property-select as="div">
-          <PropertyValueSelector
-            propertyName={property.id}
-            values={property.validValues}
-            onSelect={handleValueChange}
-            onSwitch={setFocus}
-          >
-            <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
-          </PropertyValueSelector>
-        </property-select>
-      )}
       {isKeyEditable && (
         <property-remove as="div">
           <button type="button" onClick={handleRemove}><Icon name="reject" viewBox="0 0 11 11" /></button>

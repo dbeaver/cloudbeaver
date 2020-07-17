@@ -15,15 +15,16 @@ type Props = React.PropsWithChildren<{
   selectedId?: string;
   orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
+  manual?: boolean;
 }>
 
 export function TabsState({
-  selectedId, orientation, currentTabId, children,
+  selectedId, orientation, currentTabId, children, manual,
 }: Props) {
   const state = useTabState({
     selectedId: selectedId || currentTabId,
     orientation,
-    manual: true,
+    manual,
   });
   if (currentTabId) {
     state.selectedId = currentTabId;

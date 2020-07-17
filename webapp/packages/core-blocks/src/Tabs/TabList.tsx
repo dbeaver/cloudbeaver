@@ -7,11 +7,11 @@
  */
 
 import { useContext } from 'react';
-import { TabList as BaseTabList, TabListOptions } from 'reakit/Tab';
+import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
 import { TabsContext } from './TabsContext';
 
-export function TabList(props: React.PropsWithChildren<TabListOptions>) {
+export function TabList(props: React.PropsWithChildren<Omit<TabListOptions, keyof TabStateReturn>>) {
   const state = useContext(TabsContext);
 
   if (!state) {

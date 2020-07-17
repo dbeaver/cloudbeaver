@@ -7,13 +7,12 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback, useRef, useLayoutEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogBackdrop,
   useDialogState,
 } from 'reakit/Dialog';
-import { Portal } from 'reakit/Portal';
 import styled from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -55,39 +54,47 @@ type NestedDialogType = {
   visible: boolean;
 }
 
-function NestedDialog(props: NestedDialogType) {
-  const dialogState = useDialogState();
+function NestedDialog({
+  dialog,
+  resolveDialog,
+  rejectDialog,
+  visible,
+}: NestedDialogType) {
+  const lastVisibility = useRef(visible);
+  const dialogState = useDialogState({ visible });
   const styles = useStyles(dialogStyles);
-  const refToDialog = useRef<any>();
-  dialogState.visible = props.visible;
-  const handleReject = useCallback(() => props.rejectDialog(props.dialog), [props.dialog, props.rejectDialog]);
-  const handleResolve = useCallback(
-    (result: any) => props.resolveDialog(props.dialog, result),
-    [props.dialog, props.resolveDialog]
-  );
-  const backdropClickCallback = useCallback(() => {
-    if (!props.dialog.options?.persistent) {
-      handleReject();
-    }
-  }, [props.dialog.options?.persistent, handleReject]);
 
-  const DialogComponent = props.dialog.component;
-  useLayoutEffect(() => {
-    refToDialog.current?.removeAttribute('tabIndex');
-  }, [refToDialog.current]);
+  if (!dialogState.visible
+    && dialogState.visible !== lastVisibility.current
+    && !dialog.options?.persistent
+  ) {
+    rejectDialog(dialog);
+  } else {
+    lastVisibility.current = visible;
+    dialogState.setVisible(visible);
+  }
+
+  const handleReject = useCallback(() => rejectDialog(dialog), [dialog, rejectDialog]);
+  const handleResolve = useCallback(
+    (result: any) => resolveDialog(dialog, result),
+    [dialog, resolveDialog]
+  );
+
+  const DialogComponent = dialog.component;
 
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
     <>
-      <Portal><DialogBackdrop {...dialogState} onClick={backdropClickCallback} /></Portal>
-      <Dialog {...dialogState} ref={refToDialog} aria-label="can't be provided">
-        <DialogComponent
-          payload={props.dialog.payload}
-          options={props.dialog.options}
-          resolveDialog={handleResolve}
-          rejectDialog={handleReject}
-        />
-      </Dialog>
+      <DialogBackdrop {...dialogState}>
+        <Dialog {...dialogState} >
+          <DialogComponent
+            payload={dialog.payload}
+            options={dialog.options}
+            resolveDialog={handleResolve}
+            rejectDialog={handleReject}
+          />
+        </Dialog>
+      </DialogBackdrop>
     </>
   );
 }

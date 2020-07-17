@@ -10,7 +10,9 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
-import { ErrorMessage, SubmittingForm, Loader } from '@cloudbeaver/core-blocks';
+import {
+  ErrorMessage, SubmittingForm, Loader, useFocus
+} from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -44,6 +46,7 @@ const styles = css`
 export const ConnectionDialog = observer(function ConnectionDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
+  const [focusedRef] = useFocus({ focusFirstChild: true });
   const controller = useController(ConnectionController, rejectDialog);
   const translate = useTranslate();
   let title = translate('basicConnection_connectionDialog_newConnection');
@@ -79,7 +82,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
         </center>
       ) : (
-        <SubmittingForm onSubmit={controller.onConnect}>
+        <SubmittingForm onSubmit={controller.onConnect} ref={focusedRef as React.RefObject<HTMLFormElement>}>
           <ObjectPropertyInfoForm
             prefix={`auth_${controller.dbSource?.id || ''}`}
             autofillToken={`section-${controller.dbSource?.id || ''} section-auth`}
