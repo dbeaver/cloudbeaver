@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { InputField, InFocus } from '@cloudbeaver/core-blocks';
+import { InputField, useFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthProvider } from '../../AuthProvidersResource';
@@ -27,29 +27,28 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   credentials,
   authenticate,
 }: Props) {
+  const [elementRef] = useFocus({ focusFirstChild: true });
   const handleChange = useCallback((key: string, value: string) => {
     credentials[key] = value;
   }, [credentials]);
 
   return styled(useStyles(formStyles))(
-    <InFocus>
-      <login-form as='div'>
-        {provider.credentialParameters.map(parameter => parameter.user && (
-          <group as="div" key={parameter.id}>
-            <InputField
-              type={parameter.encryption === 'none' ? 'text' : 'password'}
-              name={`authentication_${provider.id}_${parameter.id}`}
-              value={credentials[parameter.id]}
-              onChange={value => handleChange(parameter.id, value)}
-              disabled={authenticate}
-              autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
-              mod='surface'
-            >
-              {parameter.displayName}
-            </InputField>
-          </group>
-        ))}
-      </login-form>
-    </InFocus>
+    <login-form as='div' ref={elementRef as React.RefObject<HTMLDivElement>}>
+      {provider.credentialParameters.map(parameter => parameter.user && (
+        <group as="div" key={parameter.id}>
+          <InputField
+            type={parameter.encryption === 'none' ? 'text' : 'password'}
+            name={`authentication_${provider.id}_${parameter.id}`}
+            value={credentials[parameter.id]}
+            onChange={value => handleChange(parameter.id, value)}
+            disabled={authenticate}
+            autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
+            mod='surface'
+          >
+            {parameter.displayName}
+          </InputField>
+        </group>
+      ))}
+    </login-form>
   );
 });
