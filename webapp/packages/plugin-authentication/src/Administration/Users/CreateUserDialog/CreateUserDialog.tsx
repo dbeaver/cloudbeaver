@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, InputField, Checkbox
+  SubmittingForm, ErrorMessage, InputField, Checkbox, useFocus
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -60,6 +60,7 @@ const styles = composes(
 export const CreateUserDialog = observer(function CreateUserDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
+  const [focusedRef] = useFocus({ focusFirstChild: true });
   const controller = useController(CreateUserDialogController, rejectDialog);
   const translate = useTranslate();
   const handleLoginChange = useCallback(
@@ -93,7 +94,7 @@ export const CreateUserDialog = observer(function CreateUserDialog({
       )}
       onReject={rejectDialog}
     >
-      <SubmittingForm onSubmit={controller.create} autoComplete="disabled">
+      <SubmittingForm onSubmit={controller.create} autoComplete="disabled" ref={focusedRef as React.RefObject<HTMLFormElement>}>
         <create-form as='div'>
           <group as="div">
             <InputField
