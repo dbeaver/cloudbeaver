@@ -82,6 +82,7 @@ export const navigationNodeStyles = composes(
 
     name {
       margin-left: 4px;
+      padding-right: 16px;
     }
 
     portal {

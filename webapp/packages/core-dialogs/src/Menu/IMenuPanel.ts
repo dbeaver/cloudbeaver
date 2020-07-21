@@ -32,4 +32,5 @@ export interface IMenuItem {
 export type MenuTriggerProps = PropsWithChildren<{
   panel: IMenuPanel;
   style?: Style[];
+  modal?: boolean;
 }> & Omit<ButtonHTMLAttributes<any>, 'style'>;

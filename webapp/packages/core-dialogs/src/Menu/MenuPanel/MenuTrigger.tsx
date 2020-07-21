@@ -31,9 +31,10 @@ export function MenuTrigger({
   panel,
   children,
   style = [],
+  modal,
   ...props
 }: MenuTriggerProps) {
-  const menu = useMenuState();
+  const menu = useMenuState({ modal });
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
