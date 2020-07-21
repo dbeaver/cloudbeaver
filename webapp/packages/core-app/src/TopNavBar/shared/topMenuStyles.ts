@@ -46,7 +46,8 @@ export const topMenuStyles = composes(
       & menu-trigger-icon {
         margin-right: 8px;
       }
-      &:hover box > Icon {
+      &:hover box > Icon,
+      &:global([aria-expanded="true"]) box > Icon {
         background: #236ea0;
       }
     }
