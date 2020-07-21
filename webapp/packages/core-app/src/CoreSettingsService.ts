@@ -10,8 +10,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  'app.logViewer.refreshInterval': 3000,
-  'app.logViewer.maxLogEntries': 1000,
+  'app.logViewer.refreshTimeout': 3000,
+  'app.logViewer.maxLogRecords': 1000,
+  'app.logViewer.logBatchSize': 2000,
   'app.logViewer.maxFailedRequests': 3,
 };
 

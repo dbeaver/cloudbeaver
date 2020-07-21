@@ -14,17 +14,16 @@ export class SettingsSource implements ISettingsSource {
   constructor(protected fallback?: ISettingsSource) {}
 
   has(key: string): boolean {
-    if (this.store.has(key)) {
-      return true;
-    }
-    return !!this.fallback?.has(key);
+    return this.store.has(key) || !!this.fallback?.has(key);
   }
+
   getValue(key: string): any | undefined {
     if (this.fallback?.has(key)) {
       return this.fallback.getValue(key);
     }
     return this.store.get(key);
   }
+
   setValue(key: string, value: any) {
     this.store.set(key, value);
   }

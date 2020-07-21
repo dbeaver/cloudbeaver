@@ -6,6 +6,11 @@ declare module '*.scss?raw' {
   export default classes
 }
 
+declare module '*.json5' {
+  const json: any
+  export default json
+}
+
 declare module '*.scss' {
   const classes: { readonly [key: string]: string }
   export default classes
