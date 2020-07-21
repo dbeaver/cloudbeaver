@@ -67,7 +67,7 @@ export const menuPanelStyles = composes(
         display: none;
       }
 
-      &:hover {
+      &:hover, &:global([aria-expanded="true"]) {
         font-weight: 600;
 
         & Icon {

@@ -10,6 +10,12 @@
   .theme-ripple {
     @include mdc-states($color, $query: $query);
 
+    &:global([aria-expanded="true"]) {
+      &::before {
+        opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
+      }
+    }
+
     &.theme-ripple-selectable {
       &:global([aria-selected=true]) {
         &::before {
@@ -21,6 +27,12 @@
 
   &.theme-ripple {
     @include mdc-states($color, $query: $query);
+
+    &:global([aria-expanded="true"]) {
+      &::before {
+        opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
+      }
+    }
 
     &.theme-ripple-selectable {
       &:global([aria-selected=true]) {

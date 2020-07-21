@@ -51,7 +51,7 @@ export const topMenuStyles = composes(
       }
     }
     MenuItem {
-      &:hover {
+      &:hover, &:global([aria-expanded="true"]) {
         background: #236ea0;
       }
       &:before {
