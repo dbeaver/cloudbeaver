@@ -24,6 +24,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 1.1.0 - 2020-07-14
+
+- Connection management and authentication redesign
+- Webpack build minimization
+- A lot of minor UI improvements
+- Many minor UI improvements
+
 ### CloudBeaver 1.0.4 - 2020-06-16
 
 - Database navigator refresh
