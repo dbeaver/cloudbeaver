@@ -34,7 +34,9 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
@@ -162,8 +164,13 @@ public class WebServiceCore implements DBWServiceCore {
         ((DataSourceDescriptor)newDataSource).setTemporary(true);
 
         DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
-        cfg.setUserName(config.getUserName());
-        cfg.setUserPassword(config.getUserPassword());
+        if (AuthModelDatabaseNative.ID.equals(config.getAuthModelId())) {
+            cfg.setUserName(JSONUtils.getString(config.getCredentials(), "userName"));
+            cfg.setUserPassword(JSONUtils.getString(config.getCredentials(), "userPassword"));
+        } else {
+            cfg.setUserName(config.getUserName());
+            cfg.setUserPassword(config.getUserPassword());
+        }
         if (!CommonUtils.isEmpty(config.getName())) {
             newDataSource.setName(config.getName());
         }
