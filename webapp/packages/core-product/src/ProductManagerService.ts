@@ -14,13 +14,11 @@ import { ProductSettingsService } from './ProductSettingsService';
 
 @injectable()
 export class ProductManagerService {
-
   readonly settings = new ProductSettingsService(this.serverService.settings)
 
   constructor(private serverService: ServerService) { }
 
   setSettings(object: any) {
-
     parseJSONFlat(
       object,
       this.settings.setSelfValue.bind(this.settings),

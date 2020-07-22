@@ -61,7 +61,7 @@ export class LogViewerService {
     }
     this._isActive = true;
     await this.updateLog();
-    const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshInterval');
+    const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout');
     this.maxFailedRequests = this.coreSettingsService.settings.getValue('app.logViewer.maxFailedRequests');
     this.interval = setInterval(() => {
       this.updateLog();
@@ -82,7 +82,7 @@ export class LogViewerService {
   }
 
   async loadLog(): Promise<ILogEntry[]> {
-    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
+    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.logBatchSize');
     const { log } = await this.graphQLService.gql.readSessionLog({
       maxEntries: maxLogEntries,
       clearEntries: true,
@@ -97,7 +97,7 @@ export class LogViewerService {
   @action
   private addNewEntries(entries: ILogEntry[]) {
     this.log.unshift(...entries.reverse());
-    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogEntries');
+    const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogRecords');
     if (this.log.length > maxLogEntries) {
       this.log.splice(maxLogEntries, this.log.length - maxLogEntries);
     }
