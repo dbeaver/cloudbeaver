@@ -31,10 +31,11 @@ export function MenuTrigger({
   panel,
   children,
   style = [],
+  placement,
   modal,
   ...props
 }: MenuTriggerProps) {
-  const menu = useMenuState({ modal });
+  const menu = useMenuState({ modal, placement });
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <>

@@ -7,6 +7,7 @@
  */
 
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
+import { MenuInitialState } from 'reakit/Menu';
 
 import { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { Style } from '@cloudbeaver/core-theming';
@@ -32,5 +33,6 @@ export interface IMenuItem {
 export type MenuTriggerProps = PropsWithChildren<{
   panel: IMenuPanel;
   style?: Style[];
+  placement?: MenuInitialState['placement'];
   modal?: boolean;
 }> & Omit<ButtonHTMLAttributes<any>, 'style'>;
