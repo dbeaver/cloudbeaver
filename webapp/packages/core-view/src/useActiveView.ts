@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { ActiveViewService, IActiveItemProvider } from './ActiveViewService';
 
-export function useActiveView<T>(provider: IActiveItemProvider<T>) {
+export function useActiveView<T>(provider: IActiveItemProvider<T>): [() => void, () => void] {
   const activeViewService = useService(ActiveViewService);
 
   const handleFocus = useCallback(() => {

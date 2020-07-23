@@ -40,8 +40,8 @@ const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const navigation = useService(NavigationTabsService);
-  const view = useActiveView(navigation.getView);
-  const [ref] = useFocus(...view);
+  const [onFocus, onBlur] = useActiveView(navigation.getView);
+  const [ref] = useFocus({ onFocus, onBlur });
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);

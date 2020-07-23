@@ -46,8 +46,8 @@ const navigationTreeStyles = css`
 
 export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
-  const view = useActiveView(navTreeService.getView);
-  const [ref] = useFocus(...view);
+  const [onFocus, onBlur] = useActiveView(navTreeService.getView);
+  const [ref] = useFocus({ onFocus, onBlur });
   const nodeChildren = useChildren();
   const isEnabled = usePermission(EPermission.public);
 
