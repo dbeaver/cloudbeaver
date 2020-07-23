@@ -13,6 +13,7 @@ import { DataExportMenuService } from './DataExportMenuService';
 import { DataExportProcessService } from './DataExportProcessService';
 import { DataExportService } from './DataExportService';
 import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
+import { LocaleService } from './LocaleService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -24,6 +25,7 @@ export const manifest: PluginManifest = {
     DataExportService,
     DataExportProcessService,
     DataTransferProcessorsResource,
+    LocaleService,
   ],
 
   async initialize(services: IServiceInjector) {

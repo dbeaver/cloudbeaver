@@ -1,4 +1,7 @@
 export default [
+  ['authentication_login_dialog_title', 'Авторизация'],
+  ['authentication_login', 'Войти'],
+  ['authentication_logout', 'Выйти'],
   ['authentication_administration_item', 'Пользователи'],
   ['authentication_create_user_dialog_title', 'Создание нового пользователя'],
   ['authentication_create_user_dialog_create', 'Создать'],

@@ -1,4 +1,7 @@
 export default [
+  ['authentication_login_dialog_title', 'Authentication'],
+  ['authentication_login', 'Login'],
+  ['authentication_logout', 'Logout'],
   ['authentication_administration_item', 'Users'],
   ['authentication_administration_confirm_user_deletion', 'Confirm user deletion'],
   ['authentication_create_user_dialog_title', 'Create new user'],
