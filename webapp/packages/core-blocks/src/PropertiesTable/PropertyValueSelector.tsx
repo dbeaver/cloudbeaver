@@ -86,7 +86,7 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
       <MenuButton {...menu}>{children}</MenuButton>
       <Menu {...menu} aria-label={propertyName}>
         {values.map(value => (
-          <MenuItem key={value} {...menu} onClick={() => handleMenuSelect(value)}>
+          <MenuItem key={value} type='button' {...menu} onClick={() => handleMenuSelect(value)}>
             {value}
           </MenuItem>
         ))}

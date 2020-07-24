@@ -204,8 +204,8 @@ function getWordRange(editor: Editor, position: Position) {
 
   const leftSubstr = line.substr(0, position.ch);
   const rightSubstr = line.substr(position.ch);
-  const leftWord = /\w+$/.exec(leftSubstr) || [''];
-  const rightWord = /^\w+/.exec(rightSubstr) || [''];
+  const leftWord = /[*\w]+$/.exec(leftSubstr) || [''];
+  const rightWord = /^[*\w]+/.exec(rightSubstr) || [''];
 
   const from = {
     ...position,

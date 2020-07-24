@@ -305,6 +305,7 @@ export class TableViewerModel {
   private resetData() {
     this.tableDataModel.resetData();
     this.agGridModel.actions?.resetData();
+    this.tableEditor.cancelChanges();
     this.requestStatusMessage = '';
     this.queryDuration = 0;
     this._hasMoreRows = true;
