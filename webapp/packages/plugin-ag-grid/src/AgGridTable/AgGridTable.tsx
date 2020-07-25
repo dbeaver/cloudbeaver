@@ -14,17 +14,17 @@ import { AgGridReactProps } from '@ag-grid-community/react';
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { agGridStyles } from '../styles/styles';
 import { AgGridTableController } from './AgGridTableController';
-import { IAgGridModel } from './IAgGridModel';
 import { LoadingCell } from './LoadingCell';
 import { PlainTextEditor } from './PlainTextEditor/PlainTextEditor';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 
 export type AgGridTableProps = PropsWithChildren<
   AgGridReactProps & {
-    tableModel: IAgGridModel;
+    tableModel: TableViewerModel;
     className?: string;
   }>
 

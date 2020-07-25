@@ -51,5 +51,5 @@ export const TableGrid = observer(function TableGrid({
     return styled(styles)(<no-data as="div">No data to show</no-data>);
   }
 
-  return styled(styles)(<AgGridTable tableModel={model.agGridModel} />);
+  return styled(styles)(<AgGridTable tableModel={model} />);
 });

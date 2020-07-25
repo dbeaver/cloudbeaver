@@ -7,18 +7,24 @@
  */
 
 import { observable } from 'mobx';
+import { Subject, Observable } from 'rxjs';
 
 import { EditedRow, RowDiff } from './EditedRow';
 import { TableDataModel } from './TableDataModel';
+import { TableRow, SomeTableRows } from './TableRow';
 
 /**
  *  when user edit data in e table this class store changes until they will be applied
  */
 export class TableEditor {
+  readonly onRowsUpdate: Observable<number[]>
 
   @observable private editedRows = new Map<number, EditedRow>();
+  private rowsUpdateSubject: Subject<number[]>
 
   constructor(private dataModel: TableDataModel) {
+    this.rowsUpdateSubject = new Subject();
+    this.onRowsUpdate = this.rowsUpdateSubject.asObservable();
   }
 
   /**
@@ -33,8 +39,11 @@ export class TableEditor {
       return;
     }
 
-    return this.getOrCreateEditedRow(rowId)
+    const newValue = this.getOrCreateEditedRow(rowId)
       .setValue(column.position, value);
+
+    this.rowsUpdateSubject.next([rowId]);
+    return newValue;
   }
 
   revertCellValue(rowId: number, columnKey: string) {
@@ -46,13 +55,34 @@ export class TableEditor {
       return;
     }
 
-    return this.getOrCreateEditedRow(rowId)
+    const newValue = this.getOrCreateEditedRow(rowId)
       .revert(column.position);
+
+    this.rowsUpdateSubject.next([rowId]);
+    return newValue;
+  }
+
+  getRowValue(rowId: number) {
+    const editedRow = this.editedRows.get(rowId);
+    if (!editedRow) {
+      return this.dataModel.getRowByNumber(rowId);
+    }
+
+    return editedRow.newRow;
   }
 
   isEdited(): boolean {
     return Array.from(this.editedRows.values())
       .some(row => row.isEdited());
+  }
+
+  isRowEdited(rowId: number) {
+    const editedRow = this.editedRows.get(rowId);
+    if (!editedRow) {
+      return false;
+    }
+
+    return editedRow.isEdited();
   }
 
   isCellEdited(rowId: number, columnKey: string) {
@@ -78,13 +108,18 @@ export class TableEditor {
       .map(editedRow => editedRow.getDiff());
   }
 
-  applyChanges() {
-    // todo
+  applyChanges(rows: TableRow[]) {
+    const diffs = this.getChanges();
     this.editedRows.clear();
+    this.dataModel.updateRows(this.zipDiffAndResults(diffs, rows));
   }
 
-  cancelChanges() {
+  cancelChanges(skipUpdate?: boolean) {
+    const rows = Array.from(this.editedRows.keys());
     this.editedRows.clear();
+    if (!skipUpdate) {
+      this.rowsUpdateSubject.next(rows);
+    }
   }
 
   private getOrCreateEditedRow(rowId: number): EditedRow {
@@ -96,5 +131,25 @@ export class TableEditor {
     }
 
     return this.editedRows.get(rowId)!;
+  }
+
+  /**
+   * Take array of TableRow and return sparse array of TableRow
+   *
+   * @param diff
+   * @param newRows
+   */
+  private zipDiffAndResults(diff: RowDiff[], newRows: TableRow[]): SomeTableRows {
+    const length = Math.min(diff.length, newRows.length);
+    if (diff.length !== newRows.length) {
+      console.warn('Expected that new rows have same length as diff');
+    }
+    const newRowsMap: SomeTableRows = new Map();
+
+    for (let i = 0; i < length; i++) {
+      newRowsMap.set(diff[i].rowIndex, newRows[i]);
+    }
+
+    return newRowsMap;
   }
 }
