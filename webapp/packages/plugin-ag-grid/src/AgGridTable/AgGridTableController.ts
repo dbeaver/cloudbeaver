@@ -21,6 +21,7 @@ import {
   CellEditingStoppedEvent,
   CellClassParams,
   SortChangedEvent,
+  RowNode,
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
@@ -167,15 +168,17 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private updateRows(rows: number[]) {
     if (this.api) {
-      for (const rowIndex of rows) {
-        this.api
-          .getRowNode(`${rowIndex}`)
-          .setData([...this.gridModel.tableEditor.getRowValue(rowIndex)]);
+      const updatedRows: RowNode[] = [];
 
-        this.api.redrawRows({
-          rowNodes: rows.map(rowIndex => this.api!.getRowNode(`${rowIndex}`)),
-        });
+      for (const rowIndex of rows) {
+        const rowNode = this.api.getRowNode(`${rowIndex}`);
+
+        rowNode.setData([...this.gridModel.tableEditor.getRowValue(rowIndex)]);
+
+        updatedRows.push(rowNode);
       }
+
+      this.api.redrawRows({ rowNodes: updatedRows });
     }
   }
 
