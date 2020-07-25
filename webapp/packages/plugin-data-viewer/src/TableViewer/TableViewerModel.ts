@@ -111,7 +111,6 @@ export class TableViewerModel {
 
   getChunkSize = () => this._chunkSize;
   setChunkSize = (count: number) => this.updateChunkSize(count);
-  refresh = () => this.resetData();
 
   @observable queryDuration = 0;
   @observable requestStatusMessage = '';
@@ -157,6 +156,12 @@ export class TableViewerModel {
   }
 
   cancelFetch = () => {
+  }
+
+  refresh = async () => {
+    this.resetData(true);
+    await this.onRequestData(0, this.getChunkSize());
+    this.resetSubject.next();
   }
 
   onShowDetails = () => {
@@ -321,14 +326,17 @@ export class TableViewerModel {
   }
 
   @action
-  private resetData() {
+  private resetData(skipUpdate?: boolean) {
     this.tableDataModel.resetData();
     this.tableEditor.cancelChanges(true);
     this.requestStatusMessage = '';
     this.queryDuration = 0;
     this._hasMoreRows = true;
     this.errorMessage = '';
-    this.resetSubject.next();
+
+    if (!skipUpdate) {
+      this.resetSubject.next();
+    }
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {
