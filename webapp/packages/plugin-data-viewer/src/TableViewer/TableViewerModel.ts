@@ -159,7 +159,7 @@ export class TableViewerModel {
   }
 
   refresh = async () => {
-    this.resetData(true);
+    this.resetData();
     await this.onRequestData(0, this.getChunkSize());
     this.resetSubject.next();
   }
@@ -176,10 +176,6 @@ export class TableViewerModel {
 
   setQueryWhereFilter(where: string | null) {
     this.queryWhereFilter = where;
-  }
-
-  applyQueryFilters() {
-    this.resetData();
   }
 
   getSortedColumns() {
@@ -316,7 +312,7 @@ export class TableViewerModel {
     for (const sort of sorting) {
       this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
     }
-    this.resetData();
+    this.refresh();
   }
 
   @action
@@ -326,17 +322,13 @@ export class TableViewerModel {
   }
 
   @action
-  private resetData(skipUpdate?: boolean) {
+  private resetData() {
     this.tableDataModel.resetData();
     this.tableEditor.cancelChanges(true);
     this.requestStatusMessage = '';
     this.queryDuration = 0;
     this._hasMoreRows = true;
     this.errorMessage = '';
-
-    if (!skipUpdate) {
-      this.resetSubject.next();
-    }
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {

@@ -220,10 +220,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  private getSelectedRows(): RowSelection[] {
-    return this.selection.getSelectedRows();
-  }
-
   private cloneRows(rows: AgGridRow[]): AgGridRow[] {
     return rows.map(row => [...row].map(v => (v === null ? '' : v))); // TODO: temporary fix dbeaver-corp/dbeaver-web#663
   }
