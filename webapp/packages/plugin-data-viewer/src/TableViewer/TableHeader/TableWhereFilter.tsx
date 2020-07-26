@@ -50,7 +50,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
 
   const handleApply = useCallback(() => {
     context.setQueryWhereFilter(filterValue);
-    context.applyQueryFilters();
+    context.refresh();
   }, [context, filterValue]);
 
   const resetFilter = useCallback(
@@ -61,7 +61,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
 
       if (applyNeeded) {
         context.setQueryWhereFilter('');
-        context.applyQueryFilters();
+        context.refresh();
       }
     },
     [context, filterValue]

@@ -7,6 +7,7 @@
  */
 
 import { action } from 'mobx';
+import { Subject, Observable } from 'rxjs';
 
 import { TableColumn } from './TableColumn';
 import { CellValue, SomeTableRows, TableRow } from './TableRow';
@@ -16,8 +17,16 @@ import { CellValue, SomeTableRows, TableRow } from './TableRow';
  * Keep this data in consistence with server side. Don't try to modify this data if it is not inline with server changes
  */
 export class TableDataModel {
+  readonly onRowsUpdate: Observable<number[]>
+
+  private rowsUpdateSubject: Subject<number[]>
   private rows: TableRow[] = [];
   private columns: TableColumn[] = [];
+
+  constructor() {
+    this.rowsUpdateSubject = new Subject();
+    this.onRowsUpdate = this.rowsUpdateSubject.asObservable();
+  }
 
   getRows() {
     return this.rows;
@@ -64,20 +73,16 @@ export class TableDataModel {
   }
 
   @action
-  pushRows(rows: TableRow[]) {
-    this.rows.push(...rows);
-  }
-
-  @action
   updateRows(newRows: SomeTableRows) {
-    newRows.forEach((row, index) => {
-      this.updateRow(index, row);
-    });
+    for (const [key, row] of newRows) {
+      this.updateRow(key, row);
+    }
   }
 
   @action
   updateRow(rowIndex: number, value: TableRow) {
     this.rows[rowIndex] = value;
+    this.rowsUpdateSubject.next([rowIndex]);
   }
 
   @action

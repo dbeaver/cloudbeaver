@@ -17,7 +17,7 @@ export type RowDiff = {
 }
 
 export class EditedRow {
-  private newRow: TableRow
+  readonly newRow: TableRow
   @observable private editedCells = new Set<number>()
 
   constructor(readonly rowIndex: number, readonly source: TableRow) {

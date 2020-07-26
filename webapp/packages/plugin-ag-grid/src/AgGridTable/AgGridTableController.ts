@@ -7,6 +7,7 @@
  */
 
 import { computed, observable } from 'mobx';
+import { Subscription } from 'rxjs';
 
 import {
   GridApi,
@@ -20,13 +21,14 @@ import {
   CellEditingStoppedEvent,
   CellClassParams,
   SortChangedEvent,
+  RowNode,
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
+import {
+  TableViewerModel, SortModel, AgGridRow, IAgGridCol
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridContext } from './AgGridContext';
-import {
-  AgGridRow, IAgGridActions, IAgGridCol, IAgGridModel, SortModel,
-} from './IAgGridModel';
 import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
 
@@ -88,29 +90,24 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private api?: GridApi;
   private columnApi?: ColumnApi;
-  private gridModel!: IAgGridModel;
+  private gridModel!: TableViewerModel;
   private resizeTask?: any;
+  private subscriptions: Subscription[] = []
 
-  /**
-   * this actions will be passed outside data grid to ba called
-   */
-  private actions: IAgGridActions = {
-    updateRows: this.updateRows.bind(this),
-    changeChunkSize: this.changeChunkSize.bind(this),
-    resetData: this.resetData.bind(this),
-    updateCellValue: this.updateCellValue.bind(this),
-    updateRowValue: this.updateRowValue.bind(this),
-    getSelectedRows: this.getSelectedRows.bind(this),
-  };
-
-  init(gridModel: IAgGridModel) {
-    gridModel.actions = this.actions;
+  init(gridModel: TableViewerModel) {
     this.gridModel = gridModel;
-    this.gridOptions.cacheBlockSize = gridModel.chunkSize;
+    this.gridOptions.cacheBlockSize = gridModel.getChunkSize();
+
+    this.subscriptions.push(gridModel.tableDataModel.onRowsUpdate.subscribe(this.updateRows.bind(this)));
+    this.subscriptions.push(gridModel.tableEditor.onRowsUpdate.subscribe(this.updateRows.bind(this)));
+    this.subscriptions.push(gridModel.onChunkSizeChange.subscribe(this.changeChunkSize.bind(this)));
+    this.subscriptions.push(gridModel.onReset.subscribe(this.resetData.bind(this)));
   }
 
   destruct(): void {
-    this.gridModel.actions = null;
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 
   getGridOptions() {
@@ -137,13 +134,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
     try {
       const length = endRow - startRow;
-      const requestedData = await this.gridModel.onRequestData(
-        startRow,
-        length,
-        {
-          sorting: sortModel as SortModel,
-        }
-      );
+      const requestedData = await this.gridModel.onRequestData(startRow, length);
       // update columns only once after first data fetching
       if (isColumnsChanged(this.columns, requestedData.columns)) {
         this.columns = mapDataToColumns(requestedData.columns);
@@ -157,22 +148,18 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  private changeChunkSize(chunkSize: number): void {
-    this.gridOptions.cacheBlockSize = chunkSize;
+  private changeChunkSize(): void {
+    this.gridOptions.cacheBlockSize = this.gridModel.getChunkSize();
     // ag-grid is not able to change ca
     this.refresh();
   }
 
   private revertCellValue(rowIndex: number, colId: string) {
-    if (this.gridModel.onRevertCellValue) {
-      this.gridModel.onRevertCellValue(rowIndex, colId);
-    }
+    this.gridModel.revertCellValue(rowIndex, colId);
   }
 
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    if (this.gridModel.onCellEditingStopped) {
-      this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
-    }
+    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
   }
 
   private isCellEdited(rowIndex: number, column: string) {
@@ -180,21 +167,27 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private updateRows(rows: number[]) {
-    this.api?.redrawRows({
-      rowNodes: rows.map(rowIndex => this.api!.getRowNode(`${rowIndex}`)),
-    });
+    if (this.api) {
+      const updatedRows: RowNode[] = [];
+
+      for (const rowIndex of rows) {
+        const rowNode = this.api.getRowNode(`${rowIndex}`);
+
+        rowNode.setData([...this.gridModel.tableEditor.getRowValue(rowIndex)]);
+
+        updatedRows.push(rowNode);
+      }
+
+      this.api.redrawRows({ rowNodes: updatedRows });
+    }
   }
 
   private onEditSave() {
-    if (this.gridModel.onEditSave) {
-      this.gridModel.onEditSave();
-    }
+    this.gridModel.saveChanges();
   }
 
   private onEditCancel() {
-    if (this.gridModel.onEditCancel) {
-      this.gridModel.onEditCancel();
-    }
+    this.gridModel.cancelChanges();
   }
 
   private handleBodyScroll() {
@@ -216,10 +209,8 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private handleSortChanged(event: SortChangedEvent) {
-    if (this.gridModel.onSortChanged) {
-      const sortModel = event.api.getSortModel() as SortModel;
-      this.gridModel.onSortChanged(sortModel);
-    }
+    const sortModel = event.api.getSortModel() as SortModel;
+    this.gridModel.onSortChanged(sortModel);
   }
 
   /* Actions */
@@ -230,26 +221,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
       this.api.setInfiniteRowCount(0, false);
       this.api.purgeInfiniteCache(); // it will reset internal state
     }
-  }
-
-  private updateCellValue(rowNumber: number, column: string, value: any): void {
-    if (this.api) {
-      this.api
-        .getRowNode(`${rowNumber}`)
-        .setDataValue(column, value);
-    }
-  }
-
-  private updateRowValue(rowNumber: number, newRow: any[]): void {
-    if (this.api) {
-      this.api
-        .getRowNode(`${rowNumber}`)
-        .setData([...newRow]);
-    }
-  }
-
-  private getSelectedRows(): RowSelection[] {
-    return this.selection.getSelectedRows();
   }
 
   private cloneRows(rows: AgGridRow[]): AgGridRow[] {
