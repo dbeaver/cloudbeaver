@@ -102,8 +102,12 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Async tasks
 
+    @Deprecated
     @WebAction
     WebAsyncTaskInfo getAsyncTaskStatus(WebSession webSession, String taskId) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, boolean removeOnFinish) throws DBWebException;
 
     @WebAction
     boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException;

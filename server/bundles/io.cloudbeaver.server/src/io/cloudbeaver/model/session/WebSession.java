@@ -367,14 +367,14 @@ public class WebSession implements DBASession {
         }
     }
 
-    public WebAsyncTaskInfo asyncTaskStatus(String taskId) throws DBWebException {
+    public WebAsyncTaskInfo asyncTaskStatus(String taskId, boolean removeOnFinish) throws DBWebException {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
             if (taskInfo == null) {
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
             taskInfo.setRunning(taskInfo.getJob() != null && !taskInfo.getJob().isFinished());
-            if (!taskInfo.isRunning()) {
+            if (removeOnFinish && !taskInfo.isRunning()) {
                 asyncTasks.remove(taskId);
             }
             return taskInfo;

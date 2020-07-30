@@ -38,7 +38,7 @@ type AsyncTaskInfo {
     status: String
     error: ServerError
 
-    result: SQLExecuteInfo
+    result: SQLExecuteInfo @deprecated # Deprecated. Use asyncSqlExecuteResults instead
     # Task result.
     # Can be some kind of identifier to obtain real result using another API function
     taskResult: Object
@@ -326,7 +326,9 @@ extend type Mutation {
 
     asyncTaskCancel(id: String!): Boolean
 
-    asyncTaskStatus(id: String!): AsyncTaskInfo!
+    asyncTaskStatus(id: String!): AsyncTaskInfo! @deprecated # Use asyncTaskInfo instead
+
+    asyncTaskInfo(id: String!, removeOnFinish: Boolean): AsyncTaskInfo!
 
 }
 
