@@ -16,7 +16,6 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 
 @injectable()
 export class DataViewerTableService {
-
   constructor(private tableViewerStorageService: TableViewerStorageService,
               private graphQLService: GraphQLService) {
   }

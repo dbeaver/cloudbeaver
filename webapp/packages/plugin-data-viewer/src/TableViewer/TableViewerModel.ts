@@ -20,7 +20,7 @@ import { RowDiff } from './TableDataModel/EditedRow';
 import { TableColumn } from './TableDataModel/TableColumn';
 import { TableDataModel } from './TableDataModel/TableDataModel';
 import { TableEditor } from './TableDataModel/TableEditor';
-import { SomeTableRows, TableRow } from './TableDataModel/TableRow';
+import { TableRow } from './TableDataModel/TableRow';
 
 export const fetchingSettings = {
   fetchMin: 1,
