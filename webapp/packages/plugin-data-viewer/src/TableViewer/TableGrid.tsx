@@ -11,7 +11,7 @@ import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
-import { AgGridTable } from '@cloudbeaver/plugin-ag-grid';
+import { Spreadsheet } from '@cloudbeaver/plugin-data-spreadsheet';
 
 import { TableViewerModel } from './TableViewerModel';
 
@@ -20,7 +20,7 @@ type TableGridProps = PropsWithChildren<{
 }>
 
 const styles = css`
-  AgGridTable, no-data, error {
+  Spreadsheet, no-data, error {
     flex: 1;
   }
   no-data, error {
@@ -51,5 +51,5 @@ export const TableGrid = observer(function TableGrid({
     return styled(styles)(<no-data as="div">No data to show</no-data>);
   }
 
-  return styled(styles)(<AgGridTable tableModel={model} />);
+  return styled(styles)(<Spreadsheet tableModel={model} />);
 });
