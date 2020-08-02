@@ -144,7 +144,6 @@
         <setEntry value="org.jkiss.bundle.jaxb@default:default"/>
         <setEntry value="org.jkiss.bundle.jedis@default:default"/>
         <setEntry value="org.jkiss.bundle.liquibase@default:default"/>
-        <setEntry value="org.jkiss.bundle.onelogin.saml@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
         <setEntry value="org.mongodb.mongo-java-driver@default:default"/>
         <setEntry value="org.objectweb.asm@default:default"/>
