@@ -14,3 +14,5 @@ export * from './TableViewer/TableDataModel/TableRow';
 export * from './TableViewer/TableDataModel/EditedRow';
 
 export * from './IExecutionContext';
+
+export * from './DataPresentationService';

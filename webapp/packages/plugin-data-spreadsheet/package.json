@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ag-grid",
+  "name": "@cloudbeaver/plugin-data-spreadsheet",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",

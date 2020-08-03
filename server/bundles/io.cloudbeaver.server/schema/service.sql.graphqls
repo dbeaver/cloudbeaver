@@ -177,4 +177,6 @@ extend type Mutation {
         filter: SQLDataFilter
     ): AsyncTaskInfo!
 
+    asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
+
 }

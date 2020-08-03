@@ -25,11 +25,10 @@ import {
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
-  TableViewerModel, SortModel, AgGridRow, IAgGridCol
+  TableViewerModel, SortModel, AgGridRow, IAgGridCol, AccessMode
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridContext } from './AgGridContext';
-import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
 
 @injectable()
@@ -47,6 +46,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
    */
   private readonly context: AgGridContext = {
     selection: this.selection,
+    isReadonly: () => this.gridModel.access === AccessMode.Readonly,
     isCellEdited: this.isCellEdited.bind(this),
     revertCellValue: this.revertCellValue.bind(this),
     onEditSave: this.onEditSave.bind(this),
@@ -266,6 +266,10 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       headerName: v.label,
       field: `${v.position}`,
       type: v.dataKind,
+      editable: (params: any) => {
+        const context: AgGridContext = params.context;
+        return !context.isReadonly();
+      },
       valueGetter: (params: ValueGetterParams) => {
         if (!params.data) {
           return '';

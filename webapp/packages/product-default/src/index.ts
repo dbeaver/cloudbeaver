@@ -4,7 +4,7 @@ import 'reflect-metadata';
 
 import core, { bootstrap } from '@cloudbeaver/core-bootstrap';
 import administration from '@cloudbeaver/plugin-administration';
-import agGrid from '@cloudbeaver/plugin-ag-grid';
+import spreadsheet from '@cloudbeaver/plugin-data-spreadsheet';
 import authentication from '@cloudbeaver/plugin-authentication';
 import dataExport from '@cloudbeaver/plugin-data-export';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
@@ -18,7 +18,7 @@ import { defaultProductManifest } from './manifest';
 const PLUGINS = [
   core,
   administration,
-  agGrid,
+  spreadsheet,
   authentication,
   connectionCustom,
   connectionPreconfigured,

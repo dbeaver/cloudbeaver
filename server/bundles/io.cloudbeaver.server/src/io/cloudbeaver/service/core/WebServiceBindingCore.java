@@ -84,6 +84,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("setDefaultNavigatorSettings", env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), parseNavigatorSettings(env.getArgument("settings"))))
 
             .dataFetcher("asyncTaskStatus", env -> getService(env).getAsyncTaskStatus(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(
+                getWebSession(env),
+                env.getArgument("id"),
+                env.getArgument("removeOnFinish")))
             .dataFetcher("asyncTaskCancel", env -> getService(env).cancelAsyncTask(getWebSession(env), env.getArgument("id")))
         ;
 

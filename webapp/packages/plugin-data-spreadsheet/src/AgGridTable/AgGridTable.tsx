@@ -32,7 +32,7 @@ async function loader() {
   const styles = await import('../styles/base.scss');
   const { AgGridReact } = await import('@ag-grid-community/react');
   const { InfiniteRowModelModule } = await import('@ag-grid-community/infinite-row-model');
-  const { RangeSelectionModule } = await import('../modules/RangeSelection/rangeSelectionModule');
+  const { RangeSelectionModule } = await import('./modules/RangeSelection/rangeSelectionModule');
 
   return { AgGridReact, AllCommunityModules: [InfiniteRowModelModule, RangeSelectionModule] };
 }

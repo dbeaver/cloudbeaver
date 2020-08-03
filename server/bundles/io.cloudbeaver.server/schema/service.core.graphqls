@@ -38,7 +38,7 @@ type AsyncTaskInfo {
     status: String
     error: ServerError
 
-    result: SQLExecuteInfo
+    result: SQLExecuteInfo @deprecated # Deprecated. Use asyncSqlExecuteResults instead
     # Task result.
     # Can be some kind of identifier to obtain real result using another API function
     taskResult: Object
@@ -156,8 +156,36 @@ type DriverInfo {
     applicableAuthModel: [ID!]!
 }
 
+# Connection instance
+type ConnectionInfo {
+    id: ID!
+    driverId: ID!
+
+    name: String!
+    description: String
+    properties: String
+
+    template: Boolean!
+    connected: Boolean!
+    provided: Boolean!
+
+    connectTime: String
+    connectionError: ServerError
+    serverVersion: String
+    clientVersion: String
+
+    authNeeded: Boolean!
+    authModel: ID
+    authProperties: [ObjectPropertyInfo!]!
+
+    # Supported features (provided etc)
+    features: [ String! ]!
+    navigatorSettings: NavigatorSettings!
+}
+
+# @deprecated
 # Data source info is a description of some remote database. Doesn't include user credentials
-# Deprectaed. Use ConnectionInfo instead
+# Use ConnectionInfo instead
 type DataSourceInfo {
     id: ID!
     driverId: ID!
@@ -217,31 +245,6 @@ input NavigatorSettingsInput {
     hideFolders: Boolean!
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
-}
-
-# Connection instance
-type ConnectionInfo {
-    id: ID!
-    driverId: ID!
-
-    name: String!
-    description: String
-    properties: String
-
-    connected: Boolean!
-    provided: Boolean!
-    connectTime: String
-    connectionError: ServerError
-    serverVersion: String
-    clientVersion: String
-
-    authNeeded: Boolean!
-    authModel: ID
-    authProperties: [ObjectPropertyInfo!]!
-
-    # Supported features (provided etc)
-    features: [ String! ]!
-    navigatorSettings: NavigatorSettings!
 }
 
 type LogEntry {
@@ -326,7 +329,9 @@ extend type Mutation {
 
     asyncTaskCancel(id: String!): Boolean
 
-    asyncTaskStatus(id: String!): AsyncTaskInfo!
+    asyncTaskStatus(id: String!): AsyncTaskInfo! @deprecated # Use asyncTaskInfo instead
+
+    asyncTaskInfo(id: String!, removeOnFinish: Boolean): AsyncTaskInfo!
 
 }
 
