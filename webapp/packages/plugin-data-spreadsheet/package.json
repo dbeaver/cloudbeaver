@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ag-grid",
+  "name": "@cloudbeaver/plugin-data-spreadsheet",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",
@@ -19,6 +19,7 @@
     "@ag-grid-community/react": "^23.1.1"
   },
   "peerDependencies": {
+    "@cloudbeaver/plugin-data-viewer": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-di": "^0.1.0",

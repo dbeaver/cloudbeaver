@@ -7,14 +7,12 @@
  */
 
 import { action, observable } from 'mobx';
+import { Subject, Observable } from 'rxjs';
 
 import { ErrorDetailsDialog } from '@cloudbeaver/core-app';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
-import {
-  IAgGridModel, IRequestedData, IRequestDataOptions, SortModel
-} from '@cloudbeaver/plugin-ag-grid';
 
 import { IExecutionContext } from '../IExecutionContext';
 import { ErrorDialog } from './ErrorDialog';
@@ -22,13 +20,45 @@ import { RowDiff } from './TableDataModel/EditedRow';
 import { TableColumn } from './TableDataModel/TableColumn';
 import { TableDataModel } from './TableDataModel/TableDataModel';
 import { TableEditor } from './TableDataModel/TableEditor';
-import { SomeTableRows, TableRow } from './TableDataModel/TableRow';
+import { TableRow } from './TableDataModel/TableRow';
 
 export const fetchingSettings = {
   fetchMin: 1,
   fetchMax: 5000,
   fetchDefault: 200,
 };
+
+export enum AccessMode {
+  Default,
+  Readonly
+}
+
+export type AgGridRow = any[];
+
+export type SortMode = 'asc' | 'desc' | null;
+
+export type SortModel = {
+  colId: string;
+  sort: SortMode;
+}[];
+
+export interface IRequestDataOptions {
+  sorting?: SortModel;
+}
+
+export interface IAgGridCol {
+  icon?: string;
+  label?: string;
+  name?: string;
+  position?: number;
+  dataKind?: string;
+}
+
+export interface IRequestedData {
+  rows: AgGridRow[];
+  columns?: IAgGridCol[];
+  isFullyLoaded: boolean;
+}
 
 export interface IRequestDataResultOptions extends IRequestDataOptions {
   // to be extended, now just reexport to avoid ag-grid-plugin dependency
@@ -43,6 +73,7 @@ export interface ITableViewerModelOptions {
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   noLoaderWhileRequestingDataAsync?: boolean;
+  access?: AccessMode;
   requestDataAsync(
     model: TableViewerModel,
     rowOffset: number,
@@ -67,25 +98,15 @@ export class TableViewerModel {
   executionContext: IExecutionContext | null;
   sourceName?: string;
   noLoaderWhileRequestingDataAsync?: boolean;
+
+  @observable access: AccessMode;
+
   requestDataAsync: (
     model: TableViewerModel,
     rowOffset: number,
     count: number
   ) => Promise<IRequestDataResult>;
   _saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
-
-  agGridModel: IAgGridModel = {
-    chunkSize: this.getDefaultRowsCount(),
-    enableRangeSelection: true,
-    onRequestData: this.onRequestData.bind(this),
-    onSortChanged: this.onSortChanged.bind(this),
-    onCellEditingStopped: this.onCellEditingStopped.bind(this),
-    onRevertCellValue: this.revertCellValue.bind(this),
-    onEditSave: this.saveChanges.bind(this),
-    onEditCancel: this.cancelChanges.bind(this),
-    isCellEdited: this.isCellEdited.bind(this),
-    actions: null, // to be set by ag-grid-plugin
-  };
 
   get isEmpty() {
     return this.tableDataModel.isEmpty();
@@ -99,7 +120,6 @@ export class TableViewerModel {
 
   getChunkSize = () => this._chunkSize;
   setChunkSize = (count: number) => this.updateChunkSize(count);
-  refresh = () => this.resetData();
 
   @observable queryDuration = 0;
   @observable requestStatusMessage = '';
@@ -107,14 +127,20 @@ export class TableViewerModel {
   @observable errorMessage = '';
   @observable hasDetails = false;
 
+  readonly tableDataModel = new TableDataModel();
+  readonly tableEditor = new TableEditor(this.tableDataModel);
+  readonly onReset: Observable<never>;
+  readonly onChunkSizeChange: Observable<never>;
+
+  private resetSubject: Subject<never>
+  private chunkChangeSubject: Subject<never>
+
   @observable private _hasMoreRows = true
   @observable private _isLoaderVisible = false;
   @observable private _chunkSize: number = this.getDefaultRowsCount();
   @observable private queryWhereFilter: string | null = null;
 
   private exception: GQLError | null = null;
-  private tableDataModel = new TableDataModel();
-  private tableEditor = new TableEditor(this.tableDataModel);
   private sortedColumns = new MetadataMap<string, SqlDataFilterConstraint>(
     (colId, metadata) => ({ attribute: colId, orderPosition: metadata.count(), orderAsc: false })
   );
@@ -130,11 +156,22 @@ export class TableViewerModel {
     this.executionContext = options.executionContext || null;
     this.sourceName = options.sourceName;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
+    this.access = options.access || AccessMode.Default;
     this.requestDataAsync = options.requestDataAsync;
     this._saveChanges = options.saveChanges;
+    this.resetSubject = new Subject();
+    this.chunkChangeSubject = new Subject();
+    this.onReset = this.resetSubject.asObservable();
+    this.onChunkSizeChange = this.chunkChangeSubject.asObservable();
   }
 
   cancelFetch = () => {
+  }
+
+  refresh = async () => {
+    this.resetData();
+    await this.onRequestData(0, this.getChunkSize());
+    this.resetSubject.next();
   }
 
   onShowDetails = () => {
@@ -149,10 +186,6 @@ export class TableViewerModel {
 
   setQueryWhereFilter(where: string | null) {
     this.queryWhereFilter = where;
-  }
-
-  applyQueryFilters() {
-    this.resetData();
   }
 
   getSortedColumns() {
@@ -191,6 +224,10 @@ export class TableViewerModel {
   }
 
   isEdited(): boolean {
+    if (this.access === AccessMode.Readonly) {
+      return false;
+    }
+
     return this.tableEditor.isEdited();
   }
 
@@ -198,24 +235,19 @@ export class TableViewerModel {
     return this.tableEditor.isCellEdited(rowIndex, column);
   }
 
-  updateRows(rows: number[]) {
-    this.agGridModel.actions?.updateRows(rows);
-  }
-
   revertCellValue(rowNumber: number, column: string) {
-    this.agGridModel.actions?.updateRowValue(
-      rowNumber,
-      this.tableEditor.revertCellValue(rowNumber, column)!
-    );
-    this.updateRows([rowNumber]);
+    this.tableEditor.revertCellValue(rowNumber, column);
   }
 
   cancelChanges() {
-    const diffs = this.tableEditor.getChanges();
-    this.revertChanges(diffs);
+    this.tableEditor.cancelChanges();
   }
 
   async saveChanges(): Promise<void> {
+    if (this.access === AccessMode.Readonly) {
+      return;
+    }
+
     const diffs = this.tableEditor.getChanges();
 
     if (!diffs.length) {
@@ -252,13 +284,7 @@ export class TableViewerModel {
     }
   }
 
-  private onCellEditingStopped(rowNumber: number, column: string, value: any) {
-    this.tableEditor.editCellValue(rowNumber, column, value);
-
-    this.updateRows([rowNumber]);
-  }
-
-  private async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
+  async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
     // try to return data from cache
     if (this.tableDataModel.isChunkLoaded(rowOffset, count) || this.isFullyLoaded) {
       const data: IRequestedData = {
@@ -295,35 +321,36 @@ export class TableViewerModel {
     }
   }
 
+  onCellEditingStopped(rowNumber: number, column: string, value: any) {
+    if (this.access === AccessMode.Readonly) {
+      return;
+    }
+
+    this.tableEditor.editCellValue(rowNumber, column, value);
+  }
+
+  onSortChanged(sorting: SortModel) {
+    this.sortedColumns.clear();
+    for (const sort of sorting) {
+      this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
+    }
+    this.refresh();
+  }
+
   @action
   private updateChunkSize(value: number) {
     this._chunkSize = this.getDefaultRowsCount(value);
-    this.agGridModel.actions?.changeChunkSize(this._chunkSize);
+    this.chunkChangeSubject.next();
   }
 
   @action
   private resetData() {
     this.tableDataModel.resetData();
-    this.agGridModel.actions?.resetData();
-    this.tableEditor.cancelChanges();
+    this.tableEditor.cancelChanges(true);
     this.requestStatusMessage = '';
     this.queryDuration = 0;
     this._hasMoreRows = true;
     this.errorMessage = '';
-  }
-
-  private updateAgGridRows(rows: SomeTableRows) {
-    rows.forEach((row, rowNumber) => {
-      this.agGridModel.actions?.updateRowValue(rowNumber, row);
-    });
-  }
-
-  private onSortChanged(sorting: SortModel) {
-    this.sortedColumns.clear();
-    for (const sort of sorting) {
-      this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
-    }
-    this.resetData();
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {
@@ -332,48 +359,13 @@ export class TableViewerModel {
     try {
       const data = await this._saveChanges(this, diffs);
 
-      const someRows = this.zipDiffAndResults(diffs, data.rows);
-      this.tableEditor.cancelChanges();
-      this.tableDataModel.updateRows(someRows);
-      this.updateAgGridRows(someRows);
+      this.tableEditor.applyChanges(data.rows);
       this.clearErrors();
       this.updateInfo(data.statusMessage, data.duration);
-      this.updateRows(diffs.map(r => r.rowIndex));
 
     } finally {
       this._isLoaderVisible = false;
     }
-  }
-
-  private revertChanges(diffs: RowDiff[]) {
-    this.tableEditor.cancelChanges();
-    // revert ag-grid
-    const initialRows: SomeTableRows = new Map();
-    for (const diff of diffs) {
-      initialRows.set(diff.rowIndex, diff.source);
-    }
-    this.updateAgGridRows(initialRows);
-    this.updateRows(diffs.map(r => r.rowIndex));
-  }
-
-  /**
-   * Take array of TableRow and return sparse array of TableRow
-   *
-   * @param diff
-   * @param newRows
-   */
-  private zipDiffAndResults(diff: RowDiff[], newRows: TableRow[]): SomeTableRows {
-    const length = Math.min(diff.length, newRows.length);
-    if (diff.length !== newRows.length) {
-      console.warn('Expected that new rows have same length as diff');
-    }
-    const newRowsMap: SomeTableRows = new Map();
-
-    for (let i = 0; i < length; i++) {
-      newRowsMap.set(diff[i].rowIndex, newRows[i]);
-    }
-
-    return newRowsMap;
   }
 
   private showError(exception: any) {

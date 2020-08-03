@@ -11,8 +11,10 @@ import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
-import { AgGridTable } from '@cloudbeaver/plugin-ag-grid';
+import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
+import { DataPresentationService } from '../DataPresentationService';
 import { TableViewerModel } from './TableViewerModel';
 
 type TableGridProps = PropsWithChildren<{
@@ -20,7 +22,7 @@ type TableGridProps = PropsWithChildren<{
 }>
 
 const styles = css`
-  AgGridTable, no-data, error {
+  Spreadsheet, no-data, error {
     flex: 1;
   }
   no-data, error {
@@ -32,6 +34,8 @@ const styles = css`
 export const TableGrid = observer(function TableGrid({
   model,
 }: TableGridProps) {
+  const translate = useTranslate();
+  const dataPresentationService = useService(DataPresentationService);
 
   if (model.errorMessage.length > 0) {
     return styled(styles)(
@@ -40,16 +44,18 @@ export const TableGrid = observer(function TableGrid({
         <br/><br/>
         {model.hasDetails && (
           <Button type='button' mod={['outlined']} onClick={model.onShowDetails}>
-            Details
+            {translate('ui_errors_details')}
           </Button>
         )}
       </error>
     );
   }
 
-  if (model.isFullyLoaded && model.isEmpty) {
-    return styled(styles)(<no-data as="div">No data to show</no-data>);
+  const Spreadsheet = dataPresentationService.default?.component;
+
+  if ((model.isFullyLoaded && model.isEmpty) || !Spreadsheet) {
+    return styled(styles)(<no-data as="div">{translate('data_viewer_nodata_message')}</no-data>);
   }
 
-  return styled(styles)(<AgGridTable tableModel={model.agGridModel} />);
+  return styled(styles)(<Spreadsheet tableModel={model} />);
 });

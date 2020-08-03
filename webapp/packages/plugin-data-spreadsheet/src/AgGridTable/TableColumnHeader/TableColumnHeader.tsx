@@ -11,8 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { AgEvent, GridApi, Column } from '@ag-grid-community/core';
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
-
-import { SortMode } from '../IAgGridModel';
+import { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 type HeaderProps = {
   api: GridApi;

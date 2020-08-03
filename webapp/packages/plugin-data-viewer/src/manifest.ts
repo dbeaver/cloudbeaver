@@ -8,6 +8,7 @@
 
 import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
+import { DataPresentationService } from './DataPresentationService';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
 import { DataViewerTabService } from './DataViewerTabService';
@@ -24,6 +25,7 @@ export const manifest: PluginManifest = {
   providers: [
     DataViewerTabService,
     DataViewerTableService,
+    DataPresentationService,
     TableViewerStorageService,
     TableFooterMenuService,
     TableHeaderService,
