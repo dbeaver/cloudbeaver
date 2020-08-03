@@ -8,7 +8,9 @@
 
 import { PluginManifest } from '@cloudbeaver/core-di';
 
+import { SpreadsheetService } from './SpreadsheetService';
+
 export const manifest: PluginManifest = {
   info: { name: 'AgGrid Table' },
-  providers: [],
+  providers: [SpreadsheetService],
 };

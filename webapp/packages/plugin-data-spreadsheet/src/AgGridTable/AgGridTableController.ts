@@ -29,7 +29,6 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridContext } from './AgGridContext';
-import { RowSelection } from './TableSelection/RowSelection';
 import { TableSelection } from './TableSelection/TableSelection';
 
 @injectable()
