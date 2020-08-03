@@ -28,6 +28,11 @@ export const fetchingSettings = {
   fetchDefault: 200,
 };
 
+export enum AccessMode {
+  Default,
+  Readonly
+}
+
 export type AgGridRow = any[];
 
 export type SortMode = 'asc' | 'desc' | null;
@@ -68,6 +73,7 @@ export interface ITableViewerModelOptions {
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   noLoaderWhileRequestingDataAsync?: boolean;
+  access?: AccessMode;
   requestDataAsync(
     model: TableViewerModel,
     rowOffset: number,
@@ -92,6 +98,9 @@ export class TableViewerModel {
   executionContext: IExecutionContext | null;
   sourceName?: string;
   noLoaderWhileRequestingDataAsync?: boolean;
+
+  @observable access: AccessMode;
+
   requestDataAsync: (
     model: TableViewerModel,
     rowOffset: number,
@@ -147,6 +156,7 @@ export class TableViewerModel {
     this.executionContext = options.executionContext || null;
     this.sourceName = options.sourceName;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
+    this.access = options.access || AccessMode.Default;
     this.requestDataAsync = options.requestDataAsync;
     this._saveChanges = options.saveChanges;
     this.resetSubject = new Subject();
@@ -214,6 +224,10 @@ export class TableViewerModel {
   }
 
   isEdited(): boolean {
+    if (this.access === AccessMode.Readonly) {
+      return false;
+    }
+
     return this.tableEditor.isEdited();
   }
 
@@ -230,6 +244,10 @@ export class TableViewerModel {
   }
 
   async saveChanges(): Promise<void> {
+    if (this.access === AccessMode.Readonly) {
+      return;
+    }
+
     const diffs = this.tableEditor.getChanges();
 
     if (!diffs.length) {
@@ -304,6 +322,10 @@ export class TableViewerModel {
   }
 
   onCellEditingStopped(rowNumber: number, column: string, value: any) {
+    if (this.access === AccessMode.Readonly) {
+      return;
+    }
+
     this.tableEditor.editCellValue(rowNumber, column, value);
   }
 

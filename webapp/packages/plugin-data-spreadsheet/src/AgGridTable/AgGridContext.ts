@@ -10,6 +10,7 @@ import { TableSelection } from './TableSelection/TableSelection';
 
 export type AgGridContext = {
   selection: TableSelection;
+  isReadonly(): boolean;
   isCellEdited(rowId: number, column: string): boolean;
   revertCellValue(rowNumber: number, column: string): void;
   onEditSave(): void;
