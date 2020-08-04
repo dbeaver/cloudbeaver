@@ -28,13 +28,16 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.admin.AdminRoleInfo;
 import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -48,6 +51,7 @@ import java.util.Map;
  */
 public class WebServiceAdmin implements DBWServiceAdmin {
 
+    private static final Log log = Log.getLog(WebServiceAdmin.class);
 
     @NotNull
     @Override
@@ -269,12 +273,31 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         WebServiceUtils.getDataSourceRegistry().removeDataSource(dataSource);
         WebServiceUtils.getDataSourceRegistry().flushConfig();
+
+        try {
+            CBApplication.getInstance().getSecurityController().setConnectionAccess(id, null, null);
+        } catch (DBCException e) {
+            log.error(e);
+        }
         return true;
     }
 
     @Override
     public boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
-        throw new DBWebException("Not supported yet");
+        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId);
+        if (dataSource == null) {
+            throw new DBWebException("Connection '" + connectionId + "' not found");
+        }
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant role in anonymous mode");
+        }
+        try {
+            CBApplication.getInstance().getSecurityController().setConnectionAccess(connectionId, subjects, grantor.getUserId());
+        } catch (DBCException e) {
+            log.error(e);
+        }
+        return true;
     }
 
 }

@@ -525,6 +525,29 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public void setConnectionAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            // Delete all permissions
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_DATASOURCE_ACCESS WHERE DATASOURCE_ID=?", connectionId);
+            if (!ArrayUtils.isEmpty(subjects)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_DATASOURCE_ACCESS(DATASOURCE_ID,GRANT_TIME,GRANTED_BY,SUBJECT_ID) VALUES(?,?,?,?)")) {
+                    dbStat.setString(1, connectionId);
+                    dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(3, grantorId);
+                    for (String subject : subjects) {
+                        dbStat.setString(4, subject);
+                        dbStat.execute();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error granting datasource access", e);
+        }
+    }
+
     void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> registeredProviders = new HashSet<>();

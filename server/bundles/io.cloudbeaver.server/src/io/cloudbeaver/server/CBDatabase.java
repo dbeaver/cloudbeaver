@@ -57,7 +57,7 @@ public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
-    private static final String CURRENT_SCHEMA_VERSION = "5.beta";
+    private static final String CURRENT_SCHEMA_VERSION = "6.beta";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
