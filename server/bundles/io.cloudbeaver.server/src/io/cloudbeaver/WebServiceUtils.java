@@ -16,22 +16,27 @@
  */
 package io.cloudbeaver;
 
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.cloudbeaver.model.WebConnectionConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.util.Map;
 
 /**
  * Various constants
@@ -39,6 +44,8 @@ import java.io.Reader;
 public class WebServiceUtils {
 
     private static final Log log = Log.getLog(WebServiceUtils.class);
+
+    private static final Gson gson = new GsonBuilder().create();
 
     public static String makeIconId(DBPImage icon) {
         return icon.getLocation();
@@ -80,4 +87,80 @@ public class WebServiceUtils {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
 
+    @NotNull
+    public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry) throws DBWebException {
+        DBPDataSourceContainer newDataSource;
+        if (!CommonUtils.isEmpty(config.getTemplateId())) {
+            DBPDataSourceContainer tpl = registry.getDataSource(config.getTemplateId());
+            if (tpl == null) {
+                throw new DBWebException("Template connection '" + config.getTemplateId() + "' not found");
+            }
+            newDataSource = registry.createDataSource(tpl);
+        } else if (!CommonUtils.isEmpty(config.getDriverId())) {
+            String driverId = config.getDriverId();
+            if (CommonUtils.isEmpty(driverId)) {
+                throw new DBWebException("Driver not specified");
+            }
+            DBPDriver driver = getDriverById(driverId);
+
+            DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
+
+            setConnectionConfiguration(driver, dsConfig, config);
+
+            newDataSource = registry.createDataSource(driver, dsConfig);
+        } else {
+            throw new DBWebException("Template connection or driver must be specified");
+        }
+
+        newDataSource.setSavePassword(true);
+        newDataSource.setName(config.getName());
+        newDataSource.setDescription(config.getDescription());
+
+        // Set default navigator settings
+        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
+        navSettings.setShowSystemObjects(false);
+        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
+
+        initAuthProperties(newDataSource, config.getCredentials());
+
+        return newDataSource;
+    }
+
+    private static void setConnectionConfiguration(DBPDriver driver, DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
+        if (!CommonUtils.isEmpty(config.getUrl())) {
+            dsConfig.setUrl(config.getUrl());
+        } else {
+            dsConfig.setHostName(config.getHost());
+            dsConfig.setHostPort(config.getPort());
+            dsConfig.setDatabaseName(config.getDatabaseName());
+            dsConfig.setServerName(config.getServerName());
+            dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
+        }
+        if (config.getProperties() != null) {
+            for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
+                dsConfig.setProperty(pe.getKey(), CommonUtils.toString(pe.getValue()));
+            }
+        }
+        dsConfig.setUserName(config.getUserName());
+        dsConfig.setUserPassword(config.getUserPassword());
+    }
+
+    public static void initAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
+        if (!CommonUtils.isEmpty(authProperties)) {
+            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
+            //DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+
+            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
+
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        }
+    }
+
+    public static void updateConnectionFromConfig(DBPDataSourceContainer dataSource, WebConnectionConfig config) {
+        setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
+        dataSource.setName(config.getName());
+        dataSource.setDescription(config.getDescription());
+        initAuthProperties(dataSource, config.getCredentials());
+    }
 }

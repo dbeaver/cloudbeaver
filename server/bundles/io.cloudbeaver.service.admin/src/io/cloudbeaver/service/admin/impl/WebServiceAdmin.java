@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -33,6 +34,7 @@ import io.cloudbeaver.service.admin.AdminRoleInfo;
 import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -226,25 +228,48 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     ////////////////////////////////////////////////////////////////////
     // Connection management
 
-
     @Override
     public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException {
-        throw new DBWebException("Not supported yet");
+        // Get all connections from global configuration
+        List<WebConnectionInfo> result = new ArrayList<>();
+        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+            if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                result.add(new WebConnectionInfo(webSession, ds));
+            }
+        }
+
+        return result;
     }
 
     @Override
     public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
-        throw new DBWebException("Not supported yet");
+        DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, WebServiceUtils.getDataSourceRegistry());
+
+        WebServiceUtils.getDataSourceRegistry().flushConfig();
+
+        return new WebConnectionInfo(webSession, dataSource);
     }
 
     @Override
     public WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException {
-        throw new DBWebException("Not supported yet");
+        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        if (dataSource == null) {
+            throw new DBWebException("Connection '" + id + "' not found");
+        }
+        WebServiceUtils.updateConnectionFromConfig(dataSource, config);
+        dataSource.persistConfiguration();
+        return new WebConnectionInfo(webSession, dataSource);
     }
 
     @Override
     public boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
-        throw new DBWebException("Not supported yet");
+        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        if (dataSource == null) {
+            throw new DBWebException("Connection '" + id + "' not found");
+        }
+        WebServiceUtils.getDataSourceRegistry().removeDataSource(dataSource);
+        WebServiceUtils.getDataSourceRegistry().flushConfig();
+        return true;
     }
 
     @Override
