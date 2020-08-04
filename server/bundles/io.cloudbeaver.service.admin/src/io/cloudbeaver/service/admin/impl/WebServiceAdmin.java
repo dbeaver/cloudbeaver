@@ -189,7 +189,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
+    public boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");

@@ -64,7 +64,7 @@ public interface DBWServiceAdmin extends DBWService {
     boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
+    boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;

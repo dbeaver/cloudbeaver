@@ -41,8 +41,12 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     List<WebDatabaseAuthModel> getAuthModels(WebSession webSession);
 
+    @Deprecated
     @WebAction
     List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
+
+    @WebAction
+    List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     String[] getSessionPermissions(WebSession webSession) throws DBWebException;
@@ -74,6 +78,8 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException;
 
+    // Replaced with initConnection
+    @Deprecated
     @WebAction
     WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
 

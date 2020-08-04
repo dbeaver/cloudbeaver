@@ -53,8 +53,8 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             env -> getService(env).grantUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
         model.getQueryType().dataFetcher("revokeUserRole",
             env -> getService(env).revokeUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
-        model.getQueryType().dataFetcher("setRolePermissions",
-            env -> getService(env).setRolePermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")));
+        model.getQueryType().dataFetcher("setSubjectPermissions",
+            env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")));
         model.getQueryType().dataFetcher("setUserCredentials",
             env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")));
     }

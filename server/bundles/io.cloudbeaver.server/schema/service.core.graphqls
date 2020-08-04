@@ -168,6 +168,7 @@ type ConnectionInfo {
     template: Boolean!
     connected: Boolean!
     provided: Boolean!
+    readOnly: Boolean!
 
     connectTime: String
     connectionError: ServerError
@@ -201,12 +202,13 @@ type DataSourceInfo {
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
 input ConnectionConfig {
-    driverId: ID
     name: String
     description: String
 
-    # ID of predefined datasource
-    dataSourceId: ID # deprecated
+    # ID of template connection
+    templateId: ID
+    # ID of database driver
+    driverId: ID
 
     # Custom connection parameters (all optional)
 
@@ -218,13 +220,24 @@ input ConnectionConfig {
     # Properties
     properties: Object
 
-    # User credentials
+    # Template connection
+    template: Boolean
+    # Read-onyl connection
+    readOnly: Boolean
 
-    userName: String # deprecated
-    userPassword: String # deprecated
+    # User credentials
 
     authModelId: ID
     credentials: Object
+
+    #### deprecated fields
+
+    # ID of predefined datasource
+    dataSourceId: ID
+
+    # Direct user credentials
+    userName: String # @deprecated
+    userPassword: String # deprecated
 }
 
 type NavigatorSettings {
@@ -271,10 +284,8 @@ extend type Query {
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
 
-    # Get list of predefined data sources. Replaced with templateDataSources
-    dataSourceList: [ DataSourceInfo! ]! @deprecated
-
-    templateDataSources: [ DataSourceInfo! ]!
+    # List of template connections.
+    templateConnections: [ ConnectionInfo! ]!
 
     authModels: [DatabaseAuthModel!]!
 
@@ -286,6 +297,10 @@ extend type Query {
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 
+    # Deprecated API
+
+    # Get list of predefined data sources. Replaced with templateDataSources
+    templateDataSources: [ DataSourceInfo! ]! @deprecated
 }
 
 extend type Mutation {
@@ -301,14 +316,11 @@ extend type Mutation {
     # Refreshes session on server and returns its state
     changeSessionLanguage(locale: String): Boolean
 
-    # Create new custom connection
+    # Create new custom connection. Custom connections exist only within the current session.
     createConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
-
-    # Create connection from template
-    openConnection( config: ConnectionConfig! ): ConnectionInfo! @deprecated
 
     # Initiate existing connection
     initConnection( id: ID!, credentials: Object ): ConnectionInfo!
@@ -329,9 +341,16 @@ extend type Mutation {
 
     asyncTaskCancel(id: String!): Boolean
 
-    asyncTaskStatus(id: String!): AsyncTaskInfo! @deprecated # Use asyncTaskInfo instead
-
     asyncTaskInfo(id: String!, removeOnFinish: Boolean): AsyncTaskInfo!
+
+
+    #### Deprecated API
+
+    # Create connection from template. Use createConnection instead
+    openConnection( config: ConnectionConfig! ): ConnectionInfo! @deprecated
+
+    # Use asyncTaskInfo instead
+    asyncTaskStatus(id: String!): AsyncTaskInfo! @deprecated
 
 }
 

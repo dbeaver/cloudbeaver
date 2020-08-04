@@ -1,9 +1,9 @@
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.service.DBWServiceBindingServlet;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
-import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.service.DBWServiceBindingServlet;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -28,6 +28,7 @@ public class CBJettyServer {
     private static final String SESSION_CACHE_DIR = ".http-sessions";
 
     public CBJettyServer() {
+        System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
     }
 
     public void runServer() {

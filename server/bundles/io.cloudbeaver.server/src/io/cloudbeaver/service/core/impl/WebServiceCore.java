@@ -82,6 +82,7 @@ public class WebServiceCore implements DBWServiceCore {
             .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
     }
 
+    @Deprecated
     @Override
     public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
 
@@ -95,6 +96,18 @@ public class WebServiceCore implements DBWServiceCore {
                 } else {
                     log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
                 }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException {
+        List<WebConnectionInfo> result = new ArrayList<>();
+        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+            if (ds.isTemplate() && CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                result.add(new WebConnectionInfo(webSession, ds));
             }
         }
 
@@ -146,16 +159,17 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession.getWebConnectionInfo(connectionId);
     }
 
+    @Deprecated
     @Override
     public WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig config) throws DBWebException {
-        String dataSourceId = config.getDataSourceId();
-        if (CommonUtils.isEmpty(dataSourceId)) {
+        String templateId = config.getTemplateId();
+        if (CommonUtils.isEmpty(templateId)) {
             throw new DBWebException("Only preconfigured data sources are supported yet");
         }
         DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(dataSourceId);
+        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
-            throw new DBWebException("Datasource '" + dataSourceId + "' not found");
+            throw new DBWebException("Datasource '" + templateId + "' not found");
         }
 
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();

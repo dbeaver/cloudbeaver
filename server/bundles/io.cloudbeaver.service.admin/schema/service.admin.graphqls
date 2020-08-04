@@ -38,8 +38,19 @@ extend type Query {
     grantUserRole(userId: ID!, roleId: ID!): Boolean
     revokeUserRole(userId: ID!, roleId: ID!): Boolean
 
-    setRolePermissions(roleId: ID!, permissions: [ID]!): Boolean
+    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): Boolean
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
+
+    #### Connection management
+
+    # All connection configurations
+    allConnections: [ ConnectionInfo! ]!
+
+    createConnectionConfiguration( config: ConnectionConfig! ): ConnectionInfo!
+    updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
+    deleteConnectionConfiguration( id: ID! ): Boolean
+
+    setConnectionAccess(connectionId: ID!, subjects: [ID!]!): Boolean
 
 }
