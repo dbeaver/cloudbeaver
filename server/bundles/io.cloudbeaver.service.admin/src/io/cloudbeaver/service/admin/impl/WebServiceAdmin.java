@@ -18,6 +18,8 @@ package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -220,4 +222,34 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error setting user credentials", e);
         }
     }
+
+    ////////////////////////////////////////////////////////////////////
+    // Connection management
+
+
+    @Override
+    public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
+    @Override
+    public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
+    @Override
+    public WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
+    @Override
+    public boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
+    @Override
+    public boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
 }

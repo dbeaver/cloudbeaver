@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.admin.impl.WebServiceAdmin;
@@ -57,6 +58,16 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")));
         model.getQueryType().dataFetcher("setUserCredentials",
             env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")));
+
+        model.getQueryType().dataFetcher("allConnections", env -> getService(env).getAllConnections(getWebSession(env)));
+        model.getQueryType().dataFetcher("createConnectionConfiguration",
+            env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))));
+        model.getQueryType().dataFetcher("updateConnectionConfiguration",
+            env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))));
+        model.getQueryType().dataFetcher("deleteConnectionConfiguration",
+            env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")));
+        model.getQueryType().dataFetcher("setConnectionAccess",
+            env -> getService(env).setConnectionAccess(getWebSession(env), env.getArgument("connectionId"), env.getArgument("subjects")));
     }
 
 }
