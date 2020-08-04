@@ -17,8 +17,6 @@
 package io.cloudbeaver.service.core.impl;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
@@ -31,7 +29,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -39,7 +36,6 @@ import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -57,8 +53,6 @@ import java.util.stream.Collectors;
 public class WebServiceCore implements DBWServiceCore {
 
     private static final Log log = Log.getLog(WebServiceCore.class);
-
-    private static final Gson gson = new GsonBuilder().create();
 
     @Override
     public WebServerConfig getServerConfig() {
@@ -82,6 +76,7 @@ public class WebServiceCore implements DBWServiceCore {
             .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
     }
 
+    @Deprecated
     @Override
     public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
 
@@ -95,6 +90,18 @@ public class WebServiceCore implements DBWServiceCore {
                 } else {
                     log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
                 }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException {
+        List<WebConnectionInfo> result = new ArrayList<>();
+        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+            if (ds.isTemplate() && CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                result.add(new WebConnectionInfo(webSession, ds));
             }
         }
 
@@ -146,16 +153,17 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession.getWebConnectionInfo(connectionId);
     }
 
+    @Deprecated
     @Override
     public WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig config) throws DBWebException {
-        String dataSourceId = config.getDataSourceId();
-        if (CommonUtils.isEmpty(dataSourceId)) {
+        String templateId = config.getTemplateId();
+        if (CommonUtils.isEmpty(templateId)) {
             throw new DBWebException("Only preconfigured data sources are supported yet");
         }
         DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(dataSourceId);
+        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
-            throw new DBWebException("Datasource '" + dataSourceId + "' not found");
+            throw new DBWebException("Datasource '" + templateId + "' not found");
         }
 
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
@@ -200,7 +208,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
         }
 
-        initAuthProperties(dataSourceContainer, authProperties);
+        WebServiceUtils.initAuthProperties(dataSourceContainer, authProperties);
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
@@ -220,7 +228,7 @@ public class WebServiceCore implements DBWServiceCore {
     public WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
-        DBPDataSourceContainer newDataSource = makeConnectionInstance(connectionConfig, sessionRegistry);
+        DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));
         }
@@ -237,7 +245,7 @@ public class WebServiceCore implements DBWServiceCore {
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
-        DBPDataSourceContainer newDataSource = makeConnectionInstance(connectionConfig, sessionRegistry);
+        DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         try {
             ConnectionTestJob ct = new ConnectionTestJob(newDataSource, param -> {});
             ct.run(webSession.getProgressMonitor());
@@ -264,18 +272,6 @@ public class WebServiceCore implements DBWServiceCore {
     public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
         closeAndDeleteConnection(webSession, connectionId, true);
         return true;
-    }
-
-    private void initAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
-        if (!CommonUtils.isEmpty(authProperties)) {
-            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
-            //DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
-            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-
-            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
-
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
-        }
     }
 
     @NotNull
@@ -313,48 +309,6 @@ public class WebServiceCore implements DBWServiceCore {
     public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
         CBApplication.getInstance().setDefaultNavigatorSettings(settings);
         return true;
-    }
-
-    @NotNull
-    private DBPDataSourceContainer makeConnectionInstance(WebConnectionConfig config, DBPDataSourceRegistry sessionRegistry) throws DBWebException {
-        String driverId = config.getDriverId();
-        if (CommonUtils.isEmpty(driverId)) {
-            throw new DBWebException("Driver not specified");
-        }
-        DBPDriver driver = WebServiceUtils.getDriverById(driverId);
-
-        DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
-
-        DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(driver, dsConfig);
-        newDataSource.setSavePassword(true);
-
-        if (!CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(config.getUrl());
-        } else {
-            dsConfig.setHostName(config.getHost());
-            dsConfig.setHostPort(config.getPort());
-            dsConfig.setDatabaseName(config.getDatabaseName());
-            dsConfig.setServerName(config.getServerName());
-            dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
-        }
-        if (config.getProperties() != null) {
-            for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
-                dsConfig.setProperty(pe.getKey(), CommonUtils.toString(pe.getValue()));
-            }
-        }
-        dsConfig.setUserName(config.getUserName());
-        dsConfig.setUserPassword(config.getUserPassword());
-        newDataSource.setName(config.getName());
-        newDataSource.setDescription(config.getDescription());
-
-        // Set default navigator settings
-        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
-        navSettings.setShowSystemObjects(false);
-        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
-
-        initAuthProperties(newDataSource, config.getCredentials());
-
-        return newDataSource;
     }
 
 

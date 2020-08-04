@@ -17,7 +17,10 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -31,6 +34,7 @@ import io.cloudbeaver.service.admin.AdminRoleInfo;
 import io.cloudbeaver.service.admin.AdminUserInfo;
 import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -189,7 +193,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
+    public boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
@@ -220,4 +224,57 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error setting user credentials", e);
         }
     }
+
+    ////////////////////////////////////////////////////////////////////
+    // Connection management
+
+    @Override
+    public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException {
+        // Get all connections from global configuration
+        List<WebConnectionInfo> result = new ArrayList<>();
+        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+            if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                result.add(new WebConnectionInfo(webSession, ds));
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
+        DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, WebServiceUtils.getDataSourceRegistry());
+
+        WebServiceUtils.getDataSourceRegistry().flushConfig();
+
+        return new WebConnectionInfo(webSession, dataSource);
+    }
+
+    @Override
+    public WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException {
+        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        if (dataSource == null) {
+            throw new DBWebException("Connection '" + id + "' not found");
+        }
+        WebServiceUtils.updateConnectionFromConfig(dataSource, config);
+        dataSource.persistConfiguration();
+        return new WebConnectionInfo(webSession, dataSource);
+    }
+
+    @Override
+    public boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
+        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        if (dataSource == null) {
+            throw new DBWebException("Connection '" + id + "' not found");
+        }
+        WebServiceUtils.getDataSourceRegistry().removeDataSource(dataSource);
+        WebServiceUtils.getDataSourceRegistry().flushConfig();
+        return true;
+    }
+
+    @Override
+    public boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
+        throw new DBWebException("Not supported yet");
+    }
+
 }

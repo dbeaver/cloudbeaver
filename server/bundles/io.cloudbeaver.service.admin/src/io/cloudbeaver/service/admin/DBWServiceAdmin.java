@@ -19,6 +19,8 @@ package io.cloudbeaver.service.admin;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -64,9 +66,24 @@ public interface DBWServiceAdmin extends DBWService {
     boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setRolePermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
+    boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
+
+    ////////////////////////////////////////////////////////////////////
+    // Connection management
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException;
 
 }
