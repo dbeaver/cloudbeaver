@@ -16,6 +16,7 @@ export type Scalars = {
 };
 
 export type Query = {
+  allConnections: Array<ConnectionInfo>;
   authLogin: UserAuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: Array<DatabaseAuthModel>;
@@ -23,14 +24,14 @@ export type Query = {
   connectionInfo: ConnectionInfo;
   /** @deprecated Field no longer supported */
   connectionState: ConnectionInfo;
+  createConnectionConfiguration: ConnectionInfo;
   createRole: AdminRoleInfo;
   createUser: AdminUserInfo;
-  /** @deprecated Field no longer supported */
-  dataSourceList: Array<DataSourceInfo>;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
+  deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
   deleteRole?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   driverList: Array<DriverInfo>;
@@ -49,12 +50,16 @@ export type Query = {
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
   sessionUser?: Maybe<UserAuthInfo>;
-  setRolePermissions?: Maybe<Scalars['Boolean']>;
+  setConnectionAccess?: Maybe<Scalars['Boolean']>;
+  setSubjectPermissions?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
+  templateConnections: Array<ConnectionInfo>;
+  /** @deprecated Field no longer supported */
   templateDataSources: Array<DataSourceInfo>;
+  updateConnectionConfiguration: ConnectionInfo;
 };
 
 export type QueryAuthLoginArgs = {
@@ -68,6 +73,10 @@ export type QueryConnectionInfoArgs = {
 
 export type QueryConnectionStateArgs = {
   id: Scalars['ID'];
+};
+
+export type QueryCreateConnectionConfigurationArgs = {
+  config: ConnectionConfig;
 };
 
 export type QueryCreateRoleArgs = {
@@ -93,6 +102,10 @@ export type QueryDataTransferExportDataFromResultsArgs = {
 
 export type QueryDataTransferRemoveDataFileArgs = {
   dataFileId: Scalars['String'];
+};
+
+export type QueryDeleteConnectionConfigurationArgs = {
+  id: Scalars['ID'];
 };
 
 export type QueryDeleteRoleArgs = {
@@ -155,9 +168,14 @@ export type QueryRevokeUserRoleArgs = {
   roleId: Scalars['ID'];
 };
 
-export type QuerySetRolePermissionsArgs = {
+export type QuerySetConnectionAccessArgs = {
+  connectionId: Scalars['ID'];
+  subjects: Array<Scalars['ID']>;
+};
+
+export type QuerySetSubjectPermissionsArgs = {
   roleId: Scalars['ID'];
-  permissions: Array<Maybe<Scalars['ID']>>;
+  permissions: Array<Scalars['ID']>;
 };
 
 export type QuerySetUserCredentialsArgs = {
@@ -182,9 +200,17 @@ export type QuerySqlListContextsArgs = {
   connectionId: Scalars['ID'];
 };
 
+export type QueryUpdateConnectionConfigurationArgs = {
+  id: Scalars['ID'];
+  config: ConnectionConfig;
+};
+
 export type Mutation = {
   asyncSqlExecuteQuery: AsyncTaskInfo;
+  asyncSqlExecuteResults: SqlExecuteInfo;
   asyncTaskCancel?: Maybe<Scalars['Boolean']>;
+  asyncTaskInfo: AsyncTaskInfo;
+  /** @deprecated Field no longer supported */
   asyncTaskStatus: AsyncTaskInfo;
   changeSessionLanguage?: Maybe<Scalars['Boolean']>;
   closeConnection: ConnectionInfo;
@@ -216,8 +242,17 @@ export type MutationAsyncSqlExecuteQueryArgs = {
   filter?: Maybe<SqlDataFilter>;
 };
 
+export type MutationAsyncSqlExecuteResultsArgs = {
+  taskId: Scalars['ID'];
+};
+
 export type MutationAsyncTaskCancelArgs = {
   id: Scalars['String'];
+};
+
+export type MutationAsyncTaskInfoArgs = {
+  id: Scalars['String'];
+  removeOnFinish?: Maybe<Scalars['Boolean']>;
 };
 
 export type MutationAsyncTaskStatusArgs = {
@@ -335,6 +370,7 @@ export type AsyncTaskInfo = {
   running: Scalars['Boolean'];
   status?: Maybe<Scalars['String']>;
   error?: Maybe<ServerError>;
+  /** @deprecated Field no longer supported */
   result?: Maybe<SqlExecuteInfo>;
   taskResult?: Maybe<Scalars['Object']>;
 };
@@ -427,6 +463,27 @@ export type DriverInfo = {
   applicableAuthModel: Array<Scalars['ID']>;
 };
 
+export type ConnectionInfo = {
+  id: Scalars['ID'];
+  driverId: Scalars['ID'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['String']>;
+  template: Scalars['Boolean'];
+  connected: Scalars['Boolean'];
+  provided: Scalars['Boolean'];
+  readOnly: Scalars['Boolean'];
+  connectTime?: Maybe<Scalars['String']>;
+  connectionError?: Maybe<ServerError>;
+  serverVersion?: Maybe<Scalars['String']>;
+  clientVersion?: Maybe<Scalars['String']>;
+  authNeeded: Scalars['Boolean'];
+  authModel?: Maybe<Scalars['ID']>;
+  authProperties: Array<ObjectPropertyInfo>;
+  features: Array<Scalars['String']>;
+  navigatorSettings: NavigatorSettings;
+};
+
 export type DataSourceInfo = {
   id: Scalars['ID'];
   driverId: Scalars['ID'];
@@ -440,19 +497,22 @@ export type DataSourceInfo = {
 };
 
 export type ConnectionConfig = {
-  driverId?: Maybe<Scalars['ID']>;
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
-  dataSourceId?: Maybe<Scalars['ID']>;
+  templateId?: Maybe<Scalars['ID']>;
+  driverId?: Maybe<Scalars['ID']>;
   host?: Maybe<Scalars['String']>;
   port?: Maybe<Scalars['String']>;
   databaseName?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
   properties?: Maybe<Scalars['Object']>;
-  userName?: Maybe<Scalars['String']>;
-  userPassword?: Maybe<Scalars['String']>;
+  template?: Maybe<Scalars['Boolean']>;
+  readOnly?: Maybe<Scalars['Boolean']>;
   authModelId?: Maybe<Scalars['ID']>;
   credentials?: Maybe<Scalars['Object']>;
+  dataSourceId?: Maybe<Scalars['ID']>;
+  userName?: Maybe<Scalars['String']>;
+  userPassword?: Maybe<Scalars['String']>;
 };
 
 export type NavigatorSettings = {
@@ -473,25 +533,6 @@ export type NavigatorSettingsInput = {
   hideFolders: Scalars['Boolean'];
   hideSchemas: Scalars['Boolean'];
   hideVirtualModel: Scalars['Boolean'];
-};
-
-export type ConnectionInfo = {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['String']>;
-  connected: Scalars['Boolean'];
-  provided: Scalars['Boolean'];
-  connectTime?: Maybe<Scalars['String']>;
-  connectionError?: Maybe<ServerError>;
-  serverVersion?: Maybe<Scalars['String']>;
-  clientVersion?: Maybe<Scalars['String']>;
-  authNeeded: Scalars['Boolean'];
-  authModel?: Maybe<Scalars['ID']>;
-  authProperties: Array<ObjectPropertyInfo>;
-  features: Array<Scalars['String']>;
-  navigatorSettings: NavigatorSettings;
 };
 
 export type LogEntry = {
@@ -793,7 +834,7 @@ export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type ConnectionAuthPropertiesQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -805,13 +846,13 @@ export type ConnectionStateQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -850,17 +891,17 @@ export type InitConnectionMutationVariables = Exact<{
   credentials?: Maybe<Scalars['Object']>;
 }>;
 
-export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type OpenConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
 
-export type TemplateDataSourceListQueryVariables = Exact<{ [key: string]: never }>;
+export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type TemplateDataSourceListQuery = { sources: Array<Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>> };
+export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> };
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1281,6 +1322,7 @@ export const CloseConnectionDocument = `
   connection: closeConnection(id: $id) {
     id
     name
+    description
     driverId
     connected
     features
@@ -1311,6 +1353,7 @@ export const ConnectionStateDocument = `
   connection: connectionState(id: $id) {
     id
     name
+    description
     driverId
     connected
     features
@@ -1324,6 +1367,7 @@ export const CreateConnectionDocument = `
   createConnection(config: $config) {
     id
     name
+    description
     driverId
     connected
     features
@@ -1404,6 +1448,7 @@ export const InitConnectionDocument = `
   connection: initConnection(id: $id, credentials: $credentials) {
     id
     name
+    description
     driverId
     connected
     features
@@ -1417,6 +1462,7 @@ export const OpenConnectionDocument = `
   connection: openConnection(config: $config) {
     id
     name
+    description
     driverId
     connected
     features
@@ -1425,13 +1471,17 @@ export const OpenConnectionDocument = `
   }
 }
     `;
-export const TemplateDataSourceListDocument = `
-    query templateDataSourceList {
-  sources: templateDataSources {
+export const GetTemplateConnectionsDocument = `
+    query getTemplateConnections {
+  connections: templateConnections {
     id
     name
-    driverId
     description
+    driverId
+    connected
+    features
+    authNeeded
+    authModel
   }
 }
     `;
@@ -2022,8 +2072,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     openConnection(variables: OpenConnectionMutationVariables): Promise<OpenConnectionMutation> {
       return withWrapper(() => client.request<OpenConnectionMutation>(OpenConnectionDocument, variables));
     },
-    templateDataSourceList(variables?: TemplateDataSourceListQueryVariables): Promise<TemplateDataSourceListQuery> {
-      return withWrapper(() => client.request<TemplateDataSourceListQuery>(TemplateDataSourceListDocument, variables));
+    getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
+      return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
     },
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));

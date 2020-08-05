@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DBSource } from '@cloudbeaver/core-app';
+import { Connection } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class TemplateDataSourceListResource extends CachedDataResource<DBSource[], null> {
+export class TemplateConnectionsResource extends CachedDataResource<Connection[], null> {
   constructor(
     private graphQLService: GraphQLService,
     private permissionsService: PermissionsService
@@ -35,13 +35,13 @@ export class TemplateDataSourceListResource extends CachedDataResource<DBSource[
     return this.data;
   }
 
-  protected async loader(key: null): Promise<DBSource[]> {
+  protected async loader(key: null): Promise<Connection[]> {
     if (!await this.permissionsService.hasAsync(EPermission.public)) {
       this.markUpdated(key);
       return [];
     }
-    const { sources } = await this.graphQLService.gql.templateDataSourceList();
+    const { connections } = await this.graphQLService.gql.getTemplateConnections();
     this.markUpdated(key);
-    return sources;
+    return connections;
   }
 }

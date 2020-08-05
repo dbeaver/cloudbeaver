@@ -9,7 +9,7 @@
 import { observable, action } from 'mobx';
 
 import {
-  DBDriverResource, DBSource, ErrorDetailsDialog, DatabaseAuthModelsResource
+  DBDriverResource, Connection, ErrorDetailsDialog, DatabaseAuthModelsResource
 } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -17,15 +17,15 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ConnectionConfig, GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { BasicConnectionService } from '../BasicConnectionService';
-import { TemplateDataSourceListResource } from '../DataSourcesResource';
+import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
 export enum ConnectionStep {
-  DBSource,
+  ConnectionTemplateSelect,
   Connection
 }
 
 export interface IConnectionController {
-  dbSource: DBSource | null;
+  template: Connection | null;
   config: ConnectionConfig;
   isConnecting: boolean;
   onConnect(): void;
@@ -34,10 +34,10 @@ export interface IConnectionController {
 @injectable()
 export class ConnectionController
 implements IInitializableController, IDestructibleController, IConnectionController {
-  @observable step = ConnectionStep.DBSource
+  @observable step = ConnectionStep.ConnectionTemplateSelect
   @observable isLoading = true;
   @observable isConnecting = false;
-  @observable dbSource: DBSource | null = null
+  @observable template: Connection | null = null
   @observable authModel?: DatabaseAuthModel;
   @observable config: ConnectionConfig = {
     credentials: {},
@@ -49,8 +49,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private onClose!: () => void
   private isDistructed = false;
 
-  get dbSources() {
-    return this.templateDataSourceListResource.data;
+  get templateConnections() {
+    return this.templateConnectionsResource.data;
   }
 
   get dbDrivers() {
@@ -58,15 +58,15 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   get dbDriver() {
-    if (!this.dbSource) {
+    if (!this.template) {
       return undefined;
     }
-    return this.dbDrivers.get(this.dbSource.driverId);
+    return this.dbDrivers.get(this.template.driverId);
   }
 
   constructor(
     private dbDriverResource: DBDriverResource,
-    private templateDataSourceListResource: TemplateDataSourceListResource,
+    private templateConnectionsResource: TemplateConnectionsResource,
     private basicConnectionService: BasicConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
@@ -75,7 +75,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   init(onClose: () => void) {
     this.onClose = onClose;
-    this.loadDBSources();
+    this.loadTemplateConnections();
   }
 
   destruct(): void {
@@ -85,6 +85,10 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   onStep = (step: ConnectionStep) => {
     this.step = step;
     this.clearError();
+
+    if (step === ConnectionStep.ConnectionTemplateSelect) {
+      this.template = null;
+    }
   }
 
   onConnect = async () => {
@@ -102,12 +106,12 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   }
 
-  onDBSourceSelect = async (sourceId: string) => {
-    this.dbSource = this.dbSources.find(dbSource => dbSource.id === sourceId)!;
+  onTemplateSelect = async (templateId: string) => {
+    this.template = this.templateConnections.find(template => template.id === templateId)!;
 
     await this.loadAuthModel();
     this.clearError();
-    this.setDBSourceDefaults();
+    this.seTemplateDefaults();
 
     this.step = ConnectionStep.Connection;
     if (!this.authModel) {
@@ -123,7 +127,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
-    config.dataSourceId = this.config.dataSourceId;
+    config.templateId = this.config.templateId;
     config.authModelId = this.config.authModelId;
     config.credentials = this.config.credentials;
 
@@ -131,8 +135,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   @action
-  private setDBSourceDefaults() {
-    this.config.dataSourceId = this.dbSource?.id;
+  private seTemplateDefaults() {
+    this.config.templateId = this.template?.id;
     this.config.authModelId = this.dbDriver?.defaultAuthModel;
     this.config.credentials = {};
   }
@@ -153,9 +157,9 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
   }
 
-  private async loadDBSources() {
+  private async loadTemplateConnections() {
     try {
-      await this.templateDataSourceListResource.loadAll();
+      await this.templateConnectionsResource.loadAll();
       await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database sources');

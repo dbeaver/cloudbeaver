@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
 
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
-import { TemplateDataSourceListResource } from './DataSourcesResource';
+import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 @injectable()
 export class BasicConnectionPluginBootstrap {
@@ -21,7 +21,7 @@ export class BasicConnectionPluginBootstrap {
   constructor(
     private connectionDialogsService: ConnectionDialogsService,
     private mainMenuService: MainMenuService,
-    private templateDataSourceListResource: TemplateDataSourceListResource,
+    private templateConnectionsResource: TemplateConnectionsResource,
     private commonDialogService: CommonDialogService,
     private notificationService: NotificationService,
     private permissionsService: PermissionsService
@@ -29,7 +29,7 @@ export class BasicConnectionPluginBootstrap {
   }
 
   bootstrap() {
-    this.loadDbSources();
+    this.loadTemplateConnections();
     this.mainMenuService.registerMenuItem(
       this.connectionDialogsService.newConnectionMenuToken,
       {
@@ -44,20 +44,20 @@ export class BasicConnectionPluginBootstrap {
   }
 
   private async openConnectionsDialog() {
-    this.loadDbSources();
+    this.loadTemplateConnections();
     await this.commonDialogService.open(ConnectionDialog, null);
   }
 
   private isDisabled() {
-    this.loadDbSources();
-    return !this.templateDataSourceListResource.data.length;
+    this.loadTemplateConnections();
+    return !this.templateConnectionsResource.data.length;
   }
 
-  private async loadDbSources() {
+  private async loadTemplateConnections() {
     try {
-      await this.templateDataSourceListResource.loadAll();
+      await this.templateConnectionsResource.loadAll();
     } catch (error) {
-      this.notificationService.logException(error, 'Template Data Sources loading failed');
+      this.notificationService.logException(error, 'Template Connections loading failed');
     }
   }
 }

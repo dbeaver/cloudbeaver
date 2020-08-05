@@ -20,7 +20,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
-import { DBSourceSelector } from './DBSourceSelector/DBSourceSelector';
+import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
 
 const styles = css`
   CommonDialogWrapper {
@@ -51,30 +51,30 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   const translate = useTranslate();
   let title = translate('basicConnection_connectionDialog_newConnection');
 
-  if (controller.step === ConnectionStep.Connection && controller.dbSource?.name) {
-    title = controller.dbSource.name;
+  if (controller.step === ConnectionStep.Connection && controller.template?.name) {
+    title = controller.template.name;
   }
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={title}
       icon={controller.dbDriver?.icon}
-      noBodyPadding={controller.step === ConnectionStep.DBSource}
+      noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect}
       footer={controller.step === ConnectionStep.Connection && (
         <ConnectionDialogFooter
           isConnecting={controller.isConnecting}
-          onBack={() => controller.onStep(ConnectionStep.DBSource)}
+          onBack={() => controller.onStep(ConnectionStep.ConnectionTemplateSelect)}
           onConnect={controller.onConnect}
         />
       )}
       onReject={rejectDialog}
     >
       {controller.isLoading && <Loader />}
-      {!controller.isLoading && controller.step === ConnectionStep.DBSource && (
-        <DBSourceSelector
-          dbSources={controller.dbSources}
+      {!controller.isLoading && controller.step === ConnectionStep.ConnectionTemplateSelect && (
+        <TemplateConnectionSelector
+          templateConnections={controller.templateConnections}
           dbDrivers={controller.dbDrivers}
-          onSelect={controller.onDBSourceSelect}
+          onSelect={controller.onTemplateSelect}
         />
       )}
       {controller.step === ConnectionStep.Connection && (!controller.authModel ? (
@@ -84,8 +84,8 @@ export const ConnectionDialog = observer(function ConnectionDialog({
       ) : (
         <SubmittingForm onSubmit={controller.onConnect} ref={focusedRef as React.RefObject<HTMLFormElement>}>
           <ObjectPropertyInfoForm
-            prefix={`auth_${controller.dbSource?.id || ''}`}
-            autofillToken={`section-${controller.dbSource?.id || ''} section-auth`}
+            prefix={`auth_${controller.template?.id || ''}`}
+            autofillToken={`section-${controller.template?.id || ''} section-auth`}
             properties={controller.authModel.properties}
             credentials={controller.config.credentials}
             processing={controller.isConnecting}
