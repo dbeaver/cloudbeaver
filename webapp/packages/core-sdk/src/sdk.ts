@@ -252,7 +252,7 @@ export type MutationAsyncTaskCancelArgs = {
 
 export type MutationAsyncTaskInfoArgs = {
   id: Scalars['String'];
-  removeOnFinish?: Maybe<Scalars['Boolean']>;
+  removeOnFinish: Scalars['Boolean'];
 };
 
 export type MutationAsyncTaskStatusArgs = {
@@ -909,15 +909,6 @@ export type TestConnectionMutationVariables = Exact<{
 
 export type TestConnectionMutation = { testConnection: Pick<ConnectionInfo, 'id'> };
 
-export type AsyncExportTaskStatusMutationVariables = Exact<{
-  taskId: Scalars['String'];
-}>;
-
-export type AsyncExportTaskStatusMutation = { taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
-    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ); };
-
 export type ExportDataFromContainerQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
@@ -961,6 +952,16 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
 
+export type GetAsyncTaskInfoMutationVariables = Exact<{
+  taskId: Scalars['String'];
+  removeOnFinish: Scalars['Boolean'];
+}>;
+
+export type GetAsyncTaskInfoMutation = { taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  ); };
+
 export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -969,45 +970,15 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
 }>;
 
 export type AsyncSqlExecuteQueryMutation = { taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running'>
-    & { result?: Maybe<(
-      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-      & { results: Array<(
-        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
-        & { resultSet?: Maybe<(
-          Pick<SqlResultSet, 'id' | 'rows'>
-          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )>; }
-      )>; }
-    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
   ); };
 
-export type AsyncTaskStatusMutationVariables = Exact<{
-  taskId: Scalars['String'];
+export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
+  taskId: Scalars['ID'];
 }>;
 
-export type AsyncTaskStatusMutation = { taskInfo: (
-    Pick<AsyncTaskInfo, 'id' | 'running'>
-    & { result?: Maybe<(
-      Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-      & { results: Array<(
-        Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
-        & { resultSet?: Maybe<(
-          Pick<SqlResultSet, 'id' | 'rows'>
-          & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
-        )>; }
-      )>; }
-    )>; error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>>; }
-  ); };
-
-export type ExecuteSqlQueryMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  query: Scalars['String'];
-  filter?: Maybe<SqlDataFilter>;
-}>;
-
-export type ExecuteSqlQueryMutation = { result?: Maybe<(
+export type GetSqlExecuteTaskResultsMutation = { result: (
     Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
@@ -1016,7 +987,7 @@ export type ExecuteSqlQueryMutation = { result?: Maybe<(
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
       )>; }
     )>; }
-  )>; };
+  ); };
 
 export type ReadDataFromContainerMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1492,22 +1463,6 @@ export const TestConnectionDocument = `
   }
 }
     `;
-export const AsyncExportTaskStatusDocument = `
-    mutation asyncExportTaskStatus($taskId: String!) {
-  taskInfo: asyncTaskStatus(id: $taskId) {
-    id
-    name
-    running
-    status
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-    taskResult
-  }
-}
-    `;
 export const ExportDataFromContainerDocument = `
     query exportDataFromContainer($connectionId: ID!, $containerNodePath: ID!, $parameters: DataTransferParameters!) {
   taskInfo: dataTransferExportDataFromContainer(connectionId: $connectionId, containerNodePath: $containerNodePath, parameters: $parameters) {
@@ -1585,87 +1540,41 @@ export const NavGetStructContainersDocument = `
   }
 }
     `;
+export const GetAsyncTaskInfoDocument = `
+    mutation getAsyncTaskInfo($taskId: String!, $removeOnFinish: Boolean!) {
+  taskInfo: asyncTaskInfo(id: $taskId, removeOnFinish: $removeOnFinish) {
+    id
+    name
+    running
+    status
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+    taskResult
+  }
+}
+    `;
 export const AsyncSqlExecuteQueryDocument = `
     mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
   taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
     id
+    name
     running
-    result {
-      duration
-      statusMessage
-      results {
-        updateRowCount
-        sourceQuery
-        title
-        resultSet {
-          id
-          columns {
-            dataKind
-            entityName
-            fullTypeName
-            icon
-            label
-            maxLength
-            name
-            position
-            precision
-            scale
-            typeName
-          }
-          rows
-        }
-      }
-    }
+    status
     error {
       message
       errorCode
       stackTrace
     }
+    taskResult
   }
 }
     `;
-export const AsyncTaskStatusDocument = `
-    mutation asyncTaskStatus($taskId: String!) {
-  taskInfo: asyncTaskStatus(id: $taskId) {
-    id
-    running
-    result {
-      duration
-      statusMessage
-      results {
-        updateRowCount
-        sourceQuery
-        title
-        resultSet {
-          id
-          columns {
-            dataKind
-            entityName
-            fullTypeName
-            icon
-            label
-            maxLength
-            name
-            position
-            precision
-            scale
-            typeName
-          }
-          rows
-        }
-      }
-    }
-    error {
-      message
-      errorCode
-      stackTrace
-    }
-  }
-}
-    `;
-export const ExecuteSqlQueryDocument = `
-    mutation executeSqlQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
-  result: sqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
+export const GetSqlExecuteTaskResultsDocument = `
+    mutation getSqlExecuteTaskResults($taskId: ID!) {
+  result: asyncSqlExecuteResults(taskId: $taskId) {
     duration
     statusMessage
     results {
@@ -2078,9 +1987,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));
     },
-    asyncExportTaskStatus(variables: AsyncExportTaskStatusMutationVariables): Promise<AsyncExportTaskStatusMutation> {
-      return withWrapper(() => client.request<AsyncExportTaskStatusMutation>(AsyncExportTaskStatusDocument, variables));
-    },
     exportDataFromContainer(variables: ExportDataFromContainerQueryVariables): Promise<ExportDataFromContainerQuery> {
       return withWrapper(() => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables));
     },
@@ -2096,14 +2002,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     navGetStructContainers(variables: NavGetStructContainersQueryVariables): Promise<NavGetStructContainersQuery> {
       return withWrapper(() => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables));
     },
+    getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables): Promise<GetAsyncTaskInfoMutation> {
+      return withWrapper(() => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables));
+    },
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
       return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
     },
-    asyncTaskStatus(variables: AsyncTaskStatusMutationVariables): Promise<AsyncTaskStatusMutation> {
-      return withWrapper(() => client.request<AsyncTaskStatusMutation>(AsyncTaskStatusDocument, variables));
-    },
-    executeSqlQuery(variables: ExecuteSqlQueryMutationVariables): Promise<ExecuteSqlQueryMutation> {
-      return withWrapper(() => client.request<ExecuteSqlQueryMutation>(ExecuteSqlQueryDocument, variables));
+    getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
+      return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
     },
     readDataFromContainer(variables: ReadDataFromContainerMutationVariables): Promise<ReadDataFromContainerMutation> {
       return withWrapper(() => client.request<ReadDataFromContainerMutation>(ReadDataFromContainerDocument, variables));
