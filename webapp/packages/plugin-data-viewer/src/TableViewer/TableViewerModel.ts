@@ -52,6 +52,7 @@ export interface IAgGridCol {
   name?: string;
   position?: number;
   dataKind?: string;
+  readOnly: boolean;
 }
 
 export interface IRequestedData {

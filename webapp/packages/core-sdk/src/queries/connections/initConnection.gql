@@ -5,6 +5,8 @@ mutation initConnection($id: ID!, $credentials: Object) {
     description
     driverId
     connected
+    readOnly
+
     features
 
     authNeeded

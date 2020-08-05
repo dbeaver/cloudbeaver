@@ -19,6 +19,7 @@ export type TableColumn = Pick<
   | 'name'
   | 'position'
   | 'precision'
+  | 'readOnly'
   | 'scale'
   | 'typeName'
 >

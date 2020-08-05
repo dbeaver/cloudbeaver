@@ -22,6 +22,7 @@ mutation getSqlExecuteTaskResults(
                     name
                     position
                     precision
+                    readOnly
                     scale
                     typeName
                 }

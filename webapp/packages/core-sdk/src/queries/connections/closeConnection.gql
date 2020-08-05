@@ -5,6 +5,8 @@ mutation closeConnection($id: ID!) {
     description
     driverId
     connected
+    readOnly
+
     features
 
     authNeeded

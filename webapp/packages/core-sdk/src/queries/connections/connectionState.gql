@@ -5,6 +5,8 @@ query connectionState($id: ID!) {
     description
     driverId
     connected
+    readOnly
+
     features
 
     authNeeded
