@@ -19,9 +19,8 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBValueFormatting;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 
 /**
  * Web SQL query resultset.
@@ -93,15 +92,7 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public boolean isReadOnly() {
-        if (attrMeta == null || attrMeta.getMetaAttribute() == null || attrMeta.getMetaAttribute().isReadOnly()) {
-            return true;
-        }
-        DBDRowIdentifier rowIdentifier = attrMeta.getRowIdentifier();
-        if (rowIdentifier == null || !(rowIdentifier.getEntity() instanceof DBSDataManipulator)) {
-            return true;
-        }
-        DBSDataManipulator dataContainer = (DBSDataManipulator) rowIdentifier.getEntity();
-        return (dataContainer.getSupportedFeatures() & DBSDataManipulator.DATA_UPDATE) == 0;
+        return DBExecUtils.isAttributeReadOnly(attrMeta);
     }
 
 }
