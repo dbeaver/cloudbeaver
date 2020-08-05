@@ -12,7 +12,7 @@ import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
-import connectionPreconfigured from '@cloudbeaver/plugin-connection-preconfigured';
+import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import { defaultProductManifest } from './manifest';
 
 const PLUGINS = [
@@ -21,7 +21,7 @@ const PLUGINS = [
   spreadsheet,
   authentication,
   connectionCustom,
-  connectionPreconfigured,
+  connectionTemplate,
   dataExport,
   dataViewer,
   ddlViewer,

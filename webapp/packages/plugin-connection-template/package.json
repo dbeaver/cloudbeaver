@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-connection-preconfigured",
+  "name": "@cloudbeaver/plugin-connection-template",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",

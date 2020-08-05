@@ -16,7 +16,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ConnectionConfig, GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
-import { BasicConnectionService } from '../BasicConnectionService';
+import { TemplateConnectionService } from '../TemplateConnectionService';
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
 export enum ConnectionStep {
@@ -67,7 +67,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   constructor(
     private dbDriverResource: DBDriverResource,
     private templateConnectionsResource: TemplateConnectionsResource,
-    private basicConnectionService: BasicConnectionService,
+    private templateConnectionService: TemplateConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private dbAuthModelsResource: DatabaseAuthModelsResource
@@ -95,7 +95,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isConnecting = true;
     this.clearError();
     try {
-      const connection = await this.basicConnectionService.openConnectionAsync(this.getConnectionConfig());
+      const connection = await this.templateConnectionService.openConnectionAsync(this.getConnectionConfig());
 
       this.notificationService.logInfo({ title: `Connection ${connection.name} established` });
       this.onClose();
