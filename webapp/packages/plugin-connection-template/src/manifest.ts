@@ -8,25 +8,25 @@
 
 import { PluginManifest } from '@cloudbeaver/core-di';
 
-import { BasicConnectionPluginBootstrap } from './BasicConnectionPluginBootstrap';
-import { BasicConnectionService } from './BasicConnectionService';
 import { LocaleService } from './LocaleService';
+import { TemplateConnectionPluginBootstrap } from './TemplateConnectionPluginBootstrap';
+import { TemplateConnectionService } from './TemplateConnectionService';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
-export const basicConnectionPluginManifest: PluginManifest = {
+export const connectionTemplate: PluginManifest = {
   info: {
-    name: 'Basic connection plugin',
+    name: 'Connection template plugin',
   },
 
   providers: [
-    BasicConnectionService,
+    TemplateConnectionService,
     TemplateConnectionsResource,
     LocaleService,
   ],
 
   initialize(services): void {
     services
-      .resolveServiceByClass(BasicConnectionPluginBootstrap)
+      .resolveServiceByClass(TemplateConnectionPluginBootstrap)
       .bootstrap();
   },
 };

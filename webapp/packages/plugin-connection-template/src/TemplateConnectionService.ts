@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ConnectionConfig, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class BasicConnectionService {
+export class TemplateConnectionService {
 
   constructor(
     private graphQLService: GraphQLService,
