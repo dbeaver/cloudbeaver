@@ -268,7 +268,7 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       type: v.dataKind,
       editable: (params: any) => {
         const context: AgGridContext = params.context;
-        return !context.isReadonly();
+        return !(context.isReadonly() || v.readOnly);
       },
       valueGetter: (params: ValueGetterParams) => {
         if (!params.data) {

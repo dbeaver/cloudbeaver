@@ -29,6 +29,7 @@ mutation readDataFromContainer(
                     name
                     position
                     precision
+                    readOnly
                     scale
                     typeName
                 }

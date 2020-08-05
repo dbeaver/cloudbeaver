@@ -103,7 +103,7 @@ export class DataViewerTabService {
       return;
     }
 
-    this.dataViewerTableService.create(
+    await this.dataViewerTableService.create(
       tab.id,
       NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId),
       tab.handlerState.objectId

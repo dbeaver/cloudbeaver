@@ -6,17 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionInfoResource } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
+import { IRequestDataResult, TableViewerModel, AccessMode } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
 export class DataViewerTableService {
   constructor(private tableViewerStorageService: TableViewerStorageService,
+              private connectionInfoResource: ConnectionInfoResource,
               private graphQLService: GraphQLService) {
   }
 
@@ -28,16 +30,19 @@ export class DataViewerTableService {
     this.tableViewerStorageService.remove(tableId);
   }
 
-  create(
+  async create(
     tabId: string,
     connectionId: string,
     containerNodePath?: string,
-  ): TableViewerModel {
+  ): Promise<TableViewerModel> {
+    const connectionInfo = await this.connectionInfoResource.load(connectionId);
+
     return this.tableViewerStorageService.create(
       {
         tableId: tabId,
         connectionId,
         containerNodePath,
+        access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
         requestDataAsync: this.requestDataAsync.bind(this),
         saveChanges: this.saveChanges.bind(this),
       }

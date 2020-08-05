@@ -655,6 +655,7 @@ export type SqlResultColumn = {
   maxLength?: Maybe<Scalars['Int']>;
   scale?: Maybe<Scalars['Int']>;
   precision?: Maybe<Scalars['Int']>;
+  readOnly: Scalars['Boolean'];
 };
 
 export type SqlResultSet = {
@@ -834,7 +835,7 @@ export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type ConnectionAuthPropertiesQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -846,13 +847,13 @@ export type ConnectionStateQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -891,17 +892,17 @@ export type InitConnectionMutationVariables = Exact<{
   credentials?: Maybe<Scalars['Object']>;
 }>;
 
-export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type OpenConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'> };
+export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> };
+export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> };
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -984,7 +985,7 @@ export type GetSqlExecuteTaskResultsMutation = { result: (
       Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
+        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
       )>; }
     )>; }
   ); };
@@ -1002,7 +1003,7 @@ export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
       Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'scale' | 'typeName'>>>> }
+        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
       )>; }
     )>; }
   )>; };
@@ -1296,6 +1297,7 @@ export const CloseConnectionDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1327,6 +1329,7 @@ export const ConnectionStateDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1341,6 +1344,7 @@ export const CreateConnectionDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1422,6 +1426,7 @@ export const InitConnectionDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1436,6 +1441,7 @@ export const OpenConnectionDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1450,6 +1456,7 @@ export const GetTemplateConnectionsDocument = `
     description
     driverId
     connected
+    readOnly
     features
     authNeeded
     authModel
@@ -1593,6 +1600,7 @@ export const GetSqlExecuteTaskResultsDocument = `
           name
           position
           precision
+          readOnly
           scale
           typeName
         }
@@ -1623,6 +1631,7 @@ export const ReadDataFromContainerDocument = `
           name
           position
           precision
+          readOnly
           scale
           typeName
         }

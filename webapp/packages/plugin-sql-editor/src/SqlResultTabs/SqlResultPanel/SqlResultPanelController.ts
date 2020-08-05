@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 
-import { ErrorDetailsDialog } from '@cloudbeaver/core-app';
+import { ErrorDetailsDialog, ConnectionInfoResource } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,6 +20,7 @@ import {
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
+  AccessMode,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
@@ -47,6 +48,7 @@ implements IInitializableController, IDestructibleController {
 
   constructor(private sqlResultService: SqlResultService,
               private tableViewerStorageService: TableViewerStorageService,
+              private connectionInfoResource: ConnectionInfoResource,
               private commonDialogService: CommonDialogService,
               private notificationService: NotificationService) {
   }
@@ -71,12 +73,15 @@ implements IInitializableController, IDestructibleController {
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
 
+        const connectionInfo = await this.connectionInfoResource.load(panelInit.sqlQueryParams.connectionId);
+
         const tableModel = this.tableViewerStorageService.create({
           tableId: this.getTableId(),
           connectionId: panelInit.sqlQueryParams.connectionId,
           executionContext: panelInit.sqlQueryParams,
           resultId: dataSet.resultSet.id,
           sourceName: panelInit.sqlQueryParams.query,
+          access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
           requestDataAsync: this.requestDataAsync.bind(this, panelInit.sqlExecutionState),
           noLoaderWhileRequestingDataAsync: true,
           saveChanges: this.saveChanges.bind(this),
