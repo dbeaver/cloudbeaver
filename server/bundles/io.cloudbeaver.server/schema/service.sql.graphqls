@@ -80,6 +80,7 @@ type SQLResultColumn {
     precision: Int
 
     readOnly: Boolean!
+    readOnlyStatus: String
 }
 
 type SQLResultSet {

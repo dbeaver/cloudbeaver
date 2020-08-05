@@ -95,4 +95,9 @@ public class WebSQLQueryResultColumn {
         return DBExecUtils.isAttributeReadOnly(attrMeta);
     }
 
+    @Property
+    public String getReadOnlyStatus() {
+        return DBExecUtils.getAttributeReadOnlyStatus(attrMeta);
+    }
+
 }
