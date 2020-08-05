@@ -150,11 +150,12 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @NotNull
     public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) {
-        DBRRunnableWithResult<WebSQLExecuteInfo> runnable = new DBRRunnableWithResult<WebSQLExecuteInfo>() {
+        DBRRunnableWithResult<String> runnable = new DBRRunnableWithResult<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                 try {
-                    result = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
+                    this.result = executeResults.getStatusMessage();
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
                 }
