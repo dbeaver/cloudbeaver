@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -76,5 +77,5 @@ public interface DBWServiceSQL extends DBWService {
     WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException;
 
     @WebAction
-    WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSQLContextInfo sqlContext, @NotNull String taskId) throws DBWebException;
+    WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
 }

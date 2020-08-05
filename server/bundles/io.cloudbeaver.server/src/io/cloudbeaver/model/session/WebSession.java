@@ -39,7 +39,10 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
-import org.jkiss.dbeaver.model.runtime.*;
+import org.jkiss.dbeaver.model.runtime.AbstractJob;
+import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
@@ -396,7 +399,7 @@ public class WebSession implements DBASession {
         return true;
     }
 
-    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, DBRRunnableWithResult runnable) {
+    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor runnable) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
 
@@ -407,6 +410,7 @@ public class WebSession implements DBASession {
                 try {
                     runnable.run(taskMonitor);
                     asyncTask.setResult(runnable.getResult());
+                    asyncTask.setExtendedResult(runnable.getExtendedResults());
                     asyncTask.setStatus("Finished");
                     asyncTask.setRunning(false);
                 } catch (InvocationTargetException e) {

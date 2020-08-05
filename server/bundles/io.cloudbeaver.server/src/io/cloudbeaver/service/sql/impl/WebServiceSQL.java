@@ -20,6 +20,8 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.*;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
@@ -27,7 +29,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLScriptElement;
@@ -150,12 +151,13 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @NotNull
     public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) {
-        DBRRunnableWithResult<String> runnable = new DBRRunnableWithResult<String>() {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                 try {
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
                     this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
                 }
@@ -165,10 +167,10 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSQLContextInfo sqlContext, @NotNull String taskId) throws DBWebException {
-        WebAsyncTaskInfo taskStatus = sqlContext.getProcessor().getWebSession().asyncTaskStatus(taskId, true);
+    public WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, true);
         if (taskStatus != null) {
-            return (WebSQLExecuteInfo) taskStatus.getTaskResult();
+            return (WebSQLExecuteInfo) taskStatus.getExtendedResult();
         }
         return null;
     }

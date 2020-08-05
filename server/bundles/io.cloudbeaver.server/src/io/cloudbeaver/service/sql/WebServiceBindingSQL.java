@@ -109,7 +109,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
-                    getSQLContext(env), env.getArgument("taskId")
+                    getWebSession(env), env.getArgument("taskId")
                 ));
     }
 

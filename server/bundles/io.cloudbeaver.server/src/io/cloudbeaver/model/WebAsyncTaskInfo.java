@@ -27,6 +27,7 @@ public class WebAsyncTaskInfo {
     private String name;
     private boolean running;
     private Object result;
+    private Object extendedResult;
     private String status;
     private Throwable jobError;
 
@@ -71,6 +72,15 @@ public class WebAsyncTaskInfo {
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    // Extended results are used by services and never exposed to client directly
+    public Object getExtendedResult() {
+        return extendedResult;
+    }
+
+    public void setExtendedResult(Object extendedResult) {
+        this.extendedResult = extendedResult;
     }
 
     public String getStatus() {
