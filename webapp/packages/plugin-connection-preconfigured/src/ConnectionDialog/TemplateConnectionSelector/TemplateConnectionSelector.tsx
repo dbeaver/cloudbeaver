@@ -28,7 +28,7 @@ export const TemplateConnectionSelector = observer(function TemplateConnectionSe
   onSelect,
 }: Props) {
   const [search, setSearch] = useState('');
-  const filteredDBSources = useMemo(() => {
+  const filteredTemplateConnections = useMemo(() => {
     if (!search) {
       return templateConnections;
     }
@@ -38,7 +38,7 @@ export const TemplateConnectionSelector = observer(function TemplateConnectionSe
   return (
     <ItemList className={className}>
       <ItemListSearch onSearch={setSearch} />
-      {filteredDBSources.map(template => (
+      {filteredTemplateConnections.map(template => (
         <TemplateConnectionItem
           key={template.id}
           template={template}
