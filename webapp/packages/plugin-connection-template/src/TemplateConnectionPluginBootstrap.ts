@@ -16,7 +16,7 @@ import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 @injectable()
-export class BasicConnectionPluginBootstrap {
+export class TemplateConnectionPluginBootstrap {
 
   constructor(
     private connectionDialogsService: ConnectionDialogsService,
