@@ -1,8 +1,10 @@
-mutation asyncExportTaskStatus(
+mutation getAsyncTaskInfo(
     $taskId: String!
+    $removeOnFinish: Boolean!
 ) {
-    taskInfo: asyncTaskStatus(
+    taskInfo: asyncTaskInfo(
         id: $taskId
+        removeOnFinish: $removeOnFinish
     ) {
         id
         name

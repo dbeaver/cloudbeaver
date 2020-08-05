@@ -9,40 +9,40 @@
 import { observer } from 'mobx-react';
 import { useState, useMemo } from 'react';
 
-import { DBDriver, DBSource } from '@cloudbeaver/core-app';
+import { DBDriver, Connection } from '@cloudbeaver/core-app';
 import { ItemList, ItemListSearch } from '@cloudbeaver/core-blocks';
 
-import { DBSourceItem } from './DBSourceItem';
+import { TemplateConnectionItem } from './TemplateConnectionItem';
 
-type DBSourceSelectorProps = {
-  dbSources: DBSource[];
+type Props = {
+  templateConnections: Connection[];
   dbDrivers: Map<string, DBDriver>;
   className?: string;
   onSelect(dbSourceId: string): void;
 }
 
-export const DBSourceSelector = observer(function DBSourceSelector({
-  dbSources,
+export const TemplateConnectionSelector = observer(function TemplateConnectionSelector({
+  templateConnections,
   dbDrivers,
   className,
   onSelect,
-}: DBSourceSelectorProps) {
+}: Props) {
   const [search, setSearch] = useState('');
   const filteredDBSources = useMemo(() => {
     if (!search) {
-      return dbSources;
+      return templateConnections;
     }
-    return dbSources.filter(source => source.name.toUpperCase().includes(search.toUpperCase()));
-  }, [search, dbSources]);
+    return templateConnections.filter(template => template.name.toUpperCase().includes(search.toUpperCase()));
+  }, [search, templateConnections]);
 
   return (
     <ItemList className={className}>
       <ItemListSearch onSearch={setSearch} />
-      {filteredDBSources.map(dbSource => (
-        <DBSourceItem
-          key={dbSource.id}
-          dbSource={dbSource}
-          dbDriver={dbDrivers.get(dbSource.driverId)}
+      {filteredDBSources.map(template => (
+        <TemplateConnectionItem
+          key={template.id}
+          template={template}
+          dbDriver={dbDrivers.get(template.driverId)}
           onSelect={onSelect}
         />
       ))}

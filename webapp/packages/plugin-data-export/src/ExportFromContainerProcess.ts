@@ -40,7 +40,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
         containerNodePath,
         parameters,
       });
-      this.applyResult(taskInfo);
+      await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
         await this.cancelAsync(this.taskId);
@@ -80,8 +80,11 @@ export class ExportFromContainerProcess extends Deferred<string> {
       }
       // run the first check immediately because usually the query execution is fast
       try {
-        const { taskInfo } = await this.graphQLService.gql.asyncExportTaskStatus({ taskId: this.taskId });
-        this.applyResult(taskInfo);
+        const { taskInfo } = await this.graphQLService.gql.getAsyncTaskInfo({
+          taskId: this.taskId,
+          removeOnFinish: false,
+        });
+        await this.applyResult(taskInfo);
         if (this.isFinished) {
           return;
         }
@@ -111,7 +114,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
     }
   }
 
-  private applyResult(taskInfo: AsyncTaskInfo): void {
+  private async applyResult(taskInfo: AsyncTaskInfo) {
     // task is running
     if (taskInfo.running) {
       return;
@@ -128,6 +131,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
     }
     // task execution successful
     this.toResolved(taskInfo.taskResult);
+    await this.graphQLService.gql.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: true });
   }
 
   private onError(error: Error, status?: string) {

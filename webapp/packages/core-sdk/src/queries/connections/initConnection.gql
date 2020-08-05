@@ -2,6 +2,7 @@ mutation initConnection($id: ID!, $credentials: Object) {
   connection: initConnection(id: $id, credentials: $credentials) {
     id
     name
+    description
     driverId
     connected
     features

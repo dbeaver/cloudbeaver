@@ -1,8 +1,13 @@
-query templateDataSourceList {
-  sources: templateDataSources {
+query getTemplateConnections {
+  connections: templateConnections {
     id
     name
-    driverId
     description
+    driverId
+    connected
+    features
+
+    authNeeded
+    authModel
   }
 }

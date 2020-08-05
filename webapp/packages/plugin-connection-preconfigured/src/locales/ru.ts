@@ -9,5 +9,5 @@ export default [
   ['basicConnection_connectionDialog_connecting', 'Подключение...'],
   ['basicConnection_connectionDialog_connect', 'Подключиться'],
   ['basicConnection_connectionDialog_connecting_message', 'Подключение к базе...'],
-  ['basicConnection_main_menu_item', 'Подключиться'],
+  ['basicConnection_main_menu_item', 'Шаблон'],
 ];

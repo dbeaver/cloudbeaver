@@ -2,6 +2,7 @@ mutation openConnection($config: ConnectionConfig!) {
   connection: openConnection(config: $config) {
     id
     name
+    description
     driverId
     connected
     features

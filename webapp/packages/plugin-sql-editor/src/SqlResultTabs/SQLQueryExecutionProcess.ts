@@ -38,7 +38,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     // start async task
     try {
       const taskInfo = await this.executeQueryAsync(sqlQueryParams, filter);
-      this.applyResult(taskInfo);
+      await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
         await this.cancelAsync(this.taskId);
@@ -60,7 +60,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
       // run the first check immediately because usually the query execution is fast
       try {
         const taskInfo = await this.getQueryStatusAsync(this.taskId);
-        this.applyResult(taskInfo);
+        await this.applyResult(taskInfo);
         if (this.isFinished) {
           return;
         }
@@ -119,7 +119,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   }
 
   private async getQueryStatusAsync(taskId: string): Promise<AsyncTaskInfo> {
-    const { taskInfo } = await this.graphQLService.gql.asyncTaskStatus({ taskId });
+    const { taskInfo } = await this.graphQLService.gql.getAsyncTaskInfo({ taskId, removeOnFinish: false });
     return taskInfo;
   }
 
@@ -127,7 +127,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     await this.graphQLService.gql.asyncTaskCancel({ taskId });
   }
 
-  private applyResult(taskInfo: AsyncTaskInfo): void {
+  private async applyResult(taskInfo: AsyncTaskInfo) {
     // task is running
     if (taskInfo.running) {
       return;
@@ -138,12 +138,14 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
       this.onError(serverError, taskInfo.status);
       return;
     }
-    if (!taskInfo.result) {
-      this.onError(new Error('Tasks execution returns no result'), taskInfo.status);
-      return;
-    }
+    try {
     // task execution successful
-    this.toResolved(taskInfo.result);
+      const { result } = await this.graphQLService.gql.getSqlExecuteTaskResults({ taskId: taskInfo.id });
+      this.toResolved(result);
+      await this.graphQLService.gql.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: true });
+    } catch (exception) {
+      this.onError(new Error('Tasks execution returns no result'), exception);
+    }
   }
 
   private onError(error: Error, status?: string) {

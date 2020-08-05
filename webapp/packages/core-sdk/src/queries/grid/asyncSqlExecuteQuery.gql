@@ -11,37 +11,14 @@ mutation asyncSqlExecuteQuery(
         filter: $filter
     ) {
         id
+        name
         running
-        result {
-            duration
-            statusMessage
-            results {
-                updateRowCount
-                sourceQuery
-                title
-                resultSet {
-                    id
-                    columns {
-                        dataKind
-                        entityName
-                        fullTypeName
-                        icon
-                        label
-                        maxLength
-                        name
-                        position
-                        precision
-                        scale
-                        typeName
-                    }
-                    rows
-                }
-            }
-        }
+        status
         error {
             message
             errorCode
             stackTrace
         }
+        taskResult
     }
 }
