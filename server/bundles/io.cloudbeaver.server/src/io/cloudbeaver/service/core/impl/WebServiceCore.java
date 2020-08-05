@@ -318,8 +318,8 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, boolean removeOnFinish) throws DBWebException {
-        return webSession.asyncTaskStatus(taskId, removeOnFinish);
+    public WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, Boolean removeOnFinish) throws DBWebException {
+        return webSession.asyncTaskStatus(taskId, CommonUtils.toBoolean(removeOnFinish));
     }
 
     @Override
