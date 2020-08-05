@@ -18,6 +18,7 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
@@ -29,7 +30,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -135,10 +135,12 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer) {
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
-        DBRRunnableWithResult<String> runnable = new DBRRunnableWithResult<String>() {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                monitor.beginTask("Export data", 1);
                 try {
+                    monitor.subTask("Export data using " + processor.getName());
                     File exportFile = new File(dataExportFolder, makeUniqueFileName(sqlProcessor, processor));
                     try {
                         exportData(monitor, processor, dataContainer, parameters, exportFile);
@@ -158,6 +160,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     result = exportFile.getName();
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
                 }
             }
         };
