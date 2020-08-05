@@ -341,7 +341,7 @@ extend type Mutation {
 
     asyncTaskCancel(id: String!): Boolean
 
-    asyncTaskInfo(id: String!, removeOnFinish: Boolean): AsyncTaskInfo!
+    asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
 
 
     #### Deprecated API
