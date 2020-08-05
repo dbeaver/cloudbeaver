@@ -10,8 +10,8 @@ import { PluginManifest } from '@cloudbeaver/core-di';
 
 import { BasicConnectionPluginBootstrap } from './BasicConnectionPluginBootstrap';
 import { BasicConnectionService } from './BasicConnectionService';
-import { TemplateDataSourceListResource } from './DataSourcesResource';
 import { LocaleService } from './LocaleService';
+import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 export const basicConnectionPluginManifest: PluginManifest = {
   info: {
@@ -20,7 +20,7 @@ export const basicConnectionPluginManifest: PluginManifest = {
 
   providers: [
     BasicConnectionService,
-    TemplateDataSourceListResource,
+    TemplateConnectionsResource,
     LocaleService,
   ],
 

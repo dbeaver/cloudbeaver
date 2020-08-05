@@ -1,14 +1,8 @@
-mutation executeSqlQuery(
-    $connectionId: ID!
-    $contextId: ID!
-    $query: String!
-    $filter: SQLDataFilter
+mutation getSqlExecuteTaskResults(
+    $taskId: ID!
 ) {
-    result: sqlExecuteQuery(
-        connectionId: $connectionId
-        contextId: $contextId
-        sql: $query
-        filter: $filter
+    result: asyncSqlExecuteResults(
+        taskId: $taskId
     ) {
         duration
         statusMessage

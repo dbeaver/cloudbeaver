@@ -11,7 +11,7 @@ import { Subject } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { DataSourceInfo, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import { isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ROOT_NODE_PATH } from '../NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from '../NodesManager/NavNodeManagerService';
@@ -19,8 +19,6 @@ import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
-
-export type DBSource = Pick<DataSourceInfo, 'id' | 'name' | 'driverId' | 'description'>
 
 @injectable()
 export class ConnectionsManagerService {
