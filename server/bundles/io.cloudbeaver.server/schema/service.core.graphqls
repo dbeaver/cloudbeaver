@@ -286,11 +286,6 @@ extend type Query {
     connectionInfo( id: ID! ): ConnectionInfo!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
-
-    # Deprecated API
-
-    # Get list of predefined data sources. Replaced with templateDataSources
-    templateDataSources: [ DataSourceInfo! ]! @deprecated
 }
 
 extend type Mutation {
