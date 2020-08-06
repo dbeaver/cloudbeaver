@@ -10,10 +10,10 @@ import { observer } from 'mobx-react';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DBDriver } from '@cloudbeaver/core-app';
 import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader
 } from '@cloudbeaver/core-blocks';
+import { DBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';

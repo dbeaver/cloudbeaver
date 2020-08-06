@@ -6,13 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import {
+  ConnectionAuthService, Connection, ConnectionInfoResource, EConnectionFeature
+} from '@cloudbeaver/core-connections';
+import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
-import { GraphQLService, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { PermissionsService, EPermission, SessionResource } from '@cloudbeaver/core-root';
+import {
+  GraphQLService, resourceKeyList, isResourceKeyList, ResourceKey
+} from '@cloudbeaver/core-sdk';
 
-import { ConnectionAuthService } from '../ConnectionsManager/ConnectionAuthService';
-import { Connection } from '../ConnectionsManager/ConnectionInfoResource';
 import { INavigator } from '../Navigation/INavigator';
 import { IContextProvider } from '../Navigation/NavigationContext';
 import { NavigationService } from '../Navigation/NavigationService';
@@ -84,19 +87,21 @@ export interface INodeNavigationData {
 }
 
 @injectable()
-export class NavNodeManagerService {
+export class NavNodeManagerService extends Bootstrap {
   readonly navigator!: INavigator<INodeNavigationData>;
 
   constructor(
     private graphQLService: GraphQLService,
     private navigationService: NavigationService,
     private permissionsService: PermissionsService,
+    readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
+    private sessionResource: SessionResource,
   ) {
-
+    super();
     this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
       data => data.nodeId,
       this.navigateHandler.bind(this),
@@ -107,6 +112,14 @@ export class NavNodeManagerService {
       }
     );
   }
+
+  register() {
+    this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
+    this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(this.updateRootChildren.bind(this));
+  }
+
+  load() {}
 
   async navToNode(nodeId: string, parentId: string, folderId?: string) {
     await this.navigator.navigateTo({
@@ -309,6 +322,48 @@ export class NavNodeManagerService {
       getParents,
       loadParents,
     };
+  }
+
+  private async connectionUpdateHandler(key: ResourceKey<string>) {
+    const keys = isResourceKeyList(key) ? key.list : [key];
+
+    for (const id of keys) {
+      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+      this.markTreeOutdated(nodeId);
+
+      // addOpenedConnection
+      const connectionInfo = this.connectionInfo.get(id);
+
+      if (!connectionInfo?.connected) {
+        this.removeTree(nodeId);
+      }
+
+      await this.refreshNode(nodeId);
+
+      if (connectionInfo?.features.includes(EConnectionFeature.temporary)) {
+
+        const tree = this.navTree.get(ROOT_NODE_PATH);
+
+        if (!tree?.includes(nodeId)) {
+          this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
+        }
+      }
+    }
+  }
+
+  private async connectionRemoveHandler(key: ResourceKey<string>) {
+    const keys = isResourceKeyList(key) ? key.list : [key];
+
+    for (const id of keys) {
+    // deleteConnection
+      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+
+      const node = this.getNode(navNodeId);
+      if (!node) {
+        return;
+      }
+      this.navTree.deleteInNode(node.parentId, [navNodeId]);
+    }
   }
 
   private async navigateHandler(contexts: IContextProvider<INodeNavigationData>) {

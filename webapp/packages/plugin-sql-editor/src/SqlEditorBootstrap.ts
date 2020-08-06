@@ -11,9 +11,10 @@ import {
   NavigationTreeContextMenuService,
   EObjectFeature,
   NodeManagerUtils,
-  NavNode, ConnectionsManagerService, ConnectionSchemaManagerService,
-  isConnectionProvider, isObjectCatalogProvider, isObjectSchemaProvider,
+  NavNode, ConnectionSchemaManagerService,
+  isObjectCatalogProvider, isObjectSchemaProvider,
 } from '@cloudbeaver/core-app';
+import { ConnectionsManagerService, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { ActiveViewService } from '@cloudbeaver/core-view';

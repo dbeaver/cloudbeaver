@@ -9,8 +9,8 @@
 import { action, observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
-import { ErrorDetailsDialog } from '@cloudbeaver/core-app';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 

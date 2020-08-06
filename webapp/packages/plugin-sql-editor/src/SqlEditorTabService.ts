@@ -10,15 +10,17 @@ import {
   NavigationTabsService,
   TabHandler,
   ITab,
-  ConnectionInfoResource,
-  connectionProvider,
-  connectionSetter,
   objectSchemaProvider,
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaSetter,
-  ConnectionAuthService,
 } from '@cloudbeaver/core-app';
+import {
+  ConnectionInfoResource,
+  connectionProvider,
+  connectionSetter,
+  ConnectionAuthService,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';

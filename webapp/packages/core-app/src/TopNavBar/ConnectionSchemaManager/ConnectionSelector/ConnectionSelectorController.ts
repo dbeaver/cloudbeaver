@@ -8,11 +8,14 @@
 
 import { computed } from 'mobx';
 
+import {
+  ConnectionInfoResource,
+  DBDriverResource,
+  Connection
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
 
-import { Connection, ConnectionInfoResource } from '../../../shared/ConnectionsManager/ConnectionInfoResource';
-import { DBDriverResource } from '../../../shared/ConnectionsManager/DBDriverResource';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';

@@ -10,8 +10,8 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { DBDriver } from '@cloudbeaver/core-app';
 import { Loader, PropertiesTable } from '@cloudbeaver/core-blocks';
+import { DBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 

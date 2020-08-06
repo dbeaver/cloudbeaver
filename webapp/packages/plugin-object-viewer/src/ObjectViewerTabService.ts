@@ -14,13 +14,12 @@ import {
   TabHandler,
   NavigationType,
   NodeManagerUtils,
-  connectionProvider,
   objectCatalogProvider,
   objectSchemaProvider,
   NavNodeManagerService,
   DBObjectService,
-  ConnectionInfoResource,
 } from '@cloudbeaver/core-app';
+import { connectionProvider, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ResourceKey, resourceKeyList, isResourceKeyList } from '@cloudbeaver/core-sdk';

@@ -8,10 +8,10 @@
 
 import { observable, computed } from 'mobx';
 
-import { ErrorDetailsDialog } from '@cloudbeaver/core-app';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { RolesManagerService } from '../../RolesManagerService';

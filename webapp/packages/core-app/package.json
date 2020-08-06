@@ -19,6 +19,7 @@
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
+    "@cloudbeaver/core-connections": "^0.1.0",
     "@cloudbeaver/core-plugin": "^0.1.0",
     "@cloudbeaver/core-localization": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",

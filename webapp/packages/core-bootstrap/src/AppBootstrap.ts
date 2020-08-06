@@ -18,7 +18,6 @@ import {
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionExpireService } from '@cloudbeaver/core-dialogs';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 /**
