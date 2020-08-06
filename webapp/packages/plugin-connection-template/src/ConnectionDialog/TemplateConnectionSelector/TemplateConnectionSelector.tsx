@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react';
 import { useState, useMemo } from 'react';
 
-import { DBDriver, Connection } from '@cloudbeaver/core-app';
 import { ItemList, ItemListSearch } from '@cloudbeaver/core-blocks';
+import { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
 import { TemplateConnectionItem } from './TemplateConnectionItem';
 

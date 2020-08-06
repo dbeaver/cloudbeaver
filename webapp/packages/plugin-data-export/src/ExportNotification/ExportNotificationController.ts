@@ -8,11 +8,12 @@
 
 import { observable, computed } from 'mobx';
 
-import { ErrorDetailsDialog, NavNodeManagerService } from '@cloudbeaver/core-app';
+import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DataExportProcessService } from '../DataExportProcessService';

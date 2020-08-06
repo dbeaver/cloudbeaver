@@ -12,7 +12,6 @@ import {
   GraphQLService,
   SqlExecuteInfo,
   SqlDataFilter,
-  SqlDataFilterConstraint,
 } from '@cloudbeaver/core-sdk';
 import { IRequestDataResult, RowDiff } from '@cloudbeaver/plugin-data-viewer';
 
@@ -22,31 +21,10 @@ import { SQLQueryExecutionProcess } from './SQLQueryExecutionProcess';
 @injectable()
 export class SqlResultService {
 
-  constructor(private graphQLService: GraphQLService,
-              private notificationService: NotificationService) { }
-
-  /**
-   * @deprecated use asyncSqlQuery
-   */
-  async fetchData(
-    sqlQueryParams: ISqlQueryParams,
-    rowOffset: number,
-    count: number,
-    constraints?: SqlDataFilterConstraint[]
-  ): Promise<SqlExecuteInfo> {
-    const response = await this.graphQLService.gql.executeSqlQuery({
-      connectionId: sqlQueryParams.connectionId,
-      contextId: sqlQueryParams.contextId,
-      query: sqlQueryParams.query,
-
-      filter: {
-        offset: rowOffset,
-        limit: count,
-        constraints,
-      },
-    });
-    return response.result!;
-  }
+  constructor(
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService
+  ) { }
 
   asyncSqlQuery(
     sqlQueryParams: ISqlQueryParams,

@@ -8,8 +8,9 @@
 
 import styled from 'reshadow';
 
-import { TabHandlerTabProps, ConnectionInfoResource } from '@cloudbeaver/core-app';
+import { TabHandlerTabProps } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 

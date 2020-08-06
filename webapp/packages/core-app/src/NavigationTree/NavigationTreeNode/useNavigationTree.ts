@@ -8,9 +8,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
+import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
-import { useConnectionInfo } from '../../shared/ConnectionsManager/useConnectionInfo';
 import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';

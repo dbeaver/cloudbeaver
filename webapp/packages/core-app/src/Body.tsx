@@ -11,9 +11,9 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
+import { Notifications } from '@cloudbeaver/core-notifications';
 import { useStyles, useTheme } from '@cloudbeaver/core-theming';
 
-import { Notifications } from './Notifications/Notifications';
 import { ScreenService } from './Screen/ScreenService';
 
 const bodyStyles = css`

@@ -9,14 +9,16 @@
 import {
   NavigationTabsService,
   ITab,
-  ConnectionsManagerService,
-  ConnectionInfoResource,
   INavigator,
   NavigationService,
   IContextProvider,
   ITabOptions,
-  ConnectionAuthService,
 } from '@cloudbeaver/core-app';
+import {
+  ConnectionsManagerService,
+  ConnectionInfoResource,
+  ConnectionAuthService,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';

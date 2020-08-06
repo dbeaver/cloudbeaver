@@ -8,10 +8,11 @@
 
 import { observable } from 'mobx';
 
-import { ErrorDetailsDialog, ConnectionInfoResource } from '@cloudbeaver/core-app';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { PromiseCancelledError } from '@cloudbeaver/core-utils';
 import {

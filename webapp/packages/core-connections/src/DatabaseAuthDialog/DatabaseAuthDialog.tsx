@@ -10,13 +10,12 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, Loader, useFocus
+  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ObjectPropertyInfoForm } from '../../ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
 import { DBAuthDialogController } from './DBAuthDialogController';

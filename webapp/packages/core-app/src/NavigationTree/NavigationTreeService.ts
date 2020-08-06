@@ -9,11 +9,11 @@
 import { observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
+import { ConnectionAuthService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IActiveView } from '@cloudbeaver/core-view';
 
-import { ConnectionAuthService } from '../shared/ConnectionsManager/ConnectionAuthService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';

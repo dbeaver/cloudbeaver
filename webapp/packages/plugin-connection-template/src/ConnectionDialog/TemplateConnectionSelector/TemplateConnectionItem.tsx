@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
-import { DBDriver, Connection } from '@cloudbeaver/core-app';
 import { ListItem } from '@cloudbeaver/core-blocks';
+import { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
 type Props = {
   template: Connection;

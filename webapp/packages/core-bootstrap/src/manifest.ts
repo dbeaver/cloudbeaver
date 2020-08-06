@@ -7,15 +7,22 @@
  */
 
 import {
-  ConnectionDialogsService, ConnectionsManagerService,
+  ConnectionDialogsService,
   MainMenuService, NavigationService, NavigationTreeService,
   NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
-  ConnectionSchemaManagerService, ConnectionInfoResource, ContainerResource,
-  DBDriverResource, NavigationTabsService, DatabaseAuthModelsResource, ConnectionAuthService,
-  NavigationTreeContextMenuService,
+  ConnectionSchemaManagerService,
+  NavigationTabsService, NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
   RouterService, ScreenService, AppScreenService, CoreSettingsService
 } from '@cloudbeaver/core-app';
+import {
+  ConnectionsManagerService,
+  ConnectionInfoResource,
+  ContainerResource,
+  DBDriverResource,
+  DatabaseAuthModelsResource,
+  ConnectionAuthService
+} from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
 import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';

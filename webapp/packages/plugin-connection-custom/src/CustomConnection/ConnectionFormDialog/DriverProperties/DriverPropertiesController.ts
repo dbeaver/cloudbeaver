@@ -8,8 +8,8 @@
 
 import { observable } from 'mobx';
 
-import { DBDriver } from '@cloudbeaver/core-app';
 import { IProperty } from '@cloudbeaver/core-blocks';
+import { DBDriver } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
