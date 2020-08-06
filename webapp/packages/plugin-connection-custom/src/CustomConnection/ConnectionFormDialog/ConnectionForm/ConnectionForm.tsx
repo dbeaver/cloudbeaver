@@ -9,8 +9,10 @@
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { DBDriver, ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
-import { Radio, InputField, useFocus } from '@cloudbeaver/core-blocks';
+import {
+  Radio, InputField, useFocus, ObjectPropertyInfoForm
+} from '@cloudbeaver/core-blocks';
+import { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 

@@ -10,11 +10,11 @@ import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { SNACKBAR_STYLES } from '@cloudbeaver/core-app';
 import { Button, Loader, IconButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { NotificationComponentProps } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { SNACKBAR_STYLES } from '@cloudbeaver/core-notifications';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 

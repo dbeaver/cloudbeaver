@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionsManagerService, Connection } from '@cloudbeaver/core-app';
+import { ConnectionsManagerService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ConnectionConfig, GraphQLService, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 

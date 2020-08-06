@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { ObjectPropertyInfoForm } from '@cloudbeaver/core-app';
 import {
-  ErrorMessage, SubmittingForm, Loader, useFocus
+  ErrorMessage, SubmittingForm, Loader, useFocus, ObjectPropertyInfoForm
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';

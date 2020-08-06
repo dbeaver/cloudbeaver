@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { connectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { IExtension } from '@cloudbeaver/core-extensions';
 
-import { connectionProvider } from '../ConnectionsManager/extensions/IConnectionProvider';
 import { objectCatalogProvider } from './extensions/IObjectCatalogProvider';
 import { objectSchemaProvider } from './extensions/IObjectSchemaProvider';
 import { NavNodeManagerService } from './NavNodeManagerService';

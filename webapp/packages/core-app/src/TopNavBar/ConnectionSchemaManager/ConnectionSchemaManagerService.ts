@@ -8,16 +8,18 @@
 
 import { computed, observable } from 'mobx';
 
+import {
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  ObjectContainer,
+  DBDriverResource,
+  isConnectionProvider, IConnectionProvider,
+  isConnectionSetter, IConnectionSetter
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExtension } from '@cloudbeaver/core-extensions';
 
-import { ConnectionInfoResource } from '../../shared/ConnectionsManager/ConnectionInfoResource';
-import { ConnectionsManagerService } from '../../shared/ConnectionsManager/ConnectionsManagerService';
-import { ObjectContainer } from '../../shared/ConnectionsManager/ContainerResource';
-import { DBDriverResource } from '../../shared/ConnectionsManager/DBDriverResource';
-import { isConnectionProvider, IConnectionProvider } from '../../shared/ConnectionsManager/extensions/IConnectionProvider';
-import { isConnectionSetter, IConnectionSetter } from '../../shared/ConnectionsManager/extensions/IConnectionSetter';
 import { ITab } from '../../shared/NavigationTabs/ITab';
 import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
 import { IObjectCatalogProvider, isObjectCatalogProvider } from '../../shared/NodesManager/extensions/IObjectCatalogProvider';

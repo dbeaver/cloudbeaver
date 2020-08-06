@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Connection } from '@cloudbeaver/core-app';
+import { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';

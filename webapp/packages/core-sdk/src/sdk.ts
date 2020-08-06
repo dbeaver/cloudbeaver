@@ -1123,7 +1123,7 @@ export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> }
   ); };
 
 export type ReadSessionLogQueryVariables = Exact<{
@@ -1814,6 +1814,7 @@ export const OpenSessionDocument = `
       name
       driverId
       connected
+      readOnly
       features
       authNeeded
       authModel

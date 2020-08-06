@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { DBDriver, DBDriverResource } from '@cloudbeaver/core-app';
+import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 

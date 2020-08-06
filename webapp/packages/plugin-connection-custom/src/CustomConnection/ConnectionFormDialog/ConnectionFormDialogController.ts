@@ -8,10 +8,11 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriver, ErrorDetailsDialog, DatabaseAuthModelsResource } from '@cloudbeaver/core-app';
+import { DBDriver, DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';

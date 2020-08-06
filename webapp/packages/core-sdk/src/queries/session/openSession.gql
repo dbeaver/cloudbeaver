@@ -9,6 +9,8 @@ mutation openSession {
       name
       driverId
       connected
+      readOnly
+
       features
 
       authNeeded

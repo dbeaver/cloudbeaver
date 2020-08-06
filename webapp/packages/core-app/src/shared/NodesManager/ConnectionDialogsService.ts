@@ -6,17 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionInfoResource, ConnectionsManagerService, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
-import { NavNode } from '../NodesManager/EntityTypes';
-import { EObjectFeature } from '../NodesManager/EObjectFeature';
-import { NodeManagerUtils } from '../NodesManager/NodeManagerUtils';
-import { ConnectionInfoResource } from './ConnectionInfoResource';
-import { ConnectionsManagerService } from './ConnectionsManagerService';
-import { EConnectionFeature } from './EConnectionFeature';
+import { NavNode } from './EntityTypes';
+import { EObjectFeature } from './EObjectFeature';
+import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
 export class ConnectionDialogsService {
@@ -67,7 +65,9 @@ export class ConnectionDialogsService {
         title: 'Disconnect',
         onClick: (context: IMenuContext<NavNode>) => {
           const node = context.data;
-          this.connectionsManagerService.closeNavNodeConnectionAsync(node.id);
+          this.connectionsManagerService.closeConnectionAsync(
+            NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
+          );
         },
       }
     );
@@ -88,7 +88,9 @@ export class ConnectionDialogsService {
         title: 'Delete',
         onClick: (context: IMenuContext<NavNode>) => {
           const node = context.data;
-          this.connectionsManagerService.deleteNavNodeConnectionAsync(node.id);
+          this.connectionsManagerService.deleteConnection(
+            NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
+          );
         },
       }
     );
