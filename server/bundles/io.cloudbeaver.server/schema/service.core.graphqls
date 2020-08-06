@@ -163,7 +163,13 @@ type ConnectionInfo {
 
     name: String!
     description: String
-    properties: String
+
+    host: String
+    port: String
+    databaseName: String
+    url: String
+
+    properties: Object
 
     template: Boolean!
     connected: Boolean!
@@ -182,22 +188,6 @@ type ConnectionInfo {
     # Supported features (provided etc)
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
-}
-
-# @deprecated
-# Data source info is a description of some remote database. Doesn't include user credentials
-# Use ConnectionInfo instead
-type DataSourceInfo {
-    id: ID!
-    driverId: ID!
-    name: String!
-    description: String
-
-    host: String
-    server: String
-    port: String
-    url: String
-    properties: String
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info

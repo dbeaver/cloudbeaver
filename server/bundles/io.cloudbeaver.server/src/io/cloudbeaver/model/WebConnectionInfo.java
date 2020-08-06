@@ -32,6 +32,7 @@ import org.jkiss.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web connection info
@@ -84,8 +85,33 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public String getProperties() {
-        return null;
+    public String getHost() {
+        return dataSourceContainer.getConnectionConfiguration().getHostName();
+    }
+
+    @Property
+    public String getPort() {
+        return dataSourceContainer.getConnectionConfiguration().getHostPort();
+    }
+
+    @Property
+    public String getServerName() {
+        return dataSourceContainer.getConnectionConfiguration().getServerName();
+    }
+
+    @Property
+    public String getDatabaseName() {
+        return dataSourceContainer.getConnectionConfiguration().getDatabaseName();
+    }
+
+    @Property
+    public String getUrl() {
+        return dataSourceContainer.getConnectionConfiguration().getUrl();
+    }
+
+    @Property
+    public Map<String, String> getProperties() {
+        return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
     }
 
     @Property
