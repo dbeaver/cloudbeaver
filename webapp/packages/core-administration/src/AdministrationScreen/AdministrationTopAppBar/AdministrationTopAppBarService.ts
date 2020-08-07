@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SettingsMenu, Logo } from '@cloudbeaver/core-app';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -17,8 +16,6 @@ export class AdministrationTopAppBarService {
   readonly placeholder = new PlaceholderContainer();
 
   constructor() {
-    this.placeholder.add(Logo, 0);
     this.placeholder.add(Fill, 3);
-    this.placeholder.add(SettingsMenu, 4);
   }
 }

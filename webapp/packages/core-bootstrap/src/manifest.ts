@@ -7,13 +7,19 @@
  */
 
 import {
+  AdministrationLocaleService,
+  AdministrationTopAppBarService,
+  AdministrationScreenService,
+  AdministrationItemService
+} from '@cloudbeaver/core-administration';
+import {
   ConnectionDialogsService,
   MainMenuService, NavigationService, NavigationTreeService,
   NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
   ConnectionSchemaManagerService,
   NavigationTabsService, NavigationTreeContextMenuService,
   SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
-  RouterService, ScreenService, AppScreenService, CoreSettingsService
+  AppScreenService, CoreSettingsService, AdministrationTopAppBarBootstrapService
 } from '@cloudbeaver/core-app';
 import {
   ConnectionsManagerService,
@@ -39,6 +45,7 @@ import {
   PermissionsResource,
   SessionResource
 } from '@cloudbeaver/core-root';
+import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
@@ -51,6 +58,11 @@ export const coreManifest: PluginManifest = {
   depends: [],
 
   providers: [
+    AdministrationLocaleService,
+    AdministrationTopAppBarService,
+    AdministrationScreenService,
+    AdministrationItemService,
+    AdministrationTopAppBarBootstrapService,
     ActiveViewService,
     ProductSettingsService,
     ProductManagerService,

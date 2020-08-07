@@ -7,9 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ScreenService } from '@cloudbeaver/core-routing';
 
-import { RouterService } from '../RouterService';
-import { ScreenService } from '../Screen/ScreenService';
 import { AppScreen } from './AppScreen';
 
 @injectable()
@@ -19,18 +18,14 @@ export class AppScreenService {
 
   constructor(
     private screenService: ScreenService,
-    private routerService: RouterService,
   ) {}
-
-  navigateToRoot() {
-    this.routerService.router.navigate(AppScreenService.screenName);
-  }
 
   register() {
     this.screenService.create({
       name: AppScreenService.screenName,
       routes: [{ name: AppScreenService.screenName, path: '/' }],
       component: AppScreen,
+      root: true,
     });
   }
 }

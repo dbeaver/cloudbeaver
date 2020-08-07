@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { AdministrationItemService } from '@cloudbeaver/plugin-administration';
 
 @injectable()
 export class AuthAdministrationService extends Bootstrap {

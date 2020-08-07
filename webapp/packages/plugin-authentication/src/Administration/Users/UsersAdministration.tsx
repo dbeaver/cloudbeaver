@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { AdministrationTools } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { AdministrationTools } from '@cloudbeaver/plugin-administration';
 
 import { UsersAdministrationController } from './UsersAdministrationController';
 import { UsersTable } from './UsersTable/UsersTable';

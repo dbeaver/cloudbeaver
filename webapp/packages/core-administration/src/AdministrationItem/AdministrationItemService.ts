@@ -20,8 +20,9 @@ export class AdministrationItemService {
     if (this.items.length === 0) {
       return null;
     }
-
-    return this.items[0].name;
+    return this.items
+      .concat()
+      .sort((a, b) => a.order - b.order)[0].name;
   }
 
   getItem(name: string): IAdministrationItem | null {

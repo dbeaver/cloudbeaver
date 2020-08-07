@@ -8,12 +8,12 @@
 
 import { observable } from 'mobx';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { AdministrationScreenService } from '@cloudbeaver/plugin-administration';
 
 import { UsersManagerService } from '../../UsersManagerService';
 

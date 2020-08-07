@@ -1,0 +1,25 @@
+{
+  "name": "@cloudbeaver/core-routing",
+  "sideEffects": false,
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "router5": "^8.x.x",
+    "router5-plugin-browser": "^8.x.x"
+  },
+  "peerDependencies": {
+    "@cloudbeaver/core-di": "^0.1.0",
+    "mobx": "^5.x.x",
+    "mobx-react": "^6.x.x"
+  }
+}

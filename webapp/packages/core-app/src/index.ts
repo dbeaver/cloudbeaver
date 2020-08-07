@@ -1,13 +1,11 @@
 // Services
-export * from './RouterService';
 export * from './CoreSettingsService';
-export * from './Screen/IScreen';
-export * from './Screen/ScreenService';
 export * from './AppScreen/AppScreenService';
 export * from './TopNavBar/MainMenu/MainMenuService';
 export * from './TopNavBar/SettingsMenu/SettingsMenuService';
 export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/TopNavBarService';
+export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
 export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';

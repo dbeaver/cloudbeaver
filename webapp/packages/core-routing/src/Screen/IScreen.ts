@@ -14,6 +14,7 @@ export interface IScreen {
   name: string;
   routes: ScreenRoute[];
   component: ScreenComponent;
+  root?: boolean;
   onActivate?: () => void | Promise<void>;
   onDeactivate?: () => void | Promise<void>;
 }

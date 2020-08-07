@@ -14,6 +14,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@cloudbeaver/core-administration": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-connections": "^0.1.0",
@@ -26,6 +27,7 @@
     "@cloudbeaver/core-plugin": "^0.1.0",
     "@cloudbeaver/core-product": "^0.1.0",
     "@cloudbeaver/core-root": "^0.1.0",
+    "@cloudbeaver/core-routing": "^0.1.0",
     "@cloudbeaver/core-sdk": "^0.1.0",
     "@cloudbeaver/core-settings": "^0.1.0",
     "@cloudbeaver/core-theming": "^0.1.0",
