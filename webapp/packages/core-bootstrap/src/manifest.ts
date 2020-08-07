@@ -27,7 +27,10 @@ import {
   ContainerResource,
   DBDriverResource,
   DatabaseAuthModelsResource,
-  ConnectionAuthService
+  ConnectionAuthService,
+  ConnectionsAdministrationService,
+  ConnectionsResource,
+  ConnectionsLocaleService
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
@@ -76,6 +79,7 @@ export const coreManifest: PluginManifest = {
     CoreSettingsService,
     CommonDialogService,
     SessionExpireService,
+    ConnectionsLocaleService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,
     ConnectionInfoResource,
@@ -100,6 +104,8 @@ export const coreManifest: PluginManifest = {
     NavigationTabsService,
     DatabaseAuthModelsResource,
     ConnectionAuthService,
+    ConnectionsAdministrationService,
+    ConnectionsResource,
     NavigationTreeContextMenuService,
     NavigationTreeService,
     NavNodeManagerService,
