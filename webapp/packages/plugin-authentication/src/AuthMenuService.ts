@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService } from '@cloudbeaver/core-root';
-import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationService } from './AuthenticationService';
 import { AuthInfoService } from './AuthInfoService';

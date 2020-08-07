@@ -1,0 +1,23 @@
+query getConnections {
+  connections: allConnections {
+    id
+    name
+    description
+    driverId
+
+    template
+    connected
+    readOnly
+
+    host
+    port
+    databaseName
+    url
+    properties
+    
+    features
+
+    authNeeded
+    authModel
+  }
+}

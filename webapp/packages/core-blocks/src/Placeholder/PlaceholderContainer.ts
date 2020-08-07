@@ -36,7 +36,7 @@ export class PlaceholderContainer<T = any> {
       order,
     };
 
-    if (!order) {
+    if (order === undefined) {
       this.placeholders.push(placeholder);
       return;
     }

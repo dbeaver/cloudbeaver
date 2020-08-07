@@ -57,8 +57,6 @@ export type Query = {
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
   templateConnections: Array<ConnectionInfo>;
-  /** @deprecated Field no longer supported */
-  templateDataSources: Array<DataSourceInfo>;
   updateConnectionConfiguration: ConnectionInfo;
 };
 
@@ -468,7 +466,11 @@ export type ConnectionInfo = {
   driverId: Scalars['ID'];
   name: Scalars['String'];
   description?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['String']>;
+  host?: Maybe<Scalars['String']>;
+  port?: Maybe<Scalars['String']>;
+  databaseName?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
   template: Scalars['Boolean'];
   connected: Scalars['Boolean'];
   provided: Scalars['Boolean'];
@@ -482,18 +484,6 @@ export type ConnectionInfo = {
   authProperties: Array<ObjectPropertyInfo>;
   features: Array<Scalars['String']>;
   navigatorSettings: NavigatorSettings;
-};
-
-export type DataSourceInfo = {
-  id: Scalars['ID'];
-  driverId: Scalars['ID'];
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-  host?: Maybe<Scalars['String']>;
-  server?: Maybe<Scalars['String']>;
-  port?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  properties?: Maybe<Scalars['String']>;
 };
 
 export type ConnectionConfig = {
@@ -656,6 +646,7 @@ export type SqlResultColumn = {
   scale?: Maybe<Scalars['Int']>;
   precision?: Maybe<Scalars['Int']>;
   readOnly: Scalars['Boolean'];
+  readOnlyStatus?: Maybe<Scalars['String']>;
 };
 
 export type SqlResultSet = {
@@ -830,6 +821,22 @@ export type SetUserCredentialsQueryVariables = Exact<{
 }>;
 
 export type SetUserCredentialsQuery = Pick<Query, 'setUserCredentials'>;
+
+export type CreateConnectionConfigurationQueryVariables = Exact<{
+  config: ConnectionConfig;
+}>;
+
+export type CreateConnectionConfigurationQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'> };
+
+export type DeleteConnectionConfigurationQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type DeleteConnectionConfigurationQuery = Pick<Query, 'deleteConnectionConfiguration'>;
+
+export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1287,6 +1294,53 @@ export const GrantUserRoleDocument = `
 export const SetUserCredentialsDocument = `
     query setUserCredentials($userId: ID!, $providerId: ID!, $credentials: Object!) {
   setUserCredentials(userId: $userId, providerId: $providerId, credentials: $credentials)
+}
+    `;
+export const CreateConnectionConfigurationDocument = `
+    query createConnectionConfiguration($config: ConnectionConfig!) {
+  connection: createConnectionConfiguration(config: $config) {
+    id
+    name
+    description
+    driverId
+    template
+    connected
+    readOnly
+    host
+    port
+    databaseName
+    url
+    properties
+    features
+    authNeeded
+    authModel
+  }
+}
+    `;
+export const DeleteConnectionConfigurationDocument = `
+    query deleteConnectionConfiguration($id: ID!) {
+  deleteConnectionConfiguration(id: $id)
+}
+    `;
+export const GetConnectionsDocument = `
+    query getConnections {
+  connections: allConnections {
+    id
+    name
+    description
+    driverId
+    template
+    connected
+    readOnly
+    host
+    port
+    databaseName
+    url
+    properties
+    features
+    authNeeded
+    authModel
+  }
 }
     `;
 export const CloseConnectionDocument = `
@@ -1957,6 +2011,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
       return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));
+    },
+    createConnectionConfiguration(variables: CreateConnectionConfigurationQueryVariables): Promise<CreateConnectionConfigurationQuery> {
+      return withWrapper(() => client.request<CreateConnectionConfigurationQuery>(CreateConnectionConfigurationDocument, variables));
+    },
+    deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables): Promise<DeleteConnectionConfigurationQuery> {
+      return withWrapper(() => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables));
+    },
+    getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
+      return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
     },
     closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
       return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));

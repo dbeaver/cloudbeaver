@@ -8,9 +8,9 @@
 
 import { computed } from 'mobx';
 
-import { ScreenService, RouterService, AppScreenService } from '@cloudbeaver/core-app';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { PermissionsService } from '@cloudbeaver/core-root';
+import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import { EAdminPermission } from '../EAdminPermission';
@@ -49,7 +49,6 @@ export class AdministrationScreenService extends Bootstrap {
     private screenService: ScreenService,
     private routerService: RouterService,
     private permissionsService: PermissionsService,
-    private appScreenService: AppScreenService,
     private administrationItemService: AdministrationItemService
   ) {
     super();
@@ -102,7 +101,7 @@ export class AdministrationScreenService extends Bootstrap {
 
   private async handleActivate() {
     if (!this.permissionsService.has(EAdminPermission.admin)) {
-      this.appScreenService.navigateToRoot();
+      this.screenService.navigateToRoot();
       return;
     }
 

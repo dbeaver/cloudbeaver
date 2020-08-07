@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/plugin-administration';
 
 import { UsersManagerService } from '../UsersManagerService';
 import { CreateUser } from './CreateUser/CreateUser';
@@ -29,6 +29,7 @@ export class UsersAdministrationService extends Bootstrap {
   register() {
     this.administrationItemService.create({
       name: 'users',
+      order: 1,
       sub: [
         {
           name: 'create',

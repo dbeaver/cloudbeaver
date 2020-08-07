@@ -8,10 +8,10 @@
 
 import styled from 'reshadow';
 
+import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { AdministrationItemDrawerProps } from '@cloudbeaver/plugin-administration';
 
 export function UsersDrawerItem({ item, onSelect, style }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(

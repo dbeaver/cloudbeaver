@@ -29,6 +29,15 @@ export class ScreenService {
     this.routerService.subscribe(this.onRouteChange.bind(this));
   }
 
+  navigateToRoot() {
+    const screen = Array.from(this.screens.values())
+      .find(screen => screen.root);
+
+    if (screen) {
+      this.routerService.router.navigate(screen.name);
+    }
+  }
+
   create(screen: IScreen) {
     if (this.screens.has(screen.name)) {
       return;
