@@ -122,6 +122,7 @@ public class WebServiceUtils {
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
         initAuthProperties(newDataSource, config.getCredentials());
+        newDataSource.setSavePassword(config.isSaveCredentials());
 
         return newDataSource;
     }
@@ -162,5 +163,6 @@ public class WebServiceUtils {
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
         initAuthProperties(dataSource, config.getCredentials());
+        dataSource.setSavePassword(config.isSaveCredentials());
     }
 }

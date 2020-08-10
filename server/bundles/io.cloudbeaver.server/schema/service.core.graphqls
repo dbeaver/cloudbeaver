@@ -217,6 +217,7 @@ input ConnectionConfig {
 
     # User credentials
 
+    saveCredentials: Boolean
     authModelId: ID
     credentials: Object
 

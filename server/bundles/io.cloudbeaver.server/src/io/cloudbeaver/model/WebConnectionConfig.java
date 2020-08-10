@@ -47,6 +47,7 @@ public class WebConnectionConfig {
 
     private String authModelId;
     private Map<String, Object> credentials;
+    private boolean saveCredentials;
 
     public WebConnectionConfig() {
     }
@@ -77,6 +78,7 @@ public class WebConnectionConfig {
 
         authModelId = JSONUtils.getString(params, "authModelId");
         credentials = JSONUtils.getObject(params, "credentials");
+        saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
     }
 
     @Deprecated
@@ -163,5 +165,10 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getCredentials() {
         return credentials;
+    }
+
+    @Property
+    public boolean isSaveCredentials() {
+        return saveCredentials;
     }
 }
