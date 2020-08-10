@@ -37,6 +37,7 @@ import io.cloudbeaver.service.admin.DBWServiceAdmin;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -247,9 +248,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
-        DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, WebServiceUtils.getDataSourceRegistry());
-
-        WebServiceUtils.getDataSourceRegistry().flushConfig();
+        DBPDataSourceRegistry registry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
+        registry.addDataSource(dataSource);
+        registry.flushConfig();
 
         return new WebConnectionInfo(webSession, dataSource);
     }
