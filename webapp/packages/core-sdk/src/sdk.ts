@@ -498,6 +498,7 @@ export type ConnectionConfig = {
   properties?: Maybe<Scalars['Object']>;
   template?: Maybe<Scalars['Boolean']>;
   readOnly?: Maybe<Scalars['Boolean']>;
+  saveCredentials?: Maybe<Scalars['Boolean']>;
   authModelId?: Maybe<Scalars['ID']>;
   credentials?: Maybe<Scalars['Object']>;
   dataSourceId?: Maybe<Scalars['ID']>;
@@ -837,6 +838,13 @@ export type DeleteConnectionConfigurationQuery = Pick<Query, 'deleteConnectionCo
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
+
+export type UpdateConnectionConfigurationQueryVariables = Exact<{
+  id: Scalars['ID'];
+  config: ConnectionConfig;
+}>;
+
+export type UpdateConnectionConfigurationQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1325,6 +1333,27 @@ export const DeleteConnectionConfigurationDocument = `
 export const GetConnectionsDocument = `
     query getConnections {
   connections: allConnections {
+    id
+    name
+    description
+    driverId
+    template
+    connected
+    readOnly
+    host
+    port
+    databaseName
+    url
+    properties
+    features
+    authNeeded
+    authModel
+  }
+}
+    `;
+export const UpdateConnectionConfigurationDocument = `
+    query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
+  connection: updateConnectionConfiguration(id: $id, config: $config) {
     id
     name
     description
@@ -2020,6 +2049,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
       return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
+    },
+    updateConnectionConfiguration(variables: UpdateConnectionConfigurationQueryVariables): Promise<UpdateConnectionConfigurationQuery> {
+      return withWrapper(() => client.request<UpdateConnectionConfigurationQuery>(UpdateConnectionConfigurationDocument, variables));
     },
     closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
       return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));

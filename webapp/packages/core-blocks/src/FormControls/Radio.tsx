@@ -35,6 +35,8 @@ const radioStyles = composes(
     field {
       display: inline-flex;
       align-items: center;
+      font-weight: 500;
+      padding: 7px 12px;
       vertical-align: middle;
     }
   `
@@ -43,9 +45,9 @@ const radioStyles = composes(
 const radioMod = {
   primary: composes(
     css`
-    radio {
-      composes: theme-radio_primary from global;
-    }
+      radio {
+        composes: theme-radio_primary from global;
+      }
     `
   ),
 };

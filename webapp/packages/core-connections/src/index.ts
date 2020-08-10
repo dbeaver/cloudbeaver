@@ -7,6 +7,7 @@ export * from './extensions/IConnectionSetter';
 export * from './ConnectionsManagerService';
 export * from './ConnectionInfoResource';
 export * from './ConnectionAuthService';
+export * from './DriverPropertiesService';
 export * from './EConnectionFeature';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';

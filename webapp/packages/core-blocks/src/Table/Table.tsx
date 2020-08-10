@@ -16,18 +16,27 @@ import { TableContext, ITableContext } from './TableContext';
 
 type Props = React.PropsWithChildren<{
   selectedItems?: Map<any, boolean>;
+  expandedItems?: Map<any, boolean>;
   className?: string;
 }>
 
-export function Table({ selectedItems, children, className }: Props) {
+export function Table({
+  selectedItems, expandedItems, children, className,
+}: Props) {
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
+  const [expanded] = useState<Map<any, boolean>>(() => expandedItems || observable(new Map()));
   const setItemSelect = useCallback((item: any, state: boolean) => selected.set(item, state), []);
+  const setItemExpand = useCallback((item: any, state: boolean) => expanded.set(item, state), []);
   const clearSelection = useCallback(() => selected.clear(), []);
+  const collapse = useCallback(() => expanded.clear(), []);
 
   const [context] = useState<ITableContext>(() => ({
     selectedItems: selected,
+    expandedItems: expanded,
+    setItemExpand,
     setItemSelect,
     clearSelection,
+    collapse,
   }));
 
   return styled(useStyles())(

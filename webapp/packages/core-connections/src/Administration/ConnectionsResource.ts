@@ -9,42 +9,94 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
-  CachedDataResource,
   ConnectionInfo,
   ConnectionConfig,
+  CachedMapResource,
+  ResourceKey,
+  isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 
 @injectable()
-export class ConnectionsResource extends CachedDataResource<ConnectionInfo[], string | undefined> {
+export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
   constructor(
     private graphQLService: GraphQLService,
   ) {
-    super([]);
+    super(new Map());
   }
 
-  isLoaded(id?: string) {
-    return id
-      ? this.data.some(connection => connection.id === id)
-      : !!this.data.length;
+  isNew(id: string) {
+    return id.startsWith('new-');
   }
 
-  async create(config: ConnectionConfig) {
+  addNew() {
+    const connectionInfo = {
+      id: `new-${uuid()}`,
+      name: 'New connection',
+    } as ConnectionInfo;
+
+    this.data.set(connectionInfo.id, connectionInfo);
+    this.markUpdated(connectionInfo.id);
+
+    return connectionInfo;
+  }
+
+  async loadAll() {
+    await this.load('all');
+    return this.data;
+  }
+
+  async create(config: ConnectionConfig, id?: string) {
     const { connection } = await this.graphQLService.gql.createConnectionConfiguration({ config });
 
-    this.data.push(connection as ConnectionInfo);
+    if (id) {
+      this.data.delete(id);
+    }
+    this.data.set(connection.id, connection as ConnectionInfo);
 
-    return connection as ConnectionInfo;
+    return this.get(connection.id)!;
   }
 
-  async delete(id: string) {
-    await this.graphQLService.gql.deleteConnectionConfiguration({ id });
-
-    this.data.splice(this.data.findIndex(connection => connection.id === id), 1);
+  async update(id: string, config: ConnectionConfig) {
+    await this.performUpdate(id, async () => {
+      await this.setActivePromise<void>(id, this.updateConnection(id, config));
+    });
+    return this.get(id)!;
   }
 
-  protected async loader(id?: string): Promise<ConnectionInfo[]> {
+  async delete(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      for (let i = 0; i < key.list.length; i++) {
+        this.data.delete(key.list[i]);
+        if (!this.isNew(key.list[i])) {
+          await this.graphQLService.gql.deleteConnectionConfiguration({ id: key.list[i] });
+        }
+      }
+    } else {
+      this.data.delete(key);
+      if (!this.isNew(key)) {
+        await this.graphQLService.gql.deleteConnectionConfiguration({ id: key });
+      }
+    }
+    this.markUpdated(key);
+    this.itemDeleteSubject.next(key);
+  }
+
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {
     const { connections } = await this.graphQLService.gql.getConnections();
+    this.data.clear();
 
-    return connections as ConnectionInfo[];
+    for (const connection of connections) {
+      this.set(connection.id, connection as ConnectionInfo);
+    }
+    this.markUpdated(key);
+
+    return this.data;
+  }
+
+  private async updateConnection(id: string, config: ConnectionConfig) {
+    const { connection } = await this.graphQLService.gql.updateConnectionConfiguration({ id, config });
+
+    this.set(id, connection as ConnectionInfo);
   }
 }

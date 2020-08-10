@@ -19,8 +19,8 @@
     @include mdc-theme-prop(border-color, background, false);
 
     &:global([type="checkbox"]) {
-      height: 26px;
-      width: 14px;
+      height: 16px;
+      width: 16px;
     }
 
     &:global([disabled]),
@@ -36,6 +36,7 @@
 
   label {
     display: block;
+    line-height: 15px;
     box-sizing: border-box;
     padding: 0;
     overflow: hidden;

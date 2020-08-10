@@ -1,0 +1,23 @@
+query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
+  connection: updateConnectionConfiguration(id: $id, config: $config) {
+    id
+    name
+    description
+    driverId
+
+    template
+    connected
+    readOnly
+
+    host
+    port
+    databaseName
+    url
+    properties
+    
+    features
+
+    authNeeded
+    authModel
+  }
+}

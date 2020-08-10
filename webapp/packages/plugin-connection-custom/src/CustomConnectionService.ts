@@ -8,7 +8,7 @@
 
 import { ConnectionsManagerService, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ConnectionConfig, GraphQLService, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class CustomConnectionService {
@@ -17,18 +17,6 @@ export class CustomConnectionService {
     private graphQLService: GraphQLService,
     private connectionsManagerService: ConnectionsManagerService,
   ) {
-  }
-
-  async loadDriverProperties(driverId: string): Promise<ObjectPropertyInfo[]> {
-    const response = await this.graphQLService.gql.driverProperties({
-      driverId,
-    });
-
-    if (response.driver.length === 0) {
-      throw new Error('Driver properties loading failed');
-    }
-
-    return response.driver[0].driverProperties! as ObjectPropertyInfo[];
   }
 
   async createConnectionAsync(config: ConnectionConfig): Promise<Connection> {

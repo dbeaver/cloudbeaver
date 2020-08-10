@@ -14,10 +14,16 @@ import { useStyles } from '@cloudbeaver/core-theming';
 type Props = React.PropsWithChildren<{
   className?: string;
   centerContent?: boolean;
+  flex?: boolean;
 }>
 
-export const TableColumnValue = observer(function TableColumnValue({ children, centerContent, className }: Props) {
+export const TableColumnValue = observer(function TableColumnValue({
+  children,
+  centerContent,
+  flex,
+  className,
+}: Props) {
   return styled(useStyles())(
-    <td className={className} {...use({ centerContent })}>{children}</td>
+    <td className={className} {...use({ centerContent, flex })}>{children}</td>
   );
 });

@@ -1,0 +1,15 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+$mdc-theme-extra-property-values: (
+  color-positive: $color-positive,
+  color-negative: $color-negative,
+  input-border-color: $input-border-color,
+);
+
+$mdc-theme-property-values: map-merge($mdc-theme-property-values, $mdc-theme-extra-property-values);

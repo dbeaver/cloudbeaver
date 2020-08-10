@@ -7,7 +7,9 @@
  */
 
 import { observer } from 'mobx-react';
-import { useContext, useCallback, useMemo } from 'react';
+import {
+  useContext, useCallback, useMemo, Children
+} from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -15,15 +17,20 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { TableContext } from './TableContext';
 import { TableItemContext, ITableItemContext } from './TableItemContext';
 
+type ExpandProps = {
+  item: any;
+}
+
 type Props = React.PropsWithChildren<{
   item: any;
+  expandElement?: React.FunctionComponent<ExpandProps>;
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
 }>
 
 export const TableItem = observer(function TableItem({
-  item, children, className, onClick, onDoubleClick,
+  item, expandElement, children, className, onClick, onDoubleClick,
 }: Props) {
   const context = useContext(TableContext);
   if (!context) {
@@ -33,6 +40,7 @@ export const TableItem = observer(function TableItem({
   const itemContext = useMemo<ITableItemContext>(() => ({
     item,
     isSelected: () => !!context.selectedItems.get(item),
+    isExpanded: () => !!context.expandedItems.get(item),
   }), [item]);
 
   const handleClick = useCallback(
@@ -56,13 +64,27 @@ export const TableItem = observer(function TableItem({
     }
   }, [onDoubleClick]);
 
-  const isSelected = context.selectedItems.get(item);
+  const isSelected = itemContext.isSelected();
+  const isExpanded = itemContext.isExpanded();
+  const ExpandElement = expandElement;
 
   return styled(useStyles())(
     <TableItemContext.Provider value={itemContext}>
-      <tr onClick={handleClick} onDoubleClick={handleDoubleClick} className={className} {...use({ isSelected })}>
+      <tr
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        className={className}
+        {...use({ selected: isSelected, expanded: isExpanded })}
+      >
         {children}
       </tr>
+      {isExpanded && (
+        <tr {...use({ noHover: true })}>
+          <td colSpan={Children.count(children)} {...use({ expandArea: true })}>
+            {ExpandElement && <ExpandElement item={item} />}
+          </td>
+        </tr>
+      )}
     </TableItemContext.Provider>
   );
 });
