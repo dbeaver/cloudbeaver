@@ -9,5 +9,5 @@ export default [
   ['connections_connection_driver', 'Driver'],
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Port'],
-  ['connections_connection_in_tree', 'Show in navigation tree'],
+  ['connections_connection_template', 'Template'],
 ];

@@ -39,9 +39,9 @@ export const ConnectionForm = observer(function ConnectionForm({
               <Checkbox
                 name="template"
                 value={controller.connectionId}
-                checkboxLabel={translate('connections_connection_in_tree')}
-                checked={controller.config.template === false}
-                onChange={value => controller.onChange('template', !value)}
+                checkboxLabel={translate('connections_connection_template')}
+                checked={controller.config.template}
+                onChange={value => controller.onChange('template', value)}
                 disabled={controller.isSaving}
                 mod='surface'
               />
