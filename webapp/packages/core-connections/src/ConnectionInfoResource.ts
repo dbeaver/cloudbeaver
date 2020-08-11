@@ -23,7 +23,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   async init(id: string, credentials?: any): Promise<Connection> {
-    const connection = await this.performUpdate(id, async () => {
+    await this.performUpdate(id, async () => {
       const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
       this.set(id, connection);
       return connection;
@@ -64,7 +64,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   protected async loader(connectionId: string): Promise<Map<string, Connection>> {
-    const { connection } = await this.graphQLService.gql.connectionState({ id: connectionId });
+    const { connection } = await this.graphQLService.gql.connectionInfo({ id: connectionId });
 
     const oldConnection = this.get(connectionId) || {};
     this.set(connectionId, { ...oldConnection, ...connection });

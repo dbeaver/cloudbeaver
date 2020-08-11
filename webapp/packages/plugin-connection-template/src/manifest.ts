@@ -10,7 +10,6 @@ import { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { TemplateConnectionPluginBootstrap } from './TemplateConnectionPluginBootstrap';
-import { TemplateConnectionService } from './TemplateConnectionService';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 export const connectionTemplate: PluginManifest = {
@@ -19,7 +18,6 @@ export const connectionTemplate: PluginManifest = {
   },
 
   providers: [
-    TemplateConnectionService,
     TemplateConnectionsResource,
     LocaleService,
   ],
