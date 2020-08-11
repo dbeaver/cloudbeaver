@@ -42,8 +42,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 checkboxLabel={translate('connections_connection_template')}
                 checked={controller.config.template}
                 onChange={value => controller.onChange('template', value)}
-                disabled={controller.isSaving}
-                readOnly={!controller.isNew}
+                disabled={!controller.isNew || controller.isSaving}
                 mod='surface'
               />
             </group>
