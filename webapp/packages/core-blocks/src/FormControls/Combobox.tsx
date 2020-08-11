@@ -175,7 +175,12 @@ export function Combobox<T>({
         {!readOnly && (
           <>
             <MenuButton {...menu}><Icon name="arrow" viewBox="0 0 16 16" {...use({ focus: menu.visible })} /></MenuButton>
-            <Menu {...menu} aria-label={propertyName} unstable_initialFocusRef={ref}>
+            <Menu
+              {...menu}
+              aria-label={propertyName}
+              unstable_initialFocusRef={ref}
+              unstable_finalFocusRef={ref}
+            >
               {filteredItems.map(item => (
                 <MenuItem key={keySelector(item)} id={keySelector(item)} type='button' {...menu} onClick={handleMenuSelect}>
                   {valueSelector(item)}
