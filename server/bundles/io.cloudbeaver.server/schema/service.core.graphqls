@@ -305,6 +305,8 @@ extend type Mutation {
     # Create new custom connection. Custom connections exist only within the current session.
     createConnection( config: ConnectionConfig! ): ConnectionInfo!
 
+    createConnectionFromTemplate( templateId: ID! ): ConnectionInfo!
+
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
