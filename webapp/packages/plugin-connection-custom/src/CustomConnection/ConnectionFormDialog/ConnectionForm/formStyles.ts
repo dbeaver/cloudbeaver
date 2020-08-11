@@ -32,10 +32,6 @@ export const formStyles = css`
     box-sizing: border-box;
     display: flex;
   }
-  InputField[|short] {
-    min-width: unset;
-    max-width: 250px;
-  }
   hr {
     margin-left: 24px;
     margin-right: 24px;
