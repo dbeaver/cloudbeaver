@@ -49,7 +49,7 @@ export const Connection = observer(function Connection({ connection }: Props) {
       <TableColumnValue>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}</TableColumnValue>
       <TableColumnValue>{connection.port}</TableColumnValue>
-      <TableColumnValue><input type="checkbox" checked={connection.template === false} disabled/></TableColumnValue>
+      <TableColumnValue><input type="checkbox" checked={connection.template} disabled/></TableColumnValue>
       <TableColumnValue></TableColumnValue>
     </TableItem>
   );

@@ -3,8 +3,6 @@ query serverConfig {
     name
     version
     productConfiguration
-    supportsPredefinedConnections
-    supportsProvidedConnections
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces

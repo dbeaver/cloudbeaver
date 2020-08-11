@@ -1,5 +1,5 @@
-query connectionState($id: ID!) {
-  connection: connectionState(id: $id) {
+query connectionInfo($id: ID!) {
+  connection: connectionInfo(id: $id) {
     id
     name
     description

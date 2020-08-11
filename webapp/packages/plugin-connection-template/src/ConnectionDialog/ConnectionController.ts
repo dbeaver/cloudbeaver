@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action } from 'mobx';
+import { observable } from 'mobx';
 
 import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource
+  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ConnectionConfig, GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
+import { GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
-import { TemplateConnectionService } from '../TemplateConnectionService';
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
 export enum ConnectionStep {
@@ -27,7 +26,7 @@ export enum ConnectionStep {
 
 export interface IConnectionController {
   template: Connection | null;
-  config: ConnectionConfig;
+  credentials: any;
   isConnecting: boolean;
   onConnect(): void;
 }
@@ -40,9 +39,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   @observable isConnecting = false;
   @observable template: Connection | null = null
   @observable authModel?: DatabaseAuthModel;
-  @observable config: ConnectionConfig = {
-    credentials: {},
-  }
+  @observable credentials: any = { }
   @observable hasDetails = false
   @observable responseMessage: string | null = null
 
@@ -67,8 +64,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   constructor(
     private dbDriverResource: DBDriverResource,
+    private connectionInfoResource: ConnectionInfoResource,
     private templateConnectionsResource: TemplateConnectionsResource,
-    private templateConnectionService: TemplateConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private dbAuthModelsResource: DatabaseAuthModelsResource
@@ -93,13 +90,24 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   onConnect = async () => {
+    if (!this.template) {
+      return;
+    }
+
     this.isConnecting = true;
     this.clearError();
     try {
-      const connection = await this.templateConnectionService.openConnectionAsync(this.getConnectionConfig());
+      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
 
-      this.notificationService.logInfo({ title: `Connection ${connection.name} established` });
-      this.onClose();
+      try {
+        await this.connectionInfoResource.init(connection.id, this.credentials);
+
+        this.notificationService.logInfo({ title: `Connection ${connection.name} established` });
+        this.onClose();
+      } catch (exception) {
+        this.showError(exception, 'Failed to establish connection');
+        await this.connectionInfoResource.delete(connection.id);
+      }
     } catch (exception) {
       this.showError(exception, 'Failed to establish connection');
     } finally {
@@ -112,7 +120,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
     await this.loadAuthModel();
     this.clearError();
-    this.seTemplateDefaults();
+    this.credentials = {};
 
     this.step = ConnectionStep.Connection;
     if (!this.authModel) {
@@ -124,22 +132,6 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
-
-  private getConnectionConfig(): ConnectionConfig {
-    const config: ConnectionConfig = {};
-    config.templateId = this.config.templateId;
-    config.authModelId = this.config.authModelId;
-    config.credentials = this.config.credentials;
-
-    return config;
-  }
-
-  @action
-  private seTemplateDefaults() {
-    this.config.templateId = this.template?.id;
-    this.config.authModelId = this.dbDriver?.defaultAuthModel;
-    this.config.credentials = {};
   }
 
   private clearError() {

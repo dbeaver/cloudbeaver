@@ -35,6 +35,8 @@ export type Query = {
   deleteRole?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   driverList: Array<DriverInfo>;
+  getConnectionAccess: Array<AdminSubjectInfo>;
+  getSubjectAccess: Array<Scalars['ID']>;
   grantUserRole?: Maybe<Scalars['Boolean']>;
   listPermissions: Array<Maybe<AdminPermissionInfo>>;
   listRoles: Array<Maybe<AdminRoleInfo>>;
@@ -51,6 +53,7 @@ export type Query = {
   sessionState: SessionInfo;
   sessionUser?: Maybe<UserAuthInfo>;
   setConnectionAccess?: Maybe<Scalars['Boolean']>;
+  setSubjectAccess?: Maybe<Scalars['Boolean']>;
   setSubjectPermissions?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
@@ -118,6 +121,14 @@ export type QueryDriverListArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
+export type QueryGetConnectionAccessArgs = {
+  connectionId?: Maybe<Scalars['ID']>;
+};
+
+export type QueryGetSubjectAccessArgs = {
+  subject?: Maybe<Scalars['ID']>;
+};
+
 export type QueryGrantUserRoleArgs = {
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
@@ -171,6 +182,11 @@ export type QuerySetConnectionAccessArgs = {
   subjects: Array<Scalars['ID']>;
 };
 
+export type QuerySetSubjectAccessArgs = {
+  subjectId: Scalars['ID'];
+  connections: Array<Scalars['ID']>;
+};
+
 export type QuerySetSubjectPermissionsArgs = {
   roleId: Scalars['ID'];
   permissions: Array<Scalars['ID']>;
@@ -214,6 +230,7 @@ export type Mutation = {
   closeConnection: ConnectionInfo;
   closeSession?: Maybe<Scalars['Boolean']>;
   createConnection: ConnectionInfo;
+  createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
   initConnection: ConnectionInfo;
   /** @deprecated Field no longer supported */
@@ -267,6 +284,10 @@ export type MutationCloseConnectionArgs = {
 
 export type MutationCreateConnectionArgs = {
   config: ConnectionConfig;
+};
+
+export type MutationCreateConnectionFromTemplateArgs = {
+  templateId: Scalars['ID'];
 };
 
 export type MutationDeleteConnectionArgs = {
@@ -675,6 +696,16 @@ export type SqlResultRow = {
   updateValues?: Maybe<Scalars['Object']>;
 };
 
+export enum AdminSubjectType {
+  User = 'user',
+  Role = 'role'
+}
+
+export type AdminSubjectInfo = {
+  subjectId: Scalars['ID'];
+  subjectType: AdminSubjectType;
+};
+
 export type AdminUserInfo = {
   userId: Scalars['ID'];
   metaParameters: Scalars['Object'];
@@ -858,17 +889,23 @@ export type ConnectionAuthPropertiesQueryVariables = Exact<{
 
 export type ConnectionAuthPropertiesQuery = { connection: { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> } };
 
-export type ConnectionStateQueryVariables = Exact<{
+export type ConnectionInfoQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type ConnectionStateQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type ConnectionInfoQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
 export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+
+export type CreateConnectionFromTemplateMutationVariables = Exact<{
+  templateId: Scalars['ID'];
+}>;
+
+export type CreateConnectionFromTemplateMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -908,12 +945,6 @@ export type InitConnectionMutationVariables = Exact<{
 }>;
 
 export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
-
-export type OpenConnectionMutationVariables = Exact<{
-  config: ConnectionConfig;
-}>;
-
-export type OpenConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1151,7 +1182,7 @@ export type ReadSessionLogQuery = { log: Array<Pick<LogEntry, 'time' | 'type' | 
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ServerConfigQuery = { serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsPredefinedConnections' | 'supportsProvidedConnections' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
   ); };
 
@@ -1389,7 +1420,7 @@ export const CloseConnectionDocument = `
     `;
 export const ConnectionAuthPropertiesDocument = `
     query connectionAuthProperties($id: ID!) {
-  connection: connectionState(id: $id) {
+  connection: connectionInfo(id: $id) {
     authProperties {
       id
       displayName
@@ -1404,9 +1435,9 @@ export const ConnectionAuthPropertiesDocument = `
   }
 }
     `;
-export const ConnectionStateDocument = `
-    query connectionState($id: ID!) {
-  connection: connectionState(id: $id) {
+export const ConnectionInfoDocument = `
+    query connectionInfo($id: ID!) {
+  connection: connectionInfo(id: $id) {
     id
     name
     description
@@ -1422,6 +1453,21 @@ export const ConnectionStateDocument = `
 export const CreateConnectionDocument = `
     mutation createConnection($config: ConnectionConfig!) {
   createConnection(config: $config) {
+    id
+    name
+    description
+    driverId
+    connected
+    readOnly
+    features
+    authNeeded
+    authModel
+  }
+}
+    `;
+export const CreateConnectionFromTemplateDocument = `
+    mutation createConnectionFromTemplate($templateId: ID!) {
+  connection: createConnectionFromTemplate(templateId: $templateId) {
     id
     name
     description
@@ -1504,21 +1550,6 @@ export const GetDriverByIdDocument = `
 export const InitConnectionDocument = `
     mutation initConnection($id: ID!, $credentials: Object) {
   connection: initConnection(id: $id, credentials: $credentials) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    features
-    authNeeded
-    authModel
-  }
-}
-    `;
-export const OpenConnectionDocument = `
-    mutation openConnection($config: ConnectionConfig!) {
-  connection: openConnection(config: $config) {
     id
     name
     description
@@ -1921,8 +1952,6 @@ export const ServerConfigDocument = `
     name
     version
     productConfiguration
-    supportsPredefinedConnections
-    supportsProvidedConnections
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces
@@ -2059,11 +2088,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     connectionAuthProperties(variables: ConnectionAuthPropertiesQueryVariables): Promise<ConnectionAuthPropertiesQuery> {
       return withWrapper(() => client.request<ConnectionAuthPropertiesQuery>(ConnectionAuthPropertiesDocument, variables));
     },
-    connectionState(variables: ConnectionStateQueryVariables): Promise<ConnectionStateQuery> {
-      return withWrapper(() => client.request<ConnectionStateQuery>(ConnectionStateDocument, variables));
+    connectionInfo(variables: ConnectionInfoQueryVariables): Promise<ConnectionInfoQuery> {
+      return withWrapper(() => client.request<ConnectionInfoQuery>(ConnectionInfoDocument, variables));
     },
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
+    },
+    createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables): Promise<CreateConnectionFromTemplateMutation> {
+      return withWrapper(() => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables));
     },
     deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
       return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));
@@ -2082,9 +2114,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
       return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
-    },
-    openConnection(variables: OpenConnectionMutationVariables): Promise<OpenConnectionMutation> {
-      return withWrapper(() => client.request<OpenConnectionMutation>(OpenConnectionDocument, variables));
     },
     getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));

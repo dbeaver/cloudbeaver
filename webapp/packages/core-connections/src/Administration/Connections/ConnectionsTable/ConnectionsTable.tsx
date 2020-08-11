@@ -46,7 +46,7 @@ export const ConnectionsTable = observer(function ConnectionsTable({
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_host')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_port')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_in_tree')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_template')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>
       <TableBody>

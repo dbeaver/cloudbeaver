@@ -1,5 +1,5 @@
 query connectionAuthProperties($id: ID!) {
-  connection: connectionState(id: $id) {
+  connection: connectionInfo(id: $id) {
     authProperties {
       id
       displayName
