@@ -43,6 +43,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 checked={controller.config.template}
                 onChange={value => controller.onChange('template', value)}
                 disabled={controller.isSaving}
+                readOnly={!controller.isNew}
                 mod='surface'
               />
             </group>
