@@ -14,13 +14,12 @@ export const baseFormControlStyles = css`
     flex: auto;
     box-sizing: border-box;
     align-items: center;
-    padding: 12px 0;
+    padding: 12px;
     min-height: 54px;
 
     & input, 
     & textarea {
       flex: 1;
-      margin: 0 12px;
       min-height: 26px;
     }
   }
@@ -30,7 +29,7 @@ export const baseFormControlStyles = css`
     box-sizing: border-box;
     width: 150px;
     text-align: right;
-    padding: 0 12px;
+    padding-right: 24px;
     line-height: 16px;
     font-weight: 500;
   }

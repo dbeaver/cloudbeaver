@@ -14,7 +14,6 @@ import { baseFormControlStyles } from './baseFormControlStyles';
 
 const styles = css`
   checkbox {
-    margin: 0 12px;
     display: flex;
     align-items: center;
 

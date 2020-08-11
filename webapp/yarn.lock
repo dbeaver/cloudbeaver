@@ -2212,6 +2212,11 @@
   resolved "https://registry.yarnpkg.com/@material/feature-targeting/-/feature-targeting-4.0.0.tgz#8d9d1470801a1fd166773731613d9fa89e0fd85e"
   integrity sha512-0gk+f151vqmEdWkrQ9ocPlQRU9aUtSGsVBhletqIbsthLUsZIz9qk25FHjV1wHd/bGHknd9NH+T8ENprv3KLFg==
 
+"@material/layout-grid@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@material/layout-grid/-/layout-grid-4.0.0.tgz#dd425336710687c3a70cb309b741040fb328c92c"
+  integrity sha512-ljhdyEzmQGTGTxR7nVgnrsSImbMEmWM/q1/1XvnQcOJTPCqS/3ziXWCVADjgdDvE/WKJkg2nmm8bFg2qnPnWgw==
+
 "@material/radio@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@material/radio/-/radio-4.0.0.tgz#04ba5cddcac5540d32b33474c4a5eb50b4bd7860"
