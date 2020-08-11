@@ -97,10 +97,17 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isConnecting = true;
     this.clearError();
     try {
-      const connection = await this.connectionInfoResource.init(this.template.id, this.credentials);
+      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
 
-      this.notificationService.logInfo({ title: `Connection ${connection.name} established` });
-      this.onClose();
+      try {
+        await this.connectionInfoResource.init(connection.id, this.credentials);
+
+        this.notificationService.logInfo({ title: `Connection ${connection.name} established` });
+        this.onClose();
+      } catch (exception) {
+        this.showError(exception, 'Failed to establish connection');
+        await this.connectionInfoResource.delete(connection.id);
+      }
     } catch (exception) {
       this.showError(exception, 'Failed to establish connection');
     } finally {

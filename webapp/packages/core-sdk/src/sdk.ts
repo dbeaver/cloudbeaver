@@ -230,6 +230,7 @@ export type Mutation = {
   closeConnection: ConnectionInfo;
   closeSession?: Maybe<Scalars['Boolean']>;
   createConnection: ConnectionInfo;
+  createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
   initConnection: ConnectionInfo;
   /** @deprecated Field no longer supported */
@@ -283,6 +284,10 @@ export type MutationCloseConnectionArgs = {
 
 export type MutationCreateConnectionArgs = {
   config: ConnectionConfig;
+};
+
+export type MutationCreateConnectionFromTemplateArgs = {
+  templateId: Scalars['ID'];
 };
 
 export type MutationDeleteConnectionArgs = {
@@ -896,6 +901,12 @@ export type CreateConnectionMutationVariables = Exact<{
 
 export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
+export type CreateConnectionFromTemplateMutationVariables = Exact<{
+  templateId: Scalars['ID'];
+}>;
+
+export type CreateConnectionFromTemplateMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -1442,6 +1453,21 @@ export const ConnectionInfoDocument = `
 export const CreateConnectionDocument = `
     mutation createConnection($config: ConnectionConfig!) {
   createConnection(config: $config) {
+    id
+    name
+    description
+    driverId
+    connected
+    readOnly
+    features
+    authNeeded
+    authModel
+  }
+}
+    `;
+export const CreateConnectionFromTemplateDocument = `
+    mutation createConnectionFromTemplate($templateId: ID!) {
+  connection: createConnectionFromTemplate(templateId: $templateId) {
     id
     name
     description
@@ -2067,6 +2093,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
+    },
+    createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables): Promise<CreateConnectionFromTemplateMutation> {
+      return withWrapper(() => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables));
     },
     deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
       return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));

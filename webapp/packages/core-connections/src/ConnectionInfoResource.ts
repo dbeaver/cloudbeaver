@@ -22,6 +22,13 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     super(new Map());
   }
 
+  async createFromTemplate(templateId: string): Promise<Connection> {
+    const { connection } = await this.graphQLService.gql.createConnectionFromTemplate({ templateId });
+    this.set(connection.id, connection);
+
+    return this.get(connection.id)!;
+  }
+
   async init(id: string, credentials?: any): Promise<Connection> {
     await this.performUpdate(id, async () => {
       const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
