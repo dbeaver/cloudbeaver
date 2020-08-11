@@ -31,7 +31,6 @@ export const formStyles = css`
   group {
     box-sizing: border-box;
     display: flex;
-    margin: 0 12px;
   }
   InputField[|short] {
     min-width: unset;
