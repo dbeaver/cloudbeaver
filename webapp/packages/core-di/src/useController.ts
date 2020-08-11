@@ -21,33 +21,29 @@ export function useController<T extends IInitializableController>(
 ): T;
 export function useController<T>(ctor: IServiceConstructor<T>): T;
 export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): T {
-
   const app = useContext(appContext);
-  const isInitialized = useRef<boolean>(false);
-  const [controller] = useState(() => {
+  const controllerRef = useRef<T>();
+
+  useMemo(() => {
+    if (controllerRef.current && isDestructibleController(controllerRef.current)) {
+      controllerRef.current.destruct();
+    }
+
     const controller = app.resolveServiceByClass(ctor);
 
     if (isInitializableController(controller)) {
       controller.init(...args);
     }
-
-    return controller;
-  });
-
-  useMemo(() => {
-    if (isInitialized.current) {
-      throw new Error(`${ctor.name}: Controller initialization arguments can't be updated`);
-    }
-    isInitialized.current = true;
+    controllerRef.current = controller;
   }, [...args]);
 
   useEffect(() => () => {
-    if (isDestructibleController(controller)) {
-      controller.destruct();
+    if (isDestructibleController(controllerRef.current)) {
+      controllerRef.current.destruct();
     }
   }, []);
 
-  return controller as T;
+  return controllerRef.current!;
 }
 
 function isDestructibleController(obj: any): obj is IDestructibleController {

@@ -30,7 +30,7 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
       return this.data;
     }
 
-    this.performUpdate(key, async () => {
+    await this.performUpdate(key, async () => {
       if (this.isLoaded(key) && !this.isOutdated(key)) {
         return;
       }

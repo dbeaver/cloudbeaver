@@ -135,7 +135,7 @@ export const CreateUserDialog = observer(function CreateUserDialog({
           {controller.roles.map((role, i) => (
             <group as="div" key={role.roleId}>
               <Checkbox
-                type='checkbox'
+                value={role.roleId}
                 name='role'
                 checkboxLabel={role.roleName || role.roleId}
                 onChange={checked => handleRoleChange(role.roleId, checked)}

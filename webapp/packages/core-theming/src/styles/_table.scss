@@ -20,17 +20,21 @@
     @include mdc-theme-prop(border-color, background, false);
   }
 
-  tbody tr:hover {
-    @include stripes-background($mdc-theme-secondary);
-  }
+  tbody tr {
+    &:focus {
+      @include mdc-theme-prop(border-color, background, false);
+    }
 
-  tbody tr:focus {
-    @include mdc-theme-prop(border-color, background, false);
-  }
+    &:not([use|noHover]):hover,
+    &:not([use|noHover])[use|selected],
+    &:not([use|noHover])[use|expanded] {
+      @include stripes-background($mdc-theme-secondary);
+    }
 
-  tbody tr[use|isSelected] {
-    @include stripes-background($mdc-theme-secondary);
-    // @include mdc-theme-prop(border-color, $color-positive, false);
+    &[use|expanded] td {
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
   }
 
   th {
@@ -44,29 +48,50 @@
     text-transform: uppercase;
     text-align: left;
     text-decoration: none !important;
-  }
 
-  th:last-child {
-    border-right: none;
-  }
+    &[use|min] {
+      width: 1%;
+    }
 
-  th[use|min] {
-    width: 1%;
+    &:last-child {
+      border-right: none;
+    }
   }
 
   td {
-    height: 24px;
+    height: 28px;
     padding: 0 16px;
+    transition: padding ease-in-out 0.24s;
+
+    &[use|centerContent] {
+      align-items: center;
+      vertical-align: middle;
+    }
+
+    &[use|flex] {
+      display: flex;
+    }
+
+    &[use|expandArea] {
+      padding: 0;
+    }
+
+    > input[type="checkbox"] {
+      display: block;
+      height: 16px;
+      width: 16px;
+    }
   }
 
-  td[use|centerContent] {
-    align-items: center;
-    vertical-align: middle;
-  }
-
-  td > input[type="checkbox"] {
-    display: block;
-    height: 16px;
+  TableItemExpand {
+    cursor: pointer;
+    margin-left: 16px;
     width: 16px;
+    height: 100%;
+    padding: 0;
+
+    &[|expanded] {
+      transform: rotate(180deg);
+    }
   }
 }

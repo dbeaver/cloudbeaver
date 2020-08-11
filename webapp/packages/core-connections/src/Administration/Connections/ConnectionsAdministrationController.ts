@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../ConnectionsResource';
 
@@ -20,9 +20,19 @@ import { ConnectionsResource } from '../ConnectionsResource';
 export class ConnectionsAdministrationController {
   @observable isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map())
+  readonly expandedItems = observable<string, boolean>(new Map())
   readonly error = new GQLErrorCatcher();
   get connections() {
-    return this.connectionsResource.data;
+    return Array.from(this.connectionsResource.data.values())
+      .sort((a, b) => {
+        if (this.connectionsResource.isNew(a.id) === this.connectionsResource.isNew(b.id)) {
+          return 0;
+        }
+        if (this.connectionsResource.isNew(a.id)) {
+          return -1;
+        }
+        return 1;
+      });
   }
   get isLoading() {
     return this.connectionsResource.isLoading();
@@ -34,14 +44,17 @@ export class ConnectionsAdministrationController {
     private commonDialogService: CommonDialogService,
   ) { }
 
-  create = () => { }
+  create = () => {
+    const connectionInfo = this.connectionsResource.addNew();
+    this.expandedItems.set(connectionInfo.id, true);
+  }
 
   update = async () => {
     try {
-      await this.connectionsResource.refresh(undefined);
+      await this.connectionsResource.refresh('all');
     } catch (exception) {
       if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'Users update failed');
+        this.notificationService.logException(exception, 'Connections update failed');
       }
     }
   }
@@ -57,28 +70,26 @@ export class ConnectionsAdministrationController {
       const deletionList = Array
         .from(this.selectedItems)
         .filter(([_, value]) => value)
-        .map(([userId]) => userId);
+        .map(([connectionId]) => connectionId);
       if (deletionList.length === 0) {
         return;
       }
 
       const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'authentication_administration_confirm_user_deletion',
-        message: `Would you like to delete users: ${deletionList.join(', ')}`,
+        message: `Would you like to delete connections: ${deletionList.join(', ')}`,
       });
 
       if (!confirmed) {
         return;
       }
 
-      for (const userId of deletionList) {
-        await this.connectionsResource.delete(userId);
-      }
+      await this.connectionsResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
-      await this.connectionsResource.refresh(undefined);
+      await this.connectionsResource.refresh('all');
     } catch (exception) {
       if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'User delete failed');
+        this.notificationService.logException(exception, 'Connections delete failed');
       }
     } finally {
       this.isDeleting = false;

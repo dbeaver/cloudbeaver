@@ -30,12 +30,17 @@ const styles = composes(
 type Props = {
   connections: ConnectionInfo[];
   selectedItems: Map<string, boolean>;
+  expandedItems: Map<string, boolean>;
 }
 
-export const ConnectionsTable = observer(function ConnectionsTable({ connections, selectedItems }: Props) {
+export const ConnectionsTable = observer(function ConnectionsTable({
+  connections,
+  selectedItems,
+  expandedItems,
+}: Props) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems}>
+    <Table selectedItems={selectedItems} expandedItems={expandedItems}>
       <TableHeader>
         <TableColumnHeader min/>
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>

@@ -9,11 +9,13 @@
 import { observable } from 'mobx';
 
 import { IProperty } from '@cloudbeaver/core-blocks';
-import { DBDriver, DriverPropertiesService } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
+
+import { DBDriver } from '../../../../DBDriverResource';
+import { DriverPropertiesService } from '../../../../DriverPropertiesService';
 
 export type DriverPropertyState = {
   [key: string]: string;

@@ -10,43 +10,35 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { baseFormControlStyles } from './baseFormControlStyles';
+
 const styles = css`
-  label {
-    composes: theme-typography--body1 from global;
-  }
-  field {
+  checkbox {
+    margin: 0 12px;
     display: flex;
-    flex: auto;
-    box-sizing: border-box;
     align-items: center;
-    padding: 12px 0;
 
     & label {
-      width: 230px;
-      text-align: right;
       padding: 0 12px;
-      line-height: 16px;
-      font-weight: 500;
     }
+
     & input {
-      flex: 1;
-      margin: 0 12px;
-      height: 26px;
-    }
-    & checkbox {
-      display: flex;
-      align-items: center;
+      flex: auto 0 0;
+      margin: 0;
     }
   }
 `;
 
-type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value'> & {
+  value?: string;
   checkboxLabel: string;
   mod?: 'surface';
   onChange?(value: boolean): any;
 }
 
 export function Checkbox({
+  name,
+  value,
   checkboxLabel,
   children,
   className,
@@ -55,12 +47,19 @@ export function Checkbox({
   ...rest
 }: Props) {
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className}>
-      <label>{children}</label>
+      <field-label as="div">{children}</field-label>
       <checkbox as='div'>
-        <input onChange={e => onChange(e.target.checked)} {...rest} {...use({ mod })} />
-        <checkbox-label as='div'>{checkboxLabel}</checkbox-label>
+        <input
+          name={name}
+          id={value || name}
+          type='checkbox'
+          onChange={e => onChange(e.target.checked)}
+          {...rest}
+          {...use({ mod })}
+        />
+        <label htmlFor={value || name}>{checkboxLabel}</label>
       </checkbox>
     </field>
   );

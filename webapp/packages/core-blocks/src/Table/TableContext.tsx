@@ -10,8 +10,11 @@ import { createContext } from 'react';
 
 export interface ITableContext {
   selectedItems: Map<any, boolean>;
+  expandedItems: Map<any, boolean>;
   setItemSelect: (item: any, state: boolean) => void;
+  setItemExpand: (item: any, state: boolean) => void;
   clearSelection: () => void;
+  collapse: () => void;
 }
 
 export const TableContext = createContext<ITableContext | undefined>(undefined);

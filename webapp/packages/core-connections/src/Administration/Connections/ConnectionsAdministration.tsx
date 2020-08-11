@@ -57,7 +57,11 @@ export const ConnectionsAdministration = observer(function ConnectionsAdministra
         <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
       </AdministrationTools>
       <content as='div'>
-        <ConnectionsTable connections={controller.connections} selectedItems={controller.selectedItems} />
+        <ConnectionsTable
+          connections={controller.connections}
+          selectedItems={controller.selectedItems}
+          expandedItems={controller.expandedItems}
+        />
         {controller.isLoading && <Loader overlay/>}
       </content>
     </>

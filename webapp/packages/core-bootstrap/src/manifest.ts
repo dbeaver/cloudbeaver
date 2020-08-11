@@ -30,7 +30,8 @@ import {
   ConnectionAuthService,
   ConnectionsAdministrationService,
   ConnectionsResource,
-  ConnectionsLocaleService
+  ConnectionsLocaleService,
+  DriverPropertiesService
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
@@ -85,6 +86,7 @@ export const coreManifest: PluginManifest = {
     ConnectionInfoResource,
     ContainerResource,
     DBDriverResource,
+    DriverPropertiesService,
     ConnectionsManagerService,
     RouterService,
     ScreenService,

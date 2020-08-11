@@ -17,6 +17,7 @@ import { TabsContext } from '../TabsContext';
 
 type TabProps = PropsWithChildren<{
   tabId: string;
+  disabled?: boolean;
   className?: string;
   onOpen?: (tabId: string) => void;
   onClose?: (tabId: string) => void;
@@ -24,10 +25,11 @@ type TabProps = PropsWithChildren<{
 
 export function Tab({
   tabId,
-  onOpen,
-  onClose,
+  disabled,
   className,
   children,
+  onOpen,
+  onClose,
 }: TabProps) {
   const state = useContext(TabsContext);
   if (!state) {
@@ -55,6 +57,7 @@ export function Tab({
       id={tabId}
       className={className}
       onClick={handleOpen}
+      disabled={disabled}
     >
       <tab-container as='div'>
         {children}
