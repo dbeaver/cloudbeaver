@@ -242,6 +242,28 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    public WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException {
+        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
+        if (dataSourceTemplate == null) {
+            throw new DBWebException("Template data source '" + templateId + "' not found");
+        }
+
+        DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
+        DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
+        ((DataSourceDescriptor)newDataSource).setTemporary(true);
+
+        DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
+        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+        sessionRegistry.addDataSource(newDataSource);
+
+        WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
+        webSession.addConnection(connectionInfo);
+
+        return connectionInfo;
+    }
+
+    @Override
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
