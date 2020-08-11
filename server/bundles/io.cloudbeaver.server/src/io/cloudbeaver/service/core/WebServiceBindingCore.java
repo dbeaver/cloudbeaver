@@ -61,6 +61,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("sessionState", env -> getService(env).getSessionState(getWebSession(env)))
 
             .dataFetcher("connectionState", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("connectionInfo", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
 
             .dataFetcher("readSessionLog", env -> getService(env).readSessionLog(
                 getWebSession(env),
