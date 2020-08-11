@@ -1,4 +1,14 @@
 
+enum AdminSubjectType {
+    user,
+    role
+}
+
+type AdminSubjectInfo {
+    subjectId: ID!
+    subjectType: AdminSubjectType!
+}
+
 type AdminUserInfo {
     userId: ID!
 
@@ -51,6 +61,12 @@ extend type Query {
     updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
     deleteConnectionConfiguration( id: ID! ): Boolean
 
+    # Permissions
+
     setConnectionAccess(connectionId: ID!, subjects: [ID!]!): Boolean
+    getConnectionAccess(connectionId: ID): [AdminSubjectInfo!]!
+
+    setSubjectAccess(subjectId: ID!, connections: [ID!]!): Boolean
+    getSubjectAccess(subject: ID): [ID!]!
 
 }
