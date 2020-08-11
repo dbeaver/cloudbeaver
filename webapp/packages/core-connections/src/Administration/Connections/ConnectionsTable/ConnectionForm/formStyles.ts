@@ -12,17 +12,11 @@ export const formStyles = css`
   connection-form {
     flex: 1;
     display: flex;
+    overflow: auto;
     flex-direction: row;
-    padding: 18px 36px;
   }
-  left-box {
-    display: flex;
-    flex-direction: column;
-  }
-  right-box {
+  layout-grid {
     flex: 1;
-    display: flex;
-    flex-direction: column;
   }
   connection-type {
     margin-left: 150px;
@@ -37,10 +31,5 @@ export const formStyles = css`
   group {
     box-sizing: border-box;
     display: flex;
-    margin: 0 12px;
-  }
-  InputField[|short] {
-    min-width: unset;
-    max-width: 250px;
   }
 `;

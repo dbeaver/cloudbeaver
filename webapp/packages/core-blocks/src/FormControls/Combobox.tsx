@@ -77,7 +77,6 @@ const styles = composes(
     }
     input-box {
       flex: 1;
-      margin: 0 12px;
       position: relative;
       display: flex;
       align-items: center;

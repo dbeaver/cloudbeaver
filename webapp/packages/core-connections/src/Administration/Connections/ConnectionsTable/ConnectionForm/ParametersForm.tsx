@@ -30,30 +30,34 @@ export const ParametersForm = observer(function ParametersForm({
   return styled(useStyles(formStyles))(
     <>
       { !embedded && (
-        <group as="div">
-          <InputField
-            type="text"
-            name="host"
-            value={controller.config.host}
-            onChange={value => controller.onChange('host', value)}
-            disabled={controller.isSaving}
-            mod='surface'
-          >
-            {translate('customConnection_custom_host')}
-            <sub-label as="div">{translate('customConnection_custom_obligatory')}</sub-label>
-          </InputField>
-          <InputField
-            type="number"
-            name="port"
-            value={controller.config.port}
-            onChange={value => controller.onChange('port', value)}
-            disabled={controller.isSaving}
-            {...use({ short: true })}
-            mod='surface'
-          >
-            {translate('customConnection_custom_port')}
-          </InputField>
-        </group>
+        <layout-grid-inner as="div">
+          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 7 })}>
+            <InputField
+              type="text"
+              name="host"
+              value={controller.config.host}
+              onChange={value => controller.onChange('host', value)}
+              disabled={controller.isSaving}
+              mod='surface'
+            >
+              {translate('customConnection_custom_host')}
+              <sub-label as="div">{translate('customConnection_custom_obligatory')}</sub-label>
+            </InputField>
+          </layout-grid-cell>
+          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+            <InputField
+              type="number"
+              name="port"
+              value={controller.config.port}
+              onChange={value => controller.onChange('port', value)}
+              disabled={controller.isSaving}
+              {...use({ short: true })}
+              mod='surface'
+            >
+              {translate('customConnection_custom_port')}
+            </InputField>
+          </layout-grid-cell>
+        </layout-grid-inner>
       )}
       <group as="div">
         <InputField

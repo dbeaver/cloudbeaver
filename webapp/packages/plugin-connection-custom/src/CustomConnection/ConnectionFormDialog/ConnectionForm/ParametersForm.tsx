@@ -48,7 +48,6 @@ export const ParametersForm = observer(function ParametersForm({
             value={controller.config.port}
             onChange={value => controller.onChange('port', value)}
             disabled={controller.isConnecting}
-            {...use({ short: true })}
             mod='surface'
           >
             {translate('customConnection_custom_port')}

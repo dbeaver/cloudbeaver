@@ -16,6 +16,7 @@
   "dependencies": {
     "@material/button": "^4.0.0",
     "@material/elevation": "^4.0.0",
+    "@material/layout-grid": "^4.0.0",
     "@material/radio": "^4.0.0",
     "@material/ripple": "^4.0.0",
     "@material/theme": "^4.0.0",
@@ -23,12 +24,12 @@
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
-    "@cloudbeaver/core-utils": "^0.1.0",
     "@cloudbeaver/core-events": "^0.1.0",
     "@cloudbeaver/core-settings": "^0.1.0",
-    "react": "^16.x.x",
-    "reshadow": "^0.0.1-alpha.78",
+    "@cloudbeaver/core-utils": "^0.1.0",
     "mobx": "^5.x.x",
-    "mobx-react": "^6.x.x"
+    "mobx-react": "^6.x.x",
+    "react": "^16.x.x",
+    "reshadow": "^0.0.1-alpha.78"
   }
 }
