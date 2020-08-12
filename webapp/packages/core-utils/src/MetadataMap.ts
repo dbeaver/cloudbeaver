@@ -39,6 +39,14 @@ export class MetadataMap<TKey, TValue> {
     return this.length;
   }
 
+  has(key: TKey): boolean {
+    return this.data.has(key);
+  }
+
+  set(key: TKey, value: TValue) {
+    this.data.set(key, value);
+  }
+
   get(key: TKey): TValue {
     if (this.data.has(key)) {
       return this.data.get(key)!;

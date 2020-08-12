@@ -14,34 +14,45 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
-import { UsersManagerService } from '../UsersManagerService';
-import { CreateUserDialog } from './CreateUserDialog/CreateUserDialog';
+import { UsersResource } from '../UsersResource';
 
 @injectable()
 export class UsersAdministrationController {
   @observable isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map())
+  readonly expandedItems = observable<string, boolean>(new Map())
   readonly error = new GQLErrorCatcher();
   get users() {
-    return this.usersManagerService.users.data;
+    return Array.from(this.usersResource.data.values())
+      .sort((a, b) => {
+        if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
+          return 0;
+        }
+        if (this.usersResource.isNew(a.userId)) {
+          return -1;
+        }
+        return 1;
+      });
   }
+
   get isLoading() {
-    return this.usersManagerService.users.isLoading();
+    return this.usersResource.isLoading();
   }
 
   constructor(
     private notificationService: NotificationService,
-    private usersManagerService: UsersManagerService,
+    private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
   ) { }
 
   create = () => {
-    this.commonDialogService.open(CreateUserDialog, null);
+    const user = this.usersResource.addNew();
+    this.expandedItems.set(user.userId, true);
   }
 
   update = async () => {
     try {
-      await this.usersManagerService.users.refresh(undefined);
+      await this.usersResource.refreshAll();
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Users update failed');
@@ -75,10 +86,10 @@ export class UsersAdministrationController {
       }
 
       for (const userId of deletionList) {
-        await this.usersManagerService.delete(userId);
+        await this.usersResource.delete(userId);
       }
       this.selectedItems.clear();
-      await this.usersManagerService.users.refresh(undefined);
+      await this.usersResource.loadAll();
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'User delete failed');

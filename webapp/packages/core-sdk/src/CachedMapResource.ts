@@ -71,9 +71,9 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
 
   isLoaded(key: ResourceKey<TKey>): boolean {
     if (isResourceKeyList(key)) {
-      return key.list.every(key => this.data.has(key));
+      return key.list.every(key => this.has(key));
     }
-    return this.data.has(key);
+    return this.has(key);
   }
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
@@ -141,6 +141,10 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   async load(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue> {
     await this.loadData(key);
     return this.get(key) as Array<TValue>| TValue;
+  }
+
+  has(key: TKey): boolean {
+    return this.data.has(key);
   }
 }
 

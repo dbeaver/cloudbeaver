@@ -57,7 +57,11 @@ export const UsersAdministration = observer(function UsersAdministration() {
         <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
       </AdministrationTools>
       <content as='div'>
-        <UsersTable users={controller.users} selectedItems={controller.selectedItems} />
+        <UsersTable
+          users={controller.users}
+          selectedItems={controller.selectedItems}
+          expandedItems={controller.expandedItems}
+        />
         {controller.isLoading && <Loader overlay/>}
       </content>
     </>

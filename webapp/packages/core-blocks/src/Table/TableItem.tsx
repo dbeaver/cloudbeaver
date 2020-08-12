@@ -78,10 +78,10 @@ export const TableItem = observer(function TableItem({
       >
         {children}
       </tr>
-      {isExpanded && (
+      {isExpanded && ExpandElement && (
         <tr {...use({ noHover: true })}>
           <td colSpan={Children.count(children)} {...use({ expandArea: true })}>
-            {ExpandElement && <ExpandElement item={item} />}
+            <ExpandElement item={item} />
           </td>
         </tr>
       )}

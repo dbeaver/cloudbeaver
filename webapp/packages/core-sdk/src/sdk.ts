@@ -846,6 +846,13 @@ export type GrantUserRoleQueryVariables = Exact<{
 
 export type GrantUserRoleQuery = Pick<Query, 'grantUserRole'>;
 
+export type RevokeUserRoleQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  roleId: Scalars['ID'];
+}>;
+
+export type RevokeUserRoleQuery = Pick<Query, 'revokeUserRole'>;
+
 export type SetUserCredentialsQueryVariables = Exact<{
   userId: Scalars['ID'];
   providerId: Scalars['ID'];
@@ -1328,6 +1335,11 @@ export const GetUsersListDocument = `
 export const GrantUserRoleDocument = `
     query grantUserRole($userId: ID!, $roleId: ID!) {
   grantUserRole(userId: $userId, roleId: $roleId)
+}
+    `;
+export const RevokeUserRoleDocument = `
+    query revokeUserRole($userId: ID!, $roleId: ID!) {
+  revokeUserRole(userId: $userId, roleId: $roleId)
 }
     `;
 export const SetUserCredentialsDocument = `
@@ -2066,6 +2078,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     grantUserRole(variables: GrantUserRoleQueryVariables): Promise<GrantUserRoleQuery> {
       return withWrapper(() => client.request<GrantUserRoleQuery>(GrantUserRoleDocument, variables));
+    },
+    revokeUserRole(variables: RevokeUserRoleQueryVariables): Promise<RevokeUserRoleQuery> {
+      return withWrapper(() => client.request<RevokeUserRoleQuery>(RevokeUserRoleDocument, variables));
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
       return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));
