@@ -11,7 +11,6 @@ import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 import { RolesManagerService } from './Administration/RolesManagerService';
 import { RolesResource } from './Administration/RolesResource';
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
-import { UsersManagerService } from './Administration/UsersManagerService';
 import { UsersResource } from './Administration/UsersResource';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { AuthenticationService } from './AuthenticationService';
@@ -35,7 +34,6 @@ export const manifest: PluginManifest = {
     AuthDialogService,
     AuthMenuService,
     UsersAdministrationService,
-    UsersManagerService,
     RolesManagerService,
     AuthenticationLocaleService,
     RolesResource,

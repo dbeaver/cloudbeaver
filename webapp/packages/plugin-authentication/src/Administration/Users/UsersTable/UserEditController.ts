@@ -12,20 +12,25 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { RolesManagerService } from '../../RolesManagerService';
-import { UsersManagerService } from '../../UsersManagerService';
+import { UsersResource } from '../../UsersResource';
 
 @injectable()
-export class CreateUserDialogController implements IInitializableController, IDestructibleController {
+export class UserEditController implements IInitializableController, IDestructibleController {
   @observable isCreating = false;
+  @observable isLoading = true;
   @observable credentials = {
     login: '',
     password: '',
     passwordRepeat: '',
     roles: new Map<string, boolean>(),
   };
+
+  get isNew() {
+    return this.usersResource.isNew(this.userId);
+  }
 
   @computed get isFormFilled() {
     const rolesState = Array.from(this.credentials.roles.values())
@@ -38,21 +43,26 @@ export class CreateUserDialogController implements IInitializableController, IDe
   }
 
   @computed get roles() {
-    return this.rolesManagerService.roles.data;
+    return Array.from(this.rolesManagerService.roles.data.values());
   }
+
+  @computed get user(): AdminUserInfo {
+    return this.usersResource.get(this.userId)!;
+  }
+
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
-  private close!: () => void;
+  private userId!: string;
 
   constructor(
     private notificationService: NotificationService,
-    private usersManagerService: UsersManagerService,
     private commonDialogService: CommonDialogService,
     private rolesManagerService: RolesManagerService,
+    private usersResource: UsersResource,
   ) { }
 
-  init(onClose: () => void) {
-    this.close = onClose;
+  init(id: string) {
+    this.userId = id;
     this.loadRoles();
   }
 
@@ -60,10 +70,16 @@ export class CreateUserDialogController implements IInitializableController, IDe
     this.isDistructed = true;
   }
 
-  create = async () => {
+  save = async () => {
     if (this.isCreating) {
       return;
     }
+
+    if (!this.credentials.password && this.isNew) {
+      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
+      return;
+    }
+
     if (this.credentials.password !== this.credentials.passwordRepeat) {
       this.notificationService.logError({ title: 'authentication_user_passwords_not_match' });
       return;
@@ -72,17 +88,25 @@ export class CreateUserDialogController implements IInitializableController, IDe
     this.isCreating = true;
     let isUserCreated = false;
     try {
-      const user = await this.usersManagerService.create(this.credentials.login, false);
-      isUserCreated = !!user;
-      await this.usersManagerService.updateCredentials(user.userId, { password: this.credentials.password });
+      if (this.isNew) {
+        await this.usersResource.create(this.credentials.login, this.userId);
+      }
+      isUserCreated = !!this.user;
+
+      if (this.credentials.password) {
+        await this.usersResource.updateCredentials(this.user.userId, { password: this.credentials.password });
+      }
       for (const [roleId, checked] of this.credentials.roles) {
         if (checked) {
-          await this.usersManagerService.grantRole(user.userId, roleId);
+          if (!this.user.grantedRoles.includes(roleId)) {
+            await this.usersResource.grantRole(this.user.userId, roleId);
+          }
+        } else if (!this.isNew) {
+          await this.usersResource.revokeRole(this.user.userId, roleId);
         }
       }
-      await this.usersManagerService.users.refresh(user.userId);
+      await this.usersResource.refresh(this.user.userId);
       this.notificationService.logInfo({ title: 'authentication_user_user_created' });
-      this.close();
     } catch (exception) {
       if (isUserCreated) {
         await this.deleteUser(this.credentials.login);
@@ -103,7 +127,7 @@ export class CreateUserDialogController implements IInitializableController, IDe
 
   private async deleteUser(userId: string) {
     try {
-      await this.usersManagerService.delete(userId);
+      await this.usersResource.delete(userId);
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
         this.notificationService.logException(exception, 'Error deleting partially created user');
@@ -113,9 +137,23 @@ export class CreateUserDialogController implements IInitializableController, IDe
 
   private async loadRoles() {
     try {
-      await this.rolesManagerService.roles.load(undefined);
+      await this.rolesManagerService.roles.loadAll();
+      await this.loadUser();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load roles');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async loadUser() {
+    try {
+      await this.usersResource.load(this.userId);
+
+      this.credentials.login = this.user.userId;
+      this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load user');
     }
   }
 }

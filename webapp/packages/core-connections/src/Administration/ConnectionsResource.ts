@@ -15,25 +15,40 @@ import {
   ResourceKey,
   isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
-import { uuid } from '@cloudbeaver/core-utils';
+import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
+
+const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
+type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean }
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
-  constructor(
-    private graphQLService: GraphQLService,
-  ) {
+  private metadata: MetadataMap<string, boolean>;
+  constructor(private graphQLService: GraphQLService) {
     super(new Map());
+    this.metadata = new MetadataMap(() => false);
+  }
+
+  has(id: string) {
+    if (this.metadata.has(id)) {
+      return this.metadata.get(id);
+    }
+
+    return this.data.has(id);
   }
 
   isNew(id: string) {
-    return id.startsWith('new-');
+    if (!this.has(id)) {
+      return false;
+    }
+    return NEW_CONNECTION_SYMBOL in this.get(id)!;
   }
 
   addNew() {
     const connectionInfo = {
       id: `new-${uuid()}`,
       name: 'New connection',
-    } as ConnectionInfo;
+      [NEW_CONNECTION_SYMBOL]: true,
+    } as ConnectionNew;
 
     this.data.set(connectionInfo.id, connectionInfo);
     this.markUpdated(connectionInfo.id);
@@ -52,7 +67,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     if (id) {
       this.data.delete(id);
     }
-    this.data.set(connection.id, connection as ConnectionInfo);
+    this.set(connection.id, connection as ConnectionInfo);
 
     return this.get(connection.id)!;
   }
@@ -90,6 +105,10 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
       this.set(connection.id, connection as ConnectionInfo);
     }
     this.markUpdated(key);
+
+    // TODO: getConnections must accept connectionId, so we can update some connection or all connections,
+    //       here we should check is it's was a full update
+    this.metadata.set('all', true);
 
     return this.data;
   }

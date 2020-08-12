@@ -1,8 +1,5 @@
 export default [
   ['connections_administration_item', 'Connection Management'],
-  ['connections_connection_edit_save', 'Save'],
-  ['connections_connection_edit_add', 'Add'],
-  ['connections_connection_edit_cancel', 'Cancel'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_name', 'Name'],
   ['connections_connection_description', 'Description'],

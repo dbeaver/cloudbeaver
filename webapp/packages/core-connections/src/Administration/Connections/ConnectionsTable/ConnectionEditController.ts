@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 
 import {
   injectable, IInitializableController, IDestructibleController, Bootstrap
@@ -46,6 +46,10 @@ implements IInitializableController, IDestructibleController {
     properties: {},
     credentials: {},
   };
+
+  @computed get isDisabled() {
+    return this.isLoading || this.isSaving;
+  }
 
   get isNew() {
     return this.connectionsResource.isNew(this.connectionId);
@@ -180,13 +184,12 @@ implements IInitializableController, IDestructibleController {
       await this.connectionsResource.load(this.connectionId);
 
       this.connectionInfo = this.connectionsResource.get(this.connectionId)!;
+      await this.loadDriver(this.connectionInfo.driverId);
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load ConnectionInfo ${this.connectionId}`);
     } finally {
       this.isLoading = false;
     }
-
-    await this.loadDriver(this.connectionInfo.driverId);
   }
 
   private async loadDriver(driverId: string) {
