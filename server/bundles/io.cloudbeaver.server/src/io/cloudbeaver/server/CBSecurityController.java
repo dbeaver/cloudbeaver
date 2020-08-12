@@ -548,6 +548,56 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public String[] getConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+        if (subjectIds.length == 0) {
+            return new String[0];
+        }
+
+        List<String> allSubjects = new ArrayList<>();
+        Collections.addAll(allSubjects, subjectIds);
+
+        try (Connection dbCon = database.openConnection()) {
+            {
+                StringBuilder sql = new StringBuilder("SELECT ROLE_ID FROM CB_USER_ROLE WHERE USER_ID IN (");
+                appendStringParameters(sql, subjectIds);
+                sql.append(")");
+
+                try (Statement dbStat = dbCon.createStatement()) {
+                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
+                        allSubjects.add(dbResult.getString(1));
+                    }
+                }
+            }
+            {
+                StringBuilder sql = new StringBuilder("SELECT DATASOURCE_ID FROM CB_DATASOURCE_ACCESS DA WHERE SUBJECT_ID IN (");
+                appendStringParameters(sql, subjectIds);
+                sql.append(")");
+
+                if (allSubjects.isEmpty()) {
+                    return new String[0];
+                }
+                try (Statement dbStat = dbCon.createStatement()) {
+                    List<String> result = new ArrayList<>();
+                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
+                        result.add(dbResult.getString(1));
+                    }
+                    return result.toArray(new String[0]);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading datasource access", e);
+        }
+    }
+
+    private void appendStringParameters(StringBuilder sql, @NotNull String[] subjectIds) {
+        for (int i = 0; i < subjectIds.length; i++) {
+            String id = subjectIds[i];
+            if (i > 0) sql.append(",");
+            sql.append("'").append(id.replace("'", "''")).append("'");
+        }
+    }
+
     void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> registeredProviders = new HashSet<>();
