@@ -4,7 +4,8 @@ enum AdminSubjectType {
     role
 }
 
-type AdminSubjectInfo {
+type AdminConnectionGrantInfo {
+    connectionId: ID!
     subjectId: ID!
     subjectType: AdminSubjectType!
 }
@@ -14,8 +15,8 @@ type AdminUserInfo {
 
     metaParameters: Object!
     configurationParameters: Object!
-    grantedRoles: [ID]!
-    grantedConnections: [ID]!
+    grantedRoles: [ID!]!
+    grantedConnections: [AdminConnectionGrantInfo!]!
 }
 
 type AdminRoleInfo {
@@ -64,10 +65,10 @@ extend type Query {
 
     # Permissions
 
-    setConnectionAccess(connectionId: ID!, subjects: [ID!]!): Boolean
-    getConnectionAccess(connectionId: ID): [AdminSubjectInfo!]!
+    getConnectionSubjectAccess(connectionId: ID): [AdminConnectionGrantInfo!]!
+    setConnectionSubjectAccess(connectionId: ID!, subjects: [ID!]!): Boolean
 
-    setSubjectAccess(subjectId: ID!, connections: [ID!]!): Boolean
-    getSubjectAccess(subject: ID): [ID!]!
+    getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
+    setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
 
 }

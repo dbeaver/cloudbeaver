@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.DBWSecuritySubjectType;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -525,8 +527,103 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    ///////////////////////////////////////////
+    // Access management
+
+    @NotNull
     @Override
-    public void setConnectionAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
+    public DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
+        if (subjectIds.length == 0) {
+            return new DBWConnectionGrant[0];
+        }
+        List<String> allSubjects = new ArrayList<>();
+        Collections.addAll(allSubjects, subjectIds);
+
+        try (Connection dbCon = database.openConnection()) {
+            {
+                StringBuilder sql = new StringBuilder("SELECT ROLE_ID FROM CB_USER_ROLE WHERE USER_ID IN (");
+                appendStringParameters(sql, subjectIds);
+                sql.append(")");
+
+                try (Statement dbStat = dbCon.createStatement()) {
+                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
+                        allSubjects.add(dbResult.getString(1));
+                    }
+                }
+            }
+            {
+                StringBuilder sql = new StringBuilder("SELECT DA.DATASOURCE_ID,DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA,\n" +
+                    "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND SUBJECT_ID IN (");
+                appendStringParameters(sql, subjectIds);
+                sql.append(")");
+
+                if (allSubjects.isEmpty()) {
+                    return new DBWConnectionGrant[0];
+                }
+                try (Statement dbStat = dbCon.createStatement()) {
+                    List<DBWConnectionGrant> result = new ArrayList<>();
+                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
+                        result.add(new DBWConnectionGrant(
+                            dbResult.getString(1),
+                            dbResult.getString(2),
+                            DBWSecuritySubjectType.fromCode(dbResult.getString(3))));
+                    }
+                    return result.toArray(new DBWConnectionGrant[0]);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading datasource access", e);
+        }
+    }
+
+    @Override
+    public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull String[] connectionIds, String grantorId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
+            if (!ArrayUtils.isEmpty(connectionIds)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
+                    dbStat.setString(1, subjectId);
+                    dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(3, grantorId);
+                    for (String connectionId : connectionIds) {
+                        dbStat.setString(4, connectionId);
+                        dbStat.execute();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error granting datasource access", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public DBWConnectionGrant[] getConnectionSubjectAccess(String connectionId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "SELECT DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA\n" +
+                        "WHERE DA.DATA_SOURCE_ID=?")) {
+                    dbStat.setString(1, connectionId);
+                    List<DBWConnectionGrant> result = new ArrayList<>();
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        result.add(new DBWConnectionGrant(
+                            connectionId,
+                            dbResult.getString(1),
+                            DBWSecuritySubjectType.fromCode(dbResult.getString(2))));
+                    }
+                    return result.toArray(new DBWConnectionGrant[0]);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading datasource access", e);
+        }
+    }
+
+    @Override
+    public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             // Delete all permissions
             JDBCUtils.executeStatement(dbCon,
@@ -548,48 +645,6 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
-    @Override
-    public String[] getConnectionAccess(@NotNull String[] subjectIds) throws DBCException {
-        if (subjectIds.length == 0) {
-            return new String[0];
-        }
-
-        List<String> allSubjects = new ArrayList<>();
-        Collections.addAll(allSubjects, subjectIds);
-
-        try (Connection dbCon = database.openConnection()) {
-            {
-                StringBuilder sql = new StringBuilder("SELECT ROLE_ID FROM CB_USER_ROLE WHERE USER_ID IN (");
-                appendStringParameters(sql, subjectIds);
-                sql.append(")");
-
-                try (Statement dbStat = dbCon.createStatement()) {
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        allSubjects.add(dbResult.getString(1));
-                    }
-                }
-            }
-            {
-                StringBuilder sql = new StringBuilder("SELECT DATASOURCE_ID FROM CB_DATASOURCE_ACCESS DA WHERE SUBJECT_ID IN (");
-                appendStringParameters(sql, subjectIds);
-                sql.append(")");
-
-                if (allSubjects.isEmpty()) {
-                    return new String[0];
-                }
-                try (Statement dbStat = dbCon.createStatement()) {
-                    List<String> result = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        result.add(dbResult.getString(1));
-                    }
-                    return result.toArray(new String[0]);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error reading datasource access", e);
-        }
-    }
-
     private void appendStringParameters(StringBuilder sql, @NotNull String[] subjectIds) {
         for (int i = 0; i < subjectIds.length; i++) {
             String id = subjectIds[i];
@@ -597,6 +652,9 @@ class CBSecurityController implements DBWSecurityController {
             sql.append("'").append(id.replace("'", "''")).append("'");
         }
     }
+
+    ///////////////////////////////////////////
+    // Utils
 
     void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
@@ -623,9 +681,6 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException("Error reading session state", e);
         }
     }
-
-    ///////////////////////////////////////////
-    // Utils
 
     private void createAuthSubject(Connection dbCon, String subjectId, String subjectType) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE) VALUES(?,?)")) {

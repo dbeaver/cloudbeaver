@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
@@ -83,7 +84,14 @@ public interface DBWServiceAdmin extends DBWService {
     WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
-    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException;
 
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    DBWConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull String[] connections) throws DBWebException;
 }
