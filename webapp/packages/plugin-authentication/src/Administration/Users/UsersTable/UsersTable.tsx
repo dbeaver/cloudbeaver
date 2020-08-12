@@ -14,28 +14,26 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { User } from './User';
 
-const styles = composes(
-  css``,
-  css`
-    TableColumnHeader {
-      border-top: solid 1px;
-    }
-  `
-);
+const styles = css`
+  TableColumnHeader {
+    border-top: solid 1px;
+  }
+`;
 
 type Props = {
   users: AdminUserInfo[];
   selectedItems: Map<string, boolean>;
+  expandedItems: Map<string, boolean>;
 }
 
-export const UsersTable = observer(function UsersTable({ users, selectedItems }: Props) {
+export const UsersTable = observer(function UsersTable({ users, selectedItems, expandedItems }: Props) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems}>
+    <Table selectedItems={selectedItems} expandedItems={expandedItems}>
       <TableHeader>
         <TableColumnHeader min/>
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>

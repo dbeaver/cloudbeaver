@@ -6,6 +6,8 @@ export const defaultRULocale = [
   ['ui_processing_canceling', 'Отмена...'],
   ['ui_processing_retry', 'Повторить'],
   ['ui_processing_ok', 'Принять'],
+  ['ui_processing_create', 'Создать'],
+  ['ui_processing_save', 'Сохранить'],
   ['ui_error_message', 'Ошибка:'],
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
