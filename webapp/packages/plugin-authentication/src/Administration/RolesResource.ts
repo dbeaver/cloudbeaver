@@ -9,40 +9,52 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
-  CachedDataResource,
-  AdminRoleInfo
+  AdminRoleInfo,
+  CachedMapResource,
+  ResourceKey
 } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 @injectable()
-export class RolesResource extends CachedDataResource<AdminRoleInfo[], string | undefined> {
-  constructor(
-    private graphQLService: GraphQLService,
-  ) {
-    super([]);
+export class RolesResource extends CachedMapResource<string, AdminRoleInfo> {
+  private metadata: MetadataMap<string, boolean>;
+  constructor(private graphQLService: GraphQLService) {
+    super(new Map());
+    this.metadata = new MetadataMap(() => false);
   }
 
-  isLoaded(roleId?: string) {
-    return roleId
-      ? this.data.some(role => role.roleId === roleId)
-      : !!this.data.length;
+  has(id: string) {
+    if (this.metadata.has(id)) {
+      return this.metadata.get(id);
+    }
+
+    return this.data.has(id);
   }
 
-  protected async loader(roleId?: string): Promise<AdminRoleInfo[]> {
+  async loadAll() {
+    await this.load('all');
+    return this.data;
+  }
+
+  async refreshAll() {
+    await this.refresh('all');
+    return this.data;
+  }
+
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminRoleInfo>> {
+    const roleId = key === 'all' ? undefined : key as string;
+
     const { roles } = await this.graphQLService.gql.getRolesList({ roleId });
 
-    if (!roleId) {
-      this.markUpdated(roleId);
-      return roles as AdminRoleInfo[];
+    if (key === 'all') {
+      this.data.clear();
+      this.metadata.set('all', true);
     }
 
-    const index = this.data.findIndex(role => role.roleId === roleId);
-    if (index !== -1) {
-      this.data.splice(index, 1, ...roles as AdminRoleInfo[]);
-    } else {
-      this.data.push(...roles as AdminRoleInfo[]);
+    for (const role of roles) {
+      this.set(role.roleId, role as AdminRoleInfo);
     }
-
-    this.markUpdated(roleId);
+    this.markUpdated(key);
 
     return this.data;
   }

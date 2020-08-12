@@ -146,19 +146,19 @@ export const ConnectionEdit = observer(function ConnectionEdit({
         <fill as="div" />
         <Button
           type="button"
-          disabled={controller.isSaving}
+          disabled={controller.isDisabled}
           mod={['outlined']}
           onClick={handleCancel}
         >
-          {translate('connections_connection_edit_cancel')}
+          {translate('ui_processing_cancel')}
         </Button>
         <Button
           type="button"
-          disabled={controller.isSaving}
+          disabled={controller.isDisabled}
           mod={['unelevated']}
           onClick={controller.onSaveConnection}
         >
-          {translate(controller.isNew ? 'connections_connection_edit_add' : 'connections_connection_edit_save')}
+          {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
         </Button>
       </TabList>
       {controller.isLoading

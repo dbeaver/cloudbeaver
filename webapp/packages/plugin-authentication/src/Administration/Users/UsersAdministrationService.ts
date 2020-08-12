@@ -10,8 +10,7 @@ import { AdministrationItemService, AdministrationScreenService } from '@cloudbe
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { UsersManagerService } from '../UsersManagerService';
-import { CreateUser } from './CreateUser/CreateUser';
+import { UsersResource } from '../UsersResource';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersDrawerItem } from './UsersDrawerItem';
 
@@ -21,7 +20,7 @@ export class UsersAdministrationService extends Bootstrap {
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
     private notificationService: NotificationService,
-    private usersManagerService: UsersManagerService,
+    private usersResource: UsersResource,
   ) {
     super();
   }
@@ -31,10 +30,6 @@ export class UsersAdministrationService extends Bootstrap {
       name: 'users',
       order: 1,
       sub: [
-        {
-          name: 'create',
-          getComponent: () => CreateUser,
-        },
         {
           name: 'edit',
           getComponent: () => UsersAdministration,
@@ -52,17 +47,13 @@ export class UsersAdministrationService extends Bootstrap {
     this.administrationScreenService.navigateToItem('users');
   }
 
-  navToCreate() {
-    this.administrationScreenService.navigateToItemSub('users', 'create');
-  }
-
   navToEdit(userId: string) {
     this.administrationScreenService.navigateToItemSub('users', 'edit', userId);
   }
 
   private async loadUsers() {
     try {
-      await this.usersManagerService.users.load(undefined);
+      await this.usersResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading users');
     }

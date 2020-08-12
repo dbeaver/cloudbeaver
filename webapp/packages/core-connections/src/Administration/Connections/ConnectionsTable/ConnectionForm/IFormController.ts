@@ -20,6 +20,7 @@ export interface IFormController {
   config: ConnectionConfig;
   connectionType: ConnectionType;
   isSaving: boolean;
+  isDisabled: boolean;
   onChangeType(type: ConnectionType): void;
   onSelectDriver(driver: DBDriver): void;
   onChange<T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]): void;

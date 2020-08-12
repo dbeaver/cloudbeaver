@@ -6,6 +6,8 @@ export const defaultENLocale = [
   ['ui_processing_canceling', 'Canceling...'],
   ['ui_processing_retry', 'Retry'],
   ['ui_processing_ok', 'Ok'],
+  ['ui_processing_create', 'Create'],
+  ['ui_processing_save', 'Save'],
   ['ui_error_message', 'Error:'],
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],

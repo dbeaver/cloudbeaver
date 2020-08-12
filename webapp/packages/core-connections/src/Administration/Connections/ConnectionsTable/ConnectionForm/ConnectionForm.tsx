@@ -42,7 +42,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 checkboxLabel={translate('connections_connection_template')}
                 checked={controller.config.template}
                 onChange={value => controller.onChange('template', value)}
-                disabled={!controller.isNew || controller.isSaving}
+                disabled={!controller.isNew || controller.isDisabled}
                 mod='surface'
               />
             </group>
@@ -65,7 +65,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 name="name"
                 value={controller.config.name}
                 onChange={value => controller.onChange('name', value)}
-                disabled={controller.isSaving}
+                disabled={controller.isDisabled}
                 mod='surface'
               >
                 {translate('connections_connection_name')}
@@ -77,7 +77,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 rows={3}
                 value={controller.config.description}
                 onChange={value => controller.onChange('description', value)}
-                disabled={controller.isSaving}
+                disabled={controller.isDisabled}
                 mod='surface'
               >
                 {translate('connections_connection_description')}
@@ -92,7 +92,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 value={'custom'}
                 onClick={() => controller.onChangeType(ConnectionType.Attributes)}
                 checked={controller.connectionType === ConnectionType.Attributes}
-                disabled={controller.isSaving}
+                disabled={controller.isDisabled}
                 mod={['primary']}
               >
                 {translate('customConnection_connectionType_custom')}
@@ -103,7 +103,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 value={'url'}
                 onClick={() => controller.onChangeType(ConnectionType.URL)}
                 checked={controller.connectionType === ConnectionType.URL}
-                disabled={controller.isSaving}
+                disabled={controller.isDisabled}
                 mod={['primary']}
               >
                 {translate('customConnection_connectionType_url')}
@@ -118,7 +118,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                   name="url"
                   value={controller.config.url}
                   onChange={value => controller.onChange('url', value)}
-                  disabled={controller.isSaving}
+                  disabled={controller.isDisabled}
                   mod='surface'
                 >
                   {translate('customConnection_url_JDBC')}
@@ -135,7 +135,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                   autofillToken={`section-${controller.driver?.id || ''} section-auth`}
                   properties={controller.authModel.properties}
                   credentials={controller.config.credentials}
-                  processing={controller.isSaving}
+                  processing={controller.isDisabled}
                 />
               </>
             )}
