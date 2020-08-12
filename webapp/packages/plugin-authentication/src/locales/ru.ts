@@ -7,6 +7,7 @@ export default [
   ['authentication_administration_item', 'Пользователи'],
   ['authentication_administration_confirm_user_deletion', 'Подтвердите удаление'],
   ['authentication_user_name', 'Имя'],
+  ['authentication_user_credentials', 'Учетные данные'],
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],
   ['authentication_user_role', 'Роль'],

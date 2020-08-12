@@ -17,7 +17,8 @@ import {
   TableContext,
   InputField,
   Checkbox,
-  useFocus
+  useFocus,
+  InputGroup
 } from '@cloudbeaver/core-blocks';
 import { useService, useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -191,59 +192,63 @@ export const UserEdit = observer(function UserEdit({
             <layout-grid as="div">
               <layout-grid-inner as="div">
                 <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                  <create-form as='div'>
-                    <group as="div">
-                      <InputField
-                        type='text'
-                        name='login'
-                        value={controller.credentials.login}
-                        onChange={handleLoginChange}
-                        disabled={!controller.isNew || controller.isCreating}
-                        mod='surface'
-                      >
-                        {translate('authentication_user_name')}
-                      </InputField>
-                    </group>
-                    <group as="div">
-                      <InputField
-                        type='password'
-                        name='password'
-                        value={controller.credentials.password}
-                        onChange={handlePasswordChange}
+                  <group as="div">
+                    <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
+                  </group>
+                  <group as="div">
+                    <InputField
+                      type='text'
+                      name='login'
+                      value={controller.credentials.login}
+                      onChange={handleLoginChange}
+                      disabled={!controller.isNew || controller.isCreating}
+                      mod='surface'
+                    >
+                      {translate('authentication_user_name')}
+                    </InputField>
+                  </group>
+                  <group as="div">
+                    <InputField
+                      type='password'
+                      name='password'
+                      value={controller.credentials.password}
+                      onChange={handlePasswordChange}
+                      disabled={controller.isCreating}
+                      mod='surface'
+                    >
+                      {translate('authentication_user_password')}
+                    </InputField>
+                  </group>
+                  <group as="div">
+                    <InputField
+                      type='password'
+                      name='password_repeat'
+                      value={controller.credentials.passwordRepeat}
+                      onChange={handlePasswordRepeatChange}
+                      disabled={controller.isCreating}
+                      mod='surface'
+                    >
+                      {translate('authentication_user_password_repeat')}
+                    </InputField>
+                  </group>
+                </layout-grid-cell>
+                <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+                  <group as="div">
+                    <InputGroup>{translate('authentication_user_role')}</InputGroup>
+                  </group>
+                  {controller.roles.map((role, i) => (
+                    <group as="div" key={role.roleId}>
+                      <Checkbox
+                        value={role.roleId}
+                        name='role'
+                        checkboxLabel={role.roleName || role.roleId}
+                        onChange={checked => handleRoleChange(role.roleId, checked)}
+                        checked={controller.credentials.roles.get(role.roleId)}
                         disabled={controller.isCreating}
                         mod='surface'
-                      >
-                        {translate('authentication_user_password')}
-                      </InputField>
+                      />
                     </group>
-                    <group as="div">
-                      <InputField
-                        type='password'
-                        name='password_repeat'
-                        value={controller.credentials.passwordRepeat}
-                        onChange={handlePasswordRepeatChange}
-                        disabled={controller.isCreating}
-                        mod='surface'
-                      >
-                        {translate('authentication_user_password_repeat')}
-                      </InputField>
-                    </group>
-                    {controller.roles.map((role, i) => (
-                      <group as="div" key={role.roleId}>
-                        <Checkbox
-                          value={role.roleId}
-                          name='role'
-                          checkboxLabel={role.roleName || role.roleId}
-                          onChange={checked => handleRoleChange(role.roleId, checked)}
-                          checked={controller.credentials.roles.get(role.roleId)}
-                          disabled={controller.isCreating}
-                          mod='surface'
-                        >
-                          {i === 0 && translate('authentication_user_role')}
-                        </Checkbox>
-                      </group>
-                    ))}
-                  </create-form>
+                  ))}
                 </layout-grid-cell>
               </layout-grid-inner>
             </layout-grid>

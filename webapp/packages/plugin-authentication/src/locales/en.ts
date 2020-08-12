@@ -7,6 +7,7 @@ export default [
   ['authentication_administration_item', 'Users'],
   ['authentication_administration_confirm_user_deletion', 'Confirm user deletion'],
   ['authentication_user_name', 'User name'],
+  ['authentication_user_credentials', 'Credentials'],
   ['authentication_user_password', 'User password'],
   ['authentication_user_password_repeat', 'Repeat password'],
   ['authentication_user_role', 'User role'],
