@@ -107,6 +107,8 @@ public interface DBWSecurityController {
 
     void setConnectionAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException;
 
+    String[] getConnectionAccess(@NotNull String[] subjectId) throws DBCException;
+
     ///////////////////////////////////////////
     // Utils
 

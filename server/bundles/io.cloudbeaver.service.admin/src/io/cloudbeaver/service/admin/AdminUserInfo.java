@@ -20,6 +20,7 @@ import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.Map;
 
@@ -37,24 +38,33 @@ public class AdminUserInfo {
         this.user = user;
     }
 
+    @Property
     public String getUserId() {
         return user.getUserId();
     }
 
+    @Property
     public Map<String, Object> getMetaParameters() {
         return metaParameters;
     }
 
+    @Property
     public Map<String, Object> getConfigurationParameters() {
         return configurationParameters;
     }
 
+    @Property
     public String[] getGrantedRoles() throws DBCException {
         if (user.getRoles() == null) {
             WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(getUserId());
             user.setRoles(userRoles);
         }
         return user.getGrantedRoles();
+    }
+
+    @Property
+    public String[] getGrantedConnections() throws DBCException {
+        return CBPlatform.getInstance().getApplication().getSecurityController().getConnectionAccess(new String[] { getUserId()} );
     }
 
 }

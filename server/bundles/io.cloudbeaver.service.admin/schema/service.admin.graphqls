@@ -15,6 +15,7 @@ type AdminUserInfo {
     metaParameters: Object!
     configurationParameters: Object!
     grantedRoles: [ID]!
+    grantedConnections: [ID]!
 }
 
 type AdminRoleInfo {
