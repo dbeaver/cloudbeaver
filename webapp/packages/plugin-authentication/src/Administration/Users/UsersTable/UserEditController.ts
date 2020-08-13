@@ -106,8 +106,8 @@ export class UserEditController implements IInitializableController, IDestructib
         await this.updateRoles();
         await this.saveConnectionPermissions();
         await this.usersResource.refresh(this.user.userId);
+        this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
       }
-      this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
         if (this.isNew) {
