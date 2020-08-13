@@ -547,13 +547,15 @@ class CBSecurityController implements DBWSecurityController {
 
                 try (Statement dbStat = dbCon.createStatement()) {
                     try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        allSubjects.add(dbResult.getString(1));
+                        while (dbResult.next()) {
+                            allSubjects.add(dbResult.getString(1));
+                        }
                     }
                 }
             }
             {
                 StringBuilder sql = new StringBuilder("SELECT DA.DATASOURCE_ID,DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA,\n" +
-                    "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND SUBJECT_ID IN (");
+                    "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.SUBJECT_ID IN (");
                 appendStringParameters(sql, subjectIds);
                 sql.append(")");
 
@@ -563,10 +565,12 @@ class CBSecurityController implements DBWSecurityController {
                 try (Statement dbStat = dbCon.createStatement()) {
                     List<DBWConnectionGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery(sql.toString())) {
-                        result.add(new DBWConnectionGrant(
-                            dbResult.getString(1),
-                            dbResult.getString(2),
-                            DBWSecuritySubjectType.fromCode(dbResult.getString(3))));
+                        while (dbResult.next()) {
+                            result.add(new DBWConnectionGrant(
+                                dbResult.getString(1),
+                                dbResult.getString(2),
+                                DBWSecuritySubjectType.fromCode(dbResult.getString(3))));
+                        }
                     }
                     return result.toArray(new DBWConnectionGrant[0]);
                 }
@@ -604,15 +608,18 @@ class CBSecurityController implements DBWSecurityController {
         try (Connection dbCon = database.openConnection()) {
             {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "SELECT DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA\n" +
-                        "WHERE DA.DATA_SOURCE_ID=?")) {
+                    "SELECT DA.SUBJECT_ID,S.SUBJECT_TYPE\n" +
+                        "FROM CB_DATASOURCE_ACCESS DA,CB_AUTH_SUBJECT S\n" +
+                        "WHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.DATASOURCE_ID=?")) {
                     dbStat.setString(1, connectionId);
                     List<DBWConnectionGrant> result = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
-                        result.add(new DBWConnectionGrant(
-                            connectionId,
-                            dbResult.getString(1),
-                            DBWSecuritySubjectType.fromCode(dbResult.getString(2))));
+                        while (dbResult.next()) {
+                            result.add(new DBWConnectionGrant(
+                                connectionId,
+                                dbResult.getString(1),
+                                DBWSecuritySubjectType.fromCode(dbResult.getString(2))));
+                        }
                     }
                     return result.toArray(new DBWConnectionGrant[0]);
                 }

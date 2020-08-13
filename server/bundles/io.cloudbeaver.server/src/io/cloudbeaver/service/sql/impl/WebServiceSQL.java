@@ -155,11 +155,15 @@ public class WebServiceSQL implements DBWServiceSQL {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                 try {
+                    monitor.beginTask("Execute query", 1);
+                    monitor.subTask("Process query " + sql);
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
                 }
             }
         };

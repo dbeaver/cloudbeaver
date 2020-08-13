@@ -199,13 +199,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException {
+    public boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
         try {
-            CBPlatform.getInstance().getApplication().getSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
+            CBPlatform.getInstance().getApplication().getSecurityController().setSubjectPermissions(roleID, permissions.toArray(new String[0]), grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting role permissions", e);
@@ -298,7 +298,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
+    public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException {
         DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");
@@ -308,7 +308,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(connectionId, subjects, grantor.getUserId());
+            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(connectionId, subjects.toArray(new String[0]), grantor.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error setting connection subject access", e);
         }
@@ -325,7 +325,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull String[] connections) throws DBWebException {
+    public boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull List<String> connections) throws DBWebException {
         for (String connectionId : connections) {
             if (WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId) == null) {
                 throw new DBWebException("Connection '" + connectionId + "' not found");
@@ -336,7 +336,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
+            CBApplication.getInstance().getSecurityController().setSubjectConnectionAccess(subjectId, connections.toArray(new String[0]), grantor.getUserId());
         } catch (DBCException e) {
             throw new DBWebException("Error setting subject connection access", e);
         }

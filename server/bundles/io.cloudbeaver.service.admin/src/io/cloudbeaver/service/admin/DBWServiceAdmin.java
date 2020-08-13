@@ -67,7 +67,7 @@ public interface DBWServiceAdmin extends DBWService {
     boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, String[] permissions) throws DBWebException;
+    boolean setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
@@ -88,10 +88,10 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     DBWConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException;
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException;
+    boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException;
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull String[] connections) throws DBWebException;
+    boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull List<String> connections) throws DBWebException;
 }
