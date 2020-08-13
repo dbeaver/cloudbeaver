@@ -248,6 +248,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
+    public List<WebConnectionInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException {
+        throw new DBWebException("Not implemented");
+    }
+
+    @Override
     public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
         DBPDataSourceRegistry registry = WebServiceUtils.getDataSourceRegistry();
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);

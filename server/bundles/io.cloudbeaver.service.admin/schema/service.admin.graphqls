@@ -59,6 +59,8 @@ extend type Query {
     # All connection configurations
     allConnections: [ ConnectionInfo! ]!
 
+    searchConnections( hostNames: [String!]! ): ConnectionInfo!
+
     createConnectionConfiguration( config: ConnectionConfig! ): ConnectionInfo!
     updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
     deleteConnectionConfiguration( id: ID! ): Boolean

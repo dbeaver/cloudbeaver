@@ -60,6 +60,8 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")));
 
         model.getQueryType().dataFetcher("allConnections", env -> getService(env).getAllConnections(getWebSession(env)));
+        model.getQueryType().dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")));
+
         model.getQueryType().dataFetcher("createConnectionConfiguration",
             env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))));
         model.getQueryType().dataFetcher("updateConnectionConfiguration",
