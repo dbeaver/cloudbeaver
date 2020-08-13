@@ -40,13 +40,13 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -164,10 +164,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
-            String[] roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).toArray(String[]::new);
-            if (!ArrayUtils.contains(roleIds, role)) {
-                roleIds = ArrayUtils.add(String.class, roleIds, role);
-                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds, grantor.getUserId());
+            List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
+            if (!roleIds.contains(role)) {
+                roleIds.add(role);
+                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' already has role '" + role + "'");
             }
@@ -185,10 +185,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
-            String[] roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).toArray(String[]::new);
-            if (ArrayUtils.contains(roleIds, role)) {
-                roleIds = ArrayUtils.remove(String.class, roleIds, role);
-                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds, grantor.getUserId());
+            List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
+            if (roleIds.contains(role)) {
+                roleIds.remove(role);
+                CBPlatform.getInstance().getApplication().getSecurityController().setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have role '" + role + "'");
             }
