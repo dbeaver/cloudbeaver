@@ -25,6 +25,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { UsersResource } from '../../UsersResource';
+import { GrantedConnections } from './GrantedConnections';
 import { UserEditController } from './UserEditController';
 
 const styles = composes(
@@ -164,13 +165,13 @@ export const UserEdit = observer(function UserEdit({
         <Tab tabId='info' >
           <TabTitle>{translate('authentication_administration_user_info')}</TabTitle>
         </Tab>
-        <Tab tabId='connections_access' >
+        <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess} >
           <TabTitle>{translate('authentication_administration_user_connections_access')}</TabTitle>
         </Tab>
         <fill as="div" />
         <Button
           type="button"
-          disabled={controller.isCreating}
+          disabled={controller.isSaving}
           mod={['outlined']}
           onClick={handleCancel}
         >
@@ -178,7 +179,7 @@ export const UserEdit = observer(function UserEdit({
         </Button>
         <Button
           type="button"
-          disabled={controller.isCreating}
+          disabled={controller.isSaving || !controller.isFormFilled}
           mod={['unelevated']}
           onClick={controller.save}
         >
@@ -189,69 +190,80 @@ export const UserEdit = observer(function UserEdit({
         ? <Loader />
         : (
           <SubmittingForm onSubmit={controller.save} ref={focusedRef as React.RefObject<HTMLFormElement>}>
-            <layout-grid as="div">
-              <layout-grid-inner as="div">
-                <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                  <group as="div">
-                    <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-                  </group>
-                  <group as="div">
-                    <InputField
-                      type='text'
-                      name='login'
-                      value={controller.credentials.login}
-                      onChange={handleLoginChange}
-                      disabled={!controller.isNew || controller.isCreating}
-                      mod='surface'
-                    >
-                      {translate('authentication_user_name')}
-                    </InputField>
-                  </group>
-                  <group as="div">
-                    <InputField
-                      type='password'
-                      name='password'
-                      value={controller.credentials.password}
-                      onChange={handlePasswordChange}
-                      disabled={controller.isCreating}
-                      mod='surface'
-                    >
-                      {translate('authentication_user_password')}
-                    </InputField>
-                  </group>
-                  <group as="div">
-                    <InputField
-                      type='password'
-                      name='password_repeat'
-                      value={controller.credentials.passwordRepeat}
-                      onChange={handlePasswordRepeatChange}
-                      disabled={controller.isCreating}
-                      mod='surface'
-                    >
-                      {translate('authentication_user_password_repeat')}
-                    </InputField>
-                  </group>
-                </layout-grid-cell>
-                <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                  <group as="div">
-                    <InputGroup>{translate('authentication_user_role')}</InputGroup>
-                  </group>
-                  {controller.roles.map((role, i) => (
-                    <group as="div" key={role.roleId}>
-                      <Checkbox
-                        value={role.roleId}
-                        name='role'
-                        checkboxLabel={role.roleName || role.roleId}
-                        onChange={checked => handleRoleChange(role.roleId, checked)}
-                        checked={controller.credentials.roles.get(role.roleId)}
-                        disabled={controller.isCreating}
-                        mod='surface'
-                      />
+            <TabPanel tabId='info'>
+              <layout-grid as="div">
+                <layout-grid-inner as="div">
+                  <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+                    <group as="div">
+                      <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
                     </group>
-                  ))}
-                </layout-grid-cell>
-              </layout-grid-inner>
-            </layout-grid>
+                    <group as="div">
+                      <InputField
+                        type='text'
+                        name='login'
+                        value={controller.credentials.login}
+                        onChange={handleLoginChange}
+                        disabled={!controller.isNew || controller.isSaving}
+                        mod='surface'
+                      >
+                        {translate('authentication_user_name')}
+                      </InputField>
+                    </group>
+                    <group as="div">
+                      <InputField
+                        type='password'
+                        name='password'
+                        value={controller.credentials.password}
+                        onChange={handlePasswordChange}
+                        disabled={controller.isSaving}
+                        mod='surface'
+                      >
+                        {translate('authentication_user_password')}
+                      </InputField>
+                    </group>
+                    <group as="div">
+                      <InputField
+                        type='password'
+                        name='password_repeat'
+                        value={controller.credentials.passwordRepeat}
+                        onChange={handlePasswordRepeatChange}
+                        disabled={controller.isSaving}
+                        mod='surface'
+                      >
+                        {translate('authentication_user_password_repeat')}
+                      </InputField>
+                    </group>
+                  </layout-grid-cell>
+                  <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+                    <group as="div">
+                      <InputGroup>{translate('authentication_user_role')}</InputGroup>
+                    </group>
+                    {controller.roles.map((role, i) => (
+                      <group as="div" key={role.roleId}>
+                        <Checkbox
+                          value={role.roleId}
+                          name='role'
+                          checkboxLabel={role.roleName || role.roleId}
+                          onChange={checked => handleRoleChange(role.roleId, checked)}
+                          checked={controller.credentials.roles.get(role.roleId)}
+                          disabled={controller.isSaving}
+                          mod='surface'
+                        />
+                      </group>
+                    ))}
+                  </layout-grid-cell>
+                </layout-grid-inner>
+              </layout-grid>
+            </TabPanel>
+            <TabPanel tabId='connections_access'>
+              <GrantedConnections
+                user={controller.user}
+                connections={controller.connections}
+                grantedConnection={controller.grantedConnections}
+                disabled={controller.isLoading}
+                onChange={controller.handleConnectionsAccessChange}
+              />
+            </TabPanel>
           </SubmittingForm>
         )}
       {controller.error.responseMessage && (

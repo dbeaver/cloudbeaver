@@ -35,8 +35,8 @@ export type Query = {
   deleteRole?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   driverList: Array<DriverInfo>;
-  getConnectionAccess: Array<AdminSubjectInfo>;
-  getSubjectAccess: Array<Scalars['ID']>;
+  getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
+  getSubjectConnectionAccess: Array<AdminConnectionGrantInfo>;
   grantUserRole?: Maybe<Scalars['Boolean']>;
   listPermissions: Array<Maybe<AdminPermissionInfo>>;
   listRoles: Array<Maybe<AdminRoleInfo>>;
@@ -52,8 +52,8 @@ export type Query = {
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
   sessionUser?: Maybe<UserAuthInfo>;
-  setConnectionAccess?: Maybe<Scalars['Boolean']>;
-  setSubjectAccess?: Maybe<Scalars['Boolean']>;
+  setConnectionSubjectAccess?: Maybe<Scalars['Boolean']>;
+  setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
   setSubjectPermissions?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
@@ -121,12 +121,12 @@ export type QueryDriverListArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
-export type QueryGetConnectionAccessArgs = {
+export type QueryGetConnectionSubjectAccessArgs = {
   connectionId?: Maybe<Scalars['ID']>;
 };
 
-export type QueryGetSubjectAccessArgs = {
-  subject?: Maybe<Scalars['ID']>;
+export type QueryGetSubjectConnectionAccessArgs = {
+  subjectId?: Maybe<Scalars['ID']>;
 };
 
 export type QueryGrantUserRoleArgs = {
@@ -177,12 +177,12 @@ export type QueryRevokeUserRoleArgs = {
   roleId: Scalars['ID'];
 };
 
-export type QuerySetConnectionAccessArgs = {
+export type QuerySetConnectionSubjectAccessArgs = {
   connectionId: Scalars['ID'];
   subjects: Array<Scalars['ID']>;
 };
 
-export type QuerySetSubjectAccessArgs = {
+export type QuerySetSubjectConnectionAccessArgs = {
   subjectId: Scalars['ID'];
   connections: Array<Scalars['ID']>;
 };
@@ -701,7 +701,8 @@ export enum AdminSubjectType {
   Role = 'role'
 }
 
-export type AdminSubjectInfo = {
+export type AdminConnectionGrantInfo = {
+  connectionId: Scalars['ID'];
   subjectId: Scalars['ID'];
   subjectType: AdminSubjectType;
 };
@@ -710,7 +711,8 @@ export type AdminUserInfo = {
   userId: Scalars['ID'];
   metaParameters: Scalars['Object'];
   configurationParameters: Scalars['Object'];
-  grantedRoles: Array<Maybe<Scalars['ID']>>;
+  grantedRoles: Array<Scalars['ID']>;
+  grantedConnections: Array<AdminConnectionGrantInfo>;
 };
 
 export type AdminRoleInfo = {
@@ -833,6 +835,15 @@ export type GetRolesListQueryVariables = Exact<{
 
 export type GetRolesListQuery = { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> };
 
+export type GetUsersConnectionsQueryVariables = Exact<{
+  userId?: Maybe<Scalars['ID']>;
+}>;
+
+export type GetUsersConnectionsQuery = { users: Array<Maybe<(
+    Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
+    & { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
+  )>>; };
+
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
@@ -852,6 +863,13 @@ export type RevokeUserRoleQueryVariables = Exact<{
 }>;
 
 export type RevokeUserRoleQuery = Pick<Query, 'revokeUserRole'>;
+
+export type SetConnectionsQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  connections: Array<Scalars['ID']>;
+}>;
+
+export type SetConnectionsQuery = { grantedConnections: Query['setSubjectConnectionAccess'] };
 
 export type SetUserCredentialsQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1324,6 +1342,19 @@ export const GetRolesListDocument = `
   }
 }
     `;
+export const GetUsersConnectionsDocument = `
+    query getUsersConnections($userId: ID) {
+  users: listUsers(userId: $userId) {
+    userId
+    grantedRoles
+    grantedConnections {
+      connectionId
+      subjectId
+      subjectType
+    }
+  }
+}
+    `;
 export const GetUsersListDocument = `
     query getUsersList($userId: ID) {
   users: listUsers(userId: $userId) {
@@ -1340,6 +1371,11 @@ export const GrantUserRoleDocument = `
 export const RevokeUserRoleDocument = `
     query revokeUserRole($userId: ID!, $roleId: ID!) {
   revokeUserRole(userId: $userId, roleId: $roleId)
+}
+    `;
+export const SetConnectionsDocument = `
+    query setConnections($userId: ID!, $connections: [ID!]!) {
+  grantedConnections: setSubjectConnectionAccess(subjectId: $userId, connections: $connections)
 }
     `;
 export const SetUserCredentialsDocument = `
@@ -2073,6 +2109,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
     },
+    getUsersConnections(variables?: GetUsersConnectionsQueryVariables): Promise<GetUsersConnectionsQuery> {
+      return withWrapper(() => client.request<GetUsersConnectionsQuery>(GetUsersConnectionsDocument, variables));
+    },
     getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
       return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
     },
@@ -2081,6 +2120,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     revokeUserRole(variables: RevokeUserRoleQueryVariables): Promise<RevokeUserRoleQuery> {
       return withWrapper(() => client.request<RevokeUserRoleQuery>(RevokeUserRoleDocument, variables));
+    },
+    setConnections(variables: SetConnectionsQueryVariables): Promise<SetConnectionsQuery> {
+      return withWrapper(() => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables));
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables): Promise<SetUserCredentialsQuery> {
       return withWrapper(() => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables));

@@ -1,0 +1,14 @@
+query getUsersConnections($userId: ID) {
+  users: listUsers(userId: $userId) {
+    userId
+
+    #metaParameters
+    #configurationParameters
+    grantedRoles
+    grantedConnections {
+      connectionId
+      subjectId
+      subjectType
+    }
+  } 
+}
