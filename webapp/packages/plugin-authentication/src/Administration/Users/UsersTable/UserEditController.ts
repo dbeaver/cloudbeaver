@@ -8,6 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
+import { ConnectionsResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -19,7 +20,8 @@ import { UsersResource } from '../../UsersResource';
 
 @injectable()
 export class UserEditController implements IInitializableController, IDestructibleController {
-  @observable isCreating = false;
+  readonly grantedConnections = observable<string, boolean>(new Map())
+  @observable isSaving = false;
   @observable isLoading = true;
   @observable credentials = {
     login: '',
@@ -28,8 +30,12 @@ export class UserEditController implements IInitializableController, IDestructib
     roles: new Map<string, boolean>(),
   };
 
-  get isNew() {
+  @computed get isNew() {
     return this.usersResource.isNew(this.userId);
+  }
+
+  @computed get connections() {
+    return Array.from(this.connectionsResource.data.values());
   }
 
   @computed get isFormFilled() {
@@ -38,7 +44,7 @@ export class UserEditController implements IInitializableController, IDestructib
 
     return rolesState.length > 0
       && !!this.credentials.login
-      && !!this.credentials.password
+      && (!!this.credentials.password || !this.isNew)
       && this.credentials.password === this.credentials.passwordRepeat;
   }
 
@@ -53,12 +59,14 @@ export class UserEditController implements IInitializableController, IDestructib
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
   private userId!: string;
+  private connectionAccessChanged = false;
 
   constructor(
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private rolesManagerService: RolesManagerService,
     private usersResource: UsersResource,
+    private connectionsResource: ConnectionsResource
   ) { }
 
   init(id: string) {
@@ -71,12 +79,7 @@ export class UserEditController implements IInitializableController, IDestructib
   }
 
   save = async () => {
-    if (this.isCreating) {
-      return;
-    }
-
-    if (!this.credentials.password && this.isNew) {
-      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
+    if (this.isSaving) {
       return;
     }
 
@@ -85,37 +88,36 @@ export class UserEditController implements IInitializableController, IDestructib
       return;
     }
 
-    this.isCreating = true;
-    let isUserCreated = false;
+    this.isSaving = true;
     try {
       if (this.isNew) {
-        await this.usersResource.create(this.credentials.login, this.userId);
+        await this.usersResource.create({
+          userId: this.credentials.login,
+          newId: this.userId,
+          credentials: { password: this.credentials.password },
+          roles: this.getGrantedRoles(),
+          grantedConnections: this.getGrantedConnections(),
+        });
+        this.notificationService.logInfo({ title: 'authentication_administration_user_created' });
+      } else {
+        if (this.credentials.password) {
+          await this.usersResource.updateCredentials(this.user.userId, { password: this.credentials.password });
+        }
+        await this.updateRoles();
+        await this.saveConnectionPermissions();
+        await this.usersResource.refresh(this.user.userId);
+        this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
       }
-      isUserCreated = !!this.user;
-
-      if (this.credentials.password) {
-        await this.usersResource.updateCredentials(this.user.userId, { password: this.credentials.password });
-      }
-      for (const [roleId, checked] of this.credentials.roles) {
-        if (checked) {
-          if (!this.user.grantedRoles.includes(roleId)) {
-            await this.usersResource.grantRole(this.user.userId, roleId);
-          }
-        } else if (!this.isNew) {
-          await this.usersResource.revokeRole(this.user.userId, roleId);
+    } catch (exception) {
+      if (!this.error.catch(exception) || this.isDistructed) {
+        if (this.isNew) {
+          this.notificationService.logException(exception, 'Error creating new user');
+        } else {
+          this.notificationService.logException(exception, 'Error saving user');
         }
       }
-      await this.usersResource.refresh(this.user.userId);
-      this.notificationService.logInfo({ title: 'authentication_user_user_created' });
-    } catch (exception) {
-      if (isUserCreated) {
-        await this.deleteUser(this.credentials.login);
-      }
-      if (!this.error.catch(exception) || this.isDistructed) {
-        this.notificationService.logException(exception, 'Error creating new user');
-      }
     } finally {
-      this.isCreating = false;
+      this.isSaving = false;
     }
   }
 
@@ -125,14 +127,52 @@ export class UserEditController implements IInitializableController, IDestructib
     }
   }
 
-  private async deleteUser(userId: string) {
+  handleConnectionsAccessChange = () => this.connectionAccessChanged = true;
+
+  loadConnectionsAccess = async () => {
+    this.isLoading = true;
     try {
-      await this.usersResource.delete(userId);
+      await this.usersResource.loadConnections(this.userId);
+
+      const connections = this.user?.grantedConnections || [];
+
+      for (const connection of connections) {
+        this.grantedConnections.set(connection.connectionId, true);
+      }
     } catch (exception) {
-      if (!this.error.catch(exception) || this.isDistructed) {
-        this.notificationService.logException(exception, 'Error deleting partially created user');
+      this.notificationService.logException(exception, 'authentication_administration_user_connections_access_load_fail');
+    }
+    await this.loadConnections();
+    this.isLoading = false;
+  }
+
+  private async updateRoles() {
+    for (const [roleId, checked] of this.credentials.roles) {
+      if (checked) {
+        if (!this.user.grantedRoles.includes(roleId)) {
+          await this.usersResource.grantRole(this.user.userId, roleId, true);
+        }
+      } else if (!this.isNew) {
+        await this.usersResource.revokeRole(this.user.userId, roleId, true);
       }
     }
+  }
+
+  private getGrantedRoles() {
+    return Array.from(this.credentials.roles.keys()).filter(roleId => this.credentials.roles.get(roleId));
+  }
+
+  private getGrantedConnections() {
+    return Array.from(this.grantedConnections.keys())
+      .filter(connectionId => this.grantedConnections.get(connectionId));
+  }
+
+  private async saveConnectionPermissions() {
+    if (!this.connectionAccessChanged) {
+      return;
+    }
+    await this.usersResource.setConnections(this.userId, this.getGrantedConnections());
+    this.connectionAccessChanged = false;
   }
 
   private async loadRoles() {
@@ -154,6 +194,14 @@ export class UserEditController implements IInitializableController, IDestructib
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load user');
+    }
+  }
+
+  private async loadConnections() {
+    try {
+      await this.connectionsResource.loadAll();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'authentication_administration_user_connections_access_connections_load_fail');
     }
   }
 }

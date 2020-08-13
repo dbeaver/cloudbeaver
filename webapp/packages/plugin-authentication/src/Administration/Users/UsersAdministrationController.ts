@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { UsersResource } from '../UsersResource';
 
@@ -85,9 +85,7 @@ export class UsersAdministrationController {
         return;
       }
 
-      for (const userId of deletionList) {
-        await this.usersResource.delete(userId);
-      }
+      await this.usersResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
       await this.usersResource.loadAll();
     } catch (exception) {
