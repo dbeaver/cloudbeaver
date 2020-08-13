@@ -46,7 +46,7 @@ export const GrantedConnections = observer(function GrantedConnections({
     <Table selectedItems={grantedConnection} onSelect={onChange}>
       <TableHeader>
         <TableColumnHeader min/>
-        <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_administration_user_connections_access_role')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>
