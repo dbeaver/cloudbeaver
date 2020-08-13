@@ -8,6 +8,7 @@
 
 import { observable, action, computed } from 'mobx';
 
+import { UsersResource, RolesResource } from '@cloudbeaver/core-authentication';
 import {
   injectable, IInitializableController, IDestructibleController, Bootstrap
 } from '@cloudbeaver/core-di';
@@ -15,7 +16,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
-  ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel, ConnectionInfo
+  ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel, ConnectionInfo, AdminConnectionGrantInfo
 } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../DatabaseAuthModelsResource';
@@ -30,6 +31,7 @@ export enum ConnectionType {
 @injectable()
 export class ConnectionEditController
 implements IInitializableController, IDestructibleController {
+  @observable grantedSubjects: AdminConnectionGrantInfo[] = [];
   @observable connectionType = ConnectionType.Attributes
   @observable isLoading = true;
   @observable isSaving = false;
@@ -47,6 +49,14 @@ implements IInitializableController, IDestructibleController {
     credentials: {},
   };
 
+  @computed get users() {
+    return Array.from(this.usersResource.data.values());
+  }
+
+  @computed get roles() {
+    return Array.from(this.rolesResource.data.values());
+  }
+
   @computed get isDisabled() {
     return this.isLoading || this.isSaving;
   }
@@ -60,7 +70,11 @@ implements IInitializableController, IDestructibleController {
   }
 
   connectionId!: string;
+
+  readonly selectedSubjects = observable<string, boolean>(new Map())
   readonly error = new GQLErrorCatcher();
+  private accessChanged = false;
+  private accessLoaded = false;
   private isDistructed = false;
   private connectionInfo!: ConnectionInfo;
 
@@ -69,6 +83,8 @@ implements IInitializableController, IDestructibleController {
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
+    private usersResource: UsersResource,
+    private rolesResource: RolesResource,
     private dbDriverResource: DBDriverResource,
   ) { }
 
@@ -108,10 +124,12 @@ implements IInitializableController, IDestructibleController {
     try {
       if (this.isNew) {
         const connection = await this.connectionsResource.create(this.getConnectionConfig(), this.connectionId);
+        await this.saveSubjectPermissions(connection.id);
 
         this.notificationService.logInfo({ title: `Connection ${connection.name} created` });
       } else {
         const connection = await this.connectionsResource.update(this.connectionId, this.getConnectionConfig());
+        await this.saveSubjectPermissions(connection.id);
 
         this.notificationService.logInfo({ title: `Connection ${connection.name} updated` });
       }
@@ -126,6 +144,43 @@ implements IInitializableController, IDestructibleController {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
+  }
+
+  handleAccessChange = () => this.accessChanged = true;
+
+  loadAccessSubjects = async () => {
+    if (this.accessLoaded || this.isLoading) {
+      return;
+    }
+
+    this.isLoading = true;
+    try {
+      await this.usersResource.loadAll();
+      await this.rolesResource.loadAll();
+
+      this.grantedSubjects = await this.connectionsResource.loadAccessSubjects(this.connectionId);
+
+      for (const subject of this.grantedSubjects) {
+        this.selectedSubjects.set(subject.subjectId, true);
+      }
+      this.accessLoaded = true;
+    } catch (exception) {
+      this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
+    }
+    this.isLoading = false;
+  }
+
+  private getGrantedSubjects() {
+    return Array.from(this.selectedSubjects.keys())
+      .filter(connectionId => this.selectedSubjects.get(connectionId));
+  }
+
+  private async saveSubjectPermissions(connectionId: string) {
+    if (!this.accessChanged) {
+      return;
+    }
+    await this.connectionsResource.setAccessSubjects(connectionId, this.getGrantedSubjects());
+    this.accessChanged = false;
   }
 
   private getConnectionConfig(): ConnectionConfig {
@@ -161,6 +216,7 @@ implements IInitializableController, IDestructibleController {
   @action
   private setDefaults() {
     this.onChange('name', this.connectionInfo?.name || (this.driver ? `${this.driver?.name} (custom)` : ''));
+    this.onChange('description', this.connectionInfo?.description || '');
     this.onChange('template', this.connectionInfo?.template);
     this.onChange('driverId', this.connectionInfo?.driverId || this.driver?.id || '');
     this.onChange('host', this.connectionInfo?.host || '');

@@ -24,6 +24,7 @@ import { ConnectionsResource } from '../../ConnectionsResource';
 import { ConnectionEditController } from './ConnectionEditController';
 import { ConnectionForm } from './ConnectionForm/ConnectionForm';
 import { DriverProperties } from './DriverProperties/DriverProperties';
+import { GrantedSubjects } from './GrantedSubjects';
 
 const styles = composes(
   css`
@@ -41,6 +42,10 @@ const styles = composes(
 
     SubmittingForm {
       composes: theme-background-secondary from global;
+    }
+
+    GrantedSubjects {
+      composes: theme-background-surface from global;
     }
   `,
   css`
@@ -143,6 +148,9 @@ export const ConnectionEdit = observer(function ConnectionEdit({
         <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} disabled={!controller.driver} >
           <TabTitle>{translate('customConnection_properties')}</TabTitle>
         </Tab>
+        <Tab tabId='access' onOpen={controller.loadAccessSubjects} disabled={!controller.driver} >
+          <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
+        </Tab>
         <fill as="div" />
         <Button
           type="button"
@@ -177,6 +185,16 @@ export const ConnectionEdit = observer(function ConnectionEdit({
                 />
               </TabPanel>
             )}
+            <TabPanel tabId='access'>
+              <GrantedSubjects
+                grantedSubjects={controller.grantedSubjects}
+                users={controller.users}
+                roles={controller.roles}
+                selectedSubjects={controller.selectedSubjects}
+                disabled={controller.isLoading}
+                onChange={controller.handleAccessChange}
+              />
+            </TabPanel>
           </SubmittingForm>
         )
       }

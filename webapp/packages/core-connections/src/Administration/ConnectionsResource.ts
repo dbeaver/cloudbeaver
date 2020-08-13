@@ -14,6 +14,7 @@ import {
   CachedMapResource,
   ResourceKey,
   isResourceKeyList,
+  AdminConnectionGrantInfo,
 } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -95,6 +96,20 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     }
     this.markUpdated(key);
     this.itemDeleteSubject.next(key);
+  }
+
+  async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
+    if (this.isNew(connectionId)) {
+      return [];
+    }
+
+    const { subjects } = await this.graphQLService.gql.getConnectionAccess({ connectionId });
+
+    return subjects;
+  }
+
+  async setAccessSubjects(connectionId: string, subjects: string[]) {
+    await this.graphQLService.gql.setConnectionAccess({ connectionId, subjects });
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {

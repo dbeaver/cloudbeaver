@@ -900,9 +900,22 @@ export type DeleteConnectionConfigurationQueryVariables = Exact<{
 
 export type DeleteConnectionConfigurationQuery = Pick<Query, 'deleteConnectionConfiguration'>;
 
+export type GetConnectionAccessQueryVariables = Exact<{
+  connectionId?: Maybe<Scalars['ID']>;
+}>;
+
+export type GetConnectionAccessQuery = { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> };
+
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
+
+export type SetConnectionAccessQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  subjects: Array<Scalars['ID']>;
+}>;
+
+export type SetConnectionAccessQuery = Pick<Query, 'setConnectionSubjectAccess'>;
 
 export type UpdateConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1414,6 +1427,15 @@ export const DeleteConnectionConfigurationDocument = `
   deleteConnectionConfiguration(id: $id)
 }
     `;
+export const GetConnectionAccessDocument = `
+    query getConnectionAccess($connectionId: ID) {
+  subjects: getConnectionSubjectAccess(connectionId: $connectionId) {
+    connectionId
+    subjectId
+    subjectType
+  }
+}
+    `;
 export const GetConnectionsDocument = `
     query getConnections {
   connections: allConnections {
@@ -1433,6 +1455,11 @@ export const GetConnectionsDocument = `
     authNeeded
     authModel
   }
+}
+    `;
+export const SetConnectionAccessDocument = `
+    query setConnectionAccess($connectionId: ID!, $subjects: [ID!]!) {
+  setConnectionSubjectAccess(connectionId: $connectionId, subjects: $subjects)
 }
     `;
 export const UpdateConnectionConfigurationDocument = `
@@ -2138,8 +2165,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables): Promise<DeleteConnectionConfigurationQuery> {
       return withWrapper(() => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables));
     },
+    getConnectionAccess(variables?: GetConnectionAccessQueryVariables): Promise<GetConnectionAccessQuery> {
+      return withWrapper(() => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables));
+    },
     getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
       return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
+    },
+    setConnectionAccess(variables: SetConnectionAccessQueryVariables): Promise<SetConnectionAccessQuery> {
+      return withWrapper(() => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables));
     },
     updateConnectionConfiguration(variables: UpdateConnectionConfigurationQueryVariables): Promise<UpdateConnectionConfigurationQuery> {
       return withWrapper(() => client.request<UpdateConnectionConfigurationQuery>(UpdateConnectionConfigurationDocument, variables));

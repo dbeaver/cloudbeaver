@@ -9,11 +9,10 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-
-import { AuthInfoService } from './AuthInfoService';
 
 const styles = composes(
   css`

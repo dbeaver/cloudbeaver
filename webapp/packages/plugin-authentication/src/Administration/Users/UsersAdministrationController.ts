@@ -8,13 +8,12 @@
 
 import { observable } from 'mobx';
 
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
-
-import { UsersResource } from '../UsersResource';
 
 @injectable()
 export class UsersAdministrationController {

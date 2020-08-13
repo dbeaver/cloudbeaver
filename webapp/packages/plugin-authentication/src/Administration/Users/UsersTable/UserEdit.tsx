@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useContext, useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TabsState, TabList, Tab,
   TabTitle, Loader, SubmittingForm, TabPanel,
@@ -24,7 +25,6 @@ import { useService, useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { UsersResource } from '../../UsersResource';
 import { GrantedConnections } from './GrantedConnections';
 import { UserEditController } from './UserEditController';
 

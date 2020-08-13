@@ -22,6 +22,9 @@ import {
   AppScreenService, CoreSettingsService, AdministrationTopAppBarBootstrapService
 } from '@cloudbeaver/core-app';
 import {
+  AuthInfoService, AuthProviderService, AuthProvidersResource, RolesManagerService, RolesResource, UsersResource
+} from '@cloudbeaver/core-authentication';
+import {
   ConnectionsManagerService,
   ConnectionInfoResource,
   ContainerResource,
@@ -71,6 +74,12 @@ export const coreManifest: PluginManifest = {
     ProductSettingsService,
     ProductManagerService,
     PluginManagerService,
+    AuthInfoService,
+    AuthProviderService,
+    AuthProvidersResource,
+    RolesManagerService,
+    RolesResource,
+    UsersResource,
     ServerSettingsService,
     ServerConfigResource,
     PermissionsResource,

@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
 
-import { AuthInfoService } from './AuthInfoService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()

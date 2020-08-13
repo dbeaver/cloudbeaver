@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand
 } from '@cloudbeaver/core-blocks';
@@ -16,7 +17,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { UsersResource } from '../../UsersResource';
 import { UserEdit } from './UserEdit';
 
 const styles = composes(

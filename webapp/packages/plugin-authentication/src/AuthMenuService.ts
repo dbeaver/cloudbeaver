@@ -8,12 +8,12 @@
 
 import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
+import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService } from '@cloudbeaver/core-root';
 
 import { AuthenticationService } from './AuthenticationService';
-import { AuthInfoService } from './AuthInfoService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
 

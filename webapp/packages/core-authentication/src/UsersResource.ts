@@ -17,8 +17,8 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import { AuthInfoService } from '../AuthInfoService';
-import { AuthProviderService } from '../AuthProviderService';
+import { AuthInfoService } from './AuthInfoService';
+import { AuthProviderService } from './AuthProviderService';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -76,6 +76,10 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   }
 
   async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {
+    if (this.isNew(userId)) {
+      return [];
+    }
+
     const { grantedConnections } = await this.graphQLService.gql.getUserGrantedConnections({ userId });
 
     return grantedConnections;

@@ -8,15 +8,13 @@
 
 import { observable, computed } from 'mobx';
 
+import { RolesManagerService, UsersResource } from '@cloudbeaver/core-authentication';
 import { ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
-
-import { RolesManagerService } from '../../RolesManagerService';
-import { UsersResource } from '../../UsersResource';
 
 @injectable()
 export class UserEditController implements IInitializableController, IDestructibleController {

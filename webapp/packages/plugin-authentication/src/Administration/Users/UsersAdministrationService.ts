@@ -7,10 +7,10 @@
  */
 
 import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { UsersResource } from '../UsersResource';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersDrawerItem } from './UsersDrawerItem';
 
