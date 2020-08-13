@@ -171,8 +171,8 @@ export class UserEditController implements IInitializableController, IDestructib
     if (!this.connectionAccessChanged) {
       return;
     }
-    this.connectionAccessChanged = false;
     await this.usersResource.setConnections(this.userId, this.getGrantedConnections());
+    this.connectionAccessChanged = false;
   }
 
   private async loadRoles() {

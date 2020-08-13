@@ -45,7 +45,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
 
   isNew(id: string): boolean {
     if (!this.has(id)) {
-      return false;
+      return true;
     }
     return NEW_USER_SYMBOL in this.get(id)!;
   }
