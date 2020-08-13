@@ -42,7 +42,7 @@ const styles = composes(
       composes: theme-background-secondary from global;
     }
 
-    SubmittingForm {
+    SubmittingForm, Loader {
       composes: theme-background-secondary from global;
     }
   `,

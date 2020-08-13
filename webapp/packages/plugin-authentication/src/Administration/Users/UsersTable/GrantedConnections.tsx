@@ -21,6 +21,9 @@ const styles = css`
   TableColumnHeader {
     border-top: solid 1px;
   }
+  center {
+    margin: auto;
+  }
 `;
 
 type Props = {
@@ -41,6 +44,12 @@ export const GrantedConnections = observer(function GrantedConnections({
   const translate = useTranslate();
   const getConnectionPermission = useCallback((connectionId: string) => user.grantedConnections
       ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [user]);
+
+  if (connections.length === 0) {
+    return styled(useStyles(styles))(
+      <center as='div'>{translate('authentication_administration_user_connections_empty')}</center>
+    );
+  }
 
   return styled(useStyles(styles))(
     <Table selectedItems={grantedConnection} onSelect={onChange}>

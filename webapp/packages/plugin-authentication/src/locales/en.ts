@@ -6,6 +6,7 @@ export default [
   ['authentication_administration_user_connections_access_connections_load_fail', 'Connections loading failed'],
   ['authentication_administration_user_connections_access', 'Connections Access'],
   ['authentication_administration_user_connections_access_role', 'Role'],
+  ['authentication_administration_user_connections_empty', 'No available connections'],
   ['authentication_administration_user_info', 'Info'],
   ['authentication_administration_item', 'Users'],
   ['authentication_administration_confirm_user_deletion', 'Confirm user deletion'],

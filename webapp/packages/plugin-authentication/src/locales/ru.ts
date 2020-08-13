@@ -6,6 +6,7 @@ export default [
   ['authentication_administration_user_connections_access_connections_load_fail', 'Ошибка при загрузке списка коннекшенов'],
   ['authentication_administration_user_connections_access', 'Доступ к базам'],
   ['authentication_administration_user_connections_access_role', 'Роль'],
+  ['authentication_administration_user_connections_empty', 'Нет доступных коннекшенов'],
   ['authentication_administration_user_info', 'Общее'],
   ['authentication_administration_item', 'Пользователи'],
   ['authentication_administration_confirm_user_deletion', 'Подтвердите удаление'],
