@@ -157,19 +157,19 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
         if (this.isActiveUser(key.list[i])) {
           throw new Error('You can\'t delete current logged user');
         }
-        this.data.delete(key.list[i]);
         if (!this.isNew(key.list[i])) {
           await this.graphQLService.gql.deleteUser({ userId: key.list[i] });
         }
+        this.data.delete(key.list[i]);
       }
     } else {
       if (this.isActiveUser(key)) {
         throw new Error('You can\'t delete current logged user');
       }
-      this.data.delete(key);
       if (!this.isNew(key)) {
         await this.graphQLService.gql.deleteUser({ userId: key });
       }
+      this.data.delete(key);
     }
     this.markUpdated(key);
     this.itemDeleteSubject.next(key);
