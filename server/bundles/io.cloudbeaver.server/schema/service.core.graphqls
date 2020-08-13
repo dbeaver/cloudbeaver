@@ -127,6 +127,9 @@ type DriverInfo {
     # Driver Java class name
     driverClassName: String
     defaultPort: String
+    defaultDatabase: String
+    defaultServer: String
+    defaultUser: String
     sampleURL: String
     driverInfoURL: String
     driverPropertiesURL: String
