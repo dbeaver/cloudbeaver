@@ -78,7 +78,7 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException;
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    List<WebConnectionInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
+    List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException;

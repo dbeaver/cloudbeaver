@@ -31,10 +31,7 @@ import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.admin.AdminPermissionInfo;
-import io.cloudbeaver.service.admin.AdminRoleInfo;
-import io.cloudbeaver.service.admin.AdminUserInfo;
-import io.cloudbeaver.service.admin.DBWServiceAdmin;
+import io.cloudbeaver.service.admin.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -42,6 +39,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -248,8 +246,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public List<WebConnectionInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException {
-        throw new DBWebException("Not implemented");
+    public List<AdminConnectionSearchInfo> searchConnections(@NotNull WebSession webSession, @NotNull List<String> hostNames) throws DBWebException {
+        ConnectionSearcher searcher = new ConnectionSearcher(webSession, hostNames.toArray(new String[0]));
+        try {
+            searcher.run(webSession.getProgressMonitor());
+        } catch (InvocationTargetException e) {
+            throw new DBWebException("Error searching connections", e.getTargetException());
+        }
+        return searcher.getFoundConnections();
     }
 
     @Override

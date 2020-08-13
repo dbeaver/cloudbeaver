@@ -8,6 +8,7 @@ Bundle-Release-Date: 20200817
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: io.cloudbeaver.server
+Require-Bundle: io.cloudbeaver.server,
+ org.jkiss.dbeaver.registry
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.admin
