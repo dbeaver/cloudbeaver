@@ -60,6 +60,7 @@ export class UserEditController implements IInitializableController, IDestructib
   private isDistructed = false;
   private userId!: string;
   private connectionAccessChanged = false;
+  private connectionAccessLoaded = false;
 
   constructor(
     private notificationService: NotificationService,
@@ -130,15 +131,18 @@ export class UserEditController implements IInitializableController, IDestructib
   handleConnectionsAccessChange = () => this.connectionAccessChanged = true;
 
   loadConnectionsAccess = async () => {
+    if (this.isLoading || this.connectionAccessLoaded) {
+      return;
+    }
+
     this.isLoading = true;
     try {
-      await this.usersResource.loadConnections(this.userId);
-
-      const connections = this.user?.grantedConnections || [];
+      const connections = await this.usersResource.loadConnections(this.userId);
 
       for (const connection of connections) {
         this.grantedConnections.set(connection.connectionId, true);
       }
+      this.connectionAccessLoaded = true;
     } catch (exception) {
       this.notificationService.logException(exception, 'authentication_administration_user_connections_access_load_fail');
     }

@@ -48,6 +48,7 @@ export type Query = {
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   readSessionLog: Array<LogEntry>;
   revokeUserRole?: Maybe<Scalars['Boolean']>;
+  searchConnections: Array<AdminConnectionSearchInfo>;
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
@@ -175,6 +176,10 @@ export type QueryReadSessionLogArgs = {
 export type QueryRevokeUserRoleArgs = {
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
+};
+
+export type QuerySearchConnectionsArgs = {
+  hostNames: Array<Scalars['String']>;
 };
 
 export type QuerySetConnectionSubjectAccessArgs = {
@@ -707,6 +712,13 @@ export type AdminConnectionGrantInfo = {
   subjectType: AdminSubjectType;
 };
 
+export type AdminConnectionSearchInfo = {
+  host: Scalars['String'];
+  port: Scalars['Int'];
+  possibleDrivers: Array<Scalars['ID']>;
+  defaultDriver: Scalars['ID'];
+};
+
 export type AdminUserInfo = {
   userId: Scalars['ID'];
   metaParameters: Scalars['Object'];
@@ -835,14 +847,11 @@ export type GetRolesListQueryVariables = Exact<{
 
 export type GetRolesListQuery = { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> };
 
-export type GetUsersConnectionsQueryVariables = Exact<{
+export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
 
-export type GetUsersConnectionsQuery = { users: Array<Maybe<(
-    Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
-    & { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
-  )>>; };
+export type GetUserGrantedConnectionsQuery = { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> };
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
@@ -1342,16 +1351,12 @@ export const GetRolesListDocument = `
   }
 }
     `;
-export const GetUsersConnectionsDocument = `
-    query getUsersConnections($userId: ID) {
-  users: listUsers(userId: $userId) {
-    userId
-    grantedRoles
-    grantedConnections {
-      connectionId
-      subjectId
-      subjectType
-    }
+export const GetUserGrantedConnectionsDocument = `
+    query getUserGrantedConnections($userId: ID) {
+  grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
+    connectionId
+    subjectId
+    subjectType
   }
 }
     `;
@@ -2109,8 +2114,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
     },
-    getUsersConnections(variables?: GetUsersConnectionsQueryVariables): Promise<GetUsersConnectionsQuery> {
-      return withWrapper(() => client.request<GetUsersConnectionsQuery>(GetUsersConnectionsDocument, variables));
+    getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables): Promise<GetUserGrantedConnectionsQuery> {
+      return withWrapper(() => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables));
     },
     getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
       return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
