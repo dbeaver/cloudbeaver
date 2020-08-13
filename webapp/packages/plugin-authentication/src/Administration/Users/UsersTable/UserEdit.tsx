@@ -261,9 +261,9 @@ export const UserEdit = observer(function UserEdit({
             </TabPanel>
             <TabPanel tabId='connections_access'>
               <GrantedConnections
-                user={controller.user}
+                grantedConnections={controller.grantedConnections}
                 connections={controller.connections}
-                grantedConnection={controller.grantedConnections}
+                selectedConnection={controller.selectedConnections}
                 disabled={controller.isLoading}
                 onChange={controller.handleConnectionsAccessChange}
               />

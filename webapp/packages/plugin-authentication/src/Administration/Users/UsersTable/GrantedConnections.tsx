@@ -16,7 +16,7 @@ import {
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminSubjectType, ConnectionInfo, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { AdminSubjectType, ConnectionInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
@@ -33,26 +33,26 @@ const styles = css`
 `;
 
 type Props = {
-  user: AdminUserInfo;
+  grantedConnections: AdminConnectionGrantInfo[];
   connections: ConnectionInfo[];
-  grantedConnection: Map<string, boolean>;
+  selectedConnection: Map<string, boolean>;
   disabled: boolean;
   onChange?: () => void;
   className?: string;
 }
 
 export const GrantedConnections = observer(function GrantedConnections({
-  user,
+  grantedConnections,
   connections,
-  grantedConnection,
+  selectedConnection,
   disabled,
   onChange,
   className,
 }: Props) {
   const translate = useTranslate();
   const driversResource = useService(DBDriverResource);
-  const getConnectionPermission = useCallback((connectionId: string) => user.grantedConnections
-      ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [user]);
+  const getConnectionPermission = useCallback((connectionId: string) => grantedConnections
+      ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [grantedConnections]);
 
   if (connections.length === 0) {
     return styled(useStyles(styles))(
@@ -61,7 +61,7 @@ export const GrantedConnections = observer(function GrantedConnections({
   }
 
   return styled(useStyles(styles))(
-    <Table selectedItems={grantedConnection} onSelect={onChange} className={className}>
+    <Table selectedItems={selectedConnection} onSelect={onChange} className={className}>
       <TableHeader>
         <TableColumnHeader min/>
         <TableColumnHeader min/>

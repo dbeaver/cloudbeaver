@@ -81,12 +81,8 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     return grantedConnections;
   }
 
-  async setConnections(key: string, connectionsIdList: string[]) {
-    await this.performUpdate(key, async () => {
-      await this.setActivePromise(key, this.setConnectionsQuery(key, connectionsIdList));
-    });
-
-    return this.loadConnections(key);
+  async setConnections(userId: string, connections: string[]) {
+    await this.graphQLService.gql.setConnections({ userId, connections });
   }
 
   async create({
@@ -198,10 +194,6 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
       return this.get(key).every(user => !!user?.grantedConnections);
     }
     return !!this.get(key)?.grantedConnections;
-  }
-
-  private async setConnectionsQuery(userId: string, connections: string[]) {
-    await this.graphQLService.gql.setConnections({ userId, connections });
   }
 
   private isActiveUser(userId: string) {

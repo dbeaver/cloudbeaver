@@ -13,14 +13,15 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
 import { RolesManagerService } from '../../RolesManagerService';
 import { UsersResource } from '../../UsersResource';
 
 @injectable()
 export class UserEditController implements IInitializableController, IDestructibleController {
-  readonly grantedConnections = observable<string, boolean>(new Map())
+  readonly selectedConnections = observable<string, boolean>(new Map())
+  @observable grantedConnections: AdminConnectionGrantInfo[] = [];
   @observable isSaving = false;
   @observable isLoading = true;
   @observable credentials = {
@@ -138,10 +139,10 @@ export class UserEditController implements IInitializableController, IDestructib
 
     this.isLoading = true;
     try {
-      const connections = await this.usersResource.loadConnections(this.userId);
+      this.grantedConnections = await this.usersResource.loadConnections(this.userId);
 
-      for (const connection of connections) {
-        this.grantedConnections.set(connection.connectionId, true);
+      for (const connection of this.grantedConnections) {
+        this.selectedConnections.set(connection.connectionId, true);
       }
       this.connectionAccessLoaded = true;
     } catch (exception) {
@@ -168,8 +169,8 @@ export class UserEditController implements IInitializableController, IDestructib
   }
 
   private getGrantedConnections() {
-    return Array.from(this.grantedConnections.keys())
-      .filter(connectionId => this.grantedConnections.get(connectionId));
+    return Array.from(this.selectedConnections.keys())
+      .filter(connectionId => this.selectedConnections.get(connectionId));
   }
 
   private async saveConnectionPermissions() {
