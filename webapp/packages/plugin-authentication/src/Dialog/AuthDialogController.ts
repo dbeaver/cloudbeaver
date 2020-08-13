@@ -8,14 +8,12 @@
 
 import { observable, computed } from 'mobx';
 
+import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-
-import { AuthInfoService } from '../AuthInfoService';
-import { AuthProvidersResource, AuthProvider } from '../AuthProvidersResource';
 
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {

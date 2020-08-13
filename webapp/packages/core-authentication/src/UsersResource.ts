@@ -12,12 +12,13 @@ import {
   CachedMapResource,
   AdminUserInfo,
   ResourceKey,
-  isResourceKeyList
+  isResourceKeyList,
+  AdminConnectionGrantInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import { AuthInfoService } from '../AuthInfoService';
-import { AuthProviderService } from '../AuthProviderService';
+import { AuthInfoService } from './AuthInfoService';
+import { AuthProviderService } from './AuthProviderService';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -74,29 +75,18 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     return user;
   }
 
-  async loadConnections(key: string): Promise<AdminUserInfo>
-  async loadConnections(key: ResourceKey<string>): Promise<AdminUserInfo[]>
-  async loadConnections(key: ResourceKey<string>) {
-    if (this.isLoaded(key) && !this.isOutdated(key) && this.isConnectionsLoaded(key)) {
-      return this.get(key);
+  async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {
+    if (this.isNew(userId)) {
+      return [];
     }
 
-    await this.performUpdate(key, async () => {
-      if (this.isLoaded(key) && !this.isOutdated(key) && this.isConnectionsLoaded(key)) {
-        return;
-      }
+    const { grantedConnections } = await this.graphQLService.gql.getUserGrantedConnections({ userId });
 
-      await this.setActivePromise(key, this.connectionsKeyLoader(key));
-    });
-    return this.get(key);
+    return grantedConnections;
   }
 
-  async setConnections(key: string, connectionsIdList: string[]) {
-    await this.performUpdate(key, async () => {
-      await this.setActivePromise(key, this.setConnectionsQuery(key, connectionsIdList));
-    });
-
-    return this.loadConnections(key);
+  async setConnections(userId: string, connections: string[]) {
+    await this.graphQLService.gql.setConnections({ userId, connections });
   }
 
   async create({
@@ -208,31 +198,6 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
       return this.get(key).every(user => !!user?.grantedConnections);
     }
     return !!this.get(key)?.grantedConnections;
-  }
-
-  private async setConnectionsQuery(userId: string, connections: string[]) {
-    const { grantedConnections } = await this.graphQLService.gql.setConnections({ userId, connections });
-    this.markOutdated(userId);
-    // const user = this.get(userId)!;
-    // user.grantedConnections = grantedConnections;
-  }
-
-  private async connectionsKeyLoader(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        await this.connectionsLoader(key.list[i]);
-      }
-    } else {
-      await this.connectionsLoader(key);
-    }
-  }
-
-  private async connectionsLoader(userId: string) {
-    const { users } = await this.graphQLService.gql.getUsersConnections({ userId });
-
-    for (const user of users) {
-      this.set(user.userId, user as AdminUserInfo);
-    }
   }
 
   private isActiveUser(userId: string) {

@@ -10,6 +10,7 @@ import { createContext } from 'react';
 
 export interface ITableItemContext {
   item: any;
+  selectDisabled: boolean;
   isSelected(): boolean;
   isExpanded(): boolean;
 }

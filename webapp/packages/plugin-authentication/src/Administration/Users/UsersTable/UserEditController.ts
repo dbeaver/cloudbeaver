@@ -8,19 +8,18 @@
 
 import { observable, computed } from 'mobx';
 
-import { ConnectionsResource } from '@cloudbeaver/core-connections';
+import { RolesManagerService, UsersResource } from '@cloudbeaver/core-authentication';
+import { ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminUserInfo } from '@cloudbeaver/core-sdk';
-
-import { RolesManagerService } from '../../RolesManagerService';
-import { UsersResource } from '../../UsersResource';
+import { GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UserEditController implements IInitializableController, IDestructibleController {
-  readonly grantedConnections = observable<string, boolean>(new Map())
+  readonly selectedConnections = observable<string, boolean>(new Map())
+  @observable grantedConnections: AdminConnectionGrantInfo[] = [];
   @observable isSaving = false;
   @observable isLoading = true;
   @observable credentials = {
@@ -60,13 +59,15 @@ export class UserEditController implements IInitializableController, IDestructib
   private isDistructed = false;
   private userId!: string;
   private connectionAccessChanged = false;
+  private connectionAccessLoaded = false;
 
   constructor(
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private rolesManagerService: RolesManagerService,
     private usersResource: UsersResource,
-    private connectionsResource: ConnectionsResource
+    private connectionsResource: ConnectionsResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(id: string) {
@@ -130,15 +131,18 @@ export class UserEditController implements IInitializableController, IDestructib
   handleConnectionsAccessChange = () => this.connectionAccessChanged = true;
 
   loadConnectionsAccess = async () => {
+    if (this.isLoading || this.connectionAccessLoaded) {
+      return;
+    }
+
     this.isLoading = true;
     try {
-      await this.usersResource.loadConnections(this.userId);
+      this.grantedConnections = await this.usersResource.loadConnections(this.userId);
 
-      const connections = this.user?.grantedConnections || [];
-
-      for (const connection of connections) {
-        this.grantedConnections.set(connection.connectionId, true);
+      for (const connection of this.grantedConnections) {
+        this.selectedConnections.set(connection.connectionId, true);
       }
+      this.connectionAccessLoaded = true;
     } catch (exception) {
       this.notificationService.logException(exception, 'authentication_administration_user_connections_access_load_fail');
     }
@@ -163,8 +167,8 @@ export class UserEditController implements IInitializableController, IDestructib
   }
 
   private getGrantedConnections() {
-    return Array.from(this.grantedConnections.keys())
-      .filter(connectionId => this.grantedConnections.get(connectionId));
+    return Array.from(this.selectedConnections.keys())
+      .filter(connectionId => this.selectedConnections.get(connectionId));
   }
 
   private async saveConnectionPermissions() {
@@ -199,6 +203,7 @@ export class UserEditController implements IInitializableController, IDestructib
 
   private async loadConnections() {
     try {
+      await this.dbDriverResource.loadAll();
       await this.connectionsResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'authentication_administration_user_connections_access_connections_load_fail');

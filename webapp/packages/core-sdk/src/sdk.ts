@@ -48,6 +48,7 @@ export type Query = {
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   readSessionLog: Array<LogEntry>;
   revokeUserRole?: Maybe<Scalars['Boolean']>;
+  searchConnections: Array<AdminConnectionSearchInfo>;
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
@@ -175,6 +176,10 @@ export type QueryReadSessionLogArgs = {
 export type QueryRevokeUserRoleArgs = {
   userId: Scalars['ID'];
   roleId: Scalars['ID'];
+};
+
+export type QuerySearchConnectionsArgs = {
+  hostNames: Array<Scalars['String']>;
 };
 
 export type QuerySetConnectionSubjectAccessArgs = {
@@ -707,6 +712,13 @@ export type AdminConnectionGrantInfo = {
   subjectType: AdminSubjectType;
 };
 
+export type AdminConnectionSearchInfo = {
+  host: Scalars['String'];
+  port: Scalars['Int'];
+  possibleDrivers: Array<Scalars['ID']>;
+  defaultDriver: Scalars['ID'];
+};
+
 export type AdminUserInfo = {
   userId: Scalars['ID'];
   metaParameters: Scalars['Object'];
@@ -835,14 +847,11 @@ export type GetRolesListQueryVariables = Exact<{
 
 export type GetRolesListQuery = { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> };
 
-export type GetUsersConnectionsQueryVariables = Exact<{
+export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
 
-export type GetUsersConnectionsQuery = { users: Array<Maybe<(
-    Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
-    & { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
-  )>>; };
+export type GetUserGrantedConnectionsQuery = { grantedConnections: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> };
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
@@ -891,9 +900,22 @@ export type DeleteConnectionConfigurationQueryVariables = Exact<{
 
 export type DeleteConnectionConfigurationQuery = Pick<Query, 'deleteConnectionConfiguration'>;
 
+export type GetConnectionAccessQueryVariables = Exact<{
+  connectionId?: Maybe<Scalars['ID']>;
+}>;
+
+export type GetConnectionAccessQuery = { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> };
+
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
+
+export type SetConnectionAccessQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+  subjects: Array<Scalars['ID']>;
+}>;
+
+export type SetConnectionAccessQuery = Pick<Query, 'setConnectionSubjectAccess'>;
 
 export type UpdateConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1342,16 +1364,12 @@ export const GetRolesListDocument = `
   }
 }
     `;
-export const GetUsersConnectionsDocument = `
-    query getUsersConnections($userId: ID) {
-  users: listUsers(userId: $userId) {
-    userId
-    grantedRoles
-    grantedConnections {
-      connectionId
-      subjectId
-      subjectType
-    }
+export const GetUserGrantedConnectionsDocument = `
+    query getUserGrantedConnections($userId: ID) {
+  grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
+    connectionId
+    subjectId
+    subjectType
   }
 }
     `;
@@ -1409,6 +1427,15 @@ export const DeleteConnectionConfigurationDocument = `
   deleteConnectionConfiguration(id: $id)
 }
     `;
+export const GetConnectionAccessDocument = `
+    query getConnectionAccess($connectionId: ID) {
+  subjects: getConnectionSubjectAccess(connectionId: $connectionId) {
+    connectionId
+    subjectId
+    subjectType
+  }
+}
+    `;
 export const GetConnectionsDocument = `
     query getConnections {
   connections: allConnections {
@@ -1428,6 +1455,11 @@ export const GetConnectionsDocument = `
     authNeeded
     authModel
   }
+}
+    `;
+export const SetConnectionAccessDocument = `
+    query setConnectionAccess($connectionId: ID!, $subjects: [ID!]!) {
+  setConnectionSubjectAccess(connectionId: $connectionId, subjects: $subjects)
 }
     `;
 export const UpdateConnectionConfigurationDocument = `
@@ -2109,8 +2141,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
     },
-    getUsersConnections(variables?: GetUsersConnectionsQueryVariables): Promise<GetUsersConnectionsQuery> {
-      return withWrapper(() => client.request<GetUsersConnectionsQuery>(GetUsersConnectionsDocument, variables));
+    getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables): Promise<GetUserGrantedConnectionsQuery> {
+      return withWrapper(() => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables));
     },
     getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
       return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
@@ -2133,8 +2165,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables): Promise<DeleteConnectionConfigurationQuery> {
       return withWrapper(() => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables));
     },
+    getConnectionAccess(variables?: GetConnectionAccessQueryVariables): Promise<GetConnectionAccessQuery> {
+      return withWrapper(() => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables));
+    },
     getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
       return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
+    },
+    setConnectionAccess(variables: SetConnectionAccessQueryVariables): Promise<SetConnectionAccessQuery> {
+      return withWrapper(() => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables));
     },
     updateConnectionConfiguration(variables: UpdateConnectionConfigurationQueryVariables): Promise<UpdateConnectionConfigurationQuery> {
       return withWrapper(() => client.request<UpdateConnectionConfigurationQuery>(UpdateConnectionConfigurationDocument, variables));

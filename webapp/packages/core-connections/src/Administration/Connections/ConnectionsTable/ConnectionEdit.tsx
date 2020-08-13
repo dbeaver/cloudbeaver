@@ -24,6 +24,7 @@ import { ConnectionsResource } from '../../ConnectionsResource';
 import { ConnectionEditController } from './ConnectionEditController';
 import { ConnectionForm } from './ConnectionForm/ConnectionForm';
 import { DriverProperties } from './DriverProperties/DriverProperties';
+import { GrantedSubjects } from './GrantedSubjects';
 
 const styles = composes(
   css`
@@ -31,31 +32,27 @@ const styles = composes(
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
 
-    TabList {
-      composes: theme-border-color-background from global;
-    }
-
     ErrorMessage {
       composes: theme-background-secondary from global;
     }
 
-    SubmittingForm {
-      composes: theme-background-secondary from global;
+    content-box {
+      composes: theme-background-secondary theme-border-color-background from global;
+    }
+
+    GrantedSubjects {
+      composes: theme-background-surface from global;
     }
   `,
   css`
-    custom-connection {
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
+    content-box {
+      margin: 0 24px;
+      margin-bottom: 16px;
+      border: solid 1px;
+      border-top: none;
     }
 
-    CommonDialogWrapper {
-      max-height: 500px;
-      min-height: 500px;
-    }
-
-    SubmittingForm, BaseTabPanel {
+    SubmittingForm {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -68,7 +65,6 @@ const styles = composes(
       width: 100%;
       padding-left: 24px;
       outline: none;
-      border-bottom: solid 1px;
     }
 
     Tab {
@@ -91,19 +87,9 @@ const styles = composes(
       flex: 1;
     }
 
-    connection-form[|new] {
-      border-left: solid 3px;
-    }
-
     SubmittingForm, Loader {
       min-height: 320px;
       max-height: 500px;
-    }
-
-    IconButton {
-      height: 32px;
-      width: 32px;
-      margin-right: 16px;
     }
 
     Button:not(:first-child) {
@@ -143,6 +129,9 @@ export const ConnectionEdit = observer(function ConnectionEdit({
         <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} disabled={!controller.driver} >
           <TabTitle>{translate('customConnection_properties')}</TabTitle>
         </Tab>
+        <Tab tabId='access' onOpen={controller.loadAccessSubjects} disabled={!controller.driver} >
+          <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
+        </Tab>
         <fill as="div" />
         <Button
           type="button"
@@ -161,32 +150,44 @@ export const ConnectionEdit = observer(function ConnectionEdit({
           {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
         </Button>
       </TabList>
-      {controller.isLoading
-        ? <Loader />
-        : (
-          <SubmittingForm onSubmit={controller.onSaveConnection}>
-            <TabPanel tabId='options'>
-              <ConnectionForm controller={controller} />
-            </TabPanel>
-            {controller.driver && (
-              <TabPanel tabId='driver_properties'>
-                <DriverProperties
-                  driver={controller.driver}
-                  state={controller.config.properties!}
-                  loadProperties={loadProperties}
+      <content-box as="div">
+        {controller.isLoading
+          ? <Loader />
+          : (
+            <SubmittingForm onSubmit={controller.onSaveConnection}>
+              <TabPanel tabId='options'>
+                <ConnectionForm controller={controller} />
+              </TabPanel>
+              {controller.driver && (
+                <TabPanel tabId='driver_properties'>
+                  <DriverProperties
+                    driver={controller.driver}
+                    state={controller.config.properties!}
+                    loadProperties={loadProperties}
+                  />
+                </TabPanel>
+              )}
+              <TabPanel tabId='access'>
+                <GrantedSubjects
+                  grantedSubjects={controller.grantedSubjects}
+                  users={controller.users}
+                  roles={controller.roles}
+                  selectedSubjects={controller.selectedSubjects}
+                  disabled={controller.isLoading || controller.isSaving}
+                  onChange={controller.handleAccessChange}
                 />
               </TabPanel>
-            )}
-          </SubmittingForm>
-        )
-      }
-      {controller.error.responseMessage && (
-        <ErrorMessage
-          text={controller.error.responseMessage}
-          hasDetails={controller.error.hasDetails}
-          onShowDetails={controller.onShowDetails}
-        />
-      )}
+            </SubmittingForm>
+          )
+        }
+        {controller.error.responseMessage && (
+          <ErrorMessage
+            text={controller.error.responseMessage}
+            hasDetails={controller.error.hasDetails}
+            onShowDetails={controller.onShowDetails}
+          />
+        )}
+      </content-box>
     </TabsState>
   );
 });

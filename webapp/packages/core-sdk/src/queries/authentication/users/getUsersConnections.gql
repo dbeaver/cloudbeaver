@@ -1,14 +1,7 @@
-query getUsersConnections($userId: ID) {
-  users: listUsers(userId: $userId) {
-    userId
-
-    #metaParameters
-    #configurationParameters
-    grantedRoles
-    grantedConnections {
-      connectionId
-      subjectId
-      subjectType
-    }
+query getUserGrantedConnections($userId: ID) {
+  grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
+    connectionId
+    subjectId
+    subjectType
   } 
 }

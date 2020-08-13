@@ -24,13 +24,20 @@ type ExpandProps = {
 type Props = React.PropsWithChildren<{
   item: any;
   expandElement?: React.FunctionComponent<ExpandProps>;
+  selectDisabled?: boolean;
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
 }>
 
 export const TableItem = observer(function TableItem({
-  item, expandElement, children, className, onClick, onDoubleClick,
+  item,
+  expandElement,
+  selectDisabled = false,
+  children,
+  className,
+  onClick,
+  onDoubleClick,
 }: Props) {
   const context = useContext(TableContext);
   if (!context) {
@@ -39,24 +46,27 @@ export const TableItem = observer(function TableItem({
 
   const itemContext = useMemo<ITableItemContext>(() => ({
     item,
+    selectDisabled,
     isSelected: () => !!context.selectedItems.get(item),
     isExpanded: () => !!context.expandedItems.get(item),
-  }), [item]);
+  }), [item, selectDisabled]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLTableRowElement>) => {
-      const isSelected = context.selectedItems.get(item);
-      if (!e.ctrlKey) {
-        context.clearSelection();
-      }
+      if (!selectDisabled) {
+        const isSelected = context.selectedItems.get(item);
+        if (!e.ctrlKey) {
+          context.clearSelection();
+        }
 
-      context.setItemSelect(item, !isSelected);
+        context.setItemSelect(item, !isSelected);
+      }
 
       if (onClick) {
         onClick();
       }
     },
-    [context, item, onClick]
+    [context, item, selectDisabled, onClick]
   );
   const handleDoubleClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     if (onDoubleClick) {
