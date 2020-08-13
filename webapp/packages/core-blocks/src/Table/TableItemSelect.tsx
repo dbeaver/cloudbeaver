@@ -32,6 +32,6 @@ export const TableItemSelect = observer(function TableItemSelect({ disabled, cla
   }, [tableContext, context]);
 
   return styled(useStyles())(
-    <input type='checkbox' checked={context.isSelected()} onClick={handleClick} className={className} disabled={disabled}/>
+    <input type='checkbox' checked={context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>
   );
 });

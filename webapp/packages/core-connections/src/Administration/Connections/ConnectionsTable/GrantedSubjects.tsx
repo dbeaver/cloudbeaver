@@ -67,10 +67,8 @@ export const GrantedSubjects = observer(function GrantedSubjects({
       </TableHeader>
       <TableBody>
         {roles.map(role => (
-          <TableItem key={role.roleId} item={role.roleId}>
-            <TableColumnValue centerContent flex>
-              <TableItemSelect disabled={disabled}/>
-            </TableColumnValue>
+          <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
+            <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
             <TableColumnValue>{role.roleName}</TableColumnValue>
             <TableColumnValue></TableColumnValue>
             <TableColumnValue></TableColumnValue>
@@ -81,10 +79,8 @@ export const GrantedSubjects = observer(function GrantedSubjects({
           const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
 
           return (
-            <TableItem key={user.userId} item={user.userId}>
-              <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled || isRoleProvided}/>
-              </TableColumnValue>
+            <TableItem key={user.userId} item={user.userId} selectDisabled={disabled || isRoleProvided}>
+              <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
               <TableColumnValue>{user.userId}</TableColumnValue>
               <TableColumnValue>{isRoleProvided && user.grantedRoles.join(',')}</TableColumnValue>
               <TableColumnValue></TableColumnValue>

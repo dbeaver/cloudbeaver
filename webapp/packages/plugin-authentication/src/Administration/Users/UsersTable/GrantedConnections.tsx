@@ -76,10 +76,8 @@ export const GrantedConnections = observer(function GrantedConnections({
           const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
 
           return (
-            <TableItem key={connection.id} item={connection.id}>
-              <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled || isRoleProvided}/>
-              </TableColumnValue>
+            <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
+              <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
               <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
               <TableColumnValue>{connection.name}</TableColumnValue>
               <TableColumnValue>{isRoleProvided && connectionPermission?.subjectId}</TableColumnValue>
