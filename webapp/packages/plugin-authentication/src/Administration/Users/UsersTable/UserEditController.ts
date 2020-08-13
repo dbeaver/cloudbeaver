@@ -150,10 +150,10 @@ export class UserEditController implements IInitializableController, IDestructib
     for (const [roleId, checked] of this.credentials.roles) {
       if (checked) {
         if (!this.user.grantedRoles.includes(roleId)) {
-          await this.usersResource.grantRole(this.user.userId, roleId);
+          await this.usersResource.grantRole(this.user.userId, roleId, true);
         }
       } else if (!this.isNew) {
-        await this.usersResource.revokeRole(this.user.userId, roleId);
+        await this.usersResource.revokeRole(this.user.userId, roleId, true);
       }
     }
   }
