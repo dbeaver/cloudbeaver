@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
@@ -277,15 +278,27 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         WebServiceUtils.getDataSourceRegistry().flushConfig();
 
         try {
-            CBApplication.getInstance().getSecurityController().setConnectionAccess(id, null, null);
+            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(id, null, null);
         } catch (DBCException e) {
             log.error(e);
         }
         return true;
     }
 
+    ////////////////////////////////////////////////////////////////////
+    // Access management
+
     @Override
-    public boolean setConnectionAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
+    public DBWConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException {
+        try {
+            return CBApplication.getInstance().getSecurityController().getConnectionSubjectAccess(connectionId);
+        } catch (DBCException e) {
+            throw new DBWebException("Error getting connection access info", e);
+        }
+    }
+
+    @Override
+    public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull String[] subjects) throws DBWebException {
         DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");
@@ -295,9 +308,37 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
         try {
-            CBApplication.getInstance().getSecurityController().setConnectionAccess(connectionId, subjects, grantor.getUserId());
+            CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(connectionId, subjects, grantor.getUserId());
         } catch (DBCException e) {
-            log.error(e);
+            throw new DBWebException("Error setting connection subject access", e);
+        }
+        return true;
+    }
+
+    @Override
+    public DBWConnectionGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
+        try {
+            return CBApplication.getInstance().getSecurityController().getSubjectConnectionAccess(new String[] { subjectId } );
+        } catch (DBCException e) {
+            throw new DBWebException("Error getting connection access info", e);
+        }
+    }
+
+    @Override
+    public boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull String[] connections) throws DBWebException {
+        for (String connectionId : connections) {
+            if (WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId) == null) {
+                throw new DBWebException("Connection '" + connectionId + "' not found");
+            }
+        }
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant access in anonymous mode");
+        }
+        try {
+            CBApplication.getInstance().getSecurityController().setSubjectConnectionAccess(subjectId, connections, grantor.getUserId());
+        } catch (DBCException e) {
+            throw new DBWebException("Error setting subject connection access", e);
         }
         return true;
     }

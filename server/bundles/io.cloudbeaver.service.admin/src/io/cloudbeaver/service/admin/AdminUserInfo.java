@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBPlatform;
@@ -63,8 +64,8 @@ public class AdminUserInfo {
     }
 
     @Property
-    public String[] getGrantedConnections() throws DBCException {
-        return CBPlatform.getInstance().getApplication().getSecurityController().getConnectionAccess(new String[] { getUserId()} );
+    public DBWConnectionGrant[] getGrantedConnections() throws DBCException {
+        return CBPlatform.getInstance().getApplication().getSecurityController().getSubjectConnectionAccess(new String[] { getUserId()} );
     }
 
 }

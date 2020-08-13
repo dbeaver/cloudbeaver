@@ -66,8 +66,16 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))));
         model.getQueryType().dataFetcher("deleteConnectionConfiguration",
             env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")));
-        model.getQueryType().dataFetcher("setConnectionAccess",
-            env -> getService(env).setConnectionAccess(getWebSession(env), env.getArgument("connectionId"), env.getArgument("subjects")));
+
+        model.getQueryType().dataFetcher("getConnectionSubjectAccess",
+            env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")));
+        model.getQueryType().dataFetcher("setConnectionSubjectAccess",
+            env -> getService(env).setConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId"), env.getArgument("subjects")));
+
+        model.getQueryType().dataFetcher("getSubjectConnectionAccess",
+            env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")));
+        model.getQueryType().dataFetcher("setSubjectConnectionAccess",
+            env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")));
     }
 
 }
