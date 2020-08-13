@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { ConnectionsResource } from '@cloudbeaver/core-connections';
+import { ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -67,7 +67,8 @@ export class UserEditController implements IInitializableController, IDestructib
     private commonDialogService: CommonDialogService,
     private rolesManagerService: RolesManagerService,
     private usersResource: UsersResource,
-    private connectionsResource: ConnectionsResource
+    private connectionsResource: ConnectionsResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(id: string) {
@@ -203,6 +204,7 @@ export class UserEditController implements IInitializableController, IDestructib
 
   private async loadConnections() {
     try {
+      await this.dbDriverResource.loadAll();
       await this.connectionsResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'authentication_administration_user_connections_access_connections_load_fail');

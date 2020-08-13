@@ -40,8 +40,8 @@ const styles = composes(
       box-sizing: border-box;
     }
     CommonDialogWrapper {
-      max-height: 500px;
-      min-height: 500px;
+      max-height: 550px;
+      min-height: 550px;
     }
     SubmittingForm, BaseTabPanel {
       flex: 1;

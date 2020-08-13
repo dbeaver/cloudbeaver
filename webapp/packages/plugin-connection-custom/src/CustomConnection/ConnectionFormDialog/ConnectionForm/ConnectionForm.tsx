@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import {
-  Radio, InputField, useFocus, ObjectPropertyInfoForm
+  Radio, InputField, useFocus, ObjectPropertyInfoForm, InputGroup
 } from '@cloudbeaver/core-blocks';
 import { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -77,7 +77,9 @@ export const ConnectionForm = observer(function ConnectionForm({
       )}
       {controller.authModel && (
         <>
-          <hr/>
+          <group as="div">
+            <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
+          </group>
           <ObjectPropertyInfoForm
             prefix={`auth_${driver?.id || ''}`}
             autofillToken={`section-${driver?.id || ''} section-auth`}

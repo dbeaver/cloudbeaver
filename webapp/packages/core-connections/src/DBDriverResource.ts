@@ -45,7 +45,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     this.data.clear();
 
     for (const driver of driverList) {
-      this.data.set(driver.id, driver);
+      this.set(driver.id, driver);
     }
     // this.data.set('all', {} as any);
     this.markUpdated(key);

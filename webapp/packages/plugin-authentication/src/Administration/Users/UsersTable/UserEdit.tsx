@@ -42,6 +42,10 @@ const styles = composes(
       composes: theme-background-secondary from global;
     }
 
+    GrantedConnections {
+      composes: theme-background-surface from global;
+    }
+
     SubmittingForm, Loader {
       composes: theme-background-secondary from global;
     }

@@ -17,8 +17,8 @@ import { DriverSelector } from './DriverSelector';
 
 const styles = css`
   CommonDialogWrapper {
-    max-height: 500px;
-    min-height: 500px;
+    max-height: 550px;
+    min-height: 550px;
   }
   DriverSelector {
     flex: 1;

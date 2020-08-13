@@ -20,7 +20,7 @@
     @include mdc-theme-prop(border-color, background, false);
   }
 
-  tbody tr {
+  tbody > tr {
     &:focus {
       @include mdc-theme-prop(border-color, background, false);
     }
