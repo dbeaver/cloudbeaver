@@ -10,9 +10,10 @@
   $feat-color: mdc-feature-create-target($query, color);
 
   tag {
+    display: inline-block;
     padding: 2px 6px;
     border-radius: 5px;
-    display: inline-block;
+    text-transform: uppercase;
   }
 
   // CSS rules for using primary and secondary (plus light/dark variants) as background colors.

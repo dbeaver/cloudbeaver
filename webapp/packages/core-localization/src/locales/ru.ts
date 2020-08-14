@@ -1,5 +1,6 @@
 export const defaultRULocale = [
   ['name', 'ru'],
+  ['ui_tag_new', 'Новый'],
   ['ui_stepper_back', 'Назад'],
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],

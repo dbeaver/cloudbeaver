@@ -17,16 +17,26 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import {
   AdminSubjectType, AdminConnectionGrantInfo, AdminUserInfo, AdminRoleInfo
 } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-const styles = css`
-  TableColumnHeader {
-    border-top: solid 1px;
-  }
-  center {
-    margin: auto;
-  }
-`;
+const styles = composes(
+  css`
+    box {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+  `,
+  css`
+    box {
+      flex: 1;
+    }
+    TableColumnHeader {
+      border-top: solid 1px;
+    }
+    center {
+      margin: auto;
+    }
+  `
+);
 
 type Props = {
   grantedSubjects: AdminConnectionGrantInfo[];
@@ -58,36 +68,38 @@ export const GrantedSubjects = observer(function GrantedSubjects({
   }
 
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedSubjects} onSelect={onChange} className={className}>
-      <TableHeader>
-        <TableColumnHeader min/>
-        <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_edit_access_role')}</TableColumnHeader>
-        <TableColumnHeader></TableColumnHeader>
-      </TableHeader>
-      <TableBody>
-        {roles.map(role => (
-          <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
-            <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
-            <TableColumnValue>{role.roleName}</TableColumnValue>
-            <TableColumnValue></TableColumnValue>
-            <TableColumnValue></TableColumnValue>
-          </TableItem>
-        ))}
-        {users.map((user) => {
-          const connectionPermission = getSubjectPermission(user.userId);
-          const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
-
-          return (
-            <TableItem key={user.userId} item={user.userId} selectDisabled={disabled || isRoleProvided}>
+    <box as='div'>
+      <Table selectedItems={selectedSubjects} onSelect={onChange} className={className}>
+        <TableHeader>
+          <TableColumnHeader min/>
+          <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
+          <TableColumnHeader>{translate('connections_connection_edit_access_role')}</TableColumnHeader>
+          <TableColumnHeader></TableColumnHeader>
+        </TableHeader>
+        <TableBody>
+          {roles.map(role => (
+            <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
-              <TableColumnValue>{user.userId}</TableColumnValue>
-              <TableColumnValue>{isRoleProvided && user.grantedRoles.join(',')}</TableColumnValue>
+              <TableColumnValue>{role.roleName}</TableColumnValue>
+              <TableColumnValue></TableColumnValue>
               <TableColumnValue></TableColumnValue>
             </TableItem>
-          );
-        })}
-      </TableBody>
-    </Table>
+          ))}
+          {users.map((user) => {
+            const connectionPermission = getSubjectPermission(user.userId);
+            const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
+
+            return (
+              <TableItem key={user.userId} item={user.userId} selectDisabled={disabled || isRoleProvided}>
+                <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
+                <TableColumnValue>{user.userId}</TableColumnValue>
+                <TableColumnValue>{isRoleProvided && user.grantedRoles.join(',')}</TableColumnValue>
+                <TableColumnValue></TableColumnValue>
+              </TableItem>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </box>
   );
 });

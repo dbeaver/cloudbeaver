@@ -36,10 +36,10 @@ const tabsStyles = composes(
 const administrationStyles = composes(
   css`
     container {
-      composes: theme-background-surface theme-text-on-surface from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
     drawer {
-      composes: theme-border-color-background from global;
+      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     }
   `,
   css`
@@ -50,6 +50,8 @@ const administrationStyles = composes(
       overflow: hidden;
     }
     drawer {
+      position: relative;
+      flex: auto 0 0;
       width: 250px;
       padding-top: 16px;
       border-right: 2px solid;
@@ -58,6 +60,7 @@ const administrationStyles = composes(
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: auto;
     }
   `
 );

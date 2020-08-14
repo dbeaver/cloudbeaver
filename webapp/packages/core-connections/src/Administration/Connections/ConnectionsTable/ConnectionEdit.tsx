@@ -36,6 +36,14 @@ const styles = composes(
       composes: theme-background-secondary from global;
     }
 
+    TabList {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+
+    box {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+
     content-box {
       composes: theme-background-secondary theme-border-color-background from global;
     }
@@ -45,11 +53,8 @@ const styles = composes(
     }
   `,
   css`
-    content-box {
-      margin: 0 24px;
-      margin-bottom: 16px;
-      border: solid 1px;
-      border-top: none;
+    box {
+      padding: 24px;
     }
 
     SubmittingForm {
@@ -122,72 +127,74 @@ export const ConnectionEdit = observer(function ConnectionEdit({
 
   return styled(useStyles(styles))(
     <TabsState selectedId='options'>
-      <TabList>
-        <Tab tabId='options' >
-          <TabTitle>{translate('customConnection_options')}</TabTitle>
-        </Tab>
-        <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} disabled={!controller.driver} >
-          <TabTitle>{translate('customConnection_properties')}</TabTitle>
-        </Tab>
-        <Tab tabId='access' onOpen={controller.loadAccessSubjects} disabled={!controller.driver} >
-          <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
-        </Tab>
-        <fill as="div" />
-        <Button
-          type="button"
-          disabled={controller.isDisabled}
-          mod={['outlined']}
-          onClick={handleCancel}
-        >
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button
-          type="button"
-          disabled={controller.isDisabled}
-          mod={['unelevated']}
-          onClick={controller.onSaveConnection}
-        >
-          {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
-        </Button>
-      </TabList>
-      <content-box as="div">
-        {controller.isLoading
-          ? <Loader />
-          : (
-            <SubmittingForm onSubmit={controller.onSaveConnection}>
-              <TabPanel tabId='options'>
-                <ConnectionForm controller={controller} />
-              </TabPanel>
-              {controller.driver && (
-                <TabPanel tabId='driver_properties'>
-                  <DriverProperties
-                    driver={controller.driver}
-                    state={controller.config.properties!}
-                    loadProperties={loadProperties}
+      <box as='div'>
+        <TabList>
+          <Tab tabId='options' >
+            <TabTitle>{translate('customConnection_options')}</TabTitle>
+          </Tab>
+          <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} disabled={!controller.driver} >
+            <TabTitle>{translate('customConnection_properties')}</TabTitle>
+          </Tab>
+          <Tab tabId='access' onOpen={controller.loadAccessSubjects} disabled={!controller.driver} >
+            <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
+          </Tab>
+          <fill as="div" />
+          <Button
+            type="button"
+            disabled={controller.isDisabled}
+            mod={['outlined']}
+            onClick={handleCancel}
+          >
+            {translate('ui_processing_cancel')}
+          </Button>
+          <Button
+            type="button"
+            disabled={controller.isDisabled}
+            mod={['unelevated']}
+            onClick={controller.onSaveConnection}
+          >
+            {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
+          </Button>
+        </TabList>
+        <content-box as="div">
+          {controller.isLoading
+            ? <Loader />
+            : (
+              <SubmittingForm onSubmit={controller.onSaveConnection}>
+                <TabPanel tabId='options'>
+                  <ConnectionForm controller={controller} />
+                </TabPanel>
+                {controller.driver && (
+                  <TabPanel tabId='driver_properties'>
+                    <DriverProperties
+                      driver={controller.driver}
+                      state={controller.config.properties!}
+                      loadProperties={loadProperties}
+                    />
+                  </TabPanel>
+                )}
+                <TabPanel tabId='access'>
+                  <GrantedSubjects
+                    grantedSubjects={controller.grantedSubjects}
+                    users={controller.users}
+                    roles={controller.roles}
+                    selectedSubjects={controller.selectedSubjects}
+                    disabled={controller.isLoading || controller.isSaving}
+                    onChange={controller.handleAccessChange}
                   />
                 </TabPanel>
-              )}
-              <TabPanel tabId='access'>
-                <GrantedSubjects
-                  grantedSubjects={controller.grantedSubjects}
-                  users={controller.users}
-                  roles={controller.roles}
-                  selectedSubjects={controller.selectedSubjects}
-                  disabled={controller.isLoading || controller.isSaving}
-                  onChange={controller.handleAccessChange}
-                />
-              </TabPanel>
-            </SubmittingForm>
-          )
-        }
-        {controller.error.responseMessage && (
-          <ErrorMessage
-            text={controller.error.responseMessage}
-            hasDetails={controller.error.hasDetails}
-            onShowDetails={controller.onShowDetails}
-          />
-        )}
-      </content-box>
+              </SubmittingForm>
+            )
+          }
+          {controller.error.responseMessage && (
+            <ErrorMessage
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.onShowDetails}
+            />
+          )}
+        </content-box>
+      </box>
     </TabsState>
   );
 });

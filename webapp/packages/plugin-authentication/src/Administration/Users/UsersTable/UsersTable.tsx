@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import {
   Table, TableHeader, TableColumnHeader, TableBody
@@ -33,7 +33,7 @@ type Props = {
 export const UsersTable = observer(function UsersTable({ users, selectedItems, expandedItems }: Props) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems}>
+    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
         <TableColumnHeader min/>
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>

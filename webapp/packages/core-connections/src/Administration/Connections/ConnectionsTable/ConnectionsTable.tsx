@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import {
   Table, TableHeader, TableColumnHeader, TableBody
@@ -40,12 +40,12 @@ export const ConnectionsTable = observer(function ConnectionsTable({
 }: Props) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedItems} expandedItems={expandedItems}>
+    <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
         <TableColumnHeader min/>
+        <TableColumnHeader min/>
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_host')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_port')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_template')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>

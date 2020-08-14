@@ -34,8 +34,16 @@ const styles = composes(
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
 
+    TabList {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+
     ErrorMessage {
       composes: theme-background-secondary from global;
+    }
+
+    box {
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
 
     content-box {
@@ -47,11 +55,8 @@ const styles = composes(
     }
   `,
   css`
-    content-box {
-      margin: 0 24px;
-      margin-bottom: 16px;
-      border: solid 1px;
-      border-top: none;
+    box {
+      padding: 24px;
     }
 
     SubmittingForm {
@@ -146,120 +151,122 @@ export const UserEdit = observer(function UserEdit({
 
   return styled(useStyles(styles))(
     <TabsState selectedId='info'>
-      <TabList>
-        <Tab tabId='info' >
-          <TabTitle>{translate('authentication_administration_user_info')}</TabTitle>
-        </Tab>
-        <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess} >
-          <TabTitle>{translate('authentication_administration_user_connections_access')}</TabTitle>
-        </Tab>
-        <fill as="div" />
-        <Button
-          type="button"
-          disabled={controller.isSaving}
-          mod={['outlined']}
-          onClick={handleCancel}
-        >
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button
-          type="button"
-          disabled={controller.isSaving || !controller.isFormFilled}
-          mod={['unelevated']}
-          onClick={controller.save}
-        >
-          {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
-        </Button>
-      </TabList>
-      <content-box as='div'>
-        {controller.isLoading
-          ? <Loader />
-          : (
-            <SubmittingForm onSubmit={controller.save} ref={focusedRef as React.RefObject<HTMLFormElement>}>
-              <TabPanel tabId='info'>
-                <layout-grid as="div">
-                  <layout-grid-inner as="div">
-                    <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                      <group as="div">
-                        <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-                      </group>
-                      <group as="div">
-                        <InputField
-                          type='text'
-                          name='login'
-                          value={controller.credentials.login}
-                          onChange={handleLoginChange}
-                          disabled={!controller.isNew || controller.isSaving}
-                          mod='surface'
-                        >
-                          {translate('authentication_user_name')}
-                        </InputField>
-                      </group>
-                      <group as="div">
-                        <InputField
-                          type='password'
-                          name='password'
-                          value={controller.credentials.password}
-                          onChange={handlePasswordChange}
-                          disabled={controller.isSaving}
-                          mod='surface'
-                        >
-                          {translate('authentication_user_password')}
-                        </InputField>
-                      </group>
-                      <group as="div">
-                        <InputField
-                          type='password'
-                          name='password_repeat'
-                          value={controller.credentials.passwordRepeat}
-                          onChange={handlePasswordRepeatChange}
-                          disabled={controller.isSaving}
-                          mod='surface'
-                        >
-                          {translate('authentication_user_password_repeat')}
-                        </InputField>
-                      </group>
-                    </layout-grid-cell>
-                    <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                      <group as="div">
-                        <InputGroup>{translate('authentication_user_role')}</InputGroup>
-                      </group>
-                      {controller.roles.map((role, i) => (
-                        <group as="div" key={role.roleId}>
-                          <Checkbox
-                            value={role.roleId}
-                            name='role'
-                            checkboxLabel={role.roleName || role.roleId}
-                            onChange={checked => handleRoleChange(role.roleId, checked)}
-                            checked={controller.credentials.roles.get(role.roleId)}
+      <box as='div'>
+        <TabList>
+          <Tab tabId='info' >
+            <TabTitle>{translate('authentication_administration_user_info')}</TabTitle>
+          </Tab>
+          <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess} >
+            <TabTitle>{translate('authentication_administration_user_connections_access')}</TabTitle>
+          </Tab>
+          <fill as="div" />
+          <Button
+            type="button"
+            disabled={controller.isSaving}
+            mod={['outlined']}
+            onClick={handleCancel}
+          >
+            {translate('ui_processing_cancel')}
+          </Button>
+          <Button
+            type="button"
+            disabled={controller.isSaving}
+            mod={['unelevated']}
+            onClick={controller.save}
+          >
+            {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
+          </Button>
+        </TabList>
+        <content-box as='div'>
+          {controller.isLoading
+            ? <Loader />
+            : (
+              <SubmittingForm onSubmit={controller.save} ref={focusedRef as React.RefObject<HTMLFormElement>}>
+                <TabPanel tabId='info'>
+                  <layout-grid as="div">
+                    <layout-grid-inner as="div">
+                      <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+                        <group as="div">
+                          <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
+                        </group>
+                        <group as="div">
+                          <InputField
+                            type='text'
+                            name='login'
+                            value={controller.credentials.login}
+                            onChange={handleLoginChange}
+                            disabled={!controller.isNew || controller.isSaving}
+                            mod='surface'
+                          >
+                            {translate('authentication_user_name')}
+                          </InputField>
+                        </group>
+                        <group as="div">
+                          <InputField
+                            type='password'
+                            name='password'
+                            value={controller.credentials.password}
+                            onChange={handlePasswordChange}
                             disabled={controller.isSaving}
                             mod='surface'
-                          />
+                          >
+                            {translate('authentication_user_password')}
+                          </InputField>
                         </group>
-                      ))}
-                    </layout-grid-cell>
-                  </layout-grid-inner>
-                </layout-grid>
-              </TabPanel>
-              <TabPanel tabId='connections_access'>
-                <GrantedConnections
-                  grantedConnections={controller.grantedConnections}
-                  connections={controller.connections}
-                  selectedConnection={controller.selectedConnections}
-                  disabled={controller.isLoading}
-                  onChange={controller.handleConnectionsAccessChange}
-                />
-              </TabPanel>
-            </SubmittingForm>
+                        <group as="div">
+                          <InputField
+                            type='password'
+                            name='password_repeat'
+                            value={controller.credentials.passwordRepeat}
+                            onChange={handlePasswordRepeatChange}
+                            disabled={controller.isSaving}
+                            mod='surface'
+                          >
+                            {translate('authentication_user_password_repeat')}
+                          </InputField>
+                        </group>
+                      </layout-grid-cell>
+                      <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+                        <group as="div">
+                          <InputGroup>{translate('authentication_user_role')}</InputGroup>
+                        </group>
+                        {controller.roles.map((role, i) => (
+                          <group as="div" key={role.roleId}>
+                            <Checkbox
+                              value={role.roleId}
+                              name='role'
+                              checkboxLabel={role.roleName || role.roleId}
+                              onChange={checked => handleRoleChange(role.roleId, checked)}
+                              checked={controller.credentials.roles.get(role.roleId)}
+                              disabled={controller.isSaving}
+                              mod='surface'
+                            />
+                          </group>
+                        ))}
+                      </layout-grid-cell>
+                    </layout-grid-inner>
+                  </layout-grid>
+                </TabPanel>
+                <TabPanel tabId='connections_access'>
+                  <GrantedConnections
+                    grantedConnections={controller.grantedConnections}
+                    connections={controller.connections}
+                    selectedConnection={controller.selectedConnections}
+                    disabled={controller.isLoading}
+                    onChange={controller.handleConnectionsAccessChange}
+                  />
+                </TabPanel>
+              </SubmittingForm>
+            )}
+          {controller.error.responseMessage && (
+            <ErrorMessage
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.showDetails}
+            />
           )}
-        {controller.error.responseMessage && (
-          <ErrorMessage
-            text={controller.error.responseMessage}
-            hasDetails={controller.error.hasDetails}
-            onShowDetails={controller.showDetails}
-          />
-        )}
-      </content-box>
+        </content-box>
+      </box>
     </TabsState>
   );
 });
