@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-import { useState, useCallback } from 'react';
-import styled from 'reshadow';
+import { observable, computed } from 'mobx';
+import { observer } from 'mobx-react';
+import { useState, useCallback, useMemo } from 'react';
+import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -21,7 +22,7 @@ type Props = React.PropsWithChildren<{
   className?: string;
 }>
 
-export function Table({
+export const Table = observer(function Table({
   selectedItems, expandedItems, onSelect, children, className,
 }: Props) {
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
@@ -35,6 +36,7 @@ export function Table({
   const setItemExpand = useCallback((item: any, state: boolean) => expanded.set(item, state), []);
   const clearSelection = useCallback(() => selected.clear(), []);
   const collapse = useCallback(() => expanded.clear(), []);
+  const isExpanded = useMemo(() => computed(() => Array.from(expanded.values()).some(Boolean)), [expanded]);
 
   const [context] = useState<ITableContext>(() => ({
     selectedItems: selected,
@@ -47,9 +49,9 @@ export function Table({
 
   return styled(useStyles())(
     <TableContext.Provider value={context}>
-      <table className={className}>
+      <table className={className} {...use({ expanded: isExpanded.get() })}>
         {children}
       </table>
     </TableContext.Provider>
   );
-}
+});

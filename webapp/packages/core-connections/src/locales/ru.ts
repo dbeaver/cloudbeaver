@@ -4,6 +4,7 @@ export default [
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],
   ['connections_connection_edit_access_role', 'Роль'],
+  ['connections_connection_address', 'Адрес'],
   ['connections_connection_name', 'Название'],
   ['connections_connection_description', 'Описапние'],
   ['connections_connection_driver', 'Driver'],

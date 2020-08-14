@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', 'Авторизация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
+  ['authentication_administration_user_connections_user_new', 'Новый пользователь'],
   ['authentication_administration_user_connections_access_load_fail', 'Не удалось загрузить доступные пользователю коннекшены'],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Ошибка при загрузке списка коннекшенов'],
   ['authentication_administration_user_connections_access', 'Доступ к базам'],
@@ -17,6 +18,8 @@ export default [
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],
   ['authentication_user_role', 'Роль'],
+  ['authentication_user_login_not_set', 'Логин не может быть пустым'],
+  ['authentication_user_role_not_set', 'Должна быть выбрана минимум одна роль'],
   ['authentication_user_password_not_set', 'Пароль не задан'],
   ['authentication_user_passwords_not_match', 'Пароли не совпадают'],
 ];

@@ -1,0 +1,28 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+ @mixin tag($query: mdc-feature-all()) {
+  $feat-color: mdc-feature-create-target($query, color);
+
+  tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 5px;
+    text-transform: uppercase;
+  }
+
+  // CSS rules for using primary and secondary (plus light/dark variants) as background colors.
+  @each $style in ("primary", "secondary", "positive") {
+    tag[use|mod=#{$style}] {
+      @include mdc-feature-targets($feat-color) {
+        @include mdc-theme-prop(background-color, $style);
+        @include mdc-theme-prop(color, on-#{$style});
+      }
+    }
+  }
+}

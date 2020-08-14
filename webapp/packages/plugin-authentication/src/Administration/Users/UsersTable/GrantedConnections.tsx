@@ -17,20 +17,30 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminSubjectType, ConnectionInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-const styles = css`
-  TableColumnHeader {
-    border-top: solid 1px;
-  }
-  StaticImage {
-    display: flex;
-    width: 16px;
-  }
-  center {
-    margin: auto;
-  }
-`;
+const styles = composes(
+  css`
+    box {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+  `,
+  css`
+    box {
+      flex: 1;
+    }
+    TableColumnHeader {
+      border-top: solid 1px;
+    }
+    StaticImage {
+      display: flex;
+      width: 16px;
+    }
+    center {
+      margin: auto;
+    }
+  `
+);
 
 type Props = {
   grantedConnections: AdminConnectionGrantInfo[];
@@ -61,31 +71,33 @@ export const GrantedConnections = observer(function GrantedConnections({
   }
 
   return styled(useStyles(styles))(
-    <Table selectedItems={selectedConnection} onSelect={onChange} className={className}>
-      <TableHeader>
-        <TableColumnHeader min/>
-        <TableColumnHeader min/>
-        <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('authentication_administration_user_connections_access_role')}</TableColumnHeader>
-        <TableColumnHeader></TableColumnHeader>
-      </TableHeader>
-      <TableBody>
-        {connections.map((connection) => {
-          const connectionPermission = getConnectionPermission(connection.id);
-          const driver = driversResource.get(connection.driverId);
-          const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
+    <box as='div'>
+      <Table selectedItems={selectedConnection} onSelect={onChange} className={className}>
+        <TableHeader>
+          <TableColumnHeader min/>
+          <TableColumnHeader min/>
+          <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
+          <TableColumnHeader>{translate('authentication_administration_user_connections_access_role')}</TableColumnHeader>
+          <TableColumnHeader></TableColumnHeader>
+        </TableHeader>
+        <TableBody>
+          {connections.map((connection) => {
+            const connectionPermission = getConnectionPermission(connection.id);
+            const driver = driversResource.get(connection.driverId);
+            const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
 
-          return (
-            <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
-              <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
-              <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
-              <TableColumnValue>{connection.name}</TableColumnValue>
-              <TableColumnValue>{isRoleProvided && connectionPermission?.subjectId}</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
-            </TableItem>
-          );
-        })}
-      </TableBody>
-    </Table>
+            return (
+              <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
+                <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
+                <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
+                <TableColumnValue>{connection.name}</TableColumnValue>
+                <TableColumnValue>{isRoleProvided && connectionPermission?.subjectId}</TableColumnValue>
+                <TableColumnValue></TableColumnValue>
+              </TableItem>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </box>
   );
 });

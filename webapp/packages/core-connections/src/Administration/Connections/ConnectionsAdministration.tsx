@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
@@ -19,25 +19,31 @@ import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 
 const styles = composes(
   css`
-    AdministrationTools {
-      composes: theme-background-secondary theme-text-on-secondary from global;
+    AdministrationTools, layout-grid-cell {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+
+    layout-grid-cell {
+      composes: theme-border-color-background from global;
     }
   `,
   css`
-    content {
+    layout-grid {
+      width: 100%;
+      max-width: 1176px;
+    }
+
+    layout-grid-cell {
       position: relative;
-      padding-top: 16px;
-      flex: 1;
-      overflow: auto;
+      border: solid 1px;
     }
-    TableColumnHeader {
-      border-top: solid 1px;
-    }
+
     AdministrationTools {
       display: flex;
       padding: 0 16px;
       align-items: center;
     }
+
     IconButton {
       height: 32px;
       width: 32px;
@@ -50,20 +56,22 @@ export const ConnectionsAdministration = observer(function ConnectionsAdministra
   const controller = useController(ConnectionsAdministrationController);
 
   return styled(useStyles(styles))(
-    <>
-      <AdministrationTools>
-        <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
-        <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
-        <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
-      </AdministrationTools>
-      <content as='div'>
-        <ConnectionsTable
-          connections={controller.connections}
-          selectedItems={controller.selectedItems}
-          expandedItems={controller.expandedItems}
-        />
-        {controller.isLoading && <Loader overlay/>}
-      </content>
-    </>
+    <layout-grid as="div">
+      <layout-grid-inner as="div">
+        <layout-grid-cell as='div' {...use({ span: 12 })}>
+          <AdministrationTools>
+            <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
+            <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
+            <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
+          </AdministrationTools>
+          <ConnectionsTable
+            connections={controller.connections}
+            selectedItems={controller.selectedItems}
+            expandedItems={controller.expandedItems}
+          />
+          {controller.isLoading && <Loader overlay/>}
+        </layout-grid-cell>
+      </layout-grid-inner>
+    </layout-grid>
   );
 });

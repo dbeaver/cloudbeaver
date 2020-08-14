@@ -26,7 +26,7 @@ export type Style = BaseStyles | ThemeSelector
  * @param componentStyles styles array
  */
 export function useStyles(
-  ...componentStyles: Style[]
+  ...componentStyles: Array<Style | boolean>
 ) {
 
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
@@ -38,8 +38,8 @@ export function useStyles(
   useMemo(() => {
     Promise
       .all(
-        componentStyles.map(
-          style => ((typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId))
+        componentStyles.filter(Boolean).map(
+          style => ((typeof style === 'object' || style instanceof Composes) ? style : (style as ThemeSelector)(currentThemeId))
         )
       )
       .then(styles => setLoadedStyles(flat(styles)));

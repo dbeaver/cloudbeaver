@@ -12,18 +12,20 @@ import styled, { use } from 'reshadow';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 type Props = React.PropsWithChildren<{
+  align?: 'left' | 'center' | 'right' | 'justify' | 'char';
   className?: string;
   centerContent?: boolean;
   flex?: boolean;
 }>
 
 export const TableColumnValue = observer(function TableColumnValue({
+  align,
   children,
   centerContent,
   flex,
   className,
 }: Props) {
   return styled(useStyles())(
-    <td className={className} {...use({ centerContent, flex })}>{children}</td>
+    <td align={align} className={className} {...use({ centerContent, flex })}>{children}</td>
   );
 });

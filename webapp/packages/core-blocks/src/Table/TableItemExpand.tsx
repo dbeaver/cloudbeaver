@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import { useContext, useCallback } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -21,19 +21,6 @@ type Props = {
   className?: string;
   disabled?: boolean;
 }
-
-const styles = css`
-  Icon {
-    margin-left: 16px;
-    width: 16px;
-    height: 100%;
-    padding: 0 16px;
-
-    &[|expanded] {
-      transform: rotate(180deg);
-    }
-  }
-`;
 
 export const TableItemExpand = observer(function TableItemExpand({
   onExpand,
@@ -61,7 +48,7 @@ export const TableItemExpand = observer(function TableItemExpand({
     }
   }, [tableContext, context, onExpand, disabled]);
 
-  return styled(useStyles(styles))(
+  return styled(useStyles())(
     <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} onClick={handleClick} className={className}/>
   );
 });

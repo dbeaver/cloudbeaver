@@ -12,6 +12,22 @@
     min-width: 100%;
     text-align: left;
     border-collapse: collapse;
+
+    &[use|size="big"] {
+      > thead > tr > th {
+        height: 54px;
+      }
+
+      > tbody > tr > td {
+        height: 46px;
+      }
+    }
+
+    &[use|expanded] {
+      > tbody > tr:not([use|expanded]) {
+        opacity: 0.85;
+      }
+    }
   }
 
   tr {
@@ -21,6 +37,10 @@
   }
 
   tbody > tr {
+    &:last-child {
+      border-bottom: none;
+    }
+
     &:focus {
       @include mdc-theme-prop(border-color, background, false);
     }
@@ -30,11 +50,6 @@
     &:not([use|noHover])[use|expanded] {
       @include stripes-background($mdc-theme-secondary);
     }
-
-    &[use|expanded] td {
-      padding-top: 24px;
-      padding-bottom: 24px;
-    }
   }
 
   th {
@@ -43,7 +58,6 @@
     height: 36px;
     padding-top: unset;
     padding-bottom: unset;
-    border-right: 1px solid;
     @include mdc-theme-prop(border-color, background, false);
     text-transform: uppercase;
     text-align: left;
@@ -59,6 +73,7 @@
   }
 
   td {
+    position: relative;
     height: 28px;
     padding: 0 16px;
     transition: padding ease-in-out 0.24s;
@@ -85,7 +100,7 @@
 
   TableItemExpand {
     cursor: pointer;
-    margin-left: 16px;
+    margin-left: 32px;
     width: 16px;
     height: 100%;
     padding: 0;

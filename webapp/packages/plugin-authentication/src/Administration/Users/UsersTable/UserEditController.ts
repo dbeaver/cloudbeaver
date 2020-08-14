@@ -14,7 +14,9 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import {
+  GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo, AdminSubjectType
+} from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UserEditController implements IInitializableController, IDestructibleController {
@@ -35,16 +37,6 @@ export class UserEditController implements IInitializableController, IDestructib
 
   @computed get connections() {
     return Array.from(this.connectionsResource.data.values());
-  }
-
-  @computed get isFormFilled() {
-    const rolesState = Array.from(this.credentials.roles.values())
-      .filter(Boolean);
-
-    return rolesState.length > 0
-      && !!this.credentials.login
-      && (!!this.credentials.password || !this.isNew)
-      && this.credentials.password === this.credentials.passwordRepeat;
   }
 
   @computed get roles() {
@@ -83,9 +75,7 @@ export class UserEditController implements IInitializableController, IDestructib
     if (this.isSaving) {
       return;
     }
-
-    if (this.credentials.password !== this.credentials.passwordRepeat) {
-      this.notificationService.logError({ title: 'authentication_user_passwords_not_match' });
+    if (!this.validate()) {
       return;
     }
 
@@ -150,6 +140,42 @@ export class UserEditController implements IInitializableController, IDestructib
     this.isLoading = false;
   }
 
+  private validate() {
+    if (!this.credentials.login) {
+      this.notificationService.logError({ title: 'authentication_user_login_not_set' });
+      return;
+    }
+
+    if (!this.isRoleSelected()) {
+      this.notificationService.logError({ title: 'authentication_user_role_not_set' });
+      return;
+    }
+
+    if (!this.credentials.password && this.isNew) {
+      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
+      return;
+    }
+
+    if (!this.credentials.password && this.isNew) {
+      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
+      return;
+    }
+
+    if (this.credentials.password !== this.credentials.passwordRepeat) {
+      this.notificationService.logError({ title: 'authentication_user_passwords_not_match' });
+      return;
+    }
+
+    return true;
+  }
+
+  private isRoleSelected() {
+    const rolesState = Array.from(this.credentials.roles.values())
+      .filter(Boolean);
+
+    return rolesState.length > 0;
+  }
+
   private async updateRoles() {
     for (const [roleId, checked] of this.credentials.roles) {
       if (checked) {
@@ -168,7 +194,13 @@ export class UserEditController implements IInitializableController, IDestructib
 
   private getGrantedConnections() {
     return Array.from(this.selectedConnections.keys())
-      .filter(connectionId => this.selectedConnections.get(connectionId));
+      .filter((connectionId) => {
+        const connectionPermission = this.grantedConnections.find(
+          connectionPermission => connectionPermission.connectionId === connectionId
+        );
+        return this.selectedConnections.get(connectionId)
+          && connectionPermission?.subjectType !== AdminSubjectType.Role;
+      });
   }
 
   private async saveConnectionPermissions() {
@@ -194,7 +226,9 @@ export class UserEditController implements IInitializableController, IDestructib
     try {
       await this.usersResource.load(this.userId);
 
-      this.credentials.login = this.user.userId;
+      if (!this.isNew) {
+        this.credentials.login = this.user.userId;
+      }
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load user');

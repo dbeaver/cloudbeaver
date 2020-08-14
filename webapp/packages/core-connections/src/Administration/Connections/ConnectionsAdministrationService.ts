@@ -10,6 +10,7 @@ import { AdministrationItemService, AdministrationScreenService } from '@cloudbe
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { DBDriverResource } from '../../DBDriverResource';
 import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
@@ -21,6 +22,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private administrationScreenService: AdministrationScreenService,
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
+    private dbDriverResource: DBDriverResource,
   ) {
     super();
   }
@@ -57,7 +59,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   private async loadConnections() {
     try {
-      await this.connectionsResource.load(undefined);
+      await this.connectionsResource.loadAll();
+      await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading connections');
     }
