@@ -7,8 +7,9 @@
  */
 
 $mdc-theme-extra-property-values: (
-  color-positive: $color-positive,
-  color-negative: $color-negative,
+  positive: $color-positive,
+  on-positive: $color-on-positive,
+  negative: $color-negative,
   input-border-color: $input-border-color,
 );
 
