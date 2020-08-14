@@ -50,7 +50,8 @@ implements IInitializableController, IDestructibleController {
   };
 
   @computed get users() {
-    return Array.from(this.usersResource.data.values());
+    return Array.from(this.usersResource.data.values())
+      .filter(user => !this.usersResource.isNew(user.userId));
   }
 
   @computed get roles() {

@@ -36,7 +36,8 @@ export class UserEditController implements IInitializableController, IDestructib
   }
 
   @computed get connections() {
-    return Array.from(this.connectionsResource.data.values());
+    return Array.from(this.connectionsResource.data.values())
+      .filter(connection => !this.connectionsResource.isNew(connection.id));
   }
 
   @computed get roles() {

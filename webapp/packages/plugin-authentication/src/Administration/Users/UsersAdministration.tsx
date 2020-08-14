@@ -30,7 +30,6 @@ const styles = composes(
   css`
     layout-grid {
       width: 100%;
-      max-width: 1176px;
     }
 
     layout-grid-cell {

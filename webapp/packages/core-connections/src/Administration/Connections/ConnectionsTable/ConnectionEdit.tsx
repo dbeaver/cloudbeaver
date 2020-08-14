@@ -72,6 +72,10 @@ const styles = composes(
       outline: none;
     }
 
+    TabPanel {
+      overflow: auto !important;
+    }
+
     Tab {
       composes: theme-typography--body2 from global;
       text-transform: uppercase;
@@ -79,6 +83,10 @@ const styles = composes(
 
       &:global([aria-selected=true]) {
         font-weight: normal !important;
+      }
+
+      & TabTitle {
+        padding: 0 24px !important;
       }
     }
 

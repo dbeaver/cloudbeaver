@@ -74,6 +74,10 @@ const styles = composes(
       outline: none;
     }
 
+    TabPanel {
+      overflow: auto !important;
+    }
+
     Tab {
       composes: theme-typography--body2 from global;
       text-transform: uppercase;
@@ -81,6 +85,10 @@ const styles = composes(
 
       &:global([aria-selected=true]) {
         font-weight: normal !important;
+      }
+
+      & TabTitle {
+        padding: 0 24px !important;
       }
     }
 
@@ -106,6 +114,16 @@ const styles = composes(
     layout-grid {
       flex: 1;
       width: 100%;
+    }
+
+    flex-box {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    flex-box-element {
+      min-width: 450px;
     }
   `
 );
@@ -183,69 +201,67 @@ export const UserEdit = observer(function UserEdit({
             : (
               <SubmittingForm onSubmit={controller.save} ref={focusedRef as React.RefObject<HTMLFormElement>}>
                 <TabPanel tabId='info'>
-                  <layout-grid as="div">
-                    <layout-grid-inner as="div">
-                      <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                        <group as="div">
-                          <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-                        </group>
-                        <group as="div">
-                          <InputField
-                            type='text'
-                            name='login'
-                            value={controller.credentials.login}
-                            onChange={handleLoginChange}
-                            disabled={!controller.isNew || controller.isSaving}
-                            mod='surface'
-                          >
-                            {translate('authentication_user_name')}
-                          </InputField>
-                        </group>
-                        <group as="div">
-                          <InputField
-                            type='password'
-                            name='password'
-                            value={controller.credentials.password}
-                            onChange={handlePasswordChange}
+                  <flex-box as="div">
+                    <flex-box-element as='div'>
+                      <group as="div">
+                        <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
+                      </group>
+                      <group as="div">
+                        <InputField
+                          type='text'
+                          name='login'
+                          value={controller.credentials.login}
+                          onChange={handleLoginChange}
+                          disabled={!controller.isNew || controller.isSaving}
+                          mod='surface'
+                        >
+                          {translate('authentication_user_name')}
+                        </InputField>
+                      </group>
+                      <group as="div">
+                        <InputField
+                          type='password'
+                          name='password'
+                          value={controller.credentials.password}
+                          onChange={handlePasswordChange}
+                          disabled={controller.isSaving}
+                          mod='surface'
+                        >
+                          {translate('authentication_user_password')}
+                        </InputField>
+                      </group>
+                      <group as="div">
+                        <InputField
+                          type='password'
+                          name='password_repeat'
+                          value={controller.credentials.passwordRepeat}
+                          onChange={handlePasswordRepeatChange}
+                          disabled={controller.isSaving}
+                          mod='surface'
+                        >
+                          {translate('authentication_user_password_repeat')}
+                        </InputField>
+                      </group>
+                    </flex-box-element>
+                    <flex-box-element as='div'>
+                      <group as="div">
+                        <InputGroup>{translate('authentication_user_role')}</InputGroup>
+                      </group>
+                      {controller.roles.map((role, i) => (
+                        <group as="div" key={role.roleId}>
+                          <Checkbox
+                            value={role.roleId}
+                            name='role'
+                            checkboxLabel={role.roleName || role.roleId}
+                            onChange={checked => handleRoleChange(role.roleId, checked)}
+                            checked={controller.credentials.roles.get(role.roleId)}
                             disabled={controller.isSaving}
                             mod='surface'
-                          >
-                            {translate('authentication_user_password')}
-                          </InputField>
+                          />
                         </group>
-                        <group as="div">
-                          <InputField
-                            type='password'
-                            name='password_repeat'
-                            value={controller.credentials.passwordRepeat}
-                            onChange={handlePasswordRepeatChange}
-                            disabled={controller.isSaving}
-                            mod='surface'
-                          >
-                            {translate('authentication_user_password_repeat')}
-                          </InputField>
-                        </group>
-                      </layout-grid-cell>
-                      <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
-                        <group as="div">
-                          <InputGroup>{translate('authentication_user_role')}</InputGroup>
-                        </group>
-                        {controller.roles.map((role, i) => (
-                          <group as="div" key={role.roleId}>
-                            <Checkbox
-                              value={role.roleId}
-                              name='role'
-                              checkboxLabel={role.roleName || role.roleId}
-                              onChange={checked => handleRoleChange(role.roleId, checked)}
-                              checked={controller.credentials.roles.get(role.roleId)}
-                              disabled={controller.isSaving}
-                              mod='surface'
-                            />
-                          </group>
-                        ))}
-                      </layout-grid-cell>
-                    </layout-grid-inner>
-                  </layout-grid>
+                      ))}
+                    </flex-box-element>
+                  </flex-box>
                 </TabPanel>
                 <TabPanel tabId='connections_access'>
                   <GrantedConnections
