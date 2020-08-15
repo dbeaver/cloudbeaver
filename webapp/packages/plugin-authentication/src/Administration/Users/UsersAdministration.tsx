@@ -32,15 +32,21 @@ const styles = composes(
       width: 100%;
     }
 
+    layout-grid, layout-grid-inner {
+      min-height: 100%;
+    }
+
     layout-grid-cell {
       position: relative;
       border: solid 1px;
     }
+
     AdministrationTools {
       display: flex;
       padding: 0 16px;
       align-items: center;
     }
+    
     IconButton {
       height: 32px;
       width: 32px;
