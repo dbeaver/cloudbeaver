@@ -84,7 +84,9 @@ layout-grid-cell {
   }
 }
 
-.layout-grid--fixed-column-width {
+.layout-grid--fixed-column-width,
+layout-grid[use|fixed-width],
+.layout-grid[use|fixed-width] {
   @each $size in map-keys($mdc-layout-grid-columns) {
     @include mdc-layout-grid-media-query_($size) {
       $margin: map-get($mdc-layout-grid-default-margin, $size);
