@@ -556,7 +556,7 @@ class CBSecurityController implements DBWSecurityController {
             {
                 StringBuilder sql = new StringBuilder("SELECT DA.DATASOURCE_ID,DA.SUBJECT_ID,S.SUBJECT_TYPE FROM CB_DATASOURCE_ACCESS DA,\n" +
                     "CB_AUTH_SUBJECT S\nWHERE S.SUBJECT_ID = DA.SUBJECT_ID AND DA.SUBJECT_ID IN (");
-                appendStringParameters(sql, subjectIds);
+                appendStringParameters(sql, allSubjects.toArray(new String[0]));
                 sql.append(")");
 
                 if (allSubjects.isEmpty()) {

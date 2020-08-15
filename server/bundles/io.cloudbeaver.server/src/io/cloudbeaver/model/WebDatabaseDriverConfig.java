@@ -88,6 +88,21 @@ public class WebDatabaseDriverConfig {
     }
 
     @Property
+    public String getDefaultDatabase() {
+        return driver.getDefaultDatabase();
+    }
+
+    @Property
+    public String getDefaultServer() {
+        return driver.getDefaultServer();
+    }
+
+    @Property
+    public String getDefaultUser() {
+        return driver.getDefaultUser();
+    }
+
+    @Property
     public String getSampleURL() {
         return driver.getSampleURL();
     }
