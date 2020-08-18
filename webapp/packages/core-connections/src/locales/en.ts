@@ -1,9 +1,12 @@
 export default [
   ['connections_administration_item', 'Connection Management'],
+  ['connections_administration_new_connection', 'New connection'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_edit_access', 'Access'],
   ['connections_connection_edit_access_load_failed', 'Connection access loading failed'],
   ['connections_connection_edit_access_role', 'Role'],
+  ['connections_connection_edit_search', 'Search'],
+  ['connections_connection_edit_search_hosts', 'Hosts'],
   ['connections_connection_address', 'Address'],
   ['connections_connection_name', 'Name'],
   ['connections_connection_description', 'Description'],

@@ -26,17 +26,10 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
   }
 
   async loadChildren(parentId: string, key: ResourceKey<string>) {
-    if (this.isLoaded(key) && !this.isOutdated(key)) {
-      return this.data;
-    }
-
     await this.performUpdate(key, async () => {
-      if (this.isLoaded(key) && !this.isOutdated(key)) {
-        return;
-      }
-
       await this.setActivePromise(key, this.loadFromChildren(parentId));
-    });
+    }, () => this.isLoaded(key) && !this.isOutdated(key));
+
     return this.data;
   }
 

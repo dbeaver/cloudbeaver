@@ -53,6 +53,7 @@ export class UserEditController implements IInitializableController, IDestructib
   private userId!: string;
   private connectionAccessChanged = false;
   private connectionAccessLoaded = false;
+  private collapse!: () => void;
 
   constructor(
     private notificationService: NotificationService,
@@ -63,8 +64,9 @@ export class UserEditController implements IInitializableController, IDestructib
     private dbDriverResource: DBDriverResource
   ) { }
 
-  init(id: string) {
+  init(id: string, collapse: () => void) {
     this.userId = id;
+    this.collapse = collapse;
     this.loadRoles();
   }
 
@@ -90,6 +92,7 @@ export class UserEditController implements IInitializableController, IDestructib
           roles: this.getGrantedRoles(),
           grantedConnections: this.getGrantedConnections(),
         });
+        this.collapse();
         this.notificationService.logInfo({ title: 'authentication_administration_user_created' });
       } else {
         if (this.credentials.password) {

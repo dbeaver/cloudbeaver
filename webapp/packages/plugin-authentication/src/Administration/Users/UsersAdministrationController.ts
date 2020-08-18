@@ -86,7 +86,10 @@ export class UsersAdministrationController {
 
       await this.usersResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
-      await this.usersResource.loadAll();
+
+      for (const id of deletionList) {
+        this.expandedItems.delete(id);
+      }
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'User delete failed');

@@ -15,18 +15,30 @@ import {
   ResourceKey,
   isResourceKeyList,
   AdminConnectionGrantInfo,
+  AdminConnectionSearchInfo,
 } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
-const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
-type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean }
+import { DBDriverResource } from '../DBDriverResource';
+
+export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
+export const SEARCH_CONNECTION_SYMBOL = Symbol('search-connection');
+
+export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean }
+export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: AdminConnectionSearchInfo }
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
   private metadata: MetadataMap<string, boolean>;
-  constructor(private graphQLService: GraphQLService) {
+  private searchedDatabases: string[];
+
+  constructor(
+    private graphQLService: GraphQLService,
+    private dbDriverResource: DBDriverResource
+  ) {
     super(new Map());
     this.metadata = new MetadataMap(() => false);
+    this.searchedDatabases = [];
   }
 
   has(id: string) {
@@ -44,10 +56,15 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return NEW_CONNECTION_SYMBOL in this.get(id)!;
   }
 
-  addNew() {
+  isSearched(id: string) {
+    return isSearchedConnection(this.get(id));
+  }
+
+  addNew(driverId: string) {
     const connectionInfo = {
-      id: `new-${uuid()}`,
-      name: 'New connection',
+      id: uuid(),
+      driverId,
+      // name: 'New connection',
       [NEW_CONNECTION_SYMBOL]: true,
     } as ConnectionNew;
 
@@ -62,6 +79,10 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return this.data;
   }
 
+  async searchDatabases(hosts: string[]) {
+    await this.performUpdate('search', () => this.searchConnections(hosts));
+  }
+
   async create(config: ConnectionConfig, id?: string) {
     const { connection } = await this.graphQLService.gql.createConnectionConfiguration({ config });
 
@@ -74,28 +95,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   async update(id: string, config: ConnectionConfig) {
-    await this.performUpdate(id, async () => {
-      await this.setActivePromise<void>(id, this.updateConnection(id, config));
-    });
+    await this.performUpdate(id, () => this.updateConnection(id, config));
     return this.get(id)!;
   }
 
   async delete(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        this.data.delete(key.list[i]);
-        if (!this.isNew(key.list[i])) {
-          await this.graphQLService.gql.deleteConnectionConfiguration({ id: key.list[i] });
-        }
-      }
-    } else {
-      this.data.delete(key);
-      if (!this.isNew(key)) {
-        await this.graphQLService.gql.deleteConnectionConfiguration({ id: key });
-      }
-    }
-    this.markUpdated(key);
-    this.itemDeleteSubject.next(key);
+    await this.performUpdate(key, () => this.deleteConnectionTask(key));
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
@@ -110,6 +115,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
   async setAccessSubjects(connectionId: string, subjects: string[]) {
     await this.graphQLService.gql.setConnectionAccess({ connectionId, subjects });
+  }
+
+  cleanSearchDatabases() {
+    for (const id of this.searchedDatabases) {
+      this.delete(id);
+    }
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {
@@ -128,9 +139,67 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return this.data;
   }
 
+  private async searchConnections(hosts: string[]) {
+    const { databases } = await this.graphQLService.gql.searchDatabases({ hosts });
+
+    this.cleanSearchDatabases();
+
+    for (const database of databases) {
+      const connectionInfo = {
+        id: uuid(),
+        driverId: database.defaultDriver,
+        name: await this.getNameTemplate(database),
+        host: database.host,
+        port: `${database.port}`,
+        [NEW_CONNECTION_SYMBOL]: true,
+        [SEARCH_CONNECTION_SYMBOL]: database,
+      } as ConnectionSearch;
+
+      this.data.set(connectionInfo.id, connectionInfo);
+      this.markUpdated(connectionInfo.id);
+      this.searchedDatabases.push(connectionInfo.id);
+    }
+  }
+
+  private async getNameTemplate(connection: AdminConnectionSearchInfo) {
+    const driver = await this.dbDriverResource.load(connection.defaultDriver);
+
+    return `${driver.name} (${connection.host}:${connection.port})`;
+  }
+
+  private async deleteConnectionTask(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      for (let i = 0; i < key.list.length; i++) {
+        await this.deleteConnection(key.list[i]);
+      }
+    } else {
+      await this.deleteConnection(key);
+    }
+    this.itemDeleteSubject.next(key);
+  }
+
+  private async deleteConnection(connectionId: string) {
+    if (!this.data.has(connectionId)) {
+      return;
+    }
+
+    const isNew = this.isNew(connectionId);
+    this.data.delete(connectionId);
+
+    if (!isNew) {
+      await this.graphQLService.gql.deleteConnectionConfiguration({ id: connectionId });
+    }
+  }
+
   private async updateConnection(id: string, config: ConnectionConfig) {
     const { connection } = await this.graphQLService.gql.updateConnectionConfiguration({ id, config });
 
     this.set(id, connection as ConnectionInfo);
   }
+}
+
+export function isSearchedConnection(
+  connection: ConnectionInfo | undefined
+): connection is ConnectionSearch {
+  return !!connection && SEARCH_CONNECTION_SYMBOL in connection;
 }

@@ -7,15 +7,20 @@
  */
 
 import { observer } from 'mobx-react';
+import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
+
+import { TableContext } from './TableContext';
+import { TableItemContext } from './TableItemContext';
 
 type Props = React.PropsWithChildren<{
   align?: 'left' | 'center' | 'right' | 'justify' | 'char';
   className?: string;
   centerContent?: boolean;
   flex?: boolean;
+  expand?: boolean;
 }>
 
 export const TableColumnValue = observer(function TableColumnValue({
@@ -23,9 +28,31 @@ export const TableColumnValue = observer(function TableColumnValue({
   children,
   centerContent,
   flex,
+  expand,
   className,
 }: Props) {
+  const tableContext = useContext(TableContext);
+  const context = useContext(TableItemContext);
+  if (!context) {
+    return null;
+  }
+
+  const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
+    if (!expand) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    const state = !context.isExpanded();
+
+    tableContext?.setItemExpand(context.item, state);
+  }, [tableContext, context, expand]);
+
   return styled(useStyles())(
-    <td align={align} className={className} {...use({ centerContent, flex })}>{children}</td>
+    <td align={align} className={className} {...use({ centerContent })} onClick={handleClick}>
+      {flex && <td-flex as='div'>{children}</td-flex>}
+      {!flex && children}
+    </td>
   );
 });

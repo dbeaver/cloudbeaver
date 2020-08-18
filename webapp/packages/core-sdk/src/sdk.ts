@@ -468,6 +468,9 @@ export type DriverInfo = {
   providerId?: Maybe<Scalars['ID']>;
   driverClassName?: Maybe<Scalars['String']>;
   defaultPort?: Maybe<Scalars['String']>;
+  defaultDatabase?: Maybe<Scalars['String']>;
+  defaultServer?: Maybe<Scalars['String']>;
+  defaultUser?: Maybe<Scalars['String']>;
   sampleURL?: Maybe<Scalars['String']>;
   driverInfoURL?: Maybe<Scalars['String']>;
   driverPropertiesURL?: Maybe<Scalars['String']>;
@@ -910,6 +913,12 @@ export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
 
+export type SearchDatabasesQueryVariables = Exact<{
+  hosts: Array<Scalars['String']>;
+}>;
+
+export type SearchDatabasesQuery = { databases: Array<Pick<AdminConnectionSearchInfo, 'host' | 'port' | 'possibleDrivers' | 'defaultDriver'>> };
+
 export type SetConnectionAccessQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   subjects: Array<Scalars['ID']>;
@@ -962,7 +971,7 @@ export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
 
 export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
 
-export type DriverListQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel'>> };
+export type DriverListQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel'>> };
 
 export type DriverPropertiesQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -1457,6 +1466,16 @@ export const GetConnectionsDocument = `
   }
 }
     `;
+export const SearchDatabasesDocument = `
+    query searchDatabases($hosts: [String!]!) {
+  databases: searchConnections(hostNames: $hosts) {
+    host
+    port
+    possibleDrivers
+    defaultDriver
+  }
+}
+    `;
 export const SetConnectionAccessDocument = `
     query setConnectionAccess($connectionId: ID!, $subjects: [ID!]!) {
   setConnectionSubjectAccess(connectionId: $connectionId, subjects: $subjects)
@@ -1573,6 +1592,9 @@ export const DriverListDocument = `
     icon
     description
     defaultPort
+    defaultDatabase
+    defaultServer
+    defaultUser
     sampleURL
     embedded
     anonymousAccess
@@ -2170,6 +2192,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
       return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
+    },
+    searchDatabases(variables: SearchDatabasesQueryVariables): Promise<SearchDatabasesQuery> {
+      return withWrapper(() => client.request<SearchDatabasesQuery>(SearchDatabasesDocument, variables));
     },
     setConnectionAccess(variables: SetConnectionAccessQueryVariables): Promise<SetConnectionAccessQuery> {
       return withWrapper(() => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables));

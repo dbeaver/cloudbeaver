@@ -31,7 +31,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   async init(id: string, credentials?: any): Promise<Connection> {
     await this.performUpdate(id, async () => {
-      const connection = await this.setActivePromise(id, this.initConnection(id, credentials));
+      const connection = await this.initConnection(id, credentials);
       this.set(id, connection);
       return connection;
     });
@@ -41,7 +41,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   async close(connectionId: string) {
     await this.performUpdate(connectionId, async () => {
-      const connection = await this.setActivePromise(connectionId, this.closeConnection(connectionId));
+      const connection = await this.closeConnection(connectionId);
       this.set(connectionId, connection);
     });
 
@@ -63,7 +63,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
 
     return this.performUpdate(connectionId, async () => {
-      connection.authProperties = await this.setActivePromise(connectionId, this.getAuthProperties(connectionId));
+      connection.authProperties = await this.getAuthProperties(connectionId);
       this.set(connectionId, connection);
 
       return connection.authProperties!;

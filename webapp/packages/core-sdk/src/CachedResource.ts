@@ -68,12 +68,32 @@ export abstract class CachedResource<
 
   protected abstract loader(param: TParam): Promise<TData>;
 
-  protected async performUpdate<T>(param: TParam, update: (param: TParam) => Promise<T>): Promise<T> {
+  protected async performUpdate<T>(
+    param: TParam,
+    update: (param: TParam) => Promise<T>,
+  ): Promise<T>
+  protected async performUpdate<T>(
+    param: TParam,
+    update: (param: TParam) => Promise<T>,
+    exitCheck: () => boolean
+  ): Promise<T | undefined>;
+
+  protected async performUpdate<T>(
+    param: TParam,
+    update: (param: TParam) => Promise<T>,
+    exitCheck?: () => boolean
+  ): Promise<T | undefined> {
+    if (exitCheck && exitCheck()) {
+      return;
+    }
+
     await this.waitActive();
-    this.markOutdated(param);
+
+    if (exitCheck && exitCheck()) {
+      return;
+    }
 
     const result = await this.setActivePromise(param, update(param));
-    this.markUpdated(param);
     this.dataSubject.next(this.data);
 
     return result;
@@ -99,7 +119,11 @@ export abstract class CachedResource<
     this.activePromise = promise;
     this.activePromiseParam = param;
     try {
-      return await this.activePromise;
+      this.markOutdated(param);
+      const result = await this.activePromise;
+      this.markUpdated(param);
+
+      return result;
     } finally {
       this.activePromise = null;
       this.activePromiseParam = null;

@@ -16,9 +16,15 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UserEdit } from './UserEdit';
+
+const styles = css`
+  TableColumnValue[expand] {
+    cursor: pointer;
+  }
+`;
 
 type Props = {
   user: AdminUserInfo;
@@ -29,13 +35,13 @@ export const User = observer(function User({ user }: Props) {
   const usersResource = useService(UsersResource);
   const isNew = usersResource.isNew(user.userId);
 
-  return styled(useStyles())(
+  return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue>{isNew ? translate('authentication_administration_user_connections_user_new') : user.userId}</TableColumnValue>
+      <TableColumnValue expand>{isNew ? translate('authentication_administration_user_connections_user_new') : user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
       <TableColumnValue align='right'>{isNew && <tag as='div' {...use({ mod: 'positive' })}>{translate('ui_tag_new')}</tag>}</TableColumnValue>
     </TableItem>

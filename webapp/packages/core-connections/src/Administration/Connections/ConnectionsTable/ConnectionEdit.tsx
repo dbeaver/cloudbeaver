@@ -119,19 +119,19 @@ export const ConnectionEdit = observer(function ConnectionEdit({
   item,
 }: Props) {
   const tableContext = useContext(TableContext);
-  const context = useContext(TableItemContext);
+  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
   const translate = useTranslate();
-  const controller = useController(ConnectionEditController, item);
+  const controller = useController(ConnectionEditController, item, collapse);
   const connectionsResource = useService(ConnectionsResource);
   const [loadProperties, setLoadProperties] = useState(false);
 
   const handleCancel = useCallback(() => {
-    tableContext?.setItemExpand(context?.item, false);
+    collapse();
     if (controller.isNew) {
       connectionsResource.delete(item);
     }
-  }, [tableContext, context]);
+  }, [collapse]);
 
   return styled(useStyles(styles))(
     <TabsState selectedId='options'>
