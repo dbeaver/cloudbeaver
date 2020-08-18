@@ -78,12 +78,12 @@
     padding: 0 16px;
     transition: padding ease-in-out 0.24s;
 
-    &[use|centerContent] {
+    &[use|centerContent] > td-flex {
       align-items: center;
-      vertical-align: middle;
+      justify-content: center;
     }
 
-    &[use|flex] {
+    > td-flex {
       display: flex;
     }
 

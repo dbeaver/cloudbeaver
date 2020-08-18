@@ -8,3 +8,4 @@ export * from './TableItem';
 export * from './TableItemContext';
 export * from './TableItemExpand';
 export * from './TableItemSelect';
+export * from './TableItemSeparator';

@@ -63,7 +63,7 @@ export const ConnectionForm = observer(function ConnectionForm({
               keySelector={driver => driver.id}
               valueSelector={driver => driver?.name!}
               onSelect={controller.onSelectDriver}
-              readOnly={!controller.isNew}
+              readOnly={!controller.isSearched || controller.drivers.length < 2}
               mod={'surface'}
             >
               {translate('connections_connection_driver')}

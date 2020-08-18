@@ -12,6 +12,7 @@ import {
   CachedMapResource,
   DriverInfo,
 } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type DBDriver = Pick<
   DriverInfo,
@@ -20,6 +21,9 @@ export type DBDriver = Pick<
   | 'icon'
   | 'description'
   | 'defaultPort'
+  | 'defaultDatabase'
+  | 'defaultServer'
+  | 'defaultUser'
   | 'sampleURL'
   | 'embedded'
   | 'anonymousAccess'
@@ -29,9 +33,19 @@ export type DBDriver = Pick<
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver> {
+  private metadata: MetadataMap<string, boolean>;
 
   constructor(private graphQLService: GraphQLService) {
     super(new Map());
+    this.metadata = new MetadataMap(() => false);
+  }
+
+  has(id: string) {
+    if (this.metadata.has(id)) {
+      return this.metadata.get(id);
+    }
+
+    return this.data.has(id);
   }
 
   async loadAll() {
@@ -47,8 +61,12 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     for (const driver of driverList) {
       this.set(driver.id, driver);
     }
-    // this.data.set('all', {} as any);
     this.markUpdated(key);
+
+    // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
+    //       here we should check is it's was a full update
+    this.metadata.set('all', true);
+
     return this.data;
   }
 }

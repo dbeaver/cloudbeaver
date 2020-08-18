@@ -10,35 +10,46 @@ import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody
+  Table, TableHeader, TableColumnHeader, TableBody, TableItemSeparator
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { ConnectionSearch } from '../../ConnectionsResource';
 import { Connection } from './Connection';
 
 const styles = composes(
-  css``,
+  css`
+    TableItemSeparator {
+      composes: theme-background-secondary from global;
+    }
+  `,
   css`
     TableColumnHeader {
       border-top: solid 1px;
+    }
+    TableItemSeparator {
+      text-align: center;
     }
   `
 );
 
 type Props = {
   connections: ConnectionInfo[];
+  findConnections: ConnectionSearch[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
 }
 
 export const ConnectionsTable = observer(function ConnectionsTable({
   connections,
+  findConnections,
   selectedItems,
   expandedItems,
 }: Props) {
   const translate = useTranslate();
+
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
@@ -50,6 +61,8 @@ export const ConnectionsTable = observer(function ConnectionsTable({
         <TableColumnHeader></TableColumnHeader>
       </TableHeader>
       <TableBody>
+        {findConnections.map(connection => <Connection key={connection.id} connection={connection}/>)}
+        {!!findConnections.length && <TableItemSeparator key='search' colSpan={6}></TableItemSeparator>}
         {connections.map(connection => <Connection key={connection.id} connection={connection}/>)}
       </TableBody>
     </Table>

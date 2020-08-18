@@ -5,6 +5,9 @@ query driverList {
     icon
     description
     defaultPort
+    defaultDatabase
+    defaultServer
+    defaultUser
     sampleURL
     embedded
     anonymousAccess

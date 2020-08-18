@@ -12,6 +12,7 @@ import { ConnectionConfig, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 import { ConnectionType } from '../ConnectionEditController';
 
 export interface IFormController {
+  isSearched: boolean;
   isNew: boolean;
   connectionId: string;
   drivers: DBDriver[];

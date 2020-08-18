@@ -10,7 +10,7 @@ import { observable, action, computed } from 'mobx';
 
 import { UsersResource, RolesResource } from '@cloudbeaver/core-authentication';
 import {
-  injectable, IInitializableController, IDestructibleController, Bootstrap
+  injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -21,7 +21,7 @@ import {
 
 import { DatabaseAuthModelsResource } from '../../../DatabaseAuthModelsResource';
 import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
-import { ConnectionsResource } from '../../ConnectionsResource';
+import { ConnectionsResource, isSearchedConnection, SEARCH_CONNECTION_SYMBOL } from '../../ConnectionsResource';
 
 export enum ConnectionType {
   Attributes,
@@ -62,12 +62,23 @@ implements IInitializableController, IDestructibleController {
     return this.isLoading || this.isSaving;
   }
 
+  get isSearched() {
+    return this.connectionsResource.isSearched(this.connectionId);
+  }
+
   get isNew() {
     return this.connectionsResource.isNew(this.connectionId);
   }
 
   get drivers() {
-    return Array.from(this.dbDriverResource.data.values());
+    return Array.from(this.dbDriverResource.data.values())
+      .filter(({ id }) => {
+        if (!isSearchedConnection(this.connectionInfo)) {
+          return true;
+        }
+
+        return this.connectionInfo[SEARCH_CONNECTION_SYMBOL].possibleDrivers.includes(id);
+      });
   }
 
   connectionId!: string;
@@ -78,6 +89,7 @@ implements IInitializableController, IDestructibleController {
   private accessLoaded = false;
   private isDistructed = false;
   private connectionInfo!: ConnectionInfo;
+  private collapse!: () => void;
 
   constructor(
     private connectionsResource: ConnectionsResource,
@@ -89,8 +101,9 @@ implements IInitializableController, IDestructibleController {
     private dbDriverResource: DBDriverResource,
   ) { }
 
-  init(id: string) {
+  init(id: string, collapse: () => void) {
     this.connectionId = id;
+    this.collapse = collapse;
     this.loadConnectionInfo();
   }
 
@@ -112,6 +125,7 @@ implements IInitializableController, IDestructibleController {
 
   onSelectDriver = (driver: DBDriver | null) => {
     this.driver = driver;
+    this.onChange('driverId', this.driver?.id);
     if (driver) {
       this.loadDriver(driver.id);
     } else {
@@ -126,7 +140,7 @@ implements IInitializableController, IDestructibleController {
       if (this.isNew) {
         const connection = await this.connectionsResource.create(this.getConnectionConfig(), this.connectionId);
         await this.saveSubjectPermissions(connection.id);
-
+        this.collapse();
         this.notificationService.logInfo({ title: `Connection ${connection.name} created` });
       } else {
         const connection = await this.connectionsResource.update(this.connectionId, this.getConnectionConfig());
@@ -216,17 +230,38 @@ implements IInitializableController, IDestructibleController {
 
   @action
   private setDefaults() {
-    this.onChange('name', this.connectionInfo?.name || (this.driver ? `${this.driver?.name} (custom)` : ''));
+    this.onChange('name', this.getNameTemplate());
     this.onChange('description', this.connectionInfo?.description || '');
     this.onChange('template', this.connectionInfo?.template);
     this.onChange('driverId', this.connectionInfo?.driverId || this.driver?.id || '');
-    this.onChange('host', this.connectionInfo?.host || '');
+    this.onChange('host', this.connectionInfo?.host || this.driver?.defaultServer || '');
     this.onChange('port', this.connectionInfo?.port || this.driver?.defaultPort || '');
-    this.onChange('databaseName', this.connectionInfo?.databaseName || '');
+    this.onChange('databaseName', this.connectionInfo?.databaseName || this.driver?.defaultDatabase || '');
     this.onChange('url', this.connectionInfo?.url || this.driver?.sampleURL || '');
     this.onChange('properties', this.connectionInfo?.properties || {});
     this.onChange('authModelId', this.connectionInfo?.authModel || this.driver?.defaultAuthModel);
     this.onChange('credentials', {});
+  }
+
+  private getNameTemplate() {
+    if (this.connectionInfo.name) {
+      return this.connectionInfo.name;
+    }
+
+    if (this.driver) {
+      const address = this.getConnectionAddress();
+      return `${this.driver.name}${address ? ` (${address})` : ' connection'}`;
+    }
+
+    return 'New connection';
+  }
+
+  private getConnectionAddress() {
+    if (!this.connectionInfo.host) {
+      return '';
+    }
+
+    return `${this.connectionInfo.host}${this.connectionInfo.port ? `:${this.connectionInfo.port}` : ''}`;
   }
 
   private showError(exception: Error, message: string) {

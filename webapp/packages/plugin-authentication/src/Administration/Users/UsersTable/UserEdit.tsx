@@ -137,18 +137,20 @@ export const UserEdit = observer(function UserEdit({
 }: Props) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
   const translate = useTranslate();
-  const controller = useController(UserEditController, item);
+  const controller = useController(UserEditController, item, collapse);
   const usersResource = useService(UsersResource);
   const [focusedRef] = useFocus({ focusFirstChild: true });
 
   const handleCancel = useCallback(() => {
-    tableContext?.setItemExpand(context?.item, false);
+    collapse();
+
     if (controller.isNew) {
       usersResource.delete(item);
     }
-  }, [tableContext, context]);
+  }, [collapse]);
 
   const handleLoginChange = useCallback(
     (value: string) => controller.credentials.login = value,

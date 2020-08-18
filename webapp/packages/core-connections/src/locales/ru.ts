@@ -1,9 +1,12 @@
 export default [
   ['connections_administration_item', 'Управление подключениями'],
+  ['connections_administration_new_connection', 'Создание подключения'],
   ['connections_connection_edit_authentication', 'Авторизация'],
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],
   ['connections_connection_edit_access_role', 'Роль'],
+  ['connections_connection_edit_search', 'Поиск'],
+  ['connections_connection_edit_search_hosts', 'Хосты'],
   ['connections_connection_address', 'Адрес'],
   ['connections_connection_name', 'Название'],
   ['connections_connection_description', 'Описапние'],
