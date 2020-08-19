@@ -117,39 +117,37 @@ export class ConnectionsAdministrationController {
       return;
     }
 
+    const deletionList = Array
+      .from(this.selectedItems)
+      .filter(([_, value]) => value)
+      .map(([connectionId]) => connectionId);
+
+    if (deletionList.length === 0) {
+      return;
+    }
+
+    const connectionNames = deletionList
+      .map(id => this.connectionsResource.get(id)?.name)
+      .filter(Boolean);
+
+    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'authentication_administration_confirm_user_deletion',
+      message: `Would you like to delete connections: ${connectionNames.join(', ')}`,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.isProcessing = true;
 
     try {
-      const deletionList = Array
-        .from(this.selectedItems)
-        .filter(([_, value]) => value)
-        .map(([connectionId]) => connectionId);
-
-      if (deletionList.length === 0) {
-        return;
-      }
-
-      const connectionNames = deletionList
-        .map(id => this.connectionsResource.get(id)?.name)
-        .filter(Boolean);
-
-      const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
-        title: 'authentication_administration_confirm_user_deletion',
-        message: `Would you like to delete connections: ${connectionNames.join(', ')}`,
-      });
-
-      if (!confirmed) {
-        return;
-      }
-
       await this.connectionsResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
 
       for (const id of deletionList) {
         this.expandedItems.delete(id);
       }
-
-      await this.connectionsResource.refresh('all');
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Connections delete failed');
