@@ -74,7 +74,6 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
       forceUpdate(value.current);
     }, []);
 
-    const isEdited = context.isCellEdited(props.rowIndex, props.column.getColId()) || value.current !== initValue;
     const isLastColumn = props.columnApi?.getAllGridColumns().slice(-1)[0] === props.column;
     const isLastRow = props.rowIndex > 0 && ((props.api?.getInfiniteRowCount() || -1) - 1 === props.rowIndex);
     let controlsPosition: InlineEditorControls = 'right';
@@ -93,7 +92,7 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
           onChange={handleChange}
           onUndo={handleUndo}
           controlsPosition={controlsPosition}
-          edited={isEdited}
+          edited
           hideSave
           hideCancel
           autofocus
