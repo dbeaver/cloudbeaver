@@ -52,7 +52,7 @@
   textarea {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 12px;
+    padding: 4px;
     border-radius: 3px;
     border: solid 1px $input-border-color;
     @include mdc-theme-prop(color, on-surface, false);

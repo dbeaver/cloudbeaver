@@ -129,9 +129,13 @@ export class ConnectionsAdministrationController {
         return;
       }
 
+      const connectionNames = deletionList
+        .map(id => this.connectionsResource.get(id)?.name)
+        .filter(Boolean);
+
       const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'authentication_administration_confirm_user_deletion',
-        message: `Would you like to delete connections: ${deletionList.join(', ')}`,
+        message: `Would you like to delete connections: ${connectionNames.join(', ')}`,
       });
 
       if (!confirmed) {

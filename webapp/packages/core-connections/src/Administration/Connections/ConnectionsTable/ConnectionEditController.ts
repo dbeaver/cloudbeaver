@@ -241,6 +241,10 @@ implements IInitializableController, IDestructibleController {
     this.onChange('properties', this.connectionInfo?.properties || {});
     this.onChange('authModelId', this.connectionInfo?.authModel || this.driver?.defaultAuthModel);
     this.onChange('credentials', {});
+
+    if (this.connectionInfo?.url) {
+      this.connectionType = ConnectionType.URL;
+    }
   }
 
   private getNameTemplate() {
