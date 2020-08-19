@@ -35,7 +35,7 @@ export class UsersAdministrationController {
   }
 
   get isLoading() {
-    return this.usersResource.isLoading();
+    return this.usersResource.isLoading() || this.isDeleting;
   }
 
   constructor(
@@ -64,25 +64,26 @@ export class UsersAdministrationController {
       return;
     }
 
+    const deletionList = Array
+      .from(this.selectedItems)
+      .filter(([_, value]) => value)
+      .map(([userId]) => userId);
+    if (deletionList.length === 0) {
+      return;
+    }
+
+    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'authentication_administration_confirm_user_deletion',
+      message: `Would you like to delete users: ${deletionList.join(', ')}`,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.isDeleting = true;
 
     try {
-      const deletionList = Array
-        .from(this.selectedItems)
-        .filter(([_, value]) => value)
-        .map(([userId]) => userId);
-      if (deletionList.length === 0) {
-        return;
-      }
-
-      const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
-        title: 'authentication_administration_confirm_user_deletion',
-        message: `Would you like to delete users: ${deletionList.join(', ')}`,
-      });
-
-      if (!confirmed) {
-        return;
-      }
 
       await this.usersResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
