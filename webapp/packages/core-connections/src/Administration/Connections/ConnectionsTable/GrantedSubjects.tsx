@@ -73,15 +73,15 @@ export const GrantedSubjects = observer(function GrantedSubjects({
         <TableHeader>
           <TableColumnHeader min/>
           <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-          <TableColumnHeader>{translate('connections_connection_edit_access_role')}</TableColumnHeader>
           <TableColumnHeader></TableColumnHeader>
         </TableHeader>
         <TableBody>
           {roles.map(role => (
             <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
-              <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
+              <TableColumnValue centerContent flex>
+                {!disabled && <TableItemSelect />}
+              </TableColumnValue>
               <TableColumnValue>{role.roleName}</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
               <TableColumnValue></TableColumnValue>
             </TableItem>
           ))}
@@ -91,9 +91,10 @@ export const GrantedSubjects = observer(function GrantedSubjects({
 
             return (
               <TableItem key={user.userId} item={user.userId} selectDisabled={disabled || isRoleProvided}>
-                <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
+                <TableColumnValue centerContent flex>
+                  {!(disabled || isRoleProvided) && <TableItemSelect />}
+                </TableColumnValue>
                 <TableColumnValue>{user.userId}</TableColumnValue>
-                <TableColumnValue>{isRoleProvided && user.grantedRoles.join(',')}</TableColumnValue>
                 <TableColumnValue></TableColumnValue>
               </TableItem>
             );

@@ -103,6 +103,9 @@ export class UserEditController implements IInitializableController, IDestructib
         await this.usersResource.refresh(this.user.userId);
         this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
       }
+
+      this.connectionAccessLoaded = false;
+      await this.loadConnectionsAccess();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
         if (this.isNew) {
@@ -133,8 +136,11 @@ export class UserEditController implements IInitializableController, IDestructib
     try {
       this.grantedConnections = await this.usersResource.loadConnections(this.userId);
 
+      this.selectedConnections.clear();
       for (const connection of this.grantedConnections) {
-        this.selectedConnections.set(connection.connectionId, true);
+        if (connection.subjectType !== AdminSubjectType.Role) {
+          this.selectedConnections.set(connection.connectionId, true);
+        }
       }
       this.connectionAccessLoaded = true;
     } catch (exception) {

@@ -77,7 +77,7 @@ export const GrantedConnections = observer(function GrantedConnections({
           <TableColumnHeader min/>
           <TableColumnHeader min/>
           <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-          <TableColumnHeader>{translate('authentication_administration_user_connections_access_role')}</TableColumnHeader>
+          <TableColumnHeader>{translate('authentication_administration_user_connections_access_granted_by')}</TableColumnHeader>
           <TableColumnHeader></TableColumnHeader>
         </TableHeader>
         <TableBody>
@@ -88,10 +88,16 @@ export const GrantedConnections = observer(function GrantedConnections({
 
             return (
               <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
-                <TableColumnValue centerContent flex><TableItemSelect /></TableColumnValue>
+                <TableColumnValue centerContent flex>
+                  {!(disabled || isRoleProvided) && <TableItemSelect />}
+                </TableColumnValue>
                 <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
                 <TableColumnValue>{connection.name}</TableColumnValue>
-                <TableColumnValue>{isRoleProvided && connectionPermission?.subjectId}</TableColumnValue>
+                <TableColumnValue>
+                  {connectionPermission && (isRoleProvided
+                    ? `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission?.subjectId}`
+                    : translate('authentication_administration_user_connections_access_granted_directly'))}
+                </TableColumnValue>
                 <TableColumnValue></TableColumnValue>
               </TableItem>
             );
