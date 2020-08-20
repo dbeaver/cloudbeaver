@@ -88,7 +88,12 @@ export class ConnectionsAdministrationController {
     }
 
     try {
-      await this.connectionsResource.searchDatabases(this.hosts.trim().split(' '));
+      const hosts = this.hosts
+        .trim()
+        .replace(/[\s,|+-]+/gm, ' ')
+        .split(/[\s,|+-]/);
+
+      await this.connectionsResource.searchDatabases(hosts);
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Databases search failed');

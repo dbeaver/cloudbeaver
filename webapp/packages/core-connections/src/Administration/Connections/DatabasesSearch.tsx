@@ -9,18 +9,18 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { Button, InputField } from '@cloudbeaver/core-blocks';
+import { Button, InputField, SubmittingForm } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 const styles = composes(
   css`
-    database-search {
+    SubmittingForm {
       composes: theme-border-color-background from global;
     }
   `,
   css`
-    database-search {
+    SubmittingForm {
       flex: 1;
       display: flex;
       flex-wrap: wrap;
@@ -61,7 +61,7 @@ export const DatabasesSearch = observer(function DatabasesSearch({
   const translate = useTranslate();
 
   return styled(useStyles(styles))(
-    <database-search as='div' className={className}>
+    <SubmittingForm onSubmit={onSearch} className={className}>
       <group as="div">
         <InputField
           name="hosts"
@@ -76,7 +76,7 @@ export const DatabasesSearch = observer(function DatabasesSearch({
       </group>
       <action as='div'>
         <Button
-          type="button"
+          type="submit"
           disabled={disabled}
           mod={['outlined']}
           onClick={onSearch}
@@ -84,6 +84,6 @@ export const DatabasesSearch = observer(function DatabasesSearch({
           {translate('connections_connection_edit_search')}
         </Button>
       </action>
-    </database-search>
+    </SubmittingForm>
   );
 });
