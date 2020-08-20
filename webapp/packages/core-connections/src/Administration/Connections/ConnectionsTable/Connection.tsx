@@ -71,8 +71,8 @@ export const Connection = observer(function Connection({ connection }: Props) {
         {isNew && (
           <tag as='div' {...use({ mod: 'positive' })}>
             {translate('ui_tag_new')}
-          </tag>)
-        }
+          </tag>
+        )}
       </TableColumnValue>
     </TableItem>
   );
