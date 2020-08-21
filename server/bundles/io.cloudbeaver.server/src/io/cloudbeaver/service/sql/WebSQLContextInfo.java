@@ -18,10 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.WebAsyncTaskInfo;
-import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -30,13 +27,6 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
-import org.jkiss.dbeaver.model.sql.SQLQuery;
-import org.jkiss.dbeaver.model.sql.SQLScriptElement;
-import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
-import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
-import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
@@ -46,7 +36,6 @@ import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -79,7 +68,7 @@ public class WebSQLContextInfo {
         if (CommonUtils.isEmpty(catalogName) && CommonUtils.isEmpty(schemaName)) {
             ContextDefaultObjectsReader defaultObjectsReader = new ContextDefaultObjectsReader(
                 dataSource,
-                DBUtils.getDefaultContext(dataSource, false)
+                DBUtils.getOrOpenDefaultContext(dataSource, false)
             );
             defaultObjectsReader.setReadNodes(false);
             try {
@@ -157,8 +146,11 @@ public class WebSQLContextInfo {
     @WebAction
     public String getDefaultSchema() {
         if (defaultSchema == null) {
-            DBCExecutionContext defaultContext = DBUtils.getDefaultContext(
+            DBCExecutionContext defaultContext = DBUtils.getOrOpenDefaultContext(
                 defaultCatalog != null ? defaultCatalog : processor.getConnection().getDataSource(), false);
+            if (defaultContext == null) {
+                return null;
+            }
             DBSObject ao = DBUtils.getActiveInstanceObject(defaultContext);
             if (ao instanceof DBSSchema) {
                 defaultSchema = ao.getName();
