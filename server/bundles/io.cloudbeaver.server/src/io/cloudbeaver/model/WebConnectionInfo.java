@@ -111,7 +111,7 @@ public class WebConnectionInfo {
 
     @Property
     public Map<String, String> getProperties() {
-        return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
+        return dataSourceContainer.getConnectionConfiguration().getProperties();
     }
 
     @Property
