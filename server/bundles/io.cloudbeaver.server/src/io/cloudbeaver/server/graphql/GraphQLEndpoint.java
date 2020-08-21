@@ -33,8 +33,8 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;
@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -279,21 +280,23 @@ public class GraphQLEndpoint extends HttpServlet {
         public WebExecutionStrategy() {
             super(handlerParameters -> {
                 Throwable exception = handlerParameters.getException();
+                if (exception instanceof InvocationTargetException) {
+                    exception = ((InvocationTargetException) exception).getTargetException();
+                }
                 log.debug(exception);
 
                 SourceLocation sourceLocation = handlerParameters.getSourceLocation();
                 ExecutionPath path = handlerParameters.getPath();
 
                 DataFetcherExceptionHandlerResult.Builder handlerResult = DataFetcherExceptionHandlerResult.newResult();
-                if (exception instanceof GraphQLError) {
-                    if (exception instanceof DBWebException) {
-                        ((DBWebException) exception).setPath(path.toList());
-                        ((DBWebException) exception).setLocations(Collections.singletonList(sourceLocation));
-                    }
-                    return handlerResult.error((GraphQLError) exception).build();
-                } else {
-                    return handlerResult.error(new ExceptionWhileDataFetching(path, exception, sourceLocation)).build();
+                if (!(exception instanceof GraphQLError)) {
+                    exception = new DBWebException("Unexpected GraphQL error", exception);
                 }
+                if (exception instanceof DBWebException) {
+                    ((DBWebException) exception).setPath(path.toList());
+                    ((DBWebException) exception).setLocations(Collections.singletonList(sourceLocation));
+                }
+                return handlerResult.error((GraphQLError) exception).build();
             });
         }
     }

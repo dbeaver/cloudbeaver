@@ -51,6 +51,10 @@ public class CBApplication extends BaseApplicationImpl {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
+    static {
+        Log.setDefaultDebugStream(System.out);
+    }
+
     public static CBApplication getInstance() {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
