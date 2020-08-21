@@ -172,7 +172,7 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
-        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, true);
+        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
         if (taskStatus != null) {
             return (WebSQLExecuteInfo) taskStatus.getExtendedResult();
         }
