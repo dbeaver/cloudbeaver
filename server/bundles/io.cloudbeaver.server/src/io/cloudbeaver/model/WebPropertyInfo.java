@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Array;
@@ -36,6 +37,7 @@ public class WebPropertyInfo {
     private WebSession session;
     private DBPPropertyDescriptor property;
     private DBPPropertySource propertySource;
+    private boolean showProtected;
 
     public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property, DBPPropertySource propertySource) {
         this.session = session;
@@ -48,7 +50,14 @@ public class WebPropertyInfo {
         this.property = property;
     }
 
-    ///////////////////////////////////
+    public boolean isShowProtected() {
+        return showProtected;
+    }
+
+    public void setShowProtected(boolean showProtected) {
+        this.showProtected = showProtected;
+    }
+///////////////////////////////////
     // General properties
     ///////////////////////////////////
 
@@ -98,6 +107,12 @@ public class WebPropertyInfo {
 
     @Property
     public Object getValue() throws DBException {
+        if (property instanceof ObjectPropertyDescriptor) {
+            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor)property;
+            if (!showProtected && opd.isPassword() || opd.isHidden()) {
+                return "******";
+            }
+        }
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         return value == null ? null : makePropertyValue(value);
     }
