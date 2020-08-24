@@ -55,9 +55,9 @@ export const TableItem = observer(function TableItem({
     (e: React.MouseEvent<HTMLTableRowElement>) => {
       if (!selectDisabled) {
         const isSelected = context.selectedItems.get(item);
-        if (!e.ctrlKey) {
-          context.clearSelection();
-        }
+        // if (!e.ctrlKey) {
+        //   context.clearSelection();
+        // }
 
         context.setItemSelect(item, !isSelected);
       }
