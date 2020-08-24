@@ -129,6 +129,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                 value={controller.config.url}
                 onChange={value => controller.onChange('url', value)}
                 disabled={controller.isDisabled}
+                autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
                 mod='surface'
               >
                 {translate('customConnection_url_JDBC')}
@@ -141,8 +142,8 @@ export const ConnectionForm = observer(function ConnectionForm({
                 <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
               </group>
               <ObjectPropertyInfoForm
-                prefix={`auth_${controller.driver?.id || ''}`}
-                autofillToken={`section-${controller.driver?.id || ''} section-auth`}
+                prefix={`auth_${controller.driver?.id || 'driver'}`}
+                autofillToken={'off'}
                 properties={controller.authModel.properties}
                 credentials={controller.config.credentials}
                 processing={controller.isDisabled}

@@ -19,5 +19,10 @@ query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
 
     authNeeded
     authModel
+    authProperties {
+      id
+      value
+      features
+    }
   }
 }

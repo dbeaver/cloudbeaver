@@ -216,7 +216,7 @@ implements IInitializableController, IDestructibleController {
     }
     if (this.authModel) {
       config.authModelId = this.config.authModelId;
-      config.saveCredentials = Object.values(this.config.credentials).some(Boolean);
+      config.saveCredentials = this.isCredentialsChanged();
       if (config.saveCredentials) {
         config.credentials = this.config.credentials;
       }
@@ -245,6 +245,15 @@ implements IInitializableController, IDestructibleController {
     this.onChange('properties', this.connectionInfo?.properties || {});
     this.onChange('authModelId', this.connectionInfo?.authModel || this.driver?.defaultAuthModel);
     this.onChange('credentials', {});
+  }
+
+  private isCredentialsChanged() {
+    for (const property of this.connectionInfo.authProperties) {
+      if (this.config.credentials[property.id!] !== property.value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private getNameTemplate() {
@@ -320,6 +329,12 @@ implements IInitializableController, IDestructibleController {
       this.authModel = await this.dbAuthModelsResource.load(
         this.connectionInfo?.authModel || this.driver.defaultAuthModel
       );
+
+      if (this.authModel) {
+        for (const property of this.connectionInfo.authProperties) {
+          this.config.credentials[property.id!] = property.value;
+        }
+      }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load driver auth model');
     } finally {

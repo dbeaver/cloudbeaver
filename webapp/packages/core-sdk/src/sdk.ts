@@ -895,7 +895,10 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type CreateConnectionConfigurationQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'> };
+export type CreateConnectionConfigurationQuery = { connection: (
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+  ); };
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -911,7 +914,10 @@ export type GetConnectionAccessQuery = { subjects: Array<Pick<AdminConnectionGra
 
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>> };
+export type GetConnectionsQuery = { connections: Array<(
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+  )>; };
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']>;
@@ -931,7 +937,10 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type UpdateConnectionConfigurationQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'> };
+export type UpdateConnectionConfigurationQuery = { connection: (
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+  ); };
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1428,6 +1437,17 @@ export const CreateConnectionConfigurationDocument = `
     features
     authNeeded
     authModel
+    authProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
   }
 }
     `;
@@ -1463,6 +1483,17 @@ export const GetConnectionsDocument = `
     features
     authNeeded
     authModel
+    authProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
   }
 }
     `;
@@ -1499,6 +1530,17 @@ export const UpdateConnectionConfigurationDocument = `
     features
     authNeeded
     authModel
+    authProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      value
+      validValues
+      defaultValue
+      features
+    }
   }
 }
     `;

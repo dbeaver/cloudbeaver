@@ -168,7 +168,7 @@ export const ConnectionEdit = observer(function ConnectionEdit({
           {controller.isLoading
             ? <Loader />
             : (
-              <SubmittingForm onSubmit={controller.onSaveConnection}>
+              <SubmittingForm onSubmit={controller.onSaveConnection} name='connection_edit'>
                 <TabPanel tabId='options'>
                   <ConnectionForm controller={controller} />
                 </TabPanel>

@@ -51,7 +51,7 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
             value={credentials[property.id!]}
             onChange={value => handleChange(property.id!, value)}
             disabled={processing}
-            autoComplete={`${autofillToken} ${property.id}`}
+            autoComplete={autofillToken === 'off' ? 'off' : `${autofillToken} ${property.id}`}
             mod='surface'
           >
             {property.displayName}
