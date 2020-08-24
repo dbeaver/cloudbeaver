@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab as TabClass } from '@cloudbeaver/core-app';
@@ -20,6 +21,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorNavigatorService } from '../SqlEditorNavigatorService';
 import { SqlResultPanel } from './SqlResultPanel/SqlResultPanel';
+import { SqlResultTabsService } from './SqlResultTabsService';
 
 const styles = composes(
   css`
@@ -49,6 +51,24 @@ type SqlDataResultProps = {
 
 export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataResultProps) {
   const navigatorService = useService(SqlEditorNavigatorService);
+  const sqlResultTabsService = useService(SqlResultTabsService);
+
+  const orderedTabs = useMemo(
+    () => computed(
+      () => tab.handlerState.resultTabs.sort((tabA, tabB) => {
+        if (tabA.groupId === tabB.groupId) {
+          return tabA.order - tabB.order;
+        }
+
+        const groupA = tab.handlerState.queryTabGroups.find(group => group.groupId === tabA.groupId)!;
+        const groupB = tab.handlerState.queryTabGroups.find(group => group.groupId === tabB.groupId)!;
+
+        return groupA.order - groupB.order;
+      })
+    ),
+    [tab]
+  );
+
   const handleOpen = useCallback(
     (resultId: string) => navigatorService.openEditorResult(tab.id, resultId),
     []
@@ -58,33 +78,35 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
     []
   );
 
-  if (!tab.handlerState.resultTabs.length) {
+  if (!tab.handlerState.queryTabGroups.length) {
     return <TextPlaceholder>Execute query with Ctrl+Enter to see results</TextPlaceholder>;
   }
 
   const currentId = tab.handlerState.currentResultTabId || '';
 
+  const executionState = sqlResultTabsService.getTabExecutionContext(tab.id);
+
   return styled(useStyles(styles))(
     <wrapper as="div">
       <TabsBox
         currentTabId={currentId}
-        tabs={tab.handlerState.resultTabs.map(result => (
+        tabs={orderedTabs.get().map(result => (
           <Tab key={result.resultTabId} tabId={result.resultTabId} onOpen={handleOpen} onClose={handleClose}>
             <TabTitle>{result.name}</TabTitle>
           </Tab>
         ))}
         style={[styles]}
       >
-        {tab.handlerState.resultTabs.map(result => (
+        {orderedTabs.get().map(result => (
           <TabPanel key={result.resultTabId} tabId={result.resultTabId}>
-            <SqlResultPanel panelInit={result.panelParams}/>
+            <SqlResultPanel tab={tab} panelInit={result}/>
           </TabPanel>
         ))}
       </TabsBox>
       <Loader
-        loading={tab.handlerState.sqlExecutionState.isSqlExecuting}
-        cancelDisabled={!tab.handlerState.sqlExecutionState.canCancel}
-        onCancel={tab.handlerState.sqlExecutionState.cancelSQlExecuting}
+        loading={executionState.isSqlExecuting}
+        cancelDisabled={!executionState.canCancel}
+        onCancel={executionState.cancelSQlExecuting}
         overlay
       />
     </wrapper>

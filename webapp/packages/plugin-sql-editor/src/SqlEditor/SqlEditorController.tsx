@@ -32,15 +32,15 @@ export class SqlEditorController implements IInitializableController {
   }
 
   @computed get isActionsDisabled(): boolean {
-    return this.tab.handlerState.sqlExecutionState.isSqlExecuting;
+    return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isSqlExecuting;
   }
 
   handleExecute = () => {
-    this.sqlResultTabsService.executeEditorQuery(this.tab.handlerState, this.getExecutingQuery(), false);
+    this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), false);
   }
 
   handleExecuteNewTab = () => {
-    this.sqlResultTabsService.executeEditorQuery(this.tab.handlerState, this.getExecutingQuery(), true);
+    this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), true);
   }
 
   readonly options: EditorConfiguration = {
@@ -84,10 +84,11 @@ export class SqlEditorController implements IInitializableController {
   private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
 
-  constructor(private sqlResultTabsService: SqlResultTabsService,
-              private sqlDialectInfoService: SqlDialectInfoService,
-              private sqlEditorService: SqlEditorService) {
-  }
+  constructor(
+    private sqlResultTabsService: SqlResultTabsService,
+    private sqlDialectInfoService: SqlDialectInfoService,
+    private sqlEditorService: SqlEditorService,
+  ) { }
 
   init(tab: ITab<ISqlEditorTabState>) {
     this.tab = tab;

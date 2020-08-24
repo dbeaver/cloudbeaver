@@ -7,23 +7,37 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { isPromiseCancelledError, uuid } from '@cloudbeaver/core-utils';
+import { uuid, MetadataMap, isPromiseCancelledError } from '@cloudbeaver/core-utils';
 import { fetchingSettings } from '@cloudbeaver/plugin-data-viewer';
 
+import { ISqlEditorGroupMetadata } from '../ISqlEditorGroupMetadata';
 import {
-  IResultsTabState, ISqlEditorTabState, ISqlQueryParams, ISqlResultPanelParams,
+  IQueryTabGroup, ISqlEditorTabState, ISqlQueryParams, IResultDataTab
 } from '../ISqlEditorTabState';
-import { SqlResultService } from './SqlResultService';
+import { SqlEditorGroupMetadataService } from '../SqlEditorGroupMetadataService';
+import { SqlExecutionState } from '../SqlExecutionState';
 
 @injectable()
 export class SqlResultTabsService {
+  private tabExecutionContext: MetadataMap<string, SqlExecutionState>
 
-  constructor(private sqlResultService: SqlResultService) { }
+  constructor(
+    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+  ) {
+    this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
+  }
 
-  async executeEditorQuery(editorState: ISqlEditorTabState, query: string, inNewTab: boolean) {
+  getTabExecutionContext(tabId: string) {
+    return this.tabExecutionContext.get(tabId);
+  }
+
+  async executeEditorQuery(tabId: string, editorState: ISqlEditorTabState, query: string, inNewTab: boolean) {
     if (!query.trim()) {
       return;
     }
+
+    const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
+    let tabGroup: IQueryTabGroup;
 
     const sqlQueryParams: ISqlQueryParams = {
       connectionId: editorState.connectionId,
@@ -33,127 +47,104 @@ export class SqlResultTabsService {
       query,
     };
 
-    // we should first render table, because we expect that table request first data portion
-    const queryExecutionProcess = this.sqlResultService.asyncSqlQuery(
-      sqlQueryParams,
-      {
-        offset: 0,
-        limit: fetchingSettings.fetchDefault,
-      }
-    );
+    let isNewTabCreated = false;
 
-    editorState.sqlExecutionState.setCurrentlyExecutingQuery(queryExecutionProcess);
+    if (inNewTab || !currentTab?.groupId) {
+      const order = findMinimalFree(
+        editorState.queryTabGroups.map(group => group.order),
+        1
+      );
 
-    function createTabPanelParams(indexInResultSet: number): ISqlResultPanelParams {
-      const params: ISqlResultPanelParams = {
-        resultTabId: uuid(),
-        indexInResultSet,
+      tabGroup = {
+        groupId: uuid(),
+        order,
         sqlQueryParams,
-        firstDataPortion: queryExecutionProcess,
-        sqlExecutionState: editorState.sqlExecutionState,
       };
-      return params;
-    }
+      editorState.queryTabGroups.push(tabGroup);
 
-    const firstTabPanelParams = createTabPanelParams(0);
-    const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
-    const groupToReplace = inNewTab ? undefined : currentTab?.groupId;
-
-    let newGroupId = '';
-    const isFistPanel = !editorState.resultTabs.length;
-    if (isFistPanel) {
-      // add first tab synchronously before awaiting result
-      newGroupId = this.replaceGroupWithNewTab(editorState.resultTabs, firstTabPanelParams);
-      editorState.currentResultTabId = firstTabPanelParams.resultTabId;
-    }
-
-    try {
-      const data = await queryExecutionProcess.promise;
-
-      if (!isFistPanel) {
-        // replace old tabs with new one
-        newGroupId = this.replaceGroupWithNewTab(editorState.resultTabs, firstTabPanelParams, groupToReplace);
-        editorState.currentResultTabId = firstTabPanelParams.resultTabId;
-      }
-
-      // when more than one result set - add other tabs
-      if (data.results && data.results?.length > 1) {
-        // ignore first dataset, it was already added
-        for (let i = 1; i < data.results.length; i++) {
-          const tabPanelParams = createTabPanelParams(i);
-          this.addTabToGroup(editorState.resultTabs, tabPanelParams, newGroupId);
-        }
-      }
-    } catch (exception) {
-      // remove first panel if execution was cancelled
-      if (isPromiseCancelledError(exception) && isFistPanel) {
-        editorState.currentResultTabId = undefined;
-        editorState.resultTabs = [];
-      }
-      if (!isPromiseCancelledError(exception) && !isFistPanel) {
-        // replace old tabs with new one and show error in it
-        this.replaceGroupWithNewTab(editorState.resultTabs, firstTabPanelParams, groupToReplace);
-        editorState.currentResultTabId = firstTabPanelParams.resultTabId;
-      }
-    }
-  }
-
-  /**
-   * method remove current tab group from resultTabs
-   * and add one tab on the same place
-   *
-   * @return groupId of new tab
-   */
-  private replaceGroupWithNewTab(resultTabs: IResultsTabState[],
-                                 tabParams: ISqlResultPanelParams,
-                                 groupToDelete?: string): string {
-    const tabsToRemove = resultTabs.filter(tab => tab.groupId === groupToDelete);
-    const tabToReplace = tabsToRemove[0];
-
-    const order = tabToReplace
-      ? tabToReplace.order
-      : findMinimalFree(resultTabs.map(result => result.order), 1);
-
-    const resultsTabState: IResultsTabState = {
-      resultTabId: tabParams.resultTabId,
-      groupId: uuid(),
-      order,
-      name: this.getTabNameForOrder(order),
-      panelParams: tabParams,
-    };
-
-    if (tabToReplace) {
-      const index = resultTabs.findIndex(tab => tab.resultTabId === tabToReplace.resultTabId);
-      resultTabs.splice(index, 1, resultsTabState);
+      isNewTabCreated = true;
     } else {
-      resultTabs.push(resultsTabState);
+      tabGroup = editorState.queryTabGroups.find(group => group.groupId === currentTab.groupId)!;
+      tabGroup.sqlQueryParams = sqlQueryParams;
     }
 
-    tabsToRemove.forEach((tabToRemove) => {
-      const index = resultTabs.findIndex(tab => tab.resultTabId === tabToRemove.resultTabId);
-      if (index !== -1) {
-        resultTabs.splice(index, 1);
-      }
-    });
+    let editorMetadata: ISqlEditorGroupMetadata;
 
-    return resultsTabState.groupId;
+    for (let [i, length] = [0, 1]; i < length; i++) {
+      let resultTab = editorState.resultTabs.find(
+        resultTab => resultTab.groupId === tabGroup.groupId
+          && resultTab.indexInResultSet === i
+      );
+
+      if (!resultTab) {
+        const order = findMinimalFree(
+          editorState.resultTabs
+            .filter(resultTab => resultTab.groupId === tabGroup.groupId)
+            .map(result => result.order),
+          1
+        );
+        resultTab = this.createResultTab(order, tabGroup.groupId, tabGroup.order, i);
+        editorState.resultTabs.push(resultTab);
+      }
+
+      if (i === 0) {
+        editorState.currentResultTabId = resultTab.resultTabId;
+
+        try {
+          editorMetadata = this.sqlEditorGroupMetadataService.getTabData(resultTab.resultTabId);
+
+          // we should first render table, because we expect that table request first data portion
+          await editorMetadata.start(
+            this.getTabExecutionContext(tabId),
+            sqlQueryParams,
+            {
+              offset: 0,
+              limit: fetchingSettings.fetchDefault,
+            }
+          );
+
+          const data = await editorMetadata.resultDataProcess.promise;
+
+          length = data.results?.length || 1;
+          editorState.resultTabs = editorState.resultTabs
+            .filter(
+              resultTab => resultTab.groupId !== tabGroup.groupId
+              || resultTab.indexInResultSet < length
+            );
+        } catch (exception) {
+          // remove first panel if execution was cancelled
+          if (isPromiseCancelledError(exception) && isNewTabCreated) {
+            editorState.queryTabGroups = editorState.queryTabGroups.filter(group => group.groupId !== tabGroup.groupId);
+            editorState.resultTabs = editorState.resultTabs.filter(tab => tab.groupId !== tabGroup.groupId);
+            editorState.currentResultTabId = editorState.resultTabs[0]?.resultTabId;
+          }
+          return;
+        }
+      } else {
+        this.sqlEditorGroupMetadataService
+          .getTabData(resultTab.resultTabId)
+          .resultDataProcess = editorMetadata!.resultDataProcess;
+      }
+    }
   }
 
-  private addTabToGroup(resultTabs: IResultsTabState[], tabParams: ISqlResultPanelParams, groupId: string) {
-    const order = findMinimalFree(resultTabs.map(result => result.order), 1);
-
-    const resultsTabState: IResultsTabState = {
-      resultTabId: tabParams.resultTabId,
+  private createResultTab(
+    order: number,
+    groupId: string,
+    groupOrder: number,
+    indexInResultSet: number
+  ): IResultDataTab {
+    return {
+      resultTabId: uuid(),
       groupId,
       order,
-      name: this.getTabNameForOrder(order),
-      panelParams: tabParams,
+      name: this.getTabNameForOrder(order, groupOrder),
+      indexInResultSet,
     };
-    resultTabs.push(resultsTabState);
   }
 
-  private getTabNameForOrder(order: number) {
-    return order > 1 ? `Result - ${order}` : 'Result';
+  private getTabNameForOrder(order: number, groupOrder: number) {
+    return `Result - ${groupOrder} (${order})`;
   }
 
 }
