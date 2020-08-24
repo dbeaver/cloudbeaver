@@ -98,15 +98,22 @@
     }
   }
 
-  TableItemExpand {
+  table-item-expand-box {
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    margin-left: 32px;
     width: 16px;
     height: 100%;
     padding: 0;
 
-    &[|expanded] {
-      transform: rotate(180deg);
+    > Icon {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+
+      &[|expanded] {
+        transform: rotate(180deg);
+      }
     }
   }
 }

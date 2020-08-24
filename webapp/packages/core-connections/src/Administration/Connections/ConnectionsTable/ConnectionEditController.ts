@@ -248,6 +248,9 @@ implements IInitializableController, IDestructibleController {
   }
 
   private isCredentialsChanged() {
+    if (!this.connectionInfo.authProperties.length) {
+      return true;
+    }
     for (const property of this.connectionInfo.authProperties) {
       if (this.config.credentials[property.id!] !== property.value) {
         return true;

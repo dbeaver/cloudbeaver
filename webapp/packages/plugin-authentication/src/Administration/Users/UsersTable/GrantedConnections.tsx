@@ -89,7 +89,7 @@ export const GrantedConnections = observer(function GrantedConnections({
             return (
               <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
                 <TableColumnValue centerContent flex>
-                  {!(disabled || isRoleProvided) && <TableItemSelect />}
+                  <TableItemSelect disabled={disabled || isRoleProvided} checked={disabled || isRoleProvided}/>
                 </TableColumnValue>
                 <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
                 <TableColumnValue>{connection.name}</TableColumnValue>

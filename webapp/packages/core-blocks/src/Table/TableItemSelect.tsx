@@ -16,11 +16,12 @@ import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
 type Props = {
+  checked?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
-export const TableItemSelect = observer(function TableItemSelect({ disabled, className }: Props) {
+export const TableItemSelect = observer(function TableItemSelect({ checked, disabled, className }: Props) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   if (!context) {
@@ -32,6 +33,6 @@ export const TableItemSelect = observer(function TableItemSelect({ disabled, cla
   }, [tableContext, context]);
 
   return styled(useStyles())(
-    <input type='checkbox' checked={context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>
+    <input type='checkbox' checked={checked || context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>
   );
 });

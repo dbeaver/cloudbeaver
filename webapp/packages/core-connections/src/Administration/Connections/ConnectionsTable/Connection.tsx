@@ -59,9 +59,11 @@ export const Connection = observer(function Connection({ connection }: Props) {
     <TableItem item={connection.id} expandElement={ConnectionEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
+      </TableColumnValue>
+      <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue centerContent flex>
+      <TableColumnValue centerContent flex expand>
         {icons.map(icon => <StaticImage key={icon} icon={icon} />)}
       </TableColumnValue>
       <TableColumnValue expand>{connection.name}</TableColumnValue>

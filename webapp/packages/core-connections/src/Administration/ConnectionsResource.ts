@@ -16,6 +16,7 @@ import {
   isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
+  ObjectPropertyInfo,
 } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -64,6 +65,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     const connectionInfo = {
       id: uuid(),
       driverId,
+      authProperties: [] as Array<ObjectPropertyInfo>,
       // name: 'New connection',
       [NEW_CONNECTION_SYMBOL]: true,
     } as ConnectionNew;
@@ -151,6 +153,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
         name: await this.getNameTemplate(database),
         host: database.host,
         port: `${database.port}`,
+        authProperties: [] as Array<ObjectPropertyInfo>,
         [NEW_CONNECTION_SYMBOL]: true,
         [SEARCH_CONNECTION_SYMBOL]: database,
       } as ConnectionSearch;

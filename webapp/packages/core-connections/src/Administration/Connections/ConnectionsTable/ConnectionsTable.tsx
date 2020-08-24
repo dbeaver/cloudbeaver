@@ -55,6 +55,7 @@ export const ConnectionsTable = observer(function ConnectionsTable({
       <TableHeader>
         <TableColumnHeader min/>
         <TableColumnHeader min/>
+        <TableColumnHeader min/>
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_template')}</TableColumnHeader>
@@ -62,7 +63,7 @@ export const ConnectionsTable = observer(function ConnectionsTable({
       </TableHeader>
       <TableBody>
         {findConnections.map(connection => <Connection key={connection.id} connection={connection}/>)}
-        {!!findConnections.length && <TableItemSeparator key='search' colSpan={6}></TableItemSeparator>}
+        {!!findConnections.length && <TableItemSeparator key='search' colSpan={7}></TableItemSeparator>}
         {connections.map(connection => <Connection key={connection.id} connection={connection}/>)}
       </TableBody>
     </Table>

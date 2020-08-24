@@ -79,7 +79,7 @@ export const GrantedSubjects = observer(function GrantedSubjects({
           {roles.map(role => (
             <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex>
-                {!disabled && <TableItemSelect />}
+                <TableItemSelect disabled={disabled} checked={disabled}/>
               </TableColumnValue>
               <TableColumnValue>{role.roleName}</TableColumnValue>
               <TableColumnValue></TableColumnValue>
@@ -92,7 +92,7 @@ export const GrantedSubjects = observer(function GrantedSubjects({
             return (
               <TableItem key={user.userId} item={user.userId} selectDisabled={disabled || isRoleProvided}>
                 <TableColumnValue centerContent flex>
-                  {!(disabled || isRoleProvided) && <TableItemSelect />}
+                  <TableItemSelect disabled={disabled || isRoleProvided} checked={disabled || isRoleProvided}/>
                 </TableColumnValue>
                 <TableColumnValue>{user.userId}</TableColumnValue>
                 <TableColumnValue></TableColumnValue>
