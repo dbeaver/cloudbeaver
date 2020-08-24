@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import { TabHandlerTabProps } from '@cloudbeaver/core-app';
@@ -16,7 +17,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ISqlEditorTabState } from './ISqlEditorTabState';
 
-export function SqlEditorTab({
+export const SqlEditorTab = observer(function SqlEditorTab({
   tab, handler, onSelect, onClose, style,
 }: TabHandlerTabProps<ISqlEditorTabState>) {
   const connectionInfo = useService(ConnectionInfoResource);
@@ -29,4 +30,4 @@ export function SqlEditorTab({
       <TabTitle>{name}</TabTitle>
     </Tab>
   );
-}
+});
