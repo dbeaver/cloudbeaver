@@ -39,6 +39,8 @@ export const User = observer(function User({ user }: Props) {
     <TableItem item={user.userId} expandElement={UserEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
+      </TableColumnValue>
+      <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
       <TableColumnValue expand>{isNew ? translate('authentication_administration_user_connections_user_new') : user.userId}</TableColumnValue>

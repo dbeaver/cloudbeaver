@@ -36,6 +36,7 @@ export const UsersTable = observer(function UsersTable({ users, selectedItems, e
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
         <TableColumnHeader min/>
+        <TableColumnHeader min/>
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
         <TableColumnHeader></TableColumnHeader>
