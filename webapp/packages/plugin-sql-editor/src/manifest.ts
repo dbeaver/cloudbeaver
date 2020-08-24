@@ -11,6 +11,7 @@ import { PluginManifest } from '@cloudbeaver/core-di';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorService } from './SqlEditor/SqlEditorService';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap';
+import { SqlEditorGroupMetadataService } from './SqlEditorGroupMetadataService';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 import { SqlResultService } from './SqlResultTabs/SqlResultService';
@@ -27,6 +28,7 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlResultTabsService,
     SqlResultService,
     SqlEditorService,
+    SqlEditorGroupMetadataService,
     SqlEditorNavigatorService,
   ],
 

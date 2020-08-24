@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import {
   NavigationTabsService,
   TabHandler,
@@ -14,6 +16,7 @@ import {
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaSetter,
+  ITabOptions,
 } from '@cloudbeaver/core-app';
 import {
   ConnectionInfoResource,
@@ -35,8 +38,9 @@ import { SqlExecutionState } from './SqlExecutionState';
 
 @injectable()
 export class SqlEditorTabService {
+  @observable readonly tabExecutionState: Map<string, SqlExecutionState>;
+  readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
-  readonly tabHandler: TabHandler<ISqlEditorTabState>
   constructor(
     private navigationTabsService: NavigationTabsService,
     private connectionInfoResource: ConnectionInfoResource,
@@ -45,6 +49,7 @@ export class SqlEditorTabService {
     private sqlDialectInfoService: SqlDialectInfoService,
     private connectionAuthService: ConnectionAuthService
   ) {
+    this.tabExecutionState = new Map();
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
@@ -64,7 +69,53 @@ export class SqlEditorTabService {
       });
   }
 
-  registerTabHandler() {
+  registerTabHandler() { }
+
+  async createNewEditor(
+    connectionId?: string,
+    catalogId?: string,
+    schemaId?: string
+  ): Promise<ITabOptions<ISqlEditorTabState> | null> {
+    const order = this.getFreeEditorId();
+
+    if (!connectionId) {
+      connectionId = Array.from(this.connectionInfoResource.data.values())[0].id;
+    }
+
+    try {
+      const connection = await this.connectionAuthService.auth(connectionId);
+
+      if (!connection?.connected) {
+        return null;
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception);
+      throw exception;
+    }
+
+    await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
+
+    const context = await this.createSqlContext(connectionId, catalogId, schemaId);
+
+    return {
+      handlerId: sqlEditorTabHandlerKey,
+      handlerState: {
+        query: '',
+        order,
+        contextId: context.contextId,
+        connectionId,
+        objectCatalogId: context.objectCatalogId,
+        objectSchemaId: context.objectSchemaId,
+        queryTabGroups: [],
+        resultTabs: [],
+      },
+    };
+  }
+
+  private getFreeEditorId() {
+    const editorTabs = this.navigationTabsService.findTabs(isSQLEditorTab);
+    const ordered = Array.from(editorTabs).map(tab => tab.handlerState.order);
+    return findMinimalFree(ordered, 1);
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
@@ -75,6 +126,7 @@ export class SqlEditorTabService {
         || typeof tab.handlerState.objectCatalogId !== 'string'
         || typeof tab.handlerState.order !== 'number'
         || !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId)
+        || !Array.isArray(tab.handlerState.queryTabGroups)
         || !Array.isArray(tab.handlerState.resultTabs)
     ) {
       return false;
@@ -86,8 +138,10 @@ export class SqlEditorTabService {
     }
 
     tab.handlerState.currentResultTabId = '';
+    tab.handlerState.queryTabGroups = []; // clean old results
     tab.handlerState.resultTabs = []; // clean old results
-    tab.handlerState.sqlExecutionState = new SqlExecutionState();
+
+    this.tabExecutionState.set(tab.id, new SqlExecutionState());
 
     await this.sqlDialectInfoService.loadSqlDialectInfo(tab.handlerState.connectionId);
 
@@ -170,6 +224,7 @@ export class SqlEditorTabService {
   }
 
   private async handleTabClose(tab: ITab<ISqlEditorTabState>) {
+    this.tabExecutionState.delete(tab.id);
     await this.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
   }
 
@@ -227,4 +282,30 @@ export class SqlEditorTabService {
       defaultSchema,
     });
   }
+}
+
+function findMinimalFree(array: number[], base: number): number {
+  return array
+    .sort((a, b) => b - a)
+    .reduceRight((prev, cur) => (prev === cur ? prev + 1 : prev), base);
+}
+
+export function isSQLEditorTab(tab: ITab): tab is ITab<ISqlEditorTabState>;
+export function isSQLEditorTab(
+  predicate: (tab: ITab<ISqlEditorTabState>) => boolean
+): (tab: ITab) => tab is ITab<ISqlEditorTabState>
+export function isSQLEditorTab(
+  tab: ITab | ((tab: ITab<ISqlEditorTabState>) => boolean)
+): boolean | ((tab: ITab) => tab is ITab<ISqlEditorTabState>) {
+  if (typeof tab === 'function') {
+    const predicate = tab;
+    return (tab: ITab): tab is ITab<ISqlEditorTabState> => {
+      const sqlEditorTab = tab.handlerId === sqlEditorTabHandlerKey;
+      if (!predicate || !sqlEditorTab) {
+        return sqlEditorTab;
+      }
+      return predicate(tab);
+    };
+  }
+  return tab.handlerId === sqlEditorTabHandlerKey;
 }

@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { ITab } from '@cloudbeaver/core-app';
 import { Button } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { TableViewer } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
+import { IResultDataTab, ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { EPanelState, SqlResultPanelController } from './SqlResultPanelController';
 
 const style = css`
@@ -40,16 +41,19 @@ const style = css`
 `;
 
 type SqlResultPanelProps = {
-  panelInit: ISqlResultPanelParams;
+  tab: ITab<ISqlEditorTabState>;
+  panelInit: IResultDataTab;
 };
 
-export const SqlResultPanel = observer(function SqlResultPanel({ panelInit }: SqlResultPanelProps) {
+export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit }: SqlResultPanelProps) {
+  const group = tab.handlerState.queryTabGroups.find(group => group.groupId === panelInit.groupId)!;
 
-  const controller = useController(SqlResultPanelController, panelInit);
+  const controller = useController(SqlResultPanelController, tab.id, panelInit, group);
+  controller.updateResult();
 
   return styled(style)(
     <result-panel as="div">
-      { controller.state === EPanelState.ERROR && (
+      {controller.state === EPanelState.ERROR && (
         <error as="div">
           <error-text as="div">
             {controller.errorMessage}
@@ -61,7 +65,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ panelInit }: Sq
           )}
         </error>
       )}
-      { controller.state === EPanelState.MESSAGE_RESULT
+      {controller.state === EPanelState.MESSAGE_RESULT
         && (
           <wrapper as="div">
             <messages as="div">
@@ -74,7 +78,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ panelInit }: Sq
           </wrapper>
         )
       }
-      { controller.state === EPanelState.TABLE_RESULT
+      {controller.state === EPanelState.TABLE_RESULT
         && <TableViewer tableId={controller.getTableId()}/>
       }
     </result-panel>

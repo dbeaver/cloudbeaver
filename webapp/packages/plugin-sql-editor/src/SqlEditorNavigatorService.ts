@@ -8,25 +8,15 @@
 
 import {
   NavigationTabsService,
-  ITab,
   INavigator,
   NavigationService,
   IContextProvider,
-  ITabOptions,
 } from '@cloudbeaver/core-app';
-import {
-  ConnectionsManagerService,
-  ConnectionInfoResource,
-  ConnectionAuthService,
-} from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDialectInfoService } from './SqlDialectInfoService';
-import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlExecutionState } from './SqlExecutionState';
 
 enum SQLEditorNavigationAction {
@@ -56,17 +46,15 @@ export interface SQLEditorAction extends SQLEditorActionContext {
 
 @injectable()
 export class SqlEditorNavigatorService {
-
   private readonly navigator: INavigator<SQLCreateAction | SQLEditorAction>;
+
   constructor(
     private navigationTabsService: NavigationTabsService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource,
-    private gql: GraphQLService,
-    private sqlDialectInfoService: SqlDialectInfoService,
     private navigationService: NavigationService,
-    private connectionAuthService: ConnectionAuthService
+    private sqlEditorTabService: SqlEditorTabService
   ) {
 
     this.navigator = this.navigationService.createNavigator<SQLCreateAction | SQLEditorAction>(
@@ -125,11 +113,18 @@ export class SqlEditorNavigatorService {
       const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
 
       if (data.type === SQLEditorNavigationAction.create) {
-        const tabOptions = await this.createNewEditor(data.connectionId, data.catalogId, data.schemaId);
+        const tabOptions = await this.sqlEditorTabService.createNewEditor(
+          data.connectionId,
+          data.catalogId,
+          data.schemaId
+        );
         const connectionInfo = this.connectionInfoResource.get(data.connectionId || '');
 
         if (tabOptions) {
-          tabInfo.openNewTab(tabOptions);
+          const tab = tabInfo.openNewTab(tabOptions);
+
+          // FIXME: should be in SqlEditorTabService
+          this.sqlEditorTabService.tabExecutionState.set(tab.id, new SqlExecutionState());
         } else {
           this.notificationService.logError({
             title: `Failed to create editor for ${connectionInfo?.name || data.connectionId} connection`,
@@ -160,103 +155,4 @@ export class SqlEditorNavigatorService {
       this.notificationService.logException(exception, 'Error in SQL Editor while processing action with editor');
     }
   }
-
-  private async createNewEditor(
-    connectionId?: string,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<ITabOptions<ISqlEditorTabState> | null> {
-    const order = this.getFreeEditorId();
-
-    if (!connectionId) {
-      connectionId = Array.from(this.connectionInfoResource.data.values())[0].id;
-    }
-
-    try {
-      const connection = await this.connectionAuthService.auth(connectionId);
-
-      if (!connection?.connected) {
-        return null;
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception);
-      throw exception;
-    }
-
-    await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
-
-    const context = await this.createSqlContext(connectionId, catalogId, schemaId);
-
-    return {
-      handlerId: sqlEditorTabHandlerKey,
-      handlerState: {
-        query: '',
-        order,
-        contextId: context.contextId,
-        connectionId,
-        objectCatalogId: context.objectCatalogId,
-        objectSchemaId: context.objectSchemaId,
-        sqlExecutionState: new SqlExecutionState(),
-        resultTabs: [],
-      },
-    };
-  }
-
-  private getFreeEditorId() {
-    const editorTabs = this.navigationTabsService.findTabs(isSQLEditorTab);
-    const ordered = Array.from(editorTabs).map(tab => tab.handlerState.order);
-    return findMinimalFree(ordered, 1);
-  }
-
-  /**
-   * Returns context id, context catalog and schema
-   * When try create context without catalog or schema the context is created with default catalog and schema
-   * and response contains its ids.
-   * If in the response there are no catalog or schema it means that database has no catalogs or schemas at all.
-   */
-  private async createSqlContext(
-    connectionId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IExecutionContext> {
-
-    const response = await this.gql.gql.sqlContextCreate({
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    });
-    return {
-      contextId: response.context.id,
-      connectionId,
-      objectCatalogId: response.context.defaultCatalog,
-      objectSchemaId: response.context.defaultSchema,
-    };
-  }
-
-}
-
-function findMinimalFree(array: number[], base: number): number {
-  return array
-    .sort((a, b) => b - a)
-    .reduceRight((prev, cur) => (prev === cur ? prev + 1 : prev), base);
-}
-
-export function isSQLEditorTab(tab: ITab): tab is ITab<ISqlEditorTabState>;
-export function isSQLEditorTab(
-  predicate: (tab: ITab<ISqlEditorTabState>) => boolean
-): (tab: ITab) => tab is ITab<ISqlEditorTabState>
-export function isSQLEditorTab(
-  tab: ITab | ((tab: ITab<ISqlEditorTabState>) => boolean)
-): boolean | ((tab: ITab) => tab is ITab<ISqlEditorTabState>) {
-  if (typeof tab === 'function') {
-    const predicate = tab;
-    return (tab: ITab): tab is ITab<ISqlEditorTabState> => {
-      const sqlEditorTab = tab.handlerId === sqlEditorTabHandlerKey;
-      if (!predicate || !sqlEditorTab) {
-        return sqlEditorTab;
-      }
-      return predicate(tab);
-    };
-  }
-  return tab.handlerId === sqlEditorTabHandlerKey;
 }

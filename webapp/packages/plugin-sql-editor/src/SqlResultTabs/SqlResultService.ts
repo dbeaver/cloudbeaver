@@ -26,16 +26,6 @@ export class SqlResultService {
     private notificationService: NotificationService
   ) { }
 
-  asyncSqlQuery(
-    sqlQueryParams: ISqlQueryParams,
-    filter: SqlDataFilter
-  ): SQLQueryExecutionProcess {
-
-    const cancellableSqlQuery = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
-    cancellableSqlQuery.start(sqlQueryParams, filter);
-    return cancellableSqlQuery;
-  }
-
   async saveChanges(
     sqlQueryParams: ISqlQueryParams,
     resultId: string,

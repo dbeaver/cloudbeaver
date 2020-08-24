@@ -24,9 +24,12 @@ import {
   AccessMode,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlResultPanelParams } from '../../ISqlEditorTabState';
+import { IResultDataTab, IQueryTabGroup } from '../../ISqlEditorTabState';
+import { SqlEditorGroupMetadataService } from '../../SqlEditorGroupMetadataService';
 import { SqlExecutionState } from '../../SqlExecutionState';
+import { SQLQueryExecutionProcess } from '../SQLQueryExecutionProcess';
 import { SqlResultService } from '../SqlResultService';
+import { SqlResultTabsService } from '../SqlResultTabsService';
 
 export enum EPanelState {
   PENDING = 'PENDING',
@@ -45,25 +48,43 @@ implements IInitializableController, IDestructibleController {
   @observable hasDetails = false;
 
   private exception: Error | null = null;
-  private panelInit!: ISqlResultPanelParams;
+  private panelInit!: IResultDataTab;
+  private group!: IQueryTabGroup;
+  private tabId!: string;
+  private sqlProcess: SQLQueryExecutionProcess | null = null;
 
-  constructor(private sqlResultService: SqlResultService,
-              private tableViewerStorageService: TableViewerStorageService,
-              private connectionInfoResource: ConnectionInfoResource,
-              private commonDialogService: CommonDialogService,
-              private notificationService: NotificationService) {
+  constructor(
+    private sqlResultService: SqlResultService,
+    private tableViewerStorageService: TableViewerStorageService,
+    private connectionInfoResource: ConnectionInfoResource,
+    private commonDialogService: CommonDialogService,
+    private notificationService: NotificationService,
+    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+    private sqlResultTabsService: SqlResultTabsService
+  ) {
   }
 
-  async init(panelInit: ISqlResultPanelParams) {
+  async init(tabId: string, panelInit: IResultDataTab, group: IQueryTabGroup) {
+    this.tabId = tabId;
     this.panelInit = panelInit;
+    this.group = group;
+  }
+
+  async updateResult() {
+    const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.tabId);
+    const metadata = this.sqlEditorGroupMetadataService.getTabData(this.panelInit.resultTabId);
+    if (this.sqlProcess === metadata.resultDataProcess) {
+      return;
+    }
 
     try {
-      const response = await this.panelInit.firstDataPortion.promise;
+      this.sqlProcess = metadata.resultDataProcess;
+      const response = await metadata.resultDataProcess.promise;
 
-      const dataSet = response.results![panelInit.indexInResultSet];
+      const dataSet = response.results![this.panelInit.indexInResultSet];
 
       if (!dataSet) {
-        throw new Error(`dataset not found: ${panelInit.indexInResultSet}`);
+        throw new Error(`dataset not found: ${this.panelInit.indexInResultSet}`);
       }
 
       if (!dataSet.resultSet) {
@@ -74,23 +95,30 @@ implements IInitializableController, IDestructibleController {
         const initialState = this.sqlResultService
           .sqlExecuteInfoToData(response, this.panelInit.indexInResultSet, fetchingSettings.fetchDefault);
 
-        const connectionInfo = await this.connectionInfoResource.load(panelInit.sqlQueryParams.connectionId);
+        const connectionInfo = await this.connectionInfoResource.load(this.group.sqlQueryParams.connectionId);
 
-        const tableModel = this.tableViewerStorageService.create({
-          tableId: this.getTableId(),
-          connectionId: panelInit.sqlQueryParams.connectionId,
-          executionContext: panelInit.sqlQueryParams,
-          resultId: dataSet.resultSet.id,
-          sourceName: panelInit.sqlQueryParams.query,
-          access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
-          requestDataAsync: this.requestDataAsync.bind(this, panelInit.sqlExecutionState),
-          noLoaderWhileRequestingDataAsync: true,
-          saveChanges: this.saveChanges.bind(this),
-        });
+        let tableModel = this.tableViewerStorageService.get(this.getTableId());
 
-        tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
-        tableModel.setColumns(initialState.columns);
-        tableModel.updateInfo(initialState.statusMessage, initialState.duration);
+        if (!tableModel) {
+          tableModel = this.tableViewerStorageService.create({
+            tableId: this.getTableId(),
+            connectionId: this.group.sqlQueryParams.connectionId,
+            executionContext: this.group.sqlQueryParams,
+            resultId: dataSet.resultSet.id,
+            sourceName: this.group.sqlQueryParams.query,
+            access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
+            requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
+            noLoaderWhileRequestingDataAsync: true,
+            saveChanges: this.saveChanges.bind(this),
+          });
+
+          tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
+          tableModel.setColumns(initialState.columns);
+          tableModel.updateInfo(initialState.statusMessage, initialState.duration);
+        } else {
+          await this.updateTableInfo(tableModel, dataSet.resultSet.id);
+          tableModel.refresh();
+        }
       }
 
     } catch (exception) {
@@ -118,11 +146,10 @@ implements IInitializableController, IDestructibleController {
         this.errorMessage = exception.message;
       }
     }
-
   }
 
   getQuery(): string {
-    return this.panelInit.sqlQueryParams.query;
+    return this.group.sqlQueryParams.query;
   }
 
   destruct() {
@@ -147,28 +174,43 @@ implements IInitializableController, IDestructibleController {
     offset: number,
     count: number
   ): Promise<IRequestDataResult> {
+    const metadata = this.sqlEditorGroupMetadataService.getTabData(this.panelInit.resultTabId);
 
-    const queryExecutionProcess = this.sqlResultService
-      .asyncSqlQuery(this.panelInit.sqlQueryParams, {
+    metadata.start(
+      sqlExecutingState,
+      this.group.sqlQueryParams,
+      {
         offset,
         limit: count,
         constraints: Array.from(model.getSortedColumns()),
         where: model.getQueryWhereFilter() || undefined,
-      });
-    sqlExecutingState.setCurrentlyExecutingQuery(queryExecutionProcess);
-    const response = await queryExecutionProcess.promise;
+      }
+    );
+
+    this.sqlProcess = metadata.resultDataProcess;
+    const response = await metadata.resultDataProcess.promise;
     const dataResults = this.sqlResultService.sqlExecuteInfoToData(
       response,
       this.panelInit.indexInResultSet,
       count
     );
 
-    /**
-     * Note that each data fetching overwrites resultId
-     */
+    // /**
+    //  * Note that each data fetching overwrites resultId
+    //  */
     const dataSet = response.results![this.panelInit.indexInResultSet]!.resultSet!;
-    model.resultId = dataSet.id;
+    await this.updateTableInfo(model, dataSet.id);
     return dataResults;
+  }
+
+  private async updateTableInfo(model: TableViewerModel, resultId: string) {
+    const connectionInfo = await this.connectionInfoResource.load(this.group.sqlQueryParams.connectionId);
+
+    model.resultId = resultId;
+    model.access = connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default;
+    model.sourceName = this.group.sqlQueryParams.query;
+    model.executionContext = this.group.sqlQueryParams;
+    model.connectionId = this.group.sqlQueryParams.connectionId;
   }
 
   async saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult> {
@@ -176,7 +218,7 @@ implements IInitializableController, IDestructibleController {
       throw new Error('resultId must be provided before saving changes');
     }
 
-    const response = await this.sqlResultService.saveChanges(this.panelInit.sqlQueryParams, model.resultId, diffs);
+    const response = await this.sqlResultService.saveChanges(this.group.sqlQueryParams, model.resultId, diffs);
 
     return this.sqlResultService.sqlExecuteInfoToData(response, this.panelInit.indexInResultSet);
   }
