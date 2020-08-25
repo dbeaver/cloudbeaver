@@ -97,28 +97,25 @@ implements IInitializableController, IDestructibleController {
 
         const connectionInfo = await this.connectionInfoResource.load(this.group.sqlQueryParams.connectionId);
 
-        let tableModel = this.tableViewerStorageService.get(this.getTableId());
-
-        if (!tableModel) {
-          tableModel = this.tableViewerStorageService.create({
-            tableId: this.getTableId(),
-            connectionId: this.group.sqlQueryParams.connectionId,
-            executionContext: this.group.sqlQueryParams,
-            resultId: dataSet.resultSet.id,
-            sourceName: this.group.sqlQueryParams.query,
-            access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
-            requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
-            noLoaderWhileRequestingDataAsync: true,
-            saveChanges: this.saveChanges.bind(this),
-          });
-
-          tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
-          tableModel.setColumns(initialState.columns);
-          tableModel.updateInfo(initialState.statusMessage, initialState.duration);
-        } else {
-          await this.updateTableInfo(tableModel, dataSet.resultSet.id);
-          tableModel.refresh();
+        if (this.tableViewerStorageService.has(this.getTableId())) {
+          this.tableViewerStorageService.remove(this.getTableId());
         }
+
+        const tableModel = this.tableViewerStorageService.create({
+          tableId: this.getTableId(),
+          connectionId: this.group.sqlQueryParams.connectionId,
+          executionContext: this.group.sqlQueryParams,
+          resultId: dataSet.resultSet.id,
+          sourceName: this.group.sqlQueryParams.query,
+          access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
+          requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
+          noLoaderWhileRequestingDataAsync: true,
+          saveChanges: this.saveChanges.bind(this),
+        });
+
+        tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
+        tableModel.setColumns(initialState.columns);
+        tableModel.updateInfo(initialState.statusMessage, initialState.duration);
       }
 
     } catch (exception) {

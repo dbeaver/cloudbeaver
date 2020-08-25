@@ -7,7 +7,7 @@
  */
 
 import { observer, Observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useMemo, useRef } from 'react';
 import styled from 'reshadow';
 
 import { AgGridReactProps } from '@ag-grid-community/react';
@@ -48,8 +48,11 @@ export const AgGridTable = observer(function AgGridTable({
   className,
   ...rest
 }: AgGridTableProps) {
+  const refreshRef = useRef(0);
   const styles = useStyles(agGridStyles);
   const controller = useController(AgGridTableController, tableModel);
+  useMemo(() => refreshRef.current === controller.refreshId && controller.refresh(), [tableModel]);
+  refreshRef.current = controller.refreshId;
 
   return (
     <ComplexLoader

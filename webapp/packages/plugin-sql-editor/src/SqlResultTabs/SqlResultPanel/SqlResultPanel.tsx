@@ -65,22 +65,20 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
           )}
         </error>
       )}
-      {controller.state === EPanelState.MESSAGE_RESULT
-        && (
-          <wrapper as="div">
-            <messages as="div">
-              <message as="div">{controller.executionResult}</message>
-              <hr/>
-              <query as="pre">
-                {controller.getQuery()}
-              </query>
-            </messages>
-          </wrapper>
-        )
-      }
-      {controller.state === EPanelState.TABLE_RESULT
-        && <TableViewer tableId={controller.getTableId()}/>
-      }
+      {controller.state === EPanelState.MESSAGE_RESULT && (
+        <wrapper as="div">
+          <messages as="div">
+            <message as="div">{controller.executionResult}</message>
+            <hr/>
+            <query as="pre">
+              {controller.getQuery()}
+            </query>
+          </messages>
+        </wrapper>
+      )}
+      {controller.state === EPanelState.TABLE_RESULT && (
+        <TableViewer tableId={controller.getTableId()}/>
+      )}
     </result-panel>
   );
 });

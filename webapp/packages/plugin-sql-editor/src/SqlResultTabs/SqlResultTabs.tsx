@@ -55,16 +55,18 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
 
   const orderedTabs = useMemo(
     () => computed(
-      () => tab.handlerState.resultTabs.sort((tabA, tabB) => {
-        if (tabA.groupId === tabB.groupId) {
-          return tabA.order - tabB.order;
-        }
+      () => tab.handlerState.resultTabs
+        .slice()
+        .sort((tabA, tabB) => {
+          if (tabA.groupId === tabB.groupId) {
+            return tabA.order - tabB.order;
+          }
 
-        const groupA = tab.handlerState.queryTabGroups.find(group => group.groupId === tabA.groupId)!;
-        const groupB = tab.handlerState.queryTabGroups.find(group => group.groupId === tabB.groupId)!;
+          const groupA = tab.handlerState.queryTabGroups.find(group => group.groupId === tabA.groupId)!;
+          const groupB = tab.handlerState.queryTabGroups.find(group => group.groupId === tabB.groupId)!;
 
-        return groupA.order - groupB.order;
-      })
+          return groupA.order - groupB.order;
+        })
     ),
     [tab]
   );

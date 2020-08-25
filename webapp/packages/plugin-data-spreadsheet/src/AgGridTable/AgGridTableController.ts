@@ -114,7 +114,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     return this.gridOptions;
   }
 
-  private refresh() {
+  refresh() {
     this.refreshId++;
   }
 
