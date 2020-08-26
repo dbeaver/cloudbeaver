@@ -62,11 +62,6 @@ public class WebServerConfig {
     }
 
     @Property
-    public boolean isSupportsPredefinedConnections() {
-        return application.getAppConfiguration().isSupportsPredefinedConnections();
-    }
-
-    @Property
     public boolean isSupportsCustomConnections() {
         return application.getAppConfiguration().isSupportsCustomConnections();
     }
@@ -79,6 +74,11 @@ public class WebServerConfig {
     @Property
     public boolean isSupportsWorkspaces() {
         return application.getAppConfiguration().isSupportsUserWorkspaces();
+    }
+
+    @Property
+    public boolean isConfigurationMode() {
+        return application.isConfigurationMode();
     }
 
     @Property

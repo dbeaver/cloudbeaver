@@ -80,6 +80,7 @@ public class CBApplication extends BaseApplicationImpl {
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
     private boolean develMode = false;
+    private boolean configurationMode = false;
 
     public CBApplication() {
     }
@@ -349,6 +350,14 @@ public class CBApplication extends BaseApplicationImpl {
         return develMode;
     }
 
+    public boolean isConfigurationMode() {
+        return configurationMode;
+    }
+
+    public void setConfigurationMode(boolean configurationMode) {
+        this.configurationMode = configurationMode;
+    }
+
     public DBNBrowseSettings getDefaultNavigatorSettings() {
         return defaultNavigatorSettings;
     }
@@ -356,4 +365,5 @@ public class CBApplication extends BaseApplicationImpl {
     public void setDefaultNavigatorSettings(DBNBrowseSettings defaultNavigatorSettings) {
         this.defaultNavigatorSettings = defaultNavigatorSettings;
     }
+
 }

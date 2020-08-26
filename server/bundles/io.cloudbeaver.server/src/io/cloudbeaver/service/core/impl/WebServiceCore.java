@@ -328,18 +328,6 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
-        CBApplication.getInstance().setDefaultNavigatorSettings(settings);
-        return true;
-    }
-
-
-    @Override
-    public WebAsyncTaskInfo getAsyncTaskStatus(WebSession webSession, String taskId) throws DBWebException {
-        return webSession.asyncTaskStatus(taskId, true);
-    }
-
-    @Override
     public WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, Boolean removeOnFinish) throws DBWebException {
         return webSession.asyncTaskStatus(taskId, CommonUtils.toBoolean(removeOnFinish));
     }

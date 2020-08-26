@@ -104,16 +104,11 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Navigator settings
 
+    @WebAction
     boolean setConnectionNavigatorSettings(WebSession webSession, String id, DBNBrowseSettings settings) throws DBWebException;
-
-    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings);
 
     ///////////////////////////////////////////
     // Async tasks
-
-    @Deprecated
-    @WebAction
-    WebAsyncTaskInfo getAsyncTaskStatus(WebSession webSession, String taskId) throws DBWebException;
 
     @WebAction
     WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, Boolean removeOnFinish) throws DBWebException;

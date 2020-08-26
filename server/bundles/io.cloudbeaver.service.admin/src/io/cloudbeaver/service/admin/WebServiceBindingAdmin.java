@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -35,49 +36,54 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("listUsers",
-            env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")));
-        model.getQueryType().dataFetcher("listRoles",
-            env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleId")));
-        model.getQueryType().dataFetcher("listPermissions",
-            env -> getService(env).listPermissions(getWebSession(env)));
-        model.getQueryType().dataFetcher("createUser",
-            env -> getService(env).createUser(getWebSession(env), env.getArgument("userId")));
-        model.getQueryType().dataFetcher("deleteUser",
-            env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")));
-        model.getQueryType().dataFetcher("createRole",
-            env -> getService(env).createRole(getWebSession(env), env.getArgument("roleId")));
-        model.getQueryType().dataFetcher("deleteRole",
-            env -> getService(env).deleteRole(getWebSession(env), env.getArgument("roleId")));
+        model.getQueryType()
+            .dataFetcher("listUsers",
+                env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")))
+            .dataFetcher("listRoles",
+                env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleId")))
+            .dataFetcher("listPermissions",
+                env -> getService(env).listPermissions(getWebSession(env)))
+            .dataFetcher("createUser",
+                env -> getService(env).createUser(getWebSession(env), env.getArgument("userId")))
+            .dataFetcher("deleteUser",
+                env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")))
+            .dataFetcher("createRole",
+                env -> getService(env).createRole(getWebSession(env), env.getArgument("roleId")))
+            .dataFetcher("deleteRole",
+                env -> getService(env).deleteRole(getWebSession(env), env.getArgument("roleId")))
 
-        model.getQueryType().dataFetcher("grantUserRole",
-            env -> getService(env).grantUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
-        model.getQueryType().dataFetcher("revokeUserRole",
-            env -> getService(env).revokeUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")));
-        model.getQueryType().dataFetcher("setSubjectPermissions",
-            env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")));
-        model.getQueryType().dataFetcher("setUserCredentials",
-            env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")));
+            .dataFetcher("grantUserRole",
+                env -> getService(env).grantUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")))
+            .dataFetcher("revokeUserRole",
+                env -> getService(env).revokeUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")))
+            .dataFetcher("setSubjectPermissions",
+                env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")))
+        .dataFetcher("setUserCredentials",
+            env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")))
 
-        model.getQueryType().dataFetcher("allConnections", env -> getService(env).getAllConnections(getWebSession(env)));
-        model.getQueryType().dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")));
+        .dataFetcher("allConnections", env -> getService(env).getAllConnections(getWebSession(env)))
+        .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
 
-        model.getQueryType().dataFetcher("createConnectionConfiguration",
-            env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))));
-        model.getQueryType().dataFetcher("updateConnectionConfiguration",
-            env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))));
-        model.getQueryType().dataFetcher("deleteConnectionConfiguration",
-            env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")));
+        .dataFetcher("createConnectionConfiguration",
+            env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))))
+        .dataFetcher("updateConnectionConfiguration",
+            env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))))
+        .dataFetcher("deleteConnectionConfiguration",
+            env -> getService(env).deleteConnectionConfiguration(getWebSession(env), env.getArgument("id")))
 
-        model.getQueryType().dataFetcher("getConnectionSubjectAccess",
-            env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")));
-        model.getQueryType().dataFetcher("setConnectionSubjectAccess",
-            env -> getService(env).setConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId"), env.getArgument("subjects")));
+        .dataFetcher("getConnectionSubjectAccess",
+            env -> getService(env).getConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId")))
+        .dataFetcher("setConnectionSubjectAccess",
+            env -> getService(env).setConnectionSubjectAccess(getWebSession(env), env.getArgument("connectionId"), env.getArgument("subjects")))
 
-        model.getQueryType().dataFetcher("getSubjectConnectionAccess",
-            env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")));
-        model.getQueryType().dataFetcher("setSubjectConnectionAccess",
-            env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")));
+        .dataFetcher("getSubjectConnectionAccess",
+            env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")))
+        .dataFetcher("setSubjectConnectionAccess",
+            env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")))
+
+        .dataFetcher("setDefaultNavigatorSettings",
+            env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
+        ;
     }
 
 }

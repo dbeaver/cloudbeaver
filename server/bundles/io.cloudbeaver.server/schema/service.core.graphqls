@@ -79,11 +79,11 @@ type ServerConfig {
 
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean
-    supportsPredefinedConnections: Boolean @deprecated # Supported always
-    supportsProvidedConnections: Boolean @deprecated # Supported always
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
+
+    configurationMode: Boolean
 
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
@@ -324,9 +324,6 @@ extend type Mutation {
 
     # Changes navigator settings for connection
     setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): Boolean!
-
-    # Changes default navigator settings
-    setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
 
     #### Generic async functions
 

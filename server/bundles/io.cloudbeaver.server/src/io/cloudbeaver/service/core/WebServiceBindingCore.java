@@ -16,12 +16,11 @@
  */
 package io.cloudbeaver.service.core;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.server.CBPlatform;
@@ -29,17 +28,11 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
-
-import java.util.Map;
 
 /**
  * Web service implementation
  */
 public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore> {
-
-    private final Gson gson = new GsonBuilder().create();
 
     public WebServiceBindingCore() {
         super(DBWServiceCore.class, new WebServiceCore(), "schema/service.core.graphqls");
@@ -83,10 +76,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), env.getArgument("id")))
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id")))
 
-            .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(getWebSession(env), env.getArgument("id"), parseNavigatorSettings(env.getArgument("settings"))))
-            .dataFetcher("setDefaultNavigatorSettings", env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), parseNavigatorSettings(env.getArgument("settings"))))
+            .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(getWebSession(env), env.getArgument("id"), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
 
-            .dataFetcher("asyncTaskStatus", env -> getService(env).getAsyncTaskStatus(getWebSession(env), env.getArgument("id")))
             .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(
                 getWebSession(env),
                 env.getArgument("id"),
@@ -96,11 +87,6 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)
         );
-    }
-
-    private DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
-        return gson.fromJson(
-            gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
     }
 
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {

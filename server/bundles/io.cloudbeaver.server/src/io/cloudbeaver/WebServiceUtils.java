@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
@@ -165,5 +166,10 @@ public class WebServiceUtils {
         dataSource.setDescription(config.getDescription());
         initAuthProperties(dataSource, config.getCredentials());
         dataSource.setSavePassword(config.isSaveCredentials());
+    }
+
+    public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
+        return gson.fromJson(
+            gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
     }
 }

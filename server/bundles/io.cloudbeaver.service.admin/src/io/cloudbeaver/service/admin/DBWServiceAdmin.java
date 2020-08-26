@@ -25,6 +25,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,12 @@ public interface DBWServiceAdmin extends DBWService {
     WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException;
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
+
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings);
+
+    ////////////////////////////////////////////////////////////////////
+    // Permissions
 
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     DBWConnectionGrant[] getConnectionSubjectAccess(WebSession webSession, String connectionId) throws DBWebException;

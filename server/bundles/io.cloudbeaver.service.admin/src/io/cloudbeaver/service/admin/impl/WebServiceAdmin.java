@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -291,6 +292,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (DBCException e) {
             log.error(e);
         }
+        return true;
+    }
+
+    @Override
+    public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
+        CBApplication.getInstance().setDefaultNavigatorSettings(settings);
         return true;
     }
 

@@ -44,6 +44,8 @@ type AdminPermissionInfo {
 
 extend type Query {
 
+    #### Users and roles
+
     listUsers(userId: ID): [AdminUserInfo]!
     listRoles(roleId: ID): [AdminRoleInfo]!
     listPermissions: [AdminPermissionInfo]!
@@ -80,4 +82,18 @@ extend type Query {
     getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
 
+    #### Global configuration
+
+    configureServer(configuration: ServerConfigInput!): Boolean!
+
+    # Changes default navigator settings
+    setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
+
+}
+
+input ServerConfigInput {
+    serverName: String
+
+    adminName: String
+    adminPassword: String
 }
