@@ -88,8 +88,13 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
     boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
 
+    ////////////////////////////////////////////////////////////////////
+    // Server configuration
+
     @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
-    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings);
+    boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException;
+    @WebAction(requirePermissions = AdminPermissions.PERMISSION_ADMIN)
+    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Permissions
