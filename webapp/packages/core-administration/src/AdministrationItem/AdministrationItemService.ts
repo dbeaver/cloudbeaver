@@ -10,23 +10,32 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem } from './IAdministrationItem';
+import { filterConfigurationWizard } from './filterConfigurationWizard';
+import {
+  IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem, AdministrationItemType
+} from './IAdministrationItem';
+import { orderAdministrationItems } from './orderAdministrationItems';
 
 @injectable()
 export class AdministrationItemService {
   @observable items: IAdministrationItem[] = []
 
-  getDefaultItem() {
-    if (this.items.length === 0) {
+  getDefaultItem(configurationWizard: boolean) {
+    const items = this.items.filter(filterConfigurationWizard(configurationWizard));
+
+    console.log(configurationWizard, items);
+
+    if (items.length === 0) {
       return null;
     }
-    return this.items
-      .concat()
-      .sort((a, b) => a.order - b.order)[0].name;
+    return items.sort(orderAdministrationItems)[0].name;
   }
 
-  getItem(name: string): IAdministrationItem | null {
-    const item = this.items.find(item => item.name === name);
+  getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {
+    const item = this.items.find(item => (
+      filterConfigurationWizard(configurationWizard)(item)
+      && item.name === name
+    ));
     if (!item) {
       return null;
     }
@@ -44,32 +53,39 @@ export class AdministrationItemService {
   }
 
   create(options: IAdministrationItemOptions) {
-    if (this.items.some(item => item.name === options.name)) {
-      throw new Error(`Administration item "${options.name}" already exists`);
+    const type = options.type === undefined ? AdministrationItemType.Administration : options.type;
+
+    if (this.items.some(item => item.name === options.name && (
+      item.type === type
+      || item.type === AdministrationItemType.Default
+      || type === AdministrationItemType.Default
+    ))) {
+      throw new Error(`Administration item "${options.name}" already exists in the same visibility scope`);
     }
 
     const item: IAdministrationItem = {
       ...options,
+      type,
       sub: options.sub || [],
       order: options.order || Number.MAX_SAFE_INTEGER,
     };
     this.items.push(item);
   }
 
-  async activate(name: string, itemSub: string | null, param: string | null) {
-    const item = this.getItem(name);
+  async activate(name: string, itemSub: string | null, param: string | null, configurationWizard: boolean) {
+    const item = this.getItem(name, configurationWizard);
     if (!item) {
       return;
     }
 
     if (item.onActivate) {
-      await item.onActivate();
+      await item.onActivate(configurationWizard);
     }
 
     if (itemSub) {
       const sub = this.getItemSub(item, itemSub);
       if (sub && sub.onActivate) {
-        await sub.onActivate(param);
+        await sub.onActivate(param, configurationWizard);
       }
     }
   }

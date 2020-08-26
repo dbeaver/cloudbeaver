@@ -10,8 +10,10 @@ import { observer } from 'mobx-react';
 
 import { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
 
-export const DrawerItem = observer(function DrawerItem({ item, onSelect, style }: AdministrationItemDrawerProps) {
+export const DrawerItem = observer(function DrawerItem({
+  item, onSelect, style, configurationWizard,
+}: AdministrationItemDrawerProps) {
   const Component = item.getDrawerComponent();
 
-  return <Component item={item} onSelect={onSelect} style={style}/>;
+  return <Component item={item} onSelect={onSelect} configurationWizard={configurationWizard} style={style}/>;
 });

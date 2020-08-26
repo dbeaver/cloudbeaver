@@ -16,16 +16,22 @@ type Props = {
   activeItemName: string | null;
   activeItemSub: string | null;
   activeItemSubParam: string | null;
+  configurationWizard: boolean;
 }
 
-export const ItemContent = observer(function ItemContent({ activeItemName, activeItemSub, activeItemSubParam }: Props) {
+export const ItemContent = observer(function ItemContent({
+  activeItemName,
+  activeItemSub,
+  activeItemSubParam,
+  configurationWizard,
+}: Props) {
   const administrationItemService = useService(AdministrationItemService);
 
   if (!activeItemName) {
     return null;
   }
 
-  const item = administrationItemService.getItem(activeItemName);
+  const item = administrationItemService.getItem(activeItemName, configurationWizard);
 
   if (!item) {
     return null;
@@ -36,11 +42,11 @@ export const ItemContent = observer(function ItemContent({ activeItemName, activ
     if (sub) {
       const Component = sub.getComponent();
 
-      return <Component item={item} sub={sub} param={activeItemSubParam} />;
+      return <Component item={item} sub={sub} param={activeItemSubParam} configurationWizard={configurationWizard} />;
     }
   }
 
   const Component = item.getContentComponent();
 
-  return <Component item={item} />;
+  return <Component item={item} configurationWizard={configurationWizard} />;
 });

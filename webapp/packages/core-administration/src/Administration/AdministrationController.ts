@@ -6,19 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
+import { filterConfigurationWizard } from '../AdministrationItem/filterConfigurationWizard';
+import { orderAdministrationItems } from '../AdministrationItem/orderAdministrationItems';
 
 @injectable()
 export class AdministrationController {
-  @computed get items() {
+  getItems(configurationWizard: boolean) {
     return this.administrationItemService
       .items
-      .concat()
-      .sort((a, b) => a.order - b.order);
+      .filter(filterConfigurationWizard(configurationWizard))
+      .sort(orderAdministrationItems);
   }
 
   constructor(

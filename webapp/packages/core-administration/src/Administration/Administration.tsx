@@ -66,6 +66,7 @@ const administrationStyles = composes(
 );
 
 type Props = {
+  configurationWizard: boolean;
   activeItem: string | null;
   activeItemSub: string | null;
   activeItemSubParam: string | null;
@@ -73,17 +74,24 @@ type Props = {
 }
 
 export const Administration = observer(function Administration({
-  activeItem, activeItemSub, activeItemSubParam, onItemSelect,
+  configurationWizard, activeItem, activeItemSub, activeItemSubParam, onItemSelect,
 }: Props) {
   const controller = useController(AdministrationController);
+  const items = controller.getItems(configurationWizard);
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
     <container as='div'>
       <TabsState currentTabId={activeItem} orientation='vertical'>
         <drawer as='div'>
           <TabList aria-label="Administration items">
-            {controller.items.map(item => (
-              <DrawerItem key={item.name} item={item} onSelect={onItemSelect} style={[verticalTabStyles, tabsStyles]} />
+            {items.map(item => (
+              <DrawerItem
+                key={item.name}
+                item={item}
+                onSelect={onItemSelect}
+                configurationWizard={configurationWizard}
+                style={[verticalTabStyles, tabsStyles]}
+              />
             ))}
           </TabList>
         </drawer>
@@ -92,6 +100,7 @@ export const Administration = observer(function Administration({
             activeItemName={activeItem}
             activeItemSub={activeItemSub}
             activeItemSubParam={activeItemSubParam}
+            configurationWizard={configurationWizard}
           />
         </content>
       </TabsState>

@@ -18,7 +18,7 @@ import { EAdminPermission } from '../EAdminPermission';
 import { AdministrationScreenService } from './AdministrationScreenService';
 import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
 
-export const AdministrationScreen = observer(function AdministrationScreen() {
+export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
   const administrationScreenService = useService(AdministrationScreenService);
   if (!usePermission(EAdminPermission.admin)) {
     return <Translate token='root_permission_denied'/>;
@@ -33,7 +33,7 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
     <>
       <AdministrationTopAppBar />
       <Administration
-        configurationWizard={false}
+        configurationWizard={true}
         activeItem={administrationScreenService.activeItem}
         activeItemSub={administrationScreenService.activeItemSub}
         activeItemSubParam={administrationScreenService.activeItemSubParam}

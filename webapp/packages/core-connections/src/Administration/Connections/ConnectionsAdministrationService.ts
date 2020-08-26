@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, AdministrationScreenService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -30,6 +30,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   register() {
     this.administrationItemService.create({
       name: 'connections',
+      type: AdministrationItemType.Default,
       order: 2,
       sub: [
         {

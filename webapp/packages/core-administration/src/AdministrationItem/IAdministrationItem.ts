@@ -8,8 +8,15 @@
 
 import { Style } from '@cloudbeaver/core-theming';
 
+export enum AdministrationItemType {
+  Default,
+  Administration,
+  ConfigurationWizard
+}
+
 export type AdministrationItemDrawerProps = {
   item: IAdministrationItem;
+  configurationWizard: boolean;
   onSelect(id: string): void;
   style: Style[];
 }
@@ -17,18 +24,20 @@ export type AdministrationItemDrawerComponent = React.FunctionComponent<Administ
 
 export type AdministrationItemContentProps = {
   item: IAdministrationItem;
+  configurationWizard: boolean;
 }
 export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>
 
 export type AdministrationItemSubContentProps = {
   item: IAdministrationItem;
   sub: IAdministrationItemSubItem;
+  configurationWizard: boolean;
   param: string | null;
 }
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>
 
-export type AdministrationItemEvent = () => Promise<void> | void
-export type AdministrationItemSubEvent = (param: string | null) => Promise<void> | void
+export type AdministrationItemEvent = (configurationWizard: boolean) => Promise<void> | void
+export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean) => Promise<void> | void
 
 export interface IAdministrationItemSubItem {
   name: string;
@@ -38,6 +47,8 @@ export interface IAdministrationItemSubItem {
 
 export interface IAdministrationItemOptions {
   name: string;
+  /** By default will be set to AdministrationItemType.Administration */
+  type?: AdministrationItemType;
   order?: number;
   sub?: IAdministrationItemSubItem[];
   getDrawerComponent(): AdministrationItemDrawerComponent;
@@ -46,6 +57,7 @@ export interface IAdministrationItemOptions {
 }
 
 export interface IAdministrationItem extends IAdministrationItemOptions {
+  type: AdministrationItemType;
   order: number;
   sub: IAdministrationItemSubItem[];
 }
