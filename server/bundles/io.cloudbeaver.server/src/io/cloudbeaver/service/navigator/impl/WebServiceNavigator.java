@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
@@ -51,6 +52,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
+        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -98,6 +100,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     @NotNull
     public WebNavigatorNodeInfo getNavigatorNodeInfo(WebSession session, String nodePath) throws DBWebException {
+        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -113,6 +116,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public boolean refreshNavigatorNode(WebSession session, String nodePath) throws DBWebException {
+        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -129,6 +133,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public WebStructContainers getStructContainers(WebConnectionInfo connection, String catalog) throws DBWebException {
+        WebServiceUtils.checkServerConfigured();
 
         DBPDataSource dataSource = connection.getDataSource();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);

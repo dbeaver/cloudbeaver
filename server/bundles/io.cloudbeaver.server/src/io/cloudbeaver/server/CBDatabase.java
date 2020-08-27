@@ -129,6 +129,30 @@ public class CBDatabase {
         checkDatabaseStructure();
     }
 
+    void finishConfiguration() throws DBException {
+        if (!application.isConfigurationMode()) {
+            throw new DBException("Database is already configured");
+        }
+        if (cbDataSource != null) {
+            log.debug("Drop embedded datasource");
+            try {
+                // Drop database
+                try (Connection connection = cbDataSource.getConnection()) {
+                    try (Statement dbStat = connection.createStatement()) {
+                        dbStat.execute("DROP ALL OBJECTS DELETE FILES");
+                    }
+                }
+                cbDataSource.close();
+            } catch (Exception e) {
+                log.error("Error closing active datasource connections", e);
+            }
+            cbDataSource = null;
+        }
+
+        // Just run initialize again.
+        initialize();
+    }
+
     private void checkDatabaseStructure() throws DBException {
         try (Connection connection = cbDataSource.getConnection()) {
             connection.setAutoCommit(true);
@@ -214,7 +238,9 @@ public class CBDatabase {
                     dbStat.setString(3, CURRENT_SCHEMA_VERSION);
                     dbStat.execute();
                 }
-                fillInitialData();
+                if (!application.isConfigurationMode()) {
+                    fillInitialData();
+                }
             }
 
             connection.commit();

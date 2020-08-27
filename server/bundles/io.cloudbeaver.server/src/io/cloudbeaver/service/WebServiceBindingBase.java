@@ -25,6 +25,7 @@ import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -144,18 +145,21 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             if (session == null) {
                 throw new DBWebExceptionAccessDenied("Anonymous access restricted");
             }
-            Set<String> sessionPermissions;
-            try {
-                sessionPermissions = session.getSessionPermissions();
-            } catch (DBCException e) {
-                throw new DBWebExceptionAccessDenied("Can't retrieve session permissions", e);
-            }
-            if (CommonUtils.isEmpty(sessionPermissions)) {
-                throw new DBWebExceptionAccessDenied("Anonymous access restricted");
-            }
-            for (String rp : reqPermissions) {
-                if (!sessionPermissions.contains(rp)) {
-                    throw new DBWebExceptionAccessDenied("Access denied");
+            if (!CBApplication.getInstance().isConfigurationMode()) {
+                // Check permissions
+                Set<String> sessionPermissions;
+                try {
+                    sessionPermissions = session.getSessionPermissions();
+                } catch (DBCException e) {
+                    throw new DBWebExceptionAccessDenied("Can't retrieve session permissions", e);
+                }
+                if (CommonUtils.isEmpty(sessionPermissions)) {
+                    throw new DBWebExceptionAccessDenied("Anonymous access restricted");
+                }
+                for (String rp : reqPermissions) {
+                    if (!sessionPermissions.contains(rp)) {
+                        throw new DBWebExceptionAccessDenied("Access denied");
+                    }
                 }
             }
         }

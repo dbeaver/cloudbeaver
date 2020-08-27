@@ -379,8 +379,29 @@ public class CBApplication extends BaseApplicationImpl {
         return configurationMode;
     }
 
-    public void setConfigurationMode(boolean configurationMode) {
-        this.configurationMode = configurationMode;
+    public synchronized void finishConfiguration() throws DBException {
+        if (!isConfigurationMode()) {
+            throw new DBException("Application must be in configuration mode");
+        }
+
+        // Save runtime configuration
+        log.debug("Saving runtime configuration");
+
+        // Re-load runtime configuration
+        try {
+            log.debug("Reloading application configuration");
+            File runtimeConfigFile = new File(new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+            if (runtimeConfigFile.exists()) {
+                log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
+                parseConfiguration(runtimeConfigFile);
+            }
+        } catch (Exception e) {
+            throw new DBException("Error parsing configuration", e);
+        }
+        // Re-create database
+        database.finishConfiguration();
+
+        configurationMode = CommonUtils.isEmpty(serverName);
     }
 
     public DBNBrowseSettings getDefaultNavigatorSettings() {
