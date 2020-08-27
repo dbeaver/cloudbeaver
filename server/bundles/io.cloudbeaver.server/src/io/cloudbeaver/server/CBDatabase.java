@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -100,7 +101,8 @@ public class CBDatabase {
         if (!CommonUtils.isEmpty(databaseConfiguration.getUser())) {
             dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, databaseConfiguration.getUser());
             if (!CommonUtils.isEmpty(databaseConfiguration.getPassword())) {
-                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, databaseConfiguration.getPassword());
+                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD,
+                    new String(Base64.decode(databaseConfiguration.getPassword())));
             }
         }
 

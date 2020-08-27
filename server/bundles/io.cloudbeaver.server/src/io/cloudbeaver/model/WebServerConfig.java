@@ -82,6 +82,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isDevelopmentMode() {
+        return application.isDevelMode();
+    }
+
+    @Property
     public WebServerLanguage[] getSupportedLanguages() {
         List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];

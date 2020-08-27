@@ -84,6 +84,7 @@ type ServerConfig {
     supportsWorkspaces: Boolean
 
     configurationMode: Boolean
+    developmentMode: Boolean
 
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
