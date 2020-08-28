@@ -29,6 +29,8 @@ public class CBConstants {
     public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT);
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
+    public static final String RUNTIME_DATA_DIR_NAME = ".data";
+    public static final String RUNTIME_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 
@@ -46,7 +48,7 @@ public class CBConstants {
     public static final String PARAM_DEVEL_MODE = "develMode";
 
     public static final int DEFAULT_SERVER_PORT = 8080;
-    public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";
+    //public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";
     public static final String DEFAULT_CONTENT_ROOT = "/var/www/cloudbeaver";
     public static final String DEFAULT_ROOT_URI = "/";
     public static final String DEFAULT_SERVICES_URI = "/dbeaver/";

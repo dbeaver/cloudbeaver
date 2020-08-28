@@ -296,6 +296,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
+    public boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException {
+         throw new DBWebException("Not implemented");
+    }
+
+    @Override
     public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
         CBApplication.getInstance().setDefaultNavigatorSettings(settings);
         return true;

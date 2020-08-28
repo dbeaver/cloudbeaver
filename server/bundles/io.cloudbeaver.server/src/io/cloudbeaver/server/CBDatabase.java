@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -100,7 +101,8 @@ public class CBDatabase {
         if (!CommonUtils.isEmpty(databaseConfiguration.getUser())) {
             dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, databaseConfiguration.getUser());
             if (!CommonUtils.isEmpty(databaseConfiguration.getPassword())) {
-                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, databaseConfiguration.getPassword());
+                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD,
+                    new String(Base64.decode(databaseConfiguration.getPassword())));
             }
         }
 
@@ -125,6 +127,30 @@ public class CBDatabase {
         }
 
         checkDatabaseStructure();
+    }
+
+    void finishConfiguration() throws DBException {
+        if (!application.isConfigurationMode()) {
+            throw new DBException("Database is already configured");
+        }
+        if (cbDataSource != null) {
+            log.debug("Drop embedded datasource");
+            try {
+                // Drop database
+                try (Connection connection = cbDataSource.getConnection()) {
+                    try (Statement dbStat = connection.createStatement()) {
+                        dbStat.execute("DROP ALL OBJECTS DELETE FILES");
+                    }
+                }
+                cbDataSource.close();
+            } catch (Exception e) {
+                log.error("Error closing active datasource connections", e);
+            }
+            cbDataSource = null;
+        }
+
+        // Just run initialize again.
+        initialize();
     }
 
     private void checkDatabaseStructure() throws DBException {
@@ -212,7 +238,9 @@ public class CBDatabase {
                     dbStat.setString(3, CURRENT_SCHEMA_VERSION);
                     dbStat.execute();
                 }
-                fillInitialData();
+                if (!application.isConfigurationMode()) {
+                    fillInitialData();
+                }
             }
 
             connection.commit();

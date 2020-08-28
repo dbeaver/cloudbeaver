@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -171,5 +172,11 @@ public class WebServiceUtils {
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
         return gson.fromJson(
             gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
+    }
+
+    public static void checkServerConfigured() throws DBWebException {
+        if (CBApplication.getInstance().isConfigurationMode()) {
+            throw new DBWebException("Server is in configuration mode");
+        }
     }
 }

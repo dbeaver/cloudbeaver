@@ -283,7 +283,7 @@ public class GraphQLEndpoint extends HttpServlet {
                 if (exception instanceof InvocationTargetException) {
                     exception = ((InvocationTargetException) exception).getTargetException();
                 }
-                log.debug(exception);
+                log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "', " + handlerParameters.getArgumentValues(), exception);
 
                 SourceLocation sourceLocation = handlerParameters.getSourceLocation();
                 ExecutionPath path = handlerParameters.getPath();
