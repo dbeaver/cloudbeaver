@@ -19,11 +19,13 @@ package io.cloudbeaver.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
@@ -36,6 +38,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -160,7 +163,7 @@ public class CBApplication extends BaseApplicationImpl {
         try {
             loadConfiguration(configPath);
 
-            File runtimeConfigFile = new File(new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+            File runtimeConfigFile = getRuntimeConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -238,6 +241,11 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("Shutdown");
 
         return null;
+    }
+
+    @NotNull
+    private File getRuntimeConfigFile() {
+        return new File(new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME), CBConstants.RUNTIME_CONFIG_FILE_NAME);
     }
 
     private void initializeDatabase() throws DBException {
@@ -379,18 +387,24 @@ public class CBApplication extends BaseApplicationImpl {
         return configurationMode;
     }
 
-    public synchronized void finishConfiguration() throws DBException {
+    public synchronized void finishConfiguration(
+        String newServerName,
+        String adminName,
+        String adminPassword,
+        CBAppConfig appConfig) throws DBException
+    {
         if (!isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
+        saveRuntimeConfig(newServerName, adminPassword, appConfig);
 
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
-            File runtimeConfigFile = new File(new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+            File runtimeConfigFile = getRuntimeConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -399,9 +413,48 @@ public class CBApplication extends BaseApplicationImpl {
             throw new DBException("Error parsing configuration", e);
         }
         // Re-create database
-        database.finishConfiguration();
+        database.finishConfiguration(adminName, adminPassword);
 
         configurationMode = CommonUtils.isEmpty(serverName);
+    }
+
+    private void saveRuntimeConfig(String newServerName, String dbPassword, CBAppConfig appConfig) throws DBException {
+
+        File runtimeConfigFile = getRuntimeConfigFile();
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
+            Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+            try (JsonWriter json = gson.newJsonWriter(out)) {
+                json.beginObject();
+                {
+                    json.name("server");
+                    json.beginObject();
+                    if (!CommonUtils.isEmpty(newServerName)) {
+                        JSONUtils.field(json, "serverName", newServerName);
+                    }
+                    if (!CommonUtils.isEmpty(dbPassword)) {
+                        json.name("database");
+                        json.beginObject();
+                        JSONUtils.field(json, "password", Base64.encode(dbPassword.getBytes()));
+                        json.endObject();
+                    }
+                    json.endObject();
+                }
+                {
+                    json.name("app");
+                    json.beginObject();
+                    if (appConfig.isAnonymousAccessEnabled()) JSONUtils.field(json, "anonymousAccessEnabled", true);
+                    if (appConfig.isAuthenticationEnabled()) JSONUtils.field(json, "authenticationEnabled", true);
+                    if (appConfig.isSupportsCustomConnections()) JSONUtils.field(json, "supportsCustomConnections", true);
+                    json.endObject();
+                }
+                json.endObject();
+            }
+
+        } catch (IOException e) {
+            throw new DBException("Error writing runtime configuration", e);
+        }
     }
 
     public DBNBrowseSettings getDefaultNavigatorSettings() {

@@ -42,8 +42,16 @@ public class CBAppConfig {
         return authenticationEnabled;
     }
 
+    public void setAuthenticationEnabled(boolean authenticationEnabled) {
+        this.authenticationEnabled = authenticationEnabled;
+    }
+
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;
+    }
+
+    public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
+        this.anonymousAccessEnabled = anonymousAccessEnabled;
     }
 
     public String getAnonymousUserRole() {
@@ -56,6 +64,10 @@ public class CBAppConfig {
 
     public boolean isSupportsCustomConnections() {
         return supportsCustomConnections;
+    }
+
+    public void setSupportsCustomConnections(boolean supportsCustomConnections) {
+        this.supportsCustomConnections = supportsCustomConnections;
     }
 
     public boolean isSupportsConnectionBrowser() {
