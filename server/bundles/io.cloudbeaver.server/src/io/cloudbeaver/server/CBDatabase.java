@@ -140,22 +140,23 @@ public class CBDatabase {
                 // Alter admin password
                 try (Connection connection = cbDataSource.getConnection()) {
                     try (Statement dbStat = connection.createStatement()) {
-                        dbStat.execute("ALTER USER " + databaseConfiguration.getUser() +
-                            " SET PASSWORD '" + databaseConfiguration.getPassword() + "'");
-                    }
-                    if (!CommonUtils.isEmpty(adminName) && !CommonUtils.isEmpty(adminPassword)) {
-                        createAdminUser(adminName, adminPassword);
+                        dbStat.execute("ALTER USER \"" + databaseConfiguration.getUser() +
+                            "\" SET PASSWORD '" + new String(Base64.decode(databaseConfiguration.getPassword())) + "'");
                     }
                 }
                 cbDataSource.close();
+                cbDataSource = null;
             } catch (Exception e) {
-                log.error("Error closing active datasource connections", e);
+                log.error("Error altering database access", e);
             }
-            cbDataSource = null;
         }
 
         // Just run initialize again.
         initialize();
+
+        if (!CommonUtils.isEmpty(adminName) && !CommonUtils.isEmpty(adminPassword)) {
+            createAdminUser(adminName, adminPassword);
+        }
     }
 
     private void checkDatabaseStructure() throws DBException {
@@ -243,9 +244,7 @@ public class CBDatabase {
                     dbStat.setString(3, CURRENT_SCHEMA_VERSION);
                     dbStat.execute();
                 }
-                if (!application.isConfigurationMode()) {
-                    fillInitialData();
-                }
+                fillInitialData();
             }
 
             connection.commit();
@@ -277,18 +276,18 @@ public class CBDatabase {
             Gson gson = new GsonBuilder().setLenient().create();
             CBDatabaseInitialData initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
 
+            String adminName = initialData.getAdminName();
+            String adminPassword = initialData.getAdminPassword();
+
             if (!CommonUtils.isEmpty(initialData.getRoles())) {
                 // Create roles
                 for (WebRole role : initialData.getRoles()) {
                     serverController.createRole(role);
-//                    if (adminUser != null) {
-//                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminUser.getUserId());
-//                    }
+                    if (adminName != null) {
+                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                    }
                 }
             }
-
-            String adminName = initialData.getAdminName();
-            String adminPassword = initialData.getAdminPassword();
 
             if (!CommonUtils.isEmpty(adminName)) {
                 // Create admin user

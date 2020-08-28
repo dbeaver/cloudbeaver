@@ -424,6 +424,7 @@ public class CBApplication extends BaseApplicationImpl {
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setLenient()
+                .setPrettyPrinting()
                 .create();
             try (JsonWriter json = gson.newJsonWriter(out)) {
                 json.beginObject();
