@@ -23,11 +23,10 @@ export class AdministrationItemService {
   getDefaultItem(configurationWizard: boolean) {
     const items = this.items.filter(filterConfigurationWizard(configurationWizard));
 
-    console.log(configurationWizard, items);
-
     if (items.length === 0) {
       return null;
     }
+
     return items.sort(orderAdministrationItems)[0].name;
   }
 
@@ -53,7 +52,7 @@ export class AdministrationItemService {
   }
 
   create(options: IAdministrationItemOptions) {
-    const type = options.type === undefined ? AdministrationItemType.Administration : options.type;
+    const type = options.type ?? AdministrationItemType.Administration;
 
     if (this.items.some(item => item.name === options.name && (
       item.type === type

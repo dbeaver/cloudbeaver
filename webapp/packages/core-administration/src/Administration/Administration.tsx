@@ -65,16 +65,16 @@ const administrationStyles = composes(
   `
 );
 
-type Props = {
+type Props = React.PropsWithChildren<{
   configurationWizard: boolean;
   activeItem: string | null;
   activeItemSub: string | null;
   activeItemSubParam: string | null;
   onItemSelect(name: string): void;
-}
+}>
 
 export const Administration = observer(function Administration({
-  configurationWizard, activeItem, activeItemSub, activeItemSubParam, onItemSelect,
+  configurationWizard, activeItem, activeItemSub, activeItemSubParam, onItemSelect, children,
 }: Props) {
   const controller = useController(AdministrationController);
   const items = controller.getItems(configurationWizard);
@@ -96,6 +96,7 @@ export const Administration = observer(function Administration({
           </TabList>
         </drawer>
         <content as='div'>
+          {children}
           <ItemContent
             activeItemName={activeItem}
             activeItemSub={activeItemSub}
