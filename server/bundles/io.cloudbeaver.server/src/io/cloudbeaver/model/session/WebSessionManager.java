@@ -121,6 +121,10 @@ public class WebSessionManager {
 
     public void expireIdleSessions() {
         long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
+        if (CBApplication.getInstance().isConfigurationMode()) {
+            // In configuration mode sessions expire after a week
+            maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
+        }
 
         List<WebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
