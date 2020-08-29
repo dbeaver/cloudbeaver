@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-:disabled {
+:disabled, [aria-disabled="true"] {
   pointer-events: none;
   cursor: default;
   opacity: 0.5;
