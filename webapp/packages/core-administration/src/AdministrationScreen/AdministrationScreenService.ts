@@ -8,17 +8,16 @@
 
 import { computed, observable } from 'mobx';
 
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { injectable } from '@cloudbeaver/core-di';
 import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
+import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
-import { EAdminPermission } from '../EAdminPermission';
-import { AdministrationScreen } from './AdministrationScreen';
-import { ConfigurationWizardScreen } from './ConfigurationWizardScreen';
+
+const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 
 @injectable()
-export class AdministrationScreenService extends Bootstrap {
+export class AdministrationScreenService {
 
   static screenName = 'administration'
   static itemRouteName = 'administration.item'
@@ -31,6 +30,7 @@ export class AdministrationScreenService extends Bootstrap {
   static setupItemSubParamRouteName = 'setup.item.sub.param'
 
   @observable configurationWizard = false;
+  @observable itemState: Map<string, any>;
 
   @computed get activeItem(): string | null {
     if (!this.isAdministrationRouteActive()) {
@@ -56,11 +56,12 @@ export class AdministrationScreenService extends Bootstrap {
   constructor(
     private screenService: ScreenService,
     private routerService: RouterService,
-    private permissionsService: PermissionsService,
-    private administrationItemService: AdministrationItemService
+    private administrationItemService: AdministrationItemService,
+    private autoSaveService: LocalStorageSaveService
   ) {
-    super();
-    this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
+    this.itemState = new Map();
+
+    this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
   }
 
   navigateToRoot() {
@@ -95,77 +96,18 @@ export class AdministrationScreenService extends Bootstrap {
     }
   }
 
-  register() {
-    this.screenService.create({
-      name: AdministrationScreenService.screenName,
-      routes: [
-        {
-          name: AdministrationScreenService.screenName,
-          path: '/admin',
-        },
-        {
-          name: AdministrationScreenService.itemRouteName,
-          path: '/:item',
-        },
-        {
-          name: AdministrationScreenService.itemSubRouteName,
-          path: '/:sub',
-        },
-        {
-          name: AdministrationScreenService.itemSubParamRouteName,
-          path: '/:param',
-        },
-      ],
-      component: AdministrationScreen,
-      onActivate: this.handleActivate.bind(this),
-    });
+  getItemState<T>(name: string): T | undefined
+  getItemState<T>(name: string, defaultState: () => T): T
+  getItemState<T>(name: string, defaultState?: () => T): T | undefined {
+    if (!this.itemState.has(name) && defaultState) {
+      this.itemState.set(name, defaultState());
+    }
 
-    this.screenService.create({
-      name: AdministrationScreenService.setupName,
-      routes: [
-        {
-          name: AdministrationScreenService.setupName,
-          path: '/setup',
-        },
-        {
-          name: AdministrationScreenService.setupItemRouteName,
-          path: '/:item',
-        },
-        {
-          name: AdministrationScreenService.setupItemSubRouteName,
-          path: '/:sub',
-        },
-        {
-          name: AdministrationScreenService.setupItemSubParamRouteName,
-          path: '/:param',
-        },
-      ],
-      component: ConfigurationWizardScreen,
-      onActivate: this.handleActivate.bind(this),
-    });
+    return this.itemState.get(name);
   }
 
-  load(): void | Promise<void> { }
-
-  private async handleActivate() {
-    if (!this.permissionsService.has(EAdminPermission.admin)) {
-      this.screenService.navigateToRoot();
-      return;
-    }
-
-    // FIXME: for development purposes only, must be removed
-    if (this.screenService.isActive(AdministrationScreenService.setupName)) {
-      this.configurationWizard = true;
-    }
-
-    if (this.activeItem) {
-      await this.administrationItemService.activate(
-        this.activeItem,
-        this.activeItemSub,
-        this.activeItemSubParam,
-        this.configurationWizard
-      );
-    }
+  clearItemsState() {
+    this.itemState.clear();
   }
 
   private isAdministrationRouteActive() {

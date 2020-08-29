@@ -21,6 +21,7 @@ export type Query = {
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: Array<DatabaseAuthModel>;
   authProviders: Array<AuthProviderInfo>;
+  configureServer: Scalars['Boolean'];
   connectionInfo: ConnectionInfo;
   /** @deprecated Field no longer supported */
   connectionState: ConnectionInfo;
@@ -54,6 +55,7 @@ export type Query = {
   sessionState: SessionInfo;
   sessionUser?: Maybe<UserAuthInfo>;
   setConnectionSubjectAccess?: Maybe<Scalars['Boolean']>;
+  setDefaultNavigatorSettings: Scalars['Boolean'];
   setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
   setSubjectPermissions?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
@@ -67,6 +69,10 @@ export type Query = {
 export type QueryAuthLoginArgs = {
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+};
+
+export type QueryConfigureServerArgs = {
+  configuration: ServerConfigInput;
 };
 
 export type QueryConnectionInfoArgs = {
@@ -187,6 +193,10 @@ export type QuerySetConnectionSubjectAccessArgs = {
   subjects: Array<Scalars['ID']>;
 };
 
+export type QuerySetDefaultNavigatorSettingsArgs = {
+  settings: NavigatorSettingsInput;
+};
+
 export type QuerySetSubjectConnectionAccessArgs = {
   subjectId: Scalars['ID'];
   connections: Array<Scalars['ID']>;
@@ -243,7 +253,6 @@ export type Mutation = {
   openSession: SessionInfo;
   readDataFromContainer?: Maybe<SqlExecuteInfo>;
   setConnectionNavigatorSettings: Scalars['Boolean'];
-  setDefaultNavigatorSettings: Scalars['Boolean'];
   sqlContextCreate: SqlContextInfo;
   sqlContextDestroy: Scalars['Boolean'];
   sqlContextSetDefaults: Scalars['Boolean'];
@@ -317,10 +326,6 @@ export type MutationReadDataFromContainerArgs = {
 
 export type MutationSetConnectionNavigatorSettingsArgs = {
   id: Scalars['ID'];
-  settings: NavigatorSettingsInput;
-};
-
-export type MutationSetDefaultNavigatorSettingsArgs = {
   settings: NavigatorSettingsInput;
 };
 
@@ -429,13 +434,11 @@ export type ServerConfig = {
   version: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
-  /** @deprecated Field no longer supported */
-  supportsPredefinedConnections?: Maybe<Scalars['Boolean']>;
-  /** @deprecated Field no longer supported */
-  supportsProvidedConnections?: Maybe<Scalars['Boolean']>;
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
   supportsWorkspaces?: Maybe<Scalars['Boolean']>;
+  configurationMode?: Maybe<Scalars['Boolean']>;
+  developmentMode?: Maybe<Scalars['Boolean']>;
   supportedLanguages: Array<ServerLanguage>;
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
   productConfiguration: Scalars['Object'];
@@ -744,6 +747,15 @@ export type AdminPermissionInfo = {
   category?: Maybe<Scalars['String']>;
 };
 
+export type ServerConfigInput = {
+  serverName?: Maybe<Scalars['String']>;
+  adminName?: Maybe<Scalars['String']>;
+  adminPassword?: Maybe<Scalars['String']>;
+  anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
+  authenticationEnabled?: Maybe<Scalars['Boolean']>;
+  customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
+};
+
 export enum AuthCredentialEncryption {
   None = 'none',
   Plain = 'plain',
@@ -897,7 +909,7 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
 
 export type CreateConnectionConfigurationQuery = { connection: (
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   ); };
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
@@ -916,7 +928,7 @@ export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetConnectionsQuery = { connections: Array<(
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   )>; };
 
 export type SearchDatabasesQueryVariables = Exact<{
@@ -939,7 +951,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
 
 export type UpdateConnectionConfigurationQuery = { connection: (
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   ); };
 
 export type CloseConnectionMutationVariables = Exact<{
@@ -1224,6 +1236,18 @@ export type QuerySqlDialectInfoQueryVariables = Exact<{
 
 export type QuerySqlDialectInfoQuery = { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter'>> };
 
+export type ConfigureServerQueryVariables = Exact<{
+  configuration: ServerConfigInput;
+}>;
+
+export type ConfigureServerQuery = Pick<Query, 'configureServer'>;
+
+export type SetDefaultNavigatorSettingsQueryVariables = Exact<{
+  settings: NavigatorSettingsInput;
+}>;
+
+export type SetDefaultNavigatorSettingsQuery = Pick<Query, 'setDefaultNavigatorSettings'>;
+
 export type ChangeSessionLanguageMutationVariables = Exact<{
   locale: Scalars['String'];
 }>;
@@ -1439,13 +1463,7 @@ export const CreateConnectionConfigurationDocument = `
     authModel
     authProperties {
       id
-      displayName
-      description
-      category
-      dataType
       value
-      validValues
-      defaultValue
       features
     }
   }
@@ -1485,13 +1503,7 @@ export const GetConnectionsDocument = `
     authModel
     authProperties {
       id
-      displayName
-      description
-      category
-      dataType
       value
-      validValues
-      defaultValue
       features
     }
   }
@@ -1532,13 +1544,7 @@ export const UpdateConnectionConfigurationDocument = `
     authModel
     authProperties {
       id
-      displayName
-      description
-      category
-      dataType
       value
-      validValues
-      defaultValue
       features
     }
   }
@@ -2055,6 +2061,16 @@ export const QuerySqlDialectInfoDocument = `
   }
 }
     `;
+export const ConfigureServerDocument = `
+    query configureServer($configuration: ServerConfigInput!) {
+  configureServer(configuration: $configuration)
+}
+    `;
+export const SetDefaultNavigatorSettingsDocument = `
+    query setDefaultNavigatorSettings($settings: NavigatorSettingsInput!) {
+  setDefaultNavigatorSettings(settings: $settings)
+}
+    `;
 export const ChangeSessionLanguageDocument = `
     mutation changeSessionLanguage($locale: String!) {
   changeSessionLanguage(locale: $locale)
@@ -2339,6 +2355,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables): Promise<QuerySqlDialectInfoQuery> {
       return withWrapper(() => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables));
+    },
+    configureServer(variables: ConfigureServerQueryVariables): Promise<ConfigureServerQuery> {
+      return withWrapper(() => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables));
+    },
+    setDefaultNavigatorSettings(variables: SetDefaultNavigatorSettingsQueryVariables): Promise<SetDefaultNavigatorSettingsQuery> {
+      return withWrapper(() => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables));
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));

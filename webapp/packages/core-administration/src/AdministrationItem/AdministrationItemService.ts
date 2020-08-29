@@ -88,4 +88,24 @@ export class AdministrationItemService {
       }
     }
   }
+
+  async canActivate(name: string, itemSub: string | null, param: string | null, configurationWizard: boolean) {
+    const item = this.getItem(name, configurationWizard);
+    if (!item) {
+      return false;
+    }
+
+    if (item.canActivate && !await item.canActivate(configurationWizard)) {
+      return false;
+    }
+
+    if (itemSub) {
+      const sub = this.getItemSub(item, itemSub);
+      if (sub?.canActivate && !await sub.canActivate(param, configurationWizard)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

@@ -32,12 +32,9 @@ export class ConnectionsAdministrationService extends Bootstrap {
       name: 'connections',
       type: AdministrationItemType.Default,
       order: 2,
-      sub: [
-        {
-          name: 'edit',
-          getComponent: () => ConnectionsAdministration,
-        },
-      ],
+      configurationWizardOptions: {
+        description: 'connections_administration_configuration_wizard_step_description',
+      },
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onActivate: this.loadConnections.bind(this),

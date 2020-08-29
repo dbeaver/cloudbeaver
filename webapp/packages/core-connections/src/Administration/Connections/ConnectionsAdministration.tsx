@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationTools } from '@cloudbeaver/core-administration';
+import { AdministrationTools, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import { Loader, IconButton, Button } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -32,9 +32,10 @@ const styles = composes(
   css`
     layout-grid {
       width: 100%;
+      flex: 1;
     }
 
-    layout-grid, layout-grid-inner {
+    layout-grid-inner {
       min-height: 100%;
     }
 
@@ -62,9 +63,16 @@ const styles = composes(
   `
 );
 
-export const ConnectionsAdministration = observer(function ConnectionsAdministration() {
+export const ConnectionsAdministration = observer(function ConnectionsAdministration({
+  configurationWizard,
+}: AdministrationItemContentProps) {
   const translate = useTranslate();
   const controller = useController(ConnectionsAdministrationController);
+
+  if (configurationWizard && !controller.isSearching) {
+    controller.findDatabase();
+    controller.search();
+  }
 
   return styled(useStyles(styles))(
     <layout-grid as="div">

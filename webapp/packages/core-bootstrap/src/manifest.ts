@@ -10,7 +10,11 @@ import {
   AdministrationLocaleService,
   AdministrationTopAppBarService,
   AdministrationScreenService,
-  AdministrationItemService
+  AdministrationItemService,
+  ConfigurationWizardService,
+  WizardTopAppBarService,
+  AdministrationScreenServiceBootstrap,
+  ConfigurationWizardPagesBootstrapService
 } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
@@ -68,8 +72,12 @@ export const coreManifest: PluginManifest = {
     AdministrationLocaleService,
     AdministrationTopAppBarService,
     AdministrationScreenService,
+    AdministrationScreenServiceBootstrap,
     AdministrationItemService,
     AdministrationTopAppBarBootstrapService,
+    ConfigurationWizardPagesBootstrapService,
+    ConfigurationWizardService,
+    WizardTopAppBarService,
     ActiveViewService,
     ProductSettingsService,
     ProductManagerService,

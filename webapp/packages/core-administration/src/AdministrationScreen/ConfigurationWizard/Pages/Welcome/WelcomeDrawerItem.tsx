@@ -8,18 +8,19 @@
 
 import styled from 'reshadow';
 
-import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-export function ConnectionsDrawerItem({
+import { AdministrationItemDrawerProps } from '../../../../AdministrationItem/IAdministrationItem';
+
+export function WelcomeDrawerItem({
   item, onSelect, style, disabled,
 }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
     <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
       <TabIcon icon='/icons/connection.svg' />
-      <TabTitle><Translate token='connections_administration_item'/></TabTitle>
+      <TabTitle><Translate token='administration_configuration_wizard_welcome'/></TabTitle>
     </Tab>
   );
 }

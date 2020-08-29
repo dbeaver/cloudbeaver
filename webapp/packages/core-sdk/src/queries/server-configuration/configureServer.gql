@@ -1,0 +1,3 @@
+query configureServer($configuration: ServerConfigInput!) {
+  configureServer(configuration: $configuration)
+}

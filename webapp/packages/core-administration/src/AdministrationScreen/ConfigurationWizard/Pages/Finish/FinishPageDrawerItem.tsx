@@ -6,20 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-export function ConnectionsDrawerItem({
-  item, onSelect, style, disabled,
+import { AdministrationItemDrawerProps } from '../../../../AdministrationItem/IAdministrationItem';
+
+export const FinishPageDrawerItem = observer(function FinishPageDrawerItem({
+  item,
+  onSelect,
+  style,
+  disabled,
 }: AdministrationItemDrawerProps) {
+
   return styled(useStyles(...style))(
-    <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
+    <Tab
+      tabId={item.name}
+      onOpen={() => onSelect(item.name)}
+      disabled={disabled
+        || (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
+    >
       <TabIcon icon='/icons/connection.svg' />
-      <TabTitle><Translate token='connections_administration_item'/></TabTitle>
+      <TabTitle><Translate token='administration_configuration_wizard_finish'/></TabTitle>
     </Tab>
   );
-}
+});
