@@ -31,6 +31,7 @@ import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -41,9 +42,9 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
-import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -59,7 +60,10 @@ public class CBDatabase {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb-schema-create.sql";
-    private static final String CURRENT_SCHEMA_VERSION = "6.beta";
+    private static final String CURRENT_SCHEMA_VERSION = "1.0";
+
+    private static final String DEFAULT_DB_USER_NAME = "cb-data";
+    private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
 
     private final CBApplication application;
     private final CBDatabaseConfig databaseConfiguration;
@@ -94,16 +98,40 @@ public class CBDatabase {
         log.debug("Initializing database connection");
         LoggingProgressMonitor monitor = new LoggingProgressMonitor();
 
+        String dbUser = databaseConfiguration.getUser();
+        String dbPassword = databaseConfiguration.getPassword();
+        if (CommonUtils.isEmpty(dbUser) && databaseConfiguration.getUrl().startsWith("jdbc:h2")) {
+            // No database credentials specified
+            dbUser = DEFAULT_DB_USER_NAME;
+
+            // Load or generate random password
+            File pwdFile = new File(application.getDataDirectory(), DEFAULT_DB_PWD_FILE);
+            if (pwdFile.exists()) {
+                try (FileReader fr = new FileReader(pwdFile)) {
+                    dbPassword = IOUtils.readToString(fr);
+                } catch (Exception e) {
+                    log.error(e);
+                }
+            }
+            if (CommonUtils.isEmpty(dbPassword)) {
+                dbPassword = SecurityUtils.generatePassword(8);
+                try {
+                    IOUtils.writeFileFromString(pwdFile, dbPassword);
+                } catch (IOException e) {
+                    log.error(e);
+                }
+            }
+        }
+
         Driver driverInstance = driver.getDriverInstance(monitor);
 
         SystemVariablesResolver variablesResolver = new SystemVariablesResolver();
         String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
         Properties dbProperties = new Properties();
-        if (!CommonUtils.isEmpty(databaseConfiguration.getUser())) {
-            dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, databaseConfiguration.getUser());
-            if (!CommonUtils.isEmpty(databaseConfiguration.getPassword())) {
-                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD,
-                    new String(Base64.decode(databaseConfiguration.getPassword())));
+        if (!CommonUtils.isEmpty(dbUser)) {
+            dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, dbUser);
+            if (!CommonUtils.isEmpty(dbPassword)) {
+                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, dbPassword);
             }
         }
 
@@ -134,26 +162,13 @@ public class CBDatabase {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
         }
-        if (cbDataSource != null) {
-            log.debug("Alter admin settings embedded datasource");
-            try {
-                // Alter admin password
-                try (Connection connection = cbDataSource.getConnection()) {
-                    try (Statement dbStat = connection.createStatement()) {
-                        dbStat.execute("ALTER USER \"" + databaseConfiguration.getUser() +
-                            "\" SET PASSWORD '" + new String(Base64.decode(databaseConfiguration.getPassword())) + "'");
-                    }
-                }
-                cbDataSource.close();
-                cbDataSource = null;
-            } catch (Exception e) {
-                log.error("Error altering database access", e);
-            }
+
+        CBDatabaseInitialData initialData = getInitialData();
+        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName()) && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)) {
+            // Delete old admin user
+            application.getSecurityController().deleteUser(initialData.getAdminName());
         }
-
-        // Just run initialize again.
-        initialize();
-
+        // Create new admin user
         if (!CommonUtils.isEmpty(adminName) && !CommonUtils.isEmpty(adminPassword)) {
             createAdminUser(adminName, adminPassword);
         }
@@ -264,47 +279,57 @@ public class CBDatabase {
     private void fillInitialData() throws DBCException {
         // Fill initial data
         DBWSecurityController serverController = application.getSecurityController();
+
+        CBDatabaseInitialData initialData = getInitialData();
+        if (initialData == null) {
+            return;
+        }
+
+        String adminName = initialData.getAdminName();
+        String adminPassword = initialData.getAdminPassword();
+
+        if (!CommonUtils.isEmpty(initialData.getRoles())) {
+            // Create roles
+            for (WebRole role : initialData.getRoles()) {
+                serverController.createRole(role);
+                if (adminName != null) {
+                    serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
+                }
+            }
+        }
+
+        if (!CommonUtils.isEmpty(adminName)) {
+            // Create admin user
+            createAdminUser(adminName, adminPassword);
+        }
+    }
+
+    @Nullable
+    CBDatabaseInitialData getInitialData() {
         String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
-            return;
+            return null;
         }
 
         initialDataPath = CBApplication.getRelativePath(
             databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
-
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setLenient().create();
-            CBDatabaseInitialData initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
-
-            String adminName = initialData.getAdminName();
-            String adminPassword = initialData.getAdminPassword();
-
-            if (!CommonUtils.isEmpty(initialData.getRoles())) {
-                // Create roles
-                for (WebRole role : initialData.getRoles()) {
-                    serverController.createRole(role);
-                    if (adminName != null) {
-                        serverController.setSubjectPermissions(role.getRoleId(), role.getPermissions().toArray(new String[0]), adminName);
-                    }
-                }
-            }
-
-            if (!CommonUtils.isEmpty(adminName)) {
-                // Create admin user
-                createAdminUser(adminName, adminPassword);
-            }
-
+            return gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             log.error("Error loading initial data configuration", e);
+            return null;
         }
     }
 
     @NotNull
     private WebUser createAdminUser(String adminName, String adminPassword) throws DBCException {
         DBWSecurityController serverController = application.getSecurityController();
-        WebUser adminUser;
-        adminUser = new WebUser(adminName);
-        serverController.createUser(adminUser);
+        WebUser adminUser = serverController.getUserById(adminName);
+        if (adminUser == null) {
+            adminUser = new WebUser(adminName);
+            serverController.createUser(adminUser);
+        }
 
         // This is how client password will be transmitted from client
         String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), adminPassword);

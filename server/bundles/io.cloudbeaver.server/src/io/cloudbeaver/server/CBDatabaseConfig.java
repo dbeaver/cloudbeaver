@@ -16,16 +16,14 @@
  */
 package io.cloudbeaver.server;
 
-import org.jkiss.utils.Base64;
-
 /**
  * Database configuration
  */
 public class CBDatabaseConfig {
     private String driver;
     private String url;
-    private String user = "cb-admin";
-    private String password = Base64.encode("cb-admin".getBytes());
+    private String user;
+    private String password;
 
     private boolean createDatabase = true;
     private boolean allowPublicAccess = true;

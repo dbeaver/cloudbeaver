@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
-import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -245,7 +244,12 @@ public class CBApplication extends BaseApplicationImpl {
 
     @NotNull
     private File getRuntimeConfigFile() {
-        return new File(new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+        return new File(getDataDirectory(), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+    }
+
+    @NotNull
+    File getDataDirectory() {
+        return new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME);
     }
 
     private void initializeDatabase() throws DBException {
@@ -399,7 +403,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, adminPassword, appConfig);
+        saveRuntimeConfig(newServerName, appConfig);
 
         // Re-load runtime configuration
         try {
@@ -418,7 +422,7 @@ public class CBApplication extends BaseApplicationImpl {
         configurationMode = CommonUtils.isEmpty(serverName);
     }
 
-    private void saveRuntimeConfig(String newServerName, String dbPassword, CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, CBAppConfig appConfig) throws DBException {
 
         File runtimeConfigFile = getRuntimeConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
@@ -433,12 +437,6 @@ public class CBApplication extends BaseApplicationImpl {
                     json.beginObject();
                     if (!CommonUtils.isEmpty(newServerName)) {
                         JSONUtils.field(json, "serverName", newServerName);
-                    }
-                    if (!CommonUtils.isEmpty(dbPassword)) {
-                        json.name("database");
-                        json.beginObject();
-                        JSONUtils.field(json, "password", Base64.encode(dbPassword.getBytes()));
-                        json.endObject();
                     }
                     json.endObject();
                 }
