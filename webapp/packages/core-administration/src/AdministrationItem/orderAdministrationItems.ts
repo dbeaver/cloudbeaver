@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-:disabled, [aria-disabled="true"] {
-  pointer-events: none;
-  cursor: default;
-  opacity: 0.5;
+import { IAdministrationItem } from './IAdministrationItem';
+
+export function orderAdministrationItems(itemA: IAdministrationItem, itemB: IAdministrationItem) {
+  return itemA.order - itemB.order;
 }

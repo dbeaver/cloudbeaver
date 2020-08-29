@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-:disabled, [aria-disabled="true"] {
-  pointer-events: none;
-  cursor: default;
-  opacity: 0.5;
+import { NavigatorSettingsInput, ServerConfigInput } from '@cloudbeaver/core-sdk';
+
+export interface IWelcomePageState {
+  serverConfig: ServerConfigInput;
+  navigatorConfig: NavigatorSettingsInput;
 }

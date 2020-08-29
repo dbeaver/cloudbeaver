@@ -8,44 +8,74 @@
 
 import { Style } from '@cloudbeaver/core-theming';
 
+export enum AdministrationItemType {
+  Default,
+  Administration,
+  ConfigurationWizard
+}
+
 export type AdministrationItemDrawerProps = {
   item: IAdministrationItem;
+  configurationWizard: boolean;
   onSelect(id: string): void;
   style: Style[];
+  disabled?: boolean;
 }
 export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>
 
 export type AdministrationItemContentProps = {
   item: IAdministrationItem;
+  configurationWizard: boolean;
 }
 export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>
 
 export type AdministrationItemSubContentProps = {
   item: IAdministrationItem;
   sub: IAdministrationItemSubItem;
+  configurationWizard: boolean;
   param: string | null;
 }
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>
 
-export type AdministrationItemEvent = () => Promise<void> | void
-export type AdministrationItemSubEvent = (param: string | null) => Promise<void> | void
+export type AdministrationItemEvent = (configurationWizard: boolean) => Promise<void> | void
+export type AdministrationItemCanActivateEvent = (configurationWizard: boolean) => Promise<boolean> | boolean
+export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean) => Promise<void> | void
+export type AdministrationItemSubCanActivateEvent = (
+  param: string | null,
+  configurationWizard: boolean
+) => Promise<boolean> | boolean
 
 export interface IAdministrationItemSubItem {
   name: string;
   getComponent(): AdministrationItemSubContentComponent;
   onActivate?: AdministrationItemSubEvent;
+  canActivate?: AdministrationItemSubCanActivateEvent;
+}
+
+export interface IConfigurationWizardItemOptions {
+  description: string;
+  isDisabled?: () => boolean;
+  isHidden?: () => boolean;
+  isDone?: () => boolean;
+  onFinish?: () => Promise<void> | void;
+  onConfigurationFinish?: () => Promise<void> | void;
 }
 
 export interface IAdministrationItemOptions {
   name: string;
+  /** By default will be set to AdministrationItemType.Administration */
+  type?: AdministrationItemType;
+  configurationWizardOptions?: IConfigurationWizardItemOptions;
   order?: number;
   sub?: IAdministrationItemSubItem[];
   getDrawerComponent(): AdministrationItemDrawerComponent;
   getContentComponent(): AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;
+  canActivate?: AdministrationItemCanActivateEvent;
 }
 
 export interface IAdministrationItem extends IAdministrationItemOptions {
+  type: AdministrationItemType;
   order: number;
   sub: IAdministrationItemSubItem[];
 }

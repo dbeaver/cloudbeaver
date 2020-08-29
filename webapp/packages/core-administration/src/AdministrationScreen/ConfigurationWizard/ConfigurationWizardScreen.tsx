@@ -13,12 +13,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { usePermission } from '@cloudbeaver/core-root';
 
-import { Administration } from '../Administration/Administration';
-import { EAdminPermission } from '../EAdminPermission';
-import { AdministrationScreenService } from './AdministrationScreenService';
-import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
+import { Administration } from '../../Administration/Administration';
+import { EAdminPermission } from '../../EAdminPermission';
+import { AdministrationScreenService } from '../AdministrationScreenService';
+import { WizardStepper } from './WizardStepper';
+import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 
-export const AdministrationScreen = observer(function AdministrationScreen() {
+export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
   const administrationScreenService = useService(AdministrationScreenService);
   if (!usePermission(EAdminPermission.admin)) {
     return <Translate token='root_permission_denied'/>;
@@ -31,14 +32,16 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
 
   return (
     <>
-      <AdministrationTopAppBar />
+      <WizardTopAppBar />
       <Administration
-        configurationWizard={false}
+        configurationWizard={true}
         activeItem={administrationScreenService.activeItem}
         activeItemSub={administrationScreenService.activeItemSub}
         activeItemSubParam={administrationScreenService.activeItemSubParam}
         onItemSelect={handleSelect}
-      />
+      >
+        <WizardStepper />
+      </Administration>
     </>
   );
 });

@@ -37,11 +37,11 @@ export class LocalStorageSaveService {
             console.log('Error when parsing local storage value', e);
           }
         }
+
+        firstRun = false;
       }
 
       localStorage.setItem(`${storeId}`, JSON.stringify(toJS(store)));
     });
-
-    firstRun = false;
   }
 }

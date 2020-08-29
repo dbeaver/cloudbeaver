@@ -8,11 +8,13 @@
 
 import { observable } from 'mobx';
 import createRouter, {
-  Router, SubscribeFn, SubscribeState
+  State, Router, SubscribeFn, SubscribeState
 } from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 
 import { injectable } from '@cloudbeaver/core-di';
+
+export type RouterState = State;
 
 @injectable()
 export class RouterService {

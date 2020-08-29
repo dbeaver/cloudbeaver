@@ -8,10 +8,24 @@
 
 import { observer } from 'mobx-react';
 
-import { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
+import { useService } from '@cloudbeaver/core-di';
 
-export const DrawerItem = observer(function DrawerItem({ item, onSelect, style }: AdministrationItemDrawerProps) {
+import { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
+import { ConfigurationWizardService } from '../AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
+
+export const DrawerItem = observer(function DrawerItem({
+  item, onSelect, style, configurationWizard,
+}: AdministrationItemDrawerProps) {
+  const configurationWizardService = useService(ConfigurationWizardService);
   const Component = item.getDrawerComponent();
 
-  return <Component item={item} onSelect={onSelect} style={style}/>;
+  const disabled = configurationWizard && !configurationWizardService.isStepAvailable(item.name);
+
+  return <Component
+    item={item}
+    onSelect={onSelect}
+    configurationWizard={configurationWizard}
+    style={style}
+    disabled={disabled}
+  />;
 });

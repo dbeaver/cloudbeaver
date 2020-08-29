@@ -6,8 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-:disabled, [aria-disabled="true"] {
-  pointer-events: none;
-  cursor: default;
-  opacity: 0.5;
+import styled, { css } from 'reshadow';
+
+const styles = css`
+  fill {
+    flex: 1;
+  }
+`;
+
+export function Fill() {
+  return styled(styles)(<fill as='div' />);
 }
