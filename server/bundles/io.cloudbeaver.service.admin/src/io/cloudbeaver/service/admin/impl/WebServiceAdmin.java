@@ -29,6 +29,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.admin.*;
@@ -297,7 +298,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean configureServer(WebSession webSession, AdminServerConfig config) throws DBWebException {
-         throw new DBWebException("Not implemented");
+        try {
+            CBAppConfig appConfig = new CBAppConfig();
+            appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
+            appConfig.setAuthenticationEnabled(config.isAuthenticationEnabled());
+            appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
+            CBApplication.getInstance().finishConfiguration(
+                config.getServerName(),
+                config.getAdminName(),
+                config.getAdminPassword(),
+                appConfig);
+        } catch (Throwable e) {
+            throw new DBWebException("Error configuring server", e);
+        }
+        return true;
     }
 
     @Override

@@ -16,6 +16,10 @@
  */
 package io.cloudbeaver.service.admin;
 
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
+
+import java.util.Map;
+
 /**
  * Server configuration for admin API
  */
@@ -29,6 +33,16 @@ public class AdminServerConfig {
     private boolean anonymousAccessEnabled;
     private boolean authenticationEnabled;
     private boolean customConnectionsEnabled;
+
+    public AdminServerConfig(Map<String, Object> params) {
+        this.serverName = JSONUtils.getString(params, "serverName");
+        this.adminName = JSONUtils.getString(params, "adminName");
+        this.adminPassword = JSONUtils.getString(params, "adminPassword");
+
+        this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled");
+        this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled");
+        this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled");
+    }
 
     public String getServerName() {
         return serverName;

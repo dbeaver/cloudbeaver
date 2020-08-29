@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -88,14 +89,16 @@ public class WebSessionManager {
                 webSession = new WebSession(httpSession);
                 sessionMap.put(sessionId, webSession);
 
-                if (!httpSession.isNew()) {
-                    webSession.setCacheExpired(true);
-                    if (errorOnNoFound) {
-                        throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                if (!CBApplication.getInstance().isConfigurationMode()) {
+                    if (!httpSession.isNew()) {
+                        webSession.setCacheExpired(true);
+                        if (errorOnNoFound) {
+                            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                        }
                     }
-                }
 
-                log.debug("> New web session '" + webSession.getSessionId() + "'");
+                    log.debug("> New web session '" + webSession.getSessionId() + "'");
+                }
             } else {
                 if (updateInfo) {
                     // Update only once per request
@@ -118,6 +121,10 @@ public class WebSessionManager {
 
     public void expireIdleSessions() {
         long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
+        if (CBApplication.getInstance().isConfigurationMode()) {
+            // In configuration mode sessions expire after a week
+            maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
+        }
 
         List<WebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
