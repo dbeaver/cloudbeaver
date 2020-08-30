@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.core.impl;
 
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
@@ -110,6 +111,12 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public String[] getSessionPermissions(WebSession webSession) throws DBWebException {
+        if (CBApplication.getInstance().isConfigurationMode()) {
+            return new String[] {
+                DBWConstants.PERMISSION_PUBLIC,
+                DBWConstants.PERMISSION_ADMIN
+            };
+        }
         try {
             return webSession.getSessionPermissions().toArray(new String[0]);
         } catch (DBCException e) {
