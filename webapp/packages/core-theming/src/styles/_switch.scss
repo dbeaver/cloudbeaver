@@ -1,0 +1,44 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import '@material/switch/mixins';
+
+@mixin switch-core-styles($query: mdc-feature-all()) {
+  @include mdc-switch-core-styles($query);
+  
+  .theme-switch {
+    composes: mdc-switch;
+  }
+  .theme-switch_native-control {
+    composes: mdc-switch__native-control;
+  }
+  .theme-switch__track {
+    composes: mdc-switch__track;
+  }
+  .theme-switch__thumb-underlay {
+    composes: mdc-switch__thumb-underlay;
+  }
+  .theme-switch__thumb {
+    composes: mdc-switch__thumb;
+  }
+  .theme-switch--checked {
+    composes: mdc-switch--checked;
+  }
+  .theme-switch--disabled {
+    composes: mdc-switch--disabled;
+  }
+
+  .theme-switch_primary {
+    $mdc-switch-baseline-theme-color: primary;
+
+    @include mdc-switch-toggled-on-track-color($mdc-switch-baseline-theme-color, $query);
+    @include mdc-switch-toggled-on-thumb-color($mdc-switch-baseline-theme-color, $query);
+    @include mdc-switch-toggled-off-track-color($mdc-switch-toggled-off-track-color, $query);
+    @include mdc-switch-toggled-off-thumb-color($mdc-switch-toggled-off-thumb-color, $query);
+  }
+}
