@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, InputGroup, InputField, Checkbox, useFocus
+  SubmittingForm, InputGroup, InputField, Checkbox, useFocus, Switch
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigInput, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
@@ -49,19 +49,19 @@ const boxStyles = css`
     flex-wrap: wrap;
   }
   box-element {
-    min-width: 450px;
+    width: 450px;
   }
 `;
 
 type Props = {
   serverConfig: ServerConfigInput;
-  navigatorConfig: NavigatorSettingsInput;
+  onChange: () => void;
   onSave: () => void;
 }
 
 export const WelcomeConfigForm = observer(function WelcomeConfigForm({
   serverConfig,
-  navigatorConfig,
+  onChange,
   onSave,
 }: Props) {
   const translate = useTranslate();
@@ -78,6 +78,7 @@ export const WelcomeConfigForm = observer(function WelcomeConfigForm({
                 name='serverName'
                 state={serverConfig}
                 mod='surface'
+                required
               >
                 {translate('administration_configuration_wizard_welcome_server_name')}
               </InputField>
@@ -90,6 +91,7 @@ export const WelcomeConfigForm = observer(function WelcomeConfigForm({
               name="adminName"
               state={serverConfig}
               mod='surface'
+              required
             >
               {translate('administration_configuration_wizard_welcome_admin_name')}
             </InputField>
@@ -98,6 +100,7 @@ export const WelcomeConfigForm = observer(function WelcomeConfigForm({
               name="adminPassword"
               state={serverConfig}
               mod='surface'
+              required
             >
               {translate('administration_configuration_wizard_welcome_admin_password')}
             </InputField>
@@ -105,89 +108,36 @@ export const WelcomeConfigForm = observer(function WelcomeConfigForm({
               <InputGroup>{translate('administration_configuration_wizard_welcome_plugins')}</InputGroup>
             </group>
             <group as="div">
-              <Checkbox
+              <Switch
                 name="anonymousAccessEnabled"
                 state={serverConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_anonymous_access')}
-                mod='surface'
-              />
+                description={translate('administration_configuration_wizard_welcome_anonymous_access_description')}
+                mod={['primary']}
+                disabled={!serverConfig.authenticationEnabled}
+              >
+                {translate('administration_configuration_wizard_welcome_anonymous_access')}
+              </Switch>
             </group>
             <group as="div">
-              <Checkbox
+              <Switch
                 name="authenticationEnabled"
                 state={serverConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_authentication')}
-                mod='surface'
-              />
+                description={translate('administration_configuration_wizard_welcome_authentication_description')}
+                onChange={onChange}
+                mod={['primary']}
+              >
+                {translate('administration_configuration_wizard_welcome_authentication')}
+              </Switch>
             </group>
             <group as="div">
-              <Checkbox
+              <Switch
                 name="customConnectionsEnabled"
                 state={serverConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_custom_connections')}
-                mod='surface'
-              />
-            </group>
-          </box-element>
-          <box-element as='div' hidden>
-            <group as="div">
-              <InputGroup>{translate('administration_configuration_wizard_welcome_navigator')}</InputGroup>
-            </group>
-            <group as="div">
-              <Checkbox
-                name="hideFolders"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_hide_folders')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="hideSchemas"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_hide_schemas')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="hideVirtualModel"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_hide_virtual_model')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="mergeEntities"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_merge_entities')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="showOnlyEntities"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_show_only_entities')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="showSystemObjects"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_show_system_objects')}
-                mod='surface'
-              />
-            </group>
-            <group as="div">
-              <Checkbox
-                name="showUtilityObjects"
-                state={navigatorConfig}
-                checkboxLabel={translate('administration_configuration_wizard_welcome_navigator_show_utility_objects')}
-                mod='surface'
-              />
+                description={translate('administration_configuration_wizard_welcome_custom_connections_description')}
+                mod={['primary']}
+              >
+                {translate('administration_configuration_wizard_welcome_custom_connections')}
+              </Switch>
             </group>
           </box-element>
         </box>

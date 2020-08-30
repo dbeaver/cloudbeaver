@@ -27,7 +27,7 @@ export class WelcomePageController {
         serverName: 'CloudBeaver',
         adminName: 'admin',
         adminPassword: '',
-        anonymousAccessEnabled: false,
+        anonymousAccessEnabled: true,
         authenticationEnabled: false,
         customConnectionsEnabled: false,
       },
@@ -41,6 +41,12 @@ export class WelcomePageController {
         showUtilityObjects: false,
       },
     }));
+  }
+
+  onChange = () => {
+    if (!this.state.serverConfig.authenticationEnabled) {
+      this.state.serverConfig.anonymousAccessEnabled = true;
+    }
   }
 
   finish = () => this.configurationWizardService.next()

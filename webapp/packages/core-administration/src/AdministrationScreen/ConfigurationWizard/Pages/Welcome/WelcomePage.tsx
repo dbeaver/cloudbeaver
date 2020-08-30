@@ -54,7 +54,7 @@ export const WelcomePage = observer(function WelcomePage() {
           <p>Here you can configure something...</p>
           <WelcomeConfigForm
             serverConfig={controller.state.serverConfig}
-            navigatorConfig={controller.state.navigatorConfig}
+            onChange={controller.onChange}
             onSave={controller.finish}
           />
         </layout-grid-cell>

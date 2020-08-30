@@ -6,21 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
 
-const styles = css`
-  field-label {
-    composes: theme-typography--body2 from global;
-    margin-left: 150px;
-    text-align: left;
-    font-weight: initial;
-  }
-`;
-
+const styles = composes(
+  css`
+    field-label {
+      composes: theme-border-color-background from global;
+    }
+  `,
+  css`
+    field-label {
+      composes: theme-typography--body2 from global;
+      margin-left: 150px;
+      text-align: left;
+      font-weight: initial;
+      padding-bottom: 8px;
+      border-bottom: solid 1px #dedede;
+      width: 100%;
+    }
+  `
+);
 type Props = React.PropsWithChildren<{
   className?: string;
 }>
