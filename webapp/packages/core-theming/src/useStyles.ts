@@ -26,29 +26,29 @@ export type Style = BaseStyles | ThemeSelector
  * @param componentStyles styles array
  */
 export function useStyles(
-  ...componentStyles: Array<Style | boolean>
+  ...componentStyles: Array<Style | boolean | undefined>
 ) {
-
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
   const [loadedStyles, setLoadedStyles] = useState<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
+  const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
 
   useMemo(() => {
     Promise
-      .all(
-        componentStyles.filter(Boolean).map(
-          style => ((typeof style === 'object' || style instanceof Composes) ? style : (style as ThemeSelector)(currentThemeId))
-        )
-      )
+      .all(filteredStyles.map(style => (
+        (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId)
+      )))
       .then(styles => setLoadedStyles(flat(styles)));
-  }, [currentThemeId]);
+  }, [currentThemeId, ...filteredStyles, filteredStyles.length]);
 
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
     return applyComposes([...themeStyles, ...loadedStyles]);
-  }, [currentThemeId, ...loadedStyles]);
+  }, [currentThemeId, ...loadedStyles, loadedStyles.length]);
+  /* we put dynamic array length as the dependency because of preact bug,
+     otherwise useMemo will not be triggered on array change */
 
   return create(styles); // todo this method is called in each rerender
 }

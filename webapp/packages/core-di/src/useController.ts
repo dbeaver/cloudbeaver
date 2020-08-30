@@ -7,7 +7,7 @@
  */
 
 import {
-  useContext, useEffect, useRef, useState, useMemo,
+  useContext, useEffect, useRef, useMemo,
 } from 'react';
 
 import { appContext } from './AppContext';
@@ -35,7 +35,9 @@ export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): 
       controller.init(...args);
     }
     controllerRef.current = controller;
-  }, [...args]);
+  }, [...args, args.length]);
+  /* we put dynamic array length as the dependency because of preact bug,
+     otherwise useMemo will not be triggered on array change */
 
   useEffect(() => () => {
     if (isDestructibleController(controllerRef.current)) {
