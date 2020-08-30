@@ -7,7 +7,7 @@
  */
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
@@ -23,7 +23,8 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     private screenService: ScreenService,
     private permissionsService: PermissionsService,
     private administrationItemService: AdministrationItemService,
-    private administrationScreenService: AdministrationScreenService
+    private administrationScreenService: AdministrationScreenService,
+    private serverConfigResource: ServerConfigResource
   ) {
     super();
     this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
@@ -87,7 +88,14 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  async load() {
+    const config = await this.serverConfigResource.load(null);
+
+    if (config?.configurationMode) {
+      this.administrationScreenService.configurationWizard = true;
+      this.administrationScreenService.navigateToRoot();
+    }
+  }
 
   private async handleCanActivate(toState: RouterState, fromState: RouterState) {
     if (!toState.params?.item) {
@@ -106,11 +114,6 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     if (!this.permissionsService.has(EAdminPermission.admin)) {
       this.screenService.navigateToRoot();
       return;
-    }
-
-    // FIXME: for development purposes only, must be removed
-    if (this.screenService.isActive(AdministrationScreenService.setupName)) {
-      this.administrationScreenService.configurationWizard = true;
     }
 
     if (this.administrationScreenService.activeItem) {

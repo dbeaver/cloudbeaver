@@ -74,8 +74,8 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
     }
 
     try {
-      await this.graphQLService.gql.configureServer({ configuration: state.serverConfig });
       await this.graphQLService.gql.setDefaultNavigatorSettings({ settings: state.navigatorConfig });
+      await this.graphQLService.gql.configureServer({ configuration: state.serverConfig });
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 
