@@ -16,7 +16,9 @@ import { AdministrationScreenService } from '../../AdministrationScreenService';
 import { ConfigurationWizardService } from '../ConfigurationWizardService';
 import { FinishPage } from './Finish/FinishPage';
 import { FinishPageDrawerItem } from './Finish/FinishPageDrawerItem';
-import { IWelcomePageState } from './Welcome/IWelcomePageState';
+import { IServerConfigurationPageState } from './ServerConfiguration/IServerConfigurationPageState';
+import { ServerConfigurationDrawerItem } from './ServerConfiguration/ServerConfigurationDrawerItem';
+import { ServerConfigurationPage } from './ServerConfiguration/ServerConfigurationPage';
 import { WelcomeDrawerItem } from './Welcome/WelcomeDrawerItem';
 import { WelcomePage } from './Welcome/WelcomePage';
 
@@ -38,12 +40,22 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       type: AdministrationItemType.ConfigurationWizard,
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_welcome_step_description',
-        isDone: this.isWelcomeDone.bind(this),
-        onConfigurationFinish: this.saveConfig.bind(this),
       },
       order: 1,
       getContentComponent: () => WelcomePage,
       getDrawerComponent: () => WelcomeDrawerItem,
+    });
+    this.administrationItemService.create({
+      name: 'configuration',
+      type: AdministrationItemType.ConfigurationWizard,
+      configurationWizardOptions: {
+        description: 'administration_configuration_wizard_configuration_step_description',
+        isDone: this.isConfigurationDone.bind(this),
+        onConfigurationFinish: this.saveConfig.bind(this),
+      },
+      order: 1.1,
+      getContentComponent: () => ServerConfigurationPage,
+      getDrawerComponent: () => ServerConfigurationDrawerItem,
     });
     this.administrationItemService.create({
       name: 'finish',
@@ -60,17 +72,17 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  private isWelcomeDone() {
-    const state = this.administrationScreenService.getItemState<IWelcomePageState>('welcome');
+  private isConfigurationDone() {
+    const state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome');
 
     return !!(state?.serverConfig.serverName && state.serverConfig.adminName && state.serverConfig.adminPassword);
   }
 
   private async saveConfig() {
-    const state = this.administrationScreenService.getItemState<IWelcomePageState>('welcome');
+    const state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome');
 
     if (!state) {
-      return;
+      throw new Error('No state available');
     }
 
     try {

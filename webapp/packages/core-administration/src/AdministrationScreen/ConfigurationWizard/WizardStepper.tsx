@@ -84,7 +84,7 @@ export const WizardStepper = observer(function WizardStepper() {
           {translate(service.currentStepIndex === service.steps.length - 1 ? 'ui_stepper_finish' : 'ui_stepper_next')}
         </Button>
       </actions>
-      <wizard-step as='div'>{service.state.finishedSteps.length} / {service.steps.length}</wizard-step>
+      <wizard-step as='div'>{service.finishedSteps.length} / {service.stepsToFinish.length}</wizard-step>
       <wizard-text as='div'>{translate(service.currentStep?.configurationWizardOptions?.description || '')}</wizard-text>
     </wizard-stepper>
   );

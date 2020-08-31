@@ -91,8 +91,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   async load() {
     const config = await this.serverConfigResource.load(null);
 
-    if (config?.configurationMode) {
-      this.administrationScreenService.configurationWizard = true;
+    if (config?.configurationMode && !this.screenService.isActive(AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }
@@ -106,12 +105,12 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
       toState.params?.item,
       toState.params?.sub,
       toState.params?.param,
-      this.administrationScreenService.configurationWizard
+      this.administrationScreenService.isConfigurationMode
     );
   }
 
   private async handleActivate() {
-    if (await !this.permissionsService.hasAsync(EAdminPermission.admin)) {
+    if (!await this.isAccessProvided()) {
       this.screenService.navigateToRoot();
       return;
     }
@@ -121,8 +120,22 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
         this.administrationScreenService.activeItem,
         this.administrationScreenService.activeItemSub,
         this.administrationScreenService.activeItemSubParam,
-        this.administrationScreenService.configurationWizard
+        this.administrationScreenService.isConfigurationMode
       );
     }
+  }
+
+  private async isAccessProvided() {
+    if (await !this.permissionsService.hasAsync(EAdminPermission.admin)) {
+      return false;
+    }
+
+    await this.serverConfigResource.load(null);
+    if (!this.administrationScreenService.isConfigurationMode
+        && this.screenService.isActive(AdministrationScreenService.setupName)) {
+      return false;
+    }
+
+    return true;
   }
 }

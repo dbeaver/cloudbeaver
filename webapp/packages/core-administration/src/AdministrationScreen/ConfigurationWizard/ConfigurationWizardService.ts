@@ -6,32 +6,34 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems';
 import { AdministrationScreenService } from '../AdministrationScreenService';
 
-const CONFIGURATION_WIZARD_BASE_KEY = 'configuration_wizard_state';
-
-export interface IConfigurationWizardState {
-  finishedSteps: string[];
-}
-
 @injectable()
 export class ConfigurationWizardService {
-  @observable state: IConfigurationWizardState
 
   @computed get steps() {
     return this.administrationItemService.items
       .filter(filterConfigurationWizard(true))
       .sort(orderAdministrationItems);
+  }
+
+  @computed get stepsToFinish() {
+    return this.steps.filter(step => step.configurationWizardOptions?.isDone);
+  }
+
+  @computed get finishedSteps() {
+    return this.steps.filter(step => (
+      step.configurationWizardOptions?.isDone && step.configurationWizardOptions.isDone()
+    ));
   }
 
   @computed get currentStepIndex() {
@@ -83,20 +85,13 @@ export class ConfigurationWizardService {
   constructor(
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
-    private autoSaveService: LocalStorageSaveService,
     private screenService: ScreenService,
     private sessionResource: SessionResource,
     private serverConfigResource: ServerConfigResource
-  ) {
-    this.state = {
-      finishedSteps: [],
-    };
-
-    this.autoSaveService.withAutoSave(this.state, CONFIGURATION_WIZARD_BASE_KEY);
-  }
+  ) { }
 
   isStepAvailable(name: string) {
-    if (this.currentStep?.name === name || this.state.finishedSteps.includes(name)) {
+    if (this.currentStep?.name === name) {
       return true;
     }
 
@@ -105,8 +100,7 @@ export class ConfigurationWizardService {
         return true;
       }
 
-      if (step.configurationWizardOptions?.isDone
-          && !step.configurationWizardOptions?.isDone()) {
+      if (this.stepsToFinish.includes(step) && !this.finishedSteps.includes(step)) {
         return false;
       }
     }
@@ -124,12 +118,6 @@ export class ConfigurationWizardService {
     if (step.configurationWizardOptions?.onFinish) {
       await step.configurationWizardOptions.onFinish();
     }
-
-    if (this.state.finishedSteps.includes(name)) {
-      return;
-    }
-
-    this.state.finishedSteps.push(name);
   }
 
   next() {
@@ -164,18 +152,16 @@ export class ConfigurationWizardService {
   }
 
   private async finish() {
-    for (const name of this.state.finishedSteps) {
-      const step = this.getStep(name);
+    for (const step of this.steps) {
 
       if (step?.configurationWizardOptions?.onConfigurationFinish) {
         await step.configurationWizardOptions.onConfigurationFinish();
       }
     }
+
     await this.serverConfigResource.update();
     await this.sessionResource.update();
     this.administrationScreenService.clearItemsState();
-    this.state.finishedSteps = [];
-    this.administrationScreenService.configurationWizard = false;
     this.screenService.navigateToRoot();
   }
 }

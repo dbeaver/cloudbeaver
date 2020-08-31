@@ -19,7 +19,7 @@ export function WelcomeDrawerItem({
 }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
     <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
-      <TabIcon icon='/icons/connection.svg' />
+      <TabIcon icon='/icons/eye-settings-outline.svg' />
       <TabTitle><Translate token='administration_configuration_wizard_welcome'/></TabTitle>
     </Tab>
   );

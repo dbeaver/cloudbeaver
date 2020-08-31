@@ -6,19 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AppScreen } from './AppScreen';
 
 @injectable()
-export class AppScreenService {
+export class AppScreenService extends Bootstrap {
 
   static screenName = 'app'
 
   constructor(
     private screenService: ScreenService,
-  ) {}
+  ) {
+    super();
+  }
 
   register() {
     this.screenService.create({
@@ -28,4 +30,6 @@ export class AppScreenService {
       root: true,
     });
   }
+
+  load(): void | Promise<void> { }
 }

@@ -31,8 +31,6 @@ export class AppBootstrap {
   constructor(
     private exceptionsCatcherService: ExceptionsCatcherService,
     private themeService: ThemeService,
-    private routerService: RouterService,
-    private appScreenService: AppScreenService,
     private connectionDialogService: ConnectionDialogsService,
     private logViewerMenuService: LogViewerMenuService,
     private sessionExpireService: SessionExpireService,
@@ -42,11 +40,9 @@ export class AppBootstrap {
   ) { }
 
   register(): void | Promise<void> {
-    this.routerService.start();
     this.exceptionsCatcherService.subscribe();
     this.sessionExpireService.subscribe();
 
-    this.appScreenService.register();
     this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
     this.connectionDialogService.registerMenuItems();

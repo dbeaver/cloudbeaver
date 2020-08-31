@@ -12,17 +12,17 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationScreenService } from '../../../AdministrationScreenService';
 import { ConfigurationWizardService } from '../../ConfigurationWizardService';
-import { IWelcomePageState } from './IWelcomePageState';
+import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
 @injectable()
-export class WelcomePageController {
-  @observable readonly state: IWelcomePageState;
+export class ServerConfigurationPageController {
+  @observable readonly state: IServerConfigurationPageState;
 
   constructor(
     private administrationScreenService: AdministrationScreenService,
     private configurationWizardService: ConfigurationWizardService
   ) {
-    this.state = this.administrationScreenService.getItemState<IWelcomePageState>('welcome', () => ({
+    this.state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome', () => ({
       serverConfig: {
         serverName: 'CloudBeaver',
         adminName: 'admin',

@@ -9,6 +9,7 @@
 import { computed, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
@@ -29,14 +30,13 @@ export class AdministrationScreenService {
   static setupItemSubRouteName = 'setup.item.sub'
   static setupItemSubParamRouteName = 'setup.item.sub.param'
 
-  @observable configurationWizard = false;
   @observable itemState: Map<string, any>;
 
   @computed get activeItem(): string | null {
     if (!this.isAdministrationRouteActive()) {
       return null;
     }
-    return this.routerService.params.item || this.administrationItemService.getDefaultItem(this.configurationWizard);
+    return this.routerService.params.item || this.administrationItemService.getDefaultItem(this.isConfigurationMode);
   }
 
   @computed get activeItemSub(): string | null {
@@ -53,11 +53,16 @@ export class AdministrationScreenService {
     return this.routerService.params.param || null;
   }
 
+  get isConfigurationMode() {
+    return !!this.serverConfigResource.data?.configurationMode;
+  }
+
   constructor(
     private screenService: ScreenService,
     private routerService: RouterService,
     private administrationItemService: AdministrationItemService,
-    private autoSaveService: LocalStorageSaveService
+    private autoSaveService: LocalStorageSaveService,
+    private serverConfigResource: ServerConfigResource
   ) {
     this.itemState = new Map();
 
@@ -65,7 +70,7 @@ export class AdministrationScreenService {
   }
 
   navigateToRoot() {
-    if (this.configurationWizard) {
+    if (this.isConfigurationMode) {
       this.routerService.router.navigate(AdministrationScreenService.setupName);
     } else {
       this.routerService.router.navigate(AdministrationScreenService.screenName);
@@ -73,7 +78,7 @@ export class AdministrationScreenService {
   }
 
   navigateToItem(item: string) {
-    if (this.configurationWizard) {
+    if (this.isConfigurationMode) {
       this.routerService.router.navigate(AdministrationScreenService.setupItemRouteName, { item });
     } else {
       this.routerService.router.navigate(AdministrationScreenService.itemRouteName, { item });
@@ -82,14 +87,14 @@ export class AdministrationScreenService {
 
   navigateToItemSub(item: string, sub: string, param?: string) {
     if (!param) {
-      if (this.configurationWizard) {
+      if (this.isConfigurationMode) {
         this.routerService.router.navigate(AdministrationScreenService.setupItemSubRouteName, { item, sub });
       } else {
         this.routerService.router.navigate(AdministrationScreenService.itemSubRouteName, { item, sub });
       }
       return;
     }
-    if (this.configurationWizard) {
+    if (this.isConfigurationMode) {
       this.routerService.router.navigate(AdministrationScreenService.setupItemSubParamRouteName, { item, sub, param });
     } else {
       this.routerService.router.navigate(AdministrationScreenService.itemSubParamRouteName, { item, sub, param });

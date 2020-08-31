@@ -12,12 +12,12 @@ import createRouter, {
 } from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 export type RouterState = State;
 
 @injectable()
-export class RouterService {
+export class RouterService extends Bootstrap {
 
   get route() {
     return this.currentRoute;
@@ -33,6 +33,7 @@ export class RouterService {
   @observable private currentParams: Record<string, any> = {};
 
   constructor() {
+    super();
     this.router = createRouter();
 
     this.configure();
@@ -44,6 +45,11 @@ export class RouterService {
 
   subscribe(subscriber: SubscribeFn) {
     return this.router.subscribe(subscriber);
+  }
+
+  register(): void | Promise<void> { }
+  load(): void | Promise<void> {
+    this.start();
   }
 
   private configure() {

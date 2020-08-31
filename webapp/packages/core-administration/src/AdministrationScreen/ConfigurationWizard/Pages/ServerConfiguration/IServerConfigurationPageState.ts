@@ -8,7 +8,7 @@
 
 import { NavigatorSettingsInput, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
-export interface IWelcomePageState {
+export interface IServerConfigurationPageState {
   serverConfig: ServerConfigInput;
   navigatorConfig: NavigatorSettingsInput;
 }

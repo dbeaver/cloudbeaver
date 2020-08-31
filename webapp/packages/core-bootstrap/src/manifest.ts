@@ -69,6 +69,7 @@ export const coreManifest: PluginManifest = {
   depends: [],
 
   providers: [
+    RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
     AdministrationLocaleService,
     AdministrationTopAppBarService,
     AdministrationScreenService,
@@ -105,7 +106,6 @@ export const coreManifest: PluginManifest = {
     DBDriverResource,
     DriverPropertiesService,
     ConnectionsManagerService,
-    RouterService,
     ScreenService,
     AppScreenService,
     ContextMenuService,

@@ -6,9 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
+import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+
+import { ServerConfigurationForm } from './ServerConfigurationForm';
+import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 
 const styles = composes(
   css`
@@ -38,15 +43,22 @@ const styles = composes(
   `
 );
 
-export function WelcomePage() {
+export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
+  const controller = useController(ServerConfigurationPageController);
+
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
           <h3>Welcome to initial server configuration</h3>
           <p>Here you can configure something...</p>
+          <ServerConfigurationForm
+            serverConfig={controller.state.serverConfig}
+            onChange={controller.onChange}
+            onSave={controller.finish}
+          />
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>
   );
-}
+});
