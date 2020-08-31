@@ -6,8 +6,13 @@ query serverConfig {
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces
+
     anonymousAccessEnabled
     authenticationEnabled
+
+    configurationMode
+    developmentMode
+
     supportedLanguages {
       isoCode
       displayName

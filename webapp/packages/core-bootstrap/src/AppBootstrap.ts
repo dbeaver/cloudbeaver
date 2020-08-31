@@ -42,6 +42,7 @@ export class AppBootstrap {
   ) { }
 
   register(): void | Promise<void> {
+    this.routerService.start();
     this.exceptionsCatcherService.subscribe();
     this.sessionExpireService.subscribe();
 
@@ -60,6 +61,5 @@ export class AppBootstrap {
   async doAfterPluginsInit() {
     // todo this should be moved to the NavigationTabs component creation phase but now it leads to bugs
     await this.navigationTabsService.restoreTabs();
-    this.routerService.start();
   }
 }

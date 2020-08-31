@@ -2256,6 +2256,21 @@
   dependencies:
     "@material/feature-targeting" "^4.0.0"
 
+"@material/switch@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@material/switch/-/switch-4.0.0.tgz#5c5da30389f48f4f5245eb9f325cbc0e5f6bf2d4"
+  integrity sha512-90fvz0bYgeGQNBD14rdTOI/dvAPANwDQLIodOpE/r2bOZjge1K0rHSAm+TVwNCnrrM9HGmG8Ew0sIeEIj3jMMw==
+  dependencies:
+    "@material/animation" "^4.0.0"
+    "@material/base" "^4.0.0"
+    "@material/dom" "^4.0.0"
+    "@material/elevation" "^4.0.0"
+    "@material/feature-targeting" "^4.0.0"
+    "@material/ripple" "^4.0.0"
+    "@material/rtl" "^4.0.0"
+    "@material/theme" "^4.0.0"
+    tslib "^1.9.3"
+
 "@material/theme@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@material/theme/-/theme-4.0.0.tgz#8de388fcdbae20fd09b02a3bdef3049bf2f623a8"

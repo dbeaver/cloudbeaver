@@ -44,6 +44,7 @@ export const InputField: InputFieldType = observer(function InputField(
 ) {
   const {
     name,
+    required,
     state,
     children,
     className,
@@ -65,13 +66,14 @@ export const InputField: InputFieldType = observer(function InputField(
 
   return styled(useStyles(baseFormControlStyles))(
     <field as="div" className={className}>
-      <field-label as='label'>{children}</field-label>
+      <field-label as='label'>{children} {required && '*'}</field-label>
       <input
         {...rest}
         onChange={handleChange}
         name={name}
         value={value}
         {...use({ mod })}
+        required={required}
       />
     </field>
   );

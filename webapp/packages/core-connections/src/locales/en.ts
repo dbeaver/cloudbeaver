@@ -1,7 +1,8 @@
 export default [
   ['connections_administration_item', 'Connection Management'],
   ['connections_administration_new_connection', 'New connection'],
-  ['connections_administration_configuration_wizard_step_description', 'Configuring connections...'],
+  ['connections_administration_configuration_wizard_step_title', 'Database connections'],
+  ['connections_administration_configuration_wizard_step_description', 'Database connections'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_edit_access', 'Access'],
   ['connections_connection_edit_access_load_failed', 'Connection access loading failed'],

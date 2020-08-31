@@ -20,6 +20,7 @@ export * from './FormControls/InputGroup';
 export * from './FormControls/Radio';
 export * from './FormControls/ShadowInput';
 export * from './FormControls/SubmittingForm';
+export * from './FormControls/Switch';
 export * from './FormControls/Textarea';
 export * from './ErrorMessage';
 export * from './IconButton';

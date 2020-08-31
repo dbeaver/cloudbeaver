@@ -1271,7 +1271,7 @@ export type ReadSessionLogQuery = { log: Array<Pick<LogEntry, 'time' | 'type' | 
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ServerConfigQuery = { serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
   ); };
 
@@ -2117,6 +2117,8 @@ export const ServerConfigDocument = `
     supportsWorkspaces
     anonymousAccessEnabled
     authenticationEnabled
+    configurationMode
+    developmentMode
     supportedLanguages {
       isoCode
       displayName

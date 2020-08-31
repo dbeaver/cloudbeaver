@@ -11,6 +11,7 @@ import { css } from 'reshadow';
 export const baseFormControlStyles = css`
   field {
     display: flex;
+    flex-wrap: wrap;
     flex: auto;
     box-sizing: border-box;
     align-items: center;
@@ -32,5 +33,12 @@ export const baseFormControlStyles = css`
     padding-right: 24px;
     line-height: 16px;
     font-weight: 500;
+  }
+
+  field-description {
+    composes: theme-typography--caption from global;
+    flex-basis: 100%;
+    padding-top: 8px;
+    padding-left: 150px;
   }
 `;

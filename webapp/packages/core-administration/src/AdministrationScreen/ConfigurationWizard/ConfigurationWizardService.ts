@@ -9,6 +9,7 @@
 import { observable, computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
@@ -83,7 +84,9 @@ export class ConfigurationWizardService {
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
     private autoSaveService: LocalStorageSaveService,
-    private screenService: ScreenService
+    private screenService: ScreenService,
+    private sessionResource: SessionResource,
+    private serverConfigResource: ServerConfigResource
   ) {
     this.state = {
       finishedSteps: [],
@@ -168,6 +171,8 @@ export class ConfigurationWizardService {
         await step.configurationWizardOptions.onConfigurationFinish();
       }
     }
+    await this.serverConfigResource.update();
+    await this.sessionResource.update();
     this.administrationScreenService.clearItemsState();
     this.state.finishedSteps = [];
     this.administrationScreenService.configurationWizard = false;
