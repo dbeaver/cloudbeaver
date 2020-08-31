@@ -62,6 +62,9 @@ class CBSecurityController implements DBWSecurityController {
 
     @Override
     public void createUser(WebUser user) throws DBCException {
+        if (getUserById(user.getUserId()) != null) {
+            throw new DBCException("User or role '" + user.getUserId() + "' already exists");
+        }
         try (Connection dbCon = database.openConnection()) {
             createAuthSubject(dbCon, user.getUserId(), SUBJECT_USER);
             try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
