@@ -111,7 +111,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   private async handleActivate() {
-    if (!this.permissionsService.has(EAdminPermission.admin)) {
+    if (await !this.permissionsService.hasAsync(EAdminPermission.admin)) {
       this.screenService.navigateToRoot();
       return;
     }
