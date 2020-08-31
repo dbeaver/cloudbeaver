@@ -6,19 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import { UsersAdministration } from './UsersAdministration';
+import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
 
 @injectable()
 export class UsersAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
-    private administrationScreenService: AdministrationScreenService,
     private notificationService: NotificationService,
     private usersResource: UsersResource,
   ) {
@@ -27,12 +27,13 @@ export class UsersAdministrationService extends Bootstrap {
 
   register() {
     this.administrationItemService.create({
-      name: 'users',
+      name: UsersAdministrationNavigationService.ItemName,
       order: 1,
       sub: [
         {
-          name: 'edit',
+          name: UsersAdministrationNavigationService.AddItemName,
           getComponent: () => UsersAdministration,
+          onActivate: this.onCreateActivate.bind(this),
         },
       ],
       getContentComponent: () => UsersAdministration,
@@ -43,12 +44,11 @@ export class UsersAdministrationService extends Bootstrap {
 
   load(): void | Promise<void> { }
 
-  navToRoot() {
-    this.administrationScreenService.navigateToItem('users');
-  }
-
-  navToEdit(userId: string) {
-    this.administrationScreenService.navigateToItemSub('users', 'edit', userId);
+  private onCreateActivate() {
+    if (!Array.from(this.usersResource.data.values())
+      .some(user => this.usersResource.isNew(user.userId))) {
+      this.usersResource.addNew();
+    }
   }
 
   private async loadUsers() {

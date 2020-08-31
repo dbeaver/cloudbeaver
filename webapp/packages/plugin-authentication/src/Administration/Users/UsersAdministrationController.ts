@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -15,14 +15,18 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
+
 @injectable()
 export class UsersAdministrationController {
   @observable isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map())
   readonly expandedItems = observable<string, boolean>(new Map())
   readonly error = new GQLErrorCatcher();
-  get users() {
+
+  @computed get users() {
     return Array.from(this.usersResource.data.values())
+      .filter(user => !this.usersResource.isNew(user.userId))
       .sort((a, b) => {
         if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
           return 0;
@@ -34,6 +38,11 @@ export class UsersAdministrationController {
       });
   }
 
+  @computed get creatingUser() {
+    return Array.from(this.usersResource.data.values())
+      .find(user => this.usersResource.isNew(user.userId));
+  }
+
   get isLoading() {
     return this.usersResource.isLoading() || this.isDeleting;
   }
@@ -42,11 +51,21 @@ export class UsersAdministrationController {
     private notificationService: NotificationService,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
+    private usersAdministrationNavigationService: UsersAdministrationNavigationService,
   ) { }
 
   create = () => {
-    const user = this.usersResource.addNew();
-    this.expandedItems.set(user.userId, true);
+    this.usersResource.addNew();
+    this.usersAdministrationNavigationService.navToAdd();
+  }
+
+  cancelCreate = () => {
+    if (!this.creatingUser) {
+      return;
+    }
+
+    this.usersResource.delete(this.creatingUser.userId);
+    this.usersAdministrationNavigationService.navToRoot();
   }
 
   update = async () => {

@@ -27,7 +27,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     private serverConfigResource: ServerConfigResource
   ) {
     super();
-    this.permissionsService.onUpdate.subscribe(this.handleActivate.bind(this));
+    this.permissionsService.onUpdate.subscribe(this.checkPermissions.bind(this));
   }
 
   register() {
@@ -110,8 +110,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   private async handleActivate() {
-    if (!await this.isAccessProvided()) {
-      this.screenService.navigateToRoot();
+    if (!await this.checkPermissions()) {
       return;
     }
 
@@ -125,8 +124,16 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     }
   }
 
+  private async checkPermissions() {
+    if (!await this.isAccessProvided()) {
+      this.screenService.navigateToRoot();
+      return false;
+    }
+    return true;
+  }
+
   private async isAccessProvided() {
-    if (await !this.permissionsService.hasAsync(EAdminPermission.admin)) {
+    if (!await this.permissionsService.hasAsync(EAdminPermission.admin)) {
       return false;
     }
 

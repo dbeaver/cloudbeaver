@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import { PluginManifest } from '@cloudbeaver/core-di';
 
+import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthMenuService } from './AuthMenuService';
-import { Bootstrap } from './Bootstrap';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
 export const manifest: PluginManifest = {
@@ -26,11 +26,6 @@ export const manifest: PluginManifest = {
     AuthMenuService,
     UsersAdministrationService,
     AuthenticationLocaleService,
+    UsersAdministrationNavigationService,
   ],
-
-  async initialize(services: IServiceInjector) {
-    services
-      .resolveServiceByClass(Bootstrap)
-      .bootstrap();
-  },
 };

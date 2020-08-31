@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', 'Авторизация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
+  ['authentication_administration_user_connections_user_add', 'Создание пользователя'],
   ['authentication_administration_user_connections_user_new', 'Новый пользователь'],
   ['authentication_administration_user_connections_access_load_fail', 'Не удалось загрузить доступные пользователю коннекшены'],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Ошибка при загрузке списка коннекшенов'],

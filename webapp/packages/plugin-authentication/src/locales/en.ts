@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', 'Authentication'],
   ['authentication_login', 'Login'],
   ['authentication_logout', 'Logout'],
+  ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
   ['authentication_administration_user_connections_access_load_fail', 'User\'s granted connections loading failed'],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Connections loading failed'],
