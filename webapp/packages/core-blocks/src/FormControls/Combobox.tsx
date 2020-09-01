@@ -89,6 +89,7 @@ type Props<T> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | '
   propertyName?: string;
   items: T[];
   mod?: 'surface';
+  long?: boolean;
   keySelector(item: T): string;
   valueSelector(item: T): string;
   onChange?(value: string): any;
@@ -103,6 +104,7 @@ export function Combobox<T>({
   children,
   className,
   mod,
+  long,
   readOnly,
   keySelector = v => v as any,
   valueSelector = v => v as any,
@@ -158,7 +160,7 @@ export function Combobox<T>({
   }
 
   return styled(useStyles(baseFormControlStyles, styles))(
-    <field as="div" className={className}>
+    <field as="div" className={className} {...use({ long })}>
       <field-label as='label'>{children}</field-label>
       <input-box as="div">
         <input

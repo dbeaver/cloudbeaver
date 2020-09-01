@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -27,21 +27,27 @@ const styles = composes(
       padding-bottom: 8px;
       border-bottom: solid 1px #dedede;
       width: 100%;
+
+      &[|long] {
+        margin-left: 200px;
+      }
     }
   `
 );
 type Props = React.PropsWithChildren<{
   className?: string;
+  long?: boolean;
 }>
 
 export function InputGroup({
   children,
   className,
+  long,
 }: Props) {
 
   return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className}>
-      <field-label as='label'>{children}</field-label>
+      <field-label as='label' {...use({ long })}>{children}</field-label>
     </field>
   );
 }

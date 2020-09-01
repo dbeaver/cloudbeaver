@@ -54,6 +54,7 @@ export interface IAdministrationItemSubItem {
 
 export interface IConfigurationWizardItemOptions {
   description: string;
+  onValidate?: () => boolean;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
   isDone?: () => boolean;

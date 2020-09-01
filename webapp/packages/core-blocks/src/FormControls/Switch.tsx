@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -73,6 +73,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
   mod?: (keyof typeof switchMod)[];
   label?: string;
   description?: string;
+  long?: boolean;
 }
 
 type ControlledProps = BaseProps & {
@@ -106,6 +107,7 @@ export const Switch: SwitchType = observer(function Switch(props: ControlledProp
     children,
     onChange,
     mod = [],
+    long,
     disabled,
     ...rest
   } = props;
@@ -128,7 +130,7 @@ export const Switch: SwitchType = observer(function Switch(props: ControlledProp
     disabled && switchState.disabled,
     checked && switchState.checked
   ))(
-    <field as="div" className={className}>
+    <field as="div" className={className} {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <switch-control as='div'>
         <switch-control-track as='div' />

@@ -4,6 +4,7 @@ export * from './AdministrationItem/IAdministrationItem';
 export * from './AdministrationScreen/AdministrationScreenService';
 export * from './AdministrationScreen/AdministrationScreenServiceBootstrap';
 export * from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
+export * from './AdministrationScreen/ConfigurationWizard/Pages/ServerConfiguration/ServerConfigurationService';
 export * from './AdministrationScreen/ConfigurationWizard/Pages/ConfigurationWizardPagesBootstrapService';
 export * from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 export * from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService';

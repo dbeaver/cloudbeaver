@@ -41,4 +41,13 @@ export const baseFormControlStyles = css`
     padding-top: 8px;
     padding-left: 150px;
   }
+
+  field[|long] {
+    & field-label {
+      width: 200px;
+    }
+    & field-description {
+      padding-left: 200px;
+    }
+  } 
 `;

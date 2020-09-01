@@ -6,41 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 
-import { AdministrationScreenService } from '../../../AdministrationScreenService';
 import { ConfigurationWizardService } from '../../ConfigurationWizardService';
-import { IServerConfigurationPageState } from './IServerConfigurationPageState';
+import { ServerConfigurationService } from './ServerConfigurationService';
 
 @injectable()
 export class ServerConfigurationPageController {
-  @observable readonly state: IServerConfigurationPageState;
+  get state() {
+    return this.serverConfigurationService.state;
+  }
 
   constructor(
-    private administrationScreenService: AdministrationScreenService,
-    private configurationWizardService: ConfigurationWizardService
+    private configurationWizardService: ConfigurationWizardService,
+    private serverConfigurationService: ServerConfigurationService,
   ) {
-    this.state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome', () => ({
-      serverConfig: {
-        serverName: 'CloudBeaver',
-        adminName: 'admin',
-        adminPassword: '',
-        anonymousAccessEnabled: true,
-        authenticationEnabled: false,
-        customConnectionsEnabled: false,
-      },
-      navigatorConfig: {
-        hideFolders: false,
-        hideSchemas: false,
-        hideVirtualModel: false,
-        mergeEntities: false,
-        showOnlyEntities: false,
-        showSystemObjects: false,
-        showUtilityObjects: false,
-      },
-    }));
   }
 
   onChange = () => {

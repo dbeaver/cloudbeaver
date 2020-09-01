@@ -20,6 +20,7 @@ const styles = css`
 
 type Props = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & {
   mod?: 'surface';
+  long?: boolean;
   onChange?(value: string): any;
 }
 
@@ -27,12 +28,13 @@ export function Textarea({
   children,
   className,
   mod,
+  long,
   onChange = () => {},
   ...rest
 }: Props) {
 
   return styled(useStyles(baseFormControlStyles, styles))(
-    <field as="div" className={className}>
+    <field as="div" className={className} {...use({ long })}>
       <field-label as='label'>{children}</field-label>
       <textarea onChange={e => onChange(e.target.value)} {...rest} {...use({ mod })} />
     </field>

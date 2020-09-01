@@ -34,6 +34,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
   value?: string;
   checkboxLabel: string;
   mod?: 'surface';
+  long?: boolean;
 }
 
 type ControlledProps = BaseProps & {
@@ -67,6 +68,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox(
     children,
     className,
     mod,
+    long,
     onChange,
     ...rest
   } = props;
@@ -83,7 +85,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox(
   const checked = state ? state[name] : props.checked;
 
   return styled(useStyles(baseFormControlStyles, styles))(
-    <field as="div" className={className}>
+    <field as="div" className={className} {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <checkbox as='div'>
         <input

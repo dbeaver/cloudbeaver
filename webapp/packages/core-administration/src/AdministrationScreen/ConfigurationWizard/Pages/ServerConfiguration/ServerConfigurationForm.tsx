@@ -65,19 +65,22 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               state={serverConfig}
               mod='surface'
               required
+              long
             >
               {translate('administration_configuration_wizard_configuration_server_name')}
             </InputField>
           </group>
           <group as="div">
-            <InputGroup>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
+            <InputGroup long>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
           </group>
           <InputField
             type="text"
             name="adminName"
             state={serverConfig}
             mod='surface'
+            minLength={6}
             required
+            long
           >
             {translate('administration_configuration_wizard_configuration_admin_name')}
           </InputField>
@@ -87,11 +90,14 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
             state={serverConfig}
             mod='surface'
             required
+            long
           >
             {translate('administration_configuration_wizard_configuration_admin_password')}
           </InputField>
+        </box-element>
+        <box-element as='div'>
           <group as="div">
-            <InputGroup>{translate('administration_configuration_wizard_configuration_plugins')}</InputGroup>
+            <InputGroup long>{translate('administration_configuration_wizard_configuration_plugins')}</InputGroup>
           </group>
           <group as="div">
             <Switch
@@ -100,6 +106,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
               mod={['primary']}
               disabled={!serverConfig.authenticationEnabled}
+              long
             >
               {translate('administration_configuration_wizard_configuration_anonymous_access')}
             </Switch>
@@ -111,6 +118,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               description={translate('administration_configuration_wizard_configuration_authentication_description')}
               onChange={onChange}
               mod={['primary']}
+              long
             >
               {translate('administration_configuration_wizard_configuration_authentication')}
             </Switch>
@@ -121,6 +129,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               state={serverConfig}
               description={translate('administration_configuration_wizard_configuration_custom_connections_description')}
               mod={['primary']}
+              long
             >
               {translate('administration_configuration_wizard_configuration_custom_connections')}
             </Switch>
