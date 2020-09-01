@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AdministrationScreenService } from '../../../AdministrationScreenService';
@@ -17,6 +18,7 @@ import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 export class ServerConfigurationService {
 
   readonly state: IServerConfigurationPageState;
+  readonly validationTask: IExecutor<boolean>;
 
   constructor(
     private administrationScreenService: AdministrationScreenService,
@@ -42,18 +44,35 @@ export class ServerConfigurationService {
         showUtilityObjects: false,
       },
     }));
+    this.validationTask = new Executor();
   }
 
   isDone() {
     return this.isFormFilled();
   }
 
-  validate() {
-    return this.isFormFilled();
+  async validate() {
+    const context = await this.validationTask.execute(true);
+    const state = await context.getContext(this.validationStatusContext);
+
+    return state.getState();
+  }
+
+  validationStatusContext = (context: IContextProvider<boolean>) => {
+    let state = this.isFormFilled();
+
+    const invalidate = () => {
+      state = false;
+    };
+    const getState = () => state;
+
+    return {
+      getState,
+      invalidate,
+    };
   }
 
   private isFormFilled() {
-
     return !!(
       this.state?.serverConfig.serverName
       && this.state.serverConfig.adminName
