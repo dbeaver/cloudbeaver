@@ -11,14 +11,12 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
 import { PermissionsService, EPermission, SessionResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService, resourceKeyList, isResourceKeyList, ResourceKey
 } from '@cloudbeaver/core-sdk';
 
-import { INavigator } from '../Navigation/INavigator';
-import { IContextProvider } from '../Navigation/NavigationContext';
-import { NavigationService } from '../Navigation/NavigationService';
 import { ENodeFeature } from './ENodeFeature';
 import { NavNodeInfo, NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
@@ -88,11 +86,11 @@ export interface INodeNavigationData {
 
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
-  readonly navigator!: INavigator<INodeNavigationData>;
+  readonly navigator: IExecutor<INodeNavigationData>;
+  private activeNavigationNodes: string[]
 
   constructor(
     private graphQLService: GraphQLService,
-    private navigationService: NavigationService,
     private permissionsService: PermissionsService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
@@ -102,15 +100,18 @@ export class NavNodeManagerService extends Bootstrap {
     private sessionResource: SessionResource,
   ) {
     super();
-    this.navigator = this.navigationService.createNavigator<INodeNavigationData>(
-      data => data.nodeId,
-      this.navigateHandler.bind(this),
+    this.activeNavigationNodes = [];
+    this.navigator = new Executor(
       {
         type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
       }
-    );
+    )
+      .addHandler(this.navigateHandler.bind(this))
+      .addPostHandler((_, { nodeId }) => {
+        this.activeNavigationNodes = this.activeNavigationNodes.filter(id => id !== nodeId);
+      });
   }
 
   register() {
@@ -122,7 +123,7 @@ export class NavNodeManagerService extends Bootstrap {
   load() {}
 
   async navToNode(nodeId: string, parentId: string, folderId?: string) {
-    await this.navigator.navigateTo({
+    await this.navigator.execute({
       type: NavigationType.open,
       nodeId,
       parentId,
@@ -366,7 +367,16 @@ export class NavNodeManagerService extends Bootstrap {
     }
   }
 
-  private async navigateHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async navigateHandler(
+    contexts: IContextProvider<INodeNavigationData>,
+    data: INodeNavigationData
+  ): Promise<void | false> {
+    if (this.activeNavigationNodes.includes(data.nodeId)) {
+      return false;
+    }
+
+    this.activeNavigationNodes.push(data.nodeId);
+
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId)) {

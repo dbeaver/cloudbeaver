@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
-  MainMenuService, NavigationService, NavigationTreeService,
+  MainMenuService, NavigationTreeService,
   NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
   ConnectionSchemaManagerService,
   NavigationTabsService, NavigationTreeContextMenuService,
@@ -121,7 +121,6 @@ export const coreManifest: PluginManifest = {
     LogViewerService,
     MainMenuService,
     TopNavService,
-    NavigationService,
     NavigationTabsService,
     DatabaseAuthModelsResource,
     ConnectionAuthService,

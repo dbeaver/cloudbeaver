@@ -17,7 +17,6 @@ export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NavTreeResource';
 export * from './shared/NodesManager/NavNodeExtensionsService';
 export * from './shared/NodesManager/NodeManagerUtils';
-export * from './shared/Navigation/NavigationService';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
@@ -28,7 +27,6 @@ export * from './NavigationTree/NavigationTreeContextMenuService';
 // Models
 export * from './shared/NavigationTabs/ITab';
 export * from './shared/NavigationTabs/TabHandler';
-export * from './shared/Navigation/NavigationContext';
 export * from './shared/TabEntity/TabEntity';
 // Enums
 export * from './shared/NodesManager/ENodeFeature';
@@ -47,7 +45,6 @@ export * from './TopNavBar/SettingsMenu/SettingsMenu';
 export * from './TopNavBar/Logo';
 
 // Interfaces
-export * from './shared/Navigation/INavigator';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NodesManager/EntityTypes';
 

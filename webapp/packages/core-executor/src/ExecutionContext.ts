@@ -15,7 +15,7 @@ export interface IContextLoader<T = any, TData = any> {
   (contexts: IContextProvider<TData>, data: TData): Promise<T> | T;
 }
 
-export class NavigationContext<TData> implements IContextProvider<TData> {
+export class ExecutionContext<TData> implements IContextProvider<TData> {
   private contexts = new Map<IContextLoader<any, TData>, any>()
 
   constructor(private data: TData) { }

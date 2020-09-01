@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IContextProvider } from './NavigationContext';
+import { IExecutorHandler } from './IExecutorHandler';
 
-export interface INavigationHandler<T> {
-  (contexts: IContextProvider<T>, data: T): void | Promise<void>;
+export interface IExecutor<T> {
+  execute(data: T): Promise<void>;
+  addHandler(handler: IExecutorHandler<T>): void;
 }

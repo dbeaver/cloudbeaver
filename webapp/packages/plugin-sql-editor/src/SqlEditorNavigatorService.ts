@@ -6,15 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  NavigationTabsService,
-  INavigator,
-  NavigationService,
-  IContextProvider,
-} from '@cloudbeaver/core-app';
+import { NavigationTabsService } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
 
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlExecutionState } from './SqlExecutionState';
@@ -46,21 +42,18 @@ export interface SQLEditorAction extends SQLEditorActionContext {
 
 @injectable()
 export class SqlEditorNavigatorService {
-  private readonly navigator: INavigator<SQLCreateAction | SQLEditorAction>;
+  private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
 
   constructor(
     private navigationTabsService: NavigationTabsService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource,
-    private navigationService: NavigationService,
     private sqlEditorTabService: SqlEditorTabService
   ) {
 
-    this.navigator = this.navigationService.createNavigator<SQLCreateAction | SQLEditorAction>(
-      null,
-      this.navigateHandler.bind(this)
-    );
+    this.navigator = new Executor<SQLCreateAction | SQLEditorAction>()
+      .addHandler(this.navigateHandler.bind(this));
     this.connectionsManagerService.onCloseConnection.subscribe(this.nodeNavigationHandler.bind(this));
   }
 
@@ -68,7 +61,7 @@ export class SqlEditorNavigatorService {
   }
 
   openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
-    this.navigator.navigateTo({
+    this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       connectionId,
       catalogId,
@@ -77,7 +70,7 @@ export class SqlEditorNavigatorService {
   }
 
   openEditorResult(editorId: string, resultId: string) {
-    this.navigator.navigateTo({
+    this.navigator.execute({
       type: SQLEditorNavigationAction.select,
       editorId,
       resultId,
@@ -85,7 +78,7 @@ export class SqlEditorNavigatorService {
   }
 
   closeEditorResult(editorId: string, resultId: string) {
-    this.navigator.navigateTo({
+    this.navigator.execute({
       type: SQLEditorNavigationAction.close,
       editorId,
       resultId,
