@@ -7,18 +7,20 @@
  */
 
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()
-export class AuthenticationService {
+export class AuthenticationService extends Bootstrap {
   constructor(
     private serverService: ServerService,
     private authDialogService: AuthDialogService,
     private authInfoService: AuthInfoService,
-  ) { }
+  ) {
+    super();
+  }
 
   async auth() {
     const config = await this.serverService.config.load(null);
@@ -38,5 +40,12 @@ export class AuthenticationService {
     if (!config.anonymousAccessEnabled) {
       await this.authDialogService.showLoginForm(true);
     }
+  }
+
+  register(): void | Promise<void> { }
+
+  load() {
+    // we do not await it because to unblock app loading
+    this.auth();
   }
 }

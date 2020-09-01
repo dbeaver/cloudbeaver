@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class UserEditController implements IInitializableController, IDestructibleController {
+export class UserFormController implements IInitializableController, IDestructibleController {
   readonly selectedConnections = observable<string, boolean>(new Map())
   @observable grantedConnections: AdminConnectionGrantInfo[] = [];
   @observable isSaving = false;

@@ -9,11 +9,12 @@
 import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationTools } from '@cloudbeaver/core-administration';
+import { AdministrationTools, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { CreateUser } from './CreateUser';
 import { UsersAdministrationController } from './UsersAdministrationController';
 import { UsersTable } from './UsersTable/UsersTable';
 
@@ -55,7 +56,9 @@ const styles = composes(
   `
 );
 
-export const UsersAdministration = observer(function UsersAdministration() {
+export const UsersAdministration = observer(function UsersAdministration({
+  sub,
+}: AdministrationItemContentProps) {
   const controller = useController(UsersAdministrationController);
 
   return styled(useStyles(styles))(
@@ -67,6 +70,9 @@ export const UsersAdministration = observer(function UsersAdministration() {
             <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
             <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
           </AdministrationTools>
+          {sub && controller.creatingUser && (
+            <CreateUser user={controller.creatingUser} onCancel={controller.cancelCreate} />
+          )}
           <UsersTable
             users={controller.users}
             selectedItems={controller.selectedItems}

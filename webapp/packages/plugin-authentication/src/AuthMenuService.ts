@@ -9,7 +9,7 @@
 import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService } from '@cloudbeaver/core-root';
 
@@ -18,7 +18,7 @@ import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
 
 @injectable()
-export class AuthMenuService {
+export class AuthMenuService extends Bootstrap {
   constructor(
     private serverService: ServerService,
     private authDialogService: AuthDialogService,
@@ -28,7 +28,9 @@ export class AuthMenuService {
     private notificationService: NotificationService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService,
-  ) { }
+  ) {
+    super();
+  }
 
   register() {
     this.settingsMenuService.addMenuItem(
@@ -56,6 +58,8 @@ export class AuthMenuService {
     this.topNavService.placeholder.add(UserInfo, 4);
     this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
   }
+
+  load(): void | Promise<void> { }
 
   private async logout() {
     try {

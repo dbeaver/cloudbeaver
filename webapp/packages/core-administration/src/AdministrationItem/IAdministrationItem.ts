@@ -26,13 +26,13 @@ export type AdministrationItemDrawerComponent = React.FunctionComponent<Administ
 export type AdministrationItemContentProps = {
   item: IAdministrationItem;
   configurationWizard: boolean;
+  sub?: IAdministrationItemSubItem;
+  param?: string | null;
 }
 export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>
 
-export type AdministrationItemSubContentProps = {
-  item: IAdministrationItem;
+export type AdministrationItemSubContentProps = AdministrationItemContentProps & {
   sub: IAdministrationItemSubItem;
-  configurationWizard: boolean;
   param: string | null;
 }
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>
