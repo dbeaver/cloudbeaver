@@ -57,12 +57,25 @@ class CBSecurityController implements DBWSecurityController {
         this.database = database;
     }
 
+    public boolean isSubjectExists(String subjectId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT 1 FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
+                dbStat.setString(1, subjectId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    return dbResult.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while searching credentials", e);
+        }
+    }
+
     ///////////////////////////////////////////
     // Users
 
     @Override
     public void createUser(WebUser user) throws DBCException {
-        if (getUserById(user.getUserId()) != null) {
+        if (isSubjectExists(user.getUserId())) {
             throw new DBCException("User or role '" + user.getUserId() + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
@@ -348,6 +361,9 @@ class CBSecurityController implements DBWSecurityController {
 
     @Override
     public void createRole(WebRole role) throws DBCException {
+        if (isSubjectExists(role.getRoleId())) {
+            throw new DBCException("User or role '" + role.getRoleId() + "' already exists");
+        }
         try (Connection dbCon = database.openConnection()) {
             createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
             try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {

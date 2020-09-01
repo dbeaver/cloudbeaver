@@ -401,6 +401,8 @@ public class CBApplication extends BaseApplicationImpl {
             throw new DBException("Application must be in configuration mode");
         }
 
+        database.finishConfiguration(adminName, adminPassword);
+
         // Save runtime configuration
         log.debug("Saving runtime configuration");
         saveRuntimeConfig(newServerName, appConfig);
@@ -416,8 +418,6 @@ public class CBApplication extends BaseApplicationImpl {
         } catch (Exception e) {
             throw new DBException("Error parsing configuration", e);
         }
-        // Re-create database
-        database.finishConfiguration(adminName, adminPassword);
 
         configurationMode = CommonUtils.isEmpty(serverName);
     }
