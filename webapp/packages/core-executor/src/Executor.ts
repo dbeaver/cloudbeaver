@@ -43,8 +43,16 @@ export class Executor<T> implements IExecutor<T> {
     return this;
   }
 
+  removeHandler(handler: IExecutorHandler<T>) {
+    this.handlers = this.handlers.filter(h => h === handler);
+  }
+
   addPostHandler(handler: IExecutorHandler<T>) {
     this.postHandlers.push(handler);
     return this;
+  }
+
+  removePostHandler(handler: IExecutorHandler<T>) {
+    this.postHandlers = this.postHandlers.filter(h => h === handler);
   }
 }

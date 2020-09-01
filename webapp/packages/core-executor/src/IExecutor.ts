@@ -11,4 +11,7 @@ import { IExecutorHandler } from './IExecutorHandler';
 export interface IExecutor<T> {
   execute(data: T): Promise<void>;
   addHandler(handler: IExecutorHandler<T>): void;
+  removeHandler(handler: IExecutorHandler<T>): void;
+  addPostHandler(handler: IExecutorHandler<T>): void;
+  removePostHandler(handler: IExecutorHandler<T>): void;
 }
