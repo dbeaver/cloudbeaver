@@ -27,13 +27,13 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   credentials,
   authenticate,
 }: Props) {
-  const [elementRef] = useFocus({ focusFirstChild: true });
+  const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const handleChange = useCallback((key: string, value: string) => {
     credentials[key] = value;
   }, [credentials]);
 
   return styled(useStyles(formStyles))(
-    <login-form as='div' ref={elementRef as React.RefObject<HTMLDivElement>}>
+    <login-form as='div' ref={elementRef}>
       {provider.credentialParameters.map(parameter => parameter.user && (
         <group as="div" key={parameter.id}>
           <InputField

@@ -16,18 +16,18 @@ type FocusOptions = {
   onBlur?: () => void;
 }
 
-export function useFocus({
+export function useFocus<T extends HTMLElement>({
   focusFirstChild,
   onFocus,
   onBlur,
-}: FocusOptions): [React.RefObject<HTMLElement>, boolean] {
+}: FocusOptions): [React.RefObject<T>, boolean] {
   const [focus, setFocus] = useState(false);
-  const reference = useRef<HTMLElement>(null);
+  const reference = useRef<T>(null);
 
   useLayoutEffect(() => {
     if (reference.current !== null && focusFirstChild) {
       const firstFocusable = reference.current
-        .querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        .querySelector<T>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
 
       if (firstFocusable) {
         firstFocusable.focus();

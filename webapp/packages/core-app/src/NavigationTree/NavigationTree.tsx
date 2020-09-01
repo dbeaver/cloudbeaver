@@ -47,7 +47,7 @@ const navigationTreeStyles = css`
 export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
   const [onFocus, onBlur] = useActiveView(navTreeService.getView);
-  const [ref] = useFocus({ onFocus, onBlur });
+  const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const nodeChildren = useChildren();
   const isEnabled = usePermission(EPermission.public);
 
@@ -69,7 +69,7 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   return styled(navigationTreeStyles)(
-    <tree as="div" tabIndex={0} ref={ref as React.RefObject<HTMLDivElement>}>
+    <tree as="div" tabIndex={0} ref={ref}>
       {nodeChildren.children.map(id => (
         <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH}/>
       ))}

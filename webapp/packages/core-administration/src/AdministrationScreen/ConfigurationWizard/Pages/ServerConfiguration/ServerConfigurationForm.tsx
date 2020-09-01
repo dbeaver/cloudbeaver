@@ -52,10 +52,10 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
   onSave,
 }: Props) {
   const translate = useTranslate();
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   return styled(useStyles(formStyles, boxStyles))(
-    <SubmittingForm onSubmit={onSave} name='server_config' ref={focusedRef as React.RefObject<HTMLFormElement>}>
+    <SubmittingForm onSubmit={onSave} name='server_config' ref={focusedRef}>
       <box as="div">
         <box-element as='div'>
           <group as="div">
