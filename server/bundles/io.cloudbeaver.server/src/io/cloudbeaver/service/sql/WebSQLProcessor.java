@@ -593,7 +593,7 @@ public class WebSQLProcessor {
                 newRows.add(newRow);
             }
             this.bindings = leafAttributes;
-            rows = newRows;
+            this.rows = newRows;
         }
 
         private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
