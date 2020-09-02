@@ -164,7 +164,8 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value, false);
+    // TODO: probably no more needed because editCellValue executes on every change in editor
+    // this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value, false);
   }
 
   private isCellEdited(rowIndex: number, column: string) {
