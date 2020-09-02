@@ -50,7 +50,6 @@ export interface IAgGridCol {
   icon?: string;
   label?: string;
   name?: string;
-  position?: number;
   dataKind?: string;
   readOnly: boolean;
 }

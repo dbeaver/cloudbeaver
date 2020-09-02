@@ -262,10 +262,10 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
   }
   return [
     INDEX_COLUMN_DEF,
-    ...columns.map(v => ({
+    ...columns.map((v, i) => ({
       colId: v.name,
       headerName: v.label,
-      field: `${v.position}`,
+      field: `${i}`,
       type: v.dataKind,
       editable: (params: any) => {
         const context: AgGridContext = params.context;
@@ -275,12 +275,13 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
         if (!params.data) {
           return '';
         }
+        const value = params.data[params.colDef.field || 'node.id'];
 
-        if (v.dataKind === 'OBJECT') {
-          return getObjectValue(params);
+        if (typeof value === 'object') {
+          return JSON.stringify(value);
         }
 
-        return params.data[params.colDef.field || 'node.id'];
+        return value;
       },
       headerComponentParams: {
         icon: v.icon,
@@ -302,10 +303,6 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       },
     })),
   ];
-}
-
-function getObjectValue({ data, colDef }: ValueGetterParams) {
-  return data[colDef.field || 'node.id'].value;
 }
 
 function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {
