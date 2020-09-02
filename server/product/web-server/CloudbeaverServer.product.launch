@@ -158,12 +158,15 @@
     <setAttribute key="selected_workspace_bundles">
         <setEntry value="com.dbeaver.cloud.aws@default:default"/>
         <setEntry value="com.dbeaver.cloud.model@default:default"/>
+        <setEntry value="com.dbeaver.data.office@default:default"/>
         <setEntry value="com.dbeaver.db.bigtable@default:default"/>
         <setEntry value="com.dbeaver.db.cassandra@default:default"/>
         <setEntry value="com.dbeaver.db.couchbase@default:default"/>
+        <setEntry value="com.dbeaver.db.couchdb@default:default"/>
         <setEntry value="com.dbeaver.db.dynamodb@default:default"/>
         <setEntry value="com.dbeaver.db.influxdb@default:default"/>
         <setEntry value="com.dbeaver.db.mongodb@default:default"/>
+        <setEntry value="com.dbeaver.db.netezza@default:default"/>
         <setEntry value="com.dbeaver.db.postgresql.krb5@default:default"/>
         <setEntry value="com.dbeaver.db.prestodb.krb5@default:default"/>
         <setEntry value="com.dbeaver.db.redis@default:default"/>

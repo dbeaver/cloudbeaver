@@ -27,10 +27,12 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
@@ -152,13 +154,25 @@ public class WebSQLProcessor {
         }
 
         final WebSQLDataFilter dataFilter = filter;
-        final String sqlQuery = sql;
+        final String sqlQueryText = sql;
+        SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
 
         try {
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                 try (DBCSession session = context.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
-                    try (DBCStatement dbStat = session.prepareStatement(DBCStatementType.SCRIPT, sqlQuery, false, false, false)) {
-                        dbStat.setLimit(dataFilter.getOffset(), dataFilter.getLimit());
+                    AbstractExecutionSource source = new AbstractExecutionSource(
+                        dataContainer,
+                        session.getExecutionContext(),
+                        WebSQLProcessor.this,
+                        sqlQuery);
+                    try (DBCStatement dbStat = DBUtils.makeStatement(
+                        source,
+                        session,
+                        DBCStatementType.SCRIPT,
+                        sqlQuery,
+                        dataFilter.getOffset(),
+                        dataFilter.getLimit()))
+                    {
                         boolean hasResultSet = dbStat.executeStatement();
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, dataFilter);
                     } catch (DBCException e) {
@@ -469,7 +483,7 @@ public class WebSQLProcessor {
         private DBSDataContainer dataContainer;
         private WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
-        private DBDAttributeBindingMeta[] bindings;
+        private DBDAttributeBinding[] bindings;
         private List<Object[]> rows = new ArrayList<>();
 
         public WebDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer) {
@@ -497,14 +511,14 @@ public class WebSQLProcessor {
             Object[] row = new Object[bindings.length];
 
             for (int i = 0; i < bindings.length; i++) {
-                DBDAttributeBindingMeta binding = bindings[i];
+                DBDAttributeBinding binding = bindings[i];
                 try {
                     Object cellValue = binding.getValueHandler().fetchValueObject(
                         resultSet.getSession(),
                         resultSet,
                         binding.getMetaAttribute(),
                         i);
-                    row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, cellValue);
+                    row[i] = cellValue;
                 } catch (Throwable e) {
                     row[i] = new DBDValueError(e);
                 }
@@ -524,7 +538,15 @@ public class WebSQLProcessor {
                 log.error("Error binding attributes", e);
             }
 
-            convertComplexValuesToRelationalView();
+            convertComplexValuesToRelationalView(session);
+
+            // Convert row values
+            for (Object[] row : rows) {
+                for (int i = 0; i < bindings.length; i++) {
+                    DBDAttributeBinding binding = bindings[i];
+                    row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, row[i]);
+                }
+            }
 
             webResultSet.setColumns(bindings);
             webResultSet.setRows(rows.toArray(new Object[0][]));
@@ -533,8 +555,56 @@ public class WebSQLProcessor {
             webResultSet.setResultsInfo(resultsInfo);
         }
 
-        private void convertComplexValuesToRelationalView() {
+        private void convertComplexValuesToRelationalView(DBCSession session) {
             // Here we get leaf attributes and refetch them into plain tabl structure
+            List<DBDAttributeBinding> leafBindings = new ArrayList<>();
+            for (DBDAttributeBinding attr : bindings) {
+                collectLeafBindings(attr, leafBindings);
+            }
+            if (CommonUtils.equalObjects(bindings, leafBindings)) {
+                // No complex types
+                return;
+            }
+
+            // Convert original rows into new rows with leaf attributes
+            // Extract values for leaf attributes from original row
+            DBDAttributeBinding[] leafAttributes = leafBindings.toArray(new DBDAttributeBinding[0]);
+            List<Object[]> newRows = new ArrayList<>();
+            for (Object[] row : rows) {
+                Object[] newRow = new Object[leafBindings.size()];
+                for (int i = 0; i < leafBindings.size(); i++) {
+                    DBDAttributeBinding leafAttr = leafBindings.get(i);
+                    try {
+                        //Object topValue = row[leafAttr.getTopParent().getOrdinalPosition()];
+                        Object cellValue = DBUtils.getAttributeValue(leafAttr, leafAttributes, row);
+/*
+                        Object cellValue = leafAttr.getValueHandler().getValueFromObject(
+                            session,
+                            leafAttr,
+                            topValue,
+                            false,
+                            false);
+*/
+                        newRow[i] = cellValue;
+                    } catch (Exception e) {
+                        newRow[i] = new DBDValueError(e);
+                    }
+                }
+                newRows.add(newRow);
+            }
+            this.bindings = leafAttributes;
+            rows = newRows;
+        }
+
+        private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
+            List<DBDAttributeBinding> nestedBindings = attr.getNestedBindings();
+            if (CommonUtils.isEmpty(nestedBindings)) {
+                leafBindings.add(attr);
+            } else {
+                for (DBDAttributeBinding nested : nestedBindings) {
+                    collectLeafBindings(nested, leafBindings);
+                }
+            }
         }
 
         @Override
