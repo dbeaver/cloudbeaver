@@ -515,7 +515,6 @@ public class WebSQLProcessor {
 
         @Override
         public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
-            webResultSet.setRows(rows.toArray(new Object[0][]));
 
             DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;
 
@@ -525,10 +524,17 @@ public class WebSQLProcessor {
                 log.error("Error binding attributes", e);
             }
 
+            convertComplexValuesToRelationalView();
+
             webResultSet.setColumns(bindings);
+            webResultSet.setRows(rows.toArray(new Object[0][]));
 
             WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
             webResultSet.setResultsInfo(resultsInfo);
+        }
+
+        private void convertComplexValuesToRelationalView() {
+            // Here we get leaf attributes and refetch them into plain tabl structure
         }
 
         @Override
