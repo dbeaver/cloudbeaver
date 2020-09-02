@@ -247,12 +247,7 @@ export const INDEX_COLUMN_DEF: ColDef = {
   suppressMenu: true,
   editable: false,
   sortable: false,
-  cellRenderer: (params) => {
-    if (!params.data) {
-      return 'Loading...';
-    }
-    return params.rowIndex + 1;
-  },
+  cellRenderer: 'indexCellRenderer',
 };
 
 function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
