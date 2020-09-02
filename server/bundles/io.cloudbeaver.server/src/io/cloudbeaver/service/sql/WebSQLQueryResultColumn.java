@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBValueFormatting;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
@@ -42,11 +43,14 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public String getName() {
-        return attrMeta.getName();
+        return attrMeta.getFullyQualifiedName(DBPEvaluationContext.UI);
     }
 
     @Property
     public String getLabel() {
+        if (attrMeta.getParentObject() != null) {
+            return attrMeta.getParentObject().getFullyQualifiedName(DBPEvaluationContext.UI) + "." + attrMeta.getLabel();
+        }
         return attrMeta.getLabel();
     }
 
