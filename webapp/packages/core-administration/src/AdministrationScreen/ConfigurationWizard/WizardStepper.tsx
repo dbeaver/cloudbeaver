@@ -79,7 +79,6 @@ export const WizardStepper = observer(function WizardStepper() {
           type="button"
           mod={['unelevated']}
           onClick={() => service.next()}
-          disabled={!service.canNext}
         >
           {translate(service.currentStepIndex === service.steps.length - 1 ? 'ui_stepper_finish' : 'ui_stepper_next')}
         </Button>

@@ -322,12 +322,12 @@ export class TableViewerModel {
     }
   }
 
-  onCellEditingStopped(rowNumber: number, column: string, value: any) {
+  onCellEditingStopped(rowNumber: number, column: string, value: any, editing: boolean) {
     if (this.access === AccessMode.Readonly) {
       return;
     }
 
-    this.tableEditor.editCellValue(rowNumber, column, value);
+    this.tableEditor.editCellValue(rowNumber, column, value, editing);
   }
 
   onSortChanged(sorting: SortModel) {

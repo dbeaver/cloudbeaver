@@ -12,6 +12,7 @@ export type AgGridContext = {
   selection: TableSelection;
   isReadonly(): boolean;
   isCellEdited(rowId: number, column: string): boolean;
+  editCellValue(rowNumber: number, column: string, value: any, editing: boolean): void;
   revertCellValue(rowNumber: number, column: string): void;
   onEditSave(): void;
   onEditCancel(): void;

@@ -20,6 +20,7 @@
     "@cloudbeaver/core-root": "^0.1.0",
     "@cloudbeaver/core-routing": "^0.1.0",
     "@cloudbeaver/core-theming": "^0.1.0",
+    "@cloudbeaver/core-executor": "^0.1.0",
     "react": "^16.x.x",
     "mobx": "^5.x.x",
     "mobx-react": "^6.x.x",

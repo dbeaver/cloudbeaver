@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ExecutionContext } from './ExecutionContext';
+import { ExecutionContext, IContextProvider } from './ExecutionContext';
 import { IExecutor } from './IExecutor';
 import { IExecutorHandler } from './IExecutorHandler';
 
@@ -18,7 +18,7 @@ export class Executor<T> implements IExecutor<T> {
     private defaultData?: T | null
   ) { }
 
-  async execute(data: T) {
+  async execute(data: T): Promise<IContextProvider<T>> {
     if ((data === undefined || data === null) && this.defaultData !== undefined && this.defaultData !== null) {
       data = this.defaultData;
     }
@@ -29,13 +29,14 @@ export class Executor<T> implements IExecutor<T> {
       const result = await handler(context, data);
 
       if (result === false) {
-        return;
+        return context;
       }
     }
 
     for (const handler of this.postHandlers) {
       await handler(context, data);
     }
+    return context;
   }
 
   addHandler(handler: IExecutorHandler<T>) {
@@ -43,8 +44,16 @@ export class Executor<T> implements IExecutor<T> {
     return this;
   }
 
+  removeHandler(handler: IExecutorHandler<T>) {
+    this.handlers = this.handlers.filter(h => h === handler);
+  }
+
   addPostHandler(handler: IExecutorHandler<T>) {
     this.postHandlers.push(handler);
     return this;
+  }
+
+  removePostHandler(handler: IExecutorHandler<T>) {
+    this.postHandlers = this.postHandlers.filter(h => h === handler);
   }
 }

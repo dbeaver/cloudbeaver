@@ -45,7 +45,7 @@ const styles = css`
 export const ConnectionDialog = observer(function ConnectionDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const controller = useController(ConnectionController, rejectDialog);
   const translate = useTranslate();
   let title = translate('basicConnection_connectionDialog_newConnection');
@@ -81,7 +81,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
         </center>
       ) : (
-        <SubmittingForm onSubmit={controller.onConnect} ref={focusedRef as React.RefObject<HTMLFormElement>}>
+        <SubmittingForm onSubmit={controller.onConnect} ref={focusedRef}>
           <ObjectPropertyInfoForm
             prefix={`auth_${controller.template?.id || ''}`}
             autofillToken={`section-${controller.template?.id || ''} section-auth`}

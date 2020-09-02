@@ -41,7 +41,7 @@ const stylesArray = [styles];
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const navigation = useService(NavigationTabsService);
   const [onFocus, onBlur] = useActiveView(navigation.getView);
-  const [ref] = useFocus({ onFocus, onBlur });
+  const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
@@ -62,7 +62,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
       ))}
       style={stylesArray}
       tabIndex={0}
-      ref={ref as React.RefObject<HTMLDivElement>}
+      ref={ref}
     >
       {navigation.tabIdList.map(tabId => (
         <TabPanel key={tabId} tabId={tabId}>

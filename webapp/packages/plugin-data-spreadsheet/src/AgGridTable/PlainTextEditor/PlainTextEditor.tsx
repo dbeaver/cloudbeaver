@@ -71,6 +71,7 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
 
     const handleChange = useCallback((newValue: string) => {
       value.current = newValue;
+      context.editCellValue(props.rowIndex, props.column.getColId(), newValue, true);
       forceUpdate(value.current);
     }, []);
 

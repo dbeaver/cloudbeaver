@@ -61,7 +61,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   rejectDialog,
 }: DialogComponentProps<string, null>) {
   const connection = useConnectionInfo(payload);
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
 
@@ -81,7 +81,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
       {(!connection.isLoaded() || connection.isLoading())
         ? <Loader />
         : (
-          <SubmittingForm onSubmit={controller.login} ref={focusedRef as React.RefObject<HTMLFormElement>}>
+          <SubmittingForm onSubmit={controller.login} ref={focusedRef}>
             <ObjectPropertyInfoForm
               prefix={`auth_${connection.connectionInfo?.id || ''} `}
               autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}

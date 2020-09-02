@@ -55,15 +55,6 @@ export class ConfigurationWizardService {
     });
   }
 
-  @computed get canNext() {
-    if (this.currentStep?.configurationWizardOptions?.isDone
-        && !this.currentStep?.configurationWizardOptions?.isDone()) {
-      return false;
-    }
-
-    return true;
-  }
-
   @computed get nextStep() {
     return this.steps.find((item, index) => {
       if (index <= this.currentStepIndex) {
@@ -112,27 +103,37 @@ export class ConfigurationWizardService {
     const step = this.getStep(name);
 
     if (!step) {
-      return;
+      return false;
+    }
+
+    if (step.configurationWizardOptions?.onValidate) {
+      const isValid = await step.configurationWizardOptions.onValidate();
+      if (!isValid) {
+        return false;
+      }
     }
 
     if (step.configurationWizardOptions?.onFinish) {
       await step.configurationWizardOptions.onFinish();
     }
+    return true;
   }
 
-  next() {
-    if (!this.currentStep || !this.canNext) {
+  async next() {
+    if (!this.currentStep) {
       return;
     }
 
-    this.finishStep(this.currentStep.name);
+    if (!await this.finishStep(this.currentStep.name)) {
+      return;
+    }
 
     if (this.currentStepIndex + 1 < this.steps.length) {
       if (this.nextStep) {
         this.administrationScreenService.navigateToItem(this.nextStep.name);
       }
     } else {
-      this.finish();
+      await this.finish();
     }
   }
 

@@ -31,11 +31,11 @@ export const ConnectionForm = observer(function ConnectionForm({
   controller,
 }: ConnectionFormProps) {
   const translate = useTranslate();
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
 
   return styled(useStyles(formStyles))(
     <connection-form as='div'>
-      <connection-type as="div" ref={focusedRef as React.RefObject<HTMLDivElement>}>
+      <connection-type as="div" ref={focusedRef}>
         <Radio
           name="type"
           id="custom"

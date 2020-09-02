@@ -138,7 +138,7 @@ export const UserForm = observer(function UserForm({
 }: Props) {
   const translate = useTranslate();
   const controller = useController(UserFormController, userId, onCancel);
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const handleLoginChange = useCallback(
     (value: string) => controller.credentials.login = value,
@@ -186,7 +186,7 @@ export const UserForm = observer(function UserForm({
           </Button>
         </TabList>
         <content-box as='div'>
-          <SubmittingForm onSubmit={controller.save} ref={focusedRef as React.RefObject<HTMLFormElement>}>
+          <SubmittingForm onSubmit={controller.save} ref={focusedRef}>
             <TabPanel tabId='info'>
               <flex-box as="div">
                 <flex-box-element as='div'>

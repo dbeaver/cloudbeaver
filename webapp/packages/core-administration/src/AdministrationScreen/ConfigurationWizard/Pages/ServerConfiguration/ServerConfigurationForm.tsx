@@ -7,14 +7,18 @@
  */
 
 import { observer } from 'mobx-react';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
   SubmittingForm, InputGroup, InputField, useFocus, Switch
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
+
+import { ServerConfigurationService } from './ServerConfigurationService';
 
 export const formStyles = css`
   SubmittingForm {
@@ -51,11 +55,22 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
   onChange,
   onSave,
 }: Props) {
+  const service = useService(ServerConfigurationService);
   const translate = useTranslate();
-  const [focusedRef] = useFocus({ focusFirstChild: true });
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+
+  useEffect(() => {
+    const validate = () => {
+      focusedRef.current?.checkValidity();
+      focusedRef.current?.reportValidity();
+    };
+    service.validationTask.addHandler(validate);
+
+    return () => service.validationTask.removeHandler(validate);
+  }, [service]);
 
   return styled(useStyles(formStyles, boxStyles))(
-    <SubmittingForm onSubmit={onSave} name='server_config' ref={focusedRef as React.RefObject<HTMLFormElement>}>
+    <SubmittingForm onSubmit={onSave} name='server_config' ref={focusedRef}>
       <box as="div">
         <box-element as='div'>
           <group as="div">

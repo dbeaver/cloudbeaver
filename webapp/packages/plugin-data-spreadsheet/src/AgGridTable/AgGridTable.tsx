@@ -18,7 +18,7 @@ import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { agGridStyles } from '../styles/styles';
 import { AgGridTableController } from './AgGridTableController';
-import { LoadingCell } from './LoadingCell';
+import { IndexCellRenderer } from './IndexCellRenderer';
 import { PlainTextEditor } from './PlainTextEditor/PlainTextEditor';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 
@@ -40,7 +40,7 @@ async function loader() {
 const agGridComponents = {
   agColumnHeader: TableColumnHeader,
   plainTextEditor: PlainTextEditor,
-  loadingCellRenderer: LoadingCell,
+  indexCellRenderer: IndexCellRenderer,
 };
 
 export const AgGridTable = observer(function AgGridTable({
