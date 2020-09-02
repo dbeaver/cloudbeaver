@@ -48,6 +48,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     selection: this.selection,
     isReadonly: () => this.gridModel.access === AccessMode.Readonly,
     isCellEdited: this.isCellEdited.bind(this),
+    editCellValue: this.editCellValue.bind(this),
     revertCellValue: this.revertCellValue.bind(this),
     onEditSave: this.onEditSave.bind(this),
     onEditCancel: this.onEditCancel.bind(this),
@@ -158,8 +159,12 @@ export class AgGridTableController implements IInitializableController, IDestruc
     this.gridModel.revertCellValue(rowIndex, colId);
   }
 
+  private editCellValue(rowIndex: number, colId: string, value: any, editing: boolean) {
+    this.gridModel.onCellEditingStopped(rowIndex, colId, value, editing);
+  }
+
   private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value);
+    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value, false);
   }
 
   private isCellEdited(rowIndex: number, column: string) {

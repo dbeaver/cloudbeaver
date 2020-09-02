@@ -30,7 +30,7 @@ export class TableEditor {
   /**
    * this method doesn't modify TableRow but create a diff that can be applied later
    */
-  editCellValue(rowId: number, columnKey: string, value: any) {
+  editCellValue(rowId: number, columnKey: string, value: any, editing: boolean) {
     const column = this.dataModel
       .getColumns()
       .find(column => column.name === columnKey);
@@ -42,7 +42,9 @@ export class TableEditor {
     const newValue = this.getOrCreateEditedRow(rowId)
       .setValue(column.position, value);
 
-    this.rowsUpdateSubject.next([rowId]);
+    if (!editing) {
+      this.rowsUpdateSubject.next([rowId]);
+    }
     return newValue;
   }
 
