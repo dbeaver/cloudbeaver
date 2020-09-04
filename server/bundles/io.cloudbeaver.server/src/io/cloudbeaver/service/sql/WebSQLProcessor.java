@@ -41,10 +41,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -284,7 +281,7 @@ public class WebSQLProcessor {
 
                         DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
                         updateBatch.add(rowValues);
-                        DBCStatistics statistics = updateBatch.execute(session);
+                        DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
 
                         // Returns fake resultset with updated row values
                         WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
@@ -381,7 +378,7 @@ public class WebSQLProcessor {
 
                                 DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
                                 updateBatch.add(rowValues);
-                                DBCStatistics statistics = updateBatch.execute(session);
+                                DBCStatistics statistics = updateBatch.execute(session, Collections.emptyMap());
 
                                 totalUpdateCount += statistics.getRowsUpdated();
                                 result.setDuration(result.getDuration() + statistics.getExecuteTime());
