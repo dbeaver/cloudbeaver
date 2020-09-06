@@ -17,29 +17,35 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { StaticImage } from '../StaticImage';
 import { Styles } from './styles';
 
-type ItemListProps = React.PropsWithChildren<{
+type Props = React.PropsWithChildren<{
+  value?: string;
+  placeholder?: string;
   onSearch?(value: string): void;
   className?: string;
 }>
 
-export function ItemListSearch({ onSearch, className }: ItemListProps) {
+export function ItemListSearch({
+  value, placeholder, onSearch, className,
+}: Props) {
   const styles = useContext(Styles);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
   const searchHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+    if (value !== undefined) {
+      setSearch(event.target.value);
+    }
     if (onSearch) {
       onSearch(event.target.value);
     }
-  }, [onSearch]);
+  }, [value, onSearch]);
 
   return styled(useStyles(...(styles || [])))(
     <list-search as="div" className={className}>
       <StaticImage icon='/icons/search.svg' />
       <input
         name='search'
-        placeholder={translate('ui_search')}
-        value={search}
+        placeholder={translate(placeholder || 'ui_search')}
+        value={value ?? search}
         onChange={searchHandler}
         autoComplete="off"
         {...use({ mod: 'surface' })}
