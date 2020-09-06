@@ -210,10 +210,12 @@ export const UserForm = observer(function UserForm({
                     <InputField
                       type='password'
                       name='password'
+                      autoComplete='new-password'
                       value={controller.credentials.password}
                       onChange={handlePasswordChange}
                       disabled={controller.isSaving}
                       mod='surface'
+                      required
                     >
                       {translate('authentication_user_password')}
                     </InputField>
@@ -226,6 +228,7 @@ export const UserForm = observer(function UserForm({
                       onChange={handlePasswordRepeatChange}
                       disabled={controller.isSaving}
                       mod='surface'
+                      required
                     >
                       {translate('authentication_user_password_repeat')}
                     </InputField>

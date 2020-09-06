@@ -18,12 +18,14 @@ import { formStyles } from './formStyles';
 
 type Props = {
   properties: ObjectPropertyInfo[] | undefined;
-  credentials: any;
+  credentials: Record<string, string | number>;
   processing: boolean;
   prefix?: string;
   autofillToken?: string;
   className?: string;
 }
+
+const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
 export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   properties,
@@ -51,7 +53,7 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
             value={credentials[property.id!]}
             onChange={value => handleChange(property.id!, value)}
             disabled={processing}
-            autoComplete={autofillToken === 'off' ? 'off' : `${autofillToken} ${property.id}`}
+            autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
             mod='surface'
           >
             {property.displayName}

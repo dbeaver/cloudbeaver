@@ -103,6 +103,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
             type="password"
             name="adminPassword"
             state={serverConfig}
+            autoComplete='new-password'
             mod='surface'
             required
             long

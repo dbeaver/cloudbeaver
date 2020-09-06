@@ -18,9 +18,7 @@ import { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';
 
-type PropertiesState = {
-  [key: string]: string;
-}
+type PropertiesState = Record<string, string>
 
 type PropertiesTableProps = {
   properties: IProperty[];

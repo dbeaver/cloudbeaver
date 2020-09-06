@@ -180,10 +180,8 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private isRoleSelected() {
-    const rolesState = Array.from(this.credentials.roles.values())
-      .filter(Boolean);
-
-    return rolesState.length > 0;
+    return Array.from(this.credentials.roles.values())
+      .some(Boolean);
   }
 
   private async updateRoles() {
