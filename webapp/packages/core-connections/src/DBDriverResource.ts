@@ -53,6 +53,16 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     return this.data;
   }
 
+  compare(driverA: DBDriver, driverB: DBDriver): number {
+
+    if (driverA.promotedScore === driverB.promotedScore)
+    {
+      return (driverA.name || '').localeCompare((driverB.name || ''));
+    }
+
+    return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
+  }
+
   protected async loader(key: string): Promise<Map<string, DBDriver>> {
     const { driverList } = await this.graphQLService.gql.driverList();
 
