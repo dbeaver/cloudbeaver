@@ -85,13 +85,22 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
       ],
       component: ConfigurationWizardScreen,
       onActivate: this.handleActivate.bind(this),
+      onDeactivate: this.handleDeactivate.bind(this),
     });
   }
 
   async load() {
-    const config = await this.serverConfigResource.load(null);
+    await this.serverConfigResource.load(null);
 
-    if (config?.configurationMode && !this.screenService.isActive(AdministrationScreenService.setupName)) {
+    if (this.administrationScreenService.isConfigurationMode
+      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
+      this.administrationScreenService.navigateToRoot();
+    }
+  }
+
+  private async handleDeactivate() {
+    if (this.administrationScreenService.isConfigurationMode
+      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }

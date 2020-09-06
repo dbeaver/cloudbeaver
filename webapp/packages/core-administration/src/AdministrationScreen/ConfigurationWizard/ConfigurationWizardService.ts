@@ -130,7 +130,10 @@ export class ConfigurationWizardService {
 
     if (this.currentStepIndex + 1 < this.steps.length) {
       if (this.nextStep) {
-        this.administrationScreenService.navigateToItem(this.nextStep.name);
+        this.administrationScreenService.navigateTo(
+          this.nextStep.name,
+          this.nextStep.configurationWizardOptions?.defaultRoute
+        );
       }
     } else {
       await this.finish();
@@ -143,7 +146,8 @@ export class ConfigurationWizardService {
     }
 
     if (this.currentStepIndex - 1 >= 0) {
-      this.administrationScreenService.navigateToItem(this.steps[this.currentStepIndex - 1].name);
+      const step = this.steps[this.currentStepIndex - 1];
+      this.administrationScreenService.navigateTo(step.name, step.configurationWizardOptions?.defaultRoute);
     }
   }
 

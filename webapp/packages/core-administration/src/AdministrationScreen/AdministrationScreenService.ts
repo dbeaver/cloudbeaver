@@ -14,6 +14,7 @@ import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
+import { IRouteParams } from './IRouteParams';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 
@@ -74,6 +75,14 @@ export class AdministrationScreenService {
       this.routerService.router.navigate(AdministrationScreenService.setupName);
     } else {
       this.routerService.router.navigate(AdministrationScreenService.screenName);
+    }
+  }
+
+  navigateTo(item: string, params?: IRouteParams) {
+    if (!params) {
+      this.navigateToItem(item);
+    } else {
+      this.navigateToItemSub(item, params.sub, params.param);
     }
   }
 

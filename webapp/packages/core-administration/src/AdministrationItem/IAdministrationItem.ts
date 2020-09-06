@@ -8,6 +8,8 @@
 
 import { Style } from '@cloudbeaver/core-theming';
 
+import { IRouteParams } from '../AdministrationScreen/IRouteParams';
+
 export enum AdministrationItemType {
   Default,
   Administration,
@@ -54,6 +56,7 @@ export interface IAdministrationItemSubItem {
 
 export interface IConfigurationWizardItemOptions {
   description: string;
+  defaultRoute?: IRouteParams;
   onValidate?: () => Promise<boolean> | boolean;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
