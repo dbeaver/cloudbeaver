@@ -193,13 +193,6 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     return this.data;
   }
 
-  private isConnectionsLoaded(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      return this.get(key).every(user => !!user?.grantedConnections);
-    }
-    return !!this.get(key)?.grantedConnections;
-  }
-
   private isActiveUser(userId: string) {
     return this.authInfoService.userInfo?.userId === userId;
   }
