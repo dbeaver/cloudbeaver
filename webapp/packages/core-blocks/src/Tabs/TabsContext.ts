@@ -9,6 +9,11 @@
 import { createContext } from 'react';
 import { TabStateReturn } from 'reakit/Tab';
 
-export const TabsContext = createContext<TabStateReturn | undefined>(
+export interface ITabsContext {
+  state: TabStateReturn;
+  select: (tabId: string) => any;
+}
+
+export const TabsContext = createContext<ITabsContext | undefined>(
   undefined
 );

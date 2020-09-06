@@ -7,22 +7,23 @@
  */
 
 import { observer } from 'mobx-react';
-import {
-  useContext, PropsWithChildren,
-} from 'react';
-import { TabPanel as BaseTabPanel } from 'reakit/Tab';
+import { useContext } from 'react';
+import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
 import { TabsContext } from './TabsContext';
 
-type TabProps = PropsWithChildren<{
+type TabProps = {
   tabId: string;
   className?: string;
-}>;
+  children?: React.ReactNode | ((state: TabStateReturn) => React.ReactNode);
+  lazy?: boolean;
+};
 
 export const TabPanel = observer(function TabPanel({
   tabId,
   children,
   className,
+  lazy,
 }: TabProps) {
   const state = useContext(TabsContext);
 
@@ -30,8 +31,20 @@ export const TabPanel = observer(function TabPanel({
     throw new Error('Tabs context was not provided');
   }
 
+  if (lazy && state.state.selectedId !== tabId) {
+    return null;
+  }
+
+  if (typeof children === 'function') {
+    return (
+      <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+        {children(state.state)}
+      </BaseTabPanel>
+    );
+  }
+
   return (
-    <BaseTabPanel {...state} tabId={tabId} className={className}>
+    <BaseTabPanel {...state.state} tabId={tabId} className={className}>
       {children}
     </BaseTabPanel>
   );

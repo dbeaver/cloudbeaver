@@ -18,5 +18,5 @@ export function TabList(props: React.PropsWithChildren<Omit<TabListOptions, keyo
     throw new Error('Tabs context was not provided');
   }
 
-  return <BaseTabList {...props} {...state} />;
+  return <BaseTabList {...props} {...state.state} />;
 }

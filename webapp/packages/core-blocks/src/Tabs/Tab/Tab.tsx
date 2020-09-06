@@ -38,10 +38,11 @@ export function Tab({
 
   const handleOpen = useCallback((e: React.MouseEvent<any>) => {
     e.preventDefault();
+    state.select(tabId);
     if (onOpen) {
       onOpen(tabId);
     }
-  }, [onOpen]);
+  }, [state, onOpen, tabId]);
 
   const handleClose = useCallback((e: React.MouseEvent<any>) => {
     e.preventDefault();
@@ -49,11 +50,11 @@ export function Tab({
     if (onClose) {
       onClose(tabId);
     }
-  }, [onClose]);
+  }, [onClose, tabId]);
 
   return styled(useStyles())(
     <BaseTab
-      {...state}
+      {...state.state}
       id={tabId}
       className={className}
       onClick={handleOpen}
