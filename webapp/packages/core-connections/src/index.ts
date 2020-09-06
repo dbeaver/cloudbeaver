@@ -1,4 +1,5 @@
 export * from './Administration/Connections/ConnectionsAdministration';
+export * from './Administration/Connections/ConnectionsAdministrationNavService';
 export * from './Administration/Connections/ConnectionsAdministrationService';
 export * from './Administration/ConnectionsResource';
 

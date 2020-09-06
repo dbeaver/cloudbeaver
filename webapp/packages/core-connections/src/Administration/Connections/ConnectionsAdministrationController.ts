@@ -14,23 +14,15 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { DriverSelectDialog } from '../../DriverSelectDialog/DriverSelectDialog';
 import { ConnectionsResource, isSearchedConnection } from '../ConnectionsResource';
+import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 @injectable()
 export class ConnectionsAdministrationController {
-  @observable hosts = 'localhost';
   @observable isProcessing = false;
-  @observable isSearching = false;
   readonly selectedItems = observable<string, boolean>(new Map())
   readonly expandedItems = observable<string, boolean>(new Map())
   readonly error = new GQLErrorCatcher();
-
-  @computed
-  get findConnections() {
-    return Array.from(this.connectionsResource.data.values())
-      .filter(isSearchedConnection);
-  }
 
   @computed
   get connections() {
@@ -61,51 +53,13 @@ export class ConnectionsAdministrationController {
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
     private commonDialogService: CommonDialogService,
+    private connectionsAdministrationNavService: ConnectionsAdministrationNavService
   ) { }
 
-  create = async () => {
-    const driverId = await this.commonDialogService.open(DriverSelectDialog, null);
-    if (!driverId) {
-      return;
-    }
+  setCreateMethod = (method: string) => this.connectionsAdministrationNavService.navToCreate(method);
+  cancelCreate = () => this.connectionsAdministrationNavService.navToRoot();
 
-    const connectionInfo = this.connectionsResource.addNew(driverId);
-    this.expandedItems.set(connectionInfo.id, true);
-  }
-
-  findDatabase = () => {
-    this.isSearching = !this.isSearching;
-  }
-
-  search = async () => {
-    if (this.isProcessing || !this.hosts || !this.hosts.trim()) {
-      return;
-    }
-
-    this.isProcessing = true;
-    for (const connection of this.findConnections) {
-      this.expandedItems.delete(connection.id);
-    }
-
-    try {
-      const hosts = this.hosts
-        .trim()
-        .replace(/[\s,|+-]+/gm, ' ')
-        .split(/[\s,|+-]/);
-
-      await this.connectionsResource.searchDatabases(hosts);
-    } catch (exception) {
-      if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'Databases search failed');
-      }
-    } finally {
-      this.isProcessing = false;
-    }
-  }
-
-  onSearchChange = (hosts: string) => {
-    this.hosts = hosts;
-  }
+  create = () => this.connectionsAdministrationNavService.navToCreate('driver');
 
   update = async () => {
     try {

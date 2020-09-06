@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationItemService, AdministrationScreenService, AdministrationItemType } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -19,7 +19,6 @@ import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 export class ConnectionsAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
-    private administrationScreenService: AdministrationScreenService,
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource,
@@ -33,8 +32,15 @@ export class ConnectionsAdministrationService extends Bootstrap {
       type: AdministrationItemType.Default,
       order: 2,
       configurationWizardOptions: {
+        defaultRoute: { sub: 'create', param: 'search-database' },
         description: 'connections_administration_configuration_wizard_step_description',
       },
+      sub: [
+        {
+          name: 'create',
+          getComponent: () => ConnectionsAdministration,
+        },
+      ],
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onActivate: this.loadConnections.bind(this),
@@ -42,18 +48,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
-
-  navToRoot() {
-    this.administrationScreenService.navigateToItem('connections');
-  }
-
-  navToCreate() {
-    this.administrationScreenService.navigateToItemSub('connections', 'create');
-  }
-
-  navToEdit(userId: string) {
-    this.administrationScreenService.navigateToItemSub('connections', 'edit', userId);
-  }
 
   private async loadConnections() {
     try {

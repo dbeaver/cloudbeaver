@@ -8,27 +8,30 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
 import {
-  ListItem, ListItemIcon, ListItemName, ListItemDescription, StaticImage
+  ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
 } from '@cloudbeaver/core-blocks';
 
-export interface IDriver {
-  id: string;
-  icon?: string;
-  name?: string;
-  description?: string;
-}
+import { DBDriver } from '../../../DBDriverResource';
 
-type DriverProps = {
-  driver: IDriver;
+const styles = css`
+  StaticImage {
+    box-sizing: border-box;
+    width: 32px;
+  }
+`;
+
+type Props = {
+  driver: DBDriver;
   onSelect(driverId: string): void;
 }
 
-export const Driver = observer(function Driver({ driver, onSelect }: DriverProps) {
+export const Driver = observer(function Driver({ driver, onSelect }: Props) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
 
-  return (
+  return styled(styles)(
     <ListItem onClick={select}>
       <ListItemIcon><StaticImage icon={driver.icon}/></ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>

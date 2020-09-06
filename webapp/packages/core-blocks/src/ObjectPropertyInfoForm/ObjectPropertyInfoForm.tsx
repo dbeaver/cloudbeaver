@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { InputField } from '@cloudbeaver/core-blocks';
@@ -19,8 +18,7 @@ import { formStyles } from './formStyles';
 type Props = {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
-  processing: boolean;
-  prefix?: string;
+  disabled?: boolean;
   autofillToken?: string;
   className?: string;
 }
@@ -30,14 +28,10 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
-  processing,
-  prefix = '',
+  disabled,
   autofillToken = '',
   className,
 }: Props) {
-  const handleChange = useCallback((key: string, value: string) => {
-    credentials[key] = value;
-  }, [credentials]);
 
   if (!properties || properties.length === 0) {
     return styled(useStyles(formStyles))(<center as="div">Properties empty</center>);
@@ -49,10 +43,9 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
         <group as="div" key={property.id}>
           <InputField
             type={property.features.includes('password') ? 'password' : 'text'}
-            name={`${prefix}_${property.id}`}
-            value={credentials[property.id!]}
-            onChange={value => handleChange(property.id!, value)}
-            disabled={processing}
+            name={property.id!}
+            state={credentials}
+            disabled={disabled}
             autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
             mod='surface'
           >

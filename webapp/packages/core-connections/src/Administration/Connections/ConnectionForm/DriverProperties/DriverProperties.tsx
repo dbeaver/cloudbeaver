@@ -7,14 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, PropertiesTable } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { DBDriver } from '../../../../DBDriverResource';
 import { DriverPropertiesController } from './DriverPropertiesController';
 
 const styles = css`
@@ -24,35 +23,34 @@ const styles = css`
     flex-direction: column;
     overflow: auto;
   }
+  center {
+    margin: auto;
+  }
 `;
 
-type DriverPropertyState = {
-  [key: string]: string;
-}
-
 type DriverPropertiesProps = {
-  driver: DBDriver;
-  state: DriverPropertyState;
+  driverId: string;
+  state: Record<string, string>;
   loadProperties: boolean;
 }
 
 export const DriverProperties = observer(function DriverProperties({
-  driver,
+  driverId,
   state,
   loadProperties,
 }: DriverPropertiesProps) {
-  const controller = useController(DriverPropertiesController, driver);
+  const controller = useController(DriverPropertiesController, driverId);
 
-  useEffect(() => {
+  useMemo(() => {
     if (loadProperties) {
       controller.loadDriverProperties();
     }
-  }, [loadProperties]);
+  }, [loadProperties, controller]);
 
   return styled(useStyles(styles))(
     <properties as="div">
       {controller.isLoading && <Loader />}
-      {!controller.isLoading && (
+      {!controller.isLoading && controller.loaded && (
         <PropertiesTable
           properties={controller.driverProperties}
           propertiesState={state}

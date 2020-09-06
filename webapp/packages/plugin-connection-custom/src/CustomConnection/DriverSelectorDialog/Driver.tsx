@@ -9,7 +9,9 @@
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
-import { ListItem } from '@cloudbeaver/core-blocks';
+import {
+  ListItem, ListItemIcon, ListItemName, ListItemDescription, StaticImage
+} from '@cloudbeaver/core-blocks';
 
 export interface IDriver {
   id: string;
@@ -26,5 +28,11 @@ type DriverProps = {
 export const Driver = observer(function Driver({ driver, onSelect }: DriverProps) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
 
-  return <ListItem icon={driver.icon} name={driver.name} description={driver.description} onClick={select}/>;
+  return (
+    <ListItem onClick={select}>
+      <ListItemIcon><StaticImage icon={driver.icon}/></ListItemIcon>
+      <ListItemName>{driver.name}</ListItemName>
+      <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>
+    </ListItem>
+  );
 });

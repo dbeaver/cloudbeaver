@@ -81,11 +81,10 @@ export const ConnectionForm = observer(function ConnectionForm({
             <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
           </group>
           <ObjectPropertyInfoForm
-            prefix={`auth_${driver?.id || ''}`}
             autofillToken={`section-${driver?.id || ''} section-auth`}
             properties={controller.authModel.properties}
             credentials={controller.config.credentials}
-            processing={controller.isConnecting}
+            disabled={controller.isConnecting}
           />
         </>
       )}

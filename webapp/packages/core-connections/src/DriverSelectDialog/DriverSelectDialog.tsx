@@ -38,7 +38,10 @@ export const DriverSelectDialog = observer(function DriverSelectDialog({
 
   useEffect(() => { dbDriverResource.loadAll(); }, []);
   const isLoading = dbDriverResource.isLoading();
-  const drivers = useMemo(() => computed(() => Array.from(dbDriverResource.data.values())), [dbDriverResource.data]);
+  const drivers = useMemo(() => computed(() => (
+    Array.from(dbDriverResource.data.values())
+      .sort((a, b) => dbDriverResource.compare(a, b))
+  )), [dbDriverResource.data]);
 
   return styled(styles)(
     <CommonDialogWrapper
