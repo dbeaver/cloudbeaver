@@ -100,9 +100,9 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     this.set(userId, user as AdminUserInfo);
 
     try {
-      this.updateCredentials(userId, credentials);
+      await this.updateCredentials(userId, credentials);
       for (const roleId of roles) {
-        await this.grantRole(userId, roleId);
+        await this.grantRole(userId, roleId, true);
       }
 
       await this.setConnections(userId, grantedConnections);
