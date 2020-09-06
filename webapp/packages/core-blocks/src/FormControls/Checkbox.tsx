@@ -7,12 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
+import { FormContext } from './FormContext';
 
 const styles = css`
   checkbox {
@@ -57,21 +58,20 @@ type CheckboxType = {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }
 
-export const Checkbox: CheckboxType = observer(function Checkbox(
-  props: ControlledProps | ObjectProps<any, any>
-) {
-  const {
-    name,
-    value,
-    state,
-    checkboxLabel,
-    children,
-    className,
-    mod,
-    long,
-    onChange,
-    ...rest
-  } = props;
+export const Checkbox: CheckboxType = observer(function Checkbox({
+  name,
+  value,
+  state,
+  checkboxLabel,
+  checked: checkedControlled,
+  children,
+  className,
+  mod,
+  long,
+  onChange,
+  ...rest
+}: ControlledProps | ObjectProps<any, any>) {
+  const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
@@ -80,9 +80,12 @@ export const Checkbox: CheckboxType = observer(function Checkbox(
     if (onChange) {
       onChange(event.target.checked, name);
     }
-  }, [state, name, onChange]);
+    if (context) {
+      context.onChange(event.target.checked, name);
+    }
+  }, [state, name, onChange, context]);
 
-  const checked = state ? state[name] : props.checked;
+  const checked = state ? state[name] : checkedControlled;
 
   return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className} {...use({ long })}>

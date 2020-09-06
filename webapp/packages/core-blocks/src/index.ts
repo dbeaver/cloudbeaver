@@ -15,6 +15,7 @@ export * from './Tabs';
 export * from './Button';
 export * from './FormControls/Checkbox';
 export * from './FormControls/Combobox';
+export * from './FormControls/FormContext';
 export * from './FormControls/InputField';
 export * from './FormControls/InputGroup';
 export * from './FormControls/Radio';

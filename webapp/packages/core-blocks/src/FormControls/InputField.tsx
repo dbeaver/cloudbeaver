@@ -7,12 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
+import { FormContext } from './FormContext';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
   mod?: 'surface';
@@ -40,20 +41,19 @@ type InputFieldType = {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }
 
-export const InputField: InputFieldType = observer(function InputField(
-  props: ControlledProps | ObjectProps<any, any>
-) {
-  const {
-    name,
-    required,
-    state,
-    children,
-    className,
-    mod,
-    long,
-    onChange,
-    ...rest
-  } = props;
+export const InputField: InputFieldType = observer(function InputField({
+  name,
+  value: valueControlled,
+  required,
+  state,
+  children,
+  className,
+  mod,
+  long,
+  onChange,
+  ...rest
+}: ControlledProps | ObjectProps<any, any>) {
+  const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
@@ -62,9 +62,12 @@ export const InputField: InputFieldType = observer(function InputField(
     if (onChange) {
       onChange(event.target.value, name);
     }
-  }, [state, name, onChange]);
+    if (context) {
+      context.onChange(event.target.value, name);
+    }
+  }, [state, name, context, onChange]);
 
-  const value = state ? state[name] : props.value;
+  const value = state ? state[name] : valueControlled;
 
   return styled(useStyles(baseFormControlStyles))(
     <field as="div" className={className} {...use({ long })}>

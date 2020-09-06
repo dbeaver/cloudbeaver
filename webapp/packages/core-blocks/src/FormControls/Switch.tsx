@@ -7,12 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
+import { FormContext } from './FormContext';
 
 const switchStyles = composes(
   css`
@@ -96,21 +97,22 @@ type SwitchType = {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }
 
-export const Switch: SwitchType = observer(function Switch(props: ControlledProps | ObjectProps<any, any>) {
-  const {
-    name,
-    id,
-    label,
-    description,
-    state,
-    className,
-    children,
-    onChange,
-    mod = [],
-    long,
-    disabled,
-    ...rest
-  } = props;
+export const Switch: SwitchType = observer(function Switch({
+  name,
+  id,
+  label,
+  description,
+  state,
+  checked: checkedControlled,
+  className,
+  children,
+  onChange,
+  mod = [],
+  long,
+  disabled,
+  ...rest
+}: ControlledProps | ObjectProps<any, any>) {
+  const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
@@ -119,9 +121,12 @@ export const Switch: SwitchType = observer(function Switch(props: ControlledProp
     if (onChange) {
       onChange(event.target.checked, name);
     }
-  }, [state, name, onChange]);
+    if (context) {
+      context.onChange(event.target.checked, name);
+    }
+  }, [state, name, context, onChange]);
 
-  const checked = state ? state[name] : props.checked;
+  const checked = state ? state[name] : checkedControlled;
 
   return styled(useStyles(
     baseFormControlStyles,

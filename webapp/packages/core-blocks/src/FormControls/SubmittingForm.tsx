@@ -6,14 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, forwardRef } from 'react';
+import { useCallback, forwardRef, useMemo } from 'react';
 
-type FormDetailedProps = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>
+import { FormContext } from './FormContext';
+
+type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange'> & {
+  onChange?(value: string | number | boolean, name: string | undefined): void;
+}
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
   {
     children,
     onSubmit,
+    onChange = () => {},
     ...rest
   },
   ref
@@ -25,9 +30,13 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
     }
   }, [onSubmit]);
 
+  const context = useMemo(() => ({ onChange }), [onChange]);
+
   return (
     <form {...rest} onSubmit={handleSubmit} ref={ref}>
-      {children}
+      <FormContext.Provider value={context}>
+        {children}
+      </FormContext.Provider>
       <button type="submit" hidden />
     </form>
   );
