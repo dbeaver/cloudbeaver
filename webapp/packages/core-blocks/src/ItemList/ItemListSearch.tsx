@@ -31,7 +31,7 @@ export function ItemListSearch({
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
   const searchHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (value !== undefined) {
+    if (value === undefined) {
       setSearch(event.target.value);
     }
     if (onSearch) {
