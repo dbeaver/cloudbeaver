@@ -25,22 +25,19 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { EConnectionType } from '../EConnectionType';
+import { IConnectionFormModel } from '../IConnectionFormModel';
 import { formStyles } from './formStyles';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
 
 type Props = {
-  connection: ConnectionInfo;
+  model: IConnectionFormModel;
   type: EConnectionType;
-  credentials: Record<string, string | number>;
-  availableDrivers: string[];
   saving?: boolean;
   disabled?: boolean;
-  editing?: boolean;
   onTypeChange(type: EConnectionType): void;
   onSave?(): void;
 }
@@ -65,17 +62,14 @@ const styles = css`
 `;
 
 export const Options = observer(function Options({
-  connection,
+  model,
   type,
-  availableDrivers,
-  credentials,
   disabled,
   saving,
-  editing,
   onTypeChange,
   onSave,
 }: Props) {
-  const controller = useController(OptionsController, connection, credentials, availableDrivers);
+  const controller = useController(OptionsController, model);
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
@@ -86,22 +80,22 @@ export const Options = observer(function Options({
           <group as="div">
             <Checkbox
               name="template"
-              value={connection.id}
-              state={connection}
+              value={model.connection.id}
+              state={model.connection}
               checkboxLabel={translate('connections_connection_template')}
-              disabled={editing || disabled}
+              disabled={model.editing || disabled}
               mod='surface'
             />
           </group>
           <group as="div">
             <Combobox
               name='driverId'
-              state={connection}
+              state={model.connection}
               items={controller.drivers}
               keySelector={driver => driver.id}
               valueSelector={driver => driver?.name!}
               onSelect={controller.onSelectDriver}
-              readOnly={editing || controller.drivers.length < 2}
+              readOnly={model.editing || controller.drivers.length < 2}
               mod={'surface'}
               disabled={disabled}
             >
@@ -112,7 +106,7 @@ export const Options = observer(function Options({
             <InputField
               type="text"
               name="name"
-              state={connection}
+              state={model.connection}
               disabled={disabled}
               mod='surface'
             >
@@ -123,7 +117,7 @@ export const Options = observer(function Options({
             <Textarea
               name="description"
               rows={3}
-              state={connection}
+              state={model.connection}
               disabled={disabled}
               mod='surface'
             >
@@ -145,7 +139,7 @@ export const Options = observer(function Options({
           <TabsState currentTabId={type}>
             <TabPanel tabId={EConnectionType.Parameters}>
               <ParametersForm
-                connection={connection}
+                connection={model.connection}
                 embedded={controller.driver?.embedded}
                 disabled={disabled || saving}
               />
@@ -155,7 +149,7 @@ export const Options = observer(function Options({
                 <InputField
                   type="text"
                   name="url"
-                  state={connection}
+                  state={model.connection}
                   disabled={disabled}
                   autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
                   mod='surface'
@@ -173,7 +167,7 @@ export const Options = observer(function Options({
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
                 properties={controller.authModel.properties}
-                credentials={credentials}
+                credentials={model.credentials}
                 disabled={disabled}
               />
             </>

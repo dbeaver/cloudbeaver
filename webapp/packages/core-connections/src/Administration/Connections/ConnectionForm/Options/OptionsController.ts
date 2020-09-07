@@ -6,42 +6,40 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action, computed } from 'mobx';
+import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../../../DBDriverResource';
+import { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class OptionsController
 implements IInitializableController {
-  @observable credentials!: Record<string, number | string>;
-  @observable availableDrivers!: string[];
 
   @computed get drivers() {
     return Array.from(this.dbDriverResource.data.values())
-      .filter(({ id }) => this.availableDrivers.includes(id));
+      .filter(({ id }) => this.model.availableDrivers.includes(id));
   }
 
   @computed get driver() {
-    return this.dbDriverResource.get(this.connectionInfo.driverId);
+    return this.dbDriverResource.get(this.model.connection.driverId);
   }
 
   @computed get authModel() {
-    if (!this.connectionInfo?.authModel && !this.driver) {
+    if (!this.model.connection?.authModel && !this.driver) {
       return null;
     }
-    return this.dbAuthModelsResource.get(this.connectionInfo?.authModel || this.driver!.defaultAuthModel) || null;
+    return this.dbAuthModelsResource.get(this.model.connection?.authModel || this.driver!.defaultAuthModel) || null;
   }
 
   @computed get authModelLoading() {
     return this.dbAuthModelsResource.isLoading();
   }
 
-  private connectionInfo!: ConnectionInfo;
+  private model!: IConnectionFormModel;
   private nameTemplate = /^.*?\s(|\(.*?\)\s)connection$/
 
   constructor(
@@ -50,10 +48,8 @@ implements IInitializableController {
     private dbDriverResource: DBDriverResource,
   ) { }
 
-  init(connection: ConnectionInfo, credentials: Record<string, number | string>, availableDrivers: string[]) {
-    this.connectionInfo = connection;
-    this.credentials = credentials;
-    this.availableDrivers = availableDrivers;
+  init(model: IConnectionFormModel) {
+    this.model = model;
     this.loadDrivers();
   }
 
@@ -63,34 +59,34 @@ implements IInitializableController {
   @action
   private setDefaults(prevDriverId: string | null) {
     this.setDefaultParameters(prevDriverId);
-    this.connectionInfo.properties = {};
-    this.connectionInfo.authModel = this.driver?.defaultAuthModel;
+    this.model.connection.properties = {};
+    this.model.connection.authModel = this.driver?.defaultAuthModel;
     this.cleanCredentials();
   }
 
   private cleanCredentials() {
-    for (const property of Object.keys(this.credentials)) {
-      delete this.credentials[property];
+    for (const property of Object.keys(this.model.credentials)) {
+      delete this.model.credentials[property];
     }
   }
 
   private setDefaultParameters(prevDriverId?: string | null) {
     const prevDriver = this.dbDriverResource.get(prevDriverId || '');
 
-    if (this.connectionInfo.host === prevDriver?.defaultServer) {
-      this.connectionInfo.host = this.driver?.defaultServer;
+    if (this.model.connection.host === prevDriver?.defaultServer) {
+      this.model.connection.host = this.driver?.defaultServer;
     }
 
-    if (this.connectionInfo.port === prevDriver?.defaultPort) {
-      this.connectionInfo.port = this.driver?.defaultPort;
+    if (this.model.connection.port === prevDriver?.defaultPort) {
+      this.model.connection.port = this.driver?.defaultPort;
     }
 
-    if (this.connectionInfo.databaseName === prevDriver?.defaultDatabase) {
-      this.connectionInfo.databaseName = this.driver?.defaultDatabase;
+    if (this.model.connection.databaseName === prevDriver?.defaultDatabase) {
+      this.model.connection.databaseName = this.driver?.defaultDatabase;
     }
 
-    if (this.connectionInfo.url === prevDriver?.sampleURL) {
-      this.connectionInfo.url = this.driver?.sampleURL;
+    if (this.model.connection.url === prevDriver?.sampleURL) {
+      this.model.connection.url = this.driver?.sampleURL;
     }
 
     this.updateName();
@@ -100,17 +96,17 @@ implements IInitializableController {
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
       .filter(Boolean);
 
-    if (!this.connectionInfo.name
-        || (this.nameTemplate.test(this.connectionInfo.name)
-            && databaseNames.some(driver => this.connectionInfo.name.startsWith(driver)))
+    if (!this.model.connection.name
+        || (this.nameTemplate.test(this.model.connection.name)
+            && databaseNames.some(driver => this.model.connection.name.startsWith(driver)))
     ) {
-      this.connectionInfo.name = this.getNameTemplate();
+      this.model.connection.name = this.getNameTemplate();
     }
   }
 
   private getNameTemplate() {
     if (this.driver) {
-      let address = [this.connectionInfo.host, this.connectionInfo.host && this.connectionInfo.port]
+      let address = [this.model.connection.host, this.model.connection.host && this.model.connection.port]
         .filter(Boolean)
         .join(':');
 
@@ -135,12 +131,12 @@ implements IInitializableController {
 
       try {
         await this.dbAuthModelsResource.load(
-          this.connectionInfo?.authModel || this.driver.defaultAuthModel
+          this.model.connection?.authModel || this.driver.defaultAuthModel
         );
 
         if (this.authModel) {
-          for (const property of this.connectionInfo.authProperties) {
-            this.credentials[property.id!] = property.value;
+          for (const property of this.model.connection.authProperties) {
+            this.model.credentials[property.id!] = property.value;
           }
         }
       } catch (exception) {
@@ -153,7 +149,7 @@ implements IInitializableController {
 
   private async loadDriver(driverId: string | null, prev: string | null) {
     if (!driverId) {
-      this.connectionInfo.authModel = undefined;
+      this.model.connection.authModel = undefined;
       this.cleanCredentials();
       return;
     }
@@ -171,12 +167,12 @@ implements IInitializableController {
 
     try {
       await this.dbAuthModelsResource.load(
-        this.connectionInfo?.authModel || this.driver.defaultAuthModel
+        this.model.connection?.authModel || this.driver.defaultAuthModel
       );
 
       if (this.authModel) {
-        for (const property of this.connectionInfo.authProperties) {
-          this.credentials[property.id!] = property.value;
+        for (const property of this.model.connection.authProperties) {
+          this.model.credentials[property.id!] = property.value;
         }
       }
     } catch (exception) {
