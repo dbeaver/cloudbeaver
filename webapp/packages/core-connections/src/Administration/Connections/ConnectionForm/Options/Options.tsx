@@ -160,7 +160,7 @@ export const Options = observer(function Options({
               </group>
             </TabPanel>
           </TabsState>
-          {controller.authModel && (
+          {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
               <group as="div">
                 <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
