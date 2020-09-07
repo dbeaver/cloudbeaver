@@ -11,7 +11,7 @@ import { useMemo, useEffect, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage
+  TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage, Icon
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -80,7 +80,7 @@ const styles = composes(
 
     title-bar {
       composes: theme-typography--headline6 from global;
-      padding: 16px;
+      padding: 16px 24px;
       border-top: solid 1px;
       align-items: center;
       display: flex;
@@ -93,13 +93,29 @@ const styles = composes(
     }
 
     StaticImage {
+      width: 32px;
+      max-height: 32px;
       margin-right: 16px;
     }
 
     fill {
       flex: 1;
     }
-    
+
+    back-button {
+      position: relative;
+      box-sizing: border-box;
+      margin-right: 16px;
+      display: flex;
+
+      & Icon {
+        box-sizing: border-box;
+        transform: rotate(90deg);
+        cursor: pointer;
+        height: 16px;
+        width: 16px;
+      }
+    }
 
     TabList {
       align-items: center;
@@ -157,6 +173,7 @@ export const CreateConnection = observer(function CreateConnection({
     return styled(useStyles(styles))(
       <connection-create as='div'>
         <title-bar as='div'>
+          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={controller.back}/></back-button>
           {controller.driver?.icon && <StaticImage icon={controller.driver.icon} />}
           {controller.driver?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
@@ -165,6 +182,7 @@ export const CreateConnection = observer(function CreateConnection({
         <connection-create-content as='div'>
           <ConnectionForm
             model={controller as IConnectionFormModel}
+            onBack={controller.back}
             onCancel={handleConnectionCancel}
             configurationWizard={configurationWizard}
           />

@@ -122,12 +122,14 @@ const styles = composes(
 type Props = {
   model: IConnectionFormModel;
   configurationWizard?: boolean;
+  onBack?(): void;
   onCancel?(): void;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
   model,
   configurationWizard,
+  onBack = () => {},
   onCancel = () => {},
 }: Props) {
   const controller = useController(Controller, model, onCancel);
@@ -151,7 +153,7 @@ export const ConnectionForm = observer(function ConnectionForm({
             type="button"
             disabled={controller.isDisabled}
             mod={['outlined']}
-            onClick={onCancel}
+            onClick={onBack}
           >
             {translate('ui_processing_cancel')}
           </Button>
