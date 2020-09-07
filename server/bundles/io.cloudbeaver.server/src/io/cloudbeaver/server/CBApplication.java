@@ -443,9 +443,9 @@ public class CBApplication extends BaseApplicationImpl {
                 {
                     json.name("app");
                     json.beginObject();
-                    if (appConfig.isAnonymousAccessEnabled()) JSONUtils.field(json, "anonymousAccessEnabled", true);
-                    if (appConfig.isAuthenticationEnabled()) JSONUtils.field(json, "authenticationEnabled", true);
-                    if (appConfig.isSupportsCustomConnections()) JSONUtils.field(json, "supportsCustomConnections", true);
+                    JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+                    JSONUtils.field(json, "authenticationEnabled", appConfig.isAuthenticationEnabled());
+                    JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
                     json.endObject();
                 }
                 json.endObject();
