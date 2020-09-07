@@ -207,15 +207,16 @@ public class WebConnectionInfo {
 
     @Property
     public String getAuthModel() {
-        return dataSourceContainer.getConnectionConfiguration().getAuthModelId();
-    }
-
-    @Property
-    public WebPropertyInfo[] getAuthProperties() {
         String authModelId = dataSourceContainer.getConnectionConfiguration().getAuthModelId();
         if (CommonUtils.isEmpty(authModelId)) {
             authModelId = AuthModelDatabaseNative.ID;
         }
+        return authModelId;
+    }
+
+    @Property
+    public WebPropertyInfo[] getAuthProperties() {
+        String authModelId = getAuthModel();
         DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
         if (authModel == null) {
             return new WebPropertyInfo[0];
