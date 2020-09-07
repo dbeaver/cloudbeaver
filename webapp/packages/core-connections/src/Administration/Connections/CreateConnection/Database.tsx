@@ -58,7 +58,15 @@ export const Database = observer(function Database({ database, onSelect }: Props
   const orderedDrivers = useMemo(() => (
     database.possibleDrivers
       .slice()
-      .sort((a, b) => (a === database.defaultDriver ? -1 : 0))
+      .sort((a, b) => {
+        if (a === database.defaultDriver) {
+          return 1;
+        }
+        if (b === database.defaultDriver) {
+          return -1;
+        }
+        return a.localeCompare(b);
+      })
   ), [database]);
 
   return styled(useStyles(styles))(
