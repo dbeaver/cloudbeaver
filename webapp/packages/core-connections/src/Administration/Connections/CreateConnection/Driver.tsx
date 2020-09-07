@@ -20,6 +20,7 @@ const styles = css`
   StaticImage {
     box-sizing: border-box;
     width: 32px;
+    max-height: 32px;
   }
 `;
 
