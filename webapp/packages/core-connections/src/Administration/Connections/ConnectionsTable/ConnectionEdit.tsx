@@ -55,7 +55,7 @@ export const ConnectionEdit = observer(function ConnectionEdit({
   return styled(useStyles(styles))(
     <box as='div'>
       {controller.connection && (
-        <ConnectionForm model={controller as IConnectionFormModel} onCancel={collapse}/>
+        <ConnectionForm model={controller as IConnectionFormModel} onBack={collapse} onCancel={collapse}/>
       )}
     </box>
   );
