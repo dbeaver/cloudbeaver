@@ -15,6 +15,7 @@ import { DatabaseList } from './DatabaseList';
 type Props = {
   databases: AdminConnectionSearchInfo[];
   hosts: string;
+  disabled?: boolean;
   onSelect(database: AdminConnectionSearchInfo): void;
   onChange(hosts: string): void;
   onSearch?(): void;
@@ -24,6 +25,7 @@ type Props = {
 export const SearchDatabase = observer(function SearchDatabase({
   databases,
   hosts,
+  disabled,
   onChange,
   onSelect,
   onSearch,
@@ -34,6 +36,7 @@ export const SearchDatabase = observer(function SearchDatabase({
     <DatabaseList
       databases={databases}
       hosts={hosts}
+      disabled={disabled}
       onSelect={onSelect}
       onChange={onChange}
       onSearch={onSearch}

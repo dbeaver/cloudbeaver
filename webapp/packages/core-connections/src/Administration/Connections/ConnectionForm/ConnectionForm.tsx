@@ -177,8 +177,9 @@ export const ConnectionForm = observer(function ConnectionForm({
                     type={controller.connectionType}
                     credentials={model.credentials}
                     availableDrivers={model.availableDrivers}
-                    onTypeChange={controller.setType}
                     editing={model.editing}
+                    disabled={controller.isDisabled}
+                    onTypeChange={controller.setType}
                     onSave={controller.save}
                   />
                 </TabPanel>

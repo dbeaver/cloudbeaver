@@ -28,6 +28,7 @@ const styles = css`
 type Props = {
   databases: AdminConnectionSearchInfo[];
   hosts: string;
+  disabled?: boolean;
   className?: string;
   onSelect(database: AdminConnectionSearchInfo): void;
   onChange(hosts: string): void;
@@ -35,14 +36,14 @@ type Props = {
 }
 
 export const DatabaseList = observer(function DatabaseList({
-  databases, hosts, className, onSelect, onChange, onSearch,
+  databases, hosts, disabled, className, onSelect, onChange, onSearch,
 }: Props) {
   const translate = useTranslate();
 
   return styled(styles)(
     <SubmittingForm onSubmit={onSearch} className={className}>
       <ItemList>
-        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onSearch={onChange} />
+        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onSearch={onChange} disabled={disabled}/>
         {databases.map(database => (
           <Database key={database.host + database.port} database={database} onSelect={onSelect}/>
         ))}

@@ -89,7 +89,7 @@ export const Options = observer(function Options({
               value={connection.id}
               state={connection}
               checkboxLabel={translate('connections_connection_template')}
-              disabled={editing}
+              disabled={editing || disabled}
               mod='surface'
             />
           </group>
@@ -103,6 +103,7 @@ export const Options = observer(function Options({
               onSelect={controller.onSelectDriver}
               readOnly={editing || controller.drivers.length < 2}
               mod={'surface'}
+              disabled={disabled}
             >
               {translate('connections_connection_driver')}
             </Combobox>
@@ -143,7 +144,11 @@ export const Options = observer(function Options({
           </connection-type>
           <TabsState currentTabId={type}>
             <TabPanel tabId={EConnectionType.Parameters}>
-              <ParametersForm connection={connection} embedded={controller.driver?.embedded} disabled={saving} />
+              <ParametersForm
+                connection={connection}
+                embedded={controller.driver?.embedded}
+                disabled={disabled || saving}
+              />
             </TabPanel>
             <TabPanel tabId={EConnectionType.URL}>
               <group as="div">

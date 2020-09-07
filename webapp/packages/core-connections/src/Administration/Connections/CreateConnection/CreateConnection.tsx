@@ -215,6 +215,7 @@ export const CreateConnection = observer(function CreateConnection({
           <SearchDatabase
             databases={controller.databases}
             hosts={controller.hosts}
+            disabled={controller.isProcessing}
             onSelect={controller.onDatabaseSelect}
             onSearch={controller.search}
             onChange={controller.onSearchChange}
