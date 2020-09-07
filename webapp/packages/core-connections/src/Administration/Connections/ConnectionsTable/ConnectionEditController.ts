@@ -11,10 +11,8 @@ import { observable, computed } from 'mobx';
 import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, ConnectionInfo } from '@cloudbeaver/core-sdk';
 
 import { DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource } from '../../ConnectionsResource';
@@ -25,6 +23,7 @@ implements IInitializableController, IDestructibleController {
   @observable grantedSubjects: AdminConnectionGrantInfo[] | null = null;
   @observable isLoading = true;
   @observable credentials: Record<string, string> = {};
+  @observable connection: ConnectionInfo | null = null;
 
   @computed get isDisabled() {
     return this.isLoading;
@@ -35,10 +34,6 @@ implements IInitializableController, IDestructibleController {
       return null;
     }
     return this.dbDriverResource.get(this.connection.driverId) || null;
-  }
-
-  @computed get connection() {
-    return this.connectionsResource.get(this.connectionId);
   }
 
   @computed get availableDrivers() {
@@ -52,12 +47,10 @@ implements IInitializableController, IDestructibleController {
 
   readonly editing = true; // used as model IConnectionFormModel
   readonly error = new GQLErrorCatcher();
-  private isDistructed = false;
 
   constructor(
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService,
     private dbDriverResource: DBDriverResource,
   ) { }
 
@@ -67,25 +60,13 @@ implements IInitializableController, IDestructibleController {
   }
 
   destruct(): void {
-    this.isDistructed = true;
-  }
-
-  onShowDetails = () => {
-    if (this.error.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
-    }
-  }
-
-  private showError(exception: Error, message: string) {
-    if (!this.error.catch(exception) || this.isDistructed) {
-      this.notificationService.logException(exception, message);
-    }
   }
 
   private async loadConnectionInfo() {
     this.isLoading = true;
     try {
-      await this.connectionsResource.load(this.connectionId);
+      // we create a copy to protect the current value from mutation
+      this.connection = JSON.parse(JSON.stringify(await this.connectionsResource.load(this.connectionId)));
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load ConnectionInfo ${this.connectionId}`);
     } finally {
