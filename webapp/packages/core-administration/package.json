@@ -14,6 +14,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "peerDependencies": {
+    "@cloudbeaver/core-authentication": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-di": "^0.1.0",
     "@cloudbeaver/core-localization": "^0.1.0",

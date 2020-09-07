@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
@@ -24,6 +25,7 @@ export class ServerConfigurationService {
     private administrationScreenService: AdministrationScreenService,
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
+    private usersResource: UsersResource
   ) {
     this.state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome', () => ({
       serverConfig: {
@@ -89,6 +91,7 @@ export class ServerConfigurationService {
     try {
       await this.graphQLService.gql.setDefaultNavigatorSettings({ settings: this.state.navigatorConfig });
       await this.graphQLService.gql.configureServer({ configuration: this.state.serverConfig });
+      this.usersResource.refreshAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 
