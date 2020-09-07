@@ -11,15 +11,16 @@ import { useState, useMemo } from 'react';
 
 import { ItemListSearch, ItemList } from '@cloudbeaver/core-blocks';
 
-import { Driver, IDriver } from './Driver';
+import { DBDriver } from '../../../DBDriverResource';
+import { Driver } from './Driver';
 
-type DriverSelectorProps = {
-  drivers: IDriver[];
+type Props = {
+  drivers: DBDriver[];
   className?: string;
   onSelect(driverId: string): void;
 }
 
-export const DriverSelector = observer(function DriverSelector({ drivers, className, onSelect }: DriverSelectorProps) {
+export const DriverList = observer(function DriverList({ drivers, className, onSelect }: Props) {
   const [search, setSearch] = useState('');
   const filteredDrivers = useMemo(() => {
     if (!search) {
@@ -30,7 +31,7 @@ export const DriverSelector = observer(function DriverSelector({ drivers, classN
 
   return (
     <ItemList className={className}>
-      <ItemListSearch onSearch={setSearch} />
+      <ItemListSearch value={search} onSearch={setSearch} />
       {filteredDrivers.map(driver => <Driver key={driver.id} driver={driver} onSelect={onSelect}/>)}
     </ItemList>
   );

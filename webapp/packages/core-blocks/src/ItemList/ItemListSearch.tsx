@@ -20,18 +20,19 @@ import { Styles } from './styles';
 type Props = React.PropsWithChildren<{
   value?: string;
   placeholder?: string;
+  disabled?: boolean;
   onSearch?(value: string): void;
   className?: string;
 }>
 
 export function ItemListSearch({
-  value, placeholder, onSearch, className,
+  value, placeholder, disabled, onSearch, className,
 }: Props) {
   const styles = useContext(Styles);
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
   const searchHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (value !== undefined) {
+    if (value === undefined) {
       setSearch(event.target.value);
     }
     if (onSearch) {
@@ -48,6 +49,7 @@ export function ItemListSearch({
         value={value ?? search}
         onChange={searchHandler}
         autoComplete="off"
+        disabled={disabled}
         {...use({ mod: 'surface' })}
       />
     </list-search>

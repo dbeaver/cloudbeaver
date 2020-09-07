@@ -10,14 +10,13 @@ import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { Loader, IconButton, Button } from '@cloudbeaver/core-blocks';
+import { Loader, IconButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
-import { DatabasesSearch } from './DatabasesSearch';
+import { CreateConnection } from './CreateConnection/CreateConnection';
 
 const styles = composes(
   css`
@@ -64,46 +63,31 @@ const styles = composes(
 );
 
 export const ConnectionsAdministration = observer(function ConnectionsAdministration({
+  sub,
+  param,
   configurationWizard,
 }: AdministrationItemContentProps) {
-  const translate = useTranslate();
   const controller = useController(ConnectionsAdministrationController);
-
-  if (configurationWizard && !controller.isSearching) {
-    controller.findDatabase();
-    controller.search();
-  }
 
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
           <AdministrationTools>
-            <actions as='div'>
-              <Button
-                type="button"
-                disabled={controller.isLoading}
-                mod={['outlined']}
-                onClick={controller.findDatabase}
-              >
-                {translate('connections_connection_edit_search')}
-              </Button>
-            </actions>
             <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
             <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
             <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
           </AdministrationTools>
-          {controller.isSearching && (
-            <DatabasesSearch
-              hosts={controller.hosts}
-              onChange={controller.onSearchChange}
-              onSearch={controller.search}
-              disabled={controller.isLoading}
+          {sub && (
+            <CreateConnection
+              method={param || 'driver'}
+              configurationWizard={configurationWizard}
+              onChange={controller.setCreateMethod}
+              onCancel={controller.cancelCreate}
             />
           )}
           <ConnectionsTable
             connections={controller.connections}
-            findConnections={controller.findConnections}
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
           />

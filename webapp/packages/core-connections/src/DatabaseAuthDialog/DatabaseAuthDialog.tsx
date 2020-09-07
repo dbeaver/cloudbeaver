@@ -83,11 +83,10 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         : (
           <SubmittingForm onSubmit={controller.login} ref={focusedRef}>
             <ObjectPropertyInfoForm
-              prefix={`auth_${connection.connectionInfo?.id || ''} `}
               autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
               properties={connection.connectionInfo?.authProperties}
               credentials={controller.credentials}
-              processing={controller.isAuthenticating}
+              disabled={controller.isAuthenticating}
             />
           </SubmittingForm>
         )}

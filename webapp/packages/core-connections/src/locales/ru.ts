@@ -1,6 +1,10 @@
 export default [
   ['connections_administration_item', 'Управление подключениями'],
+  ['connections_administration_connection_create', 'Создание подключения'],
+  ['connections_administration_search_database_tip', 'Укажите ваши хосты, например \'localhost host1.myhost.com 192.168.0.1\' и нажмите Enter'],
   ['connections_administration_new_connection', 'Создание подключения'],
+  ['connections_administration_configuration_wizard_step_title', 'Подключения к базам'],
+  ['connections_administration_configuration_wizard_step_description', 'Подключения к базам'],
   ['connections_connection_edit_authentication', 'Авторизация'],
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],

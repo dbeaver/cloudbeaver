@@ -14,12 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { DBDriver } from '../../../../DBDriverResource';
 import { DriverPropertiesService } from '../../../../DriverPropertiesService';
-
-export type DriverPropertyState = {
-  [key: string]: string;
-}
 
 type StaticId = {
   staticId: string;
@@ -30,20 +25,20 @@ export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId
 @injectable()
 export class DriverPropertiesController implements IInitializableController {
   @observable isLoading = false;
-  @observable driver!: DBDriver
   @observable hasDetails = false
   @observable responseMessage: string | null = null
   @observable driverProperties = observable<IProperty>([])
+  @observable driverId!: string
 
-  private loaded = false;
+  loaded = false;
 
   constructor(
     private driverPropertiesService: DriverPropertiesService,
     private notificationService: NotificationService
   ) { }
 
-  init(driver: DBDriver) {
-    this.driver = driver;
+  init(driverId: string) {
+    this.driverId = driverId;
   }
 
   onAddProperty = () => {
@@ -60,7 +55,7 @@ export class DriverPropertiesController implements IInitializableController {
     }
     this.isLoading = true;
     try {
-      const driverProperties = await this.driverPropertiesService.loadDriverProperties(this.driver.id);
+      const driverProperties = await this.driverPropertiesService.loadDriverProperties(this.driverId);
       this.driverProperties = observable(driverProperties.map(property => ({
         id: property.id!,
         key: property.id!,

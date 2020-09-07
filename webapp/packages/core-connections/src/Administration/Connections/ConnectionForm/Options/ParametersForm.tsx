@@ -7,27 +7,35 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { use } from 'reshadow';
+import styled, { use, css } from 'reshadow';
 
 import { InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { formStyles } from './formStyles';
-import { IFormController } from './IFormController';
 
 type ParametersFormProps = {
-  controller: IFormController;
+  connection: ConnectionInfo;
+  disabled?: boolean;
   embedded?: boolean;
 }
 
+const styles = css`
+  layout-grid-inner {
+    max-width: 650px;
+  }
+`;
+
 export const ParametersForm = observer(function ParametersForm({
-  controller,
+  connection,
   embedded,
+  disabled,
 }: ParametersFormProps) {
   const translate = useTranslate();
 
-  return styled(useStyles(formStyles))(
+  return styled(useStyles(formStyles, styles))(
     <>
       { !embedded && (
         <layout-grid-inner as="div">
@@ -35,9 +43,8 @@ export const ParametersForm = observer(function ParametersForm({
             <InputField
               type="text"
               name="host"
-              value={controller.config.host}
-              onChange={value => controller.onChange('host', value)}
-              disabled={controller.isSaving}
+              state={connection}
+              disabled={disabled}
               mod='surface'
             >
               {translate('customConnection_custom_host')}
@@ -48,9 +55,8 @@ export const ParametersForm = observer(function ParametersForm({
             <InputField
               type="number"
               name="port"
-              value={controller.config.port}
-              onChange={value => controller.onChange('port', value)}
-              disabled={controller.isSaving}
+              state={connection}
+              disabled={disabled}
               {...use({ short: true })}
               mod='surface'
             >
@@ -63,9 +69,8 @@ export const ParametersForm = observer(function ParametersForm({
         <InputField
           type="text"
           name="databaseName"
-          value={controller.config.databaseName}
-          onChange={value => controller.onChange('databaseName', value)}
-          disabled={controller.isSaving}
+          state={connection}
+          disabled={disabled}
           mod='surface'
         >
           {translate('customConnection_custom_database')}

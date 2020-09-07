@@ -31,7 +31,6 @@ export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: Adm
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
   private metadata: MetadataMap<string, boolean>;
-  private searchedDatabases: string[];
 
   constructor(
     private graphQLService: GraphQLService,
@@ -39,7 +38,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   ) {
     super(new Map());
     this.metadata = new MetadataMap(() => false);
-    this.searchedDatabases = [];
   }
 
   has(id: string) {
@@ -82,16 +80,19 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   async searchDatabases(hosts: string[]) {
-    await this.performUpdate('search', () => this.searchConnections(hosts));
+    const { databases } = await this.graphQLService.gql.searchDatabases({ hosts });
+
+    return databases;
   }
 
-  async create(config: ConnectionConfig, id?: string) {
+  async create(config: ConnectionConfig) {
     const { connection } = await this.graphQLService.gql.createConnectionConfiguration({ config });
 
-    if (id) {
-      this.data.delete(id);
-    }
-    this.set(connection.id, connection as ConnectionInfo);
+    const newConnection: ConnectionNew = {
+      ...connection as ConnectionInfo,
+      [NEW_CONNECTION_SYMBOL]: true,
+    };
+    this.set(newConnection.id, newConnection);
 
     return this.get(connection.id)!;
   }
@@ -119,12 +120,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     await this.graphQLService.gql.setConnectionAccess({ connectionId, subjects });
   }
 
-  cleanSearchDatabases() {
-    for (const id of this.searchedDatabases) {
-      this.delete(id);
-    }
-  }
-
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {
     const { connections } = await this.graphQLService.gql.getConnections();
     this.data.clear();
@@ -139,29 +134,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     this.metadata.set('all', true);
 
     return this.data;
-  }
-
-  private async searchConnections(hosts: string[]) {
-    const { databases } = await this.graphQLService.gql.searchDatabases({ hosts });
-
-    this.cleanSearchDatabases();
-
-    for (const database of databases) {
-      const connectionInfo = {
-        id: uuid(),
-        driverId: database.defaultDriver,
-        name: await this.getNameTemplate(database),
-        host: database.host,
-        port: `${database.port}`,
-        authProperties: [] as Array<ObjectPropertyInfo>,
-        [NEW_CONNECTION_SYMBOL]: true,
-        [SEARCH_CONNECTION_SYMBOL]: database,
-      } as ConnectionSearch;
-
-      this.data.set(connectionInfo.id, connectionInfo);
-      this.markUpdated(connectionInfo.id);
-      this.searchedDatabases.push(connectionInfo.id);
-    }
   }
 
   private async getNameTemplate(connection: AdminConnectionSearchInfo) {

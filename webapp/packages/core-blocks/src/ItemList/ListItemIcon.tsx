@@ -14,20 +14,16 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { Styles } from './styles';
 
 type Props = React.PropsWithChildren<{
-  onClick(): void;
   className?: string;
 }>
 
-export function ListItem({
+export function ListItemIcon({
   children,
-  onClick,
   className,
 }: Props) {
   const styles = useContext(Styles);
 
   return styled(useStyles(...styles))(
-    <list-item as="div" onClick={onClick} className={className}>
-      {children}
-    </list-item>
+    <list-item-icon as="div" className={className}>{children}</list-item-icon>
   );
 }

@@ -11,30 +11,25 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  ListItem, ListItemIcon, ListItemName, ListItemDescription, StaticImage
+  ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
 } from '@cloudbeaver/core-blocks';
 
-export interface IDriver {
-  id: string;
-  icon?: string;
-  name?: string;
-  description?: string;
-}
+import { DBDriver } from '../../../DBDriverResource';
 
 const styles = css`
   StaticImage {
     box-sizing: border-box;
-    width: 24px;
-    max-height: 24px;
+    width: 32px;
+    max-height: 32px;
   }
 `;
 
-type DriverProps = {
-  driver: IDriver;
+type Props = {
+  driver: DBDriver;
   onSelect(driverId: string): void;
 }
 
-export const Driver = observer(function Driver({ driver, onSelect }: DriverProps) {
+export const Driver = observer(function Driver({ driver, onSelect }: Props) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
 
   return styled(styles)(

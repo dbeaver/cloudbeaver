@@ -40,20 +40,8 @@ const styles = css`
 `;
 
 export const Connection = observer(function Connection({ connection }: Props) {
-  const translate = useTranslate();
-  const connectionInfoResource = useService(ConnectionsResource);
   const driversResource = useService(DBDriverResource);
-  let drivers = [connection.driverId];
-
-  if (isSearchedConnection(connection)) {
-    drivers = connection[SEARCH_CONNECTION_SYMBOL].possibleDrivers;
-  }
-
-  const icons = drivers
-    .map(driverId => driversResource.get(driverId)?.icon)
-    .filter(Boolean);
-
-  const isNew = connectionInfoResource.isNew(connection.id);
+  const icon = driversResource.get(connection.driverId)?.icon;
 
   return styled(useStyles(styles))(
     <TableItem item={connection.id} expandElement={ConnectionEdit}>
@@ -64,18 +52,12 @@ export const Connection = observer(function Connection({ connection }: Props) {
         <TableItemExpand />
       </TableColumnValue>
       <TableColumnValue centerContent flex expand>
-        {icons.map(icon => <StaticImage key={icon} icon={icon} />)}
+        <StaticImage icon={icon} />
       </TableColumnValue>
       <TableColumnValue expand>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
       <TableColumnValue><input type="checkbox" checked={connection.template} disabled/></TableColumnValue>
-      <TableColumnValue align='right'>
-        {isNew && (
-          <tag as='div' {...use({ mod: 'positive' })}>
-            {translate('ui_tag_new')}
-          </tag>
-        )}
-      </TableColumnValue>
+      <TableColumnValue/>
     </TableItem>
   );
 });
