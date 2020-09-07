@@ -8,8 +8,11 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
-import { ListItem } from '@cloudbeaver/core-blocks';
+import {
+  ListItem, ListItemDescription, ListItemName, ListItemIcon, StaticImage
+} from '@cloudbeaver/core-blocks';
 import { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
 type Props = {
@@ -18,6 +21,14 @@ type Props = {
   onSelect(connectionId: string): void;
 }
 
+const styles = css`
+  StaticImage {
+    box-sizing: border-box;
+    width: 24px;
+    max-height: 24px;
+  }
+`;
+
 export const TemplateConnectionItem = observer(function TemplateConnectionItem({
   template,
   dbDriver,
@@ -25,5 +36,11 @@ export const TemplateConnectionItem = observer(function TemplateConnectionItem({
 }: Props) {
   const select = useCallback(() => onSelect(template.id), [template]);
 
-  return <ListItem icon={dbDriver?.icon} name={template.name} description={template.description} onClick={select}/>;
+  return styled(styles)(
+    <ListItem onClick={select}>
+      <ListItemIcon><StaticImage icon={dbDriver?.icon}/></ListItemIcon>
+      <ListItemName>{template.name}</ListItemName>
+      <ListItemDescription title={template.description}>{template.description}</ListItemDescription>
+    </ListItem>
+  );
 });
