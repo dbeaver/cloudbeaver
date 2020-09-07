@@ -143,8 +143,8 @@ implements IInitializableController, IDestructibleController {
     } else {
       config.url = this.model.connection.url;
     }
-    if (this.model.connection.authModel) {
-      config.authModelId = this.model.connection.authModel;
+    if (this.model.connection.authModel || this.driver!.defaultAuthModel) {
+      config.authModelId = this.model.connection.authModel || this.driver!.defaultAuthModel;
       config.saveCredentials = this.isCredentialsChanged();
       if (config.saveCredentials) {
         config.credentials = this.model.credentials;
