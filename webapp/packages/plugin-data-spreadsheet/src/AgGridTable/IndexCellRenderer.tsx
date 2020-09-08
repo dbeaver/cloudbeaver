@@ -6,14 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CellClassParams } from '@ag-grid-community/core';
 import { Loader } from '@cloudbeaver/core-blocks';
 
-export function IndexCellRenderer(props: CellClassParams) {
+export function IndexCellRenderer() {
   return (
     <div style={{ display: 'flex', width: '100%' }}>
-      {!props.data && <Loader small/>}
-      {props.data && props.rowIndex + 1}
+      <Loader small/>
     </div>
   );
 }

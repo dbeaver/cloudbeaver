@@ -74,6 +74,9 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
       <box as="div">
         <box-element as='div'>
           <group as="div">
+            <InputGroup long>{translate('administration_configuration_wizard_configuration_server_info')}</InputGroup>
+          </group>
+          <group as="div">
             <InputField
               type="text"
               name='serverName'

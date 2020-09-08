@@ -246,14 +246,14 @@ export const INDEX_COLUMN_DEF: ColDef = {
   headerName: '#',
   colId: `${Number.MAX_SAFE_INTEGER}`,
   field: `${Number.MAX_SAFE_INTEGER}`,
-  valueGetter: 'node.id',
   width: 70,
   pinned: 'left',
   suppressNavigable: true,
   suppressMenu: true,
   editable: false,
   sortable: false,
-  cellRenderer: 'indexCellRenderer',
+  valueGetter: props => props.node.rowIndex + 1,
+  cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
 };
 
 function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {

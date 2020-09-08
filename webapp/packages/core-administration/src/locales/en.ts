@@ -7,6 +7,7 @@ export default [
   ['administration_configuration_wizard_configuration', 'Server configuration'],
   ['administration_configuration_wizard_configuration_step_description', 'Server configuration'],
   ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
+  ['administration_configuration_wizard_configuration_server_info', 'Server Info'],
   ['administration_configuration_wizard_configuration_server_name', 'Server Name'],
   ['administration_configuration_wizard_configuration_admin', 'Administrator'],
   ['administration_configuration_wizard_configuration_admin_name', 'Admin user name'],

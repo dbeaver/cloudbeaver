@@ -66,7 +66,7 @@ export function Loader({
     return null;
   }
 
-  return styled(useStyles(loaderStyles, ...(overlay ? [overlayStyles] : [])))(
+  return styled(useStyles(loaderStyles, overlay && overlayStyles))(
     <loader as="div" className={className} {...use({ small })}>
       <icon as="div"><img src={spinnerURL}/></icon>
       {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}

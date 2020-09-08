@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton } from '@cloudbeaver/core-blocks';
+import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { TableViewerModel } from '../TableViewerModel';
@@ -73,8 +73,9 @@ type TableFooterProps = {
 export const TableFooter = observer(function TableFooter({
   model,
 }: TableFooterProps) {
+  const ref = useRef<HTMLInputElement>(null);
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => model.setChunkSize(parseInt(e.target.value, 10)),
+    () => ref.current && model.setChunkSize(parseInt(ref.current.value, 10)),
     [model]
   );
 
@@ -84,7 +85,9 @@ export const TableFooter = observer(function TableFooter({
         <IconButton type="button" name='reload' onClick={model.refresh} viewBox=""/>
       </reload>
       <count as="div">
-        <input type="number" value={model.getChunkSize()} onBlur={handleChange} {...use({ mod: 'surface' })} />
+        <SubmittingForm onSubmit={handleChange}>
+          <input type="number" value={model.getChunkSize()} ref={ref} onBlur={handleChange} {...use({ mod: 'surface' })} />
+        </SubmittingForm>
       </count>
       <TableFooterMenu model={model}/>
       {model.requestStatusMessage.length > 0 && (
