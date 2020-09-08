@@ -160,6 +160,14 @@ export const ConnectionForm = observer(function ConnectionForm({
           <Button
             type="button"
             disabled={controller.isDisabled}
+            mod={['outlined']}
+            onClick={controller.test}
+          >
+            {translate('connections_connection_test')}
+          </Button>
+          <Button
+            type="button"
+            disabled={controller.isDisabled}
             mod={['unelevated']}
             onClick={controller.save}
           >

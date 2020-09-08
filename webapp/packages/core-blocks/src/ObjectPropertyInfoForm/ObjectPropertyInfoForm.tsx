@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { InputField } from '@cloudbeaver/core-blocks';
@@ -37,6 +38,18 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
     return styled(useStyles(formStyles))(<center as="div">Properties empty</center>);
   }
 
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.type !== 'password') {
+      return;
+    }
+
+    const property = properties.find(property => property.id === e.target.name);
+
+    if (property?.value === e.target.value) {
+      credentials[e.target.name] = '';
+    }
+  }, [properties, credentials]);
+
   return styled(useStyles(formStyles))(
     <form-body as='div' className={className}>
       {properties.map(property => (
@@ -45,6 +58,7 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
             type={property.features.includes('password') ? 'password' : 'text'}
             name={property.id!}
             state={credentials}
+            onFocus={handleFocus}
             disabled={disabled}
             autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
             mod='surface'

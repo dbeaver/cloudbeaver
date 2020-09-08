@@ -18,4 +18,5 @@ export default [
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Port'],
   ['connections_connection_template', 'Template'],
+  ['connections_connection_test', 'Test Connection'],
 ];

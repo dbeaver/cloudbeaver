@@ -97,6 +97,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return this.get(connection.id)!;
   }
 
+  async test(config: ConnectionConfig): Promise<void> {
+    await this.graphQLService.gql.testConnection({
+      config,
+    });
+  }
+
   async update(id: string, config: ConnectionConfig) {
     await this.performUpdate(id, () => this.updateConnection(id, config));
     return this.get(id)!;

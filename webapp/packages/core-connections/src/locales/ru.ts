@@ -18,4 +18,5 @@ export default [
   ['connections_connection_host', 'Хост'],
   ['connections_connection_port', 'Порт'],
   ['connections_connection_template', 'Шаблон'],
+  ['connections_connection_test', 'Проверить подключение'],
 ];

@@ -93,6 +93,19 @@ implements IInitializableController, IDestructibleController {
     }
   }
 
+  test = async () => {
+    this.isSaving = true;
+    this.error.clear();
+    try {
+      await this.connectionsResource.test(this.getConnectionConfig());
+      this.notificationService.logInfo({ title: 'Connection is established' });
+    } catch (exception) {
+      this.showError(exception, 'Connection test failed');
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
   onShowDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);

@@ -54,7 +54,10 @@ implements IInitializableController {
   }
 
   onSelectDriver = (driverId: string | null, name: 'driverId', prevValue: string | null) => this.loadDriver(driverId, prevValue);
-  onFormChange = () => this.updateName();
+  onFormChange = () => {
+    this.updateName();
+    this.resetPassword();
+  }
 
   @action
   private setDefaults(prevDriverId: string | null) {
@@ -62,6 +65,29 @@ implements IInitializableController {
     this.model.connection.properties = {};
     this.model.connection.authModel = this.driver?.defaultAuthModel;
     this.cleanCredentials();
+  }
+
+  private resetPassword() {
+    if (this.isCredentialsChanged()) {
+      for (const property of this.model.connection.authProperties) {
+        if (property.features.includes('password') && this.model.credentials[property.id!] === property.value) {
+          this.model.credentials[property.id!] = '';
+          return;
+        }
+      }
+    }
+  }
+
+  private isCredentialsChanged() {
+    if (!this.model.connection.authProperties.length) {
+      return true;
+    }
+    for (const property of this.model.connection.authProperties) {
+      if (this.model.credentials[property.id!] !== property.value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private cleanCredentials() {
