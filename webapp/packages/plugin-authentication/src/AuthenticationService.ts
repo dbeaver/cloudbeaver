@@ -8,14 +8,16 @@
 
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
+import { ServerService, SessionService } from '@cloudbeaver/core-root';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
 @injectable()
 export class AuthenticationService extends Bootstrap {
+  private authenticating = false;
   constructor(
     private serverService: ServerService,
+    private sessionService: SessionService,
     private authDialogService: AuthDialogService,
     private authInfoService: AuthInfoService,
   ) {
@@ -23,29 +25,37 @@ export class AuthenticationService extends Bootstrap {
   }
 
   async auth() {
-    const config = await this.serverService.config.load(null);
-    if (!config) {
-      throw new Error('Can\'t configure Authentication');
-    }
-
-    if (!config.authenticationEnabled) {
+    if (this.authenticating) {
       return;
     }
+    this.authenticating = true;
+    try {
+      const config = await this.serverService.config.load(null);
+      if (!config) {
+        throw new Error('Can\'t configure Authentication');
+      }
 
-    const userInfo = await this.authInfoService.updateAuthInfo();
-    if (userInfo) {
-      return;
-    }
+      if (!config.authenticationEnabled) {
+        return;
+      }
 
-    if (!config.anonymousAccessEnabled) {
-      await this.authDialogService.showLoginForm(true);
+      const userInfo = await this.authInfoService.updateAuthInfo();
+      if (userInfo) {
+        return;
+      }
+
+      if (!config.anonymousAccessEnabled) {
+        await this.authDialogService.showLoginForm(true);
+      }
+    } finally {
+      this.authenticating = false;
     }
   }
 
-  register(): void | Promise<void> { }
-
-  load() {
-    // we do not await it because to unblock app loading
-    this.auth();
+  register(): void | Promise<void> {
+    this.serverService.config.onDataUpdate.subscribe(this.auth.bind(this));
+    this.sessionService.session.onDataUpdate.subscribe(this.auth.bind(this));
   }
+
+  load() { }
 }

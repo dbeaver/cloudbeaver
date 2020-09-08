@@ -175,6 +175,11 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     return this.data;
   }
 
+  refreshAllLazy() {
+    this.markOutdated('all');
+    this.metadata.set('all', false);
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUserInfo>> {
     const userId = key === 'all' ? undefined : key as string;
 

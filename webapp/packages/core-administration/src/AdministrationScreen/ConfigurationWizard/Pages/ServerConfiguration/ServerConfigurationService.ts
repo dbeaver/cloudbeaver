@@ -91,7 +91,7 @@ export class ServerConfigurationService {
     try {
       await this.graphQLService.gql.setDefaultNavigatorSettings({ settings: this.state.navigatorConfig });
       await this.graphQLService.gql.configureServer({ configuration: this.state.serverConfig });
-      this.usersResource.refreshAll();
+      this.usersResource.refreshAllLazy();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 

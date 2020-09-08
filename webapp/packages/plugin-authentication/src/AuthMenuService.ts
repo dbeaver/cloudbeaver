@@ -13,7 +13,6 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService } from '@cloudbeaver/core-root';
 
-import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
 
@@ -24,7 +23,6 @@ export class AuthMenuService extends Bootstrap {
     private authDialogService: AuthDialogService,
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
-    private authenticationService: AuthenticationService,
     private notificationService: NotificationService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService,
@@ -64,7 +62,6 @@ export class AuthMenuService extends Bootstrap {
   private async logout() {
     try {
       await this.authInfoService.logout();
-      await this.authenticationService.auth();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t logout');
     }
