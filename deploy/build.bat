@@ -12,7 +12,7 @@ mkdir cloudbeaver\web
 echo Pull dbeaver platform
 
 cd ../..
-IF NOT EXIST dbeaver git clone --depth 1 https://github.com/dbeaver/dbeaver.git
+IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 cd cloudbeaver\deploy
 
 echo Build cloudbeaver server

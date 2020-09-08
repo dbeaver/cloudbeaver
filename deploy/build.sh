@@ -14,7 +14,7 @@ mkdir ./cloudbeaver/web
 echo "Clone dbeaver platform"
 
 cd ../..
-[ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
+[ ! -d dbeaver ] && git clone https://github.com/dbeaver/dbeaver.git
 cd cloudbeaver/deploy
 
 echo "Build CloudBeaver server"
