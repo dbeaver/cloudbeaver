@@ -34,21 +34,24 @@ export class DriverPropertiesController implements IInitializableController {
   @observable driverProperties = observable<IProperty>([])
 
   private loaded = false;
+  private state!: Record<string, string>;
 
   constructor(
     private driverPropertiesService: DriverPropertiesService,
     private notificationService: NotificationService
   ) { }
 
-  init(driver: DBDriver) {
+  init(driver: DBDriver, state: Record<string, string>) {
     this.driver = driver;
+    this.state = state;
   }
 
-  onAddProperty = () => {
+  addProperty = (key?: string, value?: string) => {
     this.driverProperties.unshift({
       id: uuid(),
-      key: 'property',
-      defaultValue: '',
+      key: key ?? 'property',
+      defaultValue: value ?? '',
+      new: !key,
     });
   }
 
@@ -67,6 +70,14 @@ export class DriverPropertiesController implements IInitializableController {
         description: property.description,
         validValues: property.validValues,
       })));
+
+      for (const key of Object.keys(this.state)) {
+        if (this.driverProperties.some(property => property.key === key)) {
+          continue;
+        }
+
+        this.addProperty(key, this.state[key]);
+      }
       this.loaded = true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load driver properties');
