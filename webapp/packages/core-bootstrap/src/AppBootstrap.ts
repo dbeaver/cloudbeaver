@@ -12,12 +12,10 @@ import {
   NavigationTreeContextMenuService,
   LogViewerMenuService,
   ConnectionSchemaManagerService,
-  AppScreenService,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionExpireService } from '@cloudbeaver/core-dialogs';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
-import { RouterService } from '@cloudbeaver/core-routing';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 /**
