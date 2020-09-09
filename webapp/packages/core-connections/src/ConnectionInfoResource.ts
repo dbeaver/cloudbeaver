@@ -11,7 +11,10 @@ import {
   ConnectionInfo,
   GraphQLService,
   CachedMapResource,
-  ObjectPropertyInfo
+  ObjectPropertyInfo,
+  ResourceKey,
+  isResourceKeyList,
+  resourceKeyList
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
@@ -22,10 +25,10 @@ export type Connection = Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'c
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
   constructor(
     private graphQLService: GraphQLService,
-    connectionsResource: ConnectionsResource
+    private connectionsResource: ConnectionsResource
   ) {
     super(new Map());
-    connectionsResource.onItemAdd.subscribe(this.load.bind(this));
+    connectionsResource.onItemAdd.subscribe(this.addHandler.bind(this));
     connectionsResource.onItemDelete.subscribe(this.delete.bind(this));
     connectionsResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
   }
@@ -85,6 +88,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.set(connectionId, { ...oldConnection, ...connection });
 
     return this.data;
+  }
+
+  private async addHandler(key: ResourceKey<string>) {
+    if (isResourceKeyList(key)) {
+      this.load(resourceKeyList(key.list.filter(id => !this.connectionsResource.get(id)?.template)));
+      return;
+    }
+
+    if (this.connectionsResource.get(key)?.template) {
+      return;
+    }
+
+    this.load(key);
   }
 
   private async getAuthProperties(id: string): Promise<ObjectPropertyInfo[]> {
