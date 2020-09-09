@@ -341,13 +341,10 @@ export class NavNodeManagerService extends Bootstrap {
 
       await this.refreshNode(nodeId);
 
-      if (connectionInfo?.features.includes(EConnectionFeature.temporary)) {
+      const tree = this.navTree.get(ROOT_NODE_PATH);
 
-        const tree = this.navTree.get(ROOT_NODE_PATH);
-
-        if (!tree?.includes(nodeId)) {
-          this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
-        }
+      if (!tree?.includes(nodeId)) {
+        this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
       }
     }
   }
