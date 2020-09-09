@@ -6,12 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationItemService, AdministrationItemType, AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
@@ -20,19 +18,15 @@ import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
   constructor(
-    private administrationScreenService: AdministrationScreenService,
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private connectionInfoResource: ConnectionInfoResource,
     private dbDriverResource: DBDriverResource,
-    private graphQLService: GraphQLService
   ) {
     super();
   }
 
   register() {
-    this.administrationScreenService.activationEvent.addHandler((_, state) => this.handleDeactivate(state));
 
     this.administrationItemService.create({
       name: 'connections',
@@ -52,14 +46,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
-
-  private async handleDeactivate(state: boolean) {
-    // if (state) {
-    // return;
-    // }
-
-    // this.connectionInfoResource.markOutdated();
-  }
 
   private async loadConnections() {
     try {
