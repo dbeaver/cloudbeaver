@@ -38,10 +38,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
-import org.jkiss.dbeaver.model.navigator.DBNProjectDatabases;
+import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -78,6 +75,8 @@ public class WebSession implements DBASession {
 
     private WebUser user;
     private Set<String> sessionPermissions = null;
+    private Set<String> accessibleConnectionIds = Collections.emptySet();
+
     private String locale;
     private boolean cacheExpired;
 
@@ -174,18 +173,22 @@ public class WebSession implements DBASession {
         }
         this.user = user;
 
+        refreshSessionAuth();
+
         try {
             resetSessionCache();
             initNavigatorModel();
         } catch (DBCException e) {
             log.error(e);
         }
-        refreshSessionAuth();
     }
 
     private void initNavigatorModel() {
         CBPlatform platform = CBPlatform.getInstance();
         this.navigatorModel = new DBNModel(platform, this);
+        // Add datasource filter (based on permissions)
+        navigatorModel.addFilter(node ->
+            !(node instanceof DBNDataSource) || isDataSourceAccessible(((DBNDataSource)node).getDataSourceContainer()));
         this.navigatorModel.initialize();
 
         DBPProject project = platform.getWorkspace().getActiveProject();
@@ -229,12 +232,16 @@ public class WebSession implements DBASession {
             // All connections are accessible
             return;
         }
-        Set<String> allowedConnections = getAccessibleConnectionIds();
-        connections.removeIf(c -> !allowedConnections.contains(c.getId()));
+        connections.removeIf(c -> !accessibleConnectionIds.contains(c.getId()));
+    }
+
+    private boolean isDataSourceAccessible(DBPDataSourceContainer dataSource) {
+        return this.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+            accessibleConnectionIds.contains(dataSource.getId());
     }
 
     @NotNull
-    public Set<String> getAccessibleConnectionIds() {
+    private Set<String> readAccessibleConnectionIds() {
         CBApplication application = CBApplication.getInstance();
         String subjectId = user == null ?
             application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
@@ -282,6 +289,7 @@ public class WebSession implements DBASession {
     private void refreshSessionAuth() {
         try {
             CBApplication application = CBPlatform.getInstance().getApplication();
+
             if (this.user == null) {
                 if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
                     sessionPermissions = application.getSecurityController().getSubjectPermissions(
@@ -292,6 +300,9 @@ public class WebSession implements DBASession {
             } else {
                 sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
             }
+
+            accessibleConnectionIds = readAccessibleConnectionIds();
+
         } catch (Exception e) {
             log.error("Error reading session permissions", e);
         }
