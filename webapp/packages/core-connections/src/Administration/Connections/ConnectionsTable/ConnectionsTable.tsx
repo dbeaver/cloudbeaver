@@ -25,6 +25,9 @@ const styles = composes(
     }
   `,
   css`
+    Table {
+      width: 100%;
+    }
     TableColumnHeader {
       border-top: solid 1px;
     }

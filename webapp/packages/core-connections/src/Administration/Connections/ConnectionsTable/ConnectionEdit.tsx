@@ -26,6 +26,7 @@ const styles = composes(
   `,
   css`
     box {
+      box-sizing: border-box;
       padding: 24px;
       min-height: 320px;
       max-height: 500px;
