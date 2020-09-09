@@ -69,6 +69,9 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(requirePermissions = {})
     boolean touchSession(HttpServletRequest request) throws DBWebException;
 
+    @WebAction(requirePermissions = {})
+    boolean refreshSessionConnections(HttpServletRequest request) throws DBWebException;
+
     @WebAction
     boolean changeSessionLanguage(WebSession webSession, String locale) throws DBWebException;
 

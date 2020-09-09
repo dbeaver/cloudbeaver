@@ -303,6 +303,9 @@ extend type Mutation {
     # Refreshes session on server and returns its state
     touchSession: Boolean
 
+    # Refresh session connection list
+    refreshSessionConnections: Boolean
+
     # Refreshes session on server and returns its state
     changeSessionLanguage(locale: String): Boolean
 

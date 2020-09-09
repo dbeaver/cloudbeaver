@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.DBWConnectionGrant;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -52,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Web session.
@@ -153,7 +156,11 @@ public class WebSession implements DBASession {
         return user;
     }
 
-    public synchronized Set<String> getSessionPermissions() throws DBCException {
+    public synchronized boolean hasPermission(String perm) {
+        return getSessionPermissions().contains(perm);
+    }
+
+    public synchronized Set<String> getSessionPermissions() {
         if (sessionPermissions == null) {
             refreshSessionAuth();
         }
@@ -172,11 +179,7 @@ public class WebSession implements DBASession {
         } catch (DBCException e) {
             log.error(e);
         }
-        try {
-            refreshSessionAuth();
-        } catch (DBCException e) {
-            log.error(e);
-        }
+        refreshSessionAuth();
     }
 
     private void initNavigatorModel() {
@@ -189,14 +192,56 @@ public class WebSession implements DBASession {
         this.databases = projectNode.getDatabases();
         this.locale = Locale.getDefault().getLanguage();
 
+        try {
+            this.refreshConnections();
+        } catch (Exception e) {
+            log.error("Error getting connection list", e);
+        }
+    }
+
+    public void refreshConnections() {
+
+        // Add all provided datasources to the session
+        List<WebConnectionInfo> connList = new ArrayList<>();
+        for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
+            if (ds.isProvided()) {
+                WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
+                connList.add(connectionInfo);
+            }
+        }
+        filterAccessibleConnections(connList);
+
         // Add all provided datasources to the session
         synchronized (connections) {
-            for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
-                if (ds.isProvided()) {
-                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                    connections.put(connectionInfo.getId(), connectionInfo);
-                }
+            connections.clear();
+            for (WebConnectionInfo connectionInfo : connList) {
+                connections.put(connectionInfo.getId(), connectionInfo);
             }
+        }
+    }
+
+    public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
+        if (this.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            // All connections are accessible
+            return;
+        }
+        Set<String> allowedConnections = getAccessibleConnectionIds();
+        connections.removeIf(c -> !allowedConnections.contains(c.getId()));
+    }
+
+    @NotNull
+    public Set<String> getAccessibleConnectionIds() {
+        CBApplication application = CBApplication.getInstance();
+        String subjectId = user == null ?
+            application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
+
+        try {
+            return Arrays.stream(application.getSecurityController()
+                .getSubjectConnectionAccess(new String[]{subjectId}))
+                .map(DBWConnectionGrant::getConnectionId).collect(Collectors.toSet());
+        } catch (DBCException e) {
+            log.error("Error reading connection grants", e);
+            return Collections.emptySet();
         }
     }
 
@@ -230,17 +275,21 @@ public class WebSession implements DBASession {
         this.databases = null;
     }
 
-    private void refreshSessionAuth() throws DBCException {
-        CBApplication application = CBPlatform.getInstance().getApplication();
-        if (this.user == null) {
-            if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
-                sessionPermissions = application.getSecurityController().getSubjectPermissions(
-                    application.getAppConfiguration().getAnonymousUserRole());
+    private void refreshSessionAuth() {
+        try {
+            CBApplication application = CBPlatform.getInstance().getApplication();
+            if (this.user == null) {
+                if (application.getAppConfiguration().isAnonymousAccessEnabled()) {
+                    sessionPermissions = application.getSecurityController().getSubjectPermissions(
+                        application.getAppConfiguration().getAnonymousUserRole());
+                } else {
+                    sessionPermissions = Collections.emptySet();
+                }
             } else {
-                sessionPermissions = Collections.emptySet();
+                sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
             }
-        } else {
-            sessionPermissions = application.getSecurityController().getUserPermissions(this.user.getUserId());
+        } catch (Exception e) {
+            log.error("Error reading session permissions", e);
         }
     }
 
