@@ -33,6 +33,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
@@ -203,7 +204,10 @@ public class WebSession implements DBASession {
 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
-        for (DBPDataSourceContainer ds : databases.getDataSourceRegistry().getDataSources()) {
+        DBPDataSourceRegistry registry = databases.getDataSourceRegistry();
+        registry.refreshConfig();
+        this.databases.refreshChildren();
+        for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isProvided()) {
                 WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
                 connList.add(connectionInfo);
