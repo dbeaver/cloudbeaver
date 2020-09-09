@@ -100,7 +100,7 @@ implements IInitializableController {
     const prevDriver = this.dbDriverResource.get(prevDriverId || '');
 
     if (this.model.connection.host === prevDriver?.defaultServer) {
-      this.model.connection.host = this.driver?.defaultServer;
+      this.model.connection.host = this.driver?.defaultServer || 'localhost';
     }
 
     if (this.model.connection.port === prevDriver?.defaultPort) {

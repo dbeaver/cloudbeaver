@@ -87,6 +87,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
   async create(config: ConnectionConfig) {
     const { connection } = await this.graphQLService.gql.createConnectionConfiguration({ config });
+    await this.graphQLService.gql.refreshSessionConnections();
 
     const newConnection: ConnectionNew = {
       ...connection as ConnectionInfo,
@@ -105,11 +106,13 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
   async update(id: string, config: ConnectionConfig) {
     await this.performUpdate(id, () => this.updateConnection(id, config));
+    await this.graphQLService.gql.refreshSessionConnections();
     return this.get(id)!;
   }
 
   async delete(key: ResourceKey<string>) {
     await this.performUpdate(key, () => this.deleteConnectionTask(key));
+    await this.graphQLService.gql.refreshSessionConnections();
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {

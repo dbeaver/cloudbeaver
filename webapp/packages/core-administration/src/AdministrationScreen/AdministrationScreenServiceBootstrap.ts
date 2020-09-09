@@ -57,6 +57,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
       ],
       component: AdministrationScreen,
       onActivate: this.handleActivate.bind(this),
+      onDeactivate: this.handleDeactivate.bind(this),
     });
 
     this.screenService.create({
@@ -99,6 +100,10 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   private async handleDeactivate() {
+    if (!this.administrationScreenService.isAdministrationRouteActive()) {
+      this.administrationScreenService.activationEvent.execute(false);
+    }
+
     if (this.administrationScreenService.isConfigurationMode
       && !this.screenService.isActive(AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
@@ -122,6 +127,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     if (!await this.checkPermissions()) {
       return;
     }
+    this.administrationScreenService.activationEvent.execute(true);
 
     if (this.administrationScreenService.activeItem) {
       await this.administrationItemService.activate(

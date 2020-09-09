@@ -84,6 +84,8 @@
     }
 
     tab-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
       padding: 0 12px;
     }
 

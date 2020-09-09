@@ -252,6 +252,7 @@ export type Mutation = {
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
   readDataFromContainer?: Maybe<SqlExecuteInfo>;
+  refreshSessionConnections?: Maybe<Scalars['Boolean']>;
   setConnectionNavigatorSettings: Scalars['Boolean'];
   sqlContextCreate: SqlContextInfo;
   sqlContextDestroy: Scalars['Boolean'];
@@ -1023,6 +1024,10 @@ export type InitConnectionMutationVariables = Exact<{
 
 export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
+export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never }>;
+
+export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionConnections'>;
+
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> };
@@ -1712,6 +1717,11 @@ export const InitConnectionDocument = `
   }
 }
     `;
+export const RefreshSessionConnectionsDocument = `
+    mutation refreshSessionConnections {
+  refreshSessionConnections
+}
+    `;
 export const GetTemplateConnectionsDocument = `
     query getTemplateConnections {
   connections: templateConnections {
@@ -2294,6 +2304,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
       return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
+    },
+    refreshSessionConnections(variables?: RefreshSessionConnectionsMutationVariables): Promise<RefreshSessionConnectionsMutation> {
+      return withWrapper(() => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables));
     },
     getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));

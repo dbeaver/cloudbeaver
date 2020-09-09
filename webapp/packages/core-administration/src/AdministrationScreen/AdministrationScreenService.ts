@@ -9,6 +9,7 @@
 import { computed, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
@@ -57,6 +58,7 @@ export class AdministrationScreenService {
   get isConfigurationMode() {
     return !!this.serverConfigResource.data?.configurationMode;
   }
+  readonly activationEvent: IExecutor<boolean>;
 
   constructor(
     private screenService: ScreenService,
@@ -66,6 +68,7 @@ export class AdministrationScreenService {
     private serverConfigResource: ServerConfigResource
   ) {
     this.itemState = new Map();
+    this.activationEvent = new Executor();
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
   }
@@ -124,7 +127,7 @@ export class AdministrationScreenService {
     this.itemState.clear();
   }
 
-  private isAdministrationRouteActive() {
+  isAdministrationRouteActive() {
     return this.screenService.isActive(AdministrationScreenService.screenName)
     || this.screenService.isActive(AdministrationScreenService.setupName);
   }
