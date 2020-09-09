@@ -206,7 +206,7 @@ public class WebSession implements DBASession {
         List<WebConnectionInfo> connList = new ArrayList<>();
         DBPDataSourceRegistry registry = databases.getDataSourceRegistry();
         registry.refreshConfig();
-        this.databases.refreshChildren();
+
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isProvided()) {
                 WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
