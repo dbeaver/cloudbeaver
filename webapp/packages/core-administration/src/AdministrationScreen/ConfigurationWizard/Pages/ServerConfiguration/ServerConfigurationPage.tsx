@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
 import { useController } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ServerConfigurationForm } from './ServerConfigurationForm';
@@ -40,18 +41,23 @@ const styles = composes(
       border: solid 1px;
       padding: 16px 24px
     }
+
+    p {
+      line-height: 2;
+    }
   `
 );
 
 export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
+  const translate = useTranslate();
   const controller = useController(ServerConfigurationPageController);
 
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <h3>Welcome to initial server configuration</h3>
-          <p>Here you can configure something...</p>
+          <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
+          <p>{translate('administration_configuration_wizard_configuration_message')}</p>
           <ServerConfigurationForm
             serverConfig={controller.state.serverConfig}
             onChange={controller.onChange}

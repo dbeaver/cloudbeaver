@@ -5,6 +5,7 @@ export default [
   ['connections_administration_new_connection', 'New connection'],
   ['connections_administration_configuration_wizard_step_title', 'Database connections'],
   ['connections_administration_configuration_wizard_step_description', 'Database connections'],
+  ['connections_administration_configuration_wizard_message', 'Here you can create the database connections manually or using a database server search feature.\nYou can skip this step and configure connections later.'],
   ['connections_connection_create_search_database', 'Search Database'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_edit_access', 'Access'],
