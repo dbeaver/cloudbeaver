@@ -35,7 +35,7 @@ export class AuthenticationService extends Bootstrap {
         throw new Error('Can\'t configure Authentication');
       }
 
-      if (!config.authenticationEnabled) {
+      if (!config.authenticationEnabled || config.configurationMode) {
         return;
       }
 
