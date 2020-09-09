@@ -33,12 +33,6 @@ const styles = composes(
       display: flex;
       flex-direction: column;
     }
-
-    ErrorMessage {
-      position: sticky;
-      bottom: 0;
-      padding: 8px 24px;
-    }
   `
 );
 

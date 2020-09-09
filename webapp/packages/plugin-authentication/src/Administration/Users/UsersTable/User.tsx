@@ -7,14 +7,11 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand
 } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -31,9 +28,6 @@ type Props = {
 }
 
 export const User = observer(function User({ user }: Props) {
-  const translate = useTranslate();
-  const usersResource = useService(UsersResource);
-  const isNew = usersResource.isNew(user.userId);
 
   return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit}>
@@ -43,9 +37,9 @@ export const User = observer(function User({ user }: Props) {
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue expand>{isNew ? translate('authentication_administration_user_connections_user_new') : user.userId}</TableColumnValue>
+      <TableColumnValue expand>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
-      <TableColumnValue align='right'>{isNew && <tag as='div' {...use({ mod: 'positive' })}>{translate('ui_tag_new')}</tag>}</TableColumnValue>
+      <TableColumnValue></TableColumnValue>
     </TableItem>
   );
 });

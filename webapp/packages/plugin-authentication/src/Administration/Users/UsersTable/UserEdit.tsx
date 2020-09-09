@@ -8,12 +8,34 @@
 
 import { observer } from 'mobx-react';
 import { useContext, useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
 import {
   TableContext,
 } from '@cloudbeaver/core-blocks';
+import { useController } from '@cloudbeaver/core-di';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { UserForm } from '../UserForm/UserForm';
+import { UserEditController } from './UserEditController';
+
+const styles = composes(
+  css`
+    box {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+  `,
+  css`
+    box {
+      box-sizing: border-box;
+      padding: 24px;
+      min-height: 320px;
+      max-height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+  `
+);
 
 type Props = {
   item: string;
@@ -22,8 +44,15 @@ type Props = {
 export const UserEdit = observer(function UserEdit({
   item,
 }: Props) {
+  const controller = useController(UserEditController, item);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
-  return <UserForm userId={item} onCancel={collapse} />;
+  return styled(useStyles(styles))(
+    <box as='div'>
+      {controller.user && (
+        <UserForm user={controller.user} onCancel={collapse} editing/>
+      )}
+    </box>
+  );
 });

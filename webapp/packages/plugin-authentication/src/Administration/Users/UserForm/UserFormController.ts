@@ -31,10 +31,6 @@ export class UserFormController implements IInitializableController, IDestructib
     roles: new Map<string, boolean>(),
   };
 
-  @computed get isNew() {
-    return this.usersResource.isNew(this.userId);
-  }
-
   @computed get connections() {
     return Array.from(this.connectionsResource.data.values())
       .filter(connection => !this.connectionsResource.isNew(connection.id));
@@ -44,16 +40,14 @@ export class UserFormController implements IInitializableController, IDestructib
     return Array.from(this.rolesManagerService.roles.data.values());
   }
 
-  @computed get user(): AdminUserInfo {
-    return this.usersResource.get(this.userId)!;
-  }
+  user!: AdminUserInfo;
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
-  private userId!: string;
   private connectionAccessChanged = false;
   private connectionAccessLoaded = false;
   private collapse!: () => void;
+  private editing!: boolean;
 
   constructor(
     private notificationService: NotificationService,
@@ -64,8 +58,9 @@ export class UserFormController implements IInitializableController, IDestructib
     private dbDriverResource: DBDriverResource
   ) { }
 
-  init(id: string, collapse: () => void) {
-    this.userId = id;
+  init(user: AdminUserInfo, editing: boolean, collapse: () => void) {
+    this.user = user;
+    this.editing = editing;
     this.collapse = collapse;
     this.loadRoles();
   }
@@ -84,10 +79,9 @@ export class UserFormController implements IInitializableController, IDestructib
 
     this.isSaving = true;
     try {
-      if (this.isNew) {
+      if (!this.editing) {
         await this.usersResource.create({
           userId: this.credentials.login,
-          newId: this.userId,
           credentials: { password: this.credentials.password },
           roles: this.getGrantedRoles(),
           grantedConnections: this.getGrantedConnections(),
@@ -103,12 +97,9 @@ export class UserFormController implements IInitializableController, IDestructib
         await this.usersResource.refresh(this.user.userId);
         this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
       }
-
-      this.connectionAccessLoaded = false;
-      await this.loadConnectionsAccess();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
-        if (this.isNew) {
+        if (!this.editing) {
           this.notificationService.logException(exception, 'Error creating new user');
         } else {
           this.notificationService.logException(exception, 'Error saving user');
@@ -134,12 +125,14 @@ export class UserFormController implements IInitializableController, IDestructib
 
     this.isLoading = true;
     try {
-      this.grantedConnections = await this.usersResource.loadConnections(this.userId);
+      if (this.editing) {
+        this.grantedConnections = await this.usersResource.loadConnections(this.user.userId);
 
-      this.selectedConnections.clear();
-      for (const connection of this.grantedConnections) {
-        if (connection.subjectType !== AdminSubjectType.Role) {
-          this.selectedConnections.set(connection.connectionId, true);
+        this.selectedConnections.clear();
+        for (const connection of this.grantedConnections) {
+          if (connection.subjectType !== AdminSubjectType.Role) {
+            this.selectedConnections.set(connection.connectionId, true);
+          }
         }
       }
       this.connectionAccessLoaded = true;
@@ -161,12 +154,12 @@ export class UserFormController implements IInitializableController, IDestructib
       return;
     }
 
-    if (!this.credentials.password && this.isNew) {
+    if (!this.credentials.password && !this.editing) {
       this.notificationService.logError({ title: 'authentication_user_password_not_set' });
       return;
     }
 
-    if (!this.credentials.password && this.isNew) {
+    if (!this.credentials.password && !this.editing) {
       this.notificationService.logError({ title: 'authentication_user_password_not_set' });
       return;
     }
@@ -190,7 +183,7 @@ export class UserFormController implements IInitializableController, IDestructib
         if (!this.user.grantedRoles.includes(roleId)) {
           await this.usersResource.grantRole(this.user.userId, roleId, true);
         }
-      } else if (!this.isNew) {
+      } else {
         await this.usersResource.revokeRole(this.user.userId, roleId, true);
       }
     }
@@ -215,8 +208,10 @@ export class UserFormController implements IInitializableController, IDestructib
     if (!this.connectionAccessChanged) {
       return;
     }
-    await this.usersResource.setConnections(this.userId, this.getGrantedConnections());
+    await this.usersResource.setConnections(this.user.userId, this.getGrantedConnections());
     this.connectionAccessChanged = false;
+    this.connectionAccessLoaded = false;
+    await this.loadConnectionsAccess();
   }
 
   private async loadRoles() {
@@ -232,11 +227,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadUser() {
     try {
-      await this.usersResource.load(this.userId);
-
-      if (!this.isNew) {
-        this.credentials.login = this.user.userId;
-      }
+      this.credentials.login = this.user.userId;
       this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load user');
