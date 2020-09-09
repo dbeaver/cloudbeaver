@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useState, useMemo } from 'react';
 
 import { ItemListSearch, ItemList } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Driver, IDriver } from './Driver';
 
@@ -20,6 +21,7 @@ type DriverSelectorProps = {
 }
 
 export const DriverSelector = observer(function DriverSelector({ drivers, className, onSelect }: DriverSelectorProps) {
+  const translate = useTranslate();
   const [search, setSearch] = useState('');
   const filteredDrivers = useMemo(() => {
     if (!search) {
@@ -30,7 +32,7 @@ export const DriverSelector = observer(function DriverSelector({ drivers, classN
 
   return (
     <ItemList className={className}>
-      <ItemListSearch onSearch={setSearch} />
+      <ItemListSearch onSearch={setSearch} placeholder={translate('connections_driver_search_placeholder')}/>
       {filteredDrivers.map(driver => <Driver key={driver.id} driver={driver} onSelect={onSelect}/>)}
     </ItemList>
   );

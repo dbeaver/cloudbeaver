@@ -40,7 +40,7 @@ export const ItemContent = observer(function ItemContent({
   if (activeItemSub) {
     const sub = administrationItemService.getItemSub(item, activeItemSub);
     if (sub) {
-      const Component = sub.getComponent();
+      const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
       return <Component item={item} sub={sub} param={activeItemSubParam} configurationWizard={configurationWizard} />;
     }

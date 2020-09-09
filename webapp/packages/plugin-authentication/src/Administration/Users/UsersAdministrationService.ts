@@ -32,7 +32,6 @@ export class UsersAdministrationService extends Bootstrap {
       sub: [
         {
           name: UsersAdministrationNavigationService.AddItemName,
-          getComponent: () => UsersAdministration,
           onActivate: this.onCreateActivate.bind(this),
         },
       ],

@@ -5,6 +5,7 @@ export default [
   ['connections_administration_new_connection', 'New connection'],
   ['connections_administration_configuration_wizard_step_title', 'Database connections'],
   ['connections_administration_configuration_wizard_step_description', 'Database connections'],
+  ['connections_connection_create_search_database', 'Search Database'],
   ['connections_connection_edit_authentication', 'Authentication'],
   ['connections_connection_edit_access', 'Access'],
   ['connections_connection_edit_access_load_failed', 'Connection access loading failed'],
@@ -19,4 +20,5 @@ export default [
   ['connections_connection_port', 'Port'],
   ['connections_connection_template', 'Template'],
   ['connections_connection_test', 'Test Connection'],
+  ['connections_driver_search_placeholder', 'Type driver name...'],
 ];
