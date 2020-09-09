@@ -19,6 +19,9 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { User } from './User';
 
 const styles = css`
+  Table {
+    width: 100%;
+  }
   TableColumnHeader {
     border-top: solid 1px;
   }

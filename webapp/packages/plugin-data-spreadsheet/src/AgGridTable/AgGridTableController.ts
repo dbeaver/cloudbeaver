@@ -18,7 +18,6 @@ import {
   ColDef,
   ValueGetterParams,
   GridOptions,
-  CellEditingStoppedEvent,
   CellClassParams,
   SortChangedEvent,
   RowNode,
@@ -74,7 +73,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onGridReady: this.handleGridReady.bind(this),
     onBodyScroll: this.handleBodyScroll.bind(this),
 
-    onCellEditingStopped: this.handleCellEditingStopped.bind(this),
     onSortChanged: this.handleSortChanged.bind(this),
   };
 
@@ -161,11 +159,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private editCellValue(rowIndex: number, colId: string, value: any, editing: boolean) {
     this.gridModel.onCellEditingStopped(rowIndex, colId, value, editing);
-  }
-
-  private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    // TODO: probably no more needed because editCellValue executes on every change in editor
-    // this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getColId(), event.value, false);
   }
 
   private isCellEdited(rowIndex: number, column: string) {

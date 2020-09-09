@@ -28,13 +28,13 @@ const styles = composes(
   css`
     title-bar {
       composes: theme-typography--headline6 from global;
-      padding: 0 16px;
+      box-sizing: border-box;
+      padding: 16px 24px;
       border-top: solid 1px;
       align-items: center;
-      height: 48px;
       display: flex;
       font-weight: 400;
-      flex: 1;
+      flex: auto 0 0;
     }
   `
 );
@@ -47,7 +47,7 @@ export function CreateUser({
   return styled(useStyles(styles))(
     <user-create as='div'>
       <title-bar as='div'><Translate token='authentication_administration_user_connections_user_add'/></title-bar>
-      <UserForm userId={user.userId} onCancel={onCancel} />
+      <UserForm user={user} onCancel={onCancel} />
     </user-create>
   );
 }

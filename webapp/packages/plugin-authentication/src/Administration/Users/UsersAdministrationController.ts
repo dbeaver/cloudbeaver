@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, resourceKeyList, AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 
@@ -26,10 +26,9 @@ export class UsersAdministrationController {
 
   @computed get users() {
     return Array.from(this.usersResource.data.values())
-      .filter(user => !this.usersResource.isNew(user.userId))
       .sort((a, b) => {
         if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
-          return 0;
+          return a.userId.localeCompare(b.userId);
         }
         if (this.usersResource.isNew(a.userId)) {
           return -1;
@@ -38,10 +37,7 @@ export class UsersAdministrationController {
       });
   }
 
-  @computed get creatingUser() {
-    return Array.from(this.usersResource.data.values())
-      .find(user => this.usersResource.isNew(user.userId));
-  }
+  @observable creatingUser: AdminUserInfo | null = null;
 
   get isLoading() {
     return this.usersResource.isLoading() || this.isDeleting;
@@ -55,7 +51,13 @@ export class UsersAdministrationController {
   ) { }
 
   create = () => {
-    this.usersResource.addNew();
+    this.creatingUser = {
+      userId: '',
+      grantedRoles: [],
+      grantedConnections: [],
+      configurationParameters: {},
+      metaParameters: {},
+    } as AdminUserInfo;
     this.usersAdministrationNavigationService.navToAdd();
   }
 
@@ -64,7 +66,7 @@ export class UsersAdministrationController {
       return;
     }
 
-    this.usersResource.delete(this.creatingUser.userId);
+    this.creatingUser = null;
     this.usersAdministrationNavigationService.navToRoot();
   }
 

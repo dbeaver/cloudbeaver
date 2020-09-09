@@ -41,6 +41,11 @@ const styles = composes(
       border: solid 1px;
       padding: 16px 24px
     }
+
+    p {
+      line-height: 2;
+      white-space: pre;
+    }
   `
 );
 
@@ -52,8 +57,8 @@ export const FinishPage = observer(function FinishPage() {
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <h3>All done</h3>
-          <p>Go to fun</p>
+          <h3>{translate('administration_configuration_wizard_finish_title')}</h3>
+          <p>{translate('administration_configuration_wizard_finish_message')}</p>
 
           <Button
             type="button"

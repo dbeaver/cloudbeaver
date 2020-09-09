@@ -21,6 +21,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { GrantedConnections } from './GrantedConnections';
@@ -53,10 +54,6 @@ const styles = composes(
     }
   `,
   css`
-    box {
-      padding: 24px;
-    }
-
     SubmittingForm {
       flex: 1;
       display: flex;
@@ -128,16 +125,18 @@ const styles = composes(
 );
 
 type Props = {
-  userId: string;
+  user: AdminUserInfo;
+  editing?: boolean;
   onCancel: () => void;
 }
 
 export const UserForm = observer(function UserForm({
-  userId,
+  user,
+  editing = false,
   onCancel,
 }: Props) {
   const translate = useTranslate();
-  const controller = useController(UserFormController, userId, onCancel);
+  const controller = useController(UserFormController, user, editing, onCancel);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const handleLoginChange = useCallback(
@@ -182,7 +181,7 @@ export const UserForm = observer(function UserForm({
             mod={['unelevated']}
             onClick={controller.save}
           >
-            {translate(controller.isNew ? 'ui_processing_create' : 'ui_processing_save')}
+            {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
           </Button>
         </TabList>
         <content-box as='div'>
@@ -199,7 +198,7 @@ export const UserForm = observer(function UserForm({
                       name='login'
                       value={controller.credentials.login}
                       onChange={handleLoginChange}
-                      disabled={!controller.isNew || controller.isSaving}
+                      disabled={editing || controller.isSaving}
                       mod='surface'
                       required
                     >

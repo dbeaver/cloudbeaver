@@ -8,6 +8,7 @@
 
 import styled, { use, css } from 'reshadow';
 
+import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 const styles = composes(
@@ -35,6 +36,14 @@ const styles = composes(
       border: solid 1px;
       padding: 16px 24px
     }
+
+    p {
+      line-height: 2;
+    }
+
+    note {
+      composes: theme-typography--body2 from global;
+    }
   `
 );
 
@@ -43,8 +52,9 @@ export function WelcomePage() {
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <h3>Welcome to initial server configuration</h3>
-          <p>Here you can configure something...</p>
+          <h3><Translate token='administration_configuration_wizard_welcome_title'/></h3>
+          <p><Translate token='administration_configuration_wizard_welcome_message'/></p>
+          <note as='div'><Translate token='administration_configuration_wizard_welcome_note'/></note>
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

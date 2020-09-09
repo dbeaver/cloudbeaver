@@ -134,10 +134,10 @@ export const PropertyItem = observer(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useLayoutEffect(() => {
-    if (keyInputRef.current && isKeyEditable) {
+    if (keyInputRef.current && isKeyEditable && property.new) {
       keyInputRef.current.focus();
     }
-  }, []);
+  }, [property]);
 
   return styled(useStyles(styles))(
     <property-item as="div">
