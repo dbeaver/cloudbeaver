@@ -9,15 +9,12 @@
 import { observable, computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, AdminConnectionSearchInfo, ConnectionInfo } from '@cloudbeaver/core-sdk';
+import { AdminConnectionSearchInfo, ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource } from '../../ConnectionsResource';
-import { ConnectionsAdministrationNavService } from '../ConnectionsAdministrationNavService';
 
 @injectable()
 export class CreateConnectionController {
@@ -37,14 +34,10 @@ export class CreateConnectionController {
     return this.dbDriverResource.get(this.connection.driverId);
   }
 
-  readonly error = new GQLErrorCatcher();
-
   constructor(
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private commonDialogService: CommonDialogService,
     private dbDriverResource: DBDriverResource,
-    private connectionsAdministrationNavService: ConnectionsAdministrationNavService
   ) {
     this.credentials = {};
     this.databases = [];
@@ -67,9 +60,7 @@ export class CreateConnectionController {
 
       this.databases = await this.connectionsResource.searchDatabases(hosts);
     } catch (exception) {
-      if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'Databases search failed');
-      }
+      this.notificationService.logException(exception, 'Databases search failed');
     } finally {
       this.isProcessing = false;
     }
@@ -108,11 +99,5 @@ export class CreateConnectionController {
   back = () => {
     this.connection = null;
     this.availableDrivers = [];
-  }
-
-  showDetails = () => {
-    if (this.error.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
-    }
   }
 }

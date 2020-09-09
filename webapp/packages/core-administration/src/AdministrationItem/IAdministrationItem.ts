@@ -49,7 +49,7 @@ export type AdministrationItemSubCanActivateEvent = (
 
 export interface IAdministrationItemSubItem {
   name: string;
-  getComponent(): AdministrationItemSubContentComponent;
+  getComponent?: () => AdministrationItemSubContentComponent;
   onActivate?: AdministrationItemSubEvent;
   canActivate?: AdministrationItemSubCanActivateEvent;
 }

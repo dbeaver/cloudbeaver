@@ -20,7 +20,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -29,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -38,6 +41,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -407,6 +411,11 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("Saving runtime configuration");
         saveRuntimeConfig(newServerName, appConfig);
 
+        // Grant permissions to predefined connections
+        if (appConfig.isAnonymousAccessEnabled()) {
+            grantAnonymousAccessToConnections(appConfig, adminName);
+        }
+
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
@@ -420,6 +429,24 @@ public class CBApplication extends BaseApplicationImpl {
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+    }
+
+    private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
+        try {
+            String anonymousRoleId = appConfig.getAnonymousUserRole();
+            DBWSecurityController securityController = getSecurityController();
+            for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+                DBWConnectionGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
+                if (ArrayUtils.isEmpty(grants)) {
+                    securityController.setConnectionSubjectAccess(
+                        ds.getId(),
+                        new String[] { anonymousRoleId },
+                        adminName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error granting anonymous access to connections", e);
+        }
     }
 
     private void saveRuntimeConfig(String newServerName, CBAppConfig appConfig) throws DBException {

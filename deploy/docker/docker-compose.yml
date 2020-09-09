@@ -7,3 +7,4 @@ services:
       - "8978:8978"
     volumes:
       - "./logs:/opt/cloudbeaver/logs"
+      - "./workspace:/opt/cloudbeaver/workspace"

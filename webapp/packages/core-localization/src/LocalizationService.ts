@@ -51,13 +51,15 @@ export class LocalizationService extends Bootstrap {
   }
 
   readonly translate = (token: TLocalizationToken): string => {
-    let locale = this.localeMap.get(this.getCurrentLanguage());
+    let translation = this.localeMap
+      .get(this.getCurrentLanguage())
+      ?.get(token);
 
-    if (!locale) {
-      locale = this.localeMap.get(DEFAULT_LOCALE_NAME);
+    if (!translation) {
+      translation = this.localeMap
+        .get(DEFAULT_LOCALE_NAME)
+        ?.get(token);
     }
-
-    const translation = locale && locale.get(token);
 
     if (typeof translation === 'string') {
       return translation;

@@ -26,7 +26,6 @@ type AdminUserNew = AdminUserInfo & { [NEW_USER_SYMBOL]: boolean }
 
 type UserCreateOptions = {
   userId: string;
-  newId?: string;
   roles: string[];
   credentials: Record<string, any>;
   grantedConnections: string[];
@@ -59,22 +58,6 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     return this.data.has(id);
   }
 
-  addNew() {
-    const user = {
-      userId: `new-${uuid()}`,
-      grantedRoles: [],
-      grantedConnections: [],
-      configurationParameters: {},
-      metaParameters: {},
-      [NEW_USER_SYMBOL]: true,
-    } as AdminUserNew;
-
-    this.data.set(user.userId, user);
-    this.markUpdated(user.userId);
-
-    return user;
-  }
-
   async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {
     if (this.isNew(userId)) {
       return [];
@@ -90,14 +73,9 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   }
 
   async create({
-    userId, newId, roles, credentials, grantedConnections,
+    userId, roles, credentials, grantedConnections,
   }: UserCreateOptions): Promise<AdminUserInfo> {
     const { user } = await this.graphQLService.gql.createUser({ userId });
-
-    if (newId) {
-      this.data.delete(newId);
-    }
-    this.set(userId, user as AdminUserInfo);
 
     try {
       await this.updateCredentials(userId, credentials);
@@ -106,6 +84,8 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
       }
 
       await this.setConnections(userId, grantedConnections);
+      const user = await this.refresh(userId)as AdminUserNew;
+      user[NEW_USER_SYMBOL] = true;
     } catch (exception) {
       this.delete(userId);
       throw exception;

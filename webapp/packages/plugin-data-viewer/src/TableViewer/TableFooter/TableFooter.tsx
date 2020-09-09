@@ -75,7 +75,16 @@ export const TableFooter = observer(function TableFooter({
 }: TableFooterProps) {
   const ref = useRef<HTMLInputElement>(null);
   const handleChange = useCallback(
-    () => ref.current && model.setChunkSize(parseInt(ref.current.value, 10)),
+    () => {
+      if (!ref.current) {
+        return;
+      }
+      const value = parseInt(ref.current.value, 10);
+
+      if (model.getChunkSize() !== value) {
+        model.setChunkSize(value);
+      }
+    },
     [model]
   );
 

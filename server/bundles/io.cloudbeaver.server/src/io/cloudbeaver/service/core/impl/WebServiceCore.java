@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -101,10 +100,13 @@ public class WebServiceCore implements DBWServiceCore {
     public List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
         for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
-            if (ds.isTemplate() && CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+            if (ds.isTemplate() &&
+                CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver()))
+            {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
         }
+        webSession.filterAccessibleConnections(result);
 
         return result;
     }
@@ -117,11 +119,7 @@ public class WebServiceCore implements DBWServiceCore {
                 DBWConstants.PERMISSION_ADMIN
             };
         }
-        try {
-            return webSession.getSessionPermissions().toArray(new String[0]);
-        } catch (DBCException e) {
-            throw new DBWebException("Error reading session permissions", e);
-        }
+        return webSession.getSessionPermissions().toArray(new String[0]);
     }
 
     @Override
@@ -147,6 +145,17 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean touchSession(HttpServletRequest request) throws DBWebException {
         return CBPlatform.getInstance().getSessionManager().touchSession(request);
+    }
+
+    @Override
+    public boolean refreshSessionConnections(HttpServletRequest request) throws DBWebException {
+        WebSession session = CBPlatform.getInstance().getSessionManager().getWebSession(request);
+        if (session == null) {
+            return false;
+        } else {
+            session.refreshConnections();
+            return true;
+        }
     }
 
     @Override

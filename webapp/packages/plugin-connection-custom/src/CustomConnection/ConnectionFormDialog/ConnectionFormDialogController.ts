@@ -136,12 +136,12 @@ implements IInitializableController, IDestructibleController {
 
   @action
   private setDriverDefaults() {
-    this.config.name = `${this.driver?.name} (custom)`;
-    this.config.driverId = this.driver?.id;
-    this.config.host = '';
-    this.config.port = this.driver?.defaultPort || '';
-    this.config.databaseName = '';
-    this.config.url = this.driver?.sampleURL || '';
+    this.config.name = `${this.driver.name} (custom)`;
+    this.config.driverId = this.driver.id;
+    this.config.host = this.driver.defaultServer || 'localhost';
+    this.config.port = this.driver.defaultPort || '';
+    this.config.databaseName = this.driver.defaultDatabase;
+    this.config.url = this.driver.sampleURL || '';
     this.config.properties = {};
     this.config.authModelId = this.driver.defaultAuthModel;
     this.config.credentials = {};

@@ -39,7 +39,7 @@ export const DriverProperties = observer(function DriverProperties({
   state,
   loadProperties,
 }: DriverPropertiesProps) {
-  const controller = useController(DriverPropertiesController, driverId);
+  const controller = useController(DriverPropertiesController, driverId, state);
 
   useMemo(() => {
     if (loadProperties) {
@@ -54,7 +54,7 @@ export const DriverProperties = observer(function DriverProperties({
         <PropertiesTable
           properties={controller.driverProperties}
           propertiesState={state}
-          onAdd={controller.onAddProperty}
+          onAdd={controller.addProperty}
         />
       )}
     </properties>

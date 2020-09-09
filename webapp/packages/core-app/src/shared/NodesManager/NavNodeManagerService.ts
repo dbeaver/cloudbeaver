@@ -12,7 +12,9 @@ import {
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
-import { PermissionsService, EPermission, SessionResource } from '@cloudbeaver/core-root';
+import {
+  PermissionsService, EPermission, SessionResource, ServerService
+} from '@cloudbeaver/core-root';
 import {
   GraphQLService, resourceKeyList, isResourceKeyList, ResourceKey
 } from '@cloudbeaver/core-sdk';
@@ -98,6 +100,7 @@ export class NavNodeManagerService extends Bootstrap {
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
     private sessionResource: SessionResource,
+    private serverService: ServerService,
   ) {
     super();
     this.activeNavigationNodes = [];
@@ -144,10 +147,11 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async updateRootChildren() {
-    if (!await this.permissionsService.hasAsync(EPermission.public)) {
+    if (!await this.isNavTreeEnabled()) {
       this.navTree.delete(ROOT_NODE_PATH);
       return;
     }
+
     await this.navTree.refresh(ROOT_NODE_PATH);
   }
 
@@ -326,6 +330,10 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
+    if (!await this.isNavTreeEnabled()) {
+      return;
+    }
+
     const keys = isResourceKeyList(key) ? key.list : [key];
 
     for (const id of keys) {
@@ -341,13 +349,10 @@ export class NavNodeManagerService extends Bootstrap {
 
       await this.refreshNode(nodeId);
 
-      if (connectionInfo?.features.includes(EConnectionFeature.temporary)) {
+      const tree = this.navTree.get(ROOT_NODE_PATH);
 
-        const tree = this.navTree.get(ROOT_NODE_PATH);
-
-        if (!tree?.includes(nodeId)) {
-          this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
-        }
+      if (!tree?.includes(nodeId)) {
+        this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
       }
     }
   }
@@ -394,5 +399,19 @@ export class NavNodeManagerService extends Bootstrap {
         throw new Error('Connection not established');
       }
     }
+  }
+
+  private async isNavTreeEnabled() {
+    if (!await this.permissionsService.hasAsync(EPermission.public)) {
+      return false;
+    }
+
+    // TODO: IT'S IS REALLY BAD PLACE FOR THAT
+    const config = await this.serverService.config.load(null);
+    if (config?.configurationMode) {
+      return false;
+    }
+
+    return true;
   }
 }

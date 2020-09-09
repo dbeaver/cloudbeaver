@@ -26,17 +26,12 @@ const styles = composes(
   `,
   css`
     box {
+      box-sizing: border-box;
       padding: 24px;
       min-height: 320px;
       max-height: 500px;
       display: flex;
       flex-direction: column;
-    }
-
-    ErrorMessage {
-      position: sticky;
-      bottom: 0;
-      padding: 8px 24px;
     }
   `
 );

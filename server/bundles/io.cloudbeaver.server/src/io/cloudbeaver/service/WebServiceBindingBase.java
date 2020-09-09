@@ -28,7 +28,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -147,12 +146,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
             if (!CBApplication.getInstance().isConfigurationMode()) {
                 // Check permissions
-                Set<String> sessionPermissions;
-                try {
-                    sessionPermissions = session.getSessionPermissions();
-                } catch (DBCException e) {
-                    throw new DBWebExceptionAccessDenied("Can't retrieve session permissions", e);
-                }
+                Set<String> sessionPermissions = session.getSessionPermissions();
                 if (CommonUtils.isEmpty(sessionPermissions)) {
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
                 }

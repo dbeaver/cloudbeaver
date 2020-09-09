@@ -48,7 +48,13 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
     return this.outdated.has(key);
   }
 
-  markOutdated(key: ResourceKey<TKey>): void {
+  markOutdated(): void
+  markOutdated(key: ResourceKey<TKey>): void
+  markOutdated(key?: ResourceKey<TKey>): void {
+    if (!key) {
+      key = resourceKeyList(Array.from(this.data.keys()));
+    }
+
     if (isResourceKeyList(key)) {
       for (const itemKey of key.list) {
         this.outdated.add(itemKey);
@@ -59,7 +65,13 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
     this.outdatedSubject.next(key);
   }
 
-  markUpdated(key: ResourceKey<TKey>): void {
+  markUpdated(): void
+  markUpdated(key: ResourceKey<TKey>): void
+  markUpdated(key?: ResourceKey<TKey>): void {
+    if (!key) {
+      key = resourceKeyList(Array.from(this.data.keys()));
+    }
+
     if (isResourceKeyList(key)) {
       for (const itemKey of key.list) {
         this.outdated.delete(itemKey);

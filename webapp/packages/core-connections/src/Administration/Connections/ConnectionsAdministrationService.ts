@@ -27,6 +27,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   register() {
+
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Default,
@@ -36,10 +37,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
         description: 'connections_administration_configuration_wizard_step_description',
       },
       sub: [
-        {
-          name: 'create',
-          getComponent: () => ConnectionsAdministration,
-        },
+        { name: 'create' },
       ],
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,

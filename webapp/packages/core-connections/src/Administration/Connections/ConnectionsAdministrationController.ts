@@ -11,8 +11,7 @@ import { observable, computed } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, isSearchedConnection } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
@@ -22,8 +21,6 @@ export class ConnectionsAdministrationController {
   @observable isProcessing = false;
   readonly selectedItems = observable<string, boolean>(new Map())
   readonly expandedItems = observable<string, boolean>(new Map())
-  readonly error = new GQLErrorCatcher();
-
   @computed
   get connections() {
     return Array.from(this.connectionsResource.data.values())
@@ -65,9 +62,7 @@ export class ConnectionsAdministrationController {
     try {
       await this.connectionsResource.refresh('all');
     } catch (exception) {
-      if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'Connections update failed');
-      }
+      this.notificationService.logException(exception, 'Connections update failed');
     }
   }
 
@@ -108,17 +103,9 @@ export class ConnectionsAdministrationController {
         this.expandedItems.delete(id);
       }
     } catch (exception) {
-      if (!this.error.catch(exception)) {
-        this.notificationService.logException(exception, 'Connections delete failed');
-      }
+      this.notificationService.logException(exception, 'Connections delete failed');
     } finally {
       this.isProcessing = false;
-    }
-  }
-
-  showDetails = () => {
-    if (this.error.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   }
 }
