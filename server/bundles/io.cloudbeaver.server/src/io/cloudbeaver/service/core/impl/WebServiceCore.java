@@ -275,6 +275,7 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceRegistry sessionRegistry = webSession.getDatabasesNode().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
+        newDataSource.setSavePassword(true); // We need for test to avoid password callback
         try {
             ConnectionTestJob ct = new ConnectionTestJob(newDataSource, param -> {});
             ct.run(webSession.getProgressMonitor());
