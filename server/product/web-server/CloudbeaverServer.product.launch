@@ -143,6 +143,7 @@
         <setEntry value="org.jkiss.bundle.influxdb@default:default"/>
         <setEntry value="org.jkiss.bundle.jaxb@default:default"/>
         <setEntry value="org.jkiss.bundle.jedis@default:default"/>
+        <setEntry value="org.jkiss.bundle.lightcouch@default:default"/>
         <setEntry value="org.jkiss.bundle.liquibase@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
         <setEntry value="org.mongodb.mongo-java-driver@default:default"/>
@@ -191,12 +192,12 @@
         <setEntry value="io.cloudbeaver.service.auth.aws@default:default"/>
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
         <setEntry value="io.cloudbeaver.service.data.transfer@default:default"/>
+        <setEntry value="io.cloudbeaver.service.erd@default:default"/>
         <setEntry value="io.cloudbeaver.service.metadata@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.gis@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.office@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.transfer@default:default"/>
         <setEntry value="org.jkiss.dbeaver.erd.model@default:default"/>
-        <setEntry value="org.jkiss.dbeaver.erd.ui@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.athena@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.bigquery@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.clickhouse@default:default"/>
