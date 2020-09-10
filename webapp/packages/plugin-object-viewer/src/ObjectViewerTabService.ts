@@ -9,7 +9,6 @@
 import {
   NavigationTabsService,
   INodeNavigationData,
-  IContextProvider,
   ITab,
   TabHandler,
   NavigationType,
@@ -22,6 +21,7 @@ import {
 import { connectionProvider, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IContextProvider } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { IObjectViewerTabContext } from './IObjectViewerTabContext';

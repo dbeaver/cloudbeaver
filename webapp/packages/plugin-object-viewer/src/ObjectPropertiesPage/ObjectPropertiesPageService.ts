@@ -7,10 +7,11 @@
  */
 
 import {
-  NavNodeManagerService, ITab, IContextProvider, INodeNavigationData
+  NavNodeManagerService, ITab, INodeNavigationData
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IContextProvider } from '@cloudbeaver/core-executor';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';

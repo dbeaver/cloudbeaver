@@ -7,11 +7,12 @@
  */
 
 import {
-  EObjectFeature, NavNodeManagerService, IContextProvider, INodeNavigationData
+  EObjectFeature, NavNodeManagerService, INodeNavigationData
 } from '@cloudbeaver/core-app';
 import { ITab } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { IContextProvider } from '@cloudbeaver/core-executor';
 import { ObjectViewerTabService } from '@cloudbeaver/plugin-object-viewer';
 
 import { ddlViewer } from './DdlViewer/DdlViewer';
