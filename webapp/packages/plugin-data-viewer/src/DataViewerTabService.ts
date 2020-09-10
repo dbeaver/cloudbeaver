@@ -38,7 +38,7 @@ export class DataViewerTabService {
   ) {
 
     this.page = this.dbObjectPageService.register({
-      key: dataViewerHandlerKey,
+      key: 'data_viewer_data',
       priority: 2,
       order: 2,
       getTabComponent: () => DataViewerTab,
