@@ -7,7 +7,6 @@
  */
 
 import { autorun } from 'mobx';
-import { IReactionDisposer } from 'mobx/lib/internal';
 
 import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
@@ -21,7 +20,7 @@ export class ObjectFoldersController implements IInitializableController, IDestr
 
   private tabContainer!: ObjectFoldersTabContainer;
   private navigationTab!: ITab<IObjectViewerTabState>
-  private disposer!: IReactionDisposer;
+  private disposer!: ReturnType<typeof autorun>;
 
   constructor(
     private objectFoldersService: ObjectFoldersService,

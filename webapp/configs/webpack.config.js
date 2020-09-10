@@ -1,6 +1,7 @@
 const { resolve, join } = require('path');
 const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 // Temporary solution to remove wrong warning messages (it's was fixed https://github.com/microsoft/TypeScript/pull/35200 in typescript 3.8)
 class IgnoreNotFoundExportPlugin {
@@ -54,9 +55,10 @@ module.exports = (env, argv) => {
       {
         loader: 'postcss-loader',
         options: {
-          // syntax: 'postcss-scss',
-          plugins: postCssPlugins,
-          sourceMap: true,
+          postcssOptions: {
+            plugins: postCssPlugins,
+            sourceMap: true,
+          }
         },
       },
       {
@@ -71,13 +73,13 @@ module.exports = (env, argv) => {
       }
     ];
   }
-  
+
   process.env.NODE_ENV = argv.mode || 'development'
 
   var babelLoader = {
     loader: 'babel-loader',
     options: {
-      configFile: join(__dirname, 'babel.config.js')
+      configFile: join(__dirname, 'babel.config.js'),
     },
   }
 
@@ -148,6 +150,14 @@ module.exports = (env, argv) => {
     devtool: 'cheap-module-source-map',
     plugins: [
       new IgnoreNotFoundExportPlugin(),
+      new ForkTsCheckerWebpackPlugin({
+        typescript: {
+          diagnosticOptions: {
+            semantic: true,
+            syntactic: true,
+          },
+        },
+      }),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // all options are optional

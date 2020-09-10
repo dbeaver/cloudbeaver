@@ -96,7 +96,7 @@ export class Deferred<T> {
 }
 
 export class DeferredFromPromise<T> extends Deferred<T> {
-  constructor(public promise: Promise<T>) {
+  constructor(promise: Promise<T>) {
     super();
     promise.then(
       value => this.toResolved(value),

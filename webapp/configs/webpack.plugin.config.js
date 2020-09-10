@@ -1,4 +1,4 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { resolve, join } = require('path');
 var PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const commonConfig = require('./webpack.config.js');
