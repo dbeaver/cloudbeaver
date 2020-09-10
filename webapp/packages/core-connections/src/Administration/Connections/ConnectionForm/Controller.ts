@@ -142,6 +142,11 @@ implements IInitializableController, IDestructibleController {
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
+
+    if (this.model.editing) {
+      config.connectionId = this.model.connection.id;
+    }
+
     config.name = this.model.connection.name;
     config.description = this.model.connection.description;
     config.template = this.model.connection.template;

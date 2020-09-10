@@ -196,6 +196,8 @@ type ConnectionInfo {
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
 input ConnectionConfig {
+    # used only for testing created connection
+    connectionId: String
     name: String
     description: String
 

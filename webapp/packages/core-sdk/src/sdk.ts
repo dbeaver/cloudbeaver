@@ -520,6 +520,7 @@ export type ConnectionInfo = {
 };
 
 export type ConnectionConfig = {
+  connectionId?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   templateId?: Maybe<Scalars['ID']>;
