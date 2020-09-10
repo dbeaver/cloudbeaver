@@ -195,6 +195,8 @@
         <setEntry value="org.jkiss.dbeaver.data.gis@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.office@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.transfer@default:default"/>
+        <setEntry value="org.jkiss.dbeaver.erd.model@default:default"/>
+        <setEntry value="org.jkiss.dbeaver.erd.ui@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.athena@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.bigquery@default:default"/>
         <setEntry value="org.jkiss.dbeaver.ext.clickhouse@default:default"/>
