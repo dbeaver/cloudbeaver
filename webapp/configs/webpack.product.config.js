@@ -37,6 +37,5 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
             version: JSON.stringify(package.buildVersion),
         }),
         new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), }),
-        new webpack.NamedModulesPlugin(),
     ],
 });

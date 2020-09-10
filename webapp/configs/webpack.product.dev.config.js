@@ -23,6 +23,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         }
     },
     devtool: 'cheap-module-eval-source-map',
+    optimization: {
+        namedModules: true,
+    },
     plugins: [
         new CopyWebpackPlugin({
             patterns: getAssets(package, '')
@@ -32,7 +35,6 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         }),
         new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), }),
         new webpack.HotModuleReplacementPlugin(), // enable HMR globally
-        new webpack.NamedModulesPlugin(),
         // new BundleAnalyzerPlugin()
     ],
 });

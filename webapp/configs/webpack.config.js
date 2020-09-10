@@ -67,7 +67,7 @@ module.exports = (env, argv) => {
           sourceMap: true,
           sassOptions: {
             implementation: require('node-sass'),
-            includePaths: [resolve('node_modules'), join(__dirname, '../node_modules')]
+            includePaths: [resolve('node_modules'), resolve('../../node_modules')]
           },
         }
       }
@@ -88,7 +88,7 @@ module.exports = (env, argv) => {
     mode: argv.mode || 'development',
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
-      modules: [resolve('node_modules'), join(__dirname, '../node_modules')],
+      modules: [resolve('node_modules'), resolve('../../node_modules')],
       alias: {
         react: 'preact/compat',
         react$: 'preact/compat',

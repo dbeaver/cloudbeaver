@@ -10,7 +10,6 @@ import {
   NavNodeManagerService,
   INodeNavigationData,
   ITab,
-  NavigationType,
   NodeManagerUtils,
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
