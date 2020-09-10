@@ -16,6 +16,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { CreateUser } from './CreateUser';
 import { UsersAdministrationController } from './UsersAdministrationController';
+import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersTable } from './UsersTable/UsersTable';
 
 const styles = composes(
@@ -60,6 +61,10 @@ export const UsersAdministration = observer(function UsersAdministration({
   sub,
 }: AdministrationItemContentProps) {
   const controller = useController(UsersAdministrationController);
+
+  if (sub?.name === UsersAdministrationNavigationService.AddItemName) {
+    controller.create();
+  }
 
   return styled(useStyles(styles))(
     <layout-grid as="div">
