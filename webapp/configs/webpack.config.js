@@ -149,7 +149,6 @@ module.exports = (env, argv) => {
     // ],
     devtool: 'cheap-module-source-map',
     plugins: [
-      new IgnoreNotFoundExportPlugin(),
       new ForkTsCheckerWebpackPlugin({
         typescript: {
           diagnosticOptions: {
@@ -158,6 +157,7 @@ module.exports = (env, argv) => {
           },
         },
       }),
+      new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // all options are optional

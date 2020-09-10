@@ -32,10 +32,9 @@ export class ObjectPropertiesPageService {
   ) {
   }
 
-  registerDBObjectPage() {
+  registerDBObjectPage(): void {
     this.page = this.dbObjectPageService.register({
       key: 'properties',
-      navigatorId: 'database',
       priority: 1,
       order: 1,
       getTabComponent: () => ObjectPropertiesPageTab,

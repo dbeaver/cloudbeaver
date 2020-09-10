@@ -29,7 +29,7 @@ export class DBObjectPageService {
     return objectPage;
   }
 
-  getPage(pageId: string) {
+  getPage(pageId: string): ObjectPage | undefined {
     return this.pages.get(pageId);
   }
 

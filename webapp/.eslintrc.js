@@ -53,6 +53,7 @@ module.exports = {
     }],
     'eqeqeq': 'warn',
     'radix': 'off',
+    'no-use-before-define': 'off',
     'no-constant-condition': 'off',
     'no-console': 'off',
     'no-dupe-class-members': 'off',

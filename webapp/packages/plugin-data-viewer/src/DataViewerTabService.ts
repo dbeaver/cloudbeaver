@@ -39,7 +39,6 @@ export class DataViewerTabService {
 
     this.page = this.dbObjectPageService.register({
       key: dataViewerHandlerKey,
-      navigatorId: 'database',
       priority: 2,
       order: 2,
       getTabComponent: () => DataViewerTab,
@@ -50,7 +49,7 @@ export class DataViewerTabService {
     });
   }
 
-  registerTabHandler() {
+  registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 

@@ -32,7 +32,6 @@ export type ObjectPageRestoreCallback = (tab: ITab<IObjectViewerTabState>) => Pr
 
 export interface ObjectPageOptions {
   key: string;
-  navigatorId: string;
   priority: number;
   order?: number;
   getTabComponent(): ObjectPageTabComponent;
@@ -44,7 +43,6 @@ export interface ObjectPageOptions {
 
 export class ObjectPage {
   key: string;
-  navigatorId: string;
   priority: number;
   @observable order?: number;
   getTabComponent: () => ObjectPageTabComponent;
@@ -55,7 +53,6 @@ export class ObjectPage {
 
   constructor(options: ObjectPageOptions) {
     this.key = options.key;
-    this.navigatorId = options.navigatorId;
     this.priority = options.priority;
     this.order = options.order;
     this.getTabComponent = options.getTabComponent;
