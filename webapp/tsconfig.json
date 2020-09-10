@@ -8,7 +8,6 @@
     "lib"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
@@ -37,9 +36,6 @@
     "strict": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "paths": {
-      "@cloudbeaver/*": ["./node_modules/@cloudbeaver/*/src"]
-    },
     "types": [
       "reflect-metadata",
       "node"

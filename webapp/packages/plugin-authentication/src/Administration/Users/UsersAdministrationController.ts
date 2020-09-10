@@ -51,6 +51,10 @@ export class UsersAdministrationController {
   ) { }
 
   create = () => {
+    if (this.creatingUser) {
+      return;
+    }
+
     this.creatingUser = {
       userId: '',
       grantedRoles: [],

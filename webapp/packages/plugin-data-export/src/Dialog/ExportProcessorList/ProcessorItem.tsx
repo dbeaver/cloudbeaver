@@ -8,8 +8,11 @@
 
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
-import { ListItem } from '@cloudbeaver/core-blocks';
+import {
+  ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
+} from '@cloudbeaver/core-blocks';
 import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 type ProcessorItemProps = {
@@ -17,10 +20,25 @@ type ProcessorItemProps = {
   onSelect(processorId: string): void;
 }
 
+const styles = css`
+    StaticImage {
+      box-sizing: border-box;
+      width: 24px;
+      max-height: 24px;
+    }
+  `;
+
 export const ProcessorItem = observer(function ProcessorItem({
   processor,
   onSelect,
 }: ProcessorItemProps) {
   const select = useCallback(() => onSelect(processor.id), [processor]);
-  return <ListItem icon={processor.icon} name={processor.name} description={processor.description} onClick={select}/>;
+
+  return styled(styles)(
+    <ListItem onClick={select}>
+      <ListItemIcon><StaticImage icon={processor.icon}/></ListItemIcon>
+      <ListItemName>{processor.name}</ListItemName>
+      <ListItemDescription title={processor.description}>{processor.description}</ListItemDescription>
+    </ListItem>
+  );
 });

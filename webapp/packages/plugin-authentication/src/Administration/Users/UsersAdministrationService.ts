@@ -32,7 +32,6 @@ export class UsersAdministrationService extends Bootstrap {
       sub: [
         {
           name: UsersAdministrationNavigationService.AddItemName,
-          onActivate: this.onCreateActivate.bind(this),
         },
       ],
       getContentComponent: () => UsersAdministration,
@@ -42,13 +41,6 @@ export class UsersAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
-
-  private onCreateActivate() {
-    if (!Array.from(this.usersResource.data.values())
-      .some(user => this.usersResource.isNew(user.userId))) {
-      this.usersResource.addNew();
-    }
-  }
 
   private async loadUsers() {
     try {
