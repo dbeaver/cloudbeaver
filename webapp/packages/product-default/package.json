@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "module": "lib/index.js",
+  "types": "src/index.ts",
   "scripts": {
     "prebuild": "rimraf lib/*",
     "build": "webpack --config ../../configs/webpack.product.config",
