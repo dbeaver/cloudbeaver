@@ -20,7 +20,6 @@ import {
   DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState
 } from '@cloudbeaver/plugin-object-viewer';
 
-import { dataViewerHandlerKey } from './dataViewerHandlerKey';
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
 import { DataViewerTableService } from './DataViewerTableService';
