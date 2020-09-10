@@ -35,6 +35,7 @@
     "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "strictNullChecks": true,
     "types": [
       "reflect-metadata",

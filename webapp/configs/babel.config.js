@@ -18,7 +18,7 @@ module.exports = {
   compact: prod,
   presets: [
     "@babel/preset-react",
-    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
     [
       "@babel/preset-env",
       {
