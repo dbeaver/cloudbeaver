@@ -61,9 +61,6 @@ export class DataViewerTabService {
         trySwitchPage,
       } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
-      if (nodeInfo.type === NavigationType.closeConnection) {
-        return;
-      }
       const node = await this.navNodeManagerService.loadNode(nodeInfo);
 
       if (!this.navNodeManagerService.isNodeHasData(node)) {

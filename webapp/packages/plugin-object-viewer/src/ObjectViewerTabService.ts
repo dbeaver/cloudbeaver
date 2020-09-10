@@ -62,7 +62,7 @@ export class ObjectViewerTabService {
       });
   }
 
-  registerTabHandler() {
+  registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.connectionInfoResource.onItemAdd.subscribe(this.updateConnectionInfoTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.subscribe(this.updateTabs.bind(this));
@@ -76,31 +76,29 @@ export class ObjectViewerTabService {
     const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
     const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
 
-    if (data.type !== NavigationType.closeConnection) {
     // check if tab already exist for object
-      const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId)
-      );
+    const tab = this.navigationTabsService.findTab(
+      isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId)
+    );
 
-      if (tab) {
-        tab.handlerState.tabIcon = nodeInfo.icon;
-        tab.handlerState.tabTitle = nodeInfo.name;
-        tabInfo.registerTab(tab);
-      } else {
-        tabInfo.openNewTab<IObjectViewerTabState>({
-          handlerId: objectViewerTabHandlerKey,
-          handlerState: {
-            objectId: nodeInfo.nodeId,
-            parentId: nodeInfo.parentId,
-            parents: await nodeInfo.getParents(),
-            folderId: nodeInfo.folderId,
-            pageId: '',
-            pagesState: new Map(),
-            tabIcon: nodeInfo.icon,
-            tabTitle: nodeInfo.name,
-          },
-        });
-      }
+    if (tab) {
+      tab.handlerState.tabIcon = nodeInfo.icon;
+      tab.handlerState.tabTitle = nodeInfo.name;
+      tabInfo.registerTab(tab);
+    } else {
+      tabInfo.openNewTab<IObjectViewerTabState>({
+        handlerId: objectViewerTabHandlerKey,
+        handlerState: {
+          objectId: nodeInfo.nodeId,
+          parentId: nodeInfo.parentId,
+          parents: await nodeInfo.getParents(),
+          folderId: nodeInfo.folderId,
+          pageId: '',
+          pagesState: new Map(),
+          tabIcon: nodeInfo.icon,
+          tabTitle: nodeInfo.name,
+        },
+      });
     }
     const getPage = () => {
       if (!tabInfo.tab) {

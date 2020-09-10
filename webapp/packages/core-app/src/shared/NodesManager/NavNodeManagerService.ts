@@ -28,7 +28,6 @@ import { NodeManagerUtils } from './NodeManagerUtils';
 
 export enum NavigationType {
   open,
-  closeConnection
 }
 
 export interface NavNodeKey {
@@ -272,7 +271,7 @@ export class NavNodeManagerService extends Bootstrap {
     let name: string | undefined;
     let icon: string | undefined;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId) && data.type !== NavigationType.closeConnection) {
+    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
       const node = await this.loadNode({ nodeId, parentId });
 
       name = node.name;
