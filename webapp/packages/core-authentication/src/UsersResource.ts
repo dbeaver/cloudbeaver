@@ -63,19 +63,19 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
       return [];
     }
 
-    const { grantedConnections } = await this.graphQLService.gql.getUserGrantedConnections({ userId });
+    const { grantedConnections } = await this.graphQLService.sdk.getUserGrantedConnections({ userId });
 
     return grantedConnections;
   }
 
   async setConnections(userId: string, connections: string[]) {
-    await this.graphQLService.gql.setConnections({ userId, connections });
+    await this.graphQLService.sdk.setConnections({ userId, connections });
   }
 
   async create({
     userId, roles, credentials, grantedConnections,
   }: UserCreateOptions): Promise<AdminUserInfo> {
-    const { user } = await this.graphQLService.gql.createUser({ userId });
+    const { user } = await this.graphQLService.sdk.createUser({ userId });
 
     try {
       await this.updateCredentials(userId, credentials);
@@ -95,7 +95,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   }
 
   async grantRole(userId: string, roleId: string, skipUpdate?: boolean) {
-    await this.graphQLService.gql.grantUserRole({ userId, roleId });
+    await this.graphQLService.sdk.grantUserRole({ userId, roleId });
 
     if (!skipUpdate) {
       await this.refresh(userId);
@@ -103,7 +103,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   }
 
   async revokeRole(userId: string, roleId: string, skipUpdate?: boolean) {
-    await this.graphQLService.gql.revokeUserRole({ userId, roleId });
+    await this.graphQLService.sdk.revokeUserRole({ userId, roleId });
 
     if (!skipUpdate) {
       await this.refresh(userId);
@@ -114,7 +114,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     const provider = 'local';
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
-    await this.graphQLService.gql.setUserCredentials({
+    await this.graphQLService.sdk.setUserCredentials({
       providerId: provider,
       userId,
       credentials: processedCredentials,
@@ -128,7 +128,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
           throw new Error('You can\'t delete current logged user');
         }
         if (!this.isNew(key.list[i])) {
-          await this.graphQLService.gql.deleteUser({ userId: key.list[i] });
+          await this.graphQLService.sdk.deleteUser({ userId: key.list[i] });
         }
         this.data.delete(key.list[i]);
       }
@@ -137,7 +137,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
         throw new Error('You can\'t delete current logged user');
       }
       if (!this.isNew(key)) {
-        await this.graphQLService.gql.deleteUser({ userId: key });
+        await this.graphQLService.sdk.deleteUser({ userId: key });
       }
       this.data.delete(key);
     }
@@ -163,7 +163,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUserInfo>> {
     const userId = key === 'all' ? undefined : key as string;
 
-    const { users } = await this.graphQLService.gql.getUsersList({ userId });
+    const { users } = await this.graphQLService.sdk.getUsersList({ userId });
 
     if (key === 'all') {
       this.data.clear();

@@ -28,7 +28,7 @@ export class SqlDialectInfoService {
   async loadSqlDialectInfo(connectionId: string): Promise<SqlDialectInfo | undefined> {
     if (!this.dialectInfo.has(connectionId)) {
       try {
-        const result = await this.graphQLService.gql.querySqlDialectInfo({ connectionId });
+        const result = await this.graphQLService.sdk.querySqlDialectInfo({ connectionId });
         this.dialectInfo.set(connectionId, result.dialect!);
       } catch (error) {
         this.notificationService.logException(error, 'Failed to load SqlDialectInfo');

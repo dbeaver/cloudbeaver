@@ -21,7 +21,7 @@ export class DatabaseAuthModelsResource extends CachedMapResource<string, Databa
   }
 
   protected async loader(key: string): Promise<Map<string, DatabaseAuthModel>> {
-    const { models } = await this.graphQLService.gql.getAuthModels();
+    const { models } = await this.graphQLService.sdk.getAuthModels();
 
     this.set(resourceKeyList(models.map(model => model.id)), models);
     this.markUpdated(key);

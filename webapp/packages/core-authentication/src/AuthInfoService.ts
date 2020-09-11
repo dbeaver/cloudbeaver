@@ -26,18 +26,18 @@ export class AuthInfoService {
     private sessionService: SessionService,
   ) { }
 
-  get userInfo() {
+  get userInfo(): UserAuthInfo | null {
     return this.user;
   }
 
-  async login(provider: string, credentials: object): Promise<UserAuthInfo> {
+  async login(provider: string, credentials: Record<string, string>): Promise<UserAuthInfo> {
     if (this.user) {
       throw new Error('User already logged in');
     }
 
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
-    const { user } = await this.graphQLService.gql.authLogin({
+    const { user } = await this.graphQLService.sdk.authLogin({
       provider,
       credentials: processedCredentials,
     });
@@ -47,9 +47,9 @@ export class AuthInfoService {
     return this.user;
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     if (this.user) {
-      await this.graphQLService.gql.authLogout();
+      await this.graphQLService.sdk.authLogout();
       this.user = null;
       await this.updateSession();
     }
@@ -57,7 +57,7 @@ export class AuthInfoService {
 
   async updateAuthInfo(): Promise<UserAuthInfo | null> {
     try {
-      const { user } = await this.graphQLService.gql.getSessionUser();
+      const { user } = await this.graphQLService.sdk.getSessionUser();
       this.user = user || null;
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load session user');

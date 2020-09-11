@@ -7,24 +7,15 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  GraphQLService,
-  SqlExecuteInfo,
-  SqlDataFilter,
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import { IRequestDataResult, RowDiff } from '@cloudbeaver/plugin-data-viewer';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
-import { SQLQueryExecutionProcess } from './SQLQueryExecutionProcess';
 
 @injectable()
 export class SqlResultService {
 
-  constructor(
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService
-  ) { }
+  constructor(private graphQLService: GraphQLService) { }
 
   async saveChanges(
     sqlQueryParams: ISqlQueryParams,
@@ -32,7 +23,7 @@ export class SqlResultService {
     diff: RowDiff[]
   ): Promise<SqlExecuteInfo> {
 
-    const response = await this.graphQLService.gql.updateResultsDataBatch({
+    const response = await this.graphQLService.sdk.updateResultsDataBatch({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       resultsId: resultId,

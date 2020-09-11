@@ -37,7 +37,7 @@ export class DdlViewerService {
   }
 
   private async fetchDdlMetadata(nodeId: string): Promise<string> {
-    const response = await this.graphQLService.gql.metadataGetNodeDDL({ nodeId });
+    const response = await this.graphQLService.sdk.metadataGetNodeDDL({ nodeId });
     return response.metadataGetNodeDDL || '';
   }
 

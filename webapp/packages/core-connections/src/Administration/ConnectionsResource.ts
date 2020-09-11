@@ -80,14 +80,14 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   async searchDatabases(hosts: string[]) {
-    const { databases } = await this.graphQLService.gql.searchDatabases({ hosts });
+    const { databases } = await this.graphQLService.sdk.searchDatabases({ hosts });
 
     return databases;
   }
 
   async create(config: ConnectionConfig) {
-    const { connection } = await this.graphQLService.gql.createConnectionConfiguration({ config });
-    await this.graphQLService.gql.refreshSessionConnections();
+    const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
+    await this.graphQLService.sdk.refreshSessionConnections();
 
     const newConnection: ConnectionNew = {
       ...connection as ConnectionInfo,
@@ -99,20 +99,20 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   async test(config: ConnectionConfig): Promise<void> {
-    await this.graphQLService.gql.testConnection({
+    await this.graphQLService.sdk.testConnection({
       config,
     });
   }
 
   async update(id: string, config: ConnectionConfig) {
     await this.performUpdate(id, () => this.updateConnection(id, config));
-    await this.graphQLService.gql.refreshSessionConnections();
+    await this.graphQLService.sdk.refreshSessionConnections();
     return this.get(id)!;
   }
 
   async delete(key: ResourceKey<string>) {
     await this.performUpdate(key, () => this.deleteConnectionTask(key));
-    await this.graphQLService.gql.refreshSessionConnections();
+    await this.graphQLService.sdk.refreshSessionConnections();
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
@@ -120,17 +120,17 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
       return [];
     }
 
-    const { subjects } = await this.graphQLService.gql.getConnectionAccess({ connectionId });
+    const { subjects } = await this.graphQLService.sdk.getConnectionAccess({ connectionId });
 
     return subjects;
   }
 
   async setAccessSubjects(connectionId: string, subjects: string[]) {
-    await this.graphQLService.gql.setConnectionAccess({ connectionId, subjects });
+    await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {
-    const { connections } = await this.graphQLService.gql.getConnections();
+    const { connections } = await this.graphQLService.sdk.getConnections();
     this.data.clear();
 
     for (const connection of connections) {
@@ -171,12 +171,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     this.data.delete(connectionId);
 
     if (!isNew) {
-      await this.graphQLService.gql.deleteConnectionConfiguration({ id: connectionId });
+      await this.graphQLService.sdk.deleteConnectionConfiguration({ id: connectionId });
     }
   }
 
   private async updateConnection(id: string, config: ConnectionConfig) {
-    const { connection } = await this.graphQLService.gql.updateConnectionConfiguration({ id, config });
+    const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({ id, config });
 
     this.set(id, connection as ConnectionInfo);
   }

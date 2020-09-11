@@ -18,7 +18,7 @@ export class DriverPropertiesService {
   }
 
   async loadDriverProperties(driverId: string): Promise<ObjectPropertyInfo[]> {
-    const response = await this.graphQLService.gql.driverProperties({
+    const response = await this.graphQLService.sdk.driverProperties({
       driverId,
     });
 

@@ -64,7 +64,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
   }
 
   protected async loader(key: string): Promise<Map<string, DBDriver>> {
-    const { driverList } = await this.graphQLService.gql.driverList();
+    const { driverList } = await this.graphQLService.sdk.driverList();
 
     this.data.clear();
 

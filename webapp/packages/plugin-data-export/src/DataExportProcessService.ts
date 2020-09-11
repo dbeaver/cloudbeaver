@@ -52,7 +52,7 @@ export class DataExportProcessService {
     try {
       const dataFileId = process.process.getPayload();
       if (dataFileId) {
-        await this.graphQLService.gql.removeDataTransferFile({ dataFileId });
+        await this.graphQLService.sdk.removeDataTransferFile({ dataFileId });
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while deleting file');

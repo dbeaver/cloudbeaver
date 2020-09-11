@@ -20,7 +20,7 @@ export class CustomConnectionService {
   }
 
   async createConnectionAsync(config: ConnectionConfig): Promise<Connection> {
-    const response = await this.graphQLService.gql.createConnection({
+    const response = await this.graphQLService.sdk.createConnection({
       config,
     });
 
@@ -30,7 +30,7 @@ export class CustomConnectionService {
   }
 
   async testConnectionAsync(config: ConnectionConfig): Promise<void> {
-    await this.graphQLService.gql.testConnection({
+    await this.graphQLService.sdk.testConnection({
       config,
     });
   }

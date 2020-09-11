@@ -55,7 +55,7 @@ export class DataViewerTableService {
     defaultSchema?: string
   ): Promise<IExecutionContext> {
 
-    const response = await this.graphQLService.gql.sqlContextCreate({
+    const response = await this.graphQLService.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,
       defaultSchema,
@@ -77,7 +77,7 @@ export class DataViewerTableService {
       throw new Error('It is expected that data.sqlContextParams was set after first fetch');
     }
 
-    const response = await this.graphQLService.gql.updateResultsDataBatch({
+    const response = await this.graphQLService.sdk.updateResultsDataBatch({
       connectionId: data.executionContext.connectionId,
       contextId: data.executionContext.contextId,
       resultsId: data.resultId,
@@ -111,7 +111,7 @@ export class DataViewerTableService {
       model.executionContext = executionContext;
     }
 
-    const { readDataFromContainer } = await this.graphQLService.gql.readDataFromContainer({
+    const { readDataFromContainer } = await this.graphQLService.sdk.readDataFromContainer({
       connectionId: model.executionContext.connectionId,
       contextId: model.executionContext.contextId,
       containerNodePath: model.containerNodePath,

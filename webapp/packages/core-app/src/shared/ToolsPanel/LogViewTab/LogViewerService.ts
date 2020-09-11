@@ -83,7 +83,7 @@ export class LogViewerService {
 
   async loadLog(): Promise<ILogEntry[]> {
     const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.logBatchSize');
-    const { log } = await this.graphQLService.gql.readSessionLog({
+    const { log } = await this.graphQLService.sdk.readSessionLog({
       maxEntries: maxLogEntries,
       clearEntries: true,
     });

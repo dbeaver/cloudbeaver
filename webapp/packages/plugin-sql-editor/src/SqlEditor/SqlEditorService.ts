@@ -22,7 +22,7 @@ export class SqlEditorService {
     cursor: number
   ): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
 
-    const result = await this.gql.gql.querySqlCompletionProposals({
+    const result = await this.gql.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
       query,

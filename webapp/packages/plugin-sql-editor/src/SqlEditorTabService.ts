@@ -235,7 +235,7 @@ export class SqlEditorTabService {
       return;
     }
     try {
-      await this.gql.gql.sqlContextDestroy({ connectionId, contextId });
+      await this.gql.sdk.sqlContextDestroy({ connectionId, contextId });
     } catch (exception) {
       this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`, true);
     }
@@ -253,7 +253,7 @@ export class SqlEditorTabService {
     defaultSchema?: string
   ): Promise<IExecutionContext> {
 
-    const response = await this.gql.gql.sqlContextCreate({
+    const response = await this.gql.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,
       defaultSchema,
@@ -275,7 +275,7 @@ export class SqlEditorTabService {
     defaultCatalog?: string,
     defaultSchema?: string
   ) {
-    await this.gql.gql.sqlContextSetDefaults({
+    await this.gql.sdk.sqlContextSetDefaults({
       connectionId,
       contextId,
       defaultCatalog,

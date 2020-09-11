@@ -109,7 +109,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     sqlQueryParams: ISqlQueryParams,
     filter: SqlDataFilter,
   ): Promise<AsyncTaskInfo> {
-    const { taskInfo } = await this.graphQLService.gql.asyncSqlExecuteQuery({
+    const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       query: sqlQueryParams.query,
@@ -119,12 +119,12 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   }
 
   private async getQueryStatusAsync(taskId: string): Promise<AsyncTaskInfo> {
-    const { taskInfo } = await this.graphQLService.gql.getAsyncTaskInfo({ taskId, removeOnFinish: false });
+    const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId, removeOnFinish: false });
     return taskInfo;
   }
 
   private async cancelQueryAsync(taskId: string): Promise<void> {
-    await this.graphQLService.gql.asyncTaskCancel({ taskId });
+    await this.graphQLService.sdk.asyncTaskCancel({ taskId });
   }
 
   private async applyResult(taskInfo: AsyncTaskInfo) {
@@ -140,9 +140,9 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     }
     try {
     // task execution successful
-      const { result } = await this.graphQLService.gql.getSqlExecuteTaskResults({ taskId: taskInfo.id });
+      const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: taskInfo.id });
       this.toResolved(result);
-      await this.graphQLService.gql.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: true });
+      await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: true });
     } catch (exception) {
       this.onError(new Error('Tasks execution returns no result'), exception);
     }

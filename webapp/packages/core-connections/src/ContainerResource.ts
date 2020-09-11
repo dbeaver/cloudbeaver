@@ -31,7 +31,7 @@ export class ContainerResource extends CachedDataResource<Map<string, ObjectCont
   }
 
   protected async loader({ connectionId, catalogId }: ObjectContainerParams): Promise<Map<string, ObjectContainer[]>> {
-    const { navGetStructContainers } = await this.graphQLService.gql.navGetStructContainers({
+    const { navGetStructContainers } = await this.graphQLService.sdk.navGetStructContainers({
       connectionId,
       catalogId,
     });

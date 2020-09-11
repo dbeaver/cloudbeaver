@@ -134,7 +134,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async refreshTree(navNodeId: string) {
-    await this.graphQLService.gql.navRefreshNode({
+    await this.graphQLService.sdk.navRefreshNode({
       nodePath: navNodeId,
     });
     this.markTreeOutdated(navNodeId);

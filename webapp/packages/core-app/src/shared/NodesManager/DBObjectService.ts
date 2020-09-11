@@ -48,7 +48,7 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
   }
 
   private async loadFromChildren(parentId: string) {
-    const { dbObjects } = await this.graphQLService.gql.getChildrenDBObjectInfo({
+    const { dbObjects } = await this.graphQLService.sdk.getChildrenDBObjectInfo({
       navNodeId: parentId,
     });
 
@@ -64,7 +64,7 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {
-    const { objectInfo: { object } } = await this.graphQLService.gql.getDBObjectInfo({
+    const { objectInfo: { object } } = await this.graphQLService.sdk.getDBObjectInfo({
       navNodeId,
     });
 

@@ -35,7 +35,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, nul
   }
 
   protected async loader(key: null): Promise<SessionState> {
-    const { session } = await this.graphQLService.gql.openSession();
+    const { session } = await this.graphQLService.sdk.openSession();
 
     this.markUpdated(key);
     return session;

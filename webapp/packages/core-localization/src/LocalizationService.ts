@@ -93,7 +93,7 @@ export class LocalizationService extends Bootstrap {
     if (key === this.settings.language) {
       return;
     }
-    const response = await this.graphQLService.gql.changeSessionLanguage({ locale: key });
+    const response = await this.graphQLService.sdk.changeSessionLanguage({ locale: key });
     this.setLocale(key);
     if (response.changeSessionLanguage) {
       window.location.reload();

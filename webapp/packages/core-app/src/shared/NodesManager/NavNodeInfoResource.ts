@@ -47,7 +47,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   }
 
   private async loadNodeInfo(nodePath: string): Promise<NavNode> {
-    const { navNodeInfo } = await this.graphQLService.gql.navNodeInfo({
+    const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
       nodePath,
     });
 

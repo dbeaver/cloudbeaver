@@ -212,7 +212,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   private async loadNodeChildren(parentPath: string) {
-    const { navNodeChildren, navNodeInfo } = await this.graphQLService.gql.navNodeChildren({
+    const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
     });
 

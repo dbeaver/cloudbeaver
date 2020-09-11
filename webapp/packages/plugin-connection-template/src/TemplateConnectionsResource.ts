@@ -40,7 +40,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
       this.markUpdated(key);
       return [];
     }
-    const { connections } = await this.graphQLService.gql.getTemplateConnections();
+    const { connections } = await this.graphQLService.sdk.getTemplateConnections();
     this.markUpdated(key);
     return connections;
   }

@@ -44,7 +44,7 @@ export class RolesResource extends CachedMapResource<string, AdminRoleInfo> {
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminRoleInfo>> {
     const roleId = key === 'all' ? undefined : key as string;
 
-    const { roles } = await this.graphQLService.gql.getRolesList({ roleId });
+    const { roles } = await this.graphQLService.sdk.getRolesList({ roleId });
 
     if (key === 'all') {
       this.data.clear();
