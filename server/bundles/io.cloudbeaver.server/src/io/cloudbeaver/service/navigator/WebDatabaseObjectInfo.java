@@ -139,6 +139,7 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSEntity) features.add("entity");
         if (object instanceof DBSSchema) features.add("schema");
         if (object instanceof DBSCatalog) features.add("catalog");
+        if (object instanceof DBSObjectContainer) features.add("objectContainer");
         if (object instanceof DBPDataSourceContainer) {
             features.add("dataSource");
             DBPDataSourceContainer dbpDataSourceContainer = (DBPDataSourceContainer) this.object;
