@@ -105,7 +105,7 @@ public class CBDatabase {
             dbUser = DEFAULT_DB_USER_NAME;
 
             // Load or generate random password
-            File pwdFile = new File(application.getDataDirectory(), DEFAULT_DB_PWD_FILE);
+            File pwdFile = new File(application.getDataDirectory(true), DEFAULT_DB_PWD_FILE);
             if (pwdFile.exists()) {
                 try (FileReader fr = new FileReader(pwdFile)) {
                     dbPassword = IOUtils.readToString(fr);
