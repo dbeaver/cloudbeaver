@@ -40,6 +40,10 @@ const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const navigation = useService(NavigationTabsService);
+  // TODO: we get exception when after closing the restored page trying to open another
+  //       it's related to hooks order and state restoration
+  const style = useStyles(styles);
+
   const [onFocus, onBlur] = useActiveView(navigation.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
 
@@ -54,7 +58,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
     );
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <TabsBox
       currentTabId={navigation.currentTabId}
       tabs={navigation.tabIdList.map(tabId => (
