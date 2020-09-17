@@ -38,6 +38,7 @@ module.exports = {
     'curly': ['error', 'all'],
     'class-methods-use-this': 'off',
     'default-case': 'off',
+    'react/prop-types': 'off',
     'react/display-name': 'off',
     'react/jsx-no-literals': 'off',
     'react/react-in-jsx-scope': 'off',

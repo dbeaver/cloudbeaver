@@ -28,6 +28,9 @@ export type Style = BaseStyles | ThemeSelector
 export function useStyles(
   ...componentStyles: Array<Style | boolean | undefined>
 ) {
+  if (!componentStyles) {
+    return [];
+  }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
   const [loadedStyles, setLoadedStyles] = useState<BaseStyles[]>([]);
