@@ -73,7 +73,7 @@ export const UsersAdministration = observer(function UsersAdministration({
           <AdministrationTools>
             <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
             <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
-            <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
+            <IconButton name="refresh-outline" viewBox="0 0 28 28" onClick={controller.update} />
           </AdministrationTools>
           {sub && controller.creatingUser && (
             <CreateUser user={controller.creatingUser} onCancel={controller.cancelCreate} />

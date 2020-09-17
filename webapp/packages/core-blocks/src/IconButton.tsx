@@ -32,7 +32,7 @@ const styles = css`
 
 type Props = {
   name: string;
-  viewBox: string;
+  viewBox?: string;
 }
 
 export function IconButton({ name, viewBox, ...rest }: Props & ButtonProps) {

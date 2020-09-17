@@ -41,7 +41,7 @@ export class DdlViewerTabService {
     const ddlTab: ITab = {
       tabId: ddlViewerTabId,
       title: 'DDL',
-      icon: 'sql-text',
+      icon: '/icons/DDL.svg',
       onActivate: () => this.activateDDLTab(nodeId, node?.parentId!),
       panel: () => ddlViewer(nodeId),
     };

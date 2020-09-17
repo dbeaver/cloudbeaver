@@ -32,7 +32,7 @@ export class TableFooterMenuService {
       },
       order: 1,
       title: 'Save',
-      icon: 'apply',
+      icon: 'table-save',
       onClick: context => context.data.saveChanges(),
     });
     this.registerMenuItem({
@@ -45,7 +45,7 @@ export class TableFooterMenuService {
       },
       order: 2,
       title: 'Cancel',
-      icon: 'reject',
+      icon: 'table-cancel',
       onClick: context => context.data.cancelChanges(),
     });
   }

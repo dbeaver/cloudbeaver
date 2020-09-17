@@ -92,7 +92,7 @@ export const ConnectionsAdministration = observer(function ConnectionsAdministra
           <AdministrationTools>
             <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
             <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
-            <IconButton name="reload" viewBox="0 0 28 28" onClick={controller.update} />
+            <IconButton name="refresh-outline" viewBox="0 0 16 16" onClick={controller.update} />
           </AdministrationTools>
           {sub && (
             <CreateConnection

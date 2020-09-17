@@ -91,7 +91,7 @@ export const TableFooter = observer(function TableFooter({
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <IconButton type="button" name='reload' onClick={model.refresh} viewBox=""/>
+        <IconButton type="button" name='reload' onClick={model.refresh} viewBox="0 0 16 16"/>
       </reload>
       <count as="div">
         <SubmittingForm onSubmit={handleChange}>

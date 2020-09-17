@@ -20,7 +20,7 @@ export const ObjectPropertiesPageTab = observer(function ObjectPropertiesPageTab
 
   return styled(useStyles(...style))(
     <Tab tabId={page.key} onOpen={onSelect} >
-      <TabIcon icon='/icons/properties.png' />
+      <TabIcon icon='/icons/properties.svg' viewBox="0 0 16 16"/>
       <TabTitle>Properties</TabTitle>
     </Tab>
   );

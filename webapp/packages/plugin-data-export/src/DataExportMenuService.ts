@@ -33,7 +33,7 @@ export class DataExportMenuService {
       },
       order: 5,
       title: 'Export',
-      icon: 'export',
+      icon: 'table-export',
       onClick: this.exportData.bind(this),
     };
     this.tableFooterMenuService.registerMenuItem(exportData);

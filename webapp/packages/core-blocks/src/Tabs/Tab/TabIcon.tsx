@@ -14,13 +14,14 @@ import { IconOrImage } from '../../IconOrImage';
 
 type TabIconProps = {
   icon?: string;
+  viewBox?: string;
   className?: string;
 }
 
-export function TabIcon({ icon, className }: TabIconProps) {
+export function TabIcon({ icon, viewBox, className }: TabIconProps) {
   return styled(useStyles())(
     <tab-icon as="div" className={className}>
-      {icon ? <IconOrImage icon={icon} /> : <placeholder as="div" />}
+      {icon ? <IconOrImage icon={icon} viewBox={viewBox} /> : <placeholder as="div" />}
     </tab-icon>
   );
 }

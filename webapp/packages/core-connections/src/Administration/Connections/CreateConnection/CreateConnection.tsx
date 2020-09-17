@@ -177,7 +177,7 @@ export const CreateConnection = observer(function CreateConnection({
           {controller.driver?.icon && <StaticImage icon={controller.driver.icon} />}
           {controller.driver?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={onCancel} />
+          <IconButton name="cross" viewBox="0 0 24 24" onClick={onCancel} />
         </title-bar>
         <connection-create-content as='div'>
           <ConnectionForm

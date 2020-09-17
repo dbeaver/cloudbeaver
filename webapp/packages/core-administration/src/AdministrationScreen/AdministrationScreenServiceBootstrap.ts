@@ -148,11 +148,12 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   private async isAccessProvided() {
-    if (!await this.permissionsService.hasAsync(EAdminPermission.admin)) {
+    await this.serverConfigResource.load(null);
+    if (!await this.permissionsService.hasAsync(EAdminPermission.admin)
+          && !this.administrationScreenService.isConfigurationMode) {
       return false;
     }
 
-    await this.serverConfigResource.load(null);
     if (!this.administrationScreenService.isConfigurationMode
         && this.screenService.isActive(AdministrationScreenService.setupName)) {
       return false;

@@ -29,7 +29,7 @@ export const FinishPageDrawerItem = observer(function FinishPageDrawerItem({
       disabled={disabled
         || (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
     >
-      <TabIcon icon='/icons/cog-outline.svg' />
+      <TabIcon icon='/icons/confirmation.svg' viewBox='0 0 16 16'/>
       <TabTitle><Translate token='administration_configuration_wizard_finish'/></TabTitle>
     </Tab>
   );
