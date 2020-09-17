@@ -17,7 +17,7 @@ import { getSdk } from './sdk';
 export class GraphQLService {
   sdk: ReturnType<typeof getSdk>
 
-  private client: CustomGraphQLClient;
+  readonly client: CustomGraphQLClient;
 
   constructor(private environmentService: EnvironmentService) {
     const gqlEndpoint = this.environmentService.gqlEndpoint;

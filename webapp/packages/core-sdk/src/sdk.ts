@@ -2,8 +2,7 @@
 import { GraphQLClient } from 'graphql-request';
 
 export type Maybe<T> = T;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
-
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -825,18 +824,18 @@ export type AuthLoginQueryVariables = Exact<{
 
 export type AuthLoginQuery = { user: Pick<UserAuthInfo, 'userId' | 'displayName' | 'authProvider' | 'loginTime' | 'message'> };
 
-export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
+export type AuthLogoutQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuthLogoutQuery = Pick<Query, 'authLogout'>;
 
-export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAuthProvidersQuery = { providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
     & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
-  )>; };
+  )> };
 
-export type GetSessionUserQueryVariables = Exact<{ [key: string]: never }>;
+export type GetSessionUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetSessionUserQuery = { user?: Maybe<Pick<UserAuthInfo, 'userId' | 'displayName' | 'authProvider' | 'loginTime' | 'message'>> };
 
@@ -912,7 +911,7 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
 export type CreateConnectionConfigurationQuery = { connection: (
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  ); };
+  ) };
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -926,12 +925,12 @@ export type GetConnectionAccessQueryVariables = Exact<{
 
 export type GetConnectionAccessQuery = { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> };
 
-export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetConnectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetConnectionsQuery = { connections: Array<(
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  )>; };
+  )> };
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']>;
@@ -954,7 +953,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
 export type UpdateConnectionConfigurationQuery = { connection: (
     Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  ); };
+  ) };
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -992,7 +991,7 @@ export type DeleteConnectionMutationVariables = Exact<{
 
 export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
 
-export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
+export type DriverListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DriverListQuery = { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel'>> };
 
@@ -1003,14 +1002,14 @@ export type DriverPropertiesQueryVariables = Exact<{
 export type DriverPropertiesQuery = { driver: Array<(
     Pick<DriverInfo, 'driverParameters'>
     & { driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
-  )>; };
+  )> };
 
-export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAuthModelsQuery = { models: Array<(
     Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
     & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
-  )>; };
+  )> };
 
 export type GetDriverByIdQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -1025,11 +1024,11 @@ export type InitConnectionMutationVariables = Exact<{
 
 export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
 
-export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never }>;
+export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionConnections'>;
 
-export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> };
 
@@ -1048,7 +1047,7 @@ export type ExportDataFromContainerQueryVariables = Exact<{
 export type ExportDataFromContainerQuery = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ); };
+  ) };
 
 export type ExportDataFromResultsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1060,14 +1059,14 @@ export type ExportDataFromResultsQueryVariables = Exact<{
 export type ExportDataFromResultsQuery = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'running' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ); };
+  ) };
 
-export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetDataTransferProcessorsQuery = { processors: Array<(
     Pick<DataTransferProcessorInfo, 'id' | 'name' | 'description' | 'fileExtension' | 'appFileExtension' | 'appName' | 'order' | 'icon' | 'isBinary' | 'isHTML'>
     & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features'>>>> }
-  )>; };
+  )> };
 
 export type RemoveDataTransferFileQueryVariables = Exact<{
   dataFileId: Scalars['String'];
@@ -1080,7 +1079,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
   catalogId?: Maybe<Scalars['ID']>;
 }>;
 
-export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
+export type NavGetStructContainersQuery = { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>, schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } };
 
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
@@ -1090,7 +1089,7 @@ export type GetAsyncTaskInfoMutationVariables = Exact<{
 export type GetAsyncTaskInfoMutation = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ); };
+  ) };
 
 export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1102,7 +1101,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
 export type AsyncSqlExecuteQueryMutation = { taskInfo: (
     Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
-  ); };
+  ) };
 
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -1115,9 +1114,9 @@ export type GetSqlExecuteTaskResultsMutation = { result: (
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
-      )>; }
-    )>; }
-  ); };
+      )> }
+    )> }
+  ) };
 
 export type ReadDataFromContainerMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1133,9 +1132,9 @@ export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
-      )>; }
-    )>; }
-  )>; };
+      )> }
+    )> }
+  )> };
 
 export type UpdateResultsDataMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1150,8 +1149,8 @@ export type UpdateResultsDataMutation = { result?: Maybe<(
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )>; }
-  )>; };
+    )> }
+  )> };
 
 export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1167,8 +1166,8 @@ export type UpdateResultsDataBatchMutation = { result?: Maybe<(
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
-    )>; }
-  )>; };
+    )> }
+  )> };
 
 export type MetadataGetNodeDdlQueryVariables = Exact<{
   nodeId: Scalars['ID'];
@@ -1186,8 +1185,8 @@ export type GetChildrenDbObjectInfoQuery = { dbObjects: Array<(
     & { object?: Maybe<(
       Pick<DatabaseObjectInfo, 'features'>
       & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
-    )>; }
-  )>; };
+    )> }
+  )> };
 
 export type GetDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
@@ -1197,7 +1196,7 @@ export type GetDbObjectInfoQueryVariables = Exact<{
 export type GetDbObjectInfoQuery = { objectInfo: { object?: Maybe<(
       Pick<DatabaseObjectInfo, 'features'>
       & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
-    )>; }; };
+    )> } };
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
@@ -1206,10 +1205,10 @@ export type NavNodeChildrenQueryVariables = Exact<{
 export type NavNodeChildrenQuery = { navNodeChildren: Array<(
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  )>; navNodeInfo: (
+  )>, navNodeInfo: (
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  ); };
+  ) };
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -1218,7 +1217,7 @@ export type NavNodeInfoQueryVariables = Exact<{
 export type NavNodeInfoQuery = { navNodeInfo: (
     Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
     & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  ); };
+  ) };
 
 export type NavRefreshNodeQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -1260,12 +1259,12 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
-export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
+export type OpenSessionMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
     & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> }
-  ); };
+  ) };
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
@@ -1274,25 +1273,25 @@ export type ReadSessionLogQueryVariables = Exact<{
 
 export type ReadSessionLogQuery = { log: Array<Pick<LogEntry, 'time' | 'type' | 'message' | 'stackTrace'>> };
 
-export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
+export type ServerConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ServerConfigQuery = { serverConfig: (
     Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
-    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
-  ); };
+    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>, defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
+  ) };
 
-export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never }>;
+export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type SessionPermissionsQuery = { permissions: Query['sessionPermissions'] };
 
-export type SessionStateQueryVariables = Exact<{ [key: string]: never }>;
+export type SessionStateQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type SessionStateQuery = { sessionState: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
     & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> }
-  ); };
+  ) };
 
-export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
+export type TouchSessionMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type TouchSessionMutation = Pick<Mutation, 'touchSession'>;
 
