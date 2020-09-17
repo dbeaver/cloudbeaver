@@ -248,12 +248,18 @@ public class CBApplication extends BaseApplicationImpl {
 
     @NotNull
     private File getRuntimeConfigFile() {
-        return new File(getDataDirectory(), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+        return new File(getDataDirectory(false), CBConstants.RUNTIME_CONFIG_FILE_NAME);
     }
 
     @NotNull
-    File getDataDirectory() {
-        return new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME);
+    File getDataDirectory(boolean create) {
+        File dataDir = new File(workspaceLocation, CBConstants.RUNTIME_DATA_DIR_NAME);
+        if (create && !dataDir.exists()) {
+            if (!dataDir.mkdirs()) {
+                log.error("Can't create data directory '" + dataDir.getAbsolutePath() + "'");
+            }
+        }
+        return dataDir;
     }
 
     private void initializeDatabase() throws DBException {
