@@ -69,6 +69,10 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.subscribe(this.removeTabs.bind(this));
   }
 
+  isPageActive(tab:ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
+    return tab.handlerState.pageId === page.key;
+  }
+
   objectViewerTabContext = async (
     contexts: IContextProvider<INodeNavigationData>,
     data: INodeNavigationData
@@ -119,6 +123,8 @@ export class ObjectViewerTabService {
       return this.dbObjectPageService.trySwitchPage(tabInfo.tab, page);
     };
 
+    const isPageActive = (page: ObjectPage) => page === getPage();
+
     return {
       get tab() {
         return tabInfo.tab;
@@ -126,6 +132,7 @@ export class ObjectViewerTabService {
       get page() {
         return getPage();
       },
+      isPageActive,
       trySwitchPage,
       tabInfo,
       nodeInfo,
