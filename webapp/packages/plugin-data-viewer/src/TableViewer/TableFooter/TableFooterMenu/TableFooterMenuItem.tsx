@@ -50,6 +50,8 @@ export const tableFooterMenuStyles = composes(
     }
     menu-trigger-title {
       display: block;
+    }
+    menu-trigger-icon + menu-trigger-title {
       padding-left: 8px;
     }
   `
