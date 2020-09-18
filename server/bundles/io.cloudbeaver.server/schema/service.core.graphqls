@@ -160,6 +160,13 @@ type DriverInfo {
     applicableAuthModel: [ID!]!
 }
 
+enum ResultDataFormat {
+    resultset,
+    document,
+    graph,
+    timeseries
+}
+
 # Connection instance
 type ConnectionInfo {
     id: ID!
@@ -192,6 +199,7 @@ type ConnectionInfo {
     # Supported features (provided etc)
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
+    supportedDataFormats: [ ResultDataFormat! ]!
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info

@@ -259,7 +259,7 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
       colId: v.name,
       headerName: v.label,
       field: `${i}`,
-      type: v.dataKind,
+      // type: v.dataKind,
       editable: (params: any) => {
         const context: AgGridContext = params.context;
         return !(context.isReadonly() || v.readOnly);

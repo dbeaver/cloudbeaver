@@ -246,7 +246,7 @@ export class ConnectionSchemaManagerService {
   private removeActiveItem(id: string) {
     this.clearHistory(id);
     if (id === this.activeItem?.id) {
-      this.setActiveItem(this.activeItemHistory[0] || null);
+      this.setActiveItem(this.activeItemHistory.shift() ?? null);
     }
   }
 

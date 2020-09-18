@@ -89,6 +89,9 @@ export class NavigationTabsService {
   }
 
   @action async selectTab(tabId: string, skipHandlers?: boolean) {
+    if (tabId === '') {
+      this.state.currentId = '';
+    }
     const tab = this.tabsMap.get(tabId);
     if (!tab) {
       return;
@@ -117,8 +120,9 @@ export class NavigationTabsService {
     this.state.history = this.state.history.filter(id => id !== tabId);
     this.tabsMap.delete(tabId);
     this.state.tabs = this.state.tabs.filter(id => id !== tabId);
+
     if (this.state.currentId === tabId) {
-      this.selectTab(this.state.history[0] || '', skipHandlers);
+      this.selectTab(this.state.history.shift() ?? '', skipHandlers);
     }
   }
 

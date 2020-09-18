@@ -50,20 +50,20 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     @NotNull
-    WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException;
+    WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
-    WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter) throws DBException;
+    WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter, WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
     WebSQLExecuteInfo updateResultsData(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull List<Object> updateRow,
-        @NotNull Map<String, Object> updateValues) throws DBWebException;
+        @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
     WebSQLExecuteInfo updateResultsDataBatch(
@@ -71,10 +71,10 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException;
+        @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
-    WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBException;
+    WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBException;
 
     @WebAction
     WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;

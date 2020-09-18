@@ -10,7 +10,9 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { useChildren, TabHandlerPanelProps } from '@cloudbeaver/core-app';
-import { Loader, TabsBox, TabPanel } from '@cloudbeaver/core-blocks';
+import {
+  Loader, TabsBox, TabPanel, TextPlaceholder
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -32,9 +34,6 @@ const styles = composes(
     Tab:only-child {
       display: none;
     }
-    center {
-      margin: auto;
-    }
   `,
 );
 const stylesArray = [styles];
@@ -53,7 +52,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   }
 
   if (!children) {
-    return styled(useStyles(styles))(<center as="div">Nothing to show</center>);
+    return <TextPlaceholder>Nothing to show</TextPlaceholder>;
   }
 
   return styled(useStyles(styles))(

@@ -140,7 +140,11 @@ export class SqlEditorNavigatorService {
         );
 
         if (tab.handlerState.currentResultTabId === data.resultId) {
-          tab.handlerState.currentResultTabId = tab.handlerState.resultTabs[0]?.resultTabId || '';
+          if (tab.handlerState.resultTabs.length > 0) {
+            tab.handlerState.currentResultTabId = tab.handlerState.resultTabs[0].resultTabId;
+          } else {
+            tab.handlerState.currentResultTabId = '';
+          }
         }
       }
       this.navigationTabsService.selectTab(tab.id);
