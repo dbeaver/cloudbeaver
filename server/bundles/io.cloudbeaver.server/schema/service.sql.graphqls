@@ -101,12 +101,6 @@ type SQLResultDataDocument {
     documents: [DatabaseDocument]!
 }
 
-type SQLResultDataTable {
-    resultSet: SQLResultSet
-}
-
-union SQLQueryResultsVariant = SQLResultDataTable | SQLResultDataDocument
-
 type SQLQueryResults {
     title: String
     updateRowCount: Int
@@ -115,11 +109,8 @@ type SQLQueryResults {
     # Actual data format of this result
     dataFormat: ResultDataFormat
 
-    # Deprecated - use data.resultSet instead
-    @deprecated
     resultSet: SQLResultSet
-
-    data: SQLQueryResultsVariant
+    documents: SQLResultDataDocument
 }
 
 type SQLExecuteInfo {
