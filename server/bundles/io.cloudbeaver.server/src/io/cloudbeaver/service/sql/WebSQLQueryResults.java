@@ -18,13 +18,24 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.util.List;
+
 /**
  * Web SQL query results.
  */
 public class WebSQLQueryResults {
 
+    private final WebDataFormat dataFormat;
     private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;
+
+    public WebSQLQueryResults(WebDataFormat dataFormat) {
+        this.dataFormat = dataFormat;
+    }
+
+    public WebDataFormat getDataFormat() {
+        return dataFormat;
+    }
 
     @Property
     public Long getUpdateRowCount() {
@@ -42,5 +53,9 @@ public class WebSQLQueryResults {
 
     public void setResultSet(WebSQLQueryResultSet resultSet) {
         this.resultSet = resultSet;
+    }
+
+    public List<WebSQLDatabaseDocument> getDocuments() {
+        return null;
     }
 }

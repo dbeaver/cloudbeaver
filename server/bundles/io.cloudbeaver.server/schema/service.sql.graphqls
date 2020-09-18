@@ -91,12 +91,35 @@ type SQLResultSet {
     hasMoreData: Boolean
 }
 
+type DatabaseDocument {
+    id: String
+    properties: Object
+    data: Object
+}
+
+type SQLResultDataDocument {
+    documents: [DatabaseDocument]!
+}
+
+type SQLResultDataTable {
+    resultSet: SQLResultSet
+}
+
+union SQLQueryResultsVariant = SQLResultDataTable | SQLResultDataDocument
+
 type SQLQueryResults {
     title: String
     updateRowCount: Int
     sourceQuery: String
 
+    # Actual data format of this result
+    dataFormat: ResultDataFormat
+
+    # Deprecated - use data.resultSet instead
+    @deprecated
     resultSet: SQLResultSet
+
+    data: SQLQueryResultsVariant
 }
 
 type SQLExecuteInfo {
@@ -177,7 +200,8 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         sql: String!,
-        filter: SQLDataFilter
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat    # requested data format. May be ignored by server
     ): AsyncTaskInfo!
 
     asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !

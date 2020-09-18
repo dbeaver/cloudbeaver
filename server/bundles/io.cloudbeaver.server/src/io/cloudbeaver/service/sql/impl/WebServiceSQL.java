@@ -104,12 +104,13 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @WebAction
     @NotNull
-    public WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
+    public WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo sqlContext, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
         return sqlContext.getProcessor().processQuery(
             sqlContext.getProcessor().getWebSession().getProgressMonitor(),
             sqlContext,
             sql,
-            filter);
+            filter,
+            dataFormat);
     }
 
     @Override
@@ -121,7 +122,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter) throws DBException {
+    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
         try {
             DBRProgressMonitor monitor = contextInfo.getProcessor().getWebSession().getProgressMonitor();
 
@@ -132,7 +133,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 filter = new WebSQLDataFilter();
             }
 
-            return contextInfo.getProcessor().readDataFromContainer(contextInfo, monitor, dataContainer, filter);
+            return contextInfo.getProcessor().readDataFromContainer(contextInfo, monitor, dataContainer, filter, dataFormat);
         } catch (DBException e) {
             if (e instanceof DBWebException) throw (DBWebException) e;
             throw new DBWebException("Error reading data from '"  + containerPath + "'", e);
@@ -140,24 +141,24 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo updateResultsData(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues) throws DBWebException {
-        return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues);
+    public WebSQLExecuteInfo updateResultsData(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException {
+        return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues, dataFormat);
     }
 
     @Override
-    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException {
-        return contextInfo.getProcessor().updateResultsDataBatch(contextInfo, resultsId, updatedRows, deletedRows, addedRows);
+    public WebSQLExecuteInfo updateResultsDataBatch(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
+        return contextInfo.getProcessor().updateResultsDataBatch(contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
     }
 
     @NotNull
-    public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) {
+    public WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                 try {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
-                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter);
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(monitor, contextInfo, sql, filter, dataFormat);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
