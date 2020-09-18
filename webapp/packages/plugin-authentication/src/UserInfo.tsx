@@ -41,12 +41,13 @@ const styles = composes(
 
 export const UserInfo = observer(function UserInfo() {
   const authInfoService = useService(AuthInfoService);
+  const style = useStyles(styles);
 
   if (!authInfoService.userInfo) {
     return null;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <user as='div'>
       <user-icon as="div">
         <IconOrImage icon='user' viewBox='0 0 28 28' />
