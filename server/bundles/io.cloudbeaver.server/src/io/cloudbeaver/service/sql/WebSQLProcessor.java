@@ -127,7 +127,12 @@ public class WebSQLProcessor {
     }
 
     @NotNull
-    public WebSQLExecuteInfo processQuery(DBRProgressMonitor monitor, WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter) throws DBWebException {
+    public WebSQLExecuteInfo processQuery(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBWebException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -171,7 +176,7 @@ public class WebSQLProcessor {
                         dataFilter.getLimit()))
                     {
                         boolean hasResultSet = dbStat.executeStatement();
-                        fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, dataFilter);
+                        fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, dataFilter, dataFormat);
                     } catch (DBCException e) {
                         throw new InvocationTargetException(e);
                     }
@@ -191,7 +196,12 @@ public class WebSQLProcessor {
     }
 
     @NotNull
-    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull DBRProgressMonitor monitor, @NotNull DBSDataContainer dataContainer, @NotNull WebSQLDataFilter filter) throws DBException {
+    public WebSQLExecuteInfo readDataFromContainer(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
@@ -211,7 +221,7 @@ public class WebSQLProcessor {
                         filter.getLimit());
                     executeInfo.setDuration(statistics.getTotalTime());
 
-                    WebSQLQueryResults results = new WebSQLQueryResults();
+                    WebSQLQueryResults results = new WebSQLQueryResults(dataFormat);
                     results.setResultSet(dataReceiver.getResultSet());
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
 
@@ -229,7 +239,7 @@ public class WebSQLProcessor {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull List<Object> updateRow,
-        @NotNull Map<String, Object> updateValues) throws DBWebException
+        @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -289,7 +299,7 @@ public class WebSQLProcessor {
                         updatedResultSet.setColumns(resultsInfo.getAttributes());
                         updatedResultSet.setRows(new Object[][]{finalRow});
 
-                        WebSQLQueryResults updateResults = new WebSQLQueryResults();
+                        WebSQLQueryResults updateResults = new WebSQLQueryResults(dataFormat);
                         updateResults.setUpdateRowCount(statistics.getRowsUpdated());
                         updateResults.setResultSet(updatedResultSet);
                         result.setDuration(statistics.getExecuteTime());
@@ -311,7 +321,8 @@ public class WebSQLProcessor {
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows) throws DBWebException
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat) throws DBWebException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -385,7 +396,7 @@ public class WebSQLProcessor {
                                 resultRows.add(finalRow);
                             }
 
-                            WebSQLQueryResults updateResults = new WebSQLQueryResults();
+                            WebSQLQueryResults updateResults = new WebSQLQueryResults(dataFormat);
                             updateResults.setUpdateRowCount(totalUpdateCount);
                             updateResults.setResultSet(updatedResultSet);
                             updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
@@ -429,11 +440,17 @@ public class WebSQLProcessor {
     }
 
 
-    private void fillQueryResults(WebSQLContextInfo contextInfo, @NotNull DBSDataContainer dataContainer, @NotNull DBCStatement dbStat, boolean hasResultSet, @NotNull WebSQLExecuteInfo executeInfo, @NotNull WebSQLDataFilter filter) throws DBCException {
+    private void fillQueryResults(
+        @NotNull WebSQLContextInfo contextInfo, @NotNull DBSDataContainer dataContainer,
+        @NotNull DBCStatement dbStat,
+        boolean hasResultSet,
+        @NotNull WebSQLExecuteInfo executeInfo,
+        @NotNull WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBCException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         for (int i = 0; i < MAX_RESULTS_COUNT; i++) {
-            WebSQLQueryResults results = new WebSQLQueryResults();
+            WebSQLQueryResults results = new WebSQLQueryResults(dataFormat);
             if (hasResultSet) {
                 DBCResultSet resultSet = dbStat.openResultSet();
                 if (resultSet == null) {

@@ -73,8 +73,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                 getService(env).executeQuery(
                     getSQLContext(env),
                     env.getArgument("sql"),
-                    getDataFilter(env)
-                ))
+                    getDataFilter(env),
+                    env.getArgument("dataFormat")))
             .dataFetcher("sqlResultClose", env ->
                 getService(env).closeResult(
                     getSQLContext(env),
@@ -84,28 +84,29 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                 getService(env).readDataFromContainer(
                     getSQLContext(env),
                     env.getArgument("containerNodePath"),
-                    getDataFilter(env)
-                ))
+                    getDataFilter(env),
+                    env.getArgument("dataFormat")))
             .dataFetcher("updateResultsData", env ->
                 getService(env).updateResultsData(
                     getSQLContext(env),
                     env.getArgument("resultsId"),
                     env.getArgument("updateRow"),
-                    env.getArgument("updateValues")
-                ))
+                    env.getArgument("updateValues"),
+                    env.getArgument("dataFormat")))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),
                     env.getArgument("resultsId"),
                     getResultsRow(env, "updatedRows"),
                     getResultsRow(env, "deletedRows"),
-                    getResultsRow(env, "addedRows")
-                ))
+                    getResultsRow(env, "addedRows"),
+                    env.getArgument("dataFormat")))
             .dataFetcher("asyncSqlExecuteQuery", env ->
                 getService(env).asyncExecuteQuery(
                     getSQLContext(env),
                     env.getArgument("sql"),
-                    getDataFilter(env)
+                    getDataFilter(env),
+                    env.getArgument("dataFormat")
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
