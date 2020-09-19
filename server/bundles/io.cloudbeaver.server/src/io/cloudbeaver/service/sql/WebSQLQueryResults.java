@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.List;
@@ -51,8 +52,16 @@ public class WebSQLQueryResults {
         return resultSet;
     }
 
-    public void setResultSet(WebSQLQueryResultSet resultSet) {
-        this.resultSet = resultSet;
+    public void setResultSet(WebSQLQueryResultSet resultSet) throws DBException {
+        switch (dataFormat) {
+            case document:
+
+            case table:
+                this.resultSet = resultSet;
+                break;
+            default:
+                throw new DBException("Data format " + dataFormat + " is not supported");
+        }
     }
 
     public List<WebSQLDatabaseDocument> getDocuments() {
