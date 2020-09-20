@@ -27,8 +27,13 @@ public class CBJettyServer {
     private static final Log log = Log.getLog(CBJettyServer.class);
     private static final String SESSION_CACHE_DIR = ".http-sessions";
 
+    static {
+        // Set Jetty log level to WARN
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
+    }
+
     public CBJettyServer() {
-        System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
     }
 
     public void runServer() {
