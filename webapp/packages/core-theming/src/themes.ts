@@ -12,7 +12,6 @@ export const themes: ITheme[] = [
   {
     name: 'Light',
     id: 'light',
-    className: 'theme-light',
     loader: async () => {
       const styles = await import('./styles/theme-light.module.scss');
       return styles.default;
@@ -21,7 +20,6 @@ export const themes: ITheme[] = [
   {
     name: 'Dark',
     id: 'dark',
-    className: 'theme-dark',
     loader: async () => {
       const styles = await import('./styles/theme-dark.module.scss');
       return styles.default;

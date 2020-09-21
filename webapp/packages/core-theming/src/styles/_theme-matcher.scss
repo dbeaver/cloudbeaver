@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@cloudbeaver/core-theming/src/styles/theme-light';
-@import "base-ag-grid";
+$theme-class: "theme-#{$theme-name}";
 
-:global .#{$theme-class} {
-  @include base-ag-grid;
+@mixin theme-matcher() {
+  theme {
+    composes: #{$theme-class} from global;
+  }
 }

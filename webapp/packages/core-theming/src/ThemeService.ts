@@ -24,7 +24,6 @@ const COMMON_STYLES: any[] = [];
 export interface ITheme {
   name: string;
   id: string;
-  className: string;
   styles?: ClassCollection; // will be populated after execution ITheme.loader()
   loader: () => Promise<ClassCollection>;
 }

@@ -8,6 +8,7 @@
 
 @import 'theme-dark';
 
+@include theme-matcher;
 @include colors;
 @include tag;
 @include ripple-core-styles;

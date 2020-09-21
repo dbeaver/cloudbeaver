@@ -13,27 +13,25 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { useStyles, useTheme } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 const bodyStyles = css`
-    container {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  theme {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export const Body = observer(function Body() {
-  useTheme();
-
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
 
   return styled(useStyles(bodyStyles))(
-    <container as="div">
+    <theme as="div">
       {Screen && <Screen />}
       <DialogsPortal />
       <Notifications />
-    </container>
+    </theme>
   );
 });

@@ -37,6 +37,6 @@ $cursor: #000;
   @include mdc-typography(caption);
 }
 
-:global .theme-light {
+:global .#{$theme-class} {
   @include base-code-editor;
 }

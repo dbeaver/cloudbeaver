@@ -9,6 +9,6 @@
 @import "@cloudbeaver/core-theming/src/styles/theme-dark";
 @import "base-ag-grid";
 
-:global .theme-dark {
+:global .#{$theme-class} {
   @include base-ag-grid;
 }
