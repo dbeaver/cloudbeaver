@@ -27,9 +27,9 @@ export type Style = BaseStyles | ThemeSelector
  */
 export function useStyles(
   ...componentStyles: Array<Style | boolean | undefined>
-) {
+): Record<string, any> {
   if (!componentStyles) {
-    return [];
+    return {};
   }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
@@ -39,11 +39,22 @@ export function useStyles(
   const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
 
   useMemo(() => {
+    const staticStyles: BaseStyles[] = [];
+    const themedStyles = [];
+
+    for (const style of filteredStyles) {
+      const data = (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId);
+
+      if (data instanceof Promise) {
+        themedStyles.push(data);
+      } else {
+        staticStyles.push(data);
+      }
+    }
+    setLoadedStyles(flat(staticStyles));
     Promise
-      .all(filteredStyles.map(style => (
-        (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId)
-      )))
-      .then(styles => setLoadedStyles(flat(styles)));
+      .all(themedStyles)
+      .then(styles => setLoadedStyles(flat([staticStyles, styles])));
   }, [currentThemeId, ...filteredStyles, filteredStyles.length]);
 
   const styles = useMemo(() => {
