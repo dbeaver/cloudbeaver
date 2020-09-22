@@ -7,7 +7,7 @@
  */
 
 import { useObserver } from 'mobx-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -33,12 +33,19 @@ export function useStyles(
   }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
-  const [loadedStyles, setLoadedStyles] = useState<BaseStyles[]>([]);
+  const stylesRef = useRef<Array<Style | boolean | undefined>>([]);
+  const [patch, forceUpdate] = useState(0);
+  const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
   const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
 
-  useMemo(() => {
+  let changed = componentStyles.length !== stylesRef.current.length;
+  for (let i = 0; !changed && i < componentStyles.length; i++) {
+    changed = stylesRef.current[i] !== componentStyles[i];
+  }
+
+  if (changed) {
     const staticStyles: BaseStyles[] = [];
     const themedStyles = [];
 
@@ -51,18 +58,20 @@ export function useStyles(
         staticStyles.push(data);
       }
     }
-    setLoadedStyles(flat(staticStyles));
+    loadedStyles.current = flat(staticStyles);
+
     Promise
       .all(themedStyles)
-      .then(styles => setLoadedStyles(flat([staticStyles, styles])));
-  }, [currentThemeId, ...filteredStyles, filteredStyles.length]);
+      .then((styles) => {
+        loadedStyles.current = flat([staticStyles, styles]);
+        forceUpdate(v => v++);
+      });
+  }
 
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
-    return applyComposes([...themeStyles, ...loadedStyles]);
-  }, [currentThemeId, ...loadedStyles, loadedStyles.length]);
-  /* we put dynamic array length as the dependency because of preact bug,
-     otherwise useMemo will not be triggered on array change */
+    return applyComposes([...themeStyles, ...loadedStyles.current]);
+  }, [currentThemeId, patch]);
 
   return create(styles); // todo this method is called in each rerender
 }

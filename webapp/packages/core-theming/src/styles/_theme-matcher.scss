@@ -10,6 +10,6 @@ $theme-class: "theme-#{$theme-name}";
 
 @mixin theme-matcher() {
   theme {
-    composes: #{$theme-class} from global;
+    composes: #{$theme-class} theme-typography from global;
   }
 }

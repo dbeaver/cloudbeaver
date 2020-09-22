@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -24,11 +25,19 @@ const bodyStyles = css`
 `;
 
 export const Body = observer(function Body() {
+  const ref = useRef<HTMLDivElement>(null);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
 
+  // sync classes from theme with body for popup components and etc
+  useLayoutEffect(() => {
+    if (ref.current) {
+      document.body.className = ref.current.className;
+    }
+  });
+
   return styled(useStyles(bodyStyles))(
-    <theme as="div">
+    <theme as="div" ref={ref}>
       {Screen && <Screen />}
       <DialogsPortal />
       <Notifications />
