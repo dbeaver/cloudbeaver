@@ -29,6 +29,7 @@ export const TableItemExpand = observer(function TableItemExpand({
 }: Props) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+  const styles = useStyles();
   if (!context) {
     return null;
   }
@@ -48,7 +49,7 @@ export const TableItemExpand = observer(function TableItemExpand({
     }
   }, [tableContext, context, onExpand, disabled]);
 
-  return styled(useStyles())(
+  return styled()(
     <table-item-expand-box as='div' className={className} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })}/>
     </table-item-expand-box>

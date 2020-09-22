@@ -47,6 +47,7 @@ const styles = css`
 `;
 
 export const LogViewTab = observer(function LogViewTab() {
+  const style = useStyles(styles);
   const controller = useController(LogViewTabController);
   const translate = useTranslate();
 
@@ -54,7 +55,7 @@ export const LogViewTab = observer(function LogViewTab() {
     return null;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <wrapper as="div">
       <buttons as="div">
         <Button mod={['unelevated']} onClick={controller.clearLog}>

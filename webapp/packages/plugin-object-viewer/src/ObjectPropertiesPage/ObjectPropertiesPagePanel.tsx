@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import { useChildren } from '@cloudbeaver/core-app';
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -30,15 +30,13 @@ const viewerStyles = composes(
       flex: 1 1 auto;
       padding-top: 16px; /* TODO: must be refactored */
     }
-    center {
-      margin: auto;
-    }
   `
 );
 
 export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPagePanel({
   tab,
 }: ObjectPagePanelProps) {
+  const style = useStyles(viewerStyles);
   const { children, isLoading } = useChildren(tab.handlerState.objectId);
 
   if (!children && isLoading) {
@@ -46,12 +44,10 @@ export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPageP
   }
 
   if (!children) {
-    return styled(useStyles(viewerStyles))(
-      <center as="div"><Translate token='plugin_object_viewer_table_no_items' /></center>
-    );
+    return <TextPlaceholder><Translate token='plugin_object_viewer_table_no_items' /></TextPlaceholder>;
   }
 
-  return styled(useStyles(viewerStyles))(
+  return styled(style)(
     <wrapper as="div">
       <ObjectFolders tab={tab} />
     </wrapper>

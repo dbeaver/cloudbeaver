@@ -39,6 +39,7 @@ export const TableItem = observer(function TableItem({
   onClick,
   onDoubleClick,
 }: Props) {
+  const styles = useStyles();
   const context = useContext(TableContext);
   if (!context) {
     return null;
@@ -78,7 +79,7 @@ export const TableItem = observer(function TableItem({
   const isExpanded = itemContext.isExpanded();
   const ExpandElement = expandElement;
 
-  return styled(useStyles())(
+  return styled(styles)(
     <TableItemContext.Provider value={itemContext}>
       <tr
         onClick={handleClick}

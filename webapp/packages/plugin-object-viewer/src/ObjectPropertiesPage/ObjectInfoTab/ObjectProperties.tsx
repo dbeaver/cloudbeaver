@@ -11,16 +11,10 @@ import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ObjectProperty } from './ObjectProperty';
-
-const styles = css`
-  center {
-    margin: auto;
-  }
-`;
 
 const tabStyles = css`
   properties {
@@ -42,6 +36,7 @@ type ObjectPropertiesProps = PropsWithChildren<{
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,
 }: ObjectPropertiesProps) {
+  const style = useStyles(tabStyles);
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
 
   if (!dbObject?.properties && isLoading) {
@@ -49,12 +44,10 @@ export const ObjectProperties = observer(function ObjectProperties({
   }
 
   if (!dbObject?.properties) {
-    return styled(styles)(
-      <center as="div">There are no items to show</center>
-    );
+    return <TextPlaceholder>There are no items to show</TextPlaceholder>;
   }
 
-  return styled(useStyles(tabStyles))(
+  return styled(style)(
     <properties as="div">
       <container as="div">
         {dbObject.properties.map(v => (

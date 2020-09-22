@@ -24,6 +24,7 @@ type Props = {
 export const TableItemSelect = observer(function TableItemSelect({ checked, disabled, className }: Props) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+  const styles = useStyles();
   if (!context) {
     return null;
   }
@@ -32,7 +33,7 @@ export const TableItemSelect = observer(function TableItemSelect({ checked, disa
     tableContext?.setItemSelect(context.item, !context.isSelected());
   }, [tableContext, context]);
 
-  return styled(useStyles())(
+  return styled(styles)(
     <input type='checkbox' checked={checked || context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>
   );
 });

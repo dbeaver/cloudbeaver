@@ -93,7 +93,7 @@ export const Options = observer(function Options({
               state={model.connection}
               items={controller.drivers}
               keySelector={driver => driver.id}
-              valueSelector={driver => driver?.name!}
+              valueSelector={driver => driver?.name ?? ''}
               onSelect={controller.onSelectDriver}
               readOnly={model.editing || controller.drivers.length < 2}
               mod={'surface'}

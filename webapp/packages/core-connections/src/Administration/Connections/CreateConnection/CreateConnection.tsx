@@ -152,6 +152,7 @@ export const CreateConnection = observer(function CreateConnection({
   onChange,
   onCancel,
 }: Props) {
+  const style = useStyles(styles);
   const controller = useController(CreateConnectionController);
   const translate = useTranslate();
 
@@ -170,7 +171,7 @@ export const CreateConnection = observer(function CreateConnection({
   }, [controller, method, onCancel]);
 
   if (controller.connection) {
-    return styled(useStyles(styles))(
+    return styled(style)(
       <connection-create as='div'>
         <title-bar as='div'>
           <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={controller.back}/></back-button>
@@ -192,7 +193,7 @@ export const CreateConnection = observer(function CreateConnection({
     );
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <connection-create as='div'>
       <TabsState currentTabId={method} onChange={onChange}>
         <title-bar as='div'>

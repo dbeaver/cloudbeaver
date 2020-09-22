@@ -14,6 +14,7 @@ import { InputField } from '@cloudbeaver/core-blocks';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
 
 type Props = {
@@ -33,9 +34,10 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   autofillToken = '',
   className,
 }: Props) {
+  const style = useStyles(formStyles);
 
   if (!properties || properties.length === 0) {
-    return styled(useStyles(formStyles))(<center as="div">Properties empty</center>);
+    return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
@@ -50,7 +52,7 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
     }
   }, [properties, credentials]);
 
-  return styled(useStyles(formStyles))(
+  return styled(style)(
     <form-body as='div' className={className}>
       {properties.map(property => (
         <group as="div" key={property.id}>
