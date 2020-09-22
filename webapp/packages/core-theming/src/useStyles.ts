@@ -46,6 +46,7 @@ export function useStyles(
   }
 
   if (changed) {
+    stylesRef.current = componentStyles;
     const staticStyles: BaseStyles[] = [];
     const themedStyles = [];
 
@@ -71,7 +72,7 @@ export function useStyles(
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
     return applyComposes([...themeStyles, ...loadedStyles.current]);
-  }, [currentThemeId, patch]);
+  }, [currentThemeId, patch, stylesRef.current]);
 
   return create(styles); // todo this method is called in each rerender
 }
