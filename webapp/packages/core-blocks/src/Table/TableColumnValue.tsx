@@ -31,14 +31,12 @@ export const TableColumnValue = observer(function TableColumnValue({
   expand,
   className,
 }: Props) {
+  const styles = useStyles();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
-  if (!context) {
-    return null;
-  }
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
-    if (!expand) {
+    if (!expand || !context) {
       return;
     }
 
@@ -49,7 +47,11 @@ export const TableColumnValue = observer(function TableColumnValue({
     tableContext?.setItemExpand(context.item, state);
   }, [tableContext, context, expand]);
 
-  return styled(useStyles())(
+  if (!context) {
+    return null;
+  }
+
+  return styled(styles)(
     <td align={align} className={className} {...use({ centerContent })} onClick={handleClick}>
       {flex && <td-flex as='div'>{children}</td-flex>}
       {!flex && children}

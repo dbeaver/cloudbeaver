@@ -50,6 +50,7 @@ type SqlDataResultProps = {
 }
 
 export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataResultProps) {
+  const style = useStyles(styles);
   const navigatorService = useService(SqlEditorNavigatorService);
   const sqlResultTabsService = useService(SqlResultTabsService);
 
@@ -88,7 +89,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
 
   const executionState = sqlResultTabsService.getTabExecutionContext(tab.id);
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <wrapper as="div">
       <TabsBox
         currentTabId={currentId}
