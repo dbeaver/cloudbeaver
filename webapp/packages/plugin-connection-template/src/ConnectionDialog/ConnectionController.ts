@@ -106,7 +106,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
         this.onClose();
       } catch (exception) {
         this.showError(exception, 'Failed to establish connection');
-        await this.connectionInfoResource.delete(connection.id);
+        await this.connectionInfoResource.deleteConnection(connection.id);
       }
     } catch (exception) {
       this.showError(exception, 'Failed to establish connection');
