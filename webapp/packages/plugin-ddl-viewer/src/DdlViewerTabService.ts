@@ -42,7 +42,7 @@ export class DdlViewerTabService {
       tabId: ddlViewerTabId,
       title: 'DDL',
       icon: '/icons/DDL.svg',
-      onActivate: () => this.activateDDLTab(nodeId, node?.parentId!),
+      onActivate: () => this.activateDDLTab(nodeId, node?.parentId as string),
       panel: () => ddlViewer(nodeId),
     };
     return ddlTab;
