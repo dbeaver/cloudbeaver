@@ -95,13 +95,15 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             log.error("Error binding attributes", e);
         }
 
-        convertComplexValuesToRelationalView(session);
+        if (dataFormat != WebDataFormat.document) {
+            convertComplexValuesToRelationalView(session);
+        }
 
         // Convert row values
         for (Object[] row : rows) {
             for (int i = 0; i < bindings.length; i++) {
                 DBDAttributeBinding binding = bindings[i];
-                row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, row[i]);
+                row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, row[i], dataFormat);
             }
         }
 

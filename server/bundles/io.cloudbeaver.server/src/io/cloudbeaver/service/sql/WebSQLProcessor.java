@@ -282,7 +282,7 @@ public class WebSQLProcessor {
                             Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                             Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
                             rowValues[i] = realCellValue;
-                            finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue);
+                            finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue, dataFormat);
                         }
                         for (int i = 0; i < keyAttributes.length; i++) {
                             DBDAttributeBinding keyAttribute = keyAttributes[i];
@@ -380,7 +380,7 @@ public class WebSQLProcessor {
                                     Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                                     Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
                                     rowValues[i] = realCellValue;
-                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue);
+                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue, dataFormat);
                                 }
                                 for (int i = 0; i < keyAttributes.length; i++) {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];

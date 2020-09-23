@@ -68,9 +68,9 @@ public class WebSQLQueryResults {
     }
 
     public List<WebSQLDatabaseDocument> getDocuments() throws DBCException {
-        if (dataFormat != WebDataFormat.document) {
-            throw new DBCException("Non-document presentation");
-        }
+//        if (dataFormat != WebDataFormat.document) {
+//            throw new DBCException("Non-document presentation");
+//        }
         if (this.resultSet == null) {
             throw new DBCException("Null resultset");
         }
@@ -88,7 +88,7 @@ public class WebSQLQueryResults {
             } else if (row[0] instanceof DBDDocument) {
                 documents.add(new WebSQLDatabaseDocument(webSession, (DBDDocument) row[0]));
             } else {
-                log.debug("Non-document row value: " + row[0]);
+                log.debug("Non-document row value: " + row[0].getClass().getName());
             }
         }
 
