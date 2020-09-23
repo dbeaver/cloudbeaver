@@ -228,15 +228,12 @@ public class WebSession implements DBASession {
     }
 
     public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
-        if (this.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            // All connections are accessible
-            return;
-        }
-        connections.removeIf(c -> !accessibleConnectionIds.contains(c.getId()));
+        connections.removeIf(c -> !isDataSourceAccessible(c.getDataSourceContainer()));
     }
 
     private boolean isDataSourceAccessible(DBPDataSourceContainer dataSource) {
         return dataSource.isExternallyProvided() ||
+            dataSource.isTemporary() ||
             this.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
             accessibleConnectionIds.contains(dataSource.getId());
     }
