@@ -11,34 +11,28 @@ import { useState, useCallback, useEffect } from 'react';
 import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
-import { NavNode } from '../../shared/NodesManager/EntityTypes';
-import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';
-import { useNode } from '../../shared/NodesManager/useNode';
-import { useChildren } from '../../shared/useChildren';
-import { NavigationTreeService } from '../NavigationTreeService';
+import { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
+import { useChildren } from '../../../shared/useChildren';
+import { NavigationTreeService } from '../../NavigationTreeService';
 
-export function useNavigationTree(nodeId: string, parentId: string) {
+export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoaded: boolean, nodeOutdated: boolean) {
   const navigationTreeService = useService(NavigationTreeService);
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
   const [isExpanding, setExpanding] = useState(false);
-  const node = useNode(nodeId);
-  const children = useChildren(nodeId);
+  const children = useChildren(node.id);
 
-  if (!node.node) {
-    return undefined;
-  }
-
-  const isLoading = node.isLoading || children.isLoading || isExpanding;
-  const isLoaded = children.isLoaded || node.isLoaded;
-  let isExpandable = isExpandableFilter(node.node) && (
+  const isLoading = nodeLoading || children.isLoading || isExpanding;
+  const isLoaded = children.isLoaded || nodeLoaded;
+  let isExpandable = isExpandableFilter(node) && (
     !isLoaded || children.isOutdated || !children.children || children.children.length > 0
   );
   let isExpandedActually = isExpanded && (children.children?.length || 0) > 0;
 
-  if (node.node.objectFeatures.includes(EObjectFeature.dataSource)) {
-    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
+  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
+    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
     const { connectionInfo } = useConnectionInfo(connectionId);
 
     if (!connectionInfo?.connected) {
@@ -48,15 +42,15 @@ export function useNavigationTree(nodeId: string, parentId: string) {
   }
 
   const handleDoubleClick = useCallback(
-    () => navigationTreeService.navToNode(nodeId, parentId),
-    [navigationTreeService, nodeId, parentId]
+    () => navigationTreeService.navToNode(node.id, node.parentId),
+    [navigationTreeService, node]
   );
 
   const handleExpand = useCallback(
     async () => {
       if (!isExpandedActually) {
         setExpanding(true);
-        const state = await navigationTreeService.loadNestedNodes(nodeId);
+        const state = await navigationTreeService.loadNestedNodes(node.id);
         setExpanding(false);
         if (!state) {
           switchExpand(false);
@@ -65,31 +59,27 @@ export function useNavigationTree(nodeId: string, parentId: string) {
       }
       switchExpand(!isExpandedActually);
     },
-    [isExpandedActually, nodeId]
+    [isExpandedActually, node]
   );
 
   const handleSelect = useCallback(
     (isMultiple?: boolean) => {
-      switchSelect(navigationTreeService.selectNode(nodeId, isMultiple));
+      switchSelect(navigationTreeService.selectNode(node.id, isMultiple));
     },
-    [isSelected, nodeId]
+    [isSelected, node]
   );
 
-  const {
-    name, nodeType, icon, hasChildren,
-  } = node.node;
-
   useEffect(() => {
-    if (!isExpandable || !hasChildren) {
+    if (!isExpandable || !node.hasChildren) {
       switchExpand(false);
     }
-  }, [isExpandable, hasChildren]);
+  }, [isExpandable, node.hasChildren]);
 
   useEffect(() => {
-    if (isExpandedActually && children.isOutdated && !children.isLoading && children.isLoaded && !node.isOutdated) {
+    if (isExpandedActually && children.isOutdated && !children.isLoading && children.isLoaded && !nodeOutdated) {
       setExpanding(true);
       navigationTreeService
-        .loadNestedNodes(nodeId)
+        .loadNestedNodes(node.id)
         .then((state) => {
           setExpanding(false);
           if (!state) {
@@ -97,30 +87,25 @@ export function useNavigationTree(nodeId: string, parentId: string) {
           }
         });
     }
-  }, [isExpandedActually, children.isOutdated, children.isLoading, children.isLoaded, node.isOutdated, nodeId]);
+  }, [isExpandedActually, children.isOutdated, children.isLoading, children.isLoaded, nodeOutdated, node]);
 
   // Here we subscribe to selected nodes if current node selected (mobx)
-  if (isSelected && !navigationTreeService.isNodeSelected(nodeId)) {
+  if (isSelected && !navigationTreeService.isNodeSelected(node.id)) {
     switchSelect(false);
   }
 
   useEffect(() => () => {
-    if (navigationTreeService.isNodeSelected(nodeId)) {
-      navigationTreeService.selectNode(nodeId, true);
+    if (navigationTreeService.isNodeSelected(node.id)) {
+      navigationTreeService.selectNode(node.id, true);
     }
-  }, [navigationTreeService]);
+  }, [navigationTreeService, node]);
 
   return {
-    name,
-    node: node.node,
-    nodeType,
-    icon,
     isExpanded: isExpandedActually,
     isLoaded,
     isLoading,
     isExpandable,
     isSelected,
-    hasChildren,
     handleDoubleClick,
     handleSelect,
     handleExpand,

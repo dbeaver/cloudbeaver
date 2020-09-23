@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { useFocus } from '@cloudbeaver/core-blocks';
+import { Loader, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { useActiveView } from '@cloudbeaver/core-view';
@@ -56,6 +56,14 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
+    if (nodeChildren.isLoading) {
+      return styled(navigationTreeStyles)(
+        <center as="div">
+          <tree as="div"><Loader/></tree>
+        </center>
+      );
+    }
+
     return styled(navigationTreeStyles)(
       <center as="div">
         <tree as="div">
