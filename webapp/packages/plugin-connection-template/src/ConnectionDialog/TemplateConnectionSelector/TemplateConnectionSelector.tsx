@@ -37,7 +37,7 @@ export const TemplateConnectionSelector = observer(function TemplateConnectionSe
 
   return (
     <ItemList className={className}>
-      <ItemListSearch onSearch={setSearch} />
+      <ItemListSearch onChange={setSearch} />
       {filteredTemplateConnections.map(template => (
         <TemplateConnectionItem
           key={template.id}

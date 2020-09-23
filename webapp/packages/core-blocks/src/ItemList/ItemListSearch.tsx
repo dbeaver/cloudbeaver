@@ -7,51 +7,69 @@
  */
 
 import {
-  useState, useCallback, useContext
+  useState, useCallback, useContext, useRef
 } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { StaticImage } from '../StaticImage';
+import { IconButton } from '../IconButton';
 import { Styles } from './styles';
 
 type Props = React.PropsWithChildren<{
   value?: string;
   placeholder?: string;
   disabled?: boolean;
+  onChange?(value: string): void;
   onSearch?(value: string): void;
   className?: string;
 }>
 
 export function ItemListSearch({
-  value, placeholder, disabled, onSearch, className,
+  value, placeholder, disabled, onChange, onSearch, className,
 }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const styles = useContext(Styles);
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
-  const searchHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (value === undefined) {
       setSearch(event.target.value);
     }
+    if (onChange) {
+      onChange(event.target.value);
+    }
+  }, [value, onChange]);
+
+  const searchHandler = useCallback(() => {
+    if (!inputRef.current) {
+      return;
+    }
+
+    if (value === undefined) {
+      setSearch(inputRef.current.value);
+    }
     if (onSearch) {
-      onSearch(event.target.value);
+      onSearch(inputRef.current.value);
     }
   }, [value, onSearch]);
 
+  const ListSearchButton = IconButton;
+
   return styled(useStyles(...(styles || [])))(
     <list-search as="div" className={className}>
-      <StaticImage icon='/icons/search.svg' />
       <input
+        ref={inputRef}
         name='search'
         placeholder={translate(placeholder || 'ui_search')}
         value={value ?? search}
-        onChange={searchHandler}
+        onChange={changeHandler}
         autoComplete="off"
         disabled={disabled}
         {...use({ mod: 'surface' })}
       />
+      <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>
     </list-search>
   );
 }

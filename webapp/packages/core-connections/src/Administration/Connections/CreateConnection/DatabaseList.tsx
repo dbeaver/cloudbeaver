@@ -43,7 +43,7 @@ export const DatabaseList = observer(function DatabaseList({
   return styled(styles)(
     <SubmittingForm onSubmit={onSearch} className={className}>
       <ItemList>
-        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onSearch={onChange} disabled={disabled}/>
+        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onChange={onChange} onSearch={onSearch} disabled={disabled}/>
         {databases.map(database => (
           <Database key={database.host + database.port} database={database} onSelect={onSelect}/>
         ))}

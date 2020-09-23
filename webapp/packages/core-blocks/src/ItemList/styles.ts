@@ -22,6 +22,9 @@ export const ITEM_LIST_STYLES = composes(
     list-item-name {
       composes: theme-border-color-secondary from global;
     }
+    ListSearchButton {
+      composes: theme-ripple theme-background-primary theme-text-on-primary from global;
+    }
   `,
   css`
     item-list {
@@ -36,14 +39,23 @@ export const ITEM_LIST_STYLES = composes(
       z-index: 1;
 
       & input {
-        padding: 4px 24px;
-        padding-left: 32px;
+        padding: 4px 16px;
+        padding-right: 32px;
       }
 
-      & StaticImage {
+      & search-button {
         position: absolute;
-        top: 15px;
-        left: 32px;
+        top: 8px;
+        right: 24px;
+
+        & ListSearchButton {
+          position: relative;
+          box-sizing: border-box;
+          border-radius: 2px;
+          height: 25px;
+          width: 25px;
+          margin: 2px;
+        }
       }
     }
     list-item {
