@@ -177,7 +177,7 @@ public class WebSQLProcessor {
                     {
                         boolean hasResultSet = dbStat.executeStatement();
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, dataFilter, dataFormat);
-                    } catch (DBCException e) {
+                    } catch (DBException e) {
                         throw new InvocationTargetException(e);
                     }
                 }
@@ -209,7 +209,7 @@ public class WebSQLProcessor {
         DBDDataFilter dataFilter = filter.makeDataFilter();
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
-                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer)) {
+                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
                         session,
@@ -226,7 +226,7 @@ public class WebSQLProcessor {
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
 
                     executeInfo.setStatusMessage(dataReceiver.getResultSet().getRows().length + " row(s) fetched");
-                } catch (DBCException e) {
+                } catch (DBException e) {
                     throw new InvocationTargetException(e);
                 }
             }
@@ -446,7 +446,7 @@ public class WebSQLProcessor {
         boolean hasResultSet,
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBCException {
+        @Nullable WebDataFormat dataFormat) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         for (int i = 0; i < MAX_RESULTS_COUNT; i++) {
@@ -456,7 +456,7 @@ public class WebSQLProcessor {
                 if (resultSet == null) {
                     break;
                 }
-                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer)) {
+                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     readResultSet(dbStat.getSession(), resultSet, filter, dataReceiver);
                     results.setResultSet(dataReceiver.getResultSet());
                 }
@@ -495,14 +495,16 @@ public class WebSQLProcessor {
     private class WebDataReceiver implements DBDDataReceiver {
         private final WebSQLContextInfo contextInfo;
         private DBSDataContainer dataContainer;
+        private WebDataFormat dataFormat;
         private WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
         private DBDAttributeBinding[] bindings;
         private List<Object[]> rows = new ArrayList<>();
 
-        public WebDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer) {
+        WebDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
             this.contextInfo = contextInfo;
             this.dataContainer = dataContainer;
+            this.dataFormat = dataFormat;
         }
 
         public WebSQLQueryResultSet getResultSet() {
