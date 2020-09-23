@@ -171,6 +171,11 @@ public class WebSession implements DBASession {
         if (CommonUtils.equalObjects(this.user, user)) {
             return;
         }
+        forceUserRefresh(user);
+    }
+
+    // Note: for admin use only
+    public void forceUserRefresh(WebUser user) {
         this.user = user;
 
         refreshSessionAuth();
