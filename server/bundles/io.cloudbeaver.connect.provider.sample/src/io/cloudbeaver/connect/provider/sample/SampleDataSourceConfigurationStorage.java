@@ -54,6 +54,11 @@ public class SampleDataSourceConfigurationStorage implements DBPDataSourceConfig
     }
 
     @Override
+    public boolean isDynamic() {
+        return false;
+    }
+
+    @Override
     public String getStatus() {
         return "Valid";
     }

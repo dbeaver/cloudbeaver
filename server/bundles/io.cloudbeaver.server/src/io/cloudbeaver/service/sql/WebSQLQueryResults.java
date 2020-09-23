@@ -16,9 +16,16 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
+import org.jkiss.dbeaver.model.data.DBDDocument;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,11 +33,15 @@ import java.util.List;
  */
 public class WebSQLQueryResults {
 
+    private static final Log log = Log.getLog(WebSQLQueryResults.class);
+
+    private final WebSession webSession;
     private final WebDataFormat dataFormat;
     private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;
 
-    public WebSQLQueryResults(WebDataFormat dataFormat) {
+    WebSQLQueryResults(@NotNull WebSession webSession, @NotNull WebDataFormat dataFormat) {
+        this.webSession = webSession;
         this.dataFormat = dataFormat;
     }
 
@@ -53,18 +64,34 @@ public class WebSQLQueryResults {
     }
 
     public void setResultSet(WebSQLQueryResultSet resultSet) throws DBException {
-        switch (dataFormat) {
-            case document:
-
-            case table:
-                this.resultSet = resultSet;
-                break;
-            default:
-                throw new DBException("Data format " + dataFormat + " is not supported");
-        }
+        this.resultSet = resultSet;
     }
 
-    public List<WebSQLDatabaseDocument> getDocuments() {
-        return null;
+    public List<WebSQLDatabaseDocument> getDocuments() throws DBCException {
+        if (dataFormat != WebDataFormat.document) {
+            throw new DBCException("Non-document presentation");
+        }
+        if (this.resultSet == null) {
+            throw new DBCException("Null resultset");
+        }
+        if (this.resultSet.getColumns().length != 1 || this.resultSet.getColumns()[0].getAttribute().getDataKind() != DBPDataKind.DOCUMENT) {
+            throw new DBCException("Non-document resultset columns");
+        }
+
+        List<WebSQLDatabaseDocument> documents = new ArrayList<>();
+        for (Object[] row : resultSet.getRows()) {
+            if (row.length != 1) {
+                log.debug("Non-document row content");
+            }
+            if (row[0] == null) {
+                documents.add(null);
+            } else if (row[0] instanceof DBDDocument) {
+                documents.add(new WebSQLDatabaseDocument(webSession, (DBDDocument) row[0]));
+            } else {
+                log.debug("Non-document row value: " + row[0]);
+            }
+        }
+
+        return documents;
     }
 }

@@ -25,10 +25,11 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.DBDDataFilter;
+import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
-import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -209,7 +210,7 @@ public class WebSQLProcessor {
         DBDDataFilter dataFilter = filter.makeDataFilter();
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
-                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
                         session,
@@ -221,7 +222,7 @@ public class WebSQLProcessor {
                         filter.getLimit());
                     executeInfo.setDuration(statistics.getTotalTime());
 
-                    WebSQLQueryResults results = new WebSQLQueryResults(dataFormat);
+                    WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
                     results.setResultSet(dataReceiver.getResultSet());
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
 
@@ -299,7 +300,7 @@ public class WebSQLProcessor {
                         updatedResultSet.setColumns(resultsInfo.getAttributes());
                         updatedResultSet.setRows(new Object[][]{finalRow});
 
-                        WebSQLQueryResults updateResults = new WebSQLQueryResults(dataFormat);
+                        WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
                         updateResults.setUpdateRowCount(statistics.getRowsUpdated());
                         updateResults.setResultSet(updatedResultSet);
                         result.setDuration(statistics.getExecuteTime());
@@ -396,7 +397,7 @@ public class WebSQLProcessor {
                                 resultRows.add(finalRow);
                             }
 
-                            WebSQLQueryResults updateResults = new WebSQLQueryResults(dataFormat);
+                            WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
                             updateResults.setUpdateRowCount(totalUpdateCount);
                             updateResults.setResultSet(updatedResultSet);
                             updatedResultSet.setRows(resultRows.toArray(new Object[0][]));
@@ -450,13 +451,13 @@ public class WebSQLProcessor {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         for (int i = 0; i < MAX_RESULTS_COUNT; i++) {
-            WebSQLQueryResults results = new WebSQLQueryResults(dataFormat);
+            WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
             if (hasResultSet) {
                 DBCResultSet resultSet = dbStat.openResultSet();
                 if (resultSet == null) {
                     break;
                 }
-                try (WebDataReceiver dataReceiver = new WebDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     readResultSet(dbStat.getSession(), resultSet, filter, dataReceiver);
                     results.setResultSet(dataReceiver.getResultSet());
                 }
@@ -475,7 +476,7 @@ public class WebSQLProcessor {
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
     }
 
-    private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebDataReceiver dataReceiver) throws DBCException {
+    private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebSQLQueryDataReceiver dataReceiver) throws DBCException {
         dataReceiver.fetchStart(session, dbResult, filter.getOffset(), filter.getLimit());
         int rowCount = 0;
         while (dbResult.nextRow()) {
@@ -491,142 +492,5 @@ public class WebSQLProcessor {
 
     ///////////////////////////////////////////////////////
     // Utils
-
-    private class WebDataReceiver implements DBDDataReceiver {
-        private final WebSQLContextInfo contextInfo;
-        private DBSDataContainer dataContainer;
-        private WebDataFormat dataFormat;
-        private WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
-
-        private DBDAttributeBinding[] bindings;
-        private List<Object[]> rows = new ArrayList<>();
-
-        WebDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
-            this.contextInfo = contextInfo;
-            this.dataContainer = dataContainer;
-            this.dataFormat = dataFormat;
-        }
-
-        public WebSQLQueryResultSet getResultSet() {
-            return webResultSet;
-        }
-
-        @Override
-        public void fetchStart(DBCSession session, DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
-            DBCResultSetMetaData meta = dbResult.getMeta();
-            List<DBCAttributeMetaData> attributes = meta.getAttributes();
-            bindings = new DBDAttributeBindingMeta[attributes.size()];
-            for (int i = 0; i < attributes.size(); i++) {
-                DBCAttributeMetaData attrMeta = attributes.get(i);
-                bindings[i] = new DBDAttributeBindingMeta(dataContainer, dbResult.getSession(), attrMeta);
-            }
-        }
-
-        @Override
-        public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
-            Object[] row = new Object[bindings.length];
-
-            for (int i = 0; i < bindings.length; i++) {
-                DBDAttributeBinding binding = bindings[i];
-                try {
-                    Object cellValue = binding.getValueHandler().fetchValueObject(
-                        resultSet.getSession(),
-                        resultSet,
-                        binding.getMetaAttribute(),
-                        i);
-                    row[i] = cellValue;
-                } catch (Throwable e) {
-                    row[i] = new DBDValueError(e);
-                }
-            }
-
-            rows.add(row);
-        }
-
-        @Override
-        public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
-
-            DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;
-
-            try {
-                DBExecUtils.bindAttributes(session, entity, resultSet, bindings, rows);
-            } catch (DBException e) {
-                log.error("Error binding attributes", e);
-            }
-
-            convertComplexValuesToRelationalView(session);
-
-            // Convert row values
-            for (Object[] row : rows) {
-                for (int i = 0; i < bindings.length; i++) {
-                    DBDAttributeBinding binding = bindings[i];
-                    row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, row[i]);
-                }
-            }
-
-            webResultSet.setColumns(bindings);
-            webResultSet.setRows(rows.toArray(new Object[0][]));
-
-            WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
-            webResultSet.setResultsInfo(resultsInfo);
-        }
-
-        private void convertComplexValuesToRelationalView(DBCSession session) {
-            // Here we get leaf attributes and refetch them into plain tabl structure
-            List<DBDAttributeBinding> leafBindings = new ArrayList<>();
-            for (DBDAttributeBinding attr : bindings) {
-                collectLeafBindings(attr, leafBindings);
-            }
-            if (CommonUtils.equalObjects(bindings, leafBindings)) {
-                // No complex types
-                return;
-            }
-
-            // Convert original rows into new rows with leaf attributes
-            // Extract values for leaf attributes from original row
-            DBDAttributeBinding[] leafAttributes = leafBindings.toArray(new DBDAttributeBinding[0]);
-            List<Object[]> newRows = new ArrayList<>();
-            for (Object[] row : rows) {
-                Object[] newRow = new Object[leafBindings.size()];
-                for (int i = 0; i < leafBindings.size(); i++) {
-                    DBDAttributeBinding leafAttr = leafBindings.get(i);
-                    try {
-                        //Object topValue = row[leafAttr.getTopParent().getOrdinalPosition()];
-                        Object cellValue = DBUtils.getAttributeValue(leafAttr, leafAttributes, row);
-/*
-                        Object cellValue = leafAttr.getValueHandler().getValueFromObject(
-                            session,
-                            leafAttr,
-                            topValue,
-                            false,
-                            false);
-*/
-                        newRow[i] = cellValue;
-                    } catch (Exception e) {
-                        newRow[i] = new DBDValueError(e);
-                    }
-                }
-                newRows.add(newRow);
-            }
-            this.bindings = leafAttributes;
-            this.rows = newRows;
-        }
-
-        private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
-            List<DBDAttributeBinding> nestedBindings = attr.getNestedBindings();
-            if (CommonUtils.isEmpty(nestedBindings)) {
-                leafBindings.add(attr);
-            } else {
-                for (DBDAttributeBinding nested : nestedBindings) {
-                    collectLeafBindings(nested, leafBindings);
-                }
-            }
-        }
-
-        @Override
-        public void close() {
-            rows.clear();
-        }
-    }
 
 }

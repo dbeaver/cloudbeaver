@@ -93,6 +93,7 @@ type SQLResultSet {
 
 type DatabaseDocument {
     id: String
+    contentType: String
     properties: Object
     data: Object
 }

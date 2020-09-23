@@ -236,7 +236,8 @@ public class WebSession implements DBASession {
     }
 
     private boolean isDataSourceAccessible(DBPDataSourceContainer dataSource) {
-        return this.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+        return dataSource.isExternallyProvided() ||
+            this.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
             accessibleConnectionIds.contains(dataSource.getId());
     }
 

@@ -37,6 +37,10 @@ public class WebSQLQueryResultColumn {
         this.attrMeta = attrMeta;
     }
 
+    DBDAttributeBinding getAttribute() {
+        return attrMeta;
+    }
+
     @Property
     public Integer getPosition() {
         return attrMeta.getOrdinalPosition();

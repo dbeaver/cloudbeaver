@@ -16,23 +16,59 @@
  */
 package io.cloudbeaver.service.sql;
 
-import org.jkiss.dbeaver.Log;
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.DBDDocument;
+import org.jkiss.dbeaver.model.exec.DBCException;
+
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Map;
 
 /**
- * Web SQL query resultset.
+ * Web document wrapper.
  */
 public class WebSQLDatabaseDocument {
 
-    private static final Log log = Log.getLog(WebSQLDatabaseDocument.class);
-
+    @NotNull
+    private final WebSession webSession;
+    @Nullable
     private DBDDocument document;
 
-    public WebSQLDatabaseDocument(DBDDocument document) {
+    WebSQLDatabaseDocument(@NotNull WebSession webSession, @Nullable DBDDocument document) {
+        this.webSession = webSession;
         this.document = document;
     }
 
     public Object getDocument() {
-        return document.getRootNode();
+        return document == null ? null : document.getRootNode();
     }
+
+    public Object getId() {
+        return document == null ? null : document.getDocumentId();
+    }
+
+    public Map<String, Object> getProperties() {
+        return Collections.emptyMap();
+    }
+
+    public String getContentType() {
+        return document == null ? null : document.getDocumentContentType();
+    }
+
+    public String getData() throws DBCException {
+        if (document == null) {
+            return null;
+        }
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.serializeDocument(webSession.getProgressMonitor(), baos, StandardCharsets.UTF_8);
+            return new String(baos.toByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new DBCException("Error serializing document", e);
+        }
+    }
+
 }
