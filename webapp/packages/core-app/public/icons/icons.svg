@@ -61,6 +61,10 @@
     </g>
   </symbol>
 
+  <symbol id="search" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M13.75 10.5C13.75 12.2949 12.2949 13.75 10.5 13.75C8.70507 13.75 7.25 12.2949 7.25 10.5C7.25 8.70507 8.70507 7.25 10.5 7.25C12.2949 7.25 13.75 8.70507 13.75 10.5ZM13.6521 13.7116C12.8402 14.5085 11.7275 15 10.5 15C8.01472 15 6 12.9853 6 10.5C6 8.01472 8.01472 6 10.5 6C12.9853 6 15 8.01472 15 10.5C15 11.4459 14.7082 12.3235 14.2097 13.048L14.7678 13.1464L19.0104 17.3891L17.9497 18.4497L13.7071 14.2071L13.6521 13.7116Z"/>
+  </symbol>
+
   <symbol id="user" width="28" height="28" viewBox="0 0 28 28">
     <g fill="none" fill-rule="evenodd">
       <path fill-rule="nonzero" stroke="#FFF" stroke-width="2" d="M5.5 7.5v21c0 1.104.893 2 2 2h21c1.098 0 2-.902 2-2v-21c0-1.098-.902-2-2-2h-21c-1.107 0-2 .896-2 2z" transform="translate(-4 -4)"/>
