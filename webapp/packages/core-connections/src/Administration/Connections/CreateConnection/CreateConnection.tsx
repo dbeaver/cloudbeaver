@@ -203,7 +203,7 @@ export const CreateConnection = observer(function CreateConnection({
         </title-bar>
         <TabList>
           <Tab tabId='driver'>
-            <TabTitle>{translate('connections_connection_driver')}</TabTitle>
+            <TabTitle>{translate('connections_connection_create_custom')}</TabTitle>
           </Tab>
           <Tab tabId='search-database'>
             <TabTitle>{translate('connections_connection_create_search_database')}</TabTitle>
