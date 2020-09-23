@@ -141,17 +141,8 @@ export class NavNodeManagerService extends Bootstrap {
     await this.navTree.refresh(navNodeId);
   }
 
-  markTreeOutdated(navNodeId: string) {
+  markTreeOutdated(navNodeId: ResourceKey<string>) {
     this.navTree.markOutdated(resourceKeyList(this.navTree.getNestedChildren(navNodeId)));
-  }
-
-  async updateRootChildren() {
-    if (!await this.isNavTreeEnabled()) {
-      this.navTree.delete(ROOT_NODE_PATH);
-      return;
-    }
-
-    await this.navTree.refresh(ROOT_NODE_PATH);
   }
 
   getTree(navNodeId: string): string[] | undefined
@@ -326,6 +317,13 @@ export class NavNodeManagerService extends Bootstrap {
       getParents,
       loadParents,
     };
+  }
+
+  private async updateRootChildren() {
+    this.navTree.delete(ROOT_NODE_PATH);
+    if (await this.isNavTreeEnabled()) {
+      await this.navTree.refresh(ROOT_NODE_PATH);
+    }
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {

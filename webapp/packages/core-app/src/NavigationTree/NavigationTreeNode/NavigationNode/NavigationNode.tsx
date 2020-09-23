@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import {
   MouseEvent, KeyboardEvent, useCallback, PropsWithChildren,
 } from 'react';
@@ -14,98 +15,83 @@ import styled, { use } from 'reshadow';
 import { Icon, StaticImage, Loader } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { navigationNodeStyles } from './navigationNodeStyles';
+import { useNavigationNode } from './useNavigationNode';
 
 type NodeProps = PropsWithChildren<{
-  id: string;
-  title?: string;
-  icon?: string;
-  isExpanded: boolean;
+  node: NavNode;
   isLoading: boolean;
-  isSelected: boolean;
-  portal?: JSX.Element;
-  isExpandable?: boolean;
-  onExpand?: () => void;
-  onDoubleClick?: () => void;
-  onClick?: (isMultiple?: boolean) => void;
+  isLoaded: boolean;
+  isOutdated: boolean;
 }>
 
-const KEYCODE = {
-  ENTER: 13,
-  UP: 38,
-  DOWN: 40,
+const KEY = {
+  ENTER: 'Enter',
 };
 
-export function NavigationNode({
-  title,
-  icon,
-  children,
+export const NavigationNode = observer(function NavigationNode({
+  node,
   isLoading,
-  isExpanded,
-  isSelected,
-  portal,
-  isExpandable,
-  onExpand,
-  onDoubleClick,
-  onClick,
-}: NodeProps) {
+  isLoaded,
+  isOutdated,
 
+  children,
+}: NodeProps) {
+  const controller = useNavigationNode(node, isLoading, isLoaded, isOutdated);
   const styles = useStyles(navigationNodeStyles);
 
   const handleExpand = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-      if (onExpand) {
-        onExpand();
-      }
+      controller.handleExpand();
     },
-    [onExpand]
+    [controller.handleExpand]
   );
 
-  const handleClick = useCallback(
+  const handleSelect = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
-      if (onClick) {
-        onClick(e.ctrlKey);
-      }
+      controller.handleSelect(e.ctrlKey);
     },
-    [onClick]
+    [controller.handleSelect]
   );
 
   const handleEnter = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      switch (event.keyCode) {
-        case KEYCODE.ENTER:
-          if (onClick) {
-            onClick(event.ctrlKey);
-          }
+      switch (event.key) {
+        case KEY.ENTER:
+          controller.handleSelect(event.ctrlKey);
           break;
       }
       return true;
     },
-    [onClick]
+    [controller.handleSelect]
   );
 
   return styled(styles)(
     <>
-      <node as="div" {...use({ isExpanded })}>
+      <node as="div" {...use({ isExpanded: controller.isExpanded })}>
         <control
           tabIndex={0}
-          aria-selected={isSelected}
-          onClick={handleClick}
+          aria-selected={controller.isSelected}
+          onClick={handleSelect}
           onKeyDown={handleEnter}
-          onDoubleClick={onDoubleClick}
+          onDoubleClick={controller.handleDoubleClick}
           as="div"
         >
-          <arrow as="div" hidden={!isExpandable} onClick={handleExpand}>
-            {isLoading && <Loader small />}
-            {!isLoading && <Icon name="arrow" viewBox="0 0 16 16" />}
+          <arrow as="div" hidden={!controller.isExpandable} onClick={handleExpand}>
+            {controller.isLoading && <Loader small />}
+            {!controller.isLoading && <Icon name="arrow" viewBox="0 0 16 16" />}
           </arrow>
-          <icon as="div"><StaticImage icon={icon} /></icon>
-          <name as="div">{title}</name>
-          <portal as="div">{portal}</portal>
+          <icon as="div"><StaticImage icon={node.icon} /></icon>
+          <name as="div">{node.name}</name>
+          <portal as="div">
+            <TreeNodeMenu node={node} isSelected={controller.isSelected} />
+          </portal>
         </control>
       </node>
       <nested as="div">{children}</nested>
     </>
   );
-}
+});
