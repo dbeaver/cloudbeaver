@@ -7,7 +7,7 @@
  */
 
 import { useObserver } from 'mobx-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -27,31 +27,54 @@ export type Style = BaseStyles | ThemeSelector
  */
 export function useStyles(
   ...componentStyles: Array<Style | boolean | undefined>
-) {
+): Record<string, any> {
   if (!componentStyles) {
-    return [];
+    return {};
   }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
-  const [loadedStyles, setLoadedStyles] = useState<BaseStyles[]>([]);
+  const stylesRef = useRef<Array<Style | boolean | undefined>>([]);
+  const [patch, forceUpdate] = useState(0);
+  const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
+  const lastThemeRef = useRef<string>(currentThemeId);
   const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
 
-  useMemo(() => {
+  let changed = lastThemeRef.current !== currentThemeId || componentStyles.length !== stylesRef.current.length;
+  for (let i = 0; !changed && i < componentStyles.length; i++) {
+    changed = stylesRef.current[i] !== componentStyles[i];
+  }
+
+  if (changed) {
+    stylesRef.current = componentStyles;
+    lastThemeRef.current = currentThemeId;
+    const staticStyles: BaseStyles[] = [];
+    const themedStyles = [];
+
+    for (const style of filteredStyles) {
+      const data = (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId);
+
+      if (data instanceof Promise) {
+        themedStyles.push(data);
+      } else {
+        staticStyles.push(data);
+      }
+    }
+    loadedStyles.current = flat(staticStyles);
+
     Promise
-      .all(filteredStyles.map(style => (
-        (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId)
-      )))
-      .then(styles => setLoadedStyles(flat(styles)));
-  }, [currentThemeId, ...filteredStyles, filteredStyles.length]);
+      .all(themedStyles)
+      .then((styles) => {
+        loadedStyles.current = flat([staticStyles, styles]);
+        forceUpdate(v => v++);
+      });
+  }
 
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
-    return applyComposes([...themeStyles, ...loadedStyles]);
-  }, [currentThemeId, ...loadedStyles, loadedStyles.length]);
-  /* we put dynamic array length as the dependency because of preact bug,
-     otherwise useMemo will not be triggered on array change */
+    return applyComposes([...themeStyles, ...loadedStyles.current]);
+  }, [currentThemeId, patch, loadedStyles.current]);
 
   return create(styles); // todo this method is called in each rerender
 }

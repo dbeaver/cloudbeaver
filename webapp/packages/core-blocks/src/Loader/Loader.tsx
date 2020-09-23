@@ -47,6 +47,7 @@ export function Loader({
   loading = true,
   onCancel,
 }: LoaderProps) {
+  const style = useStyles(loaderStyles, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
   const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
 
@@ -66,7 +67,7 @@ export function Loader({
     return null;
   }
 
-  return styled(useStyles(loaderStyles, overlay && overlayStyles))(
+  return styled(style)(
     <loader as="div" className={className} {...use({ small })}>
       <icon as="div"><img src={spinnerURL}/></icon>
       {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}

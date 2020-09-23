@@ -414,3 +414,13 @@ export class NavNodeManagerService extends Bootstrap {
     return true;
   }
 }
+
+export function parseNodeParentId(nodeId: string): string {
+  const parentId = nodeId.slice(0, nodeId.lastIndexOf('/'));
+
+  if (parentId === 'database:/') {
+    return ROOT_NODE_PATH;
+  }
+
+  return parentId;
+}

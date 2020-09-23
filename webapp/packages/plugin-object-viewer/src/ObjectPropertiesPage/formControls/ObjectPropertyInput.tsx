@@ -41,11 +41,12 @@ const styles = css`
 `;
 
 export const ObjectPropertyInput = observer(function ObjectPropertyInput({ objectProperty }: ObjectPropertyProps) {
+  const style = useStyles(styles);
   if (!objectProperty) {
     return null;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <form-input as="div">
       <label-wrapper as="div">
         <label htmlFor={objectProperty.id}

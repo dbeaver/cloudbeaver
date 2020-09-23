@@ -41,6 +41,7 @@ const stylesArray = [styles];
 export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab, handler,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
+  const style = useStyles(styles);
   const {
     children, isOutdated, isLoading, isLoaded,
   } = useChildren(tab.handlerState.objectId);
@@ -55,7 +56,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
     return <TextPlaceholder>Nothing to show</TextPlaceholder>;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <TabsBox
       currentTabId={tab.handlerState.pageId}
       tabs={pages.map(page => (

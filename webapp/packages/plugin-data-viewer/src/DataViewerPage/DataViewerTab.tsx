@@ -18,13 +18,14 @@ import { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
 export const DataViewerTab = observer(function DataViewerTab({
   tab, page, onSelect, style,
 }: ObjectPageTabProps) {
+  const styles = useStyles(...style);
   const navNodeManagerService = useService(NavNodeManagerService);
 
   if (!navNodeManagerService.isNodeHasData(tab.handlerState.objectId)) {
     return null;
   }
 
-  return styled(useStyles(...style))(
+  return styled(styles)(
     <Tab tabId={page.key} onOpen={onSelect} >
       <TabIcon icon='/icons/grid.png' />
       <TabTitle>Data</TabTitle>

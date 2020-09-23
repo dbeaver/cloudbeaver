@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect
+  Table, TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -33,9 +33,6 @@ const styles = composes(
     TableColumnHeader {
       border-top: solid 1px;
     }
-    center {
-      margin: auto;
-    }
   `
 );
 
@@ -56,14 +53,9 @@ export const ConnectionAccess = observer(function ConnectionAccess({
     return null;
   }
 
+  const style = useStyles(styles);
   const controller = useController(Controller, model);
   const translate = useTranslate();
-
-  if (controller.users.length === 0 && controller.roles.length) {
-    return styled(useStyles(styles))(
-      <center as='div'>{translate('authentication_administration_user_connections_empty')}</center>
-    );
-  }
 
   const handleSelect = useCallback((item: string, state: boolean) => {
     controller.onSelect(item, state);
@@ -72,7 +64,11 @@ export const ConnectionAccess = observer(function ConnectionAccess({
     }
   }, [onChange, controller]);
 
-  return styled(useStyles(styles))(
+  if (controller.users.length === 0 && controller.roles.length) {
+    return <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>;
+  }
+
+  return styled(style)(
     <box as='div'>
       <Table selectedItems={controller.selectedSubjects} onSelect={handleSelect} className={className}>
         <TableHeader>

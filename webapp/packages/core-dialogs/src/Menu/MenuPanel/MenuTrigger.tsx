@@ -87,6 +87,7 @@ type MenuPanelElementProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
 const MenuPanelElement = observer(function MenuPanelElement({
   item, menu, style = [],
 }: MenuPanelElementProps) {
+  const styles = useStyles(menuPanelStyles, ...style);
   const onClick = useCallback(() => {
     if (item.onClick) {
       item.onClick();
@@ -97,7 +98,7 @@ const MenuPanelElement = observer(function MenuPanelElement({
   }, [item]);
 
   if (item.panel) {
-    return styled(useStyles(menuPanelStyles, ...style))(
+    return styled(styles)(
       <MenuItem
         {...menu}
         {...use({ hidden: item.isHidden })}
@@ -111,7 +112,7 @@ const MenuPanelElement = observer(function MenuPanelElement({
     );
   }
 
-  return styled(useStyles(menuPanelStyles, ...style))(
+  return styled(styles)(
     <MenuItem
       {...menu}
       {...use({ hidden: item.isHidden })}

@@ -43,11 +43,12 @@ const styles = css`
 export const ObjectPropertyCheckbox = observer(function ObjectPropertyCheckbox({
   objectProperty,
 }: ObjectPropertyProps) {
+  const style = useStyles(styles);
   if (!objectProperty) {
     return null;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <form-checkbox as="div">
       <label-wrapper as="div">
         <label htmlFor={objectProperty.id} title={objectProperty.displayName}>{objectProperty.displayName}</label>

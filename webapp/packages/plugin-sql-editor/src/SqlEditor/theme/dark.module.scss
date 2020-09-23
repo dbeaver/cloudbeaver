@@ -37,6 +37,6 @@ $cursor: #fff;
   @include mdc-typography(caption);
 }
 
-:global .theme-dark {
+:global .#{$theme-class} {
   @include base-code-editor;
 }

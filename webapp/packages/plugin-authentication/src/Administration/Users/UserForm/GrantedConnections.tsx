@@ -11,7 +11,8 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect, StaticImage
+  Table, TableHeader, TableColumnHeader, TableBody,
+  TableItem, TableColumnValue, TableItemSelect, StaticImage, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -36,9 +37,6 @@ const styles = composes(
       display: flex;
       width: 16px;
     }
-    center {
-      margin: auto;
-    }
   `
 );
 
@@ -59,18 +57,17 @@ export const GrantedConnections = observer(function GrantedConnections({
   onChange,
   className,
 }: Props) {
+  const style = useStyles(styles);
   const translate = useTranslate();
   const driversResource = useService(DBDriverResource);
   const getConnectionPermission = useCallback((connectionId: string) => grantedConnections
-      ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [grantedConnections]);
+    ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [grantedConnections]);
 
   if (connections.length === 0) {
-    return styled(useStyles(styles))(
-      <center as='div'>{translate('authentication_administration_user_connections_empty')}</center>
-    );
+    return <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>;
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <box as='div'>
       <Table selectedItems={selectedConnection} onSelect={onChange} className={className}>
         <TableHeader>
