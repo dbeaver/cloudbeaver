@@ -38,15 +38,17 @@ export function useStyles(
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
+  const lastThemeRef = useRef<string>(currentThemeId);
   const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
 
-  let changed = componentStyles.length !== stylesRef.current.length;
+  let changed = lastThemeRef.current !== currentThemeId || componentStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < componentStyles.length; i++) {
     changed = stylesRef.current[i] !== componentStyles[i];
   }
 
   if (changed) {
     stylesRef.current = componentStyles;
+    lastThemeRef.current = currentThemeId;
     const staticStyles: BaseStyles[] = [];
     const themedStyles = [];
 
@@ -72,7 +74,7 @@ export function useStyles(
   const styles = useMemo(() => {
     const themeStyles = themeService.getThemeStyles(currentThemeId);
     return applyComposes([...themeStyles, ...loadedStyles.current]);
-  }, [currentThemeId, patch, stylesRef.current]);
+  }, [currentThemeId, patch, loadedStyles.current]);
 
   return create(styles); // todo this method is called in each rerender
 }
