@@ -153,7 +153,8 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         sql: String!,
-        filter: SQLDataFilter
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat
     ): SQLExecuteInfo
 
     sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
@@ -162,7 +163,8 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         containerNodePath: ID!,
-        filter: SQLDataFilter
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat
     ): SQLExecuteInfo
 
     updateResultsData(
