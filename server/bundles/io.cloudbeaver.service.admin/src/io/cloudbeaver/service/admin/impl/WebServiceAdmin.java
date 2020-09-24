@@ -308,6 +308,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 config.getAdminName(),
                 config.getAdminPassword(),
                 appConfig);
+            // Refresh active session
+            webSession.forceUserRefresh(null);
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
         }
