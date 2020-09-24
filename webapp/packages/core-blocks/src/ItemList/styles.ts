@@ -39,7 +39,7 @@ export const ITEM_LIST_STYLES = composes(
       z-index: 1;
 
       & input {
-        padding: 4px 16px;
+        padding: 4px 8px;
         padding-right: 32px;
       }
 
