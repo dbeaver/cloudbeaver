@@ -70,6 +70,11 @@ public class WebSQLQueryResults {
         this.resultSet = resultSet;
     }
 
+    @Property
+    public WebSQLQueryResultSet getData() {
+        return getResultSet();
+    }
+
     public List<WebSQLDatabaseDocument> getDocuments() throws DBCException {
         if (dataFormat != WebDataFormat.document) {
             return null;
