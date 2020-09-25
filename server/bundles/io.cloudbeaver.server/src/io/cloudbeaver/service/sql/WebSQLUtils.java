@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
@@ -37,7 +37,7 @@ public class WebSQLUtils {
 
     private static final Log log = Log.getLog(WebSQLUtils.class);
 
-    public static Object makeWebCellValue(DBRProgressMonitor monitor, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
+    public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
             return CBConstants.ISO_DATE_FORMAT.format(cellValue);
         }
@@ -50,41 +50,41 @@ public class WebSQLUtils {
                 if (dataFormat != WebDataFormat.document) {
                     return serializeDocumentValue((DBDDocument) dbValue);
                 } else {
-                    return cellValue;
+                    return new WebSQLDatabaseDocument(session, (DBDDocument) dbValue);
                 }
             } else if (dbValue instanceof DBDComplexValue) {
-                return serializeComplexValue(monitor, (DBDComplexValue)dbValue, dataFormat);
+                return serializeComplexValue(session, (DBDComplexValue)dbValue, dataFormat);
             } else if (dbValue instanceof DBGeometry) {
                 return serializeGeometryValue((DBGeometry)dbValue);
             } else if (dbValue instanceof DBDContent) {
-                return serializeContentValue(monitor, (DBDContent)dbValue);
+                return serializeContentValue(session, (DBDContent)dbValue);
             }
         }
         return cellValue;
     }
 
-    private static Object serializeComplexValue(DBRProgressMonitor monitor, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
+    private static Object serializeComplexValue(WebSession session, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
         if (value instanceof DBDCollection) {
             DBDCollection collection = (DBDCollection) value;
             int size = collection.getItemCount();
             Object[] items = new Object[size];
             for (int i = 0; i < size; i++) {
-                items[i] = makeWebCellValue(monitor, collection.getComponentType(), collection.getItem(i), dataFormat);
+                items[i] = makeWebCellValue(session, collection.getComponentType(), collection.getItem(i), dataFormat);
             }
             return items;
         } else if (value instanceof DBDComposite) {
             DBDComposite composite = (DBDComposite)value;
             Map<String, Object> map = new LinkedHashMap<>();
             for (DBSAttributeBase attr : composite.getAttributes()) {
-                map.put(attr.getName(), makeWebCellValue(monitor, attr, composite.getAttributeValue(attr), dataFormat));
+                map.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
             }
             return map;
         }
         return value.toString();
     }
 
-    private static Object serializeContentValue(DBRProgressMonitor monitor, DBDContent value) throws DBCException {
-        return ContentUtils.getContentStringValue(monitor, value);
+    private static Object serializeContentValue(WebSession session, DBDContent value) throws DBCException {
+        return ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
     }
 
     private static Object serializeDocumentValue(DBDDocument value) {

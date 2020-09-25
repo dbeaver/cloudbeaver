@@ -60,6 +60,9 @@ public class WebSQLQueryResults {
 
     @Property
     public WebSQLQueryResultSet getResultSet() {
+        if (dataFormat == WebDataFormat.document) {
+            return null;
+        }
         return resultSet;
     }
 
@@ -68,9 +71,9 @@ public class WebSQLQueryResults {
     }
 
     public List<WebSQLDatabaseDocument> getDocuments() throws DBCException {
-//        if (dataFormat != WebDataFormat.document) {
-//            throw new DBCException("Non-document presentation");
-//        }
+        if (dataFormat != WebDataFormat.document) {
+            return null;
+        }
         if (this.resultSet == null) {
             throw new DBCException("Null resultset");
         }

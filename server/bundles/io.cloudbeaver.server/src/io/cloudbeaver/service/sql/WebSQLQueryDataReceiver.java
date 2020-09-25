@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -87,6 +88,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     @Override
     public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
 
+        WebSession webSession = contextInfo.getProcessor().getWebSession();
         DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;
 
         try {
@@ -103,7 +105,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         for (Object[] row : rows) {
             for (int i = 0; i < bindings.length; i++) {
                 DBDAttributeBinding binding = bindings[i];
-                row[i] = WebSQLUtils.makeWebCellValue(session.getProgressMonitor(), binding, row[i], dataFormat);
+                row[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row[i], dataFormat);
             }
         }
 

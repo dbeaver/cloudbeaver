@@ -243,6 +243,7 @@ public class WebSQLProcessor {
         @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException
     {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        WebSession webSession = contextInfo.getProcessor().getWebSession();
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         if (rowIdentifier == null) {
@@ -254,7 +255,7 @@ public class WebSQLProcessor {
         }
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
 
-        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+        DBRProgressMonitor monitor = this.webSession.getProgressMonitor();
         WebSQLExecuteInfo result = new WebSQLExecuteInfo();
 
         try {
@@ -282,7 +283,7 @@ public class WebSQLProcessor {
                             Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                             Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
                             rowValues[i] = realCellValue;
-                            finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue, dataFormat);
+                            finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                         }
                         for (int i = 0; i < keyAttributes.length; i++) {
                             DBDAttributeBinding keyAttribute = keyAttributes[i];
@@ -300,7 +301,7 @@ public class WebSQLProcessor {
                         updatedResultSet.setColumns(resultsInfo.getAttributes());
                         updatedResultSet.setRows(new Object[][]{finalRow});
 
-                        WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
+                        WebSQLQueryResults updateResults = new WebSQLQueryResults(this.webSession, dataFormat);
                         updateResults.setUpdateRowCount(statistics.getRowsUpdated());
                         updateResults.setResultSet(updatedResultSet);
                         result.setDuration(statistics.getExecuteTime());
@@ -380,7 +381,7 @@ public class WebSQLProcessor {
                                     Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                                     Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
                                     rowValues[i] = realCellValue;
-                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(monitor, null, realCellValue, dataFormat);
+                                    finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                                 }
                                 for (int i = 0; i < keyAttributes.length; i++) {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];
