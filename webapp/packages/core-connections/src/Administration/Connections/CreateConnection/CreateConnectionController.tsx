@@ -75,7 +75,6 @@ export class CreateConnectionController {
       id: uuid(),
       driverId,
       template: false,
-      name: '',
       authProperties: [],
       properties: {},
     } as Partial<ConnectionInfo> as any;
@@ -87,7 +86,6 @@ export class CreateConnectionController {
       id: uuid(),
       driverId: database.defaultDriver,
       template: false,
-      name: '',
       host: database.host,
       port: `${database.port}`,
       authProperties: [],

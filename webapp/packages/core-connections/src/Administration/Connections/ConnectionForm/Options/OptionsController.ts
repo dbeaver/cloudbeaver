@@ -122,7 +122,7 @@ implements IInitializableController {
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
       .filter(Boolean);
 
-    if (!this.model.connection.name
+    if (this.model.connection.name === undefined
         || (this.nameTemplate.test(this.model.connection.name)
             && databaseNames.some(driver => this.model.connection.name.startsWith(driver)))
     ) {
