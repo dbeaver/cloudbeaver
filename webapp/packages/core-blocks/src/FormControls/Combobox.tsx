@@ -91,6 +91,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   items: TValue[];
   mod?: 'surface';
   long?: boolean;
+  searchable?: boolean;
   keySelector(item: TValue): TKey;
   valueSelector(item: TValue): string;
   onSwitch?(state: boolean): void;
@@ -129,6 +130,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   className,
   mod,
   long,
+  searchable,
   readOnly,
   keySelector = v => v,
   valueSelector = v => v,
@@ -214,7 +216,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {...use({ mod })}
           {...rest}
         />
-        {(selectedItem && !readOnly) && (
+        {(selectedItem && !readOnly && searchable) && (
           <IconButton type="button" name="reject" viewBox="0 0 11 11" onClick={handleRemove} />
         )}
         {!readOnly && (
