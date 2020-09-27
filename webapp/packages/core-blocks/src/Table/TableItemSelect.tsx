@@ -25,13 +25,17 @@ export const TableItemSelect = observer(function TableItemSelect({ checked, disa
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   const styles = useStyles();
-  if (!context) {
-    return null;
-  }
   const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+    if (!context) {
+      return;
+    }
     event.stopPropagation();
     tableContext?.setItemSelect(context.item, !context.isSelected());
   }, [tableContext, context]);
+
+  if (!context) {
+    return null;
+  }
 
   return styled(styles)(
     <input type='checkbox' checked={checked || context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>

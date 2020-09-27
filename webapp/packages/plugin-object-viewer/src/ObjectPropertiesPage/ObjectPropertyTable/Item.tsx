@@ -58,7 +58,7 @@ export const Item = observer(function Item({
 
   if (!node) {
     return styled(useStyles(itemStyles))(
-      <TableItem item={objectId} onDoubleClick={handleOpen}>
+      <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
           <icon as="div">
@@ -68,7 +68,7 @@ export const Item = observer(function Item({
         {Array(columns)
           .fill(0)
           .map((_, i) => (
-            <TableColumnValue key={i}>
+            <TableColumnValue key={i} onDoubleClick={handleOpen}>
               <placeholder as="div" />
             </TableColumnValue>
           ))}
@@ -78,20 +78,20 @@ export const Item = observer(function Item({
 
   if (!dbObject?.properties) {
     return styled(useStyles(itemStyles))(
-      <TableItem item={objectId} onDoubleClick={handleOpen}>
+      <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
           <icon as="div">
             <StaticImage icon={node.icon} />
           </icon>
         </TableColumnValue>
-        <TableColumnValue>{node.name}</TableColumnValue>
+        <TableColumnValue onDoubleClick={handleOpen}>{node.name}</TableColumnValue>
       </TableItem>
     );
   }
 
   return styled(useStyles(itemStyles))(
-    <TableItem item={objectId} onDoubleClick={handleOpen}>
+    <TableItem item={objectId}>
       <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>
         <icon as="div">
@@ -99,7 +99,7 @@ export const Item = observer(function Item({
         </icon>
       </TableColumnValue>
       {dbObject.properties.map(property => (
-        <TableColumnValue key={property.id}>{getValue(property.value)}</TableColumnValue>
+        <TableColumnValue key={property.id} onDoubleClick={handleOpen}>{getValue(property.value)}</TableColumnValue>
       ))}
     </TableItem>
   );

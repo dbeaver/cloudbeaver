@@ -53,13 +53,10 @@ export const TableItem = observer(function TableItem({
   }), [item, selectDisabled]);
 
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLTableRowElement>) => {
+    (event: React.MouseEvent<HTMLTableRowElement>) => {
       if (!selectDisabled) {
+        event.stopPropagation();
         const isSelected = context.selectedItems.get(item);
-        // if (!e.ctrlKey) {
-        //   context.clearSelection();
-        // }
-
         context.setItemSelect(item, !isSelected);
       }
 

@@ -21,6 +21,8 @@ type Props = React.PropsWithChildren<{
   centerContent?: boolean;
   flex?: boolean;
   expand?: boolean;
+  onClick?(): void;
+  onDoubleClick?(): void;
 }>
 
 export const TableColumnValue = observer(function TableColumnValue({
@@ -30,29 +32,47 @@ export const TableColumnValue = observer(function TableColumnValue({
   flex,
   expand,
   className,
+  onClick,
+  onDoubleClick,
 }: Props) {
   const styles = useStyles();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>) => {
-    if (!expand || !context) {
+    if (!context) {
       return;
     }
 
-    event.stopPropagation();
+    if (expand) {
+      event.stopPropagation();
+      const state = !context.isExpanded();
+      tableContext?.setItemExpand(context.item, state);
+    }
 
-    const state = !context.isExpanded();
+    if (onClick) {
+      onClick();
+    }
+  }, [tableContext, context, expand, onClick]);
 
-    tableContext?.setItemExpand(context.item, state);
-  }, [tableContext, context, expand]);
+  const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableDataCellElement>) => {
+    if (onDoubleClick) {
+      onDoubleClick();
+    }
+  }, [onDoubleClick]);
 
   if (!context) {
     return null;
   }
 
   return styled(styles)(
-    <td align={align} className={className} {...use({ centerContent })} onClick={handleClick}>
+    <td
+      align={align}
+      className={className}
+      {...use({ centerContent })}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+    >
       {flex && <td-flex as='div'>{children}</td-flex>}
       {!flex && children}
     </td>

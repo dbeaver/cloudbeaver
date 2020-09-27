@@ -108,18 +108,18 @@ export class TableViewerModel {
   ) => Promise<IRequestDataResult>;
   _saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
-  get isEmpty() {
+  get isEmpty(): boolean {
     return this.tableDataModel.isEmpty();
   }
-  get isLoaderVisible() {
+  get isLoaderVisible(): boolean {
     return this._isLoaderVisible;
   }
-  get isFullyLoaded() {
+  get isFullyLoaded(): boolean {
     return !this._hasMoreRows;
   }
 
-  getChunkSize = () => this._chunkSize;
-  setChunkSize = (count: number) => this.updateChunkSize(count);
+  getChunkSize = (): number => this._chunkSize;
+  setChunkSize = (count: number): void => this.updateChunkSize(count);
 
   @observable queryDuration = 0;
   @observable requestStatusMessage = '';
@@ -165,34 +165,33 @@ export class TableViewerModel {
     this.onChunkSizeChange = this.chunkChangeSubject.asObservable();
   }
 
-  cancelFetch = () => {
-  }
+  cancelFetch = (): void => { }
 
-  refresh = async () => {
+  refresh = async (): Promise<void> => {
     this.resetData();
     await this.onRequestData(0, this.getChunkSize());
     this.resetSubject.next();
   }
 
-  onShowDetails = () => {
+  onShowDetails = (): void => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
   }
 
-  getQueryWhereFilter() {
+  getQueryWhereFilter(): string | null {
     return this.queryWhereFilter;
   }
 
-  setQueryWhereFilter(where: string | null) {
+  setQueryWhereFilter(where: string | null): void {
     this.queryWhereFilter = where;
   }
 
-  getSortedColumns() {
+  getSortedColumns(): IterableIterator<SqlDataFilterConstraint> {
     return this.sortedColumns.values();
   }
 
-  setColumnSorting(colId: string, orderAsc?: boolean, multiple?: boolean) {
+  setColumnSorting(colId: string, orderAsc?: boolean, multiple?: boolean): void {
     if (!multiple) {
       this.sortedColumns.clear();
     }
@@ -201,24 +200,24 @@ export class TableViewerModel {
     sorting.orderAsc = orderAsc;
   }
 
-  removeColumnSorting(colId: string) {
+  removeColumnSorting(colId: string): void {
     this.sortedColumns.delete(colId);
   }
 
   @action
-  insertRows(position: number, rows: TableRow[], hasMore: boolean) {
+  insertRows(position: number, rows: TableRow[], hasMore: boolean): void {
     const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
     this.tableDataModel.insertRows(position, rows);
     this._hasMoreRows = isRowsAddition ? hasMore : this._hasMoreRows;
   }
 
   @action
-  setColumns(columns: TableColumn[]) {
+  setColumns(columns: TableColumn[]): void {
     this.tableDataModel.setColumns(columns);
   }
 
   @action
-  updateInfo(status: string, duration?: number) {
+  updateInfo(status: string, duration?: number): void {
     this.queryDuration = duration || 0;
     this.requestStatusMessage = status;
   }
@@ -231,15 +230,15 @@ export class TableViewerModel {
     return this.tableEditor.isEdited();
   }
 
-  isCellEdited(rowIndex: number, column: string) {
+  isCellEdited(rowIndex: number, column: string): boolean {
     return this.tableEditor.isCellEdited(rowIndex, column);
   }
 
-  revertCellValue(rowNumber: number, column: string) {
+  revertCellValue(rowNumber: number, column: string): void {
     this.tableEditor.revertCellValue(rowNumber, column);
   }
 
-  cancelChanges() {
+  cancelChanges(): void {
     this.tableEditor.cancelChanges();
   }
 
@@ -321,7 +320,7 @@ export class TableViewerModel {
     }
   }
 
-  onCellEditingStopped(rowNumber: number, column: string, value: any, editing: boolean) {
+  onCellEditingStopped(rowNumber: number, column: string, value: any, editing: boolean): void {
     if (this.access === AccessMode.Readonly) {
       return;
     }
@@ -329,7 +328,7 @@ export class TableViewerModel {
     this.tableEditor.editCellValue(rowNumber, column, value, editing);
   }
 
-  onSortChanged(sorting: SortModel) {
+  onSortChanged(sorting: SortModel): void {
     this.sortedColumns.clear();
     for (const sort of sorting) {
       this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
