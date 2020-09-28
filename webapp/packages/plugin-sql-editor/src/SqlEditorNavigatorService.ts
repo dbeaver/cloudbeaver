@@ -54,11 +54,10 @@ export class SqlEditorNavigatorService {
 
     this.navigator = new Executor<SQLCreateAction | SQLEditorAction>()
       .addHandler(this.navigateHandler.bind(this));
-    this.connectionsManagerService.onCloseConnection.subscribe(this.nodeNavigationHandler.bind(this));
+    this.connectionsManagerService.onCloseConnection.subscribe(this.handleConnectionClose.bind(this));
   }
 
-  registerTabHandler() {
-  }
+  registerTabHandler() { }
 
   openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
     this.navigator.execute({
@@ -85,7 +84,7 @@ export class SqlEditorNavigatorService {
     });
   }
 
-  private async nodeNavigationHandler(connectionId: string) {
+  private async handleConnectionClose(connectionId: string) {
     try {
       for (const tab of this.navigationTabsService.findTabs(
         isSQLEditorTab(tab => tab.handlerState.connectionId.includes(connectionId))
@@ -94,7 +93,7 @@ export class SqlEditorNavigatorService {
       }
       return;
     } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Object Viewer while processing action with database node');
+      this.notificationService.logException(exception, 'Error in SQL Editor while processing connection close');
     }
   }
 
