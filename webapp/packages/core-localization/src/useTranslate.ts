@@ -16,11 +16,11 @@ import { TLocalizationToken } from './TLocalizationToken';
 export function useTranslate(): (token: TLocalizationToken) => string;
 export function useTranslate(token: TLocalizationToken): string;
 export function useTranslate(token?: TLocalizationToken): string | ((token: TLocalizationToken) => string) {
-  if (!token) {
-    return useService(LocalizationService).translate;
-  }
-
   const localizationService = useService(LocalizationService);
+
+  if (!token) {
+    return localizationService.translate;
+  }
 
   return useObserver(() => localizationService.translate(token));
 }
