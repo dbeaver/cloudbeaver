@@ -15,7 +15,7 @@ import { SubmittingForm } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { TableViewerModel } from '../TableViewerModel';
+import { DataModelWrapper } from '../DataModelWrapper';
 
 const styles = composes(
   css`
@@ -39,29 +39,29 @@ const styles = composes(
 );
 
 type Props = {
-  context: TableViewerModel;
+  context: DataModelWrapper;
 }
 
 export const TableWhereFilter = observer(function TableWhereFilter({
   context,
 }: Props) {
   const translate = useTranslate();
-  const [filterValue, setValue] = useState(() => context.getQueryWhereFilter() || '');
+  const [filterValue, setValue] = useState(() => context.deprecatedModel.getQueryWhereFilter() || '');
 
   const handleApply = useCallback(() => {
-    context.setQueryWhereFilter(filterValue);
-    context.refresh();
+    context.deprecatedModel.setQueryWhereFilter(filterValue);
+    context.deprecatedModel.refresh();
   }, [context, filterValue]);
 
   const resetFilter = useCallback(
     () => {
-      const applyNeeded = context.getQueryWhereFilter() === filterValue;
+      const applyNeeded = context.deprecatedModel.getQueryWhereFilter() === filterValue;
 
       setValue('');
 
       if (applyNeeded) {
-        context.setQueryWhereFilter('');
-        context.refresh();
+        context.deprecatedModel.setQueryWhereFilter('');
+        context.deprecatedModel.refresh();
       }
     },
     [context, filterValue]

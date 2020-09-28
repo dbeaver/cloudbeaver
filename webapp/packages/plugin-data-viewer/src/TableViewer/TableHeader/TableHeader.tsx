@@ -13,7 +13,7 @@ import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { TableViewerModel } from '../TableViewerModel';
+import { DataModelWrapper } from '../DataModelWrapper';
 import { TableHeaderService } from './TableHeaderService';
 
 const styles = composes(
@@ -33,7 +33,7 @@ const styles = composes(
 );
 
 type Props = {
-  model: TableViewerModel;
+  model: DataModelWrapper;
 }
 
 export const TableHeader = observer(function TableHeader({

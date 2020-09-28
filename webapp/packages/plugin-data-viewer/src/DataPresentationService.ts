@@ -8,10 +8,10 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { TableViewerModel } from './TableViewer/TableViewerModel';
+import { DataModelWrapper } from './TableViewer/DataModelWrapper';
 
 export interface IDataPresentationProps {
-  tableModel: TableViewerModel;
+  tableModel: DataModelWrapper;
   className?: string;
 }
 

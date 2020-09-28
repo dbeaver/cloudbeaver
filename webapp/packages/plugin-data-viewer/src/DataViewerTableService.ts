@@ -10,9 +10,11 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
+import { ContainerDataSource } from './ContainerDataSource';
+import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataModel';
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, TableViewerModel, AccessMode } from './TableViewer/TableViewerModel';
+import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
@@ -22,7 +24,7 @@ export class DataViewerTableService {
               private graphQLService: GraphQLService) {
   }
 
-  has(tableId: string) {
+  has(tableId: string): boolean {
     return this.tableViewerStorageService.has(tableId);
   }
 
@@ -33,7 +35,7 @@ export class DataViewerTableService {
   async create(
     tabId: string,
     connectionId: string,
-    containerNodePath?: string,
+    containerNodePath = '',
   ): Promise<TableViewerModel> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
 
@@ -42,11 +44,19 @@ export class DataViewerTableService {
         tableId: tabId,
         connectionId,
         containerNodePath,
-        access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
+        access: connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default,
         requestDataAsync: this.requestDataAsync.bind(this),
         saveChanges: this.saveChanges.bind(this),
-      }
-    );
+      },
+      new ContainerDataSource(this.graphQLService)
+    )
+      .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+      .setOptions({
+        connectionId,
+        containerNodePath,
+        constraints: [],
+        whereFilter: '',
+      }).deprecatedModel;
   }
 
   private async createExecutionContext(

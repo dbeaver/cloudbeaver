@@ -14,6 +14,7 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
+import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import { IExecutionContext } from '../IExecutionContext';
 import { ErrorDialog } from './ErrorDialog';
 import { RowDiff } from './TableDataModel/EditedRow';
@@ -27,11 +28,6 @@ export const fetchingSettings = {
   fetchMax: 5000,
   fetchDefault: 200,
 };
-
-export enum AccessMode {
-  Default,
-  Readonly
-}
 
 export type AgGridRow = any[];
 
@@ -73,7 +69,7 @@ export interface ITableViewerModelOptions {
   executionContext?: IExecutionContext | null; // will be filled before fist data fetch
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   noLoaderWhileRequestingDataAsync?: boolean;
-  access?: AccessMode;
+  access?: DatabaseDataAccessMode;
   requestDataAsync(
     model: TableViewerModel,
     rowOffset: number,
@@ -99,7 +95,7 @@ export class TableViewerModel {
   sourceName?: string;
   noLoaderWhileRequestingDataAsync?: boolean;
 
-  @observable access: AccessMode;
+  @observable access: DatabaseDataAccessMode;
 
   requestDataAsync: (
     model: TableViewerModel,
@@ -156,7 +152,7 @@ export class TableViewerModel {
     this.executionContext = options.executionContext || null;
     this.sourceName = options.sourceName;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
-    this.access = options.access || AccessMode.Default;
+    this.access = options.access || DatabaseDataAccessMode.Default;
     this.requestDataAsync = options.requestDataAsync;
     this._saveChanges = options.saveChanges;
     this.resetSubject = new Subject();
@@ -223,7 +219,7 @@ export class TableViewerModel {
   }
 
   isEdited(): boolean {
-    if (this.access === AccessMode.Readonly) {
+    if (this.access === DatabaseDataAccessMode.Readonly) {
       return false;
     }
 
@@ -243,7 +239,7 @@ export class TableViewerModel {
   }
 
   async saveChanges(): Promise<void> {
-    if (this.access === AccessMode.Readonly) {
+    if (this.access === DatabaseDataAccessMode.Readonly) {
       return;
     }
 
@@ -321,7 +317,7 @@ export class TableViewerModel {
   }
 
   onCellEditingStopped(rowNumber: number, column: string, value: any, editing: boolean): void {
-    if (this.access === AccessMode.Readonly) {
+    if (this.access === DatabaseDataAccessMode.Readonly) {
       return;
     }
 

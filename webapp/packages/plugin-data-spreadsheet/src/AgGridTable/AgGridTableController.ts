@@ -24,7 +24,7 @@ import {
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
-  TableViewerModel, SortModel, AgGridRow, IAgGridCol, AccessMode
+  TableViewerModel, SortModel, AgGridRow, IAgGridCol, DatabaseDataAccessMode
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridContext } from './AgGridContext';
@@ -45,7 +45,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
    */
   private readonly context: AgGridContext = {
     selection: this.selection,
-    isReadonly: () => this.gridModel.access === AccessMode.Readonly,
+    isReadonly: () => this.gridModel.access === DatabaseDataAccessMode.Readonly,
     isCellEdited: this.isCellEdited.bind(this),
     editCellValue: this.editCellValue.bind(this),
     revertCellValue: this.revertCellValue.bind(this),

@@ -9,12 +9,12 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import { TableViewerModel } from '../TableViewerModel';
+import { DataModelWrapper } from '../DataModelWrapper';
 import { TableWhereFilter } from './TableWhereFilter';
 
 @injectable()
 export class TableHeaderService extends Bootstrap {
-  readonly tableHeaderPlaceholder = new PlaceholderContainer<TableViewerModel>()
+  readonly tableHeaderPlaceholder = new PlaceholderContainer<DataModelWrapper>()
 
   register() {
     this.tableHeaderPlaceholder.add(TableWhereFilter, 1);

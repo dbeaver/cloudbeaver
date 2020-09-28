@@ -11,31 +11,49 @@ import { observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { TableViewerModel, ITableViewerModelOptions } from './TableViewerModel';
+import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
+import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
+import { DataModelWrapper } from './DataModelWrapper';
+import { ITableViewerModelOptions } from './TableViewerModel';
 
 @injectable()
 export class TableViewerStorageService {
-  @observable private tableModelMap: Map<string, TableViewerModel> = new Map();
+  @observable private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
   constructor(private commonDialogService: CommonDialogService) {}
 
   has(tableId: string): boolean {
     return this.tableModelMap.has(tableId);
   }
-  get(tableId: string) {
-    return this.tableModelMap.get(tableId);
+
+  get(tableId: string): DataModelWrapper | null | undefined {
+    return this.tableModelMap.get(tableId) as DataModelWrapper;
   }
 
+  /**
+   * @deprecated Use add method instead
+   */
   create(
     options: ITableViewerModelOptions,
-  ): TableViewerModel {
+    source: IDatabaseDataSource<any, any>
+  ): DataModelWrapper {
 
-    const tableModel = new TableViewerModel(options, this.commonDialogService);
-    this.tableModelMap.set(tableModel.tableId, tableModel);
-    return tableModel;
+    return this.add(new DataModelWrapper(
+      this.commonDialogService,
+      options,
+      source
+    )) as DataModelWrapper;
   }
 
-  remove(tableId: string) {
-    this.tableModelMap.delete(tableId);
+  add<TOptions, TResult extends IDatabaseDataResult>(
+    model: IDatabaseDataModel<TOptions, TResult>,
+  ): IDatabaseDataModel<TOptions, TResult> {
+    this.tableModelMap.set(model.id, model);
+    return this.tableModelMap.get(model.id)!;
+  }
+
+  remove(id: string): void {
+    this.tableModelMap.delete(id);
   }
 }

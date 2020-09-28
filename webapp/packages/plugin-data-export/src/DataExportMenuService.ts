@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   IContextMenuItem, IMenuContext, CommonDialogService, ContextMenuService
 } from '@cloudbeaver/core-dialogs';
-import { TableFooterMenuService, TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
+import { TableFooterMenuService, DataModelWrapper } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
@@ -26,7 +26,7 @@ export class DataExportMenuService {
   ) { }
 
   register() {
-    const exportData: IContextMenuItem<TableViewerModel> = {
+    const exportData: IContextMenuItem<DataModelWrapper> = {
       id: 'export ',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -60,13 +60,13 @@ export class DataExportMenuService {
     );
   }
 
-  private exportData(context: IMenuContext<TableViewerModel>) {
+  private exportData(context: IMenuContext<DataModelWrapper>) {
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: context.data.connectionId,
-      contextId: context.data.executionContext?.contextId,
-      containerNodePath: context.data.containerNodePath,
-      resultId: context.data.resultId,
-      sourceName: context.data.sourceName,
+      connectionId: context.data.deprecatedModel.connectionId,
+      contextId: context.data.deprecatedModel.executionContext?.contextId,
+      containerNodePath: context.data.deprecatedModel.containerNodePath,
+      resultId: context.data.deprecatedModel.resultId,
+      sourceName: context.data.deprecatedModel.sourceName,
     });
   }
 }

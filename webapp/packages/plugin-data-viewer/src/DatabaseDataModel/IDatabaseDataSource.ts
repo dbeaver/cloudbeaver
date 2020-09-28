@@ -1,0 +1,46 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { SqlResultSet } from '@cloudbeaver/core-sdk';
+
+import { IDatabaseDataResult } from './IDatabaseDataResult';
+
+export enum DataUpdateType {
+  delete,
+  update,
+  add
+}
+
+export interface IRequestInfo {
+  readonly requestDuration: number;
+  readonly requestMessage: string;
+}
+
+export interface DataUpdate<T = any> {
+  data: SqlResultSet;
+  dataUpdate: SqlResultSet;
+  type: DataUpdateType;
+}
+
+export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult> {
+  readonly offset: number;
+  readonly count: number;
+  readonly options: TOptions | null;
+  readonly requestInfo: IRequestInfo;
+
+  isLoading(): boolean;
+  setSlice(offset: number, count: number): void;
+  setOptions(options: TOptions): void;
+  requestData(
+    prevResults: TResult[]
+  ): Promise<TResult[]> | TResult[];
+  saveData(
+    prevResults: TResult[],
+    data: DataUpdate
+  ): Promise<TResult[]> | TResult[];
+}

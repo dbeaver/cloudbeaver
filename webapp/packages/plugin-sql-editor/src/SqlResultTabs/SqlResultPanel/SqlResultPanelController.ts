@@ -13,7 +13,7 @@ import { IDestructibleController, IInitializableController, injectable } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { GQLError, GraphQLService, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { PromiseCancelledError } from '@cloudbeaver/core-utils';
 import {
   fetchingSettings,
@@ -21,10 +21,11 @@ import {
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
-  AccessMode,
+  DatabaseDataAccessMode,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { IResultDataTab, IQueryTabGroup } from '../../ISqlEditorTabState';
+import { QueryDataSource } from '../../QueryDataSource';
 import { SqlEditorGroupMetadataService } from '../../SqlEditorGroupMetadataService';
 import { SqlExecutionState } from '../../SqlExecutionState';
 import { SQLQueryExecutionProcess } from '../SQLQueryExecutionProcess';
@@ -54,6 +55,7 @@ implements IInitializableController, IDestructibleController {
   private sqlProcess: SQLQueryExecutionProcess | null = null;
 
   constructor(
+    private sdk: GraphQLService,
     private sqlResultService: SqlResultService,
     private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
@@ -101,17 +103,27 @@ implements IInitializableController, IDestructibleController {
           this.tableViewerStorageService.remove(this.getTableId());
         }
 
-        const tableModel = this.tableViewerStorageService.create({
-          tableId: this.getTableId(),
-          connectionId: this.group.sqlQueryParams.connectionId,
-          executionContext: this.group.sqlQueryParams,
-          resultId: dataSet.resultSet.id,
-          sourceName: this.group.sqlQueryParams.query,
-          access: connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default,
-          requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
-          noLoaderWhileRequestingDataAsync: true,
-          saveChanges: this.saveChanges.bind(this),
-        });
+        const tableModel = this.tableViewerStorageService.create(
+          {
+            tableId: this.getTableId(),
+            connectionId: this.group.sqlQueryParams.connectionId,
+            executionContext: this.group.sqlQueryParams,
+            resultId: dataSet.resultSet.id,
+            sourceName: this.group.sqlQueryParams.query,
+            access: connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default,
+            requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
+            noLoaderWhileRequestingDataAsync: true,
+            saveChanges: this.saveChanges.bind(this),
+          },
+          new QueryDataSource(this.sdk)
+        )
+          .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+          .setOptions({
+            connectionId: this.group.sqlQueryParams.connectionId,
+            sourceName: this.group.sqlQueryParams.query,
+            constraints: [],
+            whereFilter: '',
+          }).deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
         tableModel.setColumns(initialState.columns);
@@ -204,7 +216,7 @@ implements IInitializableController, IDestructibleController {
     const connectionInfo = await this.connectionInfoResource.load(this.group.sqlQueryParams.connectionId);
 
     model.resultId = resultId;
-    model.access = connectionInfo.readOnly ? AccessMode.Readonly : AccessMode.Default;
+    model.access = connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default;
     model.sourceName = this.group.sqlQueryParams.query;
     model.executionContext = this.group.sqlQueryParams;
     model.connectionId = this.group.sqlQueryParams.connectionId;

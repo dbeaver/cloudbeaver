@@ -15,10 +15,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { DataPresentationService } from '../DataPresentationService';
-import { TableViewerModel } from './TableViewerModel';
+import { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
-  model: TableViewerModel;
+  model: DataModelWrapper;
 }>
 
 const styles = css`
@@ -37,13 +37,14 @@ export const TableGrid = observer(function TableGrid({
   const translate = useTranslate();
   const dataPresentationService = useService(DataPresentationService);
 
-  if (model.errorMessage.length > 0) {
+  // TODO: probably must be implemented in presentation component
+  if (model.deprecatedModel.errorMessage.length > 0) {
     return styled(styles)(
       <error as="div">
-        {model.errorMessage}
+        {model.deprecatedModel.errorMessage}
         <br/><br/>
-        {model.hasDetails && (
-          <Button type='button' mod={['outlined']} onClick={model.onShowDetails}>
+        {model.deprecatedModel.hasDetails && (
+          <Button type='button' mod={['outlined']} onClick={model.deprecatedModel.onShowDetails}>
             {translate('ui_errors_details')}
           </Button>
         )}
@@ -53,7 +54,7 @@ export const TableGrid = observer(function TableGrid({
 
   const Spreadsheet = dataPresentationService.default?.component;
 
-  if ((model.isFullyLoaded && model.isEmpty) || !Spreadsheet) {
+  if ((model.deprecatedModel.isFullyLoaded && model.deprecatedModel.isEmpty) || !Spreadsheet) {
     return styled(styles)(<no-data as="div">{translate('data_viewer_nodata_message')}</no-data>);
   }
 

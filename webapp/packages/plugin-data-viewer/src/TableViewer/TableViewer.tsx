@@ -49,7 +49,7 @@ export const TableViewer = observer(function TableViewer({
       <TableHeader model={tableViewerModel} />
       <TableGrid model={tableViewerModel} />
       <TableFooter model={tableViewerModel} />
-      <Loader loading={tableViewerModel.isLoaderVisible} overlay/>
+      <Loader loading={tableViewerModel.isLoading()} overlay/>
     </table-viewer>
   );
 });
