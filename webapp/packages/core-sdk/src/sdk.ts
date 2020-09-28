@@ -269,6 +269,7 @@ export type MutationAsyncSqlExecuteQueryArgs = {
   contextId: Scalars['ID'];
   sql: Scalars['String'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 };
 
 export type MutationAsyncSqlExecuteResultsArgs = {
@@ -322,6 +323,7 @@ export type MutationReadDataFromContainerArgs = {
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 };
 
 export type MutationSetConnectionNavigatorSettingsArgs = {
@@ -352,6 +354,7 @@ export type MutationSqlExecuteQueryArgs = {
   contextId: Scalars['ID'];
   sql: Scalars['String'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 };
 
 export type MutationSqlResultCloseArgs = {
@@ -493,6 +496,13 @@ export type DriverInfo = {
   applicableAuthModel: Array<Scalars['ID']>;
 };
 
+export enum ResultDataFormat {
+  Resultset = 'resultset',
+  Document = 'document',
+  Graph = 'graph',
+  Timeseries = 'timeseries'
+}
+
 export type ConnectionInfo = {
   id: Scalars['ID'];
   driverId: Scalars['ID'];
@@ -516,6 +526,7 @@ export type ConnectionInfo = {
   authProperties: Array<ObjectPropertyInfo>;
   features: Array<Scalars['String']>;
   navigatorSettings: NavigatorSettings;
+  supportedDataFormats: Array<ResultDataFormat>;
 };
 
 export type ConnectionConfig = {
@@ -683,6 +694,13 @@ export type SqlResultColumn = {
   readOnlyStatus?: Maybe<Scalars['String']>;
 };
 
+export type DatabaseDocument = {
+  id?: Maybe<Scalars['String']>;
+  contentType?: Maybe<Scalars['String']>;
+  properties?: Maybe<Scalars['Object']>;
+  data?: Maybe<Scalars['Object']>;
+};
+
 export type SqlResultSet = {
   id: Scalars['ID'];
   columns?: Maybe<Array<Maybe<SqlResultColumn>>>;
@@ -694,6 +712,7 @@ export type SqlQueryResults = {
   title?: Maybe<Scalars['String']>;
   updateRowCount?: Maybe<Scalars['Int']>;
   sourceQuery?: Maybe<Scalars['String']>;
+  dataFormat?: Maybe<ResultDataFormat>;
   resultSet?: Maybe<SqlResultSet>;
 };
 
@@ -1110,9 +1129,9 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 export type GetSqlExecuteTaskResultsMutation = { result: (
     Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
     & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
+      Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
       & { resultSet?: Maybe<(
-        Pick<SqlResultSet, 'id' | 'rows'>
+        Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
       )> }
     )> }
@@ -1128,9 +1147,9 @@ export type ReadDataFromContainerMutationVariables = Exact<{
 export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
     Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
     & { results: Array<(
-      Pick<SqlQueryResults, 'updateRowCount' | 'sourceQuery' | 'title'>
+      Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
       & { resultSet?: Maybe<(
-        Pick<SqlResultSet, 'id' | 'rows'>
+        Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
         & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
       )> }
     )> }
@@ -1859,9 +1878,10 @@ export const GetSqlExecuteTaskResultsDocument = `
     duration
     statusMessage
     results {
+      title
       updateRowCount
       sourceQuery
-      title
+      dataFormat
       resultSet {
         id
         columns {
@@ -1879,6 +1899,7 @@ export const GetSqlExecuteTaskResultsDocument = `
           typeName
         }
         rows
+        hasMoreData
       }
     }
   }
@@ -1890,9 +1911,10 @@ export const ReadDataFromContainerDocument = `
     duration
     statusMessage
     results {
+      title
       updateRowCount
       sourceQuery
-      title
+      dataFormat
       resultSet {
         id
         columns {
@@ -1910,6 +1932,7 @@ export const ReadDataFromContainerDocument = `
           typeName
         }
         rows
+        hasMoreData
       }
     }
   }

@@ -14,9 +14,10 @@ mutation readDataFromContainer(
         duration
         statusMessage
         results {
+            title
             updateRowCount
             sourceQuery
-            title
+            dataFormat
             resultSet {
                 id
                 columns {
@@ -34,6 +35,7 @@ mutation readDataFromContainer(
                     typeName
                 }
                 rows
+                hasMoreData
             }
         }
     }

@@ -7,9 +7,10 @@ mutation getSqlExecuteTaskResults(
         duration
         statusMessage
         results {
+            title
             updateRowCount
             sourceQuery
-            title
+            dataFormat
             resultSet {
                 id
                 columns {
@@ -27,6 +28,7 @@ mutation getSqlExecuteTaskResults(
                     typeName
                 }
                 rows
+                hasMoreData
             }
         }
     }
