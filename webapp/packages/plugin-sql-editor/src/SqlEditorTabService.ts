@@ -22,7 +22,7 @@ import {
   ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
-  ConnectionAuthService,
+  ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -47,7 +47,7 @@ export class SqlEditorTabService {
     private notificationService: NotificationService,
     private gql: GraphQLService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private connectionAuthService: ConnectionAuthService
+    private connectionsManagerService: ConnectionsManagerService
   ) {
     this.tabExecutionState = new Map();
 
@@ -77,25 +77,14 @@ export class SqlEditorTabService {
     schemaId?: string
   ): Promise<ITabOptions<ISqlEditorTabState> | null> {
     const order = this.getFreeEditorId();
-
-    if (!connectionId) {
-      connectionId = Array.from(this.connectionInfoResource.data.values())[0].id;
+    const connection = await this.connectionsManagerService.requireConnection(connectionId);
+    if (!connection) {
+      return null;
     }
 
-    try {
-      const connection = await this.connectionAuthService.auth(connectionId);
+    await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
 
-      if (!connection?.connected) {
-        return null;
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception);
-      throw exception;
-    }
-
-    await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
-
-    const context = await this.createSqlContext(connectionId, catalogId, schemaId);
+    const context = await this.createSqlContext(connection.id, catalogId, schemaId);
 
     return {
       handlerId: sqlEditorTabHandlerKey,
@@ -103,7 +92,7 @@ export class SqlEditorTabService {
         query: '',
         order,
         contextId: context.contextId,
-        connectionId,
+        connectionId: connection.id,
         objectCatalogId: context.objectCatalogId,
         objectSchemaId: context.objectSchemaId,
         queryTabGroups: [],
@@ -162,19 +151,11 @@ export class SqlEditorTabService {
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
     try {
+      const connection = await this.connectionsManagerService.requireConnection(connectionId);
 
-      const connection = await this.connectionAuthService.auth(connectionId);
-
-      if (!connection?.connected) {
+      if (!connection) {
         return false;
       }
-    } catch (exception) {
-      this.notificationService.logException(exception);
-      return false;
-    }
-
-    try {
-
       // try to create new context first
       const context = await this.createSqlContext(connectionId);
       // when new context created - destroy old one silently

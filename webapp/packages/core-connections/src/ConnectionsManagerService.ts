@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
 
+import { ConnectionAuthService } from './ConnectionAuthService';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
 import { ContainerResource, ObjectContainer } from './ContainerResource';
 import { EConnectionFeature } from './EConnectionFeature';
@@ -25,9 +26,32 @@ export class ConnectionsManagerService {
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
     private sessionResource: SessionResource,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private connectionAuthService: ConnectionAuthService
   ) {
     this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
+  }
+
+  async requireConnection(connectionId?: string) {
+    if (!connectionId) {
+      if (!this.hasAnyConnection()) {
+        return null;
+      }
+      connectionId = Array.from(this.connectionInfo.data.values())[0].id;
+    }
+
+    try {
+      const connection = await this.connectionAuthService.auth(connectionId);
+
+      if (!connection.connected) {
+        return null;
+      }
+
+      return connection;
+    } catch (exception) {
+      this.notificationService.logException(exception);
+      throw exception;
+    }
   }
 
   async addOpenedConnection(connection: Connection) {
