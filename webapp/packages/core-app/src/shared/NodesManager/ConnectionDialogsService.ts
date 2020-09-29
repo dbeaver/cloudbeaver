@@ -18,7 +18,6 @@ import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
 export class ConnectionDialogsService {
-  newConnectionMenuToken = 'connectionMenu';
 
   constructor(
     private mainMenuService: MainMenuService,
@@ -28,22 +27,12 @@ export class ConnectionDialogsService {
   ) {}
 
   registerMenuItems() {
-    this.mainMenuService.registerMenuItem(
-      EMainMenu.mainMenuConnectionsPanel,
-      {
-        id: this.newConnectionMenuToken,
-        order: 1,
-        title: 'app_shared_connectionMenu_newConnection',
-        isPanel: true,
-        isHidden: () => this.mainMenuService.isEmptyMenuPanel(this.newConnectionMenuToken),
-      }
-    );
 
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuConnectionsPanel,
       {
         id: 'mainMenuDisconnect',
-        order: 2,
+        order: 3,
         title: 'app_shared_connectionMenu_disconnect',
         onClick: () => this.connectionsManagerService.closeAllConnections(),
         isDisabled: () => !this.connectionsManagerService.hasAnyConnection(true),

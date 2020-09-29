@@ -20,7 +20,6 @@ export const defaultRULocale = [
   ['app_root_session_expired_title', 'Сесстия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],
   ['app_root_session_expired_reload', 'Перезагрузить'],
-  ['app_shared_connectionMenu_newConnection', 'Новое подключение'],
   ['app_shared_connectionMenu_connection', 'Подключение'],
   ['app_shared_connectionMenu_custom', 'Настроить'],
   ['app_shared_connectionMenu_disconnect', 'Отключить'],

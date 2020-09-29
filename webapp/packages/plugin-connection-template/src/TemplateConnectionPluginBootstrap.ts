@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, ConnectionDialogsService } from '@cloudbeaver/core-app';
+import { MainMenuService, ConnectionDialogsService, EMainMenu } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -30,17 +30,14 @@ export class TemplateConnectionPluginBootstrap {
 
   bootstrap() {
     this.loadTemplateConnections();
-    this.mainMenuService.registerMenuItem(
-      this.connectionDialogsService.newConnectionMenuToken,
-      {
-        id: 'mainMenuConnect',
-        order: 2,
-        title: 'basicConnection_main_menu_item',
-        onClick: () => this.openConnectionsDialog(),
-        isHidden: () => !this.permissionsService.has(EPermission.public),
-        isDisabled: () => this.isDisabled(),
-      }
-    );
+    this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
+      id: 'mainMenuConnect',
+      order: 2,
+      title: 'basicConnection_main_menu_item',
+      onClick: () => this.openConnectionsDialog(),
+      isHidden: () => !this.permissionsService.has(EPermission.public),
+      isDisabled: () => this.isDisabled(),
+    });
   }
 
   private async openConnectionsDialog() {
