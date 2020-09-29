@@ -52,7 +52,7 @@ export class ConnectionDialogsService {
           return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
             || !connection?.connected;
         },
-        title: 'Disconnect',
+        title: 'app_shared_connectionMenu_disconnect',
         onClick: (context: IMenuContext<NavNode>) => {
           const node = context.data;
           this.connectionsManagerService.closeConnectionAsync(
@@ -75,7 +75,7 @@ export class ConnectionDialogsService {
           return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
             || !connection?.features.includes(EConnectionFeature.temporary);
         },
-        title: 'Delete',
+        title: 'ui_delete',
         onClick: (context: IMenuContext<NavNode>) => {
           const node = context.data;
           this.connectionsManagerService.deleteConnection(
