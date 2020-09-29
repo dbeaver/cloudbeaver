@@ -46,6 +46,7 @@ export class ConnectionDialogsService {
         order: 2,
         title: 'app_shared_connectionMenu_disconnect',
         onClick: () => this.connectionsManagerService.closeAllConnections(),
+        isDisabled: () => !this.connectionsManagerService.hasAnyConnection(true),
       }
     );
 
