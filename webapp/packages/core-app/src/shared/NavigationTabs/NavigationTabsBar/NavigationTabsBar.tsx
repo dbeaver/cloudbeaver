@@ -10,17 +10,15 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  TextPlaceholder, TabsBox, TabPanel, useFocus
-} from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, TabsBox, TabPanel, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { useActiveView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
-import { useTranslate } from '@cloudbeaver/core-localization';
 
 const styles = composes(
   css`
