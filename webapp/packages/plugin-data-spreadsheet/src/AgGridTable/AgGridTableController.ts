@@ -99,6 +99,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
     this.subscriptions.push(gridModel.tableDataModel.onRowsUpdate.subscribe(this.updateRows.bind(this)));
     this.subscriptions.push(gridModel.tableEditor.onRowsUpdate.subscribe(this.updateRows.bind(this)));
+    this.subscriptions.push(gridModel.tableEditor.onCancelChanges.subscribe(this.cancelEditing.bind(this)));
     this.subscriptions.push(gridModel.onChunkSizeChange.subscribe(this.changeChunkSize.bind(this)));
     this.subscriptions.push(gridModel.onReset.subscribe(this.resetData.bind(this)));
   }
@@ -163,6 +164,12 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private isCellEdited(rowIndex: number, column: string) {
     return this.gridModel.isCellEdited(rowIndex, column);
+  }
+
+  private cancelEditing() {
+    if (this.api) {
+      this.api.stopEditing(true);
+    }
   }
 
   private updateRows(rows: number[]) {
