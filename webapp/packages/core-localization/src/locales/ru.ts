@@ -29,6 +29,7 @@ export const defaultRULocale = [
   ['app_shared_settingsMenu_config', 'Настройки'],
   ['app_shared_settingsMenu_theme', 'Тема'],
   ['app_shared_settingsMenu_lang', 'Язык'],
+  ['app_shared_navigationTabsBar_placeholder', 'Вы еще не добавили объекты. Дважды нажмите на объект в навигационном дереве консоли, чтобы открыть его.'],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_refreshNode', 'Обновить'],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],

@@ -20,6 +20,7 @@ import { useActiveView } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '../NavigationTabsService';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 const styles = composes(
   css`
@@ -43,6 +44,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const style = useStyles(styles);
+  const translate = useTranslate();
 
   const [onFocus, onBlur] = useActiveView(navigation.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
@@ -51,11 +53,7 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
 
   if (navigation.tabIdList.length === 0) {
-    return (
-      <TextPlaceholder>
-        There are no objects to show. Double click on an object in the navigation tree to open it.
-      </TextPlaceholder>
-    );
+    return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
   }
 
   return styled(style)(
