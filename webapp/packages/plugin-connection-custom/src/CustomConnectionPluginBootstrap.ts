@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  MainMenuService, ConnectionDialogsService,
-} from '@cloudbeaver/core-app';
+import { MainMenuService, EMainMenu } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
@@ -16,26 +14,18 @@ import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialo
 
 @injectable()
 export class CustomConnectionPluginBootstrap {
-
-  constructor(private connectionDialogsService: ConnectionDialogsService,
-              private mainMenuService: MainMenuService,
-              private commonDialogService: CommonDialogService) {
-  }
+  constructor(private mainMenuService: MainMenuService, private commonDialogService: CommonDialogService) {}
 
   bootstrap() {
-    this.mainMenuService.registerMenuItem(
-      this.connectionDialogsService.newConnectionMenuToken,
-      {
-        id: 'сustomConnection',
-        order: 1,
-        title: 'app_shared_connectionMenu_custom',
-        onClick: () => this.openConnectionsDialog(),
-      }
-    );
+    this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
+      id: 'сustomConnection',
+      order: 1,
+      title: 'app_shared_connectionMenu_custom',
+      onClick: () => this.openConnectionsDialog(),
+    });
   }
 
   private async openConnectionsDialog() {
     await this.commonDialogService.open(CustomConnectionDialog, null);
   }
-
 }
