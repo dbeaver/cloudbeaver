@@ -18,13 +18,17 @@ import { TableRow, SomeTableRows } from './TableRow';
  */
 export class TableEditor {
   readonly onRowsUpdate: Observable<number[]>
+  readonly onCancelChanges: Observable<null>
 
   @observable private editedRows = new Map<number, EditedRow>();
   private rowsUpdateSubject: Subject<number[]>
+  private cancelChangesSubject: Subject<null>
 
   constructor(private dataModel: TableDataModel) {
     this.rowsUpdateSubject = new Subject();
+    this.cancelChangesSubject = new Subject();
     this.onRowsUpdate = this.rowsUpdateSubject.asObservable();
+    this.onCancelChanges = this.cancelChangesSubject.asObservable();
   }
 
   /**
@@ -120,6 +124,7 @@ export class TableEditor {
     const rows = Array.from(this.editedRows.keys());
     this.editedRows.clear();
     if (!skipUpdate) {
+      this.cancelChangesSubject.next(null);
       this.rowsUpdateSubject.next(rows);
     }
   }
