@@ -83,7 +83,10 @@ export class ConnectionsManagerService {
     await this.afterConnectionClose(id);
   }
 
-  hasAnyConnection(): boolean {
+  hasAnyConnection(connected?: boolean): boolean {
+    if (connected) {
+      return Array.from(this.connectionInfo.data.values()).some(connection => connection.connected);
+    }
     return !!Array.from(this.connectionInfo.data.values()).length;
   }
 
