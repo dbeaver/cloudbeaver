@@ -31,7 +31,7 @@ export class TableFooterMenuService {
         return !context.data.isEdited();
       },
       order: 1,
-      title: 'Save',
+      title: 'ui_processing_save',
       icon: 'table-save',
       onClick: context => context.data.saveChanges(),
     });
@@ -44,7 +44,7 @@ export class TableFooterMenuService {
         return !context.data.isEdited();
       },
       order: 2,
-      title: 'Cancel',
+      title: 'ui_processing_cancel',
       icon: 'table-cancel',
       onClick: context => context.data.cancelChanges(),
     });

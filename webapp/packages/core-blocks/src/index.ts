@@ -32,3 +32,4 @@ export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './useClipboard';
 export * from './useFocus';
+export * from './BlocksLocaleService';

@@ -23,6 +23,7 @@ export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
+export * from './AppLocaleService';
 
 // Models
 export * from './shared/NavigationTabs/ITab';

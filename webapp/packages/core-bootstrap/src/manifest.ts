@@ -15,20 +15,38 @@ import {
   WizardTopAppBarService,
   AdministrationScreenServiceBootstrap,
   ConfigurationWizardPagesBootstrapService,
-  ServerConfigurationService
+  ServerConfigurationService,
 } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
-  MainMenuService, NavigationTreeService,
-  NavNodeManagerService, DBObjectService, NavNodeExtensionsService, NavNodeInfoResource, NavTreeResource,
+  MainMenuService,
+  NavigationTreeService,
+  NavNodeManagerService,
+  DBObjectService,
+  NavNodeExtensionsService,
+  NavNodeInfoResource,
+  NavTreeResource,
   ConnectionSchemaManagerService,
-  NavigationTabsService, NavigationTreeContextMenuService,
-  SettingsMenuService, LogViewerService, LogViewerMenuService, TopNavService,
-  AppScreenService, CoreSettingsService, AdministrationTopAppBarBootstrapService
+  NavigationTabsService,
+  NavigationTreeContextMenuService,
+  SettingsMenuService,
+  LogViewerService,
+  LogViewerMenuService,
+  TopNavService,
+  AppScreenService,
+  CoreSettingsService,
+  AdministrationTopAppBarBootstrapService,
+  AppLocaleService,
 } from '@cloudbeaver/core-app';
 import {
-  AuthInfoService, AuthProviderService, AuthProvidersResource, RolesManagerService, RolesResource, UsersResource
+  AuthInfoService,
+  AuthProviderService,
+  AuthProvidersResource,
+  RolesManagerService,
+  RolesResource,
+  UsersResource,
 } from '@cloudbeaver/core-authentication';
+import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
   ConnectionsManagerService,
   ConnectionInfoResource,
@@ -40,7 +58,7 @@ import {
   ConnectionsResource,
   ConnectionsLocaleService,
   DriverPropertiesService,
-  ConnectionsAdministrationNavService
+  ConnectionsAdministrationNavService,
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
@@ -56,7 +74,7 @@ import {
   ServerSettingsService,
   ServerConfigResource,
   PermissionsResource,
-  SessionResource
+  SessionResource,
 } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -105,6 +123,8 @@ export const coreManifest: PluginManifest = {
     ConnectionDialogsService,
     ConnectionSchemaManagerService,
     ConnectionInfoResource,
+    BlocksLocaleService,
+    AppLocaleService,
     ContainerResource,
     DBDriverResource,
     DriverPropertiesService,
@@ -147,5 +167,4 @@ export const coreManifest: PluginManifest = {
     // Note that the initialization of the core occurs in AppBootstrap
     // and it is called before the initialization phase of all manifests
   },
-
 };
