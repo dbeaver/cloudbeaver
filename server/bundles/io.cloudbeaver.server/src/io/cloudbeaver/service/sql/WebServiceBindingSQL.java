@@ -116,7 +116,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
 
     private WebDataFormat getDataFormat(DataFetchingEnvironment env) {
         String dataFormat = env.getArgument("dataFormat");
-        return CommonUtils.valueOf(WebDataFormat.class, dataFormat, WebDataFormat.table);
+        return CommonUtils.valueOf(WebDataFormat.class, dataFormat, WebDataFormat.resultset);
     }
 
     public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {

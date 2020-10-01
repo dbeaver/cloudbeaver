@@ -20,7 +20,7 @@ package io.cloudbeaver.service.sql;
  * Web data format
  */
 public enum WebDataFormat {
-    table,
+    resultset,
     document,
     timeseries
 }

@@ -43,7 +43,7 @@ public class WebSQLQueryResults {
 
     WebSQLQueryResults(@NotNull WebSession webSession, @Nullable WebDataFormat dataFormat) {
         this.webSession = webSession;
-        this.dataFormat = dataFormat == null ? WebDataFormat.table : dataFormat;
+        this.dataFormat = dataFormat == null ? WebDataFormat.resultset : dataFormat;
     }
 
     @Property
