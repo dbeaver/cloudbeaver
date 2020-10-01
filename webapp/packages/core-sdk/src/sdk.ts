@@ -1115,6 +1115,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   contextId: Scalars['ID'];
   query: Scalars['String'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
 export type AsyncSqlExecuteQueryMutation = { taskInfo: (
@@ -1142,6 +1143,7 @@ export type ReadDataFromContainerMutationVariables = Exact<{
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
 export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
@@ -1857,8 +1859,8 @@ export const GetAsyncTaskInfoDocument = `
 }
     `;
 export const AsyncSqlExecuteQueryDocument = `
-    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
-  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
+    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter, dataFormat: $dataFormat) {
     id
     name
     running
@@ -1906,8 +1908,8 @@ export const GetSqlExecuteTaskResultsDocument = `
 }
     `;
 export const ReadDataFromContainerDocument = `
-    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter) {
-  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter) {
+    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter, dataFormat: $dataFormat) {
     duration
     statusMessage
     results {
