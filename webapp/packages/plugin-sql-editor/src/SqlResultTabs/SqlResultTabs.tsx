@@ -16,6 +16,7 @@ import {
   Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -51,6 +52,7 @@ type SqlDataResultProps = {
 
 export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataResultProps) {
   const style = useStyles(styles);
+  const translate = useTranslate();
   const navigatorService = useService(SqlEditorNavigatorService);
   const sqlResultTabsService = useService(SqlResultTabsService);
 
@@ -82,7 +84,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
   );
 
   if (!tab.handlerState.queryTabGroups.length) {
-    return <TextPlaceholder>Execute query with Ctrl+Enter to see results</TextPlaceholder>;
+    return <TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>;
   }
 
   const currentId = tab.handlerState.currentResultTabId || '';

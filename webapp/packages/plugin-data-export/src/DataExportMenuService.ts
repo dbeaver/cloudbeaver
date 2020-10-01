@@ -32,7 +32,7 @@ export class DataExportMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       order: 5,
-      title: 'Export',
+      title: 'data_transfer_dialog_export',
       icon: 'table-export',
       onClick: this.exportData.bind(this),
     };
@@ -47,7 +47,7 @@ export class DataExportMenuService {
             && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
         order: 2,
-        title: 'Export',
+        title: 'data_transfer_dialog_export',
         onClick: (context) => {
           const node = context.data;
           const connectionId = NodeManagerUtils.nodeIdToConnectionId(node.id);
