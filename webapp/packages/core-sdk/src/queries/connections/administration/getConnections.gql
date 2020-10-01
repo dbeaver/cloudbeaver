@@ -14,8 +14,6 @@ query getConnections {
     databaseName
     url
     properties
-    
-    features
 
     authNeeded
     authModel
@@ -24,5 +22,8 @@ query getConnections {
       value
       features
     }
+
+    features
+    supportedDataFormats
   }
 }

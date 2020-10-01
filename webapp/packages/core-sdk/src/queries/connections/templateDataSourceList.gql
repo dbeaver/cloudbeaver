@@ -7,9 +7,10 @@ query getTemplateConnections {
     connected
     readOnly
 
-    features
-
     authNeeded
     authModel
+
+    features
+    supportedDataFormats
   }
 }

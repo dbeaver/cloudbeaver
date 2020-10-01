@@ -9,10 +9,12 @@ query sessionState {
       name
       driverId
       connected
-      features
 
       authNeeded
       authModel
+
+      features
+      supportedDataFormats
     }
   }
 }

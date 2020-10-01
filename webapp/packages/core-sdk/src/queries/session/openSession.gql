@@ -11,10 +11,11 @@ mutation openSession {
       connected
       readOnly
 
-      features
-
       authNeeded
       authModel
+
+      features
+      supportedDataFormats
     }
   }
 }
