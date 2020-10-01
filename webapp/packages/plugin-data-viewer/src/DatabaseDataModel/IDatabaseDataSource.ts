@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SqlResultSet } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
 
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 
@@ -27,15 +27,19 @@ export interface DataUpdate<T = any> {
   type: DataUpdateType;
 }
 
-export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult> {
+export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly offset: number;
   readonly count: number;
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
+  readonly dataFormat: ResultDataFormat;
+  readonly supportedDataFormats: ResultDataFormat[];
 
   isLoading(): boolean;
-  setSlice(offset: number, count: number): void;
-  setOptions(options: TOptions): void;
+  setSlice(offset: number, count: number): this;
+  setOptions(options: TOptions): this;
+  setDataFormat(dataFormat: ResultDataFormat): this;
+  setSupportedDataFormats(dataFormats: ResultDataFormat[]): this;
   requestData(
     prevResults: TResult[]
   ): Promise<TResult[]> | TResult[];

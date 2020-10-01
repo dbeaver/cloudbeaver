@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import {
   DatabaseDataSource, DataUpdate, IDatabaseDataResult, IExecutionContext
 } from '@cloudbeaver/plugin-data-viewer';
@@ -16,6 +16,7 @@ export interface IDataContainerOptions {
   connectionId: string;
   whereFilter: string;
   constraints: SqlDataFilterConstraint[];
+  dataFormat: ResultDataFormat;
 }
 
 export interface IDataContainerResult extends IDatabaseDataResult {

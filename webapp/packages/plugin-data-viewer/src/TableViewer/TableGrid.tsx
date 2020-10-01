@@ -10,22 +10,22 @@ import { observer } from 'mobx-react';
 import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { Button, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { DataPresentationService } from '../DataPresentationService';
+import { DataPresentationOptions } from '../DataPresentationService';
 import { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
-  model: DataModelWrapper;
+  model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
+  presentation: DataPresentationOptions;
 }>
 
 const styles = css`
-  Spreadsheet, no-data, error {
+  Presentation, error {
     flex: 1;
   }
-  no-data, error {
+  error {
     white-space: pre-wrap;
     padding: 16px;
   }
@@ -33,9 +33,9 @@ const styles = css`
 
 export const TableGrid = observer(function TableGrid({
   model,
+  presentation,
 }: TableGridProps) {
   const translate = useTranslate();
-  const dataPresentationService = useService(DataPresentationService);
 
   // TODO: probably must be implemented in presentation component
   if (model.deprecatedModel.errorMessage.length > 0) {
@@ -52,11 +52,11 @@ export const TableGrid = observer(function TableGrid({
     );
   }
 
-  const Spreadsheet = dataPresentationService.default?.component;
+  const Presentation = presentation.getPresentationComponent();
 
-  if ((model.deprecatedModel.isFullyLoaded && model.deprecatedModel.isEmpty) || !Spreadsheet) {
-    return styled(styles)(<no-data as="div">{translate('data_viewer_nodata_message')}</no-data>);
+  if ((model.deprecatedModel.isFullyLoaded && model.deprecatedModel.isEmpty)) {
+    return styled(styles)(<TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>);
   }
 
-  return styled(styles)(<Spreadsheet tableModel={model} />);
+  return styled(styles)(<Presentation model={model} />);
 });

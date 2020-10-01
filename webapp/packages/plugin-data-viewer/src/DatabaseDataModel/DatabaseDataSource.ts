@@ -6,18 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {
-  offset: number;
-  count: number;
-  options: TOptions | null;
-  requestInfo: IRequestInfo;
+  @observable offset: number;
+  @observable count: number;
+  @observable dataFormat: ResultDataFormat;
+  @observable options: TOptions | null;
+  @observable requestInfo: IRequestInfo;
+  @observable supportedDataFormats: ResultDataFormat[];
 
-  private activeRequest: Promise<TResult[]> | null;
-  private activeSave: Promise<TResult[]> | null;
+  @observable private activeRequest: Promise<TResult[]> | null;
+  @observable private activeSave: Promise<TResult[]> | null;
 
   constructor() {
     this.offset = 0;
@@ -25,6 +31,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.options = null;
     this.activeRequest = null;
     this.activeSave = null;
+    this.dataFormat = ResultDataFormat.Resultset;
+    this.supportedDataFormats = [];
     this.requestInfo = {
       requestDuration: 0,
       requestMessage: '',
@@ -35,13 +43,25 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return !!this.activeRequest;
   }
 
-  setSlice(offset: number, count: number): void {
+  setSlice(offset: number, count: number): this {
     this.offset = offset;
     this.count = count;
+    return this;
   }
 
-  setOptions(options: TOptions): void {
+  setOptions(options: TOptions): this {
     this.options = options;
+    return this;
+  }
+
+  setDataFormat(dataFormat: ResultDataFormat): this {
+    this.dataFormat = dataFormat;
+    return this;
+  }
+
+  setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
+    this.supportedDataFormats = dataFormats;
+    return this;
   }
 
   async requestData(prevResults: TResult[]): Promise<TResult[]> {
@@ -61,7 +81,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeRequest = promise;
       }
-      return promise;
+      return await promise;
     } finally {
       this.activeRequest = null;
     }
@@ -87,7 +107,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeSave = promise;
       }
-      return promise;
+      return await promise;
     } finally {
       this.activeSave = null;
     }
