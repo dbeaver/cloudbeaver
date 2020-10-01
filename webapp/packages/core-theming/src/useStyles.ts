@@ -19,6 +19,7 @@ import { applyComposes, ClassCollection, Composes } from './themeUtils';
 export type BaseStyles = ClassCollection | Composes
 export type ThemeSelector = (theme: string) => Promise<BaseStyles | BaseStyles[]>
 export type Style = BaseStyles | ThemeSelector
+export type DynamicStyle = Style | boolean | undefined;
 
 /**
  * Changes styles depending on theme
@@ -26,14 +27,14 @@ export type Style = BaseStyles | ThemeSelector
  * @param componentStyles styles array
  */
 export function useStyles(
-  ...componentStyles: Array<Style | boolean | undefined>
+  ...componentStyles: DynamicStyle[]
 ): Record<string, any> {
   if (!componentStyles) {
     return {};
   }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
-  const stylesRef = useRef<Array<Style | boolean | undefined>>([]);
+  const stylesRef = useRef<DynamicStyle[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
