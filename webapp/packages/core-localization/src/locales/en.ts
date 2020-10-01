@@ -1,6 +1,8 @@
 export const defaultENLocale = [
   ['name', 'en'],
   ['ui_tag_new', 'New'],
+  ['ui_light_theme', 'Light'],
+  ['ui_dark_theme', 'Dark'],
   ['ui_stepper_back', 'Back'],
   ['ui_stepper_next', 'Next'],
   ['ui_stepper_finish', 'Finish'],
