@@ -19,6 +19,7 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.service.sql.WebDataFormat;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -196,6 +197,20 @@ public class WebConnectionInfo {
     @Property
     public DBNBrowseSettings getNavigatorSettings() {
         return dataSourceContainer.getNavigatorSettings();
+    }
+
+    @Property
+    public List<WebDataFormat> getSupportedDataFormats() {
+        List<WebDataFormat> formats = new ArrayList<>();
+        formats.add(WebDataFormat.resultset);
+        DBPDataSource dataSource = dataSourceContainer.getDataSource();
+        if (dataSource == null) {
+            return formats;
+        }
+        if (dataSource.getInfo().isDynamicMetadata()) {
+            formats.add(WebDataFormat.document);
+        }
+        return formats;
     }
 
     @Property
