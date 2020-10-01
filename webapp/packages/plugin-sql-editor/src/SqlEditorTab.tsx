@@ -24,8 +24,8 @@ export const SqlEditorTab = observer(function SqlEditorTab({
   const connection = connectionInfo.get(tab.handlerState.connectionId);
   const name = `sql-${tab.handlerState.order}${connection ? ` (${connection.name})` : ''}`;
 
-  return styled(useStyles(...style))(
-    <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >
+  return styled(useStyles(style))(
+    <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} style={style}>
       <TabIcon icon='/icons/sql_script.png' />
       <TabTitle>{name}</TabTitle>
     </Tab>

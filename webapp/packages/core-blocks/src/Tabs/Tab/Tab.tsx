@@ -54,7 +54,7 @@ export function Tab({
     }
   }, [onClose, tabId]);
 
-  return styled(useStyles(...(Array.isArray(style) ? style : [style])))(
+  return styled(useStyles(style))(
     <tab-outer as='div'>
       <tab-inner as='div'>
         <BaseTab

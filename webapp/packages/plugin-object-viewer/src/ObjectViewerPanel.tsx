@@ -31,7 +31,7 @@ const styles = composes(
     }
   `,
   css`
-    Tab:only-child {
+    tab-outer:only-child {
       display: none;
     }
   `,

@@ -27,20 +27,20 @@ export type DynamicStyle = Style | boolean | undefined;
  * @param componentStyles styles array
  */
 export function useStyles(
-  ...componentStyles: DynamicStyle[]
+  ...componentStyles: (DynamicStyle | DynamicStyle[])[]
 ): Record<string, any> {
   if (!componentStyles) {
     return {};
   }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
-  const stylesRef = useRef<DynamicStyle[]>([]);
+  const stylesRef = useRef<(DynamicStyle | DynamicStyle[])[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const currentThemeId = useObserver(() => themeService.currentThemeId);
   const lastThemeRef = useRef<string>(currentThemeId);
-  const filteredStyles = componentStyles.filter(Boolean) as Array<Style>;
+  const filteredStyles = flat(componentStyles).filter(Boolean) as Array<Style>;
 
   let changed = lastThemeRef.current !== currentThemeId || componentStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < componentStyles.length; i++) {
