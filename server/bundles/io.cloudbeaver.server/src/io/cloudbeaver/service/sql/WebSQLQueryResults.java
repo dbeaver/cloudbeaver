@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
@@ -40,11 +41,12 @@ public class WebSQLQueryResults {
     private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;
 
-    WebSQLQueryResults(@NotNull WebSession webSession, @NotNull WebDataFormat dataFormat) {
+    WebSQLQueryResults(@NotNull WebSession webSession, @Nullable WebDataFormat dataFormat) {
         this.webSession = webSession;
-        this.dataFormat = dataFormat;
+        this.dataFormat = dataFormat == null ? WebDataFormat.table : dataFormat;
     }
 
+    @Property
     public WebDataFormat getDataFormat() {
         return dataFormat;
     }
