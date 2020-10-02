@@ -947,7 +947,7 @@ export type GetConnectionAccessQuery = { subjects: Array<Pick<AdminConnectionGra
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetConnectionsQuery = { connections: Array<(
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   )> };
 
@@ -970,7 +970,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
 }>;
 
 export type UpdateConnectionConfigurationQuery = { connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   ) };
 
@@ -978,7 +978,7 @@ export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type CloseConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> };
 
 export type ConnectionAuthPropertiesQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -990,19 +990,19 @@ export type ConnectionInfoQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export type ConnectionInfoQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type ConnectionInfoQuery = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> };
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type CreateConnectionMutation = { createConnection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> };
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
 }>;
 
-export type CreateConnectionFromTemplateMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type CreateConnectionFromTemplateMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> };
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1041,7 +1041,7 @@ export type InitConnectionMutationVariables = Exact<{
   credentials?: Maybe<Scalars['Object']>;
 }>;
 
-export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'> };
+export type InitConnectionMutation = { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> };
 
 export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -1049,7 +1049,7 @@ export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionCo
 
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
-export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> };
+export type GetTemplateConnectionsQuery = { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> };
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1115,6 +1115,7 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   contextId: Scalars['ID'];
   query: Scalars['String'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
 export type AsyncSqlExecuteQueryMutation = { taskInfo: (
@@ -1142,6 +1143,7 @@ export type ReadDataFromContainerMutationVariables = Exact<{
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
   filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 }>;
 
 export type ReadDataFromContainerMutation = { readDataFromContainer?: Maybe<(
@@ -1282,7 +1284,7 @@ export type OpenSessionMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type OpenSessionMutation = { session: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'readOnly' | 'features' | 'authNeeded' | 'authModel'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
   ) };
 
 export type ReadSessionLogQueryVariables = Exact<{
@@ -1307,7 +1309,7 @@ export type SessionStateQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type SessionStateQuery = { sessionState: (
     Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'features' | 'authNeeded' | 'authModel'>> }
+    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
   ) };
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never; }>;
@@ -1522,7 +1524,6 @@ export const GetConnectionsDocument = `
     databaseName
     url
     properties
-    features
     authNeeded
     authModel
     authProperties {
@@ -1530,6 +1531,8 @@ export const GetConnectionsDocument = `
       value
       features
     }
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1563,7 +1566,6 @@ export const UpdateConnectionConfigurationDocument = `
     databaseName
     url
     properties
-    features
     authNeeded
     authModel
     authProperties {
@@ -1571,6 +1573,8 @@ export const UpdateConnectionConfigurationDocument = `
       value
       features
     }
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1583,9 +1587,10 @@ export const CloseConnectionDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1615,9 +1620,10 @@ export const ConnectionInfoDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1630,9 +1636,10 @@ export const CreateConnectionDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1645,9 +1652,10 @@ export const CreateConnectionFromTemplateDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1730,9 +1738,10 @@ export const InitConnectionDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1750,9 +1759,10 @@ export const GetTemplateConnectionsDocument = `
     driverId
     connected
     readOnly
-    features
     authNeeded
     authModel
+    features
+    supportedDataFormats
   }
 }
     `;
@@ -1857,8 +1867,8 @@ export const GetAsyncTaskInfoDocument = `
 }
     `;
 export const AsyncSqlExecuteQueryDocument = `
-    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter) {
-  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter) {
+    mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter, dataFormat: $dataFormat) {
     id
     name
     running
@@ -1906,8 +1916,8 @@ export const GetSqlExecuteTaskResultsDocument = `
 }
     `;
 export const ReadDataFromContainerDocument = `
-    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter) {
-  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter) {
+    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter, dataFormat: $dataFormat) {
     duration
     statusMessage
     results {
@@ -2122,9 +2132,10 @@ export const OpenSessionDocument = `
       driverId
       connected
       readOnly
-      features
       authNeeded
       authModel
+      features
+      supportedDataFormats
     }
   }
 }
@@ -2187,9 +2198,10 @@ export const SessionStateDocument = `
       name
       driverId
       connected
-      features
       authNeeded
       authModel
+      features
+      supportedDataFormats
     }
   }
 }

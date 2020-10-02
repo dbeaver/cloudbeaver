@@ -6,19 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DataModelWrapper } from '@cloudbeaver/plugin-data-viewer';
+import { DataModelWrapper, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridTable } from './AgGridTable/AgGridTable';
 
 type Props = {
-  tableModel: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
   className?: string;
 }
 
 export function Spreadsheet({
-  tableModel,
+  model,
   className,
 }: Props) {
+  const deprecated = (model as DataModelWrapper).deprecatedModel;
 
-  return <AgGridTable tableModel={tableModel.deprecatedModel} className={className} />;
+  return <AgGridTable tableModel={deprecated} className={className} />;
 }

@@ -16,7 +16,7 @@ import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-type TableFooterMenuItemProps = ButtonHTMLAttributes<any> & {
+type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;
 };
 
@@ -60,7 +60,7 @@ export const tableFooterMenuStyles = composes(
 export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   menuItem,
   ...props
-}: TableFooterMenuItemProps) {
+}: Props) {
   const translate = useTranslate();
 
   if (!menuItem.panel) {

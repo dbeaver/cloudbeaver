@@ -7,7 +7,7 @@
  */
 
 import { IExtension } from '@cloudbeaver/core-extensions';
-import { Style } from '@cloudbeaver/core-theming';
+import { DynamicStyle } from '@cloudbeaver/core-theming';
 
 import { ITab } from './ITab';
 
@@ -16,7 +16,7 @@ export type TabHandlerTabProps<T = any> = {
   handler: TabHandler<T>;
   onSelect(tabId: string): void;
   onClose?(tabId: string): void;
-  style: Style[];
+  style: DynamicStyle | DynamicStyle[];
 }
 export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>
 

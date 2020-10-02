@@ -1,4 +1,3 @@
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 /*
  * cloudbeaver - Cloud Database Manager
  * Copyright (C) 2020 DBeaver Corp and others
@@ -7,12 +6,20 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
  * you may not use this file except in compliance with the License.
  */
 
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import { ITableViewerModelOptions, TableViewerModel } from './TableViewerModel';
 
-export class DataModelWrapper extends DatabaseDataModel<any, any> {
+const fetchingSettings = {
+  fetchMin: 1,
+  fetchMax: 5000,
+  fetchDefault: 200,
+};
+
+export class DataModelWrapper extends DatabaseDataModel<any> {
   /**
    * @deprecated Use getModel instead
    */
@@ -21,12 +28,13 @@ export class DataModelWrapper extends DatabaseDataModel<any, any> {
   constructor(
     commonDialogService: CommonDialogService,
     options: ITableViewerModelOptions,
-    source: IDatabaseDataSource<any, any>
+    source: IDatabaseDataSource<any>
   ) {
     super(source);
     if (options.tableId) {
       this.id = options.tableId;
     }
+    this.countGain = this.getDefaultRowsCount();
     this.deprecatedModel = new TableViewerModel(options, commonDialogService);
   }
 
@@ -34,15 +42,21 @@ export class DataModelWrapper extends DatabaseDataModel<any, any> {
     return this.deprecatedModel.isLoaderVisible || this.source.isLoading();
   }
 
-  setAccess(access: DatabaseDataAccessMode): this {
-    this.access = access;
-    this.deprecatedModel.access = access;
+  async refresh(): Promise<void> {
+    await this.deprecatedModel.refresh();
+    await this.requestData();
+  }
+
+  setCountGain(count: number): this {
+    const realCount = this.getDefaultRowsCount(count);
+    this.countGain = realCount;
+    this.deprecatedModel.setChunkSize(realCount);
     return this;
   }
 
-  setSlice(offset: number, count: number): this {
-    this.source.setSlice(offset, count);
-    this.deprecatedModel.setChunkSize(count);
+  setAccess(access: DatabaseDataAccessMode): this {
+    this.access = access;
+    this.deprecatedModel.access = access;
     return this;
   }
 
@@ -53,5 +67,14 @@ export class DataModelWrapper extends DatabaseDataModel<any, any> {
 
   async requestData(): Promise<void> {
     this.results = await this.source.requestData(this.results);
+  }
+
+  private getDefaultRowsCount(count?: number) {
+    return count
+      ? Math.max(
+        fetchingSettings.fetchMin,
+        Math.min(count, fetchingSettings.fetchMax)
+      )
+      : fetchingSettings.fetchDefault;
   }
 }

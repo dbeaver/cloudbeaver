@@ -13,7 +13,7 @@ import { ObjectPagePanelProps } from './ObjectPage';
 export const DBObjectPagePanel = observer(function DBObjectPagePanel({
   tab,
   page,
-}: ObjectPagePanelProps) {
+}: ObjectPagePanelProps<unknown>) {
   const Panel = page.getPanelComponent();
   return <Panel tab={tab} page={page} />;
 });

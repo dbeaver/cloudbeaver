@@ -81,8 +81,8 @@ export const TableFooter = observer(function TableFooter({
       }
       const value = parseInt(ref.current.value, 10);
 
-      if (model.deprecatedModel.getChunkSize() !== value) {
-        model.deprecatedModel.setChunkSize(value);
+      if (model.countGain !== value) {
+        model.setCountGain(value);
       }
     },
     [model]
@@ -91,11 +91,11 @@ export const TableFooter = observer(function TableFooter({
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <IconButton type="button" name='reload' onClick={model.deprecatedModel.refresh} viewBox="0 0 16 16"/>
+        <IconButton type="button" name='reload' onClick={() => model.refresh()} viewBox="0 0 16 16"/>
       </reload>
       <count as="div">
         <SubmittingForm onSubmit={handleChange}>
-          <input type="number" value={model.deprecatedModel.getChunkSize()} ref={ref} onBlur={handleChange} {...use({ mod: 'surface' })} />
+          <input type="number" value={model.countGain} ref={ref} onBlur={handleChange} {...use({ mod: 'surface' })} />
         </SubmittingForm>
       </count>
       <TableFooterMenu model={model}/>

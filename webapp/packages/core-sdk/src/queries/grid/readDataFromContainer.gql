@@ -4,12 +4,14 @@ mutation readDataFromContainer(
     $contextId: ID!
     $containerNodePath: ID!
     $filter: SQLDataFilter
+    $dataFormat: ResultDataFormat
 ) {
     readDataFromContainer(
         connectionId: $connectionId
         contextId: $contextId
         containerNodePath: $containerNodePath
         filter: $filter
+        dataFormat: $dataFormat
     ) {
         duration
         statusMessage

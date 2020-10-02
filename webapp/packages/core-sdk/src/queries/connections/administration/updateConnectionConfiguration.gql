@@ -14,8 +14,6 @@ query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
     databaseName
     url
     properties
-    
-    features
 
     authNeeded
     authModel
@@ -24,5 +22,8 @@ query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
       value
       features
     }
+
+    features
+    supportedDataFormats
   }
 }

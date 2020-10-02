@@ -20,8 +20,8 @@ export const ObjectViewerTab = observer(function ObjectViewerTab({
 }: TabHandlerTabProps<IObjectViewerTabState>) {
   const { node } = useNode(tab.handlerState.objectId);
 
-  return styled(useStyles(...style))(
-    <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} >
+  return styled(useStyles(style))(
+    <Tab tabId={tab.id} onOpen={onSelect} onClose={onClose} style={style}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{node?.name || tab.handlerState.tabTitle}</TabTitle>
     </Tab>

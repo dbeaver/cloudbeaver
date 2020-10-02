@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab } from '@cloudbeaver/core-app';
@@ -46,6 +47,7 @@ type SqlResultPanelProps = {
 };
 
 export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit }: SqlResultPanelProps) {
+  const [presentationId, setPresentation] = useState('');
   const group = tab.handlerState.queryTabGroups.find(group => group.groupId === panelInit.groupId)!;
 
   const controller = useController(SqlResultPanelController, tab.id, panelInit, group);
@@ -77,7 +79,12 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
         </wrapper>
       )}
       {controller.state === EPanelState.TABLE_RESULT && (
-        <TableViewer tableId={controller.getTableId()}/>
+        <TableViewer
+          tableId={controller.getTableId()}
+          resultIndex={panelInit.indexInResultSet}
+          presentationId={presentationId}
+          onPresentationChange={setPresentation}
+        />
       )}
     </result-panel>
   );
