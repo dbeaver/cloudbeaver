@@ -24,6 +24,7 @@ type SnackbarProps = {
   disableShowDetails?: boolean;
   onClose?: () => void;
   onShowDetails?: () => void;
+  persistent?: boolean;
 }
 
 export function Snackbar({
@@ -33,6 +34,7 @@ export function Snackbar({
   disableShowDetails,
   onClose,
   onShowDetails,
+  persistent,
 }: SnackbarProps) {
   const styles = useStyles(SNACKBAR_STYLES);
   const [mounted, setMounted] = useState(false);

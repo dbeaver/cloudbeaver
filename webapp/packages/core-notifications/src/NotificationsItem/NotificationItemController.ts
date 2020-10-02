@@ -32,6 +32,9 @@ export class NotificationItemController implements IInitializableController {
     }
 
     if (notification.type !== ENotificationType.Error) {
+      if (notification.persistent) {
+        return;
+      }
       this.closeAfter = FadeTimeout;
     }
   }

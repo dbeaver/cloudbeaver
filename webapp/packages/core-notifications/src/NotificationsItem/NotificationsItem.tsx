@@ -26,13 +26,14 @@ export const NotificationsItem = observer(function Notification({ notification }
 
   if (notification.customComponent) {
     const Custom = notification.customComponent();
-    return <Custom notification={notification} onClose={controller.handleClose} />;
+    return <Custom notification={notification} onClose={controller.handleClose} {...notification.extraProps} />;
   }
 
   return (
     <Snackbar
       text={notification.title}
       type={notification.type}
+      persistent={notification.persistent}
       disableShowDetails={controller.isDetailsDialogOpen}
       onClose={controller.handleClose}
       onShowDetails={controller.handleShowDetails}

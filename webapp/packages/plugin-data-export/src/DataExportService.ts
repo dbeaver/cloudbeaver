@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { DataTransferParameters } from '@cloudbeaver/core-sdk';
 
 import { DataExportProcessService } from './DataExportProcessService';
@@ -48,7 +48,7 @@ export class DataExportService {
       parameters
     );
 
-    this.notificationService.customNotification(() => ExportNotification, taskId);
+    this.notificationService.customNotification(ENotificationType.Custom, () => ExportNotification, {}, taskId);
     return taskId;
   }
 }
