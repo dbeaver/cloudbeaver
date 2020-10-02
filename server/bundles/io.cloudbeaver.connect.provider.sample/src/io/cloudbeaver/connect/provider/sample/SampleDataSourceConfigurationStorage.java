@@ -16,14 +16,13 @@
  */
 package io.cloudbeaver.connect.provider.sample;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -65,11 +64,11 @@ public class SampleDataSourceConfigurationStorage implements DBPDataSourceConfig
 
     @Override
     public List<? extends DBPDataSourceContainer> loadDataSources(DBPDataSourceRegistry registry, Map<String, Object> options) throws DBException {
-        IFolder metadataFolder = registry.getProject().getMetadataFolder(false);
+        File metadataFolder = registry.getProject().getMetadataFolder(false);
         if (metadataFolder.exists()) {
-            IFile sampleConfigFile = metadataFolder.getFile(SAMPLE_CONFIG_NAME);
+            File sampleConfigFile = new File(metadataFolder, SAMPLE_CONFIG_NAME);
             if (sampleConfigFile.exists()) {
-                log.debug("Loading provided connections from [" + sampleConfigFile.getFullPath().toString() + "]");
+                log.debug("Loading provided connections from [" + sampleConfigFile.getAbsolutePath() + "]");
                 List<? extends DBPDataSourceContainer> dsList = registry.loadDataSourcesFromFile(this, sampleConfigFile);
 //                for (DBPDataSourceContainer ds : dsList) {
 //                    log.debug("\tProvided connection: " + ds.getName());
