@@ -22,10 +22,11 @@ import {
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
 import { DataViewerTableService } from './DataViewerTableService';
+import { IDataViewerPageState } from './IDataViewerPageState';
 
 @injectable()
 export class DataViewerTabService {
-  page: ObjectPage;
+  page: ObjectPage<IDataViewerPageState>;
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,

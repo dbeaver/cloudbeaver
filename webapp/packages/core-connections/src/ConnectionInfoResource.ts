@@ -19,7 +19,19 @@ import {
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
 
-export type Connection = Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'connected' | 'readOnly' | 'driverId' | 'features' | 'authModel' | 'authNeeded'> & { authProperties?: ObjectPropertyInfo[] }
+export type Connection = Pick<
+  ConnectionInfo,
+  'id' |
+  'name' |
+  'description' |
+  'connected' |
+  'readOnly' |
+  'driverId' |
+  'authModel' |
+  'authNeeded' |
+  'features' |
+  'supportedDataFormats'
+> & { authProperties?: ObjectPropertyInfo[] }
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {

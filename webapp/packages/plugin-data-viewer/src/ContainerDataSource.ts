@@ -50,19 +50,23 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
       },
+      dataFormat: this.dataFormat,
     });
 
     this.requestInfo = {
       requestDuration: readDataFromContainer?.duration || 0,
       requestMessage: readDataFromContainer?.statusMessage || '',
     };
+    if (!readDataFromContainer?.results) {
+      return prevResults;
+    }
 
-    return readDataFromContainer?.results.map<IDataContainerResult>(result => ({
-      id: result.resultSet!.id,
+    return readDataFromContainer.results.map<IDataContainerResult>(result => ({
+      id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
       loadedFully: (result.resultSet?.rows?.length || 0) < this.count || !result.resultSet?.hasMoreData,
       data: result.resultSet,
-    })) || prevResults;
+    }));
   }
 
   async save(

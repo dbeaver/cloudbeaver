@@ -16,41 +16,50 @@ import { ObjectPage, ObjectPageOptions, ObjectPageCallback } from './ObjectPage'
 
 @injectable()
 export class DBObjectPageService {
-  @observable pages = new Map<string, ObjectPage>();
+  @observable pages = new Map<string, ObjectPage<any>>();
 
-  @computed get orderedPages(): ObjectPage[] {
+  @computed get orderedPages(): ObjectPage<any>[] {
     return Array.from(this.pages.values())
       .sort(this.comparePages.bind(this));
   }
 
-  @action register(options: ObjectPageOptions): ObjectPage {
+  @action register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
     const objectPage = new ObjectPage(options);
     this.pages.set(options.key, objectPage);
     return objectPage;
   }
 
-  getPage(pageId: string): ObjectPage | undefined {
+  getPage<T>(pageId: string): ObjectPage<T> | undefined {
     return this.pages.get(pageId);
   }
 
-  trySwitchPage(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
+  getPageState<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>| string): T | undefined {
+    const pageKey = typeof page === 'string' ? page : page.key;
+
+    return tab.handlerState.pagesState.get(pageKey);
+  }
+
+  trySwitchPage<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T): boolean {
     const currentPage = this.getPage(tab.handlerState.pageId);
 
     if ((currentPage?.priority || 0) < page.priority) {
-      this.selectPage(tab, page);
+      this.selectPage(tab, page, state);
       return true;
     }
     return false;
   }
 
-  selectPage = async (tab: ITab<IObjectViewerTabState>, page: ObjectPage) => {
+  selectPage = async <T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T) => {
     tab.handlerState.pageId = page.key;
+    if (state !== undefined) {
+      tab.handlerState.pagesState.set(page.key, state);
+    }
     await this.callHandlerCallback(tab, page => page.onSelect);
   }
 
   async restorePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
     for (const page of this.pages.values()) {
-      if (page.onRestore && !page.onRestore(tab)) {
+      if (page.onRestore && !page.onRestore(tab, this.getPageState(tab, page))) {
         return false;
       }
     }
@@ -61,14 +70,14 @@ export class DBObjectPageService {
     await this.callHandlerCallback(tab, page => page.onClose);
   }
 
-  private async callHandlerCallback(
+  private async callHandlerCallback<T>(
     tab: ITab<IObjectViewerTabState>,
-    selector: (page: ObjectPage) => ObjectPageCallback | undefined
+    selector: (page: ObjectPage<T>) => ObjectPageCallback<T> | undefined
   ) {
     for (const page of this.pages.values()) {
       const callback = selector(page);
       if (callback) {
-        await callback.call(page, tab);
+        await callback.call(page, tab, this.getPageState(tab, page));
       }
     }
   }

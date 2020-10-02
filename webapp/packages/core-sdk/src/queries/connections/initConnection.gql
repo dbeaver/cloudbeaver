@@ -7,9 +7,10 @@ mutation initConnection($id: ID!, $credentials: Object) {
     connected
     readOnly
 
-    features
-
     authNeeded
     authModel
+
+    features
+    supportedDataFormats
   }
 }

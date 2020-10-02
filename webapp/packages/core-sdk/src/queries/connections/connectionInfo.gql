@@ -7,9 +7,10 @@ query connectionInfo($id: ID!) {
     connected
     readOnly
 
-    features
-
     authNeeded
     authModel
+
+    features
+    supportedDataFormats
   }
 }

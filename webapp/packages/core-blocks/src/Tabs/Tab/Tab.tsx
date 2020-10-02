@@ -10,15 +10,16 @@ import { useContext, useCallback, PropsWithChildren } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { Icon } from '../../Icons';
 import { TabsContext } from '../TabsContext';
 
-type TabProps = PropsWithChildren<{
+export type TabProps = PropsWithChildren<{
   tabId: string;
   disabled?: boolean;
   className?: string;
+  style?: DynamicStyle[] | DynamicStyle;
   onOpen?: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }>
@@ -28,6 +29,7 @@ export function Tab({
   disabled,
   className,
   children,
+  style,
   onOpen,
   onClose,
 }: TabProps) {
@@ -52,22 +54,26 @@ export function Tab({
     }
   }, [onClose, tabId]);
 
-  return styled(useStyles())(
-    <BaseTab
-      {...state.state}
-      id={tabId}
-      className={className}
-      onClick={handleOpen}
-      disabled={disabled}
-    >
-      <tab-container as='div'>
-        {children}
-        {onClose && (
-          <tab-action as="div" onClick={handleClose}>
-            <Icon name="cross-bold" viewBox="0 0 7 8"/>
-          </tab-action>
-        )}
-      </tab-container>
-    </BaseTab>
+  return styled(useStyles(style))(
+    <tab-outer as='div'>
+      <tab-inner as='div'>
+        <BaseTab
+          {...state.state}
+          id={tabId}
+          className={className}
+          onClick={handleOpen}
+          disabled={disabled}
+        >
+          <tab-container as='div'>
+            {children}
+            {onClose && (
+              <tab-action as="div" onClick={handleClose}>
+                <Icon name="cross-bold" viewBox="0 0 7 8"/>
+              </tab-action>
+            )}
+          </tab-container>
+        </BaseTab>
+      </tab-inner>
+    </tab-outer>
   );
 }

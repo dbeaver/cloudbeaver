@@ -26,6 +26,9 @@ import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +53,7 @@ public class WebSQLUtils {
                 if (dataFormat != WebDataFormat.document) {
                     return serializeDocumentValue((DBDDocument) dbValue);
                 } else {
-                    return new WebSQLDatabaseDocument(session, (DBDDocument) dbValue);
+                    return serializeDocumentValue(session, (DBDDocument) dbValue);
                 }
             } else if (dbValue instanceof DBDComplexValue) {
                 return serializeComplexValue(session, (DBDComplexValue)dbValue, dataFormat);
@@ -81,6 +84,24 @@ public class WebSQLUtils {
             return map;
         }
         return value.toString();
+    }
+
+    private static Map<String, Object> serializeDocumentValue(WebSession session, DBDDocument document) throws DBCException {
+        String documentData;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.serializeDocument(session.getProgressMonitor(), baos, StandardCharsets.UTF_8);
+            documentData = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new DBCException("Error serializing document", e);
+        }
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", document.getDocumentId());
+        map.put("contentType", document.getDocumentContentType());
+        map.put("properties", Collections.emptyMap());
+        map.put("data", documentData);
+        return map;
     }
 
     private static Object serializeContentValue(WebSession session, DBDContent value) throws DBCException {

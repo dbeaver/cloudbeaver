@@ -49,14 +49,16 @@ export class DataViewerTableService {
         saveChanges: this.saveChanges.bind(this),
       },
       new ContainerDataSource(this.graphQLService)
+        .setOptions({
+          connectionId,
+          containerNodePath,
+          constraints: [],
+          whereFilter: '',
+        })
+        .setSupportedDataFormats(connectionInfo.supportedDataFormats)
     )
       .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
-      .setOptions({
-        connectionId,
-        containerNodePath,
-        constraints: [],
-        whereFilter: '',
-      }).deprecatedModel;
+      .deprecatedModel;
   }
 
   private async createExecutionContext(

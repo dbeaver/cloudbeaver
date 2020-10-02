@@ -3,12 +3,14 @@ mutation asyncSqlExecuteQuery(
     $contextId: ID!
     $query: String!
     $filter: SQLDataFilter
+    $dataFormat: ResultDataFormat
 ) {
     taskInfo: asyncSqlExecuteQuery(
         connectionId: $connectionId
         contextId: $contextId
         sql: $query
         filter: $filter
+        dataFormat: $dataFormat
     ) {
         id
         name

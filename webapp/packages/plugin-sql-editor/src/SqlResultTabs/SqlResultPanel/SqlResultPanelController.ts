@@ -13,7 +13,9 @@ import { IDestructibleController, IInitializableController, injectable } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, GraphQLService, ServerInternalError } from '@cloudbeaver/core-sdk';
+import {
+  GQLError, GraphQLService, ResultDataFormat, ServerInternalError
+} from '@cloudbeaver/core-sdk';
 import { PromiseCancelledError } from '@cloudbeaver/core-utils';
 import {
   fetchingSettings,
@@ -116,14 +118,16 @@ implements IInitializableController, IDestructibleController {
             saveChanges: this.saveChanges.bind(this),
           },
           new QueryDataSource(this.sdk)
+            .setOptions({
+              connectionId: this.group.sqlQueryParams.connectionId,
+              sourceName: this.group.sqlQueryParams.query,
+              constraints: [],
+              whereFilter: '',
+              dataFormat: ResultDataFormat.Resultset,
+            })
         )
           .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
-          .setOptions({
-            connectionId: this.group.sqlQueryParams.connectionId,
-            sourceName: this.group.sqlQueryParams.query,
-            constraints: [],
-            whereFilter: '',
-          }).deprecatedModel;
+          .deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
         tableModel.setColumns(initialState.columns);

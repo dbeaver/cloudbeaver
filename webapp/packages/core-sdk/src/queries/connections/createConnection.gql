@@ -7,9 +7,10 @@ mutation createConnection($config: ConnectionConfig!) {
     connected
     readOnly
 
-    features
-
     authNeeded
     authModel
+
+    features
+    supportedDataFormats
   }
 }

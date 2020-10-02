@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import {
   NavigationTabsService,
   INodeNavigationData,
   ITab,
   TabHandler,
-  NavigationType,
   NodeManagerUtils,
   objectCatalogProvider,
   objectSchemaProvider,
@@ -115,12 +116,12 @@ export class ObjectViewerTabService {
       return this.dbObjectPageService.getPage(pageId);
     };
 
-    const trySwitchPage = (page: ObjectPage) => {
+    const trySwitchPage = <T>(page: ObjectPage<T>, state?: T) => {
       if (!tabInfo.tab) {
         return false;
       }
 
-      return this.dbObjectPageService.trySwitchPage(tabInfo.tab, page);
+      return this.dbObjectPageService.trySwitchPage(tabInfo.tab, page, state);
     };
 
     const isPageActive = (page: ObjectPage) => page === getPage();
@@ -280,9 +281,12 @@ export class ObjectViewerTabService {
       && typeof tab.handlerState.parentId === 'string'
       && Array.isArray(tab.handlerState.parents)
       && typeof tab.handlerState.objectId === 'string'
+      && typeof tab.handlerState.pagesState === 'object'
       && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
+      tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
+
       for (const nodeId of tab.handlerState.parents) {
         await this.navNodeManagerService.loadTree(nodeId);
       }

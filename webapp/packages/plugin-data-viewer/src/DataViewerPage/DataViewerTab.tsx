@@ -15,10 +15,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
 
+import { IDataViewerPageState } from '../IDataViewerPageState';
+
 export const DataViewerTab = observer(function DataViewerTab({
   tab, page, onSelect, style,
-}: ObjectPageTabProps) {
-  const styles = useStyles(...style);
+}: ObjectPageTabProps<IDataViewerPageState>) {
+  const styles = useStyles(style);
   const navNodeManagerService = useService(NavNodeManagerService);
 
   if (!navNodeManagerService.isNodeHasData(tab.handlerState.objectId)) {
@@ -26,7 +28,7 @@ export const DataViewerTab = observer(function DataViewerTab({
   }
 
   return styled(styles)(
-    <Tab tabId={page.key} onOpen={onSelect} >
+    <Tab tabId={page.key} onOpen={onSelect} style={style}>
       <TabIcon icon='/icons/grid.png' />
       <TabTitle>Data</TabTitle>
     </Tab>

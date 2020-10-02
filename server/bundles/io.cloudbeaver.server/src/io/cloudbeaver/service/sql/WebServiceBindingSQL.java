@@ -74,7 +74,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     getSQLContext(env),
                     env.getArgument("sql"),
                     getDataFilter(env),
-                    env.getArgument("dataFormat")))
+                    getDataFormat(env)))
             .dataFetcher("sqlResultClose", env ->
                 getService(env).closeResult(
                     getSQLContext(env),
@@ -85,14 +85,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     getSQLContext(env),
                     env.getArgument("containerNodePath"),
                     getDataFilter(env),
-                    env.getArgument("dataFormat")))
+                    getDataFormat(env)))
             .dataFetcher("updateResultsData", env ->
                 getService(env).updateResultsData(
                     getSQLContext(env),
                     env.getArgument("resultsId"),
                     env.getArgument("updateRow"),
                     env.getArgument("updateValues"),
-                    env.getArgument("dataFormat")))
+                    getDataFormat(env)))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),
@@ -100,18 +100,23 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     getResultsRow(env, "updatedRows"),
                     getResultsRow(env, "deletedRows"),
                     getResultsRow(env, "addedRows"),
-                    env.getArgument("dataFormat")))
+                    getDataFormat(env)))
             .dataFetcher("asyncSqlExecuteQuery", env ->
                 getService(env).asyncExecuteQuery(
                     getSQLContext(env),
                     env.getArgument("sql"),
                     getDataFilter(env),
-                    env.getArgument("dataFormat")
+                    getDataFormat(env)
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
                     getWebSession(env), env.getArgument("taskId")
                 ));
+    }
+
+    private WebDataFormat getDataFormat(DataFetchingEnvironment env) {
+        String dataFormat = env.getArgument("dataFormat");
+        return CommonUtils.valueOf(WebDataFormat.class, dataFormat, WebDataFormat.resultset);
     }
 
     public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {

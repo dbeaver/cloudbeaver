@@ -9,49 +9,52 @@
 import { observable } from 'mobx';
 
 import { ITab } from '@cloudbeaver/core-app';
-import { Style } from '@cloudbeaver/core-theming';
+import { DynamicStyle } from '@cloudbeaver/core-theming';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 
-export type ObjectPageTabProps = {
+export type ObjectPageTabProps<T = unknown> = {
   tab: ITab<IObjectViewerTabState>;
-  page: ObjectPage;
+  page: ObjectPage<T>;
   onSelect(): void;
-  style: Style[];
+  style: DynamicStyle | DynamicStyle[];
 }
-export type ObjectPageTabComponent = React.FunctionComponent<ObjectPageTabProps>
+export type ObjectPageTabComponent<T> = React.FunctionComponent<ObjectPageTabProps<T>>
 
-export type ObjectPagePanelProps = {
+export type ObjectPagePanelProps<T = unknown> = {
   tab: ITab<IObjectViewerTabState>;
-  page: ObjectPage;
+  page: ObjectPage<T>;
 }
-export type ObjectPagePanelComponent = React.FunctionComponent<ObjectPagePanelProps>
+export type ObjectPagePanelComponent<T> = React.FunctionComponent<ObjectPagePanelProps<T>>
 
-export type ObjectPageCallback = (tab: ITab<IObjectViewerTabState>) => Promise<void> | void
-export type ObjectPageRestoreCallback = (tab: ITab<IObjectViewerTabState>) => Promise<boolean> | boolean
+export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void
+export type ObjectPageRestoreCallback<T> = (
+  tab: ITab<IObjectViewerTabState>,
+  pageState: T
+) => Promise<boolean> | boolean
 
-export interface ObjectPageOptions {
+export interface ObjectPageOptions<T = unknown> {
   key: string;
   priority: number;
   order?: number;
-  getTabComponent(): ObjectPageTabComponent;
-  getPanelComponent(): ObjectPagePanelComponent;
-  onSelect?: ObjectPageCallback;
-  onClose?: ObjectPageCallback;
-  onRestore?: ObjectPageRestoreCallback;
+  getTabComponent(): ObjectPageTabComponent<T>;
+  getPanelComponent(): ObjectPagePanelComponent<T>;
+  onSelect?: ObjectPageCallback<T>;
+  onClose?: ObjectPageCallback<T>;
+  onRestore?: ObjectPageRestoreCallback<T>;
 }
 
-export class ObjectPage {
+export class ObjectPage<T = unknown> {
   key: string;
   priority: number;
   @observable order?: number;
-  getTabComponent: () => ObjectPageTabComponent;
-  getPanelComponent: () => ObjectPagePanelComponent;
-  onSelect?: ObjectPageCallback;
-  onClose?: ObjectPageCallback;
-  onRestore?: ObjectPageRestoreCallback;
+  getTabComponent: () => ObjectPageTabComponent<T>;
+  getPanelComponent: () => ObjectPagePanelComponent<T>;
+  onSelect?: ObjectPageCallback<T>;
+  onClose?: ObjectPageCallback<T>;
+  onRestore?: ObjectPageRestoreCallback<T>;
 
-  constructor(options: ObjectPageOptions) {
+  constructor(options: ObjectPageOptions<T>) {
     this.key = options.key;
     this.priority = options.priority;
     this.order = options.order;
@@ -60,5 +63,13 @@ export class ObjectPage {
     this.onSelect = options.onSelect;
     this.onClose = options.onClose;
     this.onRestore = options.onRestore;
+  }
+
+  getState(tab: ITab<IObjectViewerTabState>): T | undefined {
+    return tab.handlerState.pagesState.get(this.key);
+  }
+
+  setState(tab: ITab<IObjectViewerTabState>, state: T): void {
+    tab.handlerState.pagesState.set(this.key, state);
   }
 }

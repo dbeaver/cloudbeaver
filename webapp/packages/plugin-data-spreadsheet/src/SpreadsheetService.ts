@@ -7,6 +7,7 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
 import { Spreadsheet } from './Spreadsheet';
@@ -19,7 +20,11 @@ export class SpreadsheetService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.dataPresentationService.add({
-      component: Spreadsheet,
+      id: 'spreadsheet',
+      dataFormat: ResultDataFormat.Resultset,
+      getPresentationComponent: () => Spreadsheet,
+      title: 'Table',
+      icon: '/icons/grid.png',
     });
   }
 

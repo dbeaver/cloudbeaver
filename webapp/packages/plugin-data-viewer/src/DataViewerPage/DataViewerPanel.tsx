@@ -6,13 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
+import { useCallback } from 'react';
+
 import { ObjectPagePanelProps } from '@cloudbeaver/plugin-object-viewer';
 
+import { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewer } from '../TableViewer/TableViewer';
 
-export const DataViewerPanel = function DataViewerPanel({
+export const DataViewerPanel = observer(function DataViewerPanel({
   tab,
-}: ObjectPagePanelProps) {
+  page,
+}: ObjectPagePanelProps<IDataViewerPageState>) {
+  const pageState = page.getState(tab);
 
-  return <TableViewer tableId={tab.id}/>;
-};
+  const handlePresentationChange = useCallback((presentationId: string) => {
+    const pageState = page.getState(tab);
+
+    if (!pageState) {
+      page.setState(tab, {
+        presentationId,
+        resultIndex: 0,
+      });
+    } else {
+      pageState.presentationId = presentationId;
+    }
+  }, [page, tab]);
+
+  return <TableViewer
+    tableId={tab.id}
+    resultIndex={pageState?.resultIndex}
+    presentationId={pageState?.presentationId}
+    onPresentationChange={handlePresentationChange}
+  />;
+});
