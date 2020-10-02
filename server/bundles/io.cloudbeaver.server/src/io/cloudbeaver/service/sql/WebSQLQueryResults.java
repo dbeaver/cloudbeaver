@@ -62,9 +62,6 @@ public class WebSQLQueryResults {
 
     @Property
     public WebSQLQueryResultSet getResultSet() {
-        if (dataFormat == WebDataFormat.document) {
-            return null;
-        }
         return resultSet;
     }
 
