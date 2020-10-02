@@ -18,7 +18,7 @@ export const defaultRULocale = [
   ['block_properties_table_value', 'Значение'],
   ['block_properties_table_add', 'Добавить'],
   ['root_permission_denied', 'Отказано в доступе'],
-  ['app_root_session_expired_title', 'Сесстия истекла'],
+  ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],
   ['app_root_session_expired_reload', 'Перезагрузить'],
   ['app_shared_connectionMenu_connection', 'Подключение'],

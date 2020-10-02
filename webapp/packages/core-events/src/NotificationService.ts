@@ -52,20 +52,11 @@ export class NotificationService {
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
 
     if (filteredNotificationList.length > this.settings.settings.getValue('notificationsPool')) {
-      if (this.notificationList.get(this.notificationList.keys[0])?.persistent) {
-        if (this.maxPersistentAllow > 1) {
-          let i = 1;
-          while (this.notificationList.get(this.notificationList.keys[i])?.persistent) {
-            i++;
-          }
-          this.notificationList.remove(this.notificationList.keys[i]);
-          return;
-        }
-        this.notificationList.remove(this.notificationList.keys[1]);
-        return;
+      let i = 0;
+      while (this.notificationList.get(this.notificationList.keys[i])?.persistent) {
+        i++;
       }
-      this.notificationList.remove(this.notificationList.keys[0]);
-
+      this.notificationList.remove(this.notificationList.keys[i]);
     }
   }
 

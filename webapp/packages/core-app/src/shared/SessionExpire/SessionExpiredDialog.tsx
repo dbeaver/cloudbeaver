@@ -7,15 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
+import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper';
-import { DialogComponentProps } from '../CommonDialog/CommonDialogService';
 
 const styles = css`
   dialog-content {

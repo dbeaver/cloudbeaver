@@ -8,12 +8,14 @@
 
 import { Subject } from 'rxjs';
 
+import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import {
   GQLError, GraphQLService, EServerErrorCode
 } from '@cloudbeaver/core-sdk';
 
-import { CommonDialogService } from '../CommonDialog/CommonDialogService';
 import { SessionExpiredDialog } from './SessionExpiredDialog';
 
 @injectable()
@@ -23,6 +25,7 @@ export class SessionExpireService {
   onSessionExpire = new Subject();
   constructor(
     private graphQLService: GraphQLService,
+    private notificationService: NotificationService,
     private commonDialogService: CommonDialogService
   ) {
   }
@@ -40,7 +43,14 @@ export class SessionExpireService {
         && !this.isNotifiedAboutExpiredSession) {
         this.isNotifiedAboutExpiredSession = true;
         this.onSessionExpire.next();
-        await this.commonDialogService.open(SessionExpiredDialog, null);
+        try {
+          await this.commonDialogService.open(SessionExpiredDialog, null);
+        } finally {
+          this.notificationService.customNotification(ENotificationType.Error, () => ActionSnackbar, {
+            btnText: 'app_root_session_expired_reload',
+            onAction: () => location.reload(),
+          }, undefined, { title: 'app_root_session_expired_title', persistent: true });
+        }
       }
       throw exception;
     }

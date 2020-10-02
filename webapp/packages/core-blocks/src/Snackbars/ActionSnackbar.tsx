@@ -49,7 +49,7 @@ export function ActionSnackbar({ notification, onAction, btnText }: Notification
               onClick={onAction}
               disabled={false}
             >
-              {btnText}
+              {translate(btnText)}
             </Button>
           </actions>
         )}
