@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
 import org.jkiss.dbeaver.model.navigator.DBNContainer;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
@@ -50,6 +51,8 @@ import java.util.List;
 public class WebServiceNavigator implements DBWServiceNavigator {
     private static final List<WebNavigatorNodeInfo> EMPTY_NODE_LIST = Collections.emptyList();
 
+    public static final String ROOT_DATABASES = "databases";
+
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
         WebServiceUtils.checkServerConfigured();
@@ -57,11 +60,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
             DBNNode[] nodeChildren;
-            boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath);
+            boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
             if (isRootPath) {
-                nodeChildren = session.getDatabasesNode().getChildren(monitor);
+                DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+                nodeChildren = projectNode.getDatabases().getChildren(monitor);
                 // Inject extra nodes
-                List<DBNNode> extraNodes = session.getProjectNode().getExtraNodes();
+                List<DBNNode> extraNodes = projectNode.getExtraNodes();
                 if (!extraNodes.isEmpty()) {
                     nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
                 }

@@ -38,16 +38,20 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.ProjectMetadata;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -88,9 +92,8 @@ public class WebSession implements DBASession {
     private final Map<String, Function<Object,Object>> attributeDisposers = new HashMap<>();
 
     private DBNModel navigatorModel;
-    private DBNProjectDatabases databases;
     private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private DBNProject projectNode;
+    private ProjectMetadata sessionProject;
 
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
@@ -110,6 +113,7 @@ public class WebSession implements DBASession {
         initNavigatorModel();
     }
 
+    @NotNull
     @Property
     public String getSessionId() {
         return id;
@@ -118,6 +122,12 @@ public class WebSession implements DBASession {
     @Override
     public boolean isApplicationSession() {
         return false;
+    }
+
+    @NotNull
+    @Override
+    public DBPProject getSingletonProject() {
+        return sessionProject;
     }
 
     @Property
@@ -190,15 +200,41 @@ public class WebSession implements DBASession {
 
     private void initNavigatorModel() {
         CBPlatform platform = CBPlatform.getInstance();
+
+        String projectName;
+        File porojectsRoot;
+        if (user != null) {
+            projectName = user.getUserId();
+            porojectsRoot = new File(platform.getWorkspace().getAbsolutePath(), "user-projects");
+        } else {
+            projectName = getSessionId();
+            porojectsRoot = new File(platform.getWorkspace().getAbsolutePath(), "session-projects");
+        }
+        sessionProject = new ProjectMetadata(
+            platform.getWorkspace(),
+            projectName,
+            new File(porojectsRoot, projectName));
+        if (user == null) {
+            sessionProject.setInMemory(true);
+        }
+        DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
+        {
+            // Copy global datasources.
+            for (DBPDataSourceContainer ds : platform.getWorkspace().getActiveProject().getDataSourceRegistry().getDataSources()) {
+                if (!ds.isTemplate()) {
+                    DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
+                    dsCopy.setTemporary(true);
+                    dataSourceRegistry.addDataSource(dsCopy);
+                }
+            }
+        }
+
         this.navigatorModel = new DBNModel(platform, this);
         // Add datasource filter (based on permissions)
         navigatorModel.addFilter(node ->
             !(node instanceof DBNDataSource) || isDataSourceAccessible(((DBNDataSource)node).getDataSourceContainer()));
         this.navigatorModel.initialize();
 
-        DBPProject project = platform.getWorkspace().getActiveProject();
-        this.projectNode = this.navigatorModel.getRoot().getProjectNode(project);
-        this.databases = projectNode.getDatabases();
         this.locale = Locale.getDefault().getLanguage();
 
         try {
@@ -212,7 +248,7 @@ public class WebSession implements DBASession {
 
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
-        DBPDataSourceRegistry registry = databases.getDataSourceRegistry();
+        DBPDataSourceRegistry registry = sessionProject.getDataSourceRegistry();
         registry.refreshConfig();
 
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
@@ -286,7 +322,6 @@ public class WebSession implements DBASession {
             this.navigatorModel.dispose();
             this.navigatorModel = null;
         }
-        this.databases = null;
     }
 
     private void refreshSessionAuth() {
@@ -322,18 +357,6 @@ public class WebSession implements DBASession {
 
     public DBNModel getNavigatorModel() {
         return navigatorModel;
-    }
-
-    public DBNProject getProjectNode() {
-        return projectNode;
-    }
-
-    public DBNProjectDatabases getDatabasesNode() {
-        return databases;
-    }
-
-    public DBNNode getNavigatorNodes() {
-        return databases;
     }
 
     /**
@@ -385,7 +408,7 @@ public class WebSession implements DBASession {
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = databases.getDataSourceRegistry().getDataSource(connectionID);
+            DBPDataSourceContainer dataSource = sessionProject.getDataSourceRegistry().getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -416,6 +439,10 @@ public class WebSession implements DBASession {
             resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
+        }
+        if (sessionProject != null) {
+            sessionProject.dispose();
+            sessionProject = null;
         }
     }
 
