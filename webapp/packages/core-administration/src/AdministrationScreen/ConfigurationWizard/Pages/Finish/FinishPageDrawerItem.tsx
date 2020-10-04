@@ -25,12 +25,12 @@ export const FinishPageDrawerItem = observer(function FinishPageDrawerItem({
   return styled(useStyles(...style))(
     <Tab
       tabId={item.name}
-      onOpen={() => onSelect(item.name)}
       disabled={disabled
         || (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
+      onOpen={() => onSelect(item.name)}
     >
-      <TabIcon icon='/icons/confirmation.svg' viewBox='0 0 16 16'/>
-      <TabTitle><Translate token='administration_configuration_wizard_finish'/></TabTitle>
+      <TabIcon icon='/icons/confirmation.svg' viewBox='0 0 16 16' />
+      <TabTitle><Translate token='administration_configuration_wizard_finish' /></TabTitle>
     </Tab>
   );
 });

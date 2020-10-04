@@ -21,5 +21,5 @@ export const Logo = observer(function Logo() {
 
   const title = `Frontend: ${version}\nBackend: ${serverService.config.data?.version}`;
 
-  return <AppLogo title={title} onClick={() => screenService.navigateToRoot()}/>;
+  return <AppLogo title={title} onClick={() => screenService.navigateToRoot()} />;
 });

@@ -38,6 +38,6 @@ export const TableItemSelect = observer(function TableItemSelect({ checked, disa
   }
 
   return styled(styles)(
-    <input type='checkbox' checked={checked || context.isSelected()} onClick={handleClick} className={className} disabled={context.selectDisabled || disabled}/>
+    <input type='checkbox' checked={checked || context.isSelected()} className={className} disabled={context.selectDisabled || disabled} onClick={handleClick} />
   );
 });

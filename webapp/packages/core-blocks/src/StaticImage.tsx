@@ -29,5 +29,5 @@ export function StaticImage({
 
   const url = icon[0] === '/' ? icon : `${staticEndpoint}/images/${icon}`;
 
-  return <img className={className} src={url} title={title} onClick={onClick}/>;
+  return <img className={className} src={url} title={title} onClick={onClick} />;
 }

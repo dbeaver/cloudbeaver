@@ -10,7 +10,7 @@ import { ValueToken } from './InjectionToken';
 import { ITypedConstructor } from './ITypedConstructor';
 
 export interface IServiceCollection {
-  addServiceByToken<T extends object>(token: any, value: T): void;
+  addServiceByToken<T extends Record<string, any>>(token: any, value: T): void;
   addServiceByClass(ctor: IServiceConstructor<any>): void;
 }
 

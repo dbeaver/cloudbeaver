@@ -27,5 +27,5 @@ export const TabHandlerTab = observer(function TabHandlerTab({
   const handler = useTabHandler(tab.handlerId);
 
   const TabHandlerTab = handler.getTabComponent();
-  return <TabHandlerTab tab={tab} handler={handler} onSelect={onSelect} onClose={onClose} style={style} />;
+  return <TabHandlerTab tab={tab} handler={handler} style={style} onSelect={onSelect} onClose={onClose} />;
 });

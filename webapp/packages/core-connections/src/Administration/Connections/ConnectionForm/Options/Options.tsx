@@ -94,10 +94,10 @@ export const Options = observer(function Options({
               items={controller.drivers}
               keySelector={driver => driver.id}
               valueSelector={driver => driver?.name ?? ''}
-              onSelect={controller.onSelectDriver}
               readOnly={model.editing || controller.drivers.length < 2}
-              mod={'surface'}
+              mod="surface"
               disabled={disabled}
+              onSelect={controller.onSelectDriver}
             >
               {translate('connections_connection_driver')}
             </Combobox>

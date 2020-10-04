@@ -18,9 +18,9 @@ export function WelcomeDrawerItem({
   item, onSelect, style, disabled,
 }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
-    <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
-      <TabIcon icon='/icons/welcome_bold.svg' viewBox='0 0 16 16'/>
-      <TabTitle><Translate token='administration_configuration_wizard_welcome'/></TabTitle>
+    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
+      <TabIcon icon='/icons/welcome_bold.svg' viewBox='0 0 16 16' />
+      <TabTitle><Translate token='administration_configuration_wizard_welcome' /></TabTitle>
     </Tab>
   );
 }

@@ -9,5 +9,5 @@
 import { Pane as BasePane, PaneProps } from 'go-split';
 
 export function Pane(props: PaneProps) {
-  return <BasePane {...props}/>;
+  return <BasePane {...props} />;
 }

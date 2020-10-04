@@ -26,7 +26,7 @@ export function ListItem({
   const styles = useContext(Styles);
 
   return styled(useStyles(...styles))(
-    <list-item as="div" onClick={onClick} className={className}>
+    <list-item as="div" className={className} onClick={onClick}>
       {children}
     </list-item>
   );

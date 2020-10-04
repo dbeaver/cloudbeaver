@@ -51,7 +51,7 @@ export const TableItemExpand = observer(function TableItemExpand({
 
   return styled(styles)(
     <table-item-expand-box as='div' className={className} onClick={handleClick}>
-      <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })}/>
+      <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
     </table-item-expand-box>
   );
 });

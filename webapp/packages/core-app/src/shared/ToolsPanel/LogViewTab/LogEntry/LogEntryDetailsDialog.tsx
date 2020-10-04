@@ -39,7 +39,7 @@ export const LogEntryDetailsDialog: DialogComponent<ILogEntry, null> = observer(
         <message as="div">
           {props.payload.message}
         </message>
-        <textarea value={props.payload.stackTrace} readOnly/>
+        <textarea value={props.payload.stackTrace} readOnly />
       </CommonDialogWrapper>
     );
   }

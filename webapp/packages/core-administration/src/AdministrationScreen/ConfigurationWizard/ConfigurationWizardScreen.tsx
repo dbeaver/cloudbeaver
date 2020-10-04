@@ -24,7 +24,7 @@ export const ConfigurationWizardScreen = observer(function ConfigurationWizardSc
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
   if (!usePermission(EAdminPermission.admin)) {
-    return <Translate token='root_permission_denied'/>;
+    return <Translate token='root_permission_denied' />;
   }
 
   const handleSelect = useCallback(
@@ -39,10 +39,10 @@ export const ConfigurationWizardScreen = observer(function ConfigurationWizardSc
     <>
       <WizardTopAppBar />
       <Administration
-        configurationWizard={true}
         activeItem={administrationScreenService.activeItem}
         activeItemSub={administrationScreenService.activeItemSub}
         activeItemSubParam={administrationScreenService.activeItemSubParam}
+        configurationWizard
         onItemSelect={handleSelect}
       >
         <WizardStepper />

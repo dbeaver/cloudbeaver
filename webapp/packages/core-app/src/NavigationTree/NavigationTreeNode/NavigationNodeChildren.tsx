@@ -33,7 +33,7 @@ export const NavigationNodeChildren = observer(function NavigationNodeChildren({
   return (
     <>
       {children.map(id => (
-        <NavigationNodeChild id={id} parentId={parentId} key={id} />
+        <NavigationNodeChild key={id} id={id} parentId={parentId} />
       ))}
     </>
   );

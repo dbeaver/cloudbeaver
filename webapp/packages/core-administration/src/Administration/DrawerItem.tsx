@@ -21,11 +21,13 @@ export const DrawerItem = observer(function DrawerItem({
 
   const disabled = configurationWizard && !configurationWizardService.isStepAvailable(item.name);
 
-  return <Component
-    item={item}
-    onSelect={onSelect}
-    configurationWizard={configurationWizard}
-    style={style}
-    disabled={disabled}
-  />;
+  return (
+    <Component
+      item={item}
+      configurationWizard={configurationWizard}
+      style={style}
+      disabled={disabled}
+      onSelect={onSelect}
+    />
+  );
 });

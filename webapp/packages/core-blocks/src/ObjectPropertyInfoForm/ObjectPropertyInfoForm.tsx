@@ -55,15 +55,15 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
   return styled(style)(
     <form-body as='div' className={className}>
       {properties.map(property => (
-        <group as="div" key={property.id}>
+        <group key={property.id} as="div">
           <InputField
             type={property.features.includes('password') ? 'password' : 'text'}
             name={property.id!}
             state={credentials}
-            onFocus={handleFocus}
             disabled={disabled}
             autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
             mod='surface'
+            onFocus={handleFocus}
           >
             {property.displayName}
           </InputField>

@@ -144,10 +144,10 @@ export const Radio: RadioType = observer(function Radio({
           onChange={handleChange}
         />
         <radio-background as="div">
-          <radio-outer-circle as="div"/>
-          <radio-inner-circle as="div"/>
+          <radio-outer-circle as="div" />
+          <radio-inner-circle as="div" />
         </radio-background>
-        <radio-ripple as="div"/>
+        <radio-ripple as="div" />
       </radio>
       <label htmlFor={id}>{children}</label>
     </field>

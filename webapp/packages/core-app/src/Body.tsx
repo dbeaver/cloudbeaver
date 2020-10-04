@@ -37,7 +37,7 @@ export const Body = observer(function Body() {
   });
 
   return styled(useStyles(bodyStyles))(
-    <theme as="div" ref={ref}>
+    <theme ref={ref} as="div">
       {Screen && <Screen />}
       <DialogsPortal />
       <Notifications />

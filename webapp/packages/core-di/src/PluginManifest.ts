@@ -13,7 +13,7 @@ import {
 export interface PluginManifest {
   info: {
     name: string;
-    defaultSettings?: object;
+    defaultSettings?: Record<string, any>;
   };
 
   /**

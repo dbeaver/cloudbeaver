@@ -139,7 +139,7 @@ export const Switch: SwitchType = observer(function Switch({
       <field-label as="div">{children}</field-label>
       <switch-control as='div'>
         <switch-control-track as='div' />
-        <switch-control-underlay as='div' >
+        <switch-control-underlay as='div'>
           <switch-control-thumb as='div' />
           <switch-input
             as='input'
@@ -147,10 +147,10 @@ export const Switch: SwitchType = observer(function Switch({
             type="checkbox"
             id={id}
             role="switch"
-            onChange={handleChange}
             aria-checked={checked}
             checked={checked}
             disabled={disabled}
+            onChange={handleChange}
           />
         </switch-control-underlay>
       </switch-control>

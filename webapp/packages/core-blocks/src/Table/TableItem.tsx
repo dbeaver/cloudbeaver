@@ -79,9 +79,9 @@ export const TableItem = observer(function TableItem({
   return styled(styles)(
     <TableItemContext.Provider value={itemContext}>
       <tr
+        className={className}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        className={className}
         {...use({ selected: isSelected, expanded: isExpanded })}
       >
         {children}

@@ -21,9 +21,10 @@ export const ShadowInput = React.forwardRef(function ShadowInput({
 }: ShadowInputProps, ref: React.Ref<HTMLInputElement>) {
   return (
     <input
+      ref={ref}
       value={children}
       onChange={e => onChange && onChange(e.target.value)}
-      ref={ref}
-      {...rest}/>
+      {...rest}
+    />
   );
 });

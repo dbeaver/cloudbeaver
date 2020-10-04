@@ -33,7 +33,7 @@ export const MainMenu = observer(function MainMenu() {
   return styled(styles)(
     <menu-wrapper as="div">
       {mainMenuService.getMainMenu().map((topItem, i) => (
-        <TopMenuItem key={i} menuItem={topItem}/>
+        <TopMenuItem key={i} menuItem={topItem} />
       ))}
     </menu-wrapper>
   );

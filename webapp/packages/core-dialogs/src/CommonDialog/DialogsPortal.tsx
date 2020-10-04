@@ -86,7 +86,7 @@ function NestedDialog({
   return styled(styles)(
     <>
       <DialogBackdrop {...dialogState}>
-        <Dialog {...dialogState} >
+        <Dialog {...dialogState}>
           <DialogComponent
             payload={dialog.payload}
             options={dialog.options}

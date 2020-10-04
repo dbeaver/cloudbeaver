@@ -70,29 +70,29 @@ export const ConnectionAccess = observer(function ConnectionAccess({
 
   return styled(style)(
     <box as='div'>
-      <Table selectedItems={controller.selectedSubjects} onSelect={handleSelect} className={className}>
+      <Table selectedItems={controller.selectedSubjects} className={className} onSelect={handleSelect}>
         <TableHeader>
-          <TableColumnHeader min/>
+          <TableColumnHeader min />
           <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-          <TableColumnHeader></TableColumnHeader>
+          <TableColumnHeader />
         </TableHeader>
         <TableBody>
           {controller.roles.map(role => (
             <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled}/>
+                <TableItemSelect disabled={disabled} />
               </TableColumnValue>
               <TableColumnValue>{role.roleName}</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
+              <TableColumnValue />
             </TableItem>
           ))}
           {controller.users.map(user => (
             <TableItem key={user.userId} item={user.userId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled}/>
+                <TableItemSelect disabled={disabled} />
               </TableColumnValue>
               <TableColumnValue>{user.userId}</TableColumnValue>
-              <TableColumnValue></TableColumnValue>
+              <TableColumnValue />
             </TableItem>
           ))}
         </TableBody>

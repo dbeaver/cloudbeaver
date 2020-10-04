@@ -34,7 +34,7 @@ export const VerticalTabs = observer(function VerticalTabs({ tabContainer, style
           ))}
         </TabList>
         {tabContainer.tabs.map(tab => (
-          <VerticalTabPanel key={tab.tabId} tab={tab} style={style}/>
+          <VerticalTabPanel key={tab.tabId} tab={tab} style={style} />
         ))}
       </vertical-tabs>
     </TabsState>

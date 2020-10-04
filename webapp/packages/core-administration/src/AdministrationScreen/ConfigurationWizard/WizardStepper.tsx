@@ -70,8 +70,8 @@ export const WizardStepper = observer(function WizardStepper() {
         <Button
           type="button"
           mod={['outlined']}
-          onClick={() => service.back()}
           disabled={service.currentStepIndex === 0}
+          onClick={() => service.back()}
         >
           {translate('ui_stepper_back')}
         </Button>

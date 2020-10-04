@@ -53,16 +53,16 @@ export const ConnectionsTable = observer(function ConnectionsTable({
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min/>
-        <TableColumnHeader min/>
-        <TableColumnHeader min/>
+        <TableColumnHeader min />
+        <TableColumnHeader min />
+        <TableColumnHeader min />
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_template')}</TableColumnHeader>
-        <TableColumnHeader></TableColumnHeader>
+        <TableColumnHeader />
       </TableHeader>
       <TableBody>
-        {connections.map(connection => <Connection key={connection.id} connection={connection}/>)}
+        {connections.map(connection => <Connection key={connection.id} connection={connection} />)}
       </TableBody>
     </Table>
   );

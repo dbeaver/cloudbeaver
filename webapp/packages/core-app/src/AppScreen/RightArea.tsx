@@ -46,7 +46,7 @@ export const RightArea = observer(function RightArea() {
         <NavigationTabsBar />
       </Pane>
       {controller.isActive && <ResizerControls />}
-      <Pane main={true}>
+      <Pane main>
         <LogViewTab />
       </Pane>
     </Split>

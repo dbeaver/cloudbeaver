@@ -105,7 +105,7 @@ export const PropertiesTable = observer(function PropertiesTable({
           {translate('block_properties_table_value')}
         </properties-header-value>
         <properties-header-right as="div">
-          {onAdd && <Button type='button' mod={['outlined']} onClick={() => onAdd()}>{translate('block_properties_table_add')}</Button> }
+          {onAdd && <Button type='button' mod={['outlined']} onClick={() => onAdd()}>{translate('block_properties_table_add')}</Button>}
         </properties-header-right>
       </properties-header>
       <properties-list as="div">
@@ -114,10 +114,10 @@ export const PropertiesTable = observer(function PropertiesTable({
             key={property.id}
             property={property}
             value={state[property.key]}
+            error={!isKeyUnique(property.key)}
             onNameChange={changeName}
             onValueChange={changeValue}
             onRemove={removeProperty}
-            error={!isKeyUnique(property.key)}
           />
         ))}
       </properties-list>

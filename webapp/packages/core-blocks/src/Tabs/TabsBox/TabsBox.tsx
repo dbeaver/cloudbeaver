@@ -32,7 +32,7 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
 
   return styled(useStyles(...style))(
     <TabsState currentTabId={currentTabId}>
-      <tabs-box as="div" className={className} ref={ref} tabIndex={tabIndex}>
+      <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && (
           <tabs as="div">
             {tabs}

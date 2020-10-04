@@ -33,7 +33,8 @@ export const NavigationTreeNode = observer(function NavigationTreeNodeFn({
     <NavigationNode node={node} isLoaded={isLoaded} isLoading={isLoading} isOutdated={isOutdated}>
       <NavigationNodeChildren
         parentId={id}
-        component={NavigationTreeNode} />
+        component={NavigationTreeNode}
+      />
     </NavigationNode>
   );
 });

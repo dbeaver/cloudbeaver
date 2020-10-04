@@ -59,7 +59,7 @@ export const NavigationTree = observer(function NavigationTree() {
     if (nodeChildren.isLoading) {
       return styled(navigationTreeStyles)(
         <center as="div">
-          <tree as="div"><Loader/></tree>
+          <tree as="div"><Loader /></tree>
         </center>
       );
     }
@@ -68,7 +68,7 @@ export const NavigationTree = observer(function NavigationTree() {
       <center as="div">
         <tree as="div">
           <message as="div">
-            No connections.<br/>
+            No connections.<br />
             Use the top menu to setup connection to your database.
           </message>
         </tree>
@@ -77,9 +77,9 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   return styled(navigationTreeStyles)(
-    <tree as="div" tabIndex={0} ref={ref}>
+    <tree ref={ref} as="div" tabIndex={0}>
       {nodeChildren.children.map(id => (
-        <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH}/>
+        <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH} />
       ))}
     </tree>
   );

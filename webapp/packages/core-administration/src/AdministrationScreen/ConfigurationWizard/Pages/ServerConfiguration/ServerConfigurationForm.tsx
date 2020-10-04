@@ -70,7 +70,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
   }, [service]);
 
   return styled(useStyles(formStyles, boxStyles))(
-    <SubmittingForm onSubmit={onSave} name='server_config' ref={focusedRef}>
+    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={onSave}>
       <box as="div">
         <box-element as='div'>
           <group as="div">
@@ -135,9 +135,9 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               name="authenticationEnabled"
               state={serverConfig}
               description={translate('administration_configuration_wizard_configuration_authentication_description')}
-              onChange={onChange}
               mod={['primary']}
               long
+              onChange={onChange}
             >
               {translate('administration_configuration_wizard_configuration_authentication')}
             </Switch>

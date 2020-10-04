@@ -20,5 +20,5 @@ const allowedTags = ['h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul',
 const nonTextTags = ['title', 'style', 'script', 'textarea', 'noscript'];
 
 export function SanitizedHTML({ html }: SanitizedHTMLProps) {
-  return (<Sanitized html={html} allowedTags={allowedTags} nonTextTags={nonTextTags}/>);
+  return (<Sanitized html={html} allowedTags={allowedTags} nonTextTags={nonTextTags} />);
 }

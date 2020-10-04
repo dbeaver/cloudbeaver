@@ -58,13 +58,13 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
 
   return styled(style)(
     <TabsBox
+      ref={ref}
       currentTabId={navigation.currentTabId}
       tabs={navigation.tabIdList.map(tabId => (
-        <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} style={stylesArray}/>
+        <TabHandlerTab key={tabId} tabId={tabId} style={stylesArray} onSelect={handleSelect} onClose={handleClose} />
       ))}
       style={stylesArray}
       tabIndex={0}
-      ref={ref}
     >
       {navigation.tabIdList.map(tabId => (
         <TabPanel key={tabId} tabId={tabId}>
