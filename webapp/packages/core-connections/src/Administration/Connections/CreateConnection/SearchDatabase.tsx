@@ -37,10 +37,10 @@ export const SearchDatabase = observer(function SearchDatabase({
       databases={databases}
       hosts={hosts}
       disabled={disabled}
+      className={className}
       onSelect={onSelect}
       onChange={onChange}
       onSearch={onSearch}
-      className={className}
     />
   );
 });
