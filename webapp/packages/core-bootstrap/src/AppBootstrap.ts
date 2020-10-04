@@ -11,10 +11,9 @@ import {
   NavigationTabsService,
   NavigationTreeContextMenuService,
   LogViewerMenuService,
-  ConnectionSchemaManagerService,
+  ConnectionSchemaManagerService, SessionExpireService
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionExpireService } from '@cloudbeaver/core-dialogs';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ThemeService } from '@cloudbeaver/core-theming';
 

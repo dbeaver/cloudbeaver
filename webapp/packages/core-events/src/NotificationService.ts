@@ -12,51 +12,70 @@ import { OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
 import {
-  ENotificationType, INotification, INotificationOptions, NotificationComponent
+  ENotificationType, INotification, INotificationExtraProps, INotificationOptions, NotificationComponent
 } from './INotification';
 
 @injectable()
 export class NotificationService {
-  readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
+  // todo change to common new Map()
+  readonly notificationList = new OrderedMap<number, INotification<any, any>>(({ id }) => id);
   private notificationNextId = 0
 
   constructor(
     private settings: EventsSettingsService,
   ) {}
 
-  notify<T = never>(options: INotificationOptions<T>, type: ENotificationType) {
+  notify<TSource = never, TProps extends INotificationExtraProps<
+  TSource> = Record<string, any>>(
+    options: INotificationOptions<TSource, TProps>, type: ENotificationType
+  ) {
+    if (options.persistent) {
+      const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
+      if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
+        throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent notification`);
+      }
+    }
+
     const id = this.notificationNextId++;
 
-    const notification: INotification<T> = {
+    const notification: INotification<TSource, TProps> = {
       id,
       title: options.title,
       message: options.message,
       details: options.details,
       isSilent: !!options.isSilent,
       customComponent: options.customComponent,
-      source: options.source!,
+      extraProps: options.extraProps || {} as TProps,
+      persistent: options.persistent,
       type,
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
+
     this.notificationList.addValue(notification);
 
-    if (this.notificationList.values.length > this.settings.settings.getValue('notificationsPool')) {
-      this.notificationList.remove(this.notificationList.keys[0]);
+    const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
+
+    if (filteredNotificationList.length > this.settings.settings.getValue('notificationsPool')) {
+      let i = 0;
+      while (this.notificationList.get(this.notificationList.keys[i])?.persistent) {
+        i++;
+      }
+      this.notificationList.remove(this.notificationList.keys[i]);
     }
   }
 
-  customNotification<T = never>(
-    component: () => NotificationComponent<T>,
-    source?: T,
-    options?: INotificationOptions<T>
+  customNotification<TSource = never, TProps extends INotificationExtraProps<TSource> = Record<string, any>>(
+    component: () => NotificationComponent<TSource, TProps>,
+    props?: TProps & INotificationExtraProps<TSource>,
+    options?: INotificationOptions<TSource, TProps> & { type?: ENotificationType; }
   ) {
     this.notify({
       title: '',
       ...options,
       customComponent: component,
-      source,
-    }, ENotificationType.Custom);
+      extraProps: props || {} as TProps,
+    }, options?.type ?? ENotificationType.Custom);
   }
 
   logInfo<T>(notification: INotificationOptions<T>) {

@@ -18,8 +18,10 @@ type IconProps = HTMLProps<HTMLDivElement> & {
 export function NotificationMark({ type, ...props }: IconProps) {
   return (
     <div {...props}>
+      {/* todo change to info icon */}
       {type === ENotificationType.Info && <CheckCircle />}
       {type === ENotificationType.Error && <Frown />}
+      {type === ENotificationType.Success && <CheckCircle />}
     </div>
   );
 }

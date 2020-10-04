@@ -26,7 +26,7 @@ export const NotificationsItem = observer(function Notification({ notification }
 
   if (notification.customComponent) {
     const Custom = notification.customComponent();
-    return <Custom notification={notification} onClose={controller.handleClose} />;
+    return <Custom notification={notification} onClose={controller.handleClose} {...notification.extraProps} />;
   }
 
   return (
@@ -34,9 +34,9 @@ export const NotificationsItem = observer(function Notification({ notification }
       text={notification.title}
       type={notification.type}
       disableShowDetails={controller.isDetailsDialogOpen}
+      closeAfter={controller.closeAfter}
       onClose={controller.handleClose}
       onShowDetails={controller.handleShowDetails}
-      closeAfter={controller.closeAfter}
     />
   );
 });

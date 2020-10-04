@@ -10,7 +10,7 @@ import { css } from 'reshadow';
 
 import { composes } from '@cloudbeaver/core-theming';
 
-export const SNACKBAR_STYLES = composes(
+export const SNACKBAR_COMMON_STYLES = composes(
   css`
     notification {
       composes: theme-background-surface theme-text-on-surface from global;

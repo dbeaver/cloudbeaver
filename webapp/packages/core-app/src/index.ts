@@ -21,6 +21,7 @@ export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
+export * from './shared/SessionExpire/SessionExpireService';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
 export * from './AppLocaleService';
