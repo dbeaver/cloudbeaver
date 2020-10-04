@@ -249,7 +249,7 @@ public class WebSession implements DBASession {
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         DBPDataSourceRegistry registry = sessionProject.getDataSourceRegistry();
-        registry.refreshConfig();
+        //registry.refreshConfig();
 
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isProvided()) {

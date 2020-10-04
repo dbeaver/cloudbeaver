@@ -248,7 +248,6 @@ public class WebServiceCore implements DBWServiceCore {
         if (CommonUtils.isEmpty(newDataSource.getName())) {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));
         }
-        ((DataSourceDescriptor)newDataSource).setTemporary(true);
         sessionRegistry.addDataSource(newDataSource);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -267,7 +266,6 @@ public class WebServiceCore implements DBWServiceCore {
 
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
-        ((DataSourceDescriptor)newDataSource).setTemporary(true);
 
         DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
