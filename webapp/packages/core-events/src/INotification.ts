@@ -17,19 +17,21 @@ export type INotificationExtraProps<T> = Record<string, any> & {
   source?: T;
 }
 
-export type NotificationComponentProps<TSource = undefined, TProps extends INotificationExtraProps<
-TSource> = Record<string, any>> = {
+export type NotificationComponentProps<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> = {
   notification: INotification<TSource, TProps>;
   onClose: () => void;
 }
 
 export type NotificationComponent<
   TSource = undefined,
-  TProps = Record<string, any>,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>,
 > = React.FunctionComponent<NotificationComponentProps<TSource> & TProps>
 
-export interface INotification<TSource = undefined, TProps extends INotificationExtraProps<
-TSource> = Record<string, any>> {
+export interface INotification<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
   readonly id: number;
   type: ENotificationType;
   title: string;
@@ -37,19 +39,20 @@ TSource> = Record<string, any>> {
   details?: string | Error;
   persistent?: boolean;
   isSilent: boolean;
+  extraProps: TProps;
   customComponent?: () => NotificationComponent<TSource, TProps>;
   close: () => void;
   showDetails: () => void;
-  extraProps?: TProps;
 }
 
-export interface INotificationOptions<TSource = undefined, TProps extends INotificationExtraProps<
-TSource> = Record<string, any>> {
+export interface INotificationOptions<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
   title: string;
   message?: string;
   details?: string | Error;
   isSilent?: boolean;
   persistent?: boolean;
-  customComponent?: () => NotificationComponent<TSource, TProps>;
   extraProps?: TProps;
+  customComponent?: () => NotificationComponent<TSource, TProps>;
 }

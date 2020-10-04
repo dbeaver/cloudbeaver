@@ -33,11 +33,10 @@ export const NotificationsItem = observer(function Notification({ notification }
     <Snackbar
       text={notification.title}
       type={notification.type}
-      persistent={notification.persistent}
       disableShowDetails={controller.isDetailsDialogOpen}
+      closeAfter={controller.closeAfter}
       onClose={controller.handleClose}
       onShowDetails={controller.handleShowDetails}
-      closeAfter={controller.closeAfter}
     />
   );
 });

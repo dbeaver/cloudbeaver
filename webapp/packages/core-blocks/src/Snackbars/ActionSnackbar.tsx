@@ -22,7 +22,9 @@ type ExtraProps = {
   actionText: string;
 }
 
-export function ActionSnackbar({ notification, onAction, actionText }: NotificationComponentProps & ExtraProps) {
+export const ActionSnackbar: React.FC<NotificationComponentProps & ExtraProps> = function ActionSnackbar({
+  notification, onAction, actionText,
+}) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
@@ -32,28 +34,25 @@ export function ActionSnackbar({ notification, onAction, actionText }: Notificat
   }, []);
 
   return styled(styles)(
-    <notification as="div" {...use({ mounted })} >
+    <notification as="div" {...use({ mounted })}>
       <notification-header as="div">
-        {notification.type && <NotificationMark type={notification.type} />}
+        <NotificationMark type={notification.type} />
         <message as="div">{translate(notification.title)}</message>
-        {!notification.persistent && notification.close && (
-          <IconButton onClick={notification.close} name="cross" viewBox="0 0 16 16" />
+        {!notification.persistent && (
+          <IconButton
+            name="cross"
+            viewBox="0 0 16 16"
+            onClick={notification.close}
+          />
         )}
       </notification-header>
       <notification-body as="div">
-        {onAction && actionText && (
-          <actions as="div">
-            <Button
-              type="button"
-              mod={['outlined']}
-              onClick={onAction}
-              disabled={false}
-            >
-              {translate(actionText)}
-            </Button>
-          </actions>
-        )}
+        <actions as="div">
+          <Button type="button" mod={['outlined']} onClick={onAction}>
+            {translate(actionText)}
+          </Button>
+        </actions>
       </notification-body>
     </notification>
   );
-}
+};

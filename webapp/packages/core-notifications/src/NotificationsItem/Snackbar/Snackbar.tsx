@@ -9,13 +9,12 @@
 import { useEffect, useState } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Button, IconButton } from '@cloudbeaver/core-blocks';
+import { Button, IconButton, SNACKBAR_COMMON_STYLES } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NotificationMark } from './NotificationMark';
-import { SNACKBAR_STYLES } from './styles';
 
 type SnackbarProps = {
   type?: ENotificationType;
@@ -24,7 +23,6 @@ type SnackbarProps = {
   disableShowDetails?: boolean;
   onClose?: () => void;
   onShowDetails?: () => void;
-  persistent?: boolean;
 }
 
 export function Snackbar({
@@ -34,9 +32,8 @@ export function Snackbar({
   disableShowDetails,
   onClose,
   onShowDetails,
-  persistent,
 }: SnackbarProps) {
-  const styles = useStyles(SNACKBAR_STYLES);
+  const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
   const translate = useTranslate();
@@ -62,12 +59,12 @@ export function Snackbar({
   }, []);
 
   return styled(styles)(
-    <notification as="div" {...use({ mounted, closing })} >
+    <notification as="div" {...use({ mounted, closing })}>
       <notification-header as="div">
         {type && <NotificationMark type={type} />}
         <message as="div">{translate(text)}</message>
         {!closeAfter && onClose && (
-          <IconButton onClick={onClose} name="cross" viewBox="0 0 16 16" />
+          <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
         )}
       </notification-header>
       <notification-body as="div">
@@ -76,8 +73,8 @@ export function Snackbar({
             <Button
               type="button"
               mod={['outlined']}
-              onClick={onShowDetails}
               disabled={disableShowDetails}
+              onClick={onShowDetails}
             >
               {translate('ui_errors_details')}
             </Button>

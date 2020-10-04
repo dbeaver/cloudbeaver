@@ -30,7 +30,7 @@ export class SessionExpireService {
   ) {
   }
 
-  subscribe() {
+  subscribe(): void {
     this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
   }
 

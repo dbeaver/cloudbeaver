@@ -44,10 +44,14 @@ export class NotificationService {
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
-    const persistent = this.notificationList.values.filter(value => value.persistent);
-    if (persistent.length >= this.settings.settings.getValue('maxPersistentAllow') && notification.persistent) {
-      throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent snackbars`);
+
+    if (notification.persistent) {
+      const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
+      if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
+        throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent notification`);
+      }
     }
+
     this.notificationList.addValue(notification);
 
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
@@ -61,8 +65,7 @@ export class NotificationService {
     }
   }
 
-  customNotification<TSource = never, TProps extends INotificationExtraProps<
-  TSource> = Record<string, any>>(
+  customNotification<TSource = never, TProps extends INotificationExtraProps<TSource> = Record<string, any>>(
     component: () => NotificationComponent<TSource, TProps>,
     props?: TProps & INotificationExtraProps<TSource>,
     options?: INotificationOptions<TSource, TProps> & { type?: ENotificationType; }

@@ -10,11 +10,12 @@ import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { Button, Loader, IconButton } from '@cloudbeaver/core-blocks';
+import {
+  Button, Loader, IconButton, SNACKBAR_COMMON_STYLES
+} from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { NotificationComponentProps } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { SNACKBAR_STYLES } from '@cloudbeaver/core-notifications';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
@@ -50,13 +51,13 @@ export const ExportNotification = observer(function ExportNotification({
     setMounted(true);
   }, []);
 
-  return styled(useStyles(SNACKBAR_STYLES, styles))(
-    <notification as="div" {...use({ mounted })} >
+  return styled(useStyles(SNACKBAR_COMMON_STYLES, styles))(
+    <notification as="div" {...use({ mounted })}>
       <notification-header as="div">
         <Loader loading={controller.isPending} hideMessage />
         <message as="div">{translate(controller.status)}</message>
         {!controller.isPending && (
-          <IconButton onClick={controller.delete} name="cross" viewBox="0 0 16 16" />
+          <IconButton name="cross" viewBox="0 0 16 16" onClick={controller.delete} />
         )}
       </notification-header>
       <notification-body as="div">
@@ -78,8 +79,8 @@ export const ExportNotification = observer(function ExportNotification({
                 tag='a'
                 href={controller.downloadUrl}
                 mod={['unelevated']}
-                onClick={controller.download}
                 download
+                onClick={controller.download}
               >
                 {translate('data_transfer_notification_download')}
               </Button>
@@ -89,8 +90,8 @@ export const ExportNotification = observer(function ExportNotification({
             <Button
               type="button"
               mod={['outlined']}
-              onClick={controller.showDetails}
               disabled={controller.isDetailsDialogOpen}
+              onClick={controller.showDetails}
             >
               {translate('ui_errors_details')}
             </Button>
@@ -99,8 +100,8 @@ export const ExportNotification = observer(function ExportNotification({
             <Button
               type="button"
               mod={['outlined']}
-              onClick={controller.cancel}
               disabled={controller.process?.getState() === EDeferredState.CANCELLING}
+              onClick={controller.cancel}
             >
               {translate('ui_processing_cancel')}
             </Button>
