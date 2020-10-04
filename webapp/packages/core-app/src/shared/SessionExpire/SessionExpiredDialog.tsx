@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
