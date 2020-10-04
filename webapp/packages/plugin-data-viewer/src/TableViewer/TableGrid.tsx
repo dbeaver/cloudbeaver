@@ -24,6 +24,7 @@ type TableGridProps = PropsWithChildren<{
 const styles = css`
   Presentation, error {
     flex: 1;
+    overflow: auto;
   }
   error {
     white-space: pre-wrap;

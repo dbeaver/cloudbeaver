@@ -27,15 +27,18 @@ const viewerStyles = css`
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   table-content {
     display: flex;
     flex: 1;
+    overflow: hidden;
   }
   table-data {
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: hidden;
   }
 `;
 

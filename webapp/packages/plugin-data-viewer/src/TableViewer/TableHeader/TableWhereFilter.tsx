@@ -11,10 +11,10 @@ import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import { SubmittingForm } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { ContainerDataSource } from '../../ContainerDataSource';
 import { DataModelWrapper } from '../DataModelWrapper';
 
 const styles = composes(
@@ -46,11 +46,12 @@ export const TableWhereFilter = observer(function TableWhereFilter({
   context,
 }: Props) {
   const translate = useTranslate();
-  const [filterValue, setValue] = useState(() => context.deprecatedModel.getQueryWhereFilter() || '');
+  const [filterValue, setValue] = useState(() => (context.source as ContainerDataSource).options?.whereFilter || '');
 
   const handleApply = useCallback(() => {
+    (context.source as ContainerDataSource).options!.whereFilter = filterValue;
     context.deprecatedModel.setQueryWhereFilter(filterValue);
-    context.deprecatedModel.refresh();
+    context.refresh();
   }, [context, filterValue]);
 
   const resetFilter = useCallback(
@@ -60,26 +61,25 @@ export const TableWhereFilter = observer(function TableWhereFilter({
       setValue('');
 
       if (applyNeeded) {
+        (context.source as ContainerDataSource).options!.whereFilter = '';
         context.deprecatedModel.setQueryWhereFilter('');
-        context.deprecatedModel.refresh();
+        context.refresh();
       }
     },
     [context, filterValue]
   );
 
   return styled(useStyles(styles))(
-    <SubmittingForm onSubmit={handleApply}>
-      <InlineEditor
-        name="data_where"
-        value={filterValue}
-        onSave={handleApply}
-        onUndo={resetFilter}
-        onChange={setValue}
-        placeholder={translate('table_header_sql_expression')}
-        controlsPosition='inside'
-        edited={!!filterValue}
-        simple
-      />
-    </SubmittingForm>
+    <InlineEditor
+      name="data_where"
+      value={filterValue}
+      onSave={handleApply}
+      onUndo={resetFilter}
+      onChange={setValue}
+      placeholder={translate('table_header_sql_expression')}
+      controlsPosition='inside'
+      edited={!!filterValue}
+      simple
+    />
   );
 });
