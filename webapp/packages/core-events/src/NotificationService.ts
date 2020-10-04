@@ -29,6 +29,13 @@ export class NotificationService {
   TSource> = Record<string, any>>(
     options: INotificationOptions<TSource, TProps>, type: ENotificationType
   ) {
+    if (options.persistent) {
+      const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
+      if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
+        throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent notification`);
+      }
+    }
+
     const id = this.notificationNextId++;
 
     const notification: INotification<TSource, TProps> = {
@@ -44,13 +51,6 @@ export class NotificationService {
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
-
-    if (notification.persistent) {
-      const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
-      if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
-        throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent notification`);
-      }
-    }
 
     this.notificationList.addValue(notification);
 
