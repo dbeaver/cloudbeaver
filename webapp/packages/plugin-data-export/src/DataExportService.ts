@@ -48,7 +48,7 @@ export class DataExportService {
       parameters
     );
 
-    this.notificationService.customNotification(ENotificationType.Custom, () => ExportNotification, {}, taskId);
+    this.notificationService.customNotification(() => ExportNotification, { source: taskId });
     return taskId;
   }
 }

@@ -12,23 +12,26 @@ import { OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
 import {
-  ENotificationType, INotification, INotificationOptions, NotificationComponent
+  ENotificationType, INotification, INotificationExtraProps, INotificationOptions, NotificationComponent
 } from './INotification';
 
 @injectable()
 export class NotificationService {
+  // todo change to common new Map()
   readonly notificationList = new OrderedMap<number, INotification<any, any>>(({ id }) => id);
   private notificationNextId = 0
-  private maxPersistentAllow = 1
 
   constructor(
     private settings: EventsSettingsService,
   ) {}
 
-  notify<T = never, TProps = Record<string, any>>(options: INotificationOptions<T, TProps>, type: ENotificationType) {
+  notify<TSource = never, TProps extends INotificationExtraProps<
+  TSource> = Record<string, any>>(
+    options: INotificationOptions<TSource, TProps>, type: ENotificationType
+  ) {
     const id = this.notificationNextId++;
 
-    const notification: INotification<T, TProps> = {
+    const notification: INotification<TSource, TProps> = {
       id,
       title: options.title,
       message: options.message,
@@ -36,16 +39,14 @@ export class NotificationService {
       isSilent: !!options.isSilent,
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
-      source: options.source!,
       persistent: options.persistent,
       type,
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
     };
     const persistent = this.notificationList.values.filter(value => value.persistent);
-    const persistentQty = persistent.length;
-    if (persistentQty >= this.maxPersistentAllow && notification.persistent) {
-      return;
+    if (persistent.length >= this.settings.settings.getValue('maxPersistentAllow') && notification.persistent) {
+      throw new Error(`You cannot create more than ${this.settings.settings.getValue('maxPersistentAllow')} persistent snackbars`);
     }
     this.notificationList.addValue(notification);
 
@@ -60,20 +61,18 @@ export class NotificationService {
     }
   }
 
-  customNotification<T = never, TProps = Record<string, any>>(
-    type: ENotificationType,
-    component: () => NotificationComponent<T, TProps>,
-    props?: TProps,
-    source?: T,
-    options?: INotificationOptions<T, TProps>
+  customNotification<TSource = never, TProps extends INotificationExtraProps<
+  TSource> = Record<string, any>>(
+    component: () => NotificationComponent<TSource, TProps>,
+    props?: TProps & INotificationExtraProps<TSource>,
+    options?: INotificationOptions<TSource, TProps> & { type?: ENotificationType; }
   ) {
     this.notify({
       title: '',
       ...options,
       customComponent: component,
       extraProps: props || {} as TProps,
-      source,
-    }, type);
+    }, options?.type ?? ENotificationType.Custom);
   }
 
   logInfo<T>(notification: INotificationOptions<T>) {

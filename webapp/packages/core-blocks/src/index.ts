@@ -32,5 +32,5 @@ export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './useClipboard';
 export * from './useFocus';
-export * from './Snackbars';
 export * from './BlocksLocaleService';
+export * from './Snackbars/ActionSnackbar';

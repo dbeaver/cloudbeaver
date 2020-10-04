@@ -46,10 +46,10 @@ export class SessionExpireService {
         try {
           await this.commonDialogService.open(SessionExpiredDialog, null);
         } finally {
-          this.notificationService.customNotification(ENotificationType.Error, () => ActionSnackbar, {
-            btnText: 'app_root_session_expired_reload',
+          this.notificationService.customNotification(() => ActionSnackbar, {
+            actionText: 'app_root_session_expired_reload',
             onAction: () => location.reload(),
-          }, undefined, { title: 'app_root_session_expired_title', persistent: true });
+          }, { title: 'app_root_session_expired_title', persistent: true, type: ENotificationType.Error });
         }
       }
       throw exception;

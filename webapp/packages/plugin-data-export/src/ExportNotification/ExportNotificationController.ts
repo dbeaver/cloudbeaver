@@ -35,7 +35,7 @@ export class ExportNotificationController implements IInitializableController {
   }
 
   get task() {
-    return this.dataExportProcessService.exportProcesses.get(this.notification.source);
+    return this.dataExportProcessService.exportProcesses.get(this.notification?.extraProps?.source);
   }
 
   get hasDetails() {
@@ -69,7 +69,7 @@ export class ExportNotificationController implements IInitializableController {
   }
 
   get downloadUrl() {
-    return this.dataExportProcessService.downloadUrl(this.notification.source);
+    return this.dataExportProcessService.downloadUrl(this.notification?.extraProps?.source);
   }
 
   private notification!: INotification<any>;
@@ -86,17 +86,17 @@ export class ExportNotificationController implements IInitializableController {
   }
 
   delete = () => {
-    this.dataExportProcessService.delete(this.notification.source);
+    this.dataExportProcessService.delete(this.notification?.extraProps?.source);
     this.notification.close();
   }
 
   download = () => {
-    this.dataExportProcessService.download(this.notification.source);
+    this.dataExportProcessService.download(this.notification?.extraProps?.source);
     this.notification.close();
   }
 
   cancel = () => {
-    this.dataExportProcessService.cancel(this.notification.source);
+    this.dataExportProcessService.cancel(this.notification?.extraProps?.source);
   }
 
   showDetails= async () => {

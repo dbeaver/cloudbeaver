@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Button, IconButton } from '@cloudbeaver/core-blocks';
-import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
+import { NotificationComponentProps } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { NotificationMark } from '@cloudbeaver/core-notifications';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -19,10 +19,10 @@ import { SNACKBAR_COMMON_STYLES } from './SnackbarCommonStyles';
 
 type ExtraProps = {
   onAction: () => void;
-  btnText: string;
+  actionText: string;
 }
 
-export function ActionSnackbar({ notification, onAction, btnText }: NotificationComponentProps & ExtraProps) {
+export function ActionSnackbar({ notification, onAction, actionText }: NotificationComponentProps & ExtraProps) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
@@ -41,7 +41,7 @@ export function ActionSnackbar({ notification, onAction, btnText }: Notification
         )}
       </notification-header>
       <notification-body as="div">
-        {onAction && btnText && (
+        {onAction && actionText && (
           <actions as="div">
             <Button
               type="button"
@@ -49,7 +49,7 @@ export function ActionSnackbar({ notification, onAction, btnText }: Notification
               onClick={onAction}
               disabled={false}
             >
-              {translate(btnText)}
+              {translate(actionText)}
             </Button>
           </actions>
         )}
