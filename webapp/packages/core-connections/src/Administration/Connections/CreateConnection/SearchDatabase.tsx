@@ -18,7 +18,7 @@ type Props = {
   disabled?: boolean;
   onSelect(database: AdminConnectionSearchInfo): void;
   onChange(hosts: string): void;
-  onSearch?(): void;
+  onSearch?(): Promise<void>;
   className?: string;
 }
 

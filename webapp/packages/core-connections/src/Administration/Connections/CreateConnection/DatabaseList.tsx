@@ -7,9 +7,12 @@
  */
 
 import { observer } from 'mobx-react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ItemListSearch, ItemList, SubmittingForm } from '@cloudbeaver/core-blocks';
+import {
+  ItemListSearch, ItemList, SubmittingForm, TextPlaceholder
+} from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
@@ -20,9 +23,6 @@ const styles = css`
     display: flex;
     flex-direction: column;
   }
-  center {
-    margin: auto;
-  }
 `;
 
 type Props = {
@@ -32,23 +32,34 @@ type Props = {
   className?: string;
   onSelect(database: AdminConnectionSearchInfo): void;
   onChange(hosts: string): void;
-  onSearch?(): void;
+  onSearch?(): Promise<void>;
 }
 
 export const DatabaseList = observer(function DatabaseList({
   databases, hosts, disabled, className, onSelect, onChange, onSearch,
 }: Props) {
   const translate = useTranslate();
+  const [isSearched, setIsSearched] = useState(false);
+
+  const searchHandler = useCallback(() => {
+    if (onSearch) {
+      onSearch().then(() => {
+        setIsSearched(true);
+      });
+    }
+  }, [onSearch]);
+
+  const placeholderMessage = isSearched ? 'ui_no_matches_placeholder' : 'connections_administration_search_database_tip';
 
   return styled(styles)(
     <SubmittingForm onSubmit={onSearch} className={className}>
       <ItemList>
-        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onChange={onChange} onSearch={onSearch} disabled={disabled}/>
+        <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} onChange={onChange} onSearch={searchHandler} disabled={disabled}/>
         {databases.map(database => (
           <Database key={database.host + database.port} database={database} onSelect={onSelect}/>
         ))}
       </ItemList>
-      {!databases.length && <center as='div'>{translate('connections_administration_search_database_tip')}</center>}
+      {!databases.length && <TextPlaceholder>{translate(placeholderMessage)}</TextPlaceholder>}
     </SubmittingForm>
   );
 });
