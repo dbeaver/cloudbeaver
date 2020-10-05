@@ -83,7 +83,7 @@ function NestedDialog({
   const DialogComponent = dialog.component;
 
   const backdropClickHandler = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (e.currentTarget.isEqualNode(e.target as HTMLElement)) {
+    if (!dialog.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
       rejectDialog(dialog);
     }
   };
