@@ -190,6 +190,9 @@ public class WebConnectionInfo {
         if (dataSourceContainer.isProvided()) {
             features.add("provided");
         }
+        if (dataSourceContainer.isManageable()) {
+            features.add("manageable");
+        }
 
         return features.toArray(new String[0]);
     }

@@ -209,6 +209,7 @@ public class WebSession implements DBASession {
             projectName = getSessionId();
             porojectsRoot = new File(platform.getWorkspace().getAbsolutePath(), "session-projects");
         }
+        projectName = CommonUtils.escapeFileName(projectName);
         sessionProject = new ProjectMetadata(
             platform.getWorkspace(),
             projectName,
