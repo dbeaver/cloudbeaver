@@ -91,10 +91,7 @@ function NestedDialog({
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
     <>
-      <DialogBackdrop
-        {...dialogState}
-        onClick={backdropClickHandler}
-      >
+      <DialogBackdrop {...dialogState} onClick={backdropClickHandler}>
         <Dialog {...dialogState} hideOnClickOutside={false}>
           <DialogComponent
             payload={dialog.payload}
