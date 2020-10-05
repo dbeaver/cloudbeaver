@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
@@ -221,7 +220,7 @@ public class WebSession implements DBASession {
         {
             // Copy global datasources.
             for (DBPDataSourceContainer ds : platform.getWorkspace().getActiveProject().getDataSourceRegistry().getDataSources()) {
-                if (!ds.isTemplate()) {
+                if (!ds.isTemplate() && isDataSourceAccessible(ds)) {
                     DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
                     dsCopy.setTemporary(true);
                     dataSourceRegistry.addDataSource(dsCopy);
@@ -230,9 +229,6 @@ public class WebSession implements DBASession {
         }
 
         this.navigatorModel = new DBNModel(platform, this);
-        // Add datasource filter (based on permissions)
-        navigatorModel.addFilter(node ->
-            !(node instanceof DBNDataSource) || isDataSourceAccessible(((DBNDataSource)node).getDataSourceContainer()));
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
@@ -249,15 +245,11 @@ public class WebSession implements DBASession {
         // Add all provided datasources to the session
         List<WebConnectionInfo> connList = new ArrayList<>();
         DBPDataSourceRegistry registry = sessionProject.getDataSourceRegistry();
-        //registry.refreshConfig();
 
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            if (ds.isProvided()) {
-                WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                connList.add(connectionInfo);
-            }
+            WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
+            connList.add(connectionInfo);
         }
-        filterAccessibleConnections(connList);
 
         // Add all provided datasources to the session
         synchronized (connections) {
