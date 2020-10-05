@@ -72,8 +72,8 @@ export class SqlResultTabsService {
 
     for (let [i, length] = [0, 1]; i < length; i++) {
       let resultTab = editorState.resultTabs.find(
-        resultTab => resultTab.groupId === tabGroup.groupId
-          && resultTab.indexInResultSet === i
+        resultTab => resultTab.groupId === tabGroup.groupId &&
+          resultTab.indexInResultSet === i
       );
 
       if (!resultTab) {
@@ -108,8 +108,8 @@ export class SqlResultTabsService {
           length = data.results?.length || 1;
           editorState.resultTabs = editorState.resultTabs
             .filter(
-              resultTab => resultTab.groupId !== tabGroup.groupId
-              || resultTab.indexInResultSet < length
+              resultTab => resultTab.groupId !== tabGroup.groupId ||
+              resultTab.indexInResultSet < length
             );
         } catch (exception) {
           // remove first panel if execution was cancelled

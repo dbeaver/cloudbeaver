@@ -203,6 +203,8 @@ export const ConnectionForm = observer(function ConnectionForm({
                   {(state) => {
                     if (state.selectedId === 'access') {
                       controller.loadAccessSubjects();
+                    } else {
+                      return null;
                     }
 
                     return (

@@ -65,8 +65,8 @@ export class NavigationTabsService {
         const map: IKeyValueMap<ITab> = {};
         for (const [key, value] of Object.entries(json as IKeyValueMap<ITab>)) {
           if (
-            typeof value.id === 'string'
-            && typeof value.handlerId === 'string'
+            typeof value.id === 'string' &&
+            typeof value.handlerId === 'string'
           ) {
             value.restored = false;
             map[key] = value;

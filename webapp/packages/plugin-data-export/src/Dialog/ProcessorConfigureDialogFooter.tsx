@@ -51,25 +51,25 @@ export const ProcessorConfigureDialogFooter = observer(
         <Button
           type="button"
           mod={['outlined']}
-          onClick={onBack}
           disabled={isExporting}
+          onClick={onBack}
         >
           {translate('ui_stepper_back')}
         </Button>
-        <fill as="div"/>
+        <fill as="div" />
         <Button
           type="button"
           mod={['outlined']}
-          onClick={onCancel}
           disabled={isExporting}
+          onClick={onCancel}
         >
           {translate('ui_processing_cancel')}
         </Button>
         <Button
           type="button"
           mod={['unelevated']}
-          onClick={onExport}
           disabled={isExporting}
+          onClick={onExport}
         >
           {translate('data_transfer_dialog_export')}
         </Button>

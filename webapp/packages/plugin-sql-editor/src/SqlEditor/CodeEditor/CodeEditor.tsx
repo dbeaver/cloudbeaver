@@ -39,7 +39,8 @@ export const CodeEditor = observer(function CodeEditor(props: CodeEditorProps) {
     <code-editor as="div" {...use({ readonly: props.readonly })} className={props.className}>
       <CodeMirror
         {...controller.bindings}
-        value={props.value || ''}/>
+        value={props.value || ''}
+      />
     </code-editor>
   );
 });

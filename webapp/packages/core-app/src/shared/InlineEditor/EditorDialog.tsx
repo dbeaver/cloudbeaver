@@ -37,11 +37,15 @@ const styles = css`
 `;
 
 export const EditorDialog: DialogComponent<string, string> = observer(
-  function EditorDialog(props: DialogComponentProps<string, string>) {
+  function EditorDialog({
+    payload,
+    resolveDialog,
+    rejectDialog,
+  }: DialogComponentProps<string, string>) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [value, setValue] = useState(props.payload);
+    const [value, setValue] = useState(payload);
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => setValue(event.target.value), []);
-    const handleApply = useCallback(() => props.resolveDialog(value), [value, props.resolveDialog]);
+    const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
     const translate = useTranslate();
 
     useEffect(() => {
@@ -56,12 +60,12 @@ export const EditorDialog: DialogComponent<string, string> = observer(
             <Button type="button" mod={['unelevated']} onClick={handleApply}>
               {translate('app_shared_inlineEditor_dialog_apply')}
             </Button>
-            <Button type="button" mod={['outlined']} onClick={props.rejectDialog}>
+            <Button type="button" mod={['outlined']} onClick={rejectDialog}>
               {translate('app_shared_inlineEditor_dialog_cancel')}
             </Button>
           </controls>
         )}
-        onReject={props.rejectDialog}
+        onReject={rejectDialog}
       >
         <textarea ref={textareaRef} value={value} onChange={handleChange} />
       </CommonDialogWrapper>

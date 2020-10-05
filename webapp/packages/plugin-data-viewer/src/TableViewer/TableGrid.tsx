@@ -43,7 +43,7 @@ export const TableGrid = observer(function TableGrid({
     return styled(styles)(
       <error as="div">
         {model.deprecatedModel.errorMessage}
-        <br/><br/>
+        <br /><br />
         {model.deprecatedModel.hasDetails && (
           <Button type='button' mod={['outlined']} onClick={model.deprecatedModel.onShowDetails}>
             {translate('ui_errors_details')}

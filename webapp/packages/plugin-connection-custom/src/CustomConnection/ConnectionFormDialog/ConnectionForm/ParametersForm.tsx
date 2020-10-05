@@ -29,15 +29,15 @@ export const ParametersForm = observer(function ParametersForm({
 
   return styled(useStyles(formStyles))(
     <>
-      { !embedded && (
+      {!embedded && (
         <group as="div">
           <InputField
             type="text"
             name="host"
             value={controller.config.host}
-            onChange={value => controller.onChange('host', value)}
             disabled={controller.isConnecting}
             mod='surface'
+            onChange={value => controller.onChange('host', value)}
           >
             {translate('customConnection_custom_host')}
             <sub-label as="div">{translate('customConnection_custom_obligatory')}</sub-label>
@@ -46,9 +46,9 @@ export const ParametersForm = observer(function ParametersForm({
             type="number"
             name="port"
             value={controller.config.port}
-            onChange={value => controller.onChange('port', value)}
             disabled={controller.isConnecting}
             mod='surface'
+            onChange={value => controller.onChange('port', value)}
           >
             {translate('customConnection_custom_port')}
           </InputField>
@@ -59,9 +59,9 @@ export const ParametersForm = observer(function ParametersForm({
           type="text"
           name="databaseName"
           value={controller.config.databaseName}
-          onChange={value => controller.onChange('databaseName', value)}
           disabled={controller.isConnecting}
           mod='surface'
+          onChange={value => controller.onChange('databaseName', value)}
         >
           {translate('customConnection_custom_database')}
         </InputField>

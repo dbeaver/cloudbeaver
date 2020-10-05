@@ -128,7 +128,7 @@ export class AdministrationScreenService {
   }
 
   isAdministrationRouteActive() {
-    return this.screenService.isActive(AdministrationScreenService.screenName)
-    || this.screenService.isActive(AdministrationScreenService.setupName);
+    return this.screenService.isActive(AdministrationScreenService.screenName) ||
+    this.screenService.isActive(AdministrationScreenService.setupName);
   }
 }

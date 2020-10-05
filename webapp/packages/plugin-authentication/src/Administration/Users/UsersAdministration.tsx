@@ -83,7 +83,7 @@ export const UsersAdministration = observer(function UsersAdministration({
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
           />
-          {controller.isLoading && <Loader overlay/>}
+          {controller.isLoading && <Loader overlay />}
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

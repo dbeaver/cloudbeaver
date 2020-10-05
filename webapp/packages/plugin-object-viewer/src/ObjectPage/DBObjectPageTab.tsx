@@ -27,5 +27,5 @@ export const DBObjectPageTab = observer(function DBObjectPageTab({
 }: DBObjectPageTabProps) {
   const handleSelect = useCallback(() => onSelect(tab, page), [tab, page, onSelect]);
   const TabComponent = page.getTabComponent();
-  return <TabComponent tab={tab} page={page} onSelect={handleSelect} style={style}/>;
+  return <TabComponent tab={tab} page={page} style={style} onSelect={handleSelect} />;
 });

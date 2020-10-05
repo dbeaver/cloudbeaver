@@ -29,7 +29,7 @@ export type DdlViewerTabPanelProps = {
   nodeId: string;
 }
 
-export const ddlViewer = (nodeId: string) => (<DdlViewerTabPanel nodeId={nodeId}/>);
+export const ddlViewer = (nodeId: string) => (<DdlViewerTabPanel nodeId={nodeId} />);
 
 const DdlViewerTabPanel = observer(function DdlViewerTabPanel(props: DdlViewerTabPanelProps) {
   const controller = useController(DdlViewerController, props.nodeId);
@@ -43,8 +43,9 @@ const DdlViewerTabPanel = observer(function DdlViewerTabPanel(props: DdlViewerTa
       {controller.metadata && (
         <CodeEditor
           value={controller.metadata}
-          readonly={true}
-          dialect={controller.dialect}/>
+          dialect={controller.dialect}
+          readonly
+        />
       )}
     </wrapper>
   );

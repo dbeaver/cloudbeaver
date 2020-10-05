@@ -54,10 +54,11 @@ export const Item = observer(function Item({
   const navNodeManagerService = useService(NavNodeManagerService);
   const { node } = useNode(objectId);
   const { dbObject } = useDatabaseObjectInfo(objectId);
+  const styles = useStyles(itemStyles);
   const handleOpen = useCallback(() => navNodeManagerService.navToNode(node!.id, node!.parentId), [node]);
 
   if (!node) {
-    return styled(useStyles(itemStyles))(
+    return styled(styles)(
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
@@ -77,7 +78,7 @@ export const Item = observer(function Item({
   }
 
   if (!dbObject?.properties) {
-    return styled(useStyles(itemStyles))(
+    return styled(styles)(
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
         <TableColumnValue>
@@ -90,7 +91,7 @@ export const Item = observer(function Item({
     );
   }
 
-  return styled(useStyles(itemStyles))(
+  return styled(styles)(
     <TableItem item={objectId}>
       <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
       <TableColumnValue>

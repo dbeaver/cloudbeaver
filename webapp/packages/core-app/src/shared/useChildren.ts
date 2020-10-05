@@ -11,7 +11,14 @@ import { useService } from '@cloudbeaver/core-di';
 import { ROOT_NODE_PATH } from './NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
 
-export function useChildren(navNodeId = ROOT_NODE_PATH) {
+type Hook = {
+  children: string[] | undefined;
+  isLoaded: boolean;
+  isLoading: boolean;
+  isOutdated: boolean;
+}
+
+export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
   const navTreeResource = useService(NavTreeResource);
   const children = navTreeResource.get(navNodeId);
   const isLoading = navTreeResource.isDataLoading(navNodeId);

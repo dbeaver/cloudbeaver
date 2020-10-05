@@ -20,14 +20,15 @@ import { AdministrationTopAppBar } from './AdministrationTopAppBar/Administratio
 
 export const AdministrationScreen = observer(function AdministrationScreen() {
   const administrationScreenService = useService(AdministrationScreenService);
-  if (!usePermission(EAdminPermission.admin)) {
-    return <Translate token='root_permission_denied' />;
-  }
 
   const handleSelect = useCallback(
     (item: string) => administrationScreenService.navigateToItem(item),
     [administrationScreenService]
   );
+  
+  if (!usePermission(EAdminPermission.admin)) {
+    return <Translate token='root_permission_denied' />;
+  }
 
   return (
     <>

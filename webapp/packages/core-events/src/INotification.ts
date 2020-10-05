@@ -29,9 +29,7 @@ export type NotificationComponent<
   TProps extends INotificationExtraProps<any> = INotificationExtraProps,
 > = React.FunctionComponent<NotificationComponentProps<TProps>>
 
-export interface INotification<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps
-> {
+export interface INotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   readonly id: number;
   type: ENotificationType;
   title: string;
@@ -45,8 +43,7 @@ export interface INotification<
   showDetails: () => void;
 }
 
-export interface INotificationOptions<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
+export interface INotificationOptions<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   title: string;
   message?: string;
   details?: string | Error;

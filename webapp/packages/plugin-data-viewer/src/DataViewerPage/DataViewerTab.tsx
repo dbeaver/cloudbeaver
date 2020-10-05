@@ -28,7 +28,7 @@ export const DataViewerTab = observer(function DataViewerTab({
   }
 
   return styled(styles)(
-    <Tab tabId={page.key} onOpen={onSelect} style={style}>
+    <Tab tabId={page.key} style={style} onOpen={onSelect}>
       <TabIcon icon='/icons/grid.png' />
       <TabTitle>Data</TabTitle>
     </Tab>

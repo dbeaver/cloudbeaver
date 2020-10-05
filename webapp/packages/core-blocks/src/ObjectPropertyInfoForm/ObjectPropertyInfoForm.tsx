@@ -36,21 +36,21 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
 }: Props) {
   const style = useStyles(formStyles);
 
-  if (!properties || properties.length === 0) {
-    return <TextPlaceholder>Properties empty</TextPlaceholder>;
-  }
-
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     if (e.target.type !== 'password') {
       return;
     }
 
-    const property = properties.find(property => property.id === e.target.name);
+    const property = properties?.find(property => property.id === e.target.name);
 
     if (property?.value === e.target.value) {
       credentials[e.target.name] = '';
     }
   }, [properties, credentials]);
+
+  if (!properties || properties.length === 0) {
+    return <TextPlaceholder>Properties empty</TextPlaceholder>;
+  }
 
   return styled(style)(
     <form-body as='div' className={className}>

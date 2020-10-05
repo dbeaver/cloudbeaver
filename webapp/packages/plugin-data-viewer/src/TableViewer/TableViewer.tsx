@@ -100,7 +100,7 @@ export const TableViewer = observer(function TableViewer({
           <TableFooter model={dataModel} />
         </table-data>
       </table-content>
-      <Loader loading={dataModel.isLoading()} overlay/>
+      <Loader loading={dataModel.isLoading()} overlay />
     </table-viewer>
   );
 });

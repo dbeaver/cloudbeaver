@@ -49,8 +49,8 @@ export class ConnectionDialogsService {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
 
-          return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
-            || !connection?.connected;
+          return !context.data.objectFeatures.includes(EObjectFeature.dataSource) ||
+            !connection?.connected;
         },
         title: 'app_shared_connectionMenu_disconnect',
         onClick: (context: IMenuContext<NavNode>) => {
@@ -72,8 +72,8 @@ export class ConnectionDialogsService {
           const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(context.data.id);
           const connection = this.connectionInfoResource.get(connectionId);
 
-          return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
-            || !connection?.features.includes(EConnectionFeature.temporary);
+          return !context.data.objectFeatures.includes(EObjectFeature.dataSource) ||
+            !connection?.features.includes(EConnectionFeature.temporary);
         },
         title: 'ui_delete',
         onClick: (context: IMenuContext<NavNode>) => {

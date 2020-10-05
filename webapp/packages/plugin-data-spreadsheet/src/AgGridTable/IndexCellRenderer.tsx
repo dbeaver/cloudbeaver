@@ -11,7 +11,7 @@ import { Loader } from '@cloudbeaver/core-blocks';
 export function IndexCellRenderer() {
   return (
     <div style={{ display: 'flex', width: '100%' }}>
-      <Loader small/>
+      <Loader small />
     </div>
   );
 }

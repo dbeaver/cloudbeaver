@@ -38,7 +38,7 @@ export const TemplateConnectionItem = observer(function TemplateConnectionItem({
 
   return styled(styles)(
     <ListItem onClick={select}>
-      <ListItemIcon><StaticImage icon={dbDriver?.icon}/></ListItemIcon>
+      <ListItemIcon><StaticImage icon={dbDriver?.icon} /></ListItemIcon>
       <ListItemName>{template.name}</ListItemName>
       <ListItemDescription title={template.description}>{template.description}</ListItemDescription>
     </ListItem>

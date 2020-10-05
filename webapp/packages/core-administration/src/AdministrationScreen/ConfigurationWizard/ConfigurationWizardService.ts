@@ -14,29 +14,30 @@ import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
+import { IAdministrationItem } from '../../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems';
 import { AdministrationScreenService } from '../AdministrationScreenService';
 
 @injectable()
 export class ConfigurationWizardService {
 
-  @computed get steps() {
+  @computed get steps(): IAdministrationItem[] {
     return this.administrationItemService.items
       .filter(filterConfigurationWizard(true))
       .sort(orderAdministrationItems);
   }
 
-  @computed get stepsToFinish() {
+  @computed get stepsToFinish(): IAdministrationItem[] {
     return this.steps.filter(step => step.configurationWizardOptions?.isDone);
   }
 
-  @computed get finishedSteps() {
+  @computed get finishedSteps(): IAdministrationItem[] {
     return this.steps.filter(step => (
       step.configurationWizardOptions?.isDone && step.configurationWizardOptions.isDone()
     ));
   }
 
-  @computed get currentStepIndex() {
+  @computed get currentStepIndex(): number {
     if (!this.currentStep) {
       return 0;
     }
@@ -44,10 +45,10 @@ export class ConfigurationWizardService {
     return this.steps.indexOf(this.currentStep) || 0;
   }
 
-  @computed get canFinish() {
+  @computed get canFinish(): boolean {
     return this.steps.every((step) => {
-      if (step.configurationWizardOptions?.isDone
-          && !step.configurationWizardOptions?.isDone()) {
+      if (step.configurationWizardOptions?.isDone &&
+          !step.configurationWizardOptions?.isDone()) {
         return false;
       }
 
@@ -55,7 +56,7 @@ export class ConfigurationWizardService {
     });
   }
 
-  @computed get nextStep() {
+  @computed get nextStep(): IAdministrationItem | undefined {
     return this.steps.find((item, index) => {
       if (index <= this.currentStepIndex) {
         return false;
@@ -69,7 +70,7 @@ export class ConfigurationWizardService {
     });
   }
 
-  @computed get currentStep() {
+  @computed get currentStep(): IAdministrationItem | undefined {
     return this.steps.find(step => step.name === this.administrationScreenService.activeItem);
   }
 
@@ -81,7 +82,7 @@ export class ConfigurationWizardService {
     private serverConfigResource: ServerConfigResource
   ) { }
 
-  isStepAvailable(name: string) {
+  isStepAvailable(name: string): boolean {
     if (this.currentStep?.name === name) {
       return true;
     }
@@ -99,7 +100,7 @@ export class ConfigurationWizardService {
     return false;
   }
 
-  async finishStep(name: string) {
+  async finishStep(name: string): Promise<boolean> {
     const step = this.getStep(name);
 
     if (!step) {
@@ -119,7 +120,7 @@ export class ConfigurationWizardService {
     return true;
   }
 
-  async next() {
+  async next(): Promise<void> {
     if (!this.currentStep) {
       return;
     }
@@ -140,7 +141,7 @@ export class ConfigurationWizardService {
     }
   }
 
-  back() {
+  back(): void {
     if (!this.currentStep) {
       return;
     }

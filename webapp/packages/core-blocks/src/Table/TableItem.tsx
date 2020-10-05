@@ -42,7 +42,7 @@ export const TableItem = observer(function TableItem({
   const styles = useStyles();
   const context = useContext(TableContext);
   if (!context) {
-    return null;
+    throw new Error('TableContext must be provided');
   }
 
   const itemContext = useMemo<ITableItemContext>(() => ({

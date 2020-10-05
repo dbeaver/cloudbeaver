@@ -14,35 +14,35 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { EDeferredState } from '@cloudbeaver/core-utils';
+import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
-import { DataExportProcessService } from '../DataExportProcessService';
+import { DataExportProcessService, ExportProcess } from '../DataExportProcessService';
 
 @injectable()
 export class ExportNotificationController implements IInitializableController {
   @observable isDetailsDialogOpen = false;
 
-  get isSuccess() {
+  get isSuccess(): boolean {
     return this.process?.getState() === EDeferredState.RESOLVED;
   }
 
-  get isPending() {
-    return this.process?.isInProgress;
+  get isPending(): boolean {
+    return !!this.process?.isInProgress;
   }
 
-  get process() {
+  get process(): Deferred<string> | undefined {
     return this.task?.process;
   }
 
-  get task() {
+  get task(): ExportProcess | undefined {
     return this.dataExportProcessService.exportProcesses.get(this.notification.extraProps.source);
   }
 
-  get hasDetails() {
+  get hasDetails(): boolean {
     return !!this.process?.getRejectionReason();
   }
 
-  @computed get sourceName() {
+  @computed get sourceName(): string {
     if (!this.task) {
       return '';
     }
@@ -55,7 +55,7 @@ export class ExportNotificationController implements IInitializableController {
     return this.localization.translate('data_transfer_exporting_sql');
   }
 
-  get status() {
+  get status(): string {
     switch (this.process?.getState()) {
       case EDeferredState.PENDING:
         return 'data_transfer_notification_preparation';
@@ -68,7 +68,7 @@ export class ExportNotificationController implements IInitializableController {
     }
   }
 
-  get downloadUrl() {
+  get downloadUrl(): string | undefined {
     return this.dataExportProcessService.downloadUrl(this.notification.extraProps.source);
   }
 
@@ -81,25 +81,25 @@ export class ExportNotificationController implements IInitializableController {
     private localization: LocalizationService,
   ) {}
 
-  init(notification: INotification<{ source: string }>) {
+  init(notification: INotification<{ source: string }>): void {
     this.notification = notification;
   }
 
-  delete = () => {
+  delete = (): void => {
     this.dataExportProcessService.delete(this.notification.extraProps.source);
     this.notification.close();
   }
 
-  download = () => {
+  download = (): void => {
     this.dataExportProcessService.download(this.notification.extraProps.source);
     this.notification.close();
   }
 
-  cancel = () => {
+  cancel = (): void => {
     this.dataExportProcessService.cancel(this.notification.extraProps.source);
   }
 
-  showDetails= async () => {
+  showDetails= async (): Promise<void> => {
     this.isDetailsDialogOpen = true;
     try {
       this.notification.showDetails();

@@ -104,15 +104,15 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
       >
         {orderedTabs.get().map(result => (
           <TabPanel key={result.resultTabId} tabId={result.resultTabId}>
-            <SqlResultPanel tab={tab} panelInit={result}/>
+            <SqlResultPanel tab={tab} panelInit={result} />
           </TabPanel>
         ))}
       </TabsBox>
       <Loader
         loading={executionState.isSqlExecuting}
         cancelDisabled={!executionState.canCancel}
-        onCancel={executionState.cancelSQlExecuting}
         overlay
+        onCancel={executionState.cancelSQlExecuting}
       />
     </wrapper>
   );

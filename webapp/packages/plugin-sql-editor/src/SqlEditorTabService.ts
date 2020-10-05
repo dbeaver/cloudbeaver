@@ -109,14 +109,14 @@ export class SqlEditorTabService {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
 
-    if (typeof tab.handlerState.query !== 'string'
-        || typeof tab.handlerState.connectionId !== 'string'
-        || typeof tab.handlerState.contextId !== 'string'
-        || typeof tab.handlerState.objectCatalogId !== 'string'
-        || typeof tab.handlerState.order !== 'number'
-        || !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId)
-        || !Array.isArray(tab.handlerState.queryTabGroups)
-        || !Array.isArray(tab.handlerState.resultTabs)
+    if (typeof tab.handlerState.query !== 'string' ||
+        typeof tab.handlerState.connectionId !== 'string' ||
+        typeof tab.handlerState.contextId !== 'string' ||
+        typeof tab.handlerState.objectCatalogId !== 'string' ||
+        typeof tab.handlerState.order !== 'number' ||
+        !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId) ||
+        !Array.isArray(tab.handlerState.queryTabGroups) ||
+        !Array.isArray(tab.handlerState.resultTabs)
     ) {
       return false;
     }

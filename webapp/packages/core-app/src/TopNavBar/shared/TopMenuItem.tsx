@@ -52,9 +52,10 @@ const buttonStyle = composes(
 
 export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [], ...props }: TopMenuItemProps) {
   const translate = useTranslate();
+  const styles = useStyles(!menuItem.panel ? buttonStyle : [...style, topMenuStyles]);
 
   if (!menuItem.panel) {
-    return styled(useStyles(buttonStyle))(
+    return styled(styles)(
       <Button
         as="button"
         {...props}
@@ -66,7 +67,7 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
     );
   }
 
-  return styled(useStyles(...style, topMenuStyles))(
+  return styled(styles)(
     <MenuTrigger
       {...props}
       panel={menuItem.panel}

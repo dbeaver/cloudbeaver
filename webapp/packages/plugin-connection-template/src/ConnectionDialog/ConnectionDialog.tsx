@@ -81,7 +81,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
         </center>
       ) : (
-        <SubmittingForm onSubmit={controller.onConnect} ref={focusedRef}>
+        <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
           <ObjectPropertyInfoForm
             autofillToken={`section-${controller.template?.id || ''} section-auth`}
             properties={controller.authModel.properties}

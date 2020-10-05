@@ -160,7 +160,7 @@ export const CreateConnection = observer(function CreateConnection({
     if (configurationWizard) {
       controller.search();
     }
-  }, [configurationWizard]);
+  }, [configurationWizard, controller]);
 
   const handleConnectionCancel = useCallback(() => {
     if (method === 'driver') {

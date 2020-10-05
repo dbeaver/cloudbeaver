@@ -35,8 +35,8 @@ export const TreeNodeMenu = observer(function TreeNodeMenu({
     [node]
   );
   const isHidden = useMemo(
-    () => computed(() => !menuPanel.menuItems.length
-      || menuPanel.menuItems.every(item => item.isHidden)),
+    () => computed(() => !menuPanel.menuItems.length ||
+      menuPanel.menuItems.every(item => item.isHidden)),
     [menuPanel]
   );
 

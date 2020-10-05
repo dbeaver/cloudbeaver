@@ -64,9 +64,9 @@ function NestedDialog({
   const dialogState = useDialogState({ visible });
   const styles = useStyles(dialogStyles);
 
-  if (!dialogState.visible
-    && dialogState.visible !== lastVisibility.current
-    && !dialog.options?.persistent
+  if (!dialogState.visible &&
+    dialogState.visible !== lastVisibility.current &&
+    !dialog.options?.persistent
   ) {
     rejectDialog(dialog);
   } else {

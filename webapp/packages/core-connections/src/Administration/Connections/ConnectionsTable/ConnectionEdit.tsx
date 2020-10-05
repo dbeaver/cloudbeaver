@@ -44,7 +44,7 @@ export const ConnectionEdit = observer(function ConnectionEdit({
   item,
 }: Props) {
   const tableContext = useContext(TableContext);
-  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
+  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
   const controller = useController(ConnectionEditController, item);
 
   return styled(useStyles(styles))(

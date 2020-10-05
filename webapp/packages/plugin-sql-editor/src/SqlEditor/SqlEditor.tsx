@@ -63,25 +63,29 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
     <sql-editor as="div" className={className}>
       <actions as="div">
         <button
+          disabled={controller.isActionsDisabled}
           onClick={controller.handleExecute}
-          disabled={controller.isActionsDisabled}>
+        >
           <StaticImage
             icon="/icons/sql_exec.png"
             title="Execute SQL Statement (Ctrl+Enter)"
           />
         </button>
         <button
+          disabled={controller.isActionsDisabled}
           onClick={controller.handleExecuteNewTab}
-          disabled={controller.isActionsDisabled}>
+        >
           <StaticImage
             icon="/icons/sql_exec_new.png"
-            title="Execute SQL in new tab (Ctrl+\\)(Shift+Ctrl+Enter)"/>
+            title="Execute SQL in new tab (Ctrl+\\)(Shift+Ctrl+Enter)"
+          />
         </button>
       </actions>
       <CodeEditor
         bindings={controller.bindings}
         dialect={controller.dialect}
-        value={controller.value} />
+        value={controller.value}
+      />
     </sql-editor>
   );
 });

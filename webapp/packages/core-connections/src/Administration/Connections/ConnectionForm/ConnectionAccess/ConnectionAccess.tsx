@@ -49,10 +49,6 @@ export const ConnectionAccess = observer(function ConnectionAccess({
   onChange,
   className,
 }: Props) {
-  if (!model.grantedSubjects) {
-    return null;
-  }
-
   const style = useStyles(styles);
   const controller = useController(Controller, model);
   const translate = useTranslate();
@@ -63,6 +59,10 @@ export const ConnectionAccess = observer(function ConnectionAccess({
       onChange();
     }
   }, [onChange, controller]);
+
+  if (!model.grantedSubjects) {
+    return null;
+  }
 
   if (controller.users.length === 0 && controller.roles.length) {
     return <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>;

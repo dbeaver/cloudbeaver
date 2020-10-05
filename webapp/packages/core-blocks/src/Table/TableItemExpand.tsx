@@ -31,7 +31,7 @@ export const TableItemExpand = observer(function TableItemExpand({
   const context = useContext(TableItemContext);
   const styles = useStyles();
   if (!context) {
-    return null;
+    throw new Error('TableContext must be provided');
   }
   const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     event.stopPropagation();

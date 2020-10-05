@@ -33,10 +33,12 @@ export const DataViewerPanel = observer(function DataViewerPanel({
     }
   }, [page, tab]);
 
-  return <TableViewer
-    tableId={tab.id}
-    resultIndex={pageState?.resultIndex}
-    presentationId={pageState?.presentationId}
-    onPresentationChange={handlePresentationChange}
-  />;
+  return (
+    <TableViewer
+      tableId={tab.id}
+      resultIndex={pageState?.resultIndex}
+      presentationId={pageState?.presentationId}
+      onPresentationChange={handlePresentationChange}
+    />
+  );
 });

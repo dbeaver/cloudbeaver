@@ -22,7 +22,7 @@ export class LogViewerService {
 
   @observable _isActive = false;
 
-  get isActive() {
+  get isActive(): boolean {
     return this._isActive;
   }
 
@@ -40,7 +40,7 @@ export class LogViewerService {
     this.permissionsService.onUpdate.subscribe(this.stopIfHasNoPermission.bind(this));
   }
 
-  toggle() {
+  toggle(): void {
     if (this._isActive) {
       this.stopLog();
     } else {
@@ -48,11 +48,11 @@ export class LogViewerService {
     }
   }
 
-  getLog() {
+  getLog(): ILogEntry[] {
     return this.log;
   }
 
-  async startLog() {
+  async startLog(): Promise<void> {
     if (this._isActive) {
       return;
     }
@@ -68,7 +68,7 @@ export class LogViewerService {
     }, refreshInterval);
   }
 
-  stopLog() {
+  stopLog(): void {
     if (this.interval) {
       clearInterval(this.interval);
       this.interval = null;
@@ -77,7 +77,7 @@ export class LogViewerService {
   }
 
   @action
-  clearLog() {
+  clearLog(): void {
     this.log = [];
   }
 

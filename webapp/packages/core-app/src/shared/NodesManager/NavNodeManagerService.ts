@@ -221,8 +221,8 @@ export class NavNodeManagerService extends Bootstrap {
       return false;
     }
 
-    return node.objectFeatures.includes(ENodeFeature.dataContainer)
-      || node.objectFeatures.includes(ENodeFeature.container);
+    return node.objectFeatures.includes(ENodeFeature.dataContainer) ||
+      node.objectFeatures.includes(ENodeFeature.container);
   }
 
   getNodeContainerInfo(nodeId: string): INodeContainerInfo {

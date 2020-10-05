@@ -42,8 +42,8 @@ export const DataExportDialog = observer(function DataExportDialog({
     <ProcessorSelectDialog
       context={payload}
       processors={controller.processors}
-      onSelect={controller.selectProcessor}
       isLoading={controller.isLoading}
+      onSelect={controller.selectProcessor}
       onClose={rejectDialog}
     />
   );

@@ -123,10 +123,12 @@ export function TableColumnHeader(props: HeaderProps) {
         <StaticImage icon={props.icon} />
       </icon>
       <name as="div">{props.displayName}</name>
-      {props.enableSorting && <sort-icon as="div" onClick={handleSort}>
-        <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'asc' })} />
-        <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'desc' })} />
-      </sort-icon>}
+      {props.enableSorting && (
+        <sort-icon as="div" onClick={handleSort}>
+          <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'asc' })} />
+          <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'desc' })} />
+        </sort-icon>
+      )}
     </table-header>
   );
 }

@@ -35,17 +35,19 @@ export const PresentationTab = observer(function PresentationTab({
   if (presentation.getTabComponent) {
     const Tab = presentation.getTabComponent();
 
-    return <Tab
-      tabId={presentation.id}
-      className={className}
-      style={verticalRotatedTabStyles}
-      model={model}
-      presentation={presentation}
-    />;
+    return (
+      <Tab
+        tabId={presentation.id}
+        className={className}
+        style={verticalRotatedTabStyles}
+        model={model}
+        presentation={presentation}
+      />
+    );
   }
   return styled(styles)(
     <Tab tabId={presentation.id} style={[verticalRotatedTabStyles, style]}>
-      <TabIcon icon={presentation.icon}/>
+      <TabIcon icon={presentation.icon} />
       <TabTitle>{presentation.title}</TabTitle>
     </Tab>
   );

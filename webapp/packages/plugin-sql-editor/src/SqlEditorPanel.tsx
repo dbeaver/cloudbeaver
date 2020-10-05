@@ -32,11 +32,11 @@ export function SqlEditorPanel({ tab }: TabHandlerPanelProps<ISqlEditorTabState>
   return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
     <Split split="horizontal" sticky={30}>
       <Pane>
-        <SqlEditor tabId={tab.id}/>
+        <SqlEditor tabId={tab.id} />
       </Pane>
       <ResizerControls />
-      <Pane main={true}>
-        <SqlResultTabs tab={tab}/>
+      <Pane main>
+        <SqlResultTabs tab={tab} />
       </Pane>
     </Split>
   );

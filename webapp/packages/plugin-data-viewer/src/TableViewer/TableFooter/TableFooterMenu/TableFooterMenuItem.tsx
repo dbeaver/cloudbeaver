@@ -62,13 +62,16 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   ...props
 }: Props) {
   const translate = useTranslate();
+  const styles = useStyles(tableFooterMenuStyles);
 
   if (!menuItem.panel) {
-    return styled(useStyles(tableFooterMenuStyles))(
+    return styled(styles)(
       <Button
-        as="button" {...props}
+        as="button"
+        {...props}
         disabled={menuItem.isDisabled}
-        onClick={() => menuItem.onClick && menuItem.onClick()}>
+        onClick={() => menuItem.onClick && menuItem.onClick()}
+      >
         {menuItem.icon && (
           <menu-trigger-icon as="div">
             <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
@@ -79,7 +82,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
     );
   }
 
-  return styled(useStyles(tableFooterMenuStyles))(
+  return styled(styles)(
     <MenuTrigger
       {...props}
       panel={menuItem.panel}

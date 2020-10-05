@@ -23,6 +23,8 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
   const [isSelected, switchSelect] = useState(false);
   const [isExpanding, setExpanding] = useState(false);
   const children = useChildren(node.id);
+  const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
+  const { connectionInfo } = useConnectionInfo(connectionId);
 
   const isLoading = nodeLoading || children.isLoading || isExpanding;
   const isLoaded = children.isLoaded || nodeLoaded;
@@ -31,14 +33,9 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
   );
   let isExpandedActually = isExpanded && (children.children?.length || 0) > 0;
 
-  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
-    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-    const { connectionInfo } = useConnectionInfo(connectionId);
-
-    if (!connectionInfo?.connected) {
-      isExpandable = true;
-      isExpandedActually = false;
-    }
+  if (node.objectFeatures.includes(EObjectFeature.dataSource) && !connectionInfo?.connected) {
+    isExpandable = true;
+    isExpandedActually = false;
   }
 
   const handleDoubleClick = useCallback(

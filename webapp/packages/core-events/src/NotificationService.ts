@@ -18,16 +18,20 @@ import {
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
-  readonly notificationList = new OrderedMap<number, INotification<INotificationExtraProps<any>>>(({ id }) => id);
+  readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0
+
+  get visibleNotifications(): INotification<any>[] {
+    return this.notificationList.values.filter(notification=> !notification.isSilent)
+  }
 
   constructor(
     private settings: EventsSettingsService,
   ) {}
 
   notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
-    options: INotificationOptions<TSource, TProps>, type: ENotificationType
-  ) {
+    options: INotificationOptions<TProps>, type: ENotificationType
+  ): void {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
       if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
@@ -70,7 +74,7 @@ export class NotificationService {
     component: () => NotificationComponent<TProps>,
     props?: TProps,
     options?: INotificationOptions<TProps> & { type?: ENotificationType; }
-  ) {
+  ): void {
     this.notify({
       title: '',
       ...options,
@@ -79,15 +83,15 @@ export class NotificationService {
     }, options?.type ?? ENotificationType.Custom);
   }
 
-  logInfo<T>(notification: INotificationOptions<T>) {
+  logInfo<T>(notification: INotificationOptions<T>): void {
     this.notify(notification, ENotificationType.Info);
   }
 
-  logError<T>(notification: INotificationOptions<T>) {
+  logError<T>(notification: INotificationOptions<T>): void {
     this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError, message?: string, silent?: boolean) {
+  logException(exception: Error | GQLError, message?: string, silent?: boolean): void {
     const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
     if (!silent) {
       this.logError({
@@ -100,7 +104,7 @@ export class NotificationService {
     console.error(exception);
   }
 
-  close(id: number) {
+  close(id: number): void {
     // TODO: emit event or something
 
     this.notificationList.remove(id);

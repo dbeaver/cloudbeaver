@@ -183,8 +183,8 @@ export class SqlEditorController implements IInitializableController {
 
   private isLineEndedWithDelimiter(delimiters: string[], line: string) {
     for (const delimiter of delimiters) {
-      if (line.length === 0 || (line.length - delimiter.length >= 0
-        && line.substr(line.length - delimiter.length, delimiter.length) === delimiter)) {
+      if (line.length === 0 || (line.length - delimiter.length >= 0 &&
+        line.substr(line.length - delimiter.length, delimiter.length) === delimiter)) {
         return true;
       }
     }

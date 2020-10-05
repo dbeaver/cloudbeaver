@@ -75,15 +75,15 @@ export const ProcessorConfigureDialog = observer(
     return styled(useStyles(styles))(
       <CommonDialogWrapper
         title={title}
-        noBodyPadding
-        footer={
+        footer={(
           <ProcessorConfigureDialogFooter
             isExporting={isExporting}
             onExport={onExport}
             onBack={onBack}
             onCancel={onClose}
           />
-        }
+        )}
+        noBodyPadding
         onReject={onClose}
       >
         <PropertiesTable
