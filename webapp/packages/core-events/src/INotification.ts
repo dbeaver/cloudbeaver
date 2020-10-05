@@ -13,25 +13,25 @@ export enum ENotificationType {
   Custom =' Custom'
 }
 
-export type INotificationExtraProps<T> = Record<string, any> & {
+export type INotificationExtraProps<T = never> = {
   source?: T;
+  [key: string]: any;
 }
 
 export type NotificationComponentProps<
-  TSource = undefined,
-  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> = {
-  notification: INotification<TSource, TProps>;
+  TProps extends INotificationExtraProps<any> = INotificationExtraProps
+> = TProps & {
+  notification: INotification<TProps>;
   onClose: () => void;
 }
 
 export type NotificationComponent<
-  TSource = undefined,
-  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>,
-> = React.FunctionComponent<NotificationComponentProps<TSource> & TProps>
+  TProps extends INotificationExtraProps<any> = INotificationExtraProps,
+> = React.FunctionComponent<NotificationComponentProps<TProps>>
 
 export interface INotification<
-  TSource = undefined,
-  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
+  TProps extends INotificationExtraProps<any> = INotificationExtraProps
+> {
   readonly id: number;
   type: ENotificationType;
   title: string;
@@ -40,19 +40,18 @@ export interface INotification<
   persistent?: boolean;
   isSilent: boolean;
   extraProps: TProps;
-  customComponent?: () => NotificationComponent<TSource, TProps>;
+  customComponent?: () => NotificationComponent<TProps>;
   close: () => void;
   showDetails: () => void;
 }
 
 export interface INotificationOptions<
-  TSource = undefined,
-  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
+  TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   title: string;
   message?: string;
   details?: string | Error;
   isSilent?: boolean;
   persistent?: boolean;
   extraProps?: TProps;
-  customComponent?: () => NotificationComponent<TSource, TProps>;
+  customComponent?: () => NotificationComponent<TProps>;
 }

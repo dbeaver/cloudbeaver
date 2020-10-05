@@ -35,7 +35,7 @@ export class ExportNotificationController implements IInitializableController {
   }
 
   get task() {
-    return this.dataExportProcessService.exportProcesses.get(this.notification?.extraProps?.source);
+    return this.dataExportProcessService.exportProcesses.get(this.notification.extraProps.source);
   }
 
   get hasDetails() {
@@ -72,7 +72,7 @@ export class ExportNotificationController implements IInitializableController {
     return this.dataExportProcessService.downloadUrl(this.notification.extraProps.source);
   }
 
-  private notification!: INotification<any>;
+  private notification!: INotification<{ source: string }>;
 
   constructor(
     private commonDialogService: CommonDialogService,
@@ -81,7 +81,7 @@ export class ExportNotificationController implements IInitializableController {
     private localization: LocalizationService,
   ) {}
 
-  init(notification: INotification<any>) {
+  init(notification: INotification<{ source: string }>) {
     this.notification = notification;
   }
 

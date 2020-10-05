@@ -40,9 +40,13 @@ const styles = css`
   }
 `;
 
-export const ExportNotification = observer(function ExportNotification({
+type Props = NotificationComponentProps<{
+  source: string;
+}>
+
+export const ExportNotification: React.FC<Props> = observer(function ExportNotification({
   notification,
-}: NotificationComponentProps<string>) {
+}) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
   const [mounted, setMounted] = useState(false);

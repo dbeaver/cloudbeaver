@@ -18,15 +18,14 @@ import {
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
-  readonly notificationList = new OrderedMap<number, INotification<any, any>>(({ id }) => id);
+  readonly notificationList = new OrderedMap<number, INotification<INotificationExtraProps<any>>>(({ id }) => id);
   private notificationNextId = 0
 
   constructor(
     private settings: EventsSettingsService,
   ) {}
 
-  notify<TSource = never, TProps extends INotificationExtraProps<
-  TSource> = Record<string, any>>(
+  notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
     options: INotificationOptions<TSource, TProps>, type: ENotificationType
   ) {
     if (options.persistent) {
@@ -38,7 +37,7 @@ export class NotificationService {
 
     const id = this.notificationNextId++;
 
-    const notification: INotification<TSource, TProps> = {
+    const notification: INotification<TProps> = {
       id,
       title: options.title,
       message: options.message,
@@ -65,10 +64,12 @@ export class NotificationService {
     }
   }
 
-  customNotification<TSource = never, TProps extends INotificationExtraProps<TSource> = Record<string, any>>(
-    component: () => NotificationComponent<TSource, TProps>,
-    props?: TProps & INotificationExtraProps<TSource>,
-    options?: INotificationOptions<TSource, TProps> & { type?: ENotificationType; }
+  customNotification<
+    TProps extends INotificationExtraProps<any> = INotificationExtraProps
+  >(
+    component: () => NotificationComponent<TProps>,
+    props?: TProps,
+    options?: INotificationOptions<TProps> & { type?: ENotificationType; }
   ) {
     this.notify({
       title: '',
