@@ -79,7 +79,7 @@ implements IInitializableController, IDestructibleController {
 
       this.notificationService.logInfo({ title: 'Connection is established' });
     } catch (exception) {
-      this.showError(exception, 'Connection test failed');
+      this.notificationService.logException(exception, 'connections_connection_test_fail');
     } finally {
       this.isConnecting = false;
     }
@@ -94,7 +94,7 @@ implements IInitializableController, IDestructibleController {
       this.notificationService.logInfo({ title: `Connection ${connection.name} created` });
       this.onClose();
     } catch (exception) {
-      this.showError(exception, 'Failed to create connection');
+      this.notificationService.logException(exception, 'connections_connection_create_fail');
     } finally {
       this.isConnecting = false;
     }
