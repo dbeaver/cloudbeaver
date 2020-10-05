@@ -75,6 +75,6 @@ export function Button({
 }: ButtonProps) {
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest}><ripple as="div"/>{children}</Button>
+    <Button {...rest}><ripple as="div" />{children}</Button>
   );
 }

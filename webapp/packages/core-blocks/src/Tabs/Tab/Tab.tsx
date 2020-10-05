@@ -61,14 +61,14 @@ export function Tab({
           {...state.state}
           id={tabId}
           className={className}
-          onClick={handleOpen}
           disabled={disabled}
+          onClick={handleOpen}
         >
           <tab-container as='div'>
             {children}
             {onClose && (
               <tab-action as="div" onClick={handleClose}>
-                <Icon name="cross-bold" viewBox="0 0 7 8"/>
+                <Icon name="cross-bold" viewBox="0 0 7 8" />
               </tab-action>
             )}
           </tab-container>

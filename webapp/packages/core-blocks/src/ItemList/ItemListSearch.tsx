@@ -64,9 +64,9 @@ export function ItemListSearch({
         name='search'
         placeholder={translate(placeholder || 'ui_search')}
         value={value ?? search}
-        onChange={changeHandler}
         autoComplete="off"
         disabled={disabled}
+        onChange={changeHandler}
         {...use({ mod: 'surface' })}
       />
       <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>

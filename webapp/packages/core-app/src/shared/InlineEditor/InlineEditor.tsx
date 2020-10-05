@@ -96,15 +96,15 @@ export const InlineEditor = observer(function InlineEditor({
     <editor as="div" className={className}>
       <editor-container as="div">
         <input
+          ref={inputRef}
           name={name}
           type={type}
           value={value}
           tabIndex={tabIndex}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          ref={inputRef}
           placeholder={placeholder}
           autoComplete="off"
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
       </editor-container>
       <editor-actions as="div" {...use({ position: controlsPosition })}>

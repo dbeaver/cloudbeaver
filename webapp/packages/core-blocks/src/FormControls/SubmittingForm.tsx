@@ -33,7 +33,7 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   const context = useMemo(() => ({ onChange }), [onChange]);
 
   return (
-    <form {...rest} onSubmit={handleSubmit} ref={ref}>
+    <form {...rest} ref={ref} onSubmit={handleSubmit}>
       <FormContext.Provider value={context}>
         {children}
       </FormContext.Provider>

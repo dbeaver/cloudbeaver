@@ -174,7 +174,7 @@ export const CreateConnection = observer(function CreateConnection({
     return styled(style)(
       <connection-create as='div'>
         <title-bar as='div'>
-          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={controller.back}/></back-button>
+          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={controller.back} /></back-button>
           {controller.driver?.icon && <StaticImage icon={controller.driver.icon} />}
           {controller.driver?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
@@ -183,12 +183,12 @@ export const CreateConnection = observer(function CreateConnection({
         <connection-create-content as='div'>
           <ConnectionForm
             model={controller as IConnectionFormModel}
+            configurationWizard={configurationWizard}
             onBack={controller.back}
             onCancel={handleConnectionCancel}
-            configurationWizard={configurationWizard}
           />
         </connection-create-content>
-        <connection-create-footer as='div'/>
+        <connection-create-footer as='div' />
       </connection-create>
     );
   }
@@ -211,7 +211,7 @@ export const CreateConnection = observer(function CreateConnection({
         </TabList>
       </TabsState>
       <connection-create-content as='div'>
-        {method === 'driver' && <CustomConnection onSelect={controller.onDriverSelect}/>}
+        {method === 'driver' && <CustomConnection onSelect={controller.onDriverSelect} />}
         {method === 'search-database' && (
           <SearchDatabase
             databases={controller.databases}
@@ -222,9 +222,9 @@ export const CreateConnection = observer(function CreateConnection({
             onChange={controller.onSearchChange}
           />
         )}
-        {controller.isProcessing && <Loader overlay/>}
+        {controller.isProcessing && <Loader overlay />}
       </connection-create-content>
-      <connection-create-footer as='div'/>
+      <connection-create-footer as='div' />
     </connection-create>
   );
 });

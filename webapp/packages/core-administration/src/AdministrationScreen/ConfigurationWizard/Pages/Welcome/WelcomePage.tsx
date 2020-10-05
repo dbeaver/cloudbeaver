@@ -52,9 +52,9 @@ export function WelcomePage() {
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <h3><Translate token='administration_configuration_wizard_welcome_title'/></h3>
-          <p><Translate token='administration_configuration_wizard_welcome_message'/></p>
-          <note as='div'><Translate token='administration_configuration_wizard_welcome_note'/></note>
+          <h3><Translate token='administration_configuration_wizard_welcome_title' /></h3>
+          <p><Translate token='administration_configuration_wizard_welcome_message' /></p>
+          <note as='div'><Translate token='administration_configuration_wizard_welcome_note' /></note>
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

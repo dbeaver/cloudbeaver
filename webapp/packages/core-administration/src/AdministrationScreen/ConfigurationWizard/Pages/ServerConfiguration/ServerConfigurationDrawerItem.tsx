@@ -18,9 +18,9 @@ export function ServerConfigurationDrawerItem({
   item, onSelect, style, disabled,
 }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
-    <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
+    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/cog-outline.svg' />
-      <TabTitle><Translate token='administration_configuration_wizard_configuration'/></TabTitle>
+      <TabTitle><Translate token='administration_configuration_wizard_configuration' /></TabTitle>
     </Tab>
   );
 }

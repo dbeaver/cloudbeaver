@@ -31,7 +31,7 @@ export class NotificationItemController implements IInitializableController {
       this.handleShowDetails = this.showDetails.bind(this);
     }
 
-    if (notification.type !== ENotificationType.Error) {
+    if (notification.type !== ENotificationType.Error && !notification.persistent) {
       this.closeAfter = FadeTimeout;
     }
   }

@@ -74,9 +74,9 @@ export const InputField: InputFieldType = observer(function InputField({
       <field-label as='label'>{children} {required && '*'}</field-label>
       <input
         {...rest}
-        onChange={handleChange}
         name={name}
         value={value}
+        onChange={handleChange}
         {...use({ mod })}
         required={required}
       />

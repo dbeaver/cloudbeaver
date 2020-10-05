@@ -143,12 +143,12 @@ export const PropertyItem = observer(function PropertyItem({
     <property-item as="div">
       <property-name as='div' title={property.description} {...use({ error })}>
         <ShadowInput
+          ref={keyInputRef}
           type='text'
           name={property.id}
-          onChange={handleKeyChange}
-          ref={keyInputRef}
           readOnly={!isKeyEditable}
           autoComplete='none'
+          onChange={handleKeyChange}
         >
           {property.displayName || property.key}
         </ShadowInput>
@@ -157,8 +157,8 @@ export const PropertyItem = observer(function PropertyItem({
         <ShadowInput
           type='text'
           name={`${property.id}_value`}
-          onChange={handleValueChange}
           autoComplete='none'
+          onChange={handleValueChange}
           {...use({ focus, edited })}
         >
           {value !== undefined ? value : property.defaultValue}

@@ -75,10 +75,10 @@ export const NavigationNode = observer(function NavigationNode({
         <control
           tabIndex={0}
           aria-selected={controller.isSelected}
+          as="div"
           onClick={handleSelect}
           onKeyDown={handleEnter}
           onDoubleClick={controller.handleDoubleClick}
-          as="div"
         >
           <arrow as="div" hidden={!controller.isExpandable} onClick={handleExpand}>
             {controller.isLoading && <Loader small />}

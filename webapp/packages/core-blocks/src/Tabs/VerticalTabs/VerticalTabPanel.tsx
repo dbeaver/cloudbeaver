@@ -25,7 +25,7 @@ export const VerticalTabPanel = observer(function VerticalTabPanel({ tab, style 
 
   return styled(useStyles(verticalTabStyles, ...style))(
     <TabPanel tabId={tab.tabId}>
-      <Panel/>
+      <Panel />
     </TabPanel>
   );
 });

@@ -35,8 +35,8 @@ export const CustomConnection = observer(function CustomConnection({
   )), [dbDriverResource.data]);
 
   if (loading) {
-    return <Loader className={className}/>;
+    return <Loader className={className} />;
   }
 
-  return <DriverList drivers={drivers.get()} onSelect={onSelect} className={className}/>;
+  return <DriverList drivers={drivers.get()} className={className} onSelect={onSelect} />;
 });

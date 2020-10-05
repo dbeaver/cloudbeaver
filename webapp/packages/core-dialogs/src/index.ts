@@ -14,5 +14,3 @@ export * from './Menu/models/ComputedMenuPanelModel';
 export * from './Menu/ContextMenu/ContextMenuService';
 export * from './Menu/ContextMenu/IContextMenuItem';
 export * from './Menu/ContextMenu/IMenuContext';
-
-export * from './SessionExpire/SessionExpireService';

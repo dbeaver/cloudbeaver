@@ -46,7 +46,7 @@ export function Main() {
   return styled(useStyles(mainStyles, splitStyles))(
     <space as="main">
       <Split sticky={30}>
-        <Pane main={true}>
+        <Pane main>
           <NavigationTree />
         </Pane>
         <ResizerControls />

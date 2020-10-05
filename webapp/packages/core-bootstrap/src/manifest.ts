@@ -37,6 +37,7 @@ import {
   CoreSettingsService,
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
+  SessionExpireService
 } from '@cloudbeaver/core-app';
 import {
   AuthInfoService,
@@ -61,7 +62,7 @@ import {
   ConnectionsAdministrationNavService,
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
-import { CommonDialogService, ContextMenuService, SessionExpireService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
 import { NotificationService, ExceptionsCatcherService, EventsSettingsService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';

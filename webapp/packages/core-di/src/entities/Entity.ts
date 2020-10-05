@@ -101,8 +101,8 @@ export class Entity {
   }
 
   protected addMixin(ctor: ITypedConstructor<any>): void;
-  protected addMixin<T extends object>(token: InjectionToken<T>, value: T): void;
-  protected addMixin<T extends object>(ctorOrToken: InjectionToken<T>, value?: T): void {
+  protected addMixin<T extends Record<string, any>>(token: InjectionToken<T>, value: T): void;
+  protected addMixin<T extends Record<string, any>>(ctorOrToken: InjectionToken<T>, value?: T): void {
     this.mixins.push(ctorOrToken as InjectionToken<any>);
     if (value !== undefined) {
       this.container.addServiceByToken(ctorOrToken, value);
@@ -117,7 +117,7 @@ export class Entity {
 
 }
 
-export type MixinProvider<T extends object> = ITypedConstructor<T> | {
+export type MixinProvider<T extends Record<string, any>> = ITypedConstructor<T> | {
   token: InjectionToken<T>;
   value: T;
 };

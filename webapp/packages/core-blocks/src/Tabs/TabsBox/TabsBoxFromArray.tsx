@@ -47,7 +47,7 @@ export const TabsBoxFromArray = observer(function TabsBoxFromArray({
       currentTabId={currentTabId}
       tabs={!hideTabs && tabIdList.map(tabId => (
         <Tab key={tabId} tabId={tabId} onOpen={onOpen} onClose={onClose}>
-          <TabData tabId={tabId}/>
+          <TabData tabId={tabId} />
         </Tab>
       ))}
       className={className}
@@ -55,7 +55,7 @@ export const TabsBoxFromArray = observer(function TabsBoxFromArray({
     >
       {tabIdList?.map(tabId => (
         <TabPanel key={tabId} tabId={tabId}>
-          <PanelData tabId={tabId}/>
+          <PanelData tabId={tabId} />
         </TabPanel>
       ))}
     </TabsBox>

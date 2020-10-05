@@ -9,34 +9,50 @@
 export enum ENotificationType {
   Info = 'Info',
   Error = 'Error',
+  Success = 'Success',
   Custom =' Custom'
 }
 
-export type NotificationComponentProps<T = undefined> = {
-  notification: INotification<T>;
+export type INotificationExtraProps<T> = Record<string, any> & {
+  source?: T;
+}
+
+export type NotificationComponentProps<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> = {
+  notification: INotification<TSource, TProps>;
   onClose: () => void;
 }
-export type NotificationComponent<T = undefined> = React.FunctionComponent<NotificationComponentProps<T>>
 
-export interface INotification<T = undefined> {
+export type NotificationComponent<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>,
+> = React.FunctionComponent<NotificationComponentProps<TSource> & TProps>
+
+export interface INotification<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
   readonly id: number;
   type: ENotificationType;
   title: string;
   message?: string;
   details?: string | Error;
+  persistent?: boolean;
   isSilent: boolean;
-  customComponent?: () => NotificationComponent<T>;
-  source: T;
+  extraProps: TProps;
+  customComponent?: () => NotificationComponent<TSource, TProps>;
   close: () => void;
   showDetails: () => void;
 }
 
-export interface INotificationOptions<T = undefined> {
+export interface INotificationOptions<
+  TSource = undefined,
+  TProps extends INotificationExtraProps<TSource> = INotificationExtraProps<TSource>> {
   title: string;
   message?: string;
   details?: string | Error;
   isSilent?: boolean;
   persistent?: boolean;
-  customComponent?: () => NotificationComponent<T>;
-  source?: T;
+  extraProps?: TProps;
+  customComponent?: () => NotificationComponent<TSource, TProps>;
 }

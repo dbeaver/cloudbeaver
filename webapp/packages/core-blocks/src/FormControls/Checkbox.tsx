@@ -96,8 +96,8 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
           name={name}
           id={value || name}
           type='checkbox'
-          onChange={handleChange}
           checked={checked}
+          onChange={handleChange}
           {...use({ mod })}
         />
         <label htmlFor={value || name}>{checkboxLabel}</label>

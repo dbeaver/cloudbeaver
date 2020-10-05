@@ -37,7 +37,7 @@ export const ParametersForm = observer(function ParametersForm({
 
   return styled(useStyles(formStyles, styles))(
     <>
-      { !embedded && (
+      {!embedded && (
         <layout-grid-inner as="div">
           <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 7 })}>
             <InputField

@@ -51,7 +51,6 @@ export const EditorDialog: DialogComponent<string, string> = observer(
     return styled(useStyles(styles))(
       <CommonDialogWrapper
         title={translate('app_shared_inlineEditor_dialog_title')}
-        onReject={props.rejectDialog}
         footer={(
           <controls as="div">
             <Button type="button" mod={['unelevated']} onClick={handleApply}>
@@ -62,8 +61,9 @@ export const EditorDialog: DialogComponent<string, string> = observer(
             </Button>
           </controls>
         )}
+        onReject={props.rejectDialog}
       >
-        <textarea value={value} onChange={handleChange} ref={textareaRef}/>
+        <textarea ref={textareaRef} value={value} onChange={handleChange} />
       </CommonDialogWrapper>
     );
   }

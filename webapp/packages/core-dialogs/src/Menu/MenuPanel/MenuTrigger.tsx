@@ -44,7 +44,7 @@ export function MenuTrigger({
           {children}
         </box>
       </MenuButton>
-      <MenuPanel panel={panel} menu={menu} style={style}/>
+      <MenuPanel panel={panel} menu={menu} style={style} />
     </>
   );
 }
@@ -103,12 +103,12 @@ const MenuPanelElement = observer(function MenuPanelElement({
         {...menu}
         {...use({ hidden: item.isHidden })}
         aria-label={item.id}
-        onClick={onClick}
         disabled={item.isDisabled}
         menuItem={item}
         style={style}
-        {...{ as: MenuInnerTrigger }}>
-      </MenuItem>
+        onClick={onClick}
+        {...{ as: MenuInnerTrigger }}
+      />
     );
   }
 
@@ -117,9 +117,10 @@ const MenuPanelElement = observer(function MenuPanelElement({
       {...menu}
       {...use({ hidden: item.isHidden })}
       aria-label={item.id}
+      disabled={item.isDisabled}
       onClick={onClick}
-      disabled={item.isDisabled}>
-      <MenuPanelItem menuItem={item} style={style}/>
+    >
+      <MenuPanelItem menuItem={item} style={style} />
     </MenuItem>
   );
 });
@@ -148,10 +149,10 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
     <>
       <MenuButton ref={ref} {...menu} {...rest}>
         <box as='div'>
-          <MenuPanelItem menuItem={menuItem} style={style}/>
+          <MenuPanelItem menuItem={menuItem} style={style} />
         </box>
       </MenuButton>
-      <MenuPanel panel={panel!} menu={menu} style={style}/>
+      <MenuPanel panel={panel!} menu={menu} style={style} />
     </>
   );
 });

@@ -139,7 +139,7 @@ export const ConnectionForm = observer(function ConnectionForm({
     <TabsState selectedId='options'>
       <box as='div'>
         <TabList>
-          <Tab tabId='options' >
+          <Tab tabId='options'>
             <TabTitle>{translate('customConnection_options')}</TabTitle>
           </Tab>
           <Tab tabId='driver_properties' disabled={!controller.driver}>
@@ -215,8 +215,7 @@ export const ConnectionForm = observer(function ConnectionForm({
                   }}
                 </TabPanel>
               </>
-            )
-          }
+            )}
           {controller.error.responseMessage && (
             <ErrorMessage
               text={controller.error.responseMessage}

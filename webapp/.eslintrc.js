@@ -18,14 +18,17 @@ module.exports = {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
+
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
       },
     },
+
     typescript: {
       directory: './',
     },
+
     react: {
       createClass: 'createReactClass',
       pragma: 'React',
@@ -42,6 +45,39 @@ module.exports = {
     'react/display-name': 'off',
     'react/jsx-no-literals': 'off',
     'react/react-in-jsx-scope': 'off',
+    'react/jsx-max-props-per-line': [1, { "when": "multiline" }],
+    'react/jsx-closing-bracket-location': 'error',
+    'react/jsx-closing-tag-location': 'error',
+    'react/jsx-tag-spacing': ['error', {
+      "closingSlash": "never",
+      "beforeSelfClosing": "always",
+      "afterOpening": "never",
+      "beforeClosing": "never"
+    }],
+    'react/jsx-boolean-value': 'error',
+    'react/jsx-wrap-multilines': ['error', {
+      "declaration": "parens-new-line",
+      "assignment": "parens-new-line",
+      "return": "parens-new-line",
+      "arrow": "parens-new-line",
+      "condition": "parens-new-line",
+      "logical": "parens-new-line",
+      "prop": "parens-new-line"
+    }],
+    'react/self-closing-comp': ["error"],
+    'react/jsx-sort-props': ['error', {
+      "callbacksLast": true,
+      "shorthandLast": true,
+      "ignoreCase": true,
+      "noSortAlphabetically": true,
+      "reservedFirst": true,
+    }],
+    'react/destructuring-assignment': ['error'],
+    'react/jsx-curly-brace-presence': ['error', "never"],
+    'react/jsx-curly-newline': ['error'],
+    'react/jsx-curly-spacing': ['error', { "when": "never", "children": true }],
+    'react/jsx-equals-spacing': ['error', 'never'],
+    'react/jsx-first-prop-new-line': ['warn', 'multiline'],
     'brace-style': 'off', // prefer 1tbs or stroustrup styles, avoid allman style
     'operator-linebreak': 'warn',
     'consistent-return': 'off',

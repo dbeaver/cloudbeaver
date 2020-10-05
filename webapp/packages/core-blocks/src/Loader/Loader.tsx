@@ -69,13 +69,17 @@ export function Loader({
 
   return styled(style)(
     <loader as="div" className={className} {...use({ small })}>
-      <icon as="div"><img src={spinnerURL}/></icon>
+      <icon as="div"><img src={spinnerURL} /></icon>
       {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}
       {onCancel && (
         <actions as='div'>
-          <Button type="button" mod={['unelevated']}
+          <Button
+            type="button"
+            mod={['unelevated']}
             disabled={cancelDisabled}
-            onClick={onCancel}><Translate token='ui_processing_cancel' /></Button>
+            onClick={onCancel}
+          ><Translate token='ui_processing_cancel' />
+          </Button>
         </actions>
       )}
     </loader>

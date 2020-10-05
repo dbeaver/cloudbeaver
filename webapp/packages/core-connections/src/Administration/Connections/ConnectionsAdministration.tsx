@@ -86,7 +86,7 @@ export const ConnectionsAdministration = observer(function ConnectionsAdministra
         <layout-grid-cell as='div' {...use({ span: 12 })}>
           {configurationWizard && (
             <message-box as='div'>
-              <p><Translate token='connections_administration_configuration_wizard_message'/></p>
+              <p><Translate token='connections_administration_configuration_wizard_message' /></p>
             </message-box>
           )}
           <AdministrationTools>
@@ -107,7 +107,7 @@ export const ConnectionsAdministration = observer(function ConnectionsAdministra
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
           />
-          {controller.isLoading && <Loader overlay/>}
+          {controller.isLoading && <Loader overlay />}
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

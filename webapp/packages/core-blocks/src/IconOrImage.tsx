@@ -25,7 +25,7 @@ export const IconOrImage = function IconOrImage({ icon, className, viewBox }: Ic
   );
 
   if (isStaticIcon) {
-    return <StaticImage icon={icon} className={className}/>;
+    return <StaticImage icon={icon} className={className} />;
   }
 
   return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} />;

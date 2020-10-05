@@ -45,28 +45,28 @@ export function ConfirmationDialog({
     <dialog className={className}>
       <header>
         <header-title as="div">
-          <h1><Translate token={payload.title}/></h1>
+          <h1><Translate token={payload.title} /></h1>
           <reject as="div">
             <Icon name="cross" viewBox="0 0 16 16" onClick={handleReject} />
           </reject>
         </header-title>
       </header>
-      <dialog-body as="div"><Translate token={payload.message}/></dialog-body>
+      <dialog-body as="div"><Translate token={payload.message} /></dialog-body>
       <footer>
         <Button
           type="button"
           mod={['outlined']}
           onClick={handleReject}
         >
-          <Translate token='ui_processing_cancel'/>
+          <Translate token='ui_processing_cancel' />
         </Button>
-        <fill as="div"/>
+        <fill as="div" />
         <Button
           type="button"
           mod={['unelevated']}
           onClick={handleResolve}
         >
-          <Translate token='ui_processing_ok'/>
+          <Translate token='ui_processing_ok' />
         </Button>
       </footer>
     </dialog>

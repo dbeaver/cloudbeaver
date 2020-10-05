@@ -88,9 +88,9 @@ export const Administration = observer(function Administration({
               <DrawerItem
                 key={item.name}
                 item={item}
-                onSelect={onItemSelect}
                 configurationWizard={configurationWizard}
                 style={[verticalTabStyles, tabsStyles]}
+                onSelect={onItemSelect}
               />
             ))}
           </TabList>

@@ -17,9 +17,9 @@ export function ConnectionsDrawerItem({
   item, onSelect, style, disabled, configurationWizard,
 }: AdministrationItemDrawerProps) {
   return styled(useStyles(...style))(
-    <Tab tabId={item.name} onOpen={() => onSelect(item.name)} disabled={disabled}>
+    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/connection.svg' />
-      <TabTitle><Translate token={configurationWizard ? 'connections_administration_configuration_wizard_step_title' : 'connections_administration_item'}/></TabTitle>
+      <TabTitle><Translate token={configurationWizard ? 'connections_administration_configuration_wizard_step_title' : 'connections_administration_item'} /></TabTitle>
     </Tab>
   );
 }

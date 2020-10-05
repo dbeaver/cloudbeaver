@@ -36,7 +36,10 @@ export const inversifyWrapper: IDiWrapper = {
       mainContainer.addServiceByClass(Ctor);
     },
 
-    addServiceByToken<T extends object>(token: ValueToken<T> | IServiceConstructor<T>, value: T): void {
+    addServiceByToken<T extends Record<string, unknown>>(
+      token: ValueToken<T> | IServiceConstructor<T>,
+      value: T
+    ): void {
       mainContainer.addServiceByToken(token, value);
     },
   },

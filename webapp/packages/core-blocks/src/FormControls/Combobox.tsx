@@ -210,9 +210,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
         <input
           ref={ref}
           name={name}
-          onChange={handleChange}
           value={selectedItem ? valueSelector(selectedItem) : searchValue}
           readOnly={!!selectedItem || readOnly}
+          onChange={handleChange}
           {...use({ mod })}
           {...rest}
         />

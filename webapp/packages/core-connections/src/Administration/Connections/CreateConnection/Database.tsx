@@ -72,7 +72,7 @@ export const Database = observer(function Database({ database, onSelect }: Props
   return styled(useStyles(styles))(
     <ListItem onClick={select}>
       <ListItemIcon>
-        {orderedDrivers.map(driverId => <StaticImage key={driverId} icon={drivers.get(driverId)?.icon}/>)}
+        {orderedDrivers.map(driverId => <StaticImage key={driverId} icon={drivers.get(driverId)?.icon} />)}
       </ListItemIcon>
       <ListItemName>{database.host}:{database.port}</ListItemName>
     </ListItem>
