@@ -32,7 +32,7 @@ const TextPlaceholderStyles = composes(
   `
 );
 
-export function TextPlaceholder(props: React.PropsWithChildren<unknown>) {
+export const TextPlaceholder: React.FC = function TextPlaceholder(props) {
   return styled(useStyles(TextPlaceholderStyles))(
     <div>
       <span>

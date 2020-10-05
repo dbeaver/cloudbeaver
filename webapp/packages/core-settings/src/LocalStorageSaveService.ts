@@ -18,7 +18,7 @@ let id = 0;
 
 @injectable()
 export class LocalStorageSaveService {
-  withAutoSave(store: object, name?: string, remap?: (savedStore: object) => object): void {
+  withAutoSave<T>(store: T, name?: string, remap?: (savedStore: any) => any): void {
     let firstRun = true;
     const storeId = name || ++id;
 

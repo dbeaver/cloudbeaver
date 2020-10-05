@@ -27,13 +27,13 @@ export function useFocus<T extends HTMLElement>({
   useLayoutEffect(() => {
     if (reference.current !== null && focusFirstChild) {
       const firstFocusable = reference.current
-        .querySelector<T>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        .querySelector<T>('button, [href], input, select, textarea, [tabndex]:not([tabndex="-1"])');
 
       if (firstFocusable) {
         firstFocusable.focus();
       }
     }
-  }, [reference.current, focusFirstChild]);
+  }, [focusFirstChild]);
 
   useEffect(() => {
     if (!reference.current) {
@@ -56,14 +56,16 @@ export function useFocus<T extends HTMLElement>({
       setFocus(false);
     };
 
-    reference.current.addEventListener('focusin', focusHandler);
-    reference.current.addEventListener('focusout', blurHandler);
+    const element = reference.current;
+
+    element.addEventListener('focusin', focusHandler);
+    element.addEventListener('focusout', blurHandler);
 
     return () => {
-      reference.current?.removeEventListener('focusin', focusHandler);
-      reference.current?.removeEventListener('focusout', blurHandler);
+      element.removeEventListener('focusin', focusHandler);
+      element.removeEventListener('focusout', blurHandler);
     };
-  }, [reference.current, onFocus, onBlur]);
+  }, [onFocus, onBlur]);
 
   return [reference, focus];
 }

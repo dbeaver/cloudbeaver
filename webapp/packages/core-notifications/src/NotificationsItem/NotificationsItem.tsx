@@ -14,14 +14,11 @@ import { INotification } from '@cloudbeaver/core-events';
 import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
-type NotificationProps = {
+type Props = {
   notification: INotification<any>;
 }
 
-export const NotificationsItem = observer(function Notification({ notification }: NotificationProps) {
-  if (notification.isSilent) {
-    return null;
-  }
+export const NotificationsItem = observer(function Notification({ notification }: Props) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {

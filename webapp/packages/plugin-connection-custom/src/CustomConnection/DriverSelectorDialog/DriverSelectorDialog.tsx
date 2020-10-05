@@ -49,7 +49,7 @@ export const DriverSelectorDialog = observer(
         onReject={onClose}
       >
         {isLoading && <Loader />}
-        {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect}/>}
+        {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
       </CommonDialogWrapper>
     );
   }

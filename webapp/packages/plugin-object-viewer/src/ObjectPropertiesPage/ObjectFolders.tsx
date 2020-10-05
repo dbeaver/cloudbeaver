@@ -53,5 +53,5 @@ type ObjectFoldersProps = {
 export const ObjectFolders = observer(function ObjectFolders({ tab }: ObjectFoldersProps) {
   const controller = useController(ObjectFoldersController, tab);
 
-  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={[styles]}/>);
+  return styled(useStyles(styles))(<VerticalTabs tabContainer={controller.getTabContainer()} style={[styles]} />);
 });

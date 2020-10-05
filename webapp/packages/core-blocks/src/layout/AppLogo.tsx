@@ -32,7 +32,7 @@ type Props = {
   onClick?: () => void;
 }
 
-export function AppLogo({ title, onClick }: Props) {
+export const AppLogo: React.FC<Props> = function AppLogo({ title, onClick }) {
   return styled(styles)(
     <logo as="div" title={title} onClick={onClick}>
       <Icon name="logo" viewBox="0 0 361 73" />

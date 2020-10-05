@@ -56,7 +56,7 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
 
   @action
   activateTab(tabId: string | null) {
-    if (tabId == null) {
+    if (tabId === null) {
       this._activeTabId = null;
       return;
     }

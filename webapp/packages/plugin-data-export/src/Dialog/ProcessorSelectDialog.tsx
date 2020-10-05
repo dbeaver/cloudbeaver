@@ -69,7 +69,7 @@ export const ProcessorSelectDialog = observer(
           <pre title={context.sourceName}>{context.sourceName}</pre>
         </export-object>
         {isLoading && <Loader />}
-        {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect}/>}
+        {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
       </CommonDialogWrapper>
     );
   }

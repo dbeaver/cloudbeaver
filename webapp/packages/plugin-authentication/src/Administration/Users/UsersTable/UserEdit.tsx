@@ -51,7 +51,7 @@ export const UserEdit = observer(function UserEdit({
   return styled(useStyles(styles))(
     <box as='div'>
       {controller.user && (
-        <UserForm user={controller.user} onCancel={collapse} editing/>
+        <UserForm user={controller.user} editing onCancel={collapse} />
       )}
     </box>
   );

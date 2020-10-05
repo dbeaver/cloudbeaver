@@ -36,12 +36,13 @@ type HeaderProps = {
 
 export const Header = observer(function Header({ properties }: HeaderProps) {
   const translate = useTranslate();
+  const style = useStyles(styles);
 
   if (!properties.length) {
-    return styled(useStyles(styles))(
+    return styled(style)(
       <>
-        <TableColumnHeader min></TableColumnHeader>
-        <TableColumnHeader></TableColumnHeader>
+        <TableColumnHeader min />
+        <TableColumnHeader />
         <TableColumnHeader title={translate('plugin_object_viewer_table_name')}>
           {translate('plugin_object_viewer_table_name')}
         </TableColumnHeader>
@@ -49,10 +50,10 @@ export const Header = observer(function Header({ properties }: HeaderProps) {
     );
   }
 
-  return styled(useStyles(styles))(
+  return styled(style)(
     <>
-      <TableColumnHeader min></TableColumnHeader>
-      <TableColumnHeader></TableColumnHeader>
+      <TableColumnHeader min />
+      <TableColumnHeader />
       {properties.map(property => (
         <TableColumnHeader key={property.id} title={property.description}>
           {property.displayName}

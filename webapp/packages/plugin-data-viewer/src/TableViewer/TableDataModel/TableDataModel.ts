@@ -42,8 +42,8 @@ export class TableDataModel {
 
   isChunkLoaded(offset: number, count: number) {
     return (
-      (this.rows.length > offset && !!this.rows[offset])
-      && (this.rows.length > offset + count - 1 && !!this.rows[offset + count - 1])
+      (this.rows.length > offset && !!this.rows[offset]) &&
+      (this.rows.length > offset + count - 1 && !!this.rows[offset + count - 1])
     );
   }
 

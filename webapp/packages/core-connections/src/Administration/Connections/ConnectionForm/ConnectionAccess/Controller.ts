@@ -60,7 +60,7 @@ implements IInitializableController {
     await this.usersResource.loadAll();
     await this.rolesResource.loadAll();
 
-    for (const subject of this.model.grantedSubjects!) {
+    for (const subject of this.model.grantedSubjects || []) {
       this.selectedSubjects.set(subject.subjectId, true);
     }
   }

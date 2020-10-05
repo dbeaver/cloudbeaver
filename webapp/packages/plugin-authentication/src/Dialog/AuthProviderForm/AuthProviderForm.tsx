@@ -33,17 +33,17 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   }, [credentials]);
 
   return styled(useStyles(formStyles))(
-    <login-form as='div' ref={elementRef}>
+    <login-form ref={elementRef} as='div'>
       {provider.credentialParameters.map(parameter => parameter.user && (
-        <group as="div" key={parameter.id}>
+        <group key={parameter.id} as="div">
           <InputField
             type={parameter.encryption === 'none' ? 'text' : 'password'}
             name={`authentication_${provider.id}_${parameter.id}`}
             value={credentials[parameter.id]}
-            onChange={value => handleChange(parameter.id, value)}
             disabled={authenticate}
             autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
             mod='surface'
+            onChange={value => handleChange(parameter.id, value)}
           >
             {parameter.displayName}
           </InputField>

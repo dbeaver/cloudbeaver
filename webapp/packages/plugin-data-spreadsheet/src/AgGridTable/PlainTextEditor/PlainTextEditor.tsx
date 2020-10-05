@@ -88,15 +88,15 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
         <InlineEditor
           type={props.colDef.type === 'NUMERIC' ? 'number' : 'text'}
           value={value.current}
-          onSave={handleSave}
-          onReject={handleReject}
-          onChange={handleChange}
-          onUndo={handleUndo}
           controlsPosition={controlsPosition}
           edited
           hideSave
           hideCancel
           autofocus
+          onSave={handleSave}
+          onReject={handleReject}
+          onChange={handleChange}
+          onUndo={handleUndo}
         />
       </editor>
     );

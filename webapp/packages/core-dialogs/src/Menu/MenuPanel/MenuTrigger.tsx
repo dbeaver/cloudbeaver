@@ -27,14 +27,14 @@ import { menuPanelStyles } from './menuPanelStyles';
 /**
  * MenuTrigger
  */
-export function MenuTrigger({
+export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
   panel,
   children,
   style = [],
   placement,
   modal,
   ...props
-}: MenuTriggerProps) {
+}) {
   const menu = useMenuState({ modal, placement });
 
   return styled(useStyles(menuPanelStyles, ...style))(
@@ -95,7 +95,7 @@ const MenuPanelElement = observer(function MenuPanelElement({
     if (!item.panel) {
       menu.hide();
     }
-  }, [item]);
+  }, [item, menu]);
 
   if (item.panel) {
     return styled(styles)(

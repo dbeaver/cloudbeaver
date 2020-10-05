@@ -53,7 +53,6 @@ export const ErrorDialog = observer(function ErrorDialog({
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={translate('ui_data_saving_error')}
-      onReject={rejectDialog}
       footer={(
         <controls as="div">
           {payload.onShowDetails && (
@@ -61,13 +60,14 @@ export const ErrorDialog = observer(function ErrorDialog({
               {translate('ui_errors_details')}
             </Button>
           )}
-          <fill as="div"/>
+          <fill as="div" />
           <Button type="button" mod={['outlined']} onClick={rejectDialog}>{translate('ui_processing_cancel')}</Button>
           <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
         </controls>
       )}
+      onReject={rejectDialog}
     >
-      <message as="div"><SanitizedHTML html={payload.message}/></message>
+      <message as="div"><SanitizedHTML html={payload.message} /></message>
     </CommonDialogWrapper>
   );
 });

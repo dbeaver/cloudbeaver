@@ -64,8 +64,8 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
           key={page.key}
           tab={tab}
           page={page}
-          onSelect={dbObjectPagesService.selectPage}
           style={stylesArray}
+          onSelect={dbObjectPagesService.selectPage}
         />
       ))}
       style={stylesArray}

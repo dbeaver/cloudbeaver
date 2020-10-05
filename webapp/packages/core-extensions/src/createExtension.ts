@@ -10,20 +10,20 @@ import { EXTENSION_SYMBOL } from './constants';
 import { IExtension } from './IExtension';
 
 export function createExtension<T>(
-  extension: object,
+  extension: Record<string, any>,
   key: symbol
 ): IExtension<T> {
   return Object.assign(extension, { [EXTENSION_SYMBOL]: key });
 }
 
 export function isExtension<T>(
-  obj: any,
+  obj: Record<any, any> | IExtension<T>,
   key?: symbol,
 ): obj is IExtension<T> {
   if (!(EXTENSION_SYMBOL in obj)) {
     return false;
   }
-  if (key && obj[EXTENSION_SYMBOL] !== key) {
+  if (key && (obj as IExtension<T>)[EXTENSION_SYMBOL] !== key) {
     return false;
   }
   return true;

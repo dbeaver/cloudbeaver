@@ -20,7 +20,8 @@ export const CustomConnectionDialog = observer(function CustomConnectionDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
   const controller = useController(CustomConnectionController);
-  let title = useTranslate('basicConnection_connectionDialog_newConnection');
+  const translate = useTranslate();
+  let title = translate('basicConnection_connectionDialog_newConnection');
 
   if (controller.step === ConnectionStep.Connection && controller.driver?.name) {
     title = controller.driver.name;
@@ -41,8 +42,8 @@ export const CustomConnectionDialog = observer(function CustomConnectionDialog({
     <DriverSelectorDialog
       title={title}
       drivers={controller.drivers}
-      onSelect={controller.onDriverSelect}
       isLoading={controller.isLoading}
+      onSelect={controller.onDriverSelect}
       onClose={rejectDialog}
     />
   );

@@ -51,25 +51,25 @@ export const ConnectionFormDialogFooter = observer(
         <Button
           type="button"
           mod={['outlined']}
-          onClick={onBack}
           disabled={isConnecting}
+          onClick={onBack}
         >
           {translate('ui_stepper_back')}
         </Button>
-        <fill as="div"/>
+        <fill as="div" />
         <Button
           type="button"
           mod={['outlined']}
-          onClick={onConnectionTest}
           disabled={isConnecting}
+          onClick={onConnectionTest}
         >
           {translate('customConnection_test')}
         </Button>
         <Button
           type="button"
           mod={['unelevated']}
-          onClick={onCreateConnection}
           disabled={isConnecting}
+          onClick={onCreateConnection}
         >
           {translate('customConnection_create')}
         </Button>

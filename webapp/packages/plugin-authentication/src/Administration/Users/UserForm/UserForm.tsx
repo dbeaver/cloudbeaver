@@ -160,10 +160,10 @@ export const UserForm = observer(function UserForm({
     <TabsState selectedId='info'>
       <box as='div'>
         <TabList>
-          <Tab tabId='info' >
+          <Tab tabId='info'>
             <TabTitle>{translate('authentication_administration_user_info')}</TabTitle>
           </Tab>
-          <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess} >
+          <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess}>
             <TabTitle>{translate('authentication_administration_user_connections_access')}</TabTitle>
           </Tab>
           <fill as="div" />
@@ -185,7 +185,7 @@ export const UserForm = observer(function UserForm({
           </Button>
         </TabList>
         <content-box as='div'>
-          <SubmittingForm onSubmit={controller.save} ref={focusedRef}>
+          <SubmittingForm ref={focusedRef} onSubmit={controller.save}>
             <TabPanel tabId='info'>
               <flex-box as="div">
                 <flex-box-element as='div'>
@@ -197,10 +197,10 @@ export const UserForm = observer(function UserForm({
                       type='text'
                       name='login'
                       value={controller.credentials.login}
-                      onChange={handleLoginChange}
                       disabled={editing || controller.isSaving}
                       mod='surface'
                       required
+                      onChange={handleLoginChange}
                     >
                       {translate('authentication_user_name')}
                     </InputField>
@@ -211,10 +211,10 @@ export const UserForm = observer(function UserForm({
                       name='password'
                       autoComplete='new-password'
                       value={controller.credentials.password}
-                      onChange={handlePasswordChange}
                       disabled={controller.isSaving}
                       mod='surface'
                       required
+                      onChange={handlePasswordChange}
                     >
                       {translate('authentication_user_password')}
                     </InputField>
@@ -224,10 +224,10 @@ export const UserForm = observer(function UserForm({
                       type='password'
                       name='password_repeat'
                       value={controller.credentials.passwordRepeat}
-                      onChange={handlePasswordRepeatChange}
                       disabled={controller.isSaving}
                       mod='surface'
                       required
+                      onChange={handlePasswordRepeatChange}
                     >
                       {translate('authentication_user_password_repeat')}
                     </InputField>
@@ -238,22 +238,22 @@ export const UserForm = observer(function UserForm({
                     <InputGroup>{translate('authentication_user_role')}</InputGroup>
                   </group>
                   {controller.roles.map((role, i) => (
-                    <group as="div" key={role.roleId}>
+                    <group key={role.roleId} as="div">
                       <Checkbox
                         value={role.roleId}
                         name='role'
                         checkboxLabel={role.roleName || role.roleId}
-                        onChange={checked => handleRoleChange(role.roleId, checked)}
                         checked={controller.credentials.roles.get(role.roleId)}
                         disabled={controller.isSaving}
                         mod='surface'
+                        onChange={checked => handleRoleChange(role.roleId, checked)}
                       />
                     </group>
                   ))}
                 </flex-box-element>
               </flex-box>
             </TabPanel>
-            {controller.isLoading && <Loader overlay/>}
+            {controller.isLoading && <Loader overlay />}
             <TabPanel tabId='connections_access'>
               <GrantedConnections
                 grantedConnections={controller.grantedConnections}

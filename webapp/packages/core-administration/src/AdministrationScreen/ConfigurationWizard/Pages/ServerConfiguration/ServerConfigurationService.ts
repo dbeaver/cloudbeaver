@@ -76,10 +76,10 @@ export class ServerConfigurationService {
 
   private isFormFilled() {
     return !!(
-      this.state?.serverConfig.serverName
-      && this.state.serverConfig.adminName
-      && this.state.serverConfig.adminName.length > 5
-      && this.state.serverConfig.adminPassword
+      this.state?.serverConfig.serverName &&
+      this.state.serverConfig.adminName &&
+      this.state.serverConfig.adminName.length > 5 &&
+      this.state.serverConfig.adminPassword
     );
   }
 

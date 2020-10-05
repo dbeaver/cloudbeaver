@@ -199,8 +199,8 @@ export class UserFormController implements IInitializableController, IDestructib
         const connectionPermission = this.grantedConnections.find(
           connectionPermission => connectionPermission.connectionId === connectionId
         );
-        return this.selectedConnections.get(connectionId)
-          && connectionPermission?.subjectType !== AdminSubjectType.Role;
+        return this.selectedConnections.get(connectionId) &&
+          connectionPermission?.subjectType !== AdminSubjectType.Role;
       });
   }
 

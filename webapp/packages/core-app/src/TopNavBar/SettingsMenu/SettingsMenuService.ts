@@ -57,8 +57,8 @@ export class SettingsMenuService extends Bootstrap {
       {
         id: 'administrationMenuEnter',
         order: 0,
-        isHidden: () => !this.permissionsService.has(EAdminPermission.admin)
-          || this.screenService.isActive(AdministrationScreenService.screenName),
+        isHidden: () => !this.permissionsService.has(EAdminPermission.admin) ||
+          this.screenService.isActive(AdministrationScreenService.screenName),
         title: 'administration_menu_enter',
         onClick: () => this.administrationScreenService.navigateToRoot(),
       }

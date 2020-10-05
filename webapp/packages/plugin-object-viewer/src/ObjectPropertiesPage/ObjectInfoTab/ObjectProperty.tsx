@@ -41,8 +41,8 @@ export const ObjectProperty = observer(function ObjectProperty({
       {...use({ checkbox: matchType(objectProperty.dataType) === 'checkbox' })}
     >
       {matchType(objectProperty.dataType) === 'checkbox'
-        ? <ObjectPropertyCheckbox objectProperty={objectProperty}/>
-        : <ObjectPropertyInput objectProperty={objectProperty}/>}
+        ? <ObjectPropertyCheckbox objectProperty={objectProperty} />
+        : <ObjectPropertyInput objectProperty={objectProperty} />}
     </property>
   );
 });

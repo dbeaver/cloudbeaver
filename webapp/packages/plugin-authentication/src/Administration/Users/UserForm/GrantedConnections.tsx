@@ -69,13 +69,13 @@ export const GrantedConnections = observer(function GrantedConnections({
 
   return styled(style)(
     <box as='div'>
-      <Table selectedItems={selectedConnection} onSelect={onChange} className={className}>
+      <Table selectedItems={selectedConnection} className={className} onSelect={onChange}>
         <TableHeader>
-          <TableColumnHeader min/>
-          <TableColumnHeader min/>
+          <TableColumnHeader min />
+          <TableColumnHeader min />
           <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
           <TableColumnHeader>{translate('authentication_administration_user_connections_access_granted_by')}</TableColumnHeader>
-          <TableColumnHeader></TableColumnHeader>
+          <TableColumnHeader />
         </TableHeader>
         <TableBody>
           {connections.map((connection) => {
@@ -86,7 +86,7 @@ export const GrantedConnections = observer(function GrantedConnections({
             return (
               <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
                 <TableColumnValue centerContent flex>
-                  <TableItemSelect disabled={disabled || isRoleProvided} checked={disabled || isRoleProvided}/>
+                  <TableItemSelect disabled={disabled || isRoleProvided} checked={disabled || isRoleProvided} />
                 </TableColumnValue>
                 <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
                 <TableColumnValue>{connection.name}</TableColumnValue>
@@ -95,7 +95,7 @@ export const GrantedConnections = observer(function GrantedConnections({
                     ? `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission?.subjectId}`
                     : translate('authentication_administration_user_connections_access_granted_directly'))}
                 </TableColumnValue>
-                <TableColumnValue></TableColumnValue>
+                <TableColumnValue />
               </TableItem>
             );
           })}

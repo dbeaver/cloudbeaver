@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { DataTransferParameters } from '@cloudbeaver/core-sdk';
 
 import { DataExportProcessService } from './DataExportProcessService';
@@ -23,26 +23,22 @@ export class DataExportService {
     readonly processors: DataTransferProcessorsResource
   ) { }
 
-  async cancel(exportId: string) {
+  async cancel(exportId: string): Promise<void> {
     await this.dataExportProcessService.cancel(exportId);
   }
 
-  async delete(exportId: string) {
+  async delete(exportId: string): Promise<void> {
     await this.dataExportProcessService.delete(exportId);
   }
 
-  download(exportId: string) {
+  download(exportId: string): void {
     this.dataExportProcessService.download(exportId);
-  }
-
-  downloadUrl(exportId: string) {
-    return this.dataExportProcessService.download(exportId);
   }
 
   async exportData(
     context: IExportContext,
     parameters: DataTransferParameters
-  ) {
+  ): Promise<string> {
     const taskId = await this.dataExportProcessService.exportData(
       context,
       parameters

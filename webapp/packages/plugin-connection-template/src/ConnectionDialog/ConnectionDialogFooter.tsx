@@ -48,17 +48,17 @@ export const ConnectionDialogFooter = observer(
         <Button
           type="button"
           mod={['outlined']}
-          onClick={onBack}
           disabled={isConnecting}
+          onClick={onBack}
         >
           {translate('ui_stepper_back')}
         </Button>
-        <fill as="div"/>
+        <fill as="div" />
         <Button
           type="button"
           mod={['unelevated']}
-          onClick={onConnect}
           disabled={isConnecting}
+          onClick={onConnect}
         >
           {isConnecting
             ? translate('basicConnection_connectionDialog_connecting')

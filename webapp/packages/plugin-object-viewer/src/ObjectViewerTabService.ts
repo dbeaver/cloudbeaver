@@ -277,13 +277,13 @@ export class ObjectViewerTabService {
 
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
-      typeof tab.handlerState?.folderId === 'string'
-      && typeof tab.handlerState.parentId === 'string'
-      && Array.isArray(tab.handlerState.parents)
-      && typeof tab.handlerState.objectId === 'string'
-      && typeof tab.handlerState.pagesState === 'object'
-      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
-      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
+      typeof tab.handlerState?.folderId === 'string' &&
+      typeof tab.handlerState.parentId === 'string' &&
+      Array.isArray(tab.handlerState.parents) &&
+      typeof tab.handlerState.objectId === 'string' &&
+      typeof tab.handlerState.pagesState === 'object' &&
+      (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string') &&
+      (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
 

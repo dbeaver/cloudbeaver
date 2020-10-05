@@ -38,9 +38,9 @@ export class SessionExpireService {
     try {
       return await request;
     } catch (exception) {
-      if (exception instanceof GQLError
-        && exception.errorCode === EServerErrorCode.sessionExpired
-        && !this.isNotifiedAboutExpiredSession) {
+      if (exception instanceof GQLError &&
+        exception.errorCode === EServerErrorCode.sessionExpired &&
+        !this.isNotifiedAboutExpiredSession) {
         this.isNotifiedAboutExpiredSession = true;
         this.onSessionExpire.next();
         try {

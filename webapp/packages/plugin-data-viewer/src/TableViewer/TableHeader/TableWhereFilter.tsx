@@ -73,13 +73,13 @@ export const TableWhereFilter = observer(function TableWhereFilter({
     <InlineEditor
       name="data_where"
       value={filterValue}
-      onSave={handleApply}
-      onUndo={resetFilter}
-      onChange={setValue}
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
       simple
+      onSave={handleApply}
+      onUndo={resetFilter}
+      onChange={setValue}
     />
   );
 });

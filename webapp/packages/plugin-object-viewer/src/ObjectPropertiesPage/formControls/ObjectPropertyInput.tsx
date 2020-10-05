@@ -49,15 +49,18 @@ export const ObjectPropertyInput = observer(function ObjectPropertyInput({ objec
   return styled(style)(
     <form-input as="div">
       <label-wrapper as="div">
-        <label htmlFor={objectProperty.id}
-          title={objectProperty.displayName}>{objectProperty.displayName}</label>
+        <label
+          htmlFor={objectProperty.id}
+          title={objectProperty.displayName}
+        >{objectProperty.displayName}
+        </label>
       </label-wrapper>
       <input-wrapper as="div">
         <input
           type={matchType(objectProperty.dataType)}
           value={getValue(objectProperty.value)}
           {...additionalProps(objectProperty)}
-          readOnly={true}
+          readOnly
         />
       </input-wrapper>
     </form-input>

@@ -64,9 +64,9 @@ function NestedDialog({
   const dialogState = useDialogState({ visible });
   const styles = useStyles(dialogStyles);
 
-  if (!dialogState.visible
-    && dialogState.visible !== lastVisibility.current
-    && !dialog.options?.persistent
+  if (!dialogState.visible &&
+    dialogState.visible !== lastVisibility.current &&
+    !dialog.options?.persistent
   ) {
     rejectDialog(dialog);
   } else {
@@ -82,11 +82,17 @@ function NestedDialog({
 
   const DialogComponent = dialog.component;
 
+  const backdropClickHandler = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!dialog.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
+      rejectDialog(dialog);
+    }
+  };
+
   // TODO: place Dialog inside CommonDialogWrapper, so we can pass aria-label
   return styled(styles)(
     <>
-      <DialogBackdrop {...dialogState}>
-        <Dialog {...dialogState}>
+      <DialogBackdrop {...dialogState} onClick={backdropClickHandler}>
+        <Dialog {...dialogState} hideOnClickOutside={false}>
           <DialogComponent
             payload={dialog.payload}
             options={dialog.options}

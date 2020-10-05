@@ -39,7 +39,7 @@ export const User = observer(function User({ user }: Props) {
       </TableColumnValue>
       <TableColumnValue expand>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
-      <TableColumnValue></TableColumnValue>
+      <TableColumnValue />
     </TableItem>
   );
 });

@@ -23,17 +23,17 @@ import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
-  if (!usePermission(EAdminPermission.admin)) {
-    return <Translate token='root_permission_denied' />;
-  }
 
   const handleSelect = useCallback(
     (item: string) => {
       const route = administrationItemService.getItem(item, true)?.configurationWizardOptions?.defaultRoute;
       administrationScreenService.navigateTo(item, route);
     },
-    [administrationScreenService]
+    [administrationItemService, administrationScreenService]
   );
+  if (!usePermission(EAdminPermission.admin)) {
+    return <Translate token='root_permission_denied' />;
+  }
 
   return (
     <>

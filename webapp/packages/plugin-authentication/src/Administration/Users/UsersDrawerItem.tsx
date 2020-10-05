@@ -17,7 +17,7 @@ export function UsersDrawerItem({ item, onSelect, style }: AdministrationItemDra
   return styled(useStyles(...style))(
     <Tab tabId={item.name} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/account.svg' />
-      <TabTitle><Translate token='authentication_administration_item'/></TabTitle>
+      <TabTitle><Translate token='authentication_administration_item' /></TabTitle>
     </Tab>
   );
 }

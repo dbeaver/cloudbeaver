@@ -36,7 +36,7 @@ export const ProcessorItem = observer(function ProcessorItem({
 
   return styled(styles)(
     <ListItem onClick={select}>
-      <ListItemIcon><StaticImage icon={processor.icon}/></ListItemIcon>
+      <ListItemIcon><StaticImage icon={processor.icon} /></ListItemIcon>
       <ListItemName>{processor.name}</ListItemName>
       <ListItemDescription title={processor.description}>{processor.description}</ListItemDescription>
     </ListItem>

@@ -17,12 +17,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { SNACKBAR_COMMON_STYLES } from './SnackbarCommonStyles';
 
-type ExtraProps = {
+type Props = NotificationComponentProps<{
   onAction: () => void;
   actionText: string;
-}
+}>
 
-export const ActionSnackbar: React.FC<NotificationComponentProps & ExtraProps> = function ActionSnackbar({
+export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
   notification, onAction, actionText,
 }) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);

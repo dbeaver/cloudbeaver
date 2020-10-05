@@ -99,18 +99,18 @@ export class ConnectionSchemaManagerService {
   }
 
   get isConnectionChangeable(): boolean {
-    return !!this.activeItem?.changeConnectionId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeConnectionId &&
+      !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   get isObjectCatalogChangeable(): boolean {
-    return !!this.activeItem?.changeCatalogId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeCatalogId &&
+      !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   get isObjectSchemaChangeable(): boolean {
-    return !!this.activeItem?.changeSchemaId
-      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeSchemaId &&
+      !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   @observable private activeItem: IActiveItem<any> | null = null;

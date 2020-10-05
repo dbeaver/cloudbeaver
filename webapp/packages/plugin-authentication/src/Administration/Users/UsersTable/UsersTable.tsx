@@ -38,14 +38,14 @@ export const UsersTable = observer(function UsersTable({ users, selectedItems, e
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min/>
-        <TableColumnHeader min/>
+        <TableColumnHeader min />
+        <TableColumnHeader min />
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
-        <TableColumnHeader></TableColumnHeader>
+        <TableColumnHeader />
       </TableHeader>
       <TableBody>
-        {users.map(user => <User key={user.userId} user={user}/>)}
+        {users.map(user => <User key={user.userId} user={user} />)}
       </TableBody>
     </Table>
   );

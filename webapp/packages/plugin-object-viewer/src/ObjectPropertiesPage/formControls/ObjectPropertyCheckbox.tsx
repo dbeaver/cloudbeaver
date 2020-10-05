@@ -58,7 +58,7 @@ export const ObjectPropertyCheckbox = observer(function ObjectPropertyCheckbox({
           type={matchType(objectProperty.dataType)}
           value={getValue(objectProperty.value as any)}
           {...additionalProps(objectProperty)}
-          readOnly={true}
+          readOnly
         />
       </input-wrapper>
     </form-checkbox>

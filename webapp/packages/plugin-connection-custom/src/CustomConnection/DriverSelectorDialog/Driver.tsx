@@ -39,7 +39,7 @@ export const Driver = observer(function Driver({ driver, onSelect }: DriverProps
 
   return styled(styles)(
     <ListItem onClick={select}>
-      <ListItemIcon><StaticImage icon={driver.icon}/></ListItemIcon>
+      <ListItemIcon><StaticImage icon={driver.icon} /></ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>
       <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>
     </ListItem>

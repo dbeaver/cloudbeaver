@@ -44,7 +44,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       [props.payload]
     );
 
-    const title = useTranslate('core_eventsLog_dbeaverErrorDetails');
+    const translate = useTranslate();
 
     const [copy] = useClipboard();
     const copyHandler = useCallback(
@@ -54,7 +54,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
 
     return styled(useStyles(styles))(
       <CommonDialogWrapper
-        title={title}
+        title={translate('core_eventsLog_dbeaverErrorDetails')}
         footer={(
           <controls as="div">
             <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>Close</Button>
@@ -66,12 +66,12 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
         onReject={props.rejectDialog}
       >
         {error.reason && <property as="div">{error.reason}</property>}
-        {error.htmlBody && (<SanitizedHTML html={error.htmlBody}/>)}
+        {error.htmlBody && (<SanitizedHTML html={error.htmlBody} />)}
         {error.errors.map(
           (error, id) => (
             <>
-              {id > 0 && <hr/>}
-              <DisplayErrorInfo key={id} error={error}/>
+              {id > 0 && <hr />}
+              <DisplayErrorInfo key={id} error={error} />
             </>
           )
         )}

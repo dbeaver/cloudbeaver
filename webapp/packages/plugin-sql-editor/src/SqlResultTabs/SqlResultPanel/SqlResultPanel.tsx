@@ -71,7 +71,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
         <wrapper as="div">
           <messages as="div">
             <message as="div">{controller.executionResult}</message>
-            <hr/>
+            <hr />
             <query as="pre">
               {controller.getQuery()}
             </query>

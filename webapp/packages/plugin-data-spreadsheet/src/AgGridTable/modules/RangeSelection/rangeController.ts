@@ -200,8 +200,8 @@ export class RangeController implements IRangeController {
       }
       this.lastSelectedCell = cell;
       this.lastFocus = cell;
-      if (!this.gridOptionsWrapper.isEnableRangeSelection()
-        || cell.column.getColId() === INDEX_COLUMN_DEF.colId) {
+      if (!this.gridOptionsWrapper.isEnableRangeSelection() ||
+        cell.column.getColId() === INDEX_COLUMN_DEF.colId) {
         return;
       }
       this.selection.selectCell(cell.rowIndex, cell.column.getColId(), appendRange);
@@ -439,9 +439,9 @@ export class RangeController implements IRangeController {
     }
 
     private isCellInTemporaryRange(rowId: number, column: string) {
-      if (!this.temporaryRange
-        || this.temporaryRange.firstRow > rowId || this.temporaryRange.lastRow < rowId
-        || !this.temporaryRange.columns.includes(column)
+      if (!this.temporaryRange ||
+        this.temporaryRange.firstRow > rowId || this.temporaryRange.lastRow < rowId ||
+        !this.temporaryRange.columns.includes(column)
       ) {
         return false;
       }

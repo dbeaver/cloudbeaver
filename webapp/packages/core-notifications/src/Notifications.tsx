@@ -32,7 +32,7 @@ export const Notifications = observer(function Notifications() {
   return styled(useStyles(styles))(
     <Portal>
       <notifications as="div">
-        {notificationService.notificationList.values.map(notification => (
+        {notificationService.visibleNotifications.map(notification => (
           <NotificationsItem key={notification.id} notification={notification} />
         ))}
       </notifications>

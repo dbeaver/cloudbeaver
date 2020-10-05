@@ -35,15 +35,15 @@ export const ConnectionForm = observer(function ConnectionForm({
 
   return styled(useStyles(formStyles))(
     <connection-form as='div'>
-      <connection-type as="div" ref={focusedRef}>
+      <connection-type ref={focusedRef} as="div">
         <Radio
           name="type"
           id="custom"
           value="custom"
-          onClick={() => controller.onChangeType(ConnectionType.Attributes)}
           checked={controller.connectionType === ConnectionType.Attributes}
           disabled={controller.isConnecting}
           mod={['primary']}
+          onClick={() => controller.onChangeType(ConnectionType.Attributes)}
         >
           {translate('customConnection_connectionType_custom')}
         </Radio>
@@ -51,10 +51,10 @@ export const ConnectionForm = observer(function ConnectionForm({
           name="type"
           id="url"
           value="url"
-          onClick={() => controller.onChangeType(ConnectionType.URL)}
           checked={controller.connectionType === ConnectionType.URL}
           disabled={controller.isConnecting}
           mod={['primary']}
+          onClick={() => controller.onChangeType(ConnectionType.URL)}
         >
           {translate('customConnection_connectionType_url')}
         </Radio>
@@ -67,9 +67,9 @@ export const ConnectionForm = observer(function ConnectionForm({
             type="text"
             name="url"
             value={controller.config.url}
-            onChange={value => controller.onChange('url', value)}
             disabled={controller.isConnecting}
             mod='surface'
+            onChange={value => controller.onChange('url', value)}
           >
             {translate('customConnection_url_JDBC')}
           </InputField>

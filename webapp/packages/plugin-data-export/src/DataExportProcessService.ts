@@ -20,7 +20,7 @@ type Process = {
   process: Deferred<string>;
 }
 
-type ExportProcess = {
+export type ExportProcess = {
   taskId: string;
   context: IExportContext;
   parameters: DataTransferParameters;
@@ -36,7 +36,7 @@ export class DataExportProcessService {
     private notificationService: NotificationService,
   ) { }
 
-  async cancel(exportId: string) {
+  async cancel(exportId: string): Promise<void> {
     const process = this.exportProcesses.get(exportId);
     if (!process) {
       return;
@@ -44,7 +44,7 @@ export class DataExportProcessService {
     process.process.cancel();
   }
 
-  async delete(exportId: string) {
+  async delete(exportId: string): Promise<void> {
     const process = this.exportProcesses.get(exportId);
     if (!process) {
       return;
@@ -61,7 +61,7 @@ export class DataExportProcessService {
     }
   }
 
-  download(exportId: string) {
+  download(exportId: string): void {
     const process = this.exportProcesses.get(exportId);
     if (!process) {
       return;
@@ -73,7 +73,7 @@ export class DataExportProcessService {
     this.exportProcesses.remove(exportId);
   }
 
-  downloadUrl(exportId: string) {
+  downloadUrl(exportId: string): string | undefined {
     const process = this.exportProcesses.get(exportId);
     if (!process) {
       return;

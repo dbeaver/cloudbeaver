@@ -95,13 +95,12 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
       <CommonDialogWrapper
         title={title}
         icon={driver?.icon}
-        noBodyPadding
         header={(
           <TabList>
-            <Tab tabId='options' >
+            <Tab tabId='options'>
               <TabTitle>{translate('customConnection_options')}</TabTitle>
             </Tab>
-            <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)} >
+            <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)}>
               <TabTitle>{translate('customConnection_properties')}</TabTitle>
             </Tab>
           </TabList>
@@ -114,6 +113,7 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
             onBack={onBack}
           />
         )}
+        noBodyPadding
         onReject={onClose}
       >
         {controller.isLoading
@@ -131,8 +131,7 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
                 />
               </TabPanel>
             </SubmittingForm>
-          )
-        }
+          )}
         {controller.error.responseMessage && (
           <ErrorMessage
             text={controller.error.responseMessage}

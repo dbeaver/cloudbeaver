@@ -16,6 +16,6 @@ import { ObjectProperties } from './ObjectProperties';
 export const ObjectInfoTab = observer(function ObjectInfoTab() {
   const nodePropertiesMixin = useService(NodePropertiesMixin);
   return (
-    <ObjectProperties objectId={nodePropertiesMixin.nodeId}/>
+    <ObjectProperties objectId={nodePropertiesMixin.nodeId} />
   );
 });

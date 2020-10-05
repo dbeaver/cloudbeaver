@@ -20,7 +20,7 @@ export class SettingsService {
    * @param key
    * @param settings - observable object expected
    */
-  registerSettings<T extends object>(settings: T, key: string): void {
+  registerSettings<T extends Record<any, unknown>>(settings: T, key: string): void {
     this.localStorageSaveService.withAutoSave(settings, key);
   }
 }

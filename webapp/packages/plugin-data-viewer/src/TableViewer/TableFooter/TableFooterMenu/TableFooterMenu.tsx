@@ -37,7 +37,7 @@ export const TableFooterMenu = observer(function TableFooterMenu({ model, classN
   return styled(styles)(
     <menu-wrapper as="div" className={className}>
       {mainMenuService.constructMenuWithContext(model).map((topItem, i) => (
-        <TableFooterMenuItem key={i} menuItem={topItem}/>
+        <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}
     </menu-wrapper>
   );

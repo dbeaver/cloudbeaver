@@ -29,9 +29,6 @@ export type DynamicStyle = Style | boolean | undefined;
 export function useStyles(
   ...componentStyles: (DynamicStyle | DynamicStyle[])[]
 ): Record<string, any> {
-  if (!componentStyles) {
-    return {};
-  }
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
   const stylesRef = useRef<(DynamicStyle | DynamicStyle[])[]>([]);

@@ -45,9 +45,9 @@ export const ObjectPropertyTable = observer(function ObjectPropertyTable({
     );
   }
 
-  return <ObjectChildrenPropertyTable nodeIds={children.children}/>;
+  return <ObjectChildrenPropertyTable nodeIds={children.children} />;
 });
 
 export const objectPropertyTablePanel = (parentId: string, objectId: string) => (
-  <ObjectPropertyTable parentId={parentId} objectId={objectId}/>
+  <ObjectPropertyTable parentId={parentId} objectId={objectId} />
 );

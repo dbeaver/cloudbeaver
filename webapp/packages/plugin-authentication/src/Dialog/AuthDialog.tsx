@@ -91,7 +91,6 @@ export const AuthDialog = observer(function AuthDialog({
     <TabsState currentTabId={controller.provider?.id || null}>
       <CommonDialogWrapper
         title={translate('authentication_login_dialog_title')}
-        noBodyPadding
         header={(
           <TabList aria-label='Auth providers'>
             {controller.providers.map(provider => (
@@ -111,6 +110,7 @@ export const AuthDialog = observer(function AuthDialog({
             onLogin={controller.login}
           />
         )}
+        noBodyPadding
         onReject={options?.persistent ? undefined : rejectDialog}
       >
         <SubmittingForm onSubmit={controller.login}>
