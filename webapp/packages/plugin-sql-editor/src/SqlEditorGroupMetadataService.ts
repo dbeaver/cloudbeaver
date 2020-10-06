@@ -34,13 +34,13 @@ export class SqlEditorGroupMetadataService {
     const serviceContext = this;
 
     return {
-      async start(context, sqlQueryParams, filter) {
+      async start(context, sqlQueryParams, filter, dataFormat) {
         this.resultDataProcess = new SQLQueryExecutionProcess(
           serviceContext.graphQLService,
           serviceContext.notificationService
         );
         context.setCurrentlyExecutingQuery(this.resultDataProcess);
-        this.resultDataProcess.start(sqlQueryParams, filter);
+        this.resultDataProcess.start(sqlQueryParams, filter, dataFormat);
 
         return this.resultDataProcess;
       },

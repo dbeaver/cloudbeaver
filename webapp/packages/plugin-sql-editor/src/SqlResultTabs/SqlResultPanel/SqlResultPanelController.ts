@@ -14,7 +14,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
-  GQLError, GraphQLService, ResultDataFormat, ServerInternalError
+  GQLError, ResultDataFormat, ServerInternalError
 } from '@cloudbeaver/core-sdk';
 import { PromiseCancelledError } from '@cloudbeaver/core-utils';
 import {
@@ -30,7 +30,6 @@ import { IResultDataTab, IQueryTabGroup } from '../../ISqlEditorTabState';
 import { QueryDataSource } from '../../QueryDataSource';
 import { SqlEditorGroupMetadataService } from '../../SqlEditorGroupMetadataService';
 import { SqlExecutionState } from '../../SqlExecutionState';
-import { SQLQueryExecutionProcess } from '../SQLQueryExecutionProcess';
 import { SqlResultService } from '../SqlResultService';
 import { SqlResultTabsService } from '../SqlResultTabsService';
 
@@ -54,10 +53,9 @@ implements IInitializableController, IDestructibleController {
   private panelInit!: IResultDataTab;
   private group!: IQueryTabGroup;
   private tabId!: string;
-  private sqlProcess: SQLQueryExecutionProcess | null = null;
+  private source: QueryDataSource;
 
   constructor(
-    private sdk: GraphQLService,
     private sqlResultService: SqlResultService,
     private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
@@ -66,6 +64,7 @@ implements IInitializableController, IDestructibleController {
     private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
     private sqlResultTabsService: SqlResultTabsService
   ) {
+    this.source = new QueryDataSource(this.sqlEditorGroupMetadataService, this.sqlResultTabsService);
   }
 
   async init(tabId: string, panelInit: IResultDataTab, group: IQueryTabGroup) {
@@ -74,15 +73,15 @@ implements IInitializableController, IDestructibleController {
     this.group = group;
   }
 
-  async updateResult() {
+  async updateResult(dataFormat: ResultDataFormat = ResultDataFormat.Resultset) {
     const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.tabId);
     const metadata = this.sqlEditorGroupMetadataService.getTabData(this.panelInit.resultTabId);
-    if (this.sqlProcess === metadata.resultDataProcess) {
+    if (this.source.sqlProcess === metadata.resultDataProcess) {
       return;
     }
 
     try {
-      this.sqlProcess = metadata.resultDataProcess;
+      this.source.sqlProcess = metadata.resultDataProcess;
       const response = await metadata.resultDataProcess.promise;
 
       const dataSet = response.results![this.panelInit.indexInResultSet];
@@ -105,6 +104,18 @@ implements IInitializableController, IDestructibleController {
           this.tableViewerStorageService.remove(this.getTableId());
         }
 
+        this.source.setOptions({
+          tabId: this.tabId,
+          resultTabId: this.getTableId(),
+          group: this.group,
+          connectionId: this.group.sqlQueryParams.connectionId,
+          sourceName: this.group.sqlQueryParams.query,
+          constraints: [],
+          whereFilter: '',
+        })
+          .setDataFormat(dataSet.dataFormat || ResultDataFormat.Resultset)
+          .setSupportedDataFormats(connectionInfo.supportedDataFormats);
+
         const tableModel = this.tableViewerStorageService.create(
           {
             tableId: this.getTableId(),
@@ -117,16 +128,10 @@ implements IInitializableController, IDestructibleController {
             noLoaderWhileRequestingDataAsync: true,
             saveChanges: this.saveChanges.bind(this),
           },
-          new QueryDataSource(this.sdk)
-            .setOptions({
-              connectionId: this.group.sqlQueryParams.connectionId,
-              sourceName: this.group.sqlQueryParams.query,
-              constraints: [],
-              whereFilter: '',
-              dataFormat: ResultDataFormat.Resultset,
-            })
+          this.source
         )
           .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
+          .setResults(this.source.getResults(response) || [])
           .deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
@@ -197,10 +202,11 @@ implements IInitializableController, IDestructibleController {
         limit: count,
         constraints: Array.from(model.getSortedColumns()),
         where: model.getQueryWhereFilter() || undefined,
-      }
+      },
+      ResultDataFormat.Resultset
     );
 
-    this.sqlProcess = metadata.resultDataProcess;
+    this.source.sqlProcess = metadata.resultDataProcess;
     const response = await metadata.resultDataProcess.promise;
     const dataResults = this.sqlResultService.sqlExecuteInfoToData(
       response,
