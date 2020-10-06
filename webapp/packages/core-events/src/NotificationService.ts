@@ -93,6 +93,11 @@ export class NotificationService {
 
   logException(exception: Error | GQLError, message?: string, silent?: boolean): void {
     const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
+    const isSessionExpired = exception.name === 'SessionError';
+
+    if(isSessionExpired && message) {
+      message = exception.message
+    }
     if (!silent) {
       this.logError({
         title: message || exceptionMessage,
