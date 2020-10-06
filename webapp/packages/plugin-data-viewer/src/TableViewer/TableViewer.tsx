@@ -64,7 +64,7 @@ export const TableViewer = observer(function TableViewer({
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
-    if (presentation) {
+    if (presentation && presentation.dataFormat !== dataModel?.source.dataFormat) {
       dataModel?.setDataFormat(presentation.dataFormat)
         .reload();
       onPresentationChange(id);

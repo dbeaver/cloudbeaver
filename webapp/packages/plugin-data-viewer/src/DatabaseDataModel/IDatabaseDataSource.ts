@@ -34,6 +34,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly requestInfo: IRequestInfo;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
+  readonly canCancel: boolean;
 
   isLoading(): boolean;
   setSlice(offset: number, count: number): this;
@@ -47,4 +48,5 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
     prevResults: TResult[],
     data: DataUpdate
   ): Promise<TResult[]> | TResult[];
+  cancel(): Promise<boolean>;
 }

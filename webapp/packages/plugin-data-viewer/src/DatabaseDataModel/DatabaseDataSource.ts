@@ -21,6 +21,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   @observable options: TOptions | null;
   @observable requestInfo: IRequestInfo;
   @observable supportedDataFormats: ResultDataFormat[];
+  abstract  canCancel: boolean;
 
   @observable private activeRequest: Promise<TResult[]> | null;
   @observable private activeSave: Promise<TResult[]> | null;
@@ -38,6 +39,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
       requestMessage: '',
     };
   }
+
+  abstract cancel(): Promise<boolean>;
 
   isLoading(): boolean {
     return !!this.activeRequest;
