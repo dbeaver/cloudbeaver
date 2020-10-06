@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Checkbox
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -56,7 +56,7 @@ export const Connection = observer(function Connection({ connection }: Props) {
       </TableColumnValue>
       <TableColumnValue expand>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
-      <TableColumnValue><input type="checkbox" checked={connection.template} disabled /></TableColumnValue>
+      <TableColumnValue><Checkbox checked={connection.template} disabled /></TableColumnValue>
       <TableColumnValue />
     </TableItem>
   );

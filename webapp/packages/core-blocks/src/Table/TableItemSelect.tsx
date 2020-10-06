@@ -12,6 +12,7 @@ import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { Checkbox } from '../FormControls/Checkbox';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
@@ -38,6 +39,11 @@ export const TableItemSelect = observer(function TableItemSelect({ checked, disa
   }
 
   return styled(styles)(
-    <input type='checkbox' checked={checked || context.isSelected()} className={className} disabled={context.selectDisabled || disabled} onClick={handleClick} />
+    <Checkbox
+      className={className}
+      disabled={context.selectDisabled || disabled}
+      checked={checked || context.isSelected()}
+      onClick={handleClick}
+    />
   );
 });
