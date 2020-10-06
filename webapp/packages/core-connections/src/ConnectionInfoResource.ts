@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Observable, Subject } from 'rxjs';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   ConnectionInfo,
@@ -14,7 +16,7 @@ import {
   ObjectPropertyInfo,
   ResourceKey,
   isResourceKeyList,
-  resourceKeyList
+  resourceKeyList, ConnectionConfig
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
@@ -35,11 +37,16 @@ export type Connection = Pick<
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
+  readonly onConnectionCreate: Observable<Connection>;
+  private connectionCreateSubject: Subject<Connection>;
   constructor(
     private graphQLService: GraphQLService,
     private connectionsResource: ConnectionsResource
   ) {
     super(new Map());
+    this.connectionCreateSubject = new Subject<Connection>();
+    this.onConnectionCreate = this.connectionCreateSubject.asObservable();
+    connectionsResource.onConnectionCreate.subscribe(this.createHandler.bind(this));
     connectionsResource.onItemAdd.subscribe(this.addHandler.bind(this));
     connectionsResource.onItemDelete.subscribe(this.delete.bind(this));
     connectionsResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
@@ -49,7 +56,20 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({ templateId });
     this.set(connection.id, connection);
 
-    return this.get(connection.id)!;
+    const observedConnection = this.get(connection.id)!;
+    this.connectionCreateSubject.next(observedConnection);
+    return observedConnection;
+  }
+
+  async createConnection(config: ConnectionConfig): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.createConnection({
+      config,
+    });
+    this.set(connection.id, connection);
+
+    const observedConnection = this.get(connection.id)!;
+    this.connectionCreateSubject.next(observedConnection);
+    return observedConnection;
   }
 
   async init(id: string, credentials?: any): Promise<Connection> {
@@ -100,6 +120,16 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.set(connectionId, { ...oldConnection, ...connection });
 
     return this.data;
+  }
+
+  private async createHandler(connection: ConnectionInfo) {
+    if (connection.template) {
+      return;
+    }
+
+    await this.load(connection.id);
+    const observedConnection = this.get(connection.id) as Connection;
+    this.connectionCreateSubject.next(observedConnection);
   }
 
   private async addHandler(key: ResourceKey<string>) {

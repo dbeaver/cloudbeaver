@@ -119,6 +119,7 @@ export class NavNodeManagerService extends Bootstrap {
   register(): void {
     this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
+    this.connectionInfo.onConnectionCreate.subscribe(this.connectionCreateHandler.bind(this));
     this.sessionResource.onDataUpdate.subscribe(this.updateRootChildren.bind(this));
   }
 
@@ -325,6 +326,23 @@ export class NavNodeManagerService extends Bootstrap {
     }
   }
 
+  private async connectionCreateHandler(connection: Connection) {
+    if (!await this.isNavTreeEnabled()) {
+      return;
+    }
+
+    await this.navTree.load(ROOT_NODE_PATH);
+    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
+    this.markTreeOutdated(nodeId);
+
+    await this.navNodeInfoResource.refresh(nodeId);
+    const tree = this.navTree.get(ROOT_NODE_PATH);
+
+    if (!tree?.includes(nodeId)) {
+      this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
+    }
+  }
+
   private async connectionUpdateHandler(key: ResourceKey<string>) {
     if (!await this.isNavTreeEnabled()) {
       return;
@@ -345,17 +363,6 @@ export class NavNodeManagerService extends Bootstrap {
       }
 
       this.navNodeInfoResource.markOutdated(nodeId);
-
-      const node = this.navNodeInfoResource.get(nodeId);
-
-      if(!node) {
-        await this.navNodeInfoResource.load(nodeId);
-        const tree = this.navTree.get(ROOT_NODE_PATH);
-
-        if (!tree?.includes(nodeId)) {
-          this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
-        }
-      }
     }
   }
 
