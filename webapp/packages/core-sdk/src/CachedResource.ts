@@ -11,22 +11,33 @@ import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
 
+interface IResourceTask<TParam> {
+  readonly param: TParam;
+  readonly task: Promise<any>;
+}
+
 @injectable()
 export abstract class CachedResource<
   TData,
   TParam,
 > {
-  @observable data: TData;
+  @observable 
+  data: TData;
 
   readonly onDataUpdate: Observable<TData>;
   readonly onDataOutdated: Observable<TParam>;
 
-  @observable protected outdated = new Set<TParam>();
-  @observable protected loading = false;
+  @observable 
+  protected outdated = new Set<TParam>();
+
+  @observable 
+  protected loading = false;
+
   protected outdatedSubject: Subject<TParam>;
   protected dataSubject: Subject<TData>;
-  @observable protected activePromiseParam: TParam | null = null;
-  private activePromise: Promise<any> | null = null;
+
+  @observable.shallow
+  protected tasks: IResourceTask<TParam>[] = [];
 
   constructor(defaultValue: TData) {
     this.data = defaultValue;
@@ -34,6 +45,7 @@ export abstract class CachedResource<
     this.dataSubject = new Subject();
     this.onDataOutdated = this.outdatedSubject.asObservable();
     this.onDataUpdate = this.dataSubject.asObservable();
+    this.loadingTask = this.loadingTask.bind(this);
   }
 
   abstract isLoaded(param: TParam): boolean;
@@ -56,14 +68,17 @@ export abstract class CachedResource<
   }
 
   async refresh(param: TParam): Promise<any> {
-    this.markOutdated(param);
-    await this.loadData(param);
+    await this.loadData(param, true);
     return this.data;
   }
 
   async load(param: TParam): Promise<any> {
     await this.loadData(param);
     return this.data;
+  }
+
+  protected includes(param: TParam, second: TParam): boolean {
+    return param === second;
   }
 
   protected abstract loader(param: TParam): Promise<TData>;
@@ -87,65 +102,72 @@ export abstract class CachedResource<
       return;
     }
 
-    await this.waitActive();
-
-    if (exitCheck && exitCheck()) {
-      return;
-    }
-
-    const result = await this.setActivePromise(param, update(param));
-    this.dataSubject.next(this.data);
-
-    return result;
+    return this.task(param, async () => {
+      // repeated because previous task maybe has been load requested data
+      if (exitCheck && exitCheck()) {
+        return;
+      }
+      
+      return await this.taskWrapper(param, update);
+    })
   }
 
-  protected async loadData(param: TParam) {
-    if (this.isLoaded(param) && !this.isOutdated(param)) {
+  protected async loadData(param: TParam, refresh?: boolean): Promise<void> {
+    if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
       return;
     }
 
-    await this.waitActive();
+    await this.task(param, async () => {
+      // repeated because previous task maybe has been load requested data
+      if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
+        return;
+      }
 
-    // repeated because previous task maybe has been load requested data
-    if (this.isLoaded(param) && !this.isOutdated(param)) {
-      return;
-    }
-
-    await this.setActivePromise(param, this.loadingTask(param));
-    this.dataSubject.next(this.data);
-  }
-
-  protected async setActivePromise<T>(param: TParam, promise: Promise<T>): Promise<T> {
-    this.activePromise = promise;
-    this.activePromiseParam = param;
-    try {
-      this.markOutdated(param);
-      const result = await this.activePromise;
-      this.markUpdated(param);
-
-      return result;
-    } finally {
-      this.activePromise = null;
-      this.activePromiseParam = null;
-    }
+      await this.taskWrapper(param, this.loadingTask);
+    })
   }
 
   private async loadingTask(param: TParam) {
+    this.data = await this.loader(param);
+  }
+
+  private async taskWrapper<T>(param: TParam, promise: (param: TParam) => Promise<T>) {
     const prevState = this.loading;
     this.loading = true;
-
+    this.markOutdated(param);
     try {
-      this.data = await this.loader(param);
+      const value = await promise(param);
+      this.markUpdated(param);
+      this.dataSubject.next(this.data);
+      return value;
     } finally {
       this.loading = prevState;
     }
   }
 
-  protected async waitActive() {
-    if (this.activePromise) {
+  protected async task<T>(param: TParam, action: (param: TParam) => Promise<T>): Promise<T> {
+    const task: IResourceTask<TParam> = {
+      param,
+      task: this.wrappedTask(param, action),
+    }
+    this.tasks.push(task);
+
+    try {
+      return await task.task;
+    } finally {
+      this.tasks.splice(this.tasks.indexOf(task), 1);
+    }
+  }
+
+  private async wrappedTask<T>(param: TParam, task: (param: TParam) => Promise<T>): Promise<T> {
+    const queue = this.tasks.filter(task => this.includes(param, task.param));
+
+    for(const task of queue) {
       try {
-        await this.activePromise;
+        await task.task;
       } catch {}
     }
+
+    return await task(param);
   }
 }

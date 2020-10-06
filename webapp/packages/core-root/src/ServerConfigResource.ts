@@ -6,29 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, ServerConfig } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null, null> {
+  @observable private loaded: boolean;
   constructor(
     private graphQLService: GraphQLService,
   ) {
     super(null);
+    this.loaded = false;
   }
 
-  isLoaded() {
-    return !!this.data;
+  isLoaded(): boolean {
+    return this.loaded;
   }
 
-  async update() {
+  async update(): Promise<void> {
     await this.refresh(null);
   }
 
   protected async loader(key: null): Promise<ServerConfig> {
     const { serverConfig } = await this.graphQLService.sdk.serverConfig();
 
-    this.markUpdated(key);
+    this.loaded = true;
     return serverConfig;
   }
 }

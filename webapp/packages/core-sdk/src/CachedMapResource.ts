@@ -11,13 +11,7 @@ import { Subject, Observable } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { CachedResource } from './CachedResource';
-
-export const RESOURCE_KEY_LIST = Symbol('@CachedMapResource/list');
-
-export type ResourceKeyList<TKey> = {
-  list: TKey[];
-  [RESOURCE_KEY_LIST]: true;
-}
+import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
 
 export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
 
@@ -89,14 +83,7 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   }
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
-    if (isResourceKeyList(key)) {
-      return key.list.some(
-        key => (isResourceKeyList(this.activePromiseParam)
-          ? this.activePromiseParam.list.includes(key)
-          : key === this.activePromiseParam)
-      );
-    }
-    return this.activePromiseParam === key;
+    return this.tasks.some(task=> this.includes(key, task.param));
   }
 
   get(key: TKey): TValue | undefined;
@@ -126,7 +113,7 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   delete(key: TKey): void;
   delete(key: ResourceKeyList<TKey>): void;
   delete(key: ResourceKey<TKey>): void;
-  delete(key: ResourceKey<TKey>) {
+  delete(key: ResourceKey<TKey>): void {
     if (isResourceKeyList(key)) {
       for (let i = 0; i < key.list.length; i++) {
         this.data.delete(key.list[i]);
@@ -142,8 +129,7 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   async refresh(key: ResourceKeyList<TKey>): Promise<Array<TValue>>;
   async refresh(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue>;
   async refresh(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue> {
-    this.markOutdated(key);
-    await this.loadData(key);
+    await this.loadData(key, true);
     return this.get(key) as Array<TValue>| TValue;
   }
 
@@ -158,12 +144,16 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   has(key: TKey): boolean {
     return this.data.has(key);
   }
-}
 
-export function isResourceKeyList<T>(data: any): data is ResourceKeyList<T> {
-  return data && typeof data === 'object' && RESOURCE_KEY_LIST in data;
-}
+  protected includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
+    if (isResourceKeyList(param)) {
+      return param.includes(key);
+    }
 
-export function resourceKeyList<T>(list: T[]): ResourceKeyList<T> {
-  return { [RESOURCE_KEY_LIST]: true, list };
+    if (isResourceKeyList(key)) {
+      return key.includes(param);
+    }
+
+    return param === key;
+  }
 }

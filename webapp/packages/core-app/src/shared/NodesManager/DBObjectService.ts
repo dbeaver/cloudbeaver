@@ -25,15 +25,17 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
     this.navNodeInfoResource.onItemDelete.subscribe(key => this.delete(key));
   }
 
-  async loadChildren(parentId: string, key: ResourceKey<string>) {
-    await this.performUpdate(key, async () => {
-      await this.setActivePromise(key, this.loadFromChildren(parentId));
-    }, () => this.isLoaded(key) && !this.isOutdated(key));
+  async loadChildren(parentId: string, key: ResourceKey<string>): Promise<Map<string, DBObject>> {
+    await this.performUpdate(
+      key, 
+      () => this.loadFromChildren(parentId), 
+      () => this.isLoaded(key) && !this.isOutdated(key)
+    );
 
     return this.data;
   }
 
-  protected async loader(key: ResourceKey<string>) {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, DBObject>> {
     if (isResourceKeyList(key)) {
       const values: DBObject[] = [];
       for (const navNodeId of key.list) {
