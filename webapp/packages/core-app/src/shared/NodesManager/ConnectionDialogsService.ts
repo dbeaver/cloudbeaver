@@ -73,7 +73,7 @@ export class ConnectionDialogsService {
           const connection = this.connectionInfoResource.get(connectionId);
 
           return !context.data.objectFeatures.includes(EObjectFeature.dataSource) ||
-            !connection?.features.includes(EConnectionFeature.temporary);
+            !connection?.features.includes(EConnectionFeature.manageable);
         },
         title: 'ui_delete',
         onClick: (context: IMenuContext<NavNode>) => {
