@@ -9,6 +9,7 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
@@ -20,15 +21,18 @@ export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>
 @injectable()
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], null> {
   @observable private loaded;
+
   constructor(
     private graphQLService: GraphQLService,
+    private permissionsService: PermissionsService
   ) {
     super([]);
     this.loaded = false;
+    this.permissionsService.onUpdate.subscribe(() => this.markOutdated(null));
   }
 
-  isLoaded() {
-    return !this.loaded;
+  isLoaded(): boolean {
+    return this.loaded;
   }
 
   protected async loader(key: null): Promise<AuthProvider[]> {
