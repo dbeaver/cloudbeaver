@@ -153,7 +153,8 @@ public class WebServiceCore implements DBWServiceCore {
         if (session == null) {
             return false;
         } else {
-            session.refreshConnections();
+            // We do full user refresh because we need to get config from global project
+            session.forceUserRefresh(session.getUser());
             return true;
         }
     }
