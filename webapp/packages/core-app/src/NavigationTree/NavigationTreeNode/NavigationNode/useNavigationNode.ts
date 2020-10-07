@@ -21,12 +21,12 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
   const navigationTreeService = useService(NavigationTreeService);
   const [isExpanded, switchExpand] = useState(false);
   const [isSelected, switchSelect] = useState(false);
-  const [isExpanding, setExpanding] = useState(false);
+  const [isProcessing, setProcessing] = useState(false);
   const children = useChildren(node.id);
   const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
   const { connectionInfo } = useConnectionInfo(connectionId);
 
-  const isLoading = nodeLoading || children.isLoading || isExpanding;
+  const isLoading = nodeLoading || children.isLoading || isProcessing;
   const isLoaded = children.isLoaded || nodeLoaded;
   let isExpandable = isExpandableFilter(node) && (
     !isLoaded || children.isOutdated || !children.children || children.children.length > 0
@@ -39,16 +39,23 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
   }
 
   const handleDoubleClick = useCallback(
-    () => navigationTreeService.navToNode(node.id, node.parentId),
+    async () => {
+      setProcessing(true);
+      try {
+        await navigationTreeService.navToNode(node.id, node.parentId);
+      } finally {
+        setProcessing(false);
+      }
+    },
     [navigationTreeService, node]
   );
 
   const handleExpand = useCallback(
     async () => {
       if (!isExpandedActually) {
-        setExpanding(true);
+        setProcessing(true);
         const state = await navigationTreeService.loadNestedNodes(node.id);
-        setExpanding(false);
+        setProcessing(false);
         if (!state) {
           switchExpand(false);
           return;
@@ -74,11 +81,11 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
 
   useEffect(() => {
     if (isExpandedActually && children.isOutdated && !children.isLoading && children.isLoaded && !nodeOutdated) {
-      setExpanding(true);
+      setProcessing(true);
       navigationTreeService
         .loadNestedNodes(node.id)
         .then((state) => {
-          setExpanding(false);
+          setProcessing(false);
           if (!state) {
             switchExpand(false);
           }

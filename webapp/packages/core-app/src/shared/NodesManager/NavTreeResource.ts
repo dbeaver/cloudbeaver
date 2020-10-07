@@ -31,7 +31,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   deleteInNode(key: string, value: string[]): void;
   deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
-  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
     if (isResourceKeyList(keyObject)) {
       for (let i = 0; i < keyObject.list.length; i++) {
         const key = keyObject.list[i];
@@ -58,7 +58,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   unshiftToNode(key: string, value: string[]): void;
   unshiftToNode(key: ResourceKeyList<string>, value: string[][]): void;
-  unshiftToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+  unshiftToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
     if (isResourceKeyList(keyObject)) {
       for (let i = 0; i < keyObject.list.length; i++) {
         const key = keyObject.list[i];
@@ -81,7 +81,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   pushToNode(key: string, value: string[]): void;
   pushToNode(key: ResourceKeyList<string>, value: string[][]): void;
-  pushToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]) {
+  pushToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
     if (isResourceKeyList(keyObject)) {
       for (let i = 0; i < keyObject.list.length; i++) {
         const key = keyObject.list[i];
@@ -127,7 +127,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   delete(key: string): void;
   delete(key: ResourceKeyList<string>): void;
   delete(key: ResourceKey<string>): void;
-  delete(key: ResourceKey<string>) {
+  delete(key: ResourceKey<string>): void {
     const items = this.getNestedChildren(key);
     if (items.length === 0) {
       return;
@@ -142,7 +142,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.navNodeInfoResource.delete(resourceKeyList(items.filter(navNodeId => navNodeId !== key)));
   }
 
-  protected async loader(key: ResourceKey<string>) {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
     if (isResourceKeyList(key)) {
       const values: NavNodeChildrenQuery[] = [];
       for (const nodePath of key.list) {
@@ -156,7 +156,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return this.data;
   }
 
-  getNestedChildren(navNode: ResourceKey<string>) {
+  getNestedChildren(navNode: ResourceKey<string>): string[] {
     const nestedChildren: string[] = [];
     let prevChildren: string[];
     if (isResourceKeyList(navNode)) {

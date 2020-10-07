@@ -8,7 +8,7 @@
 
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
-  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter,
+  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter, ResultDataFormat
 } from '@cloudbeaver/core-sdk';
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState,
@@ -33,11 +33,12 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
 
   async start(
     sqlQueryParams: ISqlQueryParams,
-    filter: SqlDataFilter
+    filter: SqlDataFilter,
+    dataFormat: ResultDataFormat
   ): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(sqlQueryParams, filter);
+      const taskInfo = await this.executeQueryAsync(sqlQueryParams, filter, dataFormat);
       await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -108,12 +109,14 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   private async executeQueryAsync(
     sqlQueryParams: ISqlQueryParams,
     filter: SqlDataFilter,
+    dataFormat: ResultDataFormat,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
       query: sqlQueryParams.query,
       filter,
+      dataFormat,
     });
     return taskInfo;
   }

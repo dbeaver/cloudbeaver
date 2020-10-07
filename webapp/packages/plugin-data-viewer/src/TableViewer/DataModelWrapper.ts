@@ -7,6 +7,7 @@
  */
 
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
@@ -39,11 +40,24 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   isLoading(): boolean {
-    return this.deprecatedModel.isLoaderVisible || this.source.isLoading();
+    return !this.deprecatedModel.noLoaderWhileRequestingDataAsync && (
+      this.deprecatedModel.isLoaderVisible || this.source.isLoading()
+    );
+  }
+
+  async reload(): Promise<void> {
+    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+      await this.deprecatedModel.refresh();
+    }
+    this.setSlice(0, this.countGain);
+    await this.requestData();
   }
 
   async refresh(): Promise<void> {
-    await this.deprecatedModel.refresh();
+    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+      await this.deprecatedModel.refresh();
+      return;
+    }
     await this.requestData();
   }
 

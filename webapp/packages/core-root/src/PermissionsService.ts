@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
 
 import { PermissionsResource } from './PermissionsResource';
-import { SessionResource } from './SessionResource';
 
 export enum EPermission {
   public = 'public'
@@ -19,17 +18,13 @@ export enum EPermission {
 
 @injectable()
 export class PermissionsService {
-  readonly onUpdate: Observable<unknown>;
-
-  private updateSubject: Subject<unknown>;
+  get onUpdate(): Observable<Set<string>> {
+    return this.permissions.onDataUpdate
+  }
 
   constructor(
-    private sessionResource: SessionResource,
     private permissions: PermissionsResource,
   ) {
-    this.updateSubject = new Subject();
-    this.onUpdate = this.updateSubject.asObservable();
-    this.sessionResource.onDataUpdate.subscribe(this.update.bind(this));
   }
 
   has(id: string): boolean {
@@ -41,8 +36,7 @@ export class PermissionsService {
     return this.has(id);
   }
 
-  async update() {
+  async update(): Promise<void> {
     await this.permissions.refresh(null);
-    this.updateSubject.next();
   }
 }

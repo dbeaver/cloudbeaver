@@ -1,5 +1,5 @@
 mutation createConnection($config: ConnectionConfig!) {
-  createConnection(config: $config) {
+  connection: createConnection(config: $config) {
     id
     name
     description

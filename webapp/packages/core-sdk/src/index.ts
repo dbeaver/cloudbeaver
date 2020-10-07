@@ -7,5 +7,6 @@ export * from './EServerErrorCode';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';
+export * from './ResourceKeyList';
 export * from './sdk';
 export * from './ServerInternalError';

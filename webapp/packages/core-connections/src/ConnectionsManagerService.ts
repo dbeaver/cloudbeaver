@@ -73,9 +73,9 @@ export class ConnectionsManagerService {
   }
 
   async deleteConnection(id: string) {
-    const connection = this.connectionInfo.get(id);
+    const connection = await this.connectionInfo.load(id);
 
-    if (!connection?.features.includes(EConnectionFeature.temporary)) {
+    if (!connection.features.includes(EConnectionFeature.manageable)) {
       return;
     }
 

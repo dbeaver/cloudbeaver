@@ -9,103 +9,105 @@
 @import "@material/layout-grid/variables";
 @import "@material/layout-grid/mixins";
 
-:root {
-  @each $size in map-keys($mdc-layout-grid-columns) {
-    --mdc-layout-grid-margin-#{$size}: #{map-get($mdc-layout-grid-default-margin, $size)};
-    --mdc-layout-grid-gutter-#{$size}: #{map-get($mdc-layout-grid-default-gutter, $size)};
-    --mdc-layout-grid-column-width-#{$size}: #{map-get($mdc-layout-grid-column-width, $size)};
-  }
-}
-
-.layout-grid,
-layout-grid {
-  @each $size in map-keys($mdc-layout-grid-columns) {
-    @include mdc-layout-grid-media-query_($size) {
-      $margin: map-get($mdc-layout-grid-default-margin, $size);
-
-      @include mdc-layout-grid($size, $margin, $mdc-layout-grid-max-width);
+@mixin layout-grid($query: mdc-feature-all()) {
+  :root {
+    @each $size in map-keys($mdc-layout-grid-columns) {
+      --mdc-layout-grid-margin-#{$size}: #{map-get($mdc-layout-grid-default-margin, $size)};
+      --mdc-layout-grid-gutter-#{$size}: #{map-get($mdc-layout-grid-default-gutter, $size)};
+      --mdc-layout-grid-column-width-#{$size}: #{map-get($mdc-layout-grid-column-width, $size)};
     }
   }
-}
 
-.layout-grid__inner,
-layout-grid-inner {
-  @each $size in map-keys($mdc-layout-grid-columns) {
-    @include mdc-layout-grid-media-query_($size) {
-      $margin: map-get($mdc-layout-grid-default-margin, $size);
-      $gutter: map-get($mdc-layout-grid-default-gutter, $size);
+  .layout-grid,
+  layout-grid {
+    @each $size in map-keys($mdc-layout-grid-columns) {
+      @include mdc-layout-grid-media-query_($size) {
+        $margin: map-get($mdc-layout-grid-default-margin, $size);
 
-      @include mdc-layout-grid-inner($size, $margin, $gutter);
-    }
-  }
-}
-
-.layout-grid__cell,
-layout-grid-cell {
-  // select the upper breakpoint
-  $upper-breakpoint: nth(map-keys($mdc-layout-grid-columns), 1);
-
-  @each $size in map-keys($mdc-layout-grid-columns) {
-    @include mdc-layout-grid-media-query_($size) {
-      $gutter: map-get($mdc-layout-grid-default-gutter, $size);
-
-      @include mdc-layout-grid-cell($size, $mdc-layout-grid-default-column-span, $gutter);
-
-      @for $span from 1 through map-get($mdc-layout-grid-columns, $upper-breakpoint) {
-        // Span classes.
-        @at-root .layout-grid__cell--span-#{$span},
-          .layout-grid__cell--span-#{$span}-#{$size},
-          [use|span="#{$span}"],
-          [use|span-#{$size}="#{$span}"] {
-          @include mdc-layout-grid-cell-span_($size, $span, $gutter);
-        }
+        @include mdc-layout-grid($size, $margin, $mdc-layout-grid-max-width);
       }
     }
   }
 
-  // Order override classes.
-  @for $i from 1 through map-get($mdc-layout-grid-columns, $upper-breakpoint) {
-    &--order-#{$i} {
-      @include mdc-layout-grid-cell-order($i);
+  .layout-grid__inner,
+  layout-grid-inner {
+    @each $size in map-keys($mdc-layout-grid-columns) {
+      @include mdc-layout-grid-media-query_($size) {
+        $margin: map-get($mdc-layout-grid-default-margin, $size);
+        $gutter: map-get($mdc-layout-grid-default-gutter, $size);
+
+        @include mdc-layout-grid-inner($size, $margin, $gutter);
+      }
     }
   }
 
-  // Alignment classes.
-  &--align-top {
-    @include mdc-layout-grid-cell-align(top);
-  }
+  .layout-grid__cell,
+  layout-grid-cell {
+    // select the upper breakpoint
+    $upper-breakpoint: nth(map-keys($mdc-layout-grid-columns), 1);
 
-  &--align-middle {
-    @include mdc-layout-grid-cell-align(middle);
-  }
+    @each $size in map-keys($mdc-layout-grid-columns) {
+      @include mdc-layout-grid-media-query_($size) {
+        $gutter: map-get($mdc-layout-grid-default-gutter, $size);
 
-  &--align-bottom {
-    @include mdc-layout-grid-cell-align(bottom);
-  }
-}
+        @include mdc-layout-grid-cell($size, $mdc-layout-grid-default-column-span, $gutter);
 
-.layout-grid--fixed-column-width,
-layout-grid[use|fixed-width],
-.layout-grid[use|fixed-width] {
-  @each $size in map-keys($mdc-layout-grid-columns) {
-    @include mdc-layout-grid-media-query_($size) {
-      $margin: map-get($mdc-layout-grid-default-margin, $size);
-      $gutter: map-get($mdc-layout-grid-default-gutter, $size);
-      $column-width: map-get($mdc-layout-grid-column-width, $size);
+        @for $span from 1 through map-get($mdc-layout-grid-columns, $upper-breakpoint) {
+          // Span classes.
+          @at-root .layout-grid__cell--span-#{$span},
+            .layout-grid__cell--span-#{$span}-#{$size},
+            [use|span="#{$span}"],
+            [use|span-#{$size}="#{$span}"] {
+            @include mdc-layout-grid-cell-span_($size, $span, $gutter);
+          }
+        }
+      }
+    }
 
-      @include mdc-layout-grid-fixed-column-width($size, $margin, $gutter, $column-width);
+    // Order override classes.
+    @for $i from 1 through map-get($mdc-layout-grid-columns, $upper-breakpoint) {
+      &--order-#{$i} {
+        @include mdc-layout-grid-cell-order($i);
+      }
+    }
+
+    // Alignment classes.
+    &--align-top {
+      @include mdc-layout-grid-cell-align(top);
+    }
+
+    &--align-middle {
+      @include mdc-layout-grid-cell-align(middle);
+    }
+
+    &--align-bottom {
+      @include mdc-layout-grid-cell-align(bottom);
     }
   }
-}
 
-.layout-grid--align-left,
-[use|align="left"] {
-  margin-right: auto;
-  margin-left: 0;
-}
+  .layout-grid--fixed-column-width,
+  layout-grid[use|fixed-width],
+  .layout-grid[use|fixed-width] {
+    @each $size in map-keys($mdc-layout-grid-columns) {
+      @include mdc-layout-grid-media-query_($size) {
+        $margin: map-get($mdc-layout-grid-default-margin, $size);
+        $gutter: map-get($mdc-layout-grid-default-gutter, $size);
+        $column-width: map-get($mdc-layout-grid-column-width, $size);
 
-.layout-grid--align-right,
-[use|align="right"] {
-  margin-right: 0;
-  margin-left: auto;
+        @include mdc-layout-grid-fixed-column-width($size, $margin, $gutter, $column-width);
+      }
+    }
+  }
+
+  .layout-grid--align-left,
+  [use|align="left"] {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  .layout-grid--align-right,
+  [use|align="right"] {
+    margin-right: 0;
+    margin-left: auto;
+  }
 }

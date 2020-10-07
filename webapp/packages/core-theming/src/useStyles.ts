@@ -61,12 +61,14 @@ export function useStyles(
     }
     loadedStyles.current = flat(staticStyles);
 
-    Promise
-      .all(themedStyles)
-      .then((styles) => {
-        loadedStyles.current = flat([staticStyles, styles]);
-        forceUpdate(v => v++);
-      });
+    if(themedStyles.length > 0) {
+      Promise
+        .all(themedStyles)
+        .then((styles) => {
+          loadedStyles.current = flat([staticStyles, styles]);
+          forceUpdate(patch + 1);
+        });
+    }
   }
 
   const styles = useMemo(() => {

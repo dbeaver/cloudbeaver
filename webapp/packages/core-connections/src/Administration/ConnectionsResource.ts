@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Observable, Subject } from 'rxjs';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -20,8 +22,6 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DBDriverResource } from '../DBDriverResource';
-
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 export const SEARCH_CONNECTION_SYMBOL = Symbol('search-connection');
 
@@ -30,13 +30,17 @@ export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: Adm
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
+  readonly onConnectionCreate: Observable<ConnectionInfo>;
+
   private metadata: MetadataMap<string, boolean>;
+  private connectionCreateSubject: Subject<ConnectionInfo>;
 
   constructor(
     private graphQLService: GraphQLService,
-    private dbDriverResource: DBDriverResource
   ) {
     super(new Map());
+    this.connectionCreateSubject = new Subject<ConnectionInfo>();
+    this.onConnectionCreate = this.connectionCreateSubject.asObservable();
     this.metadata = new MetadataMap(() => false);
   }
 
@@ -85,7 +89,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return databases;
   }
 
-  async create(config: ConnectionConfig) {
+  async create(config: ConnectionConfig): Promise<ConnectionInfo> {
     const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
     await this.graphQLService.sdk.refreshSessionConnections();
 
@@ -95,7 +99,9 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     };
     this.set(newConnection.id, newConnection);
 
-    return this.get(connection.id)!;
+    const observedConnection = this.get(connection.id)!;
+    this.connectionCreateSubject.next(observedConnection);
+    return observedConnection;
   }
 
   async test(config: ConnectionConfig): Promise<void> {
@@ -143,12 +149,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     this.metadata.set('all', true);
 
     return this.data;
-  }
-
-  private async getNameTemplate(connection: AdminConnectionSearchInfo) {
-    const driver = await this.dbDriverResource.load(connection.defaultDriver);
-
-    return `${driver.name} (${connection.host}:${connection.port})`;
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {

@@ -6,17 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GraphQLService, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import {
-  DatabaseDataSource, DataUpdate, IDatabaseDataResult, IExecutionContext
+  DatabaseDataSource, DataUpdate, IDatabaseDataResult
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { ISqlEditorGroupMetadata } from './ISqlEditorGroupMetadata';
+import { IQueryTabGroup } from './ISqlEditorTabState';
+import { SqlEditorGroupMetadataService } from './SqlEditorGroupMetadataService';
+import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
+import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
+
 export interface IDataContainerOptions {
+  tabId: string;
+  resultTabId: string;
   sourceName: string;
   connectionId: string;
   whereFilter: string;
   constraints: SqlDataFilterConstraint[];
-  dataFormat: ResultDataFormat;
+  group: IQueryTabGroup;
 }
 
 export interface IDataContainerResult extends IDatabaseDataResult {
@@ -24,95 +32,85 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 }
 
 export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
-  private executionContext: IExecutionContext | null;
+  canCancel: boolean;
 
-  constructor(private graphQLService: GraphQLService) {
+  sqlProcess: SQLQueryExecutionProcess | null = null;
+  private metadata!: ISqlEditorGroupMetadata;
+
+  constructor(
+    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+    private sqlResultTabsService: SqlResultTabsService
+  ) {
     super();
-    this.executionContext = null;
+    this.canCancel = false;
+  }
+
+  cancel(): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  save(
+    prevResults: IDataContainerResult[], 
+    data: DataUpdate<any>
+  ): IDataContainerResult[] | Promise<IDataContainerResult[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  setOptions(options: IDataContainerOptions): this {
+    this.options = options;
+    this.metadata = this.sqlEditorGroupMetadataService.getTabData(options.resultTabId);
+    return this;
+  }
+
+  getResults(response: SqlExecuteInfo): IDataContainerResult[] | null {
+    this.requestInfo = {
+      requestDuration: response.duration || 0,
+      requestMessage: response.statusMessage || '',
+    };
+
+    if (!response.results) {
+      return null;
+    }
+
+    return response.results.map<IDataContainerResult>(result => ({
+      id: result.resultSet?.id || '0',
+      dataFormat: result.dataFormat!,
+      loadedFully: (result.resultSet?.rows?.length || 0) < this.count, 
+      // allays returns false
+      // || !result.resultSet?.hasMoreData,
+      data: result.resultSet,
+    }));
   }
 
   async request(
     prevResults: IDataContainerResult[]
   ): Promise<IDataContainerResult[]> {
-    // if (!this.options?.containerNodePath) {
-    //   throw new Error('containerNodePath must be provided for table');
-    // }
-    // const executionContext = await this.ensureContextCreated();
-
-    // const { readDataFromContainer } = await this.graphQLService.sdk.readDataFromContainer({
-    //   connectionId: executionContext.connectionId,
-    //   contextId: executionContext.contextId,
-    //   containerNodePath: this.options.containerNodePath,
-    //   filter: {
-    //     offset: this.offset,
-    //     limit: this.count,
-    //     constraints: this.options.constraints,
-    //     where: this.options.whereFilter || undefined,
-    //   },
-    // });
-
-    // this.requestInfo = {
-    //   requestDuration: readDataFromContainer?.duration || 0,
-    //   requestMessage: readDataFromContainer?.statusMessage || '',
-    // };
-
-    // return readDataFromContainer?.results.map<IDataContainerResult>(result => ({
-    //   id: result.resultSet!.id,
-    //   dataFormat: result.dataFormat!,
-    //   loadedFully: (result.resultSet?.rows?.length || 0) < this.count || !result.resultSet?.hasMoreData,
-    //   data: result.resultSet,
-    // })) || prevResults;
-
-    return prevResults;
-  }
-
-  async save(
-    prevResults: IDataContainerResult[],
-    data: DataUpdate
-  ): Promise<IDataContainerResult[]> {
-    const executionContext = await this.ensureContextCreated();
-
-    const response = await this.graphQLService.sdk.updateResultsDataBatch({
-      connectionId: executionContext.connectionId,
-      contextId: executionContext.contextId,
-      resultsId: data.data.id,
-      // updatedRows: this.getRowsDiff(data),
-    });
-
-    this.requestInfo = {
-      requestDuration: response.result?.duration || 0,
-      requestMessage: 'Saved successfully',
-    };
-
-    throw new Error('Not implemented');
-  }
-
-  private async ensureContextCreated(): Promise<IExecutionContext> {
-    if (!this.executionContext) {
-      if (!this.options) {
-        throw new Error('Options must be provided');
-      }
-      this.executionContext = await this.createExecutionContext(this.options.connectionId);
+    if(!this.options){
+      return prevResults;
     }
-    return this.executionContext;
-  }
 
-  private async createExecutionContext(
-    connectionId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IExecutionContext> {
+    const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.options.tabId);
+    this.metadata.start(
+      sqlExecutionContext,
+      this.options.group.sqlQueryParams,
+      {
+        offset: this.offset,
+        limit: this.count,
+        constraints: this.options.constraints,
+        where: this.options.whereFilter || undefined,
+      },
+      this.dataFormat,
+    );
 
-    const response = await this.graphQLService.sdk.sqlContextCreate({
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    });
-    return {
-      contextId: response.context.id,
-      connectionId,
-      objectCatalogId: response.context.defaultCatalog,
-      objectSchemaId: response.context.defaultSchema,
-    };
+    this.sqlProcess = this.metadata.resultDataProcess;
+    const response = await this.metadata.resultDataProcess.promise;
+
+    const results = this.getResults(response);
+
+    if (!results) {
+      return prevResults;
+    }
+
+    return results;
   }
 }

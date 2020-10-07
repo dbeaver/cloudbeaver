@@ -11,17 +11,23 @@ import { observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
+import { SessionResource } from './SessionResource';
+
 @injectable()
 export class PermissionsResource extends CachedDataResource<Set<string>, null> {
-  @observable private loaded = false;
+  @observable private loaded: boolean;
 
   constructor(
     private graphQLService: GraphQLService,
+    private sessionResource: SessionResource,
   ) {
     super(new Set());
+    this.loaded = false;
+    this.sessionResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(() => this.load(null));
   }
 
-  isLoaded() {
+  isLoaded(): boolean {
     return this.loaded;
   }
 
@@ -30,13 +36,14 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
   }
 
   protected async loader(key: null): Promise<Set<string>> {
+    await this.sessionResource.load(null);
+    
     const { permissions } = await this.graphQLService.sdk.sessionPermissions();
 
     this.data.clear();
     for (const permission of permissions) {
       this.data.add(permission);
     }
-    this.markUpdated(key);
     this.loaded = true;
 
     return this.data;

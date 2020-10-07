@@ -52,6 +52,11 @@ implements IDatabaseDataModel<TOptions, TResult> {
     await this.requestData();
   }
 
+  setResults(results: TResult[]): this {
+    this.results = results;
+    return this;
+  }
+
   setCountGain(count: number): this {
     this.countGain = count;
     return this;

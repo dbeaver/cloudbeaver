@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap, isPromiseCancelledError } from '@cloudbeaver/core-utils';
 import { fetchingSettings } from '@cloudbeaver/plugin-data-viewer';
 
@@ -100,7 +101,8 @@ export class SqlResultTabsService {
             {
               offset: 0,
               limit: fetchingSettings.fetchDefault,
-            }
+            },
+            ResultDataFormat.Resultset
           );
 
           const data = await editorMetadata.resultDataProcess.promise;

@@ -25,11 +25,17 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
+  canCancel: boolean;
   private executionContext: IExecutionContext | null;
 
   constructor(private graphQLService: GraphQLService) {
     super();
     this.executionContext = null;
+    this.canCancel = false;
+  }
+  
+  cancel(): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 
   async request(
@@ -64,7 +70,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     return readDataFromContainer.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < this.count || !result.resultSet?.hasMoreData,
+      loadedFully: (result.resultSet?.rows?.length || 0) < this.count, 
+      // allays returns false
+      // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
     }));
   }

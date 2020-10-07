@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SqlDataFilter } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, SqlDataFilter } from '@cloudbeaver/core-sdk';
 
 import { ISqlQueryParams } from './ISqlEditorTabState';
 import { SqlExecutionState } from './SqlExecutionState';
@@ -16,7 +16,8 @@ export interface ISqlEditorGroupMetadata {
   start(
     context: SqlExecutionState,
     sqlQueryParams: ISqlQueryParams,
-    filter: SqlDataFilter
+    filter: SqlDataFilter,
+    dataFormat: ResultDataFormat,
   ): Promise<SQLQueryExecutionProcess>;
   resultDataProcess: SQLQueryExecutionProcess;
 }
