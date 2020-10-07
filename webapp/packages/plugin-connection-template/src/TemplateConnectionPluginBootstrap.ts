@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { MainMenuService, ConnectionDialogsService, EMainMenu } from '@cloudbeaver/core-app';
-import { injectable } from '@cloudbeaver/core-di';
+import { MainMenuService, EMainMenu } from '@cloudbeaver/core-app';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
@@ -16,38 +16,42 @@ import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 @injectable()
-export class TemplateConnectionPluginBootstrap {
+export class TemplateConnectionPluginBootstrap extends Bootstrap {
 
   constructor(
-    private connectionDialogsService: ConnectionDialogsService,
     private mainMenuService: MainMenuService,
     private templateConnectionsResource: TemplateConnectionsResource,
     private commonDialogService: CommonDialogService,
     private notificationService: NotificationService,
     private permissionsService: PermissionsService
   ) {
+    super();
   }
 
-  bootstrap() {
-    this.loadTemplateConnections();
+  register(): void | Promise<void> {
+    this.mainMenuService.onConnectionClick.subscribe(this.loadTemplateConnections.bind(this));
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
       id: 'mainMenuConnect',
       order: 2,
-      title: 'basicConnection_main_menu_item',
-      onClick: () => this.openConnectionsDialog(),
+      titleGetter: this.getMenuTitle.bind(this),
+      onClick: this.openConnectionsDialog.bind(this),
       isHidden: () => !this.permissionsService.has(EPermission.public),
-      isDisabled: () => this.isDisabled(),
+      isDisabled: () => !this.templateConnectionsResource.data.length,
     });
+  }
+
+  load(): void | Promise<void> { }
+
+  private getMenuTitle(): string {
+    if(this.templateConnectionsResource.isLoading()){
+      return 'ui_processing_loading'
+    }
+    return 'basicConnection_main_menu_item';
   }
 
   private async openConnectionsDialog() {
     this.loadTemplateConnections();
     await this.commonDialogService.open(ConnectionDialog, null);
-  }
-
-  private isDisabled() {
-    this.loadTemplateConnections();
-    return !this.templateConnectionsResource.data.length;
   }
 
   private async loadTemplateConnections() {

@@ -74,6 +74,7 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
       disabled={menuItem.isDisabled}
       style={[...style, topMenuStyles]}
       placement="bottom-end"
+      onClick={() => menuItem.onClick && menuItem.onClick()}
     >
       {menuItem.icon && (
         <menu-trigger-icon as="div">

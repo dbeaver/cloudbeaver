@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Observable, Subject } from 'rxjs';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { IComputedMenuItemOptions, StaticMenu } from '@cloudbeaver/core-dialogs';
 
@@ -17,16 +19,22 @@ export enum EMainMenu {
 @injectable()
 export class MainMenuService {
 
+  readonly onConnectionClick: Observable<unknown>;
+  
   private menuOptions = new StaticMenu();
   private mainMenuToken = 'mainMenu';
+  private connectionClick: Subject<unknown>;
 
   constructor() {
+    this.connectionClick = new Subject();
+    this.onConnectionClick = this.connectionClick.asObservable();
     this.menuOptions.addRootPanel(this.mainMenuToken);
 
     const connectionMenu: IComputedMenuItemOptions = {
       id: EMainMenu.mainMenuConnectionsPanel,
       order: 1,
       title: 'app_shared_connectionMenu_connection',
+      onClick: () => this.connectionClick.next(),
       isPanel: true,
     };
     this.registerRootItem(connectionMenu);

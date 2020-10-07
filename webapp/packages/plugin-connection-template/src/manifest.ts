@@ -20,11 +20,6 @@ export const connectionTemplate: PluginManifest = {
   providers: [
     TemplateConnectionsResource,
     LocaleService,
+    TemplateConnectionPluginBootstrap,
   ],
-
-  initialize(services): void {
-    services
-      .resolveServiceByClass(TemplateConnectionPluginBootstrap)
-      .bootstrap();
-  },
 };
