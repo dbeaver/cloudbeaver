@@ -12,7 +12,7 @@ import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Checkbox } from '../FormControls/Checkbox';
+import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 

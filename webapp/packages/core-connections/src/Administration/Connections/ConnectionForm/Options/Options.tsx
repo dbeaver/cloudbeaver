@@ -21,7 +21,7 @@ import {
   TabsState,
   TabPanel,
   Combobox,
-  SubmittingForm
+  SubmittingForm, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -78,7 +78,7 @@ export const Options = observer(function Options({
       <box as="div">
         <box-element as='div'>
           <group as="div">
-            <Checkbox
+            <FieldCheckbox
               name="template"
               value={model.connection.id}
               state={model.connection}
