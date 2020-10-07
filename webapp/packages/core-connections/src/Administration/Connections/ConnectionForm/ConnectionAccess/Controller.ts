@@ -20,8 +20,7 @@ implements IInitializableController {
   @observable selectedSubjects: Map<string, boolean> = new Map();
 
   @computed get users() {
-    return Array.from(this.usersResource.data.values())
-      .filter(user => !this.usersResource.isNew(user.userId));
+    return Array.from(this.usersResource.data.values());
   }
 
   @computed get roles() {

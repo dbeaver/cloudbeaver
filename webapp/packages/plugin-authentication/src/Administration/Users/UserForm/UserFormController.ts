@@ -32,8 +32,7 @@ export class UserFormController implements IInitializableController, IDestructib
   };
 
   @computed get connections() {
-    return Array.from(this.connectionsResource.data.values())
-      .filter(connection => !this.connectionsResource.isNew(connection.id));
+    return Array.from(this.connectionsResource.data.values());
   }
 
   @computed get roles() {

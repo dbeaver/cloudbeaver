@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -17,20 +19,21 @@ export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>
 
 @injectable()
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], null> {
+  @observable private loaded;
   constructor(
     private graphQLService: GraphQLService,
   ) {
     super([]);
+    this.loaded = false;
   }
 
   isLoaded() {
-    return !!this.data.length;
+    return !this.loaded;
   }
 
   protected async loader(key: null): Promise<AuthProvider[]> {
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
-
-    this.markUpdated(key);
+    this.loaded = true;
     return providers;
   }
 }

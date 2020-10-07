@@ -63,21 +63,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return isSearchedConnection(this.get(id));
   }
 
-  addNew(driverId: string) {
-    const connectionInfo = {
-      id: uuid(),
-      driverId,
-      authProperties: [] as Array<ObjectPropertyInfo>,
-      // name: 'New connection',
-      [NEW_CONNECTION_SYMBOL]: true,
-    } as ConnectionNew;
-
-    this.data.set(connectionInfo.id, connectionInfo);
-    this.markUpdated(connectionInfo.id);
-
-    return connectionInfo;
-  }
-
   async loadAll() {
     await this.load('all');
     return this.data;
@@ -122,10 +107,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
-    if (this.isNew(connectionId)) {
-      return [];
-    }
-
     const { subjects } = await this.graphQLService.sdk.getConnectionAccess({ connectionId });
 
     return subjects;
@@ -167,12 +148,8 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
       return;
     }
 
-    const isNew = this.isNew(connectionId);
+    await this.graphQLService.sdk.deleteConnectionConfiguration({ id: connectionId });
     this.data.delete(connectionId);
-
-    if (!isNew) {
-      await this.graphQLService.sdk.deleteConnectionConfiguration({ id: connectionId });
-    }
   }
 
   private async updateConnection(id: string, config: ConnectionConfig) {
