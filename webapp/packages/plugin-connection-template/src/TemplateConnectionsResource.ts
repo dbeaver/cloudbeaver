@@ -41,6 +41,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
 
   protected async loader(key: null): Promise<Connection[]> {
     if (!await this.permissionsService.hasAsync(EPermission.public)) {
+      this.loaded = true;
       return [];
     }
     const { connections } = await this.graphQLService.sdk.getTemplateConnections();
