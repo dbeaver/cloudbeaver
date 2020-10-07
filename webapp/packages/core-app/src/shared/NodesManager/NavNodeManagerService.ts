@@ -339,7 +339,7 @@ export class NavNodeManagerService extends Bootstrap {
     const tree = this.navTree.get(ROOT_NODE_PATH);
 
     if (!tree?.includes(nodeId)) {
-      this.navTree.unshiftToNode(ROOT_NODE_PATH, [nodeId]);
+      this.navTree.refresh(ROOT_NODE_PATH)
     }
   }
 
