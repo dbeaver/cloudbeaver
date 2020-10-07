@@ -14,6 +14,7 @@ import { IResponseInterceptor } from './IResponseInterceptor';
 
 export class CustomGraphQLClient extends GraphQLClient {
   private interceptors: IResponseInterceptor[] = [];
+  private isRequestsBlocked = false;
 
   constructor(endpoint: string) {
     super(endpoint);
@@ -30,7 +31,16 @@ export class CustomGraphQLClient extends GraphQLClient {
     );
   }
 
+  blockRequests(): void {
+    this.isRequestsBlocked = true;
+  }
+
   private async overrideRequest<T>(query: string, variables?: Variables): Promise<T> {
+    if(this.isRequestsBlocked) {
+      const e = new Error('Session expired');
+      e.name = 'SessionError';
+      throw e;
+    }
     try {
       const response = await this.rawRequest<T>(query, variables);
 

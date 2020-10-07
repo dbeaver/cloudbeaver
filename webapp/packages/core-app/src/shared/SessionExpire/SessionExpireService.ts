@@ -36,9 +36,7 @@ export class SessionExpireService {
 
   private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
     if(this.isNotifiedAboutExpiredSession) {
-      const e = new Error('Session expired');
-      e.name = 'SessionError';
-      throw e;
+      this.graphQLService.blockGraphQLRequests();
     }
     try {
       return await request;
