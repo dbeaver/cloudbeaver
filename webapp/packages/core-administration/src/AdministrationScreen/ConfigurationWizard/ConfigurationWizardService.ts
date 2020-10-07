@@ -166,7 +166,6 @@ export class ConfigurationWizardService {
     }
 
     await this.serverConfigResource.update();
-    await this.sessionResource.update();
     this.administrationScreenService.clearItemsState();
     this.screenService.navigateToRoot();
   }
