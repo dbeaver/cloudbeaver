@@ -185,16 +185,20 @@ public class WebSession implements DBASession {
 
     // Note: for admin use only
     public void forceUserRefresh(WebUser user) {
+        if (!CommonUtils.equalObjects(this.user, user)) {
+            // User has changed. We need to reset all session attributes
+            try {
+                resetSessionCache();
+            } catch (DBCException e) {
+                log.error(e);
+            }
+        }
+
         this.user = user;
 
         refreshSessionAuth();
 
-        try {
-            resetSessionCache();
-            initNavigatorModel();
-        } catch (DBCException e) {
-            log.error(e);
-        }
+        initNavigatorModel();
     }
 
     private void initNavigatorModel() {
@@ -298,7 +302,9 @@ public class WebSession implements DBASession {
             attributeDisposers.clear();
             attributes.clear();
         }
+    }
 
+    private void resetNavigationModel() {
         Map<String, WebConnectionInfo> conCopy;
         synchronized (this.connections) {
             conCopy = new HashMap<>(this.connections);
@@ -429,6 +435,7 @@ public class WebSession implements DBASession {
 
     void close() {
         try {
+            resetNavigationModel();
             resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
