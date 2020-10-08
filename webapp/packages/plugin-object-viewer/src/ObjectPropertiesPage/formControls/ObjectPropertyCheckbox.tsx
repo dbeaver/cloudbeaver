@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { Checkbox } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { additionalProps, getValue, matchType } from '../helpers';
@@ -38,6 +39,9 @@ const styles = css`
     font-size: 13px;
     line-height: 26px;
   }
+  Checkbox {
+    margin: -10px;
+  }
 `;
 
 export const ObjectPropertyCheckbox = observer(function ObjectPropertyCheckbox({
@@ -54,12 +58,20 @@ export const ObjectPropertyCheckbox = observer(function ObjectPropertyCheckbox({
         <label htmlFor={objectProperty.id} title={objectProperty.displayName}>{objectProperty.displayName}</label>
       </label-wrapper>
       <input-wrapper as="div">
-        <input
-          type={matchType(objectProperty.dataType)}
-          value={getValue(objectProperty.value as any)}
-          {...additionalProps(objectProperty)}
-          readOnly
-        />
+        {matchType(objectProperty.dataType) === 'checkbox' ? (
+          <Checkbox
+            value={getValue(objectProperty.value as any)}
+            {...additionalProps(objectProperty)}
+            readOnly
+          />
+        ) : (
+          <input
+            type={matchType(objectProperty.dataType)}
+            value={getValue(objectProperty.value as any)}
+            {...additionalProps(objectProperty)}
+            readOnly
+          />
+        )}  
       </input-wrapper>
     </form-checkbox>
   );

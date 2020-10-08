@@ -1,0 +1,49 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+ @import '@material/checkbox/mixins';
+ $mdc-checkbox-icon-size: 16px;
+
+ @mixin checkbox-core-styles($query: mdc-feature-all()) {
+   @include mdc-checkbox-core-styles($query);
+   
+   .theme-checkbox {
+     composes: mdc-checkbox;
+   }
+   .theme-checkbox_native-control {
+     composes: mdc-checkbox__native-control;
+   }
+   .theme-checkbox__background {
+     composes: mdc-checkbox__background;
+   }
+   .theme-checkbox__checkmark {
+     composes: mdc-checkbox__checkmark;
+   }
+   .theme-checkbox__checkmark-path {
+     composes: mdc-checkbox__checkmark-path;
+   }
+   .theme-checkbox__mixedmark {
+    composes: mdc-checkbox__mixedmark;
+   }
+   .theme-checkbox__ripple {
+    composes: mdc-checkbox__ripple;
+   }
+   .theme-checkbox--checked {
+     composes: mdc-checkbox--selected;
+   }
+   .theme-checkbox--disabled {
+     composes: mdc-checkbox--disabled;
+   }
+ 
+   .theme-checkbox_primary {
+     $mdc-checkbox-mark-color: $mdc-theme-on-primary;
+     @include mdc-checkbox-ink-color($mdc-checkbox-mark-color, $query);
+     @include mdc-checkbox-disabled-ink-color(rgba($mdc-checkbox-mark-color, .50), $query);
+     @include mdc-checkbox-container-colors($mdc-checkbox-border-color, transparent,  $mdc-theme-primary, $mdc-theme-primary )
+   }
+ }
