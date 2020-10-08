@@ -37,6 +37,10 @@ const styles = css`
   TableColumnValue[expand] {
     cursor: pointer;
   }
+  Checkbox {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
 `;
 
 export const Connection = observer(function Connection({ connection }: Props) {
