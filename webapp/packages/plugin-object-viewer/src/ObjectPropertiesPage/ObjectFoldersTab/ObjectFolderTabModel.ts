@@ -19,6 +19,7 @@ export class ObjectFolderTabModel implements ITab {
   get title(): string {
     return this.node.name || '';
   }
+
   get icon(): string | undefined {
     return this.node.icon;
   }
@@ -26,7 +27,7 @@ export class ObjectFolderTabModel implements ITab {
   panel: () => ReactElement | null;
 
   constructor(private node: NavNode,
-              public onActivate: () => void) {
+    public onActivate: () => void) {
     this.tabId = node.id;
     this.panel = () => objectPropertyTablePanel(node.parentId, node.id);
   }

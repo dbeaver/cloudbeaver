@@ -34,4 +34,4 @@ export const TopAppBar: React.FC = function TopAppBar({ children }) {
       {children}
     </header>
   );
-}
+};

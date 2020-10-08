@@ -25,7 +25,7 @@ export enum ConnectionType {
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
-  @observable connectionType = ConnectionType.Attributes
+  @observable connectionType = ConnectionType.Attributes;
   @observable isLoading = true;
   @observable isConnecting = false;
   @observable driver!: DBDriver;
@@ -65,11 +65,11 @@ implements IInitializableController, IDestructibleController {
 
   onChangeType = (type: ConnectionType) => {
     this.connectionType = type;
-  }
+  };
 
   onChange = (property: keyof ConnectionConfig, value: any) => {
     this.config[property] = value;
-  }
+  };
 
   onTestConnection = async () => {
     this.isConnecting = true;
@@ -83,7 +83,7 @@ implements IInitializableController, IDestructibleController {
     } finally {
       this.isConnecting = false;
     }
-  }
+  };
 
   onCreateConnection = async () => {
     this.isConnecting = true;
@@ -98,13 +98,13 @@ implements IInitializableController, IDestructibleController {
     } finally {
       this.isConnecting = false;
     }
-  }
+  };
 
   onShowDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};

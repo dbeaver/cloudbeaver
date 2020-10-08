@@ -43,7 +43,7 @@ export class NotificationItemController implements IInitializableController {
       return;
     }
     this.notification.close();
-  }
+  };
 
   private async showDetails() {
     this.isDetailsDialogOpen = true;

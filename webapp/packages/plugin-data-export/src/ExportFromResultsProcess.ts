@@ -24,7 +24,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
 
   constructor(private graphQLService: GraphQLService,
-              private notificationService: NotificationService) {
+    private notificationService: NotificationService) {
     super();
   }
 

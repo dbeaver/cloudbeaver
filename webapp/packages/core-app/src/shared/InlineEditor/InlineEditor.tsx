@@ -20,9 +20,9 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
-export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside'
+export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
-export type InlineEditorProps = {
+export interface InlineEditorProps {
   name?: string;
   value: string;
   type?: string;
@@ -34,10 +34,10 @@ export type InlineEditorProps = {
   hideCancel?: boolean;
   edited?: boolean;
   autofocus?: boolean;
-  onChange(value: string): void;
-  onSave(): void;
-  onReject?(): void;
-  onUndo(): void;
+  onChange: (value: string) => void;
+  onSave: () => void;
+  onReject?: () => void;
+  onUndo: () => void;
   className?: string;
 }
 

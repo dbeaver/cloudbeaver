@@ -88,16 +88,16 @@ export class ExportNotificationController implements IInitializableController {
   delete = (): void => {
     this.dataExportProcessService.delete(this.notification.extraProps.source);
     this.notification.close();
-  }
+  };
 
   download = (): void => {
     this.dataExportProcessService.download(this.notification.extraProps.source);
     this.notification.close();
-  }
+  };
 
   cancel = (): void => {
     this.dataExportProcessService.cancel(this.notification.extraProps.source);
-  }
+  };
 
   showDetails= async (): Promise<void> => {
     this.isDetailsDialogOpen = true;
@@ -107,5 +107,5 @@ export class ExportNotificationController implements IInitializableController {
     } finally {
       this.isDetailsDialogOpen = false;
     }
-  }
+  };
 }

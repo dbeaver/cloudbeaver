@@ -16,7 +16,7 @@ import { useStyles, Style } from '@cloudbeaver/core-theming';
 
 import { menuPanelStyles } from './menuPanelStyles';
 
-type MenuPanelItemProps = {
+interface MenuPanelItemProps {
   menuItem: IMenuItem;
   style?: Style[];
 }

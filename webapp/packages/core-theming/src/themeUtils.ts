@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type ClassCollection = {
+export interface ClassCollection {
   [key: string]: string;
 }
 
 export class Composes {
-  composes: ClassCollection
-  styles?: ClassCollection
+  composes: ClassCollection;
+  styles?: ClassCollection;
   constructor(composes: ClassCollection, styles?: ClassCollection) {
     this.composes = composes;
     this.styles = styles;

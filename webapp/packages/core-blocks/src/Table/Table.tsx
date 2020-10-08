@@ -20,7 +20,7 @@ type Props = React.PropsWithChildren<{
   expandedItems?: Map<any, boolean>;
   onSelect?: (item: any, state: boolean) => void;
   className?: string;
-}>
+}>;
 
 export const Table = observer(function Table({
   selectedItems, expandedItems, onSelect, children, className,

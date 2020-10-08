@@ -9,5 +9,5 @@
 import { DatabaseDataModel } from './DatabaseDataModel';
 
 export interface DatabaseDataFormat<T> {
-  processResult(model: DatabaseDataModel<any, any>, data: T): void;
+  processResult: (model: DatabaseDataModel<any, any>, data: T) => void;
 }

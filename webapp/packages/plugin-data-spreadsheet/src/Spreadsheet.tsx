@@ -10,7 +10,7 @@ import { DataModelWrapper, IDatabaseDataModel } from '@cloudbeaver/plugin-data-v
 
 import { AgGridTable } from './AgGridTable/AgGridTable';
 
-type Props = {
+interface Props {
   model: IDatabaseDataModel<any, any>;
   className?: string;
 }

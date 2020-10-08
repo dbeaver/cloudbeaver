@@ -9,7 +9,7 @@
 
 import Sanitized from 'react-sanitized-html';
 
-export type SanitizedHTMLProps = {
+export interface SanitizedHTMLProps {
   html: string;
 }
 

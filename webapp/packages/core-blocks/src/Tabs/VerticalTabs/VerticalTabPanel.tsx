@@ -18,7 +18,7 @@ import { verticalTabStyles } from './verticalTabStyles';
 type VerticalTabPanelProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
   tab: ITab;
   style: Style[];
-}
+};
 
 export const VerticalTabPanel = observer(function VerticalTabPanel({ tab, style }: VerticalTabPanelProps) {
   const Panel = tab.panel;

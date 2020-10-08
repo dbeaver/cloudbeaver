@@ -15,10 +15,10 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { DBDriver } from '../../../DBDriverResource';
 import { Driver } from './Driver';
 
-type Props = {
+interface Props {
   drivers: DBDriver[];
   className?: string;
-  onSelect(driverId: string): void;
+  onSelect: (driverId: string) => void;
 }
 
 export const DriverList = observer(function DriverList({ drivers, className, onSelect }: Props) {

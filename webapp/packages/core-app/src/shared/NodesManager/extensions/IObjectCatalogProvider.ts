@@ -10,9 +10,7 @@ import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-exte
 
 const objectCatalogProviderSymbol = Symbol('@extension/ObjectCatalogProvider');
 
-export interface IObjectCatalogProvider<T = never> {
-  (context: T): string | undefined;
-}
+export type IObjectCatalogProvider<T = never> = (context: T) => string | undefined;
 
 export function objectCatalogProvider<T>(provider: IObjectCatalogProvider<T>) {
   return createExtension<T>(provider, objectCatalogProviderSymbol);

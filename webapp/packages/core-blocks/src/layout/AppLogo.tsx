@@ -27,7 +27,7 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   title: string;
   onClick?: () => void;
 }
@@ -38,4 +38,4 @@ export const AppLogo: React.FC<Props> = function AppLogo({ title, onClick }) {
       <Icon name="logo" viewBox="0 0 361 73" />
     </logo>
   );
-}
+};

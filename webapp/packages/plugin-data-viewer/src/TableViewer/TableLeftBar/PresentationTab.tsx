@@ -17,7 +17,7 @@ import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationOptions } from '../../DataPresentationService';
 
-type Props = {
+interface Props {
   model: IDatabaseDataModel<any>;
   presentation: DataPresentationOptions;
   className?: string;
@@ -29,7 +29,7 @@ export const PresentationTab = observer(function PresentationTab({
   presentation,
   className,
   style,
-}:Props) {
+}: Props) {
   const styles = useStyles(verticalRotatedTabStyles, style);
 
   if (presentation.getTabComponent) {

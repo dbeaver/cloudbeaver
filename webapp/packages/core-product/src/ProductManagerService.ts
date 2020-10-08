@@ -14,7 +14,7 @@ import { ProductSettingsService } from './ProductSettingsService';
 
 @injectable()
 export class ProductManagerService {
-  readonly settings = new ProductSettingsService(this.serverService.settings)
+  readonly settings = new ProductSettingsService(this.serverService.settings);
 
   constructor(private serverService: ServerService) { }
 

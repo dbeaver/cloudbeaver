@@ -20,11 +20,11 @@ export class Entity {
   readonly id: string;
 
   protected container = new DIContainer();
-  @observable.shallow protected children = new Map<string, Entity>()
+  @observable.shallow protected children = new Map<string, Entity>();
 
-  private mixins: InjectionToken<any>[] = [];
+  private mixins: Array<InjectionToken<any>> = [];
 
-  constructor(providers: MixinProvider<any>[] = [], id?: string) {
+  constructor(providers: Array<MixinProvider<any>> = [], id?: string) {
     this.id = id || uuid();
     this.addMixin(Entity, this);
     this.addMixin(ServiceInjectorToken, this.getServiceInjector());
@@ -90,7 +90,7 @@ export class Entity {
     });
   }
 
-  protected addProviders(providers: MixinProvider<any>[]) {
+  protected addProviders(providers: Array<MixinProvider<any>>) {
     providers.forEach((provider) => {
       if (typeof provider === 'function') {
         this.addMixin(provider);
@@ -123,5 +123,5 @@ export type MixinProvider<T extends Record<string, any>> = ITypedConstructor<T> 
 };
 
 export interface IDestroyableMixin {
-  destruct(): void;
+  destruct: () => void;
 }

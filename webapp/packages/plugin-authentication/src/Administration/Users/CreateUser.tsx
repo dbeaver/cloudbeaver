@@ -14,9 +14,9 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { UserForm } from './UserForm/UserForm';
 
-type Props = {
- user: AdminUserInfo;
- onCancel: () => void;
+interface Props {
+  user: AdminUserInfo;
+  onCancel: () => void;
 }
 
 const styles = composes(

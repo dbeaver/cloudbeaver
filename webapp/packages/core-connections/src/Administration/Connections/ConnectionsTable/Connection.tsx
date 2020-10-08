@@ -21,7 +21,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { ConnectionsResource, isSearchedConnection, SEARCH_CONNECTION_SYMBOL } from '../../ConnectionsResource';
 import { ConnectionEdit } from './ConnectionEdit';
 
-type Props = {
+interface Props {
   connection: ConnectionInfo;
 }
 

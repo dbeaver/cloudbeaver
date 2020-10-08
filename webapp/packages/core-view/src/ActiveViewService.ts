@@ -13,12 +13,10 @@ import { IExtension } from '@cloudbeaver/core-extensions';
 
 export interface IActiveView<T> {
   context: T;
-  extensions: IExtension<T>[];
+  extensions: Array<IExtension<T>>;
 }
 
-export interface IActiveItemProvider<T> {
-  (): IActiveView<T> | null;
-}
+export type IActiveItemProvider<T> = () => IActiveView<T> | null;
 
 @injectable()
 export class ActiveViewService {

@@ -67,7 +67,7 @@ const tableFooterStyles = composes(
   `
 );
 
-type TableFooterProps = {
+interface TableFooterProps {
   model: DataModelWrapper;
 }
 
@@ -101,14 +101,14 @@ export const TableFooter = observer(function TableFooter({
         </SubmittingForm>
       </count>
       <TableFooterMenu model={model} />
-      {(model.source.dataFormat === ResultDataFormat.Resultset && 
-      model.deprecatedModel.requestStatusMessage.length > 0) && (
+      {(model.source.dataFormat === ResultDataFormat.Resultset
+      && model.deprecatedModel.requestStatusMessage.length > 0) && (
         <time>
           {model.deprecatedModel.requestStatusMessage} - {model.deprecatedModel.queryDuration}ms
         </time>
       )}
-      {(model.source.dataFormat !== ResultDataFormat.Resultset && 
-      model.source.requestInfo.requestMessage.length > 0) && (
+      {(model.source.dataFormat !== ResultDataFormat.Resultset
+      && model.source.requestInfo.requestMessage.length > 0) && (
         <time>
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>

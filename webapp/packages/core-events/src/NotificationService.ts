@@ -15,15 +15,14 @@ import {
   ENotificationType, INotification, INotificationExtraProps, INotificationOptions, NotificationComponent
 } from './INotification';
 
-
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
   readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
-  private notificationNextId = 0
+  private notificationNextId = 0;
 
-  get visibleNotifications(): INotification<any>[] {
-    return this.notificationList.values.filter(notification=> !notification.isSilent)
+  get visibleNotifications(): Array<INotification<any>> {
+    return this.notificationList.values.filter(notification => !notification.isSilent);
   }
 
   constructor(
@@ -74,7 +73,7 @@ export class NotificationService {
   >(
     component: () => NotificationComponent<TProps>,
     props?: TProps,
-    options?: INotificationOptions<TProps> & { type?: ENotificationType; }
+    options?: INotificationOptions<TProps> & { type?: ENotificationType }
   ): void {
     this.notify({
       title: '',

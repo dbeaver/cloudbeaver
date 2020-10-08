@@ -19,7 +19,7 @@ export interface TabElementProps {
   tabId: string;
 }
 
-type TabsBoxControllerProps ={
+interface TabsBoxControllerProps {
   currentTabId: string;
   tabIdList: string[];
   tab: React.ElementType<TabElementProps>;

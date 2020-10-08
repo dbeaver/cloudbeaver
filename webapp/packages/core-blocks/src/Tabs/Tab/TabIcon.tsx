@@ -12,7 +12,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../../IconOrImage';
 
-type TabIconProps = {
+interface TabIconProps {
   icon?: string;
   viewBox?: string;
   className?: string;

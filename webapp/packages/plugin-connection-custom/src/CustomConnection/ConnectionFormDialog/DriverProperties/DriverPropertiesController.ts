@@ -15,23 +15,23 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-export type DriverPropertyState = {
+export interface DriverPropertyState {
   [key: string]: string;
 }
 
-type StaticId = {
+interface StaticId {
   staticId: string;
 }
 
-export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId
+export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId;
 
 @injectable()
 export class DriverPropertiesController implements IInitializableController {
   @observable isLoading = false;
-  @observable driver!: DBDriver
-  @observable hasDetails = false
-  @observable responseMessage: string | null = null
-  @observable driverProperties = observable<IProperty>([])
+  @observable driver!: DBDriver;
+  @observable hasDetails = false;
+  @observable responseMessage: string | null = null;
+  @observable driverProperties = observable<IProperty>([]);
 
   private loaded = false;
   private state!: Record<string, string>;
@@ -53,7 +53,7 @@ export class DriverPropertiesController implements IInitializableController {
       defaultValue: value ?? '',
       new: !key,
     });
-  }
+  };
 
   async loadDriverProperties() {
     if (this.isLoading || this.loaded) {

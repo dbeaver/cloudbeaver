@@ -23,7 +23,7 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   user: AdminUserInfo;
 }
 

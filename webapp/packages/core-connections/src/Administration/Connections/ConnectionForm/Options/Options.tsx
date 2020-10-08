@@ -33,13 +33,13 @@ import { formStyles } from './formStyles';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
 
-type Props = {
+interface Props {
   model: IConnectionFormModel;
   type: EConnectionType;
   saving?: boolean;
   disabled?: boolean;
-  onTypeChange(type: EConnectionType): void;
-  onSave?(): void;
+  onTypeChange: (type: EConnectionType) => void;
+  onSave?: () => void;
 }
 
 const styles = css`

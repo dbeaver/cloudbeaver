@@ -50,7 +50,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   }
 
   save(
-    prevResults: IDataContainerResult[], 
+    prevResults: IDataContainerResult[],
     data: DataUpdate<any>
   ): IDataContainerResult[] | Promise<IDataContainerResult[]> {
     throw new Error('Method not implemented.');
@@ -75,7 +75,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return response.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < this.count, 
+      loadedFully: (result.resultSet?.rows?.length || 0) < this.count,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
@@ -85,7 +85,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   async request(
     prevResults: IDataContainerResult[]
   ): Promise<IDataContainerResult[]> {
-    if(!this.options){
+    if (!this.options) {
       return prevResults;
     }
 

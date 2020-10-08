@@ -16,7 +16,7 @@ type StaticImageProps = PropsWithChildren<{
   className?: string;
   title?: string;
   onClick?: (e: React.MouseEvent) => void;
-}>
+}>;
 
 export function StaticImage({
   icon, className, title, onClick,

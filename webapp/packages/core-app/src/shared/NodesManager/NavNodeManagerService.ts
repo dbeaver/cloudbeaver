@@ -7,7 +7,7 @@
  */
 
 import {
-  ConnectionAuthService, Connection, ConnectionInfoResource, EConnectionFeature
+  ConnectionAuthService, Connection, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -88,7 +88,7 @@ export interface INodeNavigationData {
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
-  private activeNavigationNodes: string[]
+  private activeNavigationNodes: string[];
 
   constructor(
     private graphQLService: GraphQLService,
@@ -148,8 +148,8 @@ export class NavNodeManagerService extends Bootstrap {
 
   getTree(navNodeId: string): string[] | undefined
   getTree(navNodeKey: NavNodeKey): string[] | undefined
-  getTree(navNodeKey: NavNodeKey[]): (string[] | undefined)[]
-  getTree(navNodeId: string | NavNodeKey | NavNodeKey[]): string[] | undefined | (string[] | undefined)[] {
+  getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>
+  getTree(navNodeId: string | NavNodeKey | NavNodeKey[]): string[] | undefined | Array<string[] | undefined> {
     if (typeof navNodeId === 'string') {
       return this.navTree.data.get(navNodeId);
     }
@@ -175,8 +175,8 @@ export class NavNodeManagerService extends Bootstrap {
 
   getNode(navNodeId: string): NavNode | undefined
   getNode(navNodeKey: NavNodeKey): NavNode | undefined
-  getNode(navNodeKey: NavNodeKey[]): (NavNode | undefined)[]
-  getNode(navNodeId: string | NavNodeKey | NavNodeKey[]): NavNode | undefined | (NavNode | undefined)[] {
+  getNode(navNodeKey: NavNodeKey[]): Array<NavNode | undefined>
+  getNode(navNodeId: string | NavNodeKey | NavNodeKey[]): NavNode | undefined | Array<NavNode | undefined> {
     if (typeof navNodeId === 'string') {
       return this.navNodeInfoResource.get(navNodeId);
     }
@@ -221,15 +221,15 @@ export class NavNodeManagerService extends Bootstrap {
       return false;
     }
 
-    return node.objectFeatures.includes(ENodeFeature.dataContainer) ||
-      node.objectFeatures.includes(ENodeFeature.container);
+    return node.objectFeatures.includes(ENodeFeature.dataContainer)
+      || node.objectFeatures.includes(ENodeFeature.container);
   }
 
   getNodeContainerInfo(nodeId: string): INodeContainerInfo {
     const initial: INodeContainerInfo = {};
 
     const scanParents = (res: INodeContainerInfo,
-                         nodeId?: string): INodeContainerInfo => {
+      nodeId?: string): INodeContainerInfo => {
       if (!nodeId) {
         return res;
       }
@@ -317,7 +317,7 @@ export class NavNodeManagerService extends Bootstrap {
       getParents,
       loadParents,
     };
-  }
+  };
 
   private async updateRootChildren() {
     this.navTree.delete(ROOT_NODE_PATH);
@@ -339,7 +339,7 @@ export class NavNodeManagerService extends Bootstrap {
     const tree = this.navTree.get(ROOT_NODE_PATH);
 
     if (!tree?.includes(nodeId)) {
-      this.navTree.refresh(ROOT_NODE_PATH)
+      this.navTree.refresh(ROOT_NODE_PATH);
     }
   }
 
@@ -384,6 +384,7 @@ export class NavNodeManagerService extends Bootstrap {
   private async navigateHandler(
     contexts: IContextProvider<INodeNavigationData>,
     data: INodeNavigationData
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void | false> {
     if (this.activeNavigationNodes.includes(data.nodeId)) {
       return false;

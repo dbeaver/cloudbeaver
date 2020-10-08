@@ -37,7 +37,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   connections: ConnectionInfo[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;

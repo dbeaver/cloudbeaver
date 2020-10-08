@@ -46,7 +46,7 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   async reload(): Promise<void> {
-    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+    if (this.source.dataFormat === ResultDataFormat.Resultset) {
       await this.deprecatedModel.refresh();
     }
     this.setSlice(0, this.countGain);
@@ -54,7 +54,7 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   async refresh(): Promise<void> {
-    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+    if (this.source.dataFormat === ResultDataFormat.Resultset) {
       await this.deprecatedModel.refresh();
       return;
     }
@@ -86,9 +86,9 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   private getDefaultRowsCount(count?: number) {
     return count
       ? Math.max(
-        fetchingSettings.fetchMin,
-        Math.min(count, fetchingSettings.fetchMax)
-      )
+          fetchingSettings.fetchMin,
+          Math.min(count, fetchingSettings.fetchMax)
+        )
       : fetchingSettings.fetchDefault;
   }
 }

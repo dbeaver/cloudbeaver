@@ -37,7 +37,7 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
 
   protected async loader(key: null): Promise<Set<string>> {
     await this.sessionResource.load(null);
-    
+
     const { permissions } = await this.graphQLService.sdk.sessionPermissions();
 
     this.data.clear();

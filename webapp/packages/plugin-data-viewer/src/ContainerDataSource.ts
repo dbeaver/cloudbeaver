@@ -33,7 +33,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     this.executionContext = null;
     this.canCancel = false;
   }
-  
+
   cancel(): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
@@ -70,7 +70,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     return readDataFromContainer.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < this.count, 
+      loadedFully: (result.resultSet?.rows?.length || 0) < this.count,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,

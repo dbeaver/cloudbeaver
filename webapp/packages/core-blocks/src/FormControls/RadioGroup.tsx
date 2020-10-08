@@ -16,24 +16,24 @@ import { RadioGroupContext, IRadioGroupContext } from './RadioGroupContext';
 
 type BaseProps = React.PropsWithChildren<{
   name: string;
-}>
+}>;
 
 type ControlledProps<T> = BaseProps & {
   value?: T;
-  onChange?(value: T, name: string): any;
+  onChange?: (value: T, name: string) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?(value: TState[TKey], name: TKey): any;
+  onChange?: (value: TState[TKey], name: TKey) => any;
 
   value?: never;
-}
+};
 
-type RadioGroupType = {
+interface RadioGroupType {
   <T>(props: ControlledProps<T>): JSX.Element;
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }

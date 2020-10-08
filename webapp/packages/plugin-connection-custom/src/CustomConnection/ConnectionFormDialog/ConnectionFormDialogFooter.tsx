@@ -30,11 +30,11 @@ const styles = css`
   }
 `;
 
-export type ConnectionFormDialogFooterProps = {
+export interface ConnectionFormDialogFooterProps {
   isConnecting: boolean;
-  onConnectionTest(): void;
-  onCreateConnection(): void;
-  onBack(): void;
+  onConnectionTest: () => void;
+  onCreateConnection: () => void;
+  onBack: () => void;
 }
 
 export const ConnectionFormDialogFooter = observer(

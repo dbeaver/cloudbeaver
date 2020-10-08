@@ -13,30 +13,29 @@ import styled, { use } from 'reshadow';
 import { FormContext } from '../FormContext';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
-
 export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
   value?: string;
   checkboxLabel?: string;
   mod?: 'surface';
   long?: boolean;
-}
+};
 
 export type CheckboxControlledProps = CheckboxBaseProps & {
   checked?: boolean;
   indeterminate?: boolean;
-  onChange?(value: boolean, name?: string): any;
+  onChange?: (value: boolean, name?: string) => any;
   state?: never;
-}
+};
 
 export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
   name: TKey;
   state: TState;
-  onChange?(value: boolean, name: TKey): any;
+  onChange?: (value: boolean, name: TKey) => any;
   checked?: never;
   indeterminate?: boolean;
-}
+};
 
-export type CheckboxType = {
+export interface CheckboxType {
   (props: CheckboxControlledProps): JSX.Element;
   <TKey extends keyof TState, TState>(props: CheckboxObjectProps<TKey, TState>): JSX.Element;
 }
@@ -70,7 +69,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   const checked = state ? state[name] : checkedControlled;
 
   return styled()(
-    <CheckboxMarkup 
+    <CheckboxMarkup
       {...rest}
       name={name}
       id={value || name}

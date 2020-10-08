@@ -10,9 +10,7 @@ import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-exte
 
 const objectCatalogSetterSymbol = Symbol('@extension/ObjectCatalogSetter');
 
-export interface IObjectCatalogSetter<T = never> {
-  (catalogId: string, context: T): Promise<boolean> | boolean;
-}
+export type IObjectCatalogSetter<T = never> = (catalogId: string, context: T) => Promise<boolean> | boolean;
 
 export function objectCatalogSetter<T>(provider: IObjectCatalogSetter<T>) {
   return createExtension<T>(provider, objectCatalogSetterSymbol);

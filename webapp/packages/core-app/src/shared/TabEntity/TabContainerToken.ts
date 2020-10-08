@@ -9,9 +9,9 @@
 import { createValueToken, IServiceInjector } from '@cloudbeaver/core-di';
 
 export interface ITabContainerEntity {
-  getTabServiceInjector(tabId: string): IServiceInjector;
-  closeTab(tabId: string): void;
-  activateTab(tabId: string): void;
+  getTabServiceInjector: (tabId: string) => IServiceInjector;
+  closeTab: (tabId: string) => void;
+  activateTab: (tabId: string) => void;
 }
 
 export const TabContainerToken = createValueToken<ITabContainerEntity>('ITabContainerEntity');

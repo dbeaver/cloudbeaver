@@ -16,19 +16,19 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 import { DriverPropertiesService } from '../../../../DriverPropertiesService';
 
-type StaticId = {
+interface StaticId {
   staticId: string;
 }
 
-export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId
+export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId;
 
 @injectable()
 export class DriverPropertiesController implements IInitializableController {
   @observable isLoading = false;
-  @observable hasDetails = false
-  @observable responseMessage: string | null = null
-  @observable driverProperties = observable<IProperty>([])
-  @observable driverId!: string
+  @observable hasDetails = false;
+  @observable responseMessage: string | null = null;
+  @observable driverProperties = observable<IProperty>([]);
+  @observable driverId!: string;
 
   loaded = false;
 
@@ -51,7 +51,7 @@ export class DriverPropertiesController implements IInitializableController {
       defaultValue: value ?? '',
       new: !key,
     });
-  }
+  };
 
   async loadDriverProperties() {
     if (this.isLoading || this.loaded) {

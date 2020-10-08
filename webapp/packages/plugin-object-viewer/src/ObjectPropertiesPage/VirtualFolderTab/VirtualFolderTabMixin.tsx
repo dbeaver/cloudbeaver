@@ -40,8 +40,7 @@ export class VirtualFolderTabMixin {
       for (const nodeId of this.getChildrenId()) {
         await this.dbObjectService.load(nodeId);
       }
-    }
-    finally {
+    } finally {
       this.isActivated = true;
     }
 

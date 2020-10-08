@@ -23,10 +23,10 @@ import { PlainTextEditor } from './PlainTextEditor/PlainTextEditor';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 
 export type AgGridTableProps = PropsWithChildren<
-  AgGridReactProps & {
-    tableModel: TableViewerModel;
-    className?: string;
-  }>
+AgGridReactProps & {
+  tableModel: TableViewerModel;
+  className?: string;
+}>;
 
 async function loader() {
   const styles = await import('../styles/base.scss');

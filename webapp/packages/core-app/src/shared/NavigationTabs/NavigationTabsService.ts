@@ -22,7 +22,7 @@ import { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
 import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
 
-type TabsState = {
+interface TabsState {
   tabs: string[];
   history: string[];
   currentId: string;
@@ -65,8 +65,8 @@ export class NavigationTabsService {
         const map: IKeyValueMap<ITab> = {};
         for (const [key, value] of Object.entries(json as IKeyValueMap<ITab>)) {
           if (
-            typeof value.id === 'string' &&
-            typeof value.handlerId === 'string'
+            typeof value.id === 'string'
+            && typeof value.handlerId === 'string'
           ) {
             value.restored = false;
             map[key] = value;
@@ -158,7 +158,7 @@ export class NavigationTabsService {
       context: tab,
       extensions: handler.extensions || [],
     };
-  }
+  };
 
   getTabHandler(handlerId: string): TabHandler | undefined {
     return this.handlers.get(handlerId);
@@ -232,7 +232,7 @@ export class NavigationTabsService {
     }
   }
 
-  navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this)
+  navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this);
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
     const handler = this.handlers.get(tab.handlerId);

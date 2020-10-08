@@ -12,7 +12,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 type Props = React.PropsWithChildren<{
   className?: string;
-}>
+}>;
 
 export function TableHeader({ children, className }: Props) {
   return styled(useStyles())(

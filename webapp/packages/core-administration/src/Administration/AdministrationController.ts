@@ -10,11 +10,12 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../AdministrationItem/filterConfigurationWizard';
+import { IAdministrationItem } from '../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../AdministrationItem/orderAdministrationItems';
 
 @injectable()
 export class AdministrationController {
-  getItems(configurationWizard: boolean) {
+  getItems(configurationWizard: boolean): IAdministrationItem[] {
     return this.administrationItemService
       .items
       .filter(filterConfigurationWizard(configurationWizard))
@@ -22,6 +23,6 @@ export class AdministrationController {
   }
 
   constructor(
-    private administrationItemService: AdministrationItemService
+    private readonly administrationItemService: AdministrationItemService
   ) {}
 }

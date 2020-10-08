@@ -17,7 +17,7 @@ import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {
-  @observable provider: AuthProvider | null = null
+  @observable provider: AuthProvider | null = null;
   @observable isAuthenticating = false;
   @observable credentials = {};
 
@@ -68,7 +68,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     } finally {
       this.isAuthenticating = false;
     }
-  }
+  };
 
   selectProvider = (providerId: string) => {
     if (providerId === this.provider?.id) {
@@ -77,13 +77,13 @@ export class AuthDialogController implements IInitializableController, IDestruct
     this.provider = this.authProvidersResource
       .data.find(provider => provider.id === providerId) || null;
     this.credentials = {};
-  }
+  };
 
   showDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   private async loadProviders() {
     try {
@@ -97,8 +97,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   private compareProviders = (providerA: AuthProvider, providerB: AuthProvider): number => {
-    if (providerA.defaultProvider === providerB.defaultProvider)
-    {
+    if (providerA.defaultProvider === providerB.defaultProvider) {
       return providerA.label.localeCompare(providerB.label);
     }
 
@@ -106,5 +105,5 @@ export class AuthDialogController implements IInitializableController, IDestruct
       return -1;
     }
     return 1;
-  }
+  };
 }

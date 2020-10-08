@@ -18,25 +18,25 @@ import { FormContext } from './FormContext';
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
   mod?: 'surface';
   long?: boolean;
-}
+};
 
 type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
-  onChange?(value: string, name?: string): any;
+  onChange?: (value: string, name?: string) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?(value: string, name: TKey): any;
+  onChange?: (value: string, name: TKey) => any;
 
   value?: never;
-}
+};
 
-type InputFieldType = {
+interface InputFieldType {
   (props: ControlledProps): JSX.Element;
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }

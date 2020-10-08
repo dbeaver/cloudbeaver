@@ -47,8 +47,8 @@ type TableViewerProps = PropsWithChildren<{
   resultIndex: number | undefined;
   presentationId: string | undefined;
   className?: string;
-  onPresentationChange(id: string): void;
-}>
+  onPresentationChange: (id: string) => void;
+}>;
 
 export const TableViewer = observer(function TableViewer({
   tableId,

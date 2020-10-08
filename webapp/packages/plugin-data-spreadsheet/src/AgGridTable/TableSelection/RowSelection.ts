@@ -7,7 +7,7 @@
  */
 
 export class RowSelection {
-  columns = new Set<string>()
+  columns = new Set<string>();
   constructor(readonly rowId: number) {}
 
   add(columnIndexList: string[]) {

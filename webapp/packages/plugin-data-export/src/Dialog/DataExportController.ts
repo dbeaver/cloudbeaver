@@ -25,12 +25,13 @@ export enum DataExportStep {
 
 @injectable()
 export class DataExportController implements IInitializableController, IDestructibleController {
-  @observable step = DataExportStep.DataTransferProcessor
+  @observable step = DataExportStep.DataTransferProcessor;
   get isLoading() {
     return this.dataExportService.processors.isLoading();
   }
-  @observable isExporting = false
-  @observable processor: DataTransferProcessorInfo | null = null
+
+  @observable isExporting = false;
+  @observable processor: DataTransferProcessorInfo | null = null;
 
   @computed get processors(): DataTransferProcessorInfo[] {
     return Array
@@ -40,8 +41,8 @@ export class DataExportController implements IInitializableController, IDestruct
       .sort(sortProcessors);
   }
 
-  @observable processorProperties: any = {}
-  @observable properties: IProperty[] = []
+  @observable processorProperties: any = {};
+  @observable properties: IProperty[] = [];
 
   readonly error = new GQLErrorCatcher();
 
@@ -88,11 +89,11 @@ export class DataExportController implements IInitializableController, IDestruct
       this.isExporting = false;
       this.close();
     }
-  }
+  };
 
   setStep = (step: DataExportStep) => {
     this.step = step;
-  }
+  };
 
   selectProcessor = (processorId: string) => {
     this.processor = this.dataExportService
@@ -113,13 +114,13 @@ export class DataExportController implements IInitializableController, IDestruct
 
     this.step = DataExportStep.Configure;
     this.error.clear();
-  }
+  };
 
   showDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   private async loadProcessors() {
     try {
@@ -131,8 +132,7 @@ export class DataExportController implements IInitializableController, IDestruct
 }
 
 function sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
-  if (processorA.order === processorB.order)
-  {
+  if (processorA.order === processorB.order) {
     return (processorA.name || '').localeCompare((processorB.name || ''));
   }
 

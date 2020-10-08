@@ -40,7 +40,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   grantedConnections: AdminConnectionGrantInfo[];
   connections: ConnectionInfo[];
   selectedConnection: Map<string, boolean>;

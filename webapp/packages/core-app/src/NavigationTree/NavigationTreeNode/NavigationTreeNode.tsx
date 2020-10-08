@@ -12,7 +12,7 @@ import { useNode } from '../../shared/NodesManager/useNode';
 import { NavigationNode } from './NavigationNode/NavigationNode';
 import { NavigationNodeChildren } from './NavigationNodeChildren';
 
-type NavigationTreeNodeProps = {
+interface NavigationTreeNodeProps {
   id: string;
   parentId: string;
 }

@@ -10,25 +10,25 @@ import { ValueToken } from './InjectionToken';
 import { ITypedConstructor } from './ITypedConstructor';
 
 export interface IServiceCollection {
-  addServiceByToken<T extends Record<string, any>>(token: any, value: T): void;
-  addServiceByClass(ctor: IServiceConstructor<any>): void;
+  addServiceByToken: <T extends Record<string, any>>(token: any, value: T) => void;
+  addServiceByClass: (ctor: IServiceConstructor<any>) => void;
 }
 
 export type ExtractInitArgs<T> = T extends IInitializableController<infer TArgs>? TArgs : never;
 
 export interface IDestructibleController {
-  destruct(): void;
+  destruct: () => void;
 }
 
 export interface IInitializableController<TArgs extends any[] = any[]> {
-  init(...args: TArgs): void;
+  init: (...args: TArgs) => void;
 }
 
 export interface IServiceConstructor<T> extends ITypedConstructor<T> {
 }
 
 export interface IServiceInjector {
-  getServiceByClass<T>(ctor: IServiceConstructor<T>): T;
-  getServiceByToken<T>(token: ValueToken<T>): T;
-  resolveServiceByClass<T>(ctor: IServiceConstructor<T>): T;
+  getServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;
+  getServiceByToken: <T>(token: ValueToken<T>) => T;
+  resolveServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;
 }

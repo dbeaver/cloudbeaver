@@ -27,7 +27,7 @@ implements IInitializableController {
     return Array.from(this.rolesResource.data.values());
   }
 
-  private model!: IConnectionFormModel
+  private model!: IConnectionFormModel;
 
   constructor(
     private usersResource: UsersResource,
@@ -53,7 +53,7 @@ implements IInitializableController {
       subjectId,
       subjectType: AdminSubjectType.User,
     });
-  }
+  };
 
   private async loadSubjects() {
     await this.usersResource.loadAll();

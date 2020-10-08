@@ -26,7 +26,7 @@ const styles = css`
   }
 `;
 
-type TableFooterMenuProps = {
+interface TableFooterMenuProps {
   model: DataModelWrapper;
   className?: string;
 }

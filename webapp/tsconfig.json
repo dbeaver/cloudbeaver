@@ -3,10 +3,8 @@
   "files": [
     "typings.d.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "lib"
-  ],
+  "include": ["src"],
+  "exclude": ["**/node_modules", "**/.*/"],
   "compilerOptions": {
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
@@ -18,6 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
+    "importsNotUsedAsValues": "preserve",
     "jsx": "preserve",
     "target": "ES6",
     "module": "none",

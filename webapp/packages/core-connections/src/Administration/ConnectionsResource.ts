@@ -25,8 +25,8 @@ import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 export const SEARCH_CONNECTION_SYMBOL = Symbol('search-connection');
 
-export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean }
-export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: AdminConnectionSearchInfo }
+export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean };
+export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: AdminConnectionSearchInfo };
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {

@@ -21,7 +21,7 @@ import { formStyles } from './formStyles';
 import { IFormController } from './IFormController';
 import { ParametersForm } from './ParametersForm';
 
-type ConnectionFormProps = {
+interface ConnectionFormProps {
   driver: DBDriver | null;
   controller: IFormController;
 }

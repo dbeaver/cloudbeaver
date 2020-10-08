@@ -10,9 +10,7 @@ import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-exte
 
 const objectSchemaProviderSymbol = Symbol('@extension/ObjectSchemaProvider');
 
-export interface IObjectSchemaProvider<T = never> {
-  (context: T): string | undefined;
-}
+export type IObjectSchemaProvider<T = never> = (context: T) => string | undefined;
 
 export function objectSchemaProvider<T>(provider: IObjectSchemaProvider<T>) {
   return createExtension<T>(provider, objectSchemaProviderSymbol);

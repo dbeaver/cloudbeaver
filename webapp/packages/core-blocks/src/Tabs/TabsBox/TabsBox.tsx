@@ -19,7 +19,7 @@ type TabsBoxProps = PropsWithChildren<{
   tabIndex?: number;
   className?: string;
   style?: Style[];
-}>
+}>;
 
 export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox({
   currentTabId,

@@ -14,11 +14,11 @@ import { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
 import { TemplateConnectionItem } from './TemplateConnectionItem';
 
-type Props = {
+interface Props {
   templateConnections: Connection[];
   dbDrivers: Map<string, DBDriver>;
   className?: string;
-  onSelect(dbSourceId: string): void;
+  onSelect: (dbSourceId: string) => void;
 }
 
 export const TemplateConnectionSelector = observer(function TemplateConnectionSelector({

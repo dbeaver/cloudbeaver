@@ -19,20 +19,20 @@ export interface PluginManifest {
   /**
    * First phase, only register services in DI here
    */
-  registerServices?(services: IServiceCollection): void;
+  registerServices?: (services: IServiceCollection) => void;
 
-  providers: IServiceConstructor<any>[];
+  providers: Array<IServiceConstructor<any>>;
 
   /**
    * Second phase.
    * You can be sure that all services of all plugins are already registered here and you can use any service
    */
-  initialize?(services: IServiceInjector): Promise<void> | void;
+  initialize?: (services: IServiceInjector) => Promise<void> | void;
 
   /**
    * Third phase but we still don't know what is it :)
    */
-  load?(): Promise<void> | void;
+  load?: () => Promise<void> | void;
 
   /**
    * The list of plugins which your plugin depends on

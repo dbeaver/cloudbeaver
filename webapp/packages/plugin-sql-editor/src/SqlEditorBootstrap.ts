@@ -50,8 +50,8 @@ export class SqlEditorBootstrap {
     const openSqlEditor: IContextMenuItem<NavNode> = {
       id: 'open-sql-editor',
       isPresent(context) {
-        return context.contextType === NavigationTreeContextMenuService.nodeContextType &&
-          context.data.objectFeatures.includes(EObjectFeature.dataSource);
+        return context.contextType === NavigationTreeContextMenuService.nodeContextType
+          && context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
       title: 'SQL',
       order: 2,

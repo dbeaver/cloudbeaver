@@ -13,11 +13,11 @@ import { SqlExecutionState } from './SqlExecutionState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
 export interface ISqlEditorGroupMetadata {
-  start(
+  start: (
     context: SqlExecutionState,
     sqlQueryParams: ISqlQueryParams,
     filter: SqlDataFilter,
     dataFormat: ResultDataFormat,
-  ): Promise<SQLQueryExecutionProcess>;
+  ) => Promise<SQLQueryExecutionProcess>;
   resultDataProcess: SQLQueryExecutionProcess;
 }

@@ -16,7 +16,7 @@ type Props<T = unknown> = T extends unknown ? {
 } : {
   container: PlaceholderContainer<T>;
   context: T;
-}
+};
 
 export const Placeholder = observer(function Placeholder<T = unknown>({ container, context }: Props<T>) {
   return (

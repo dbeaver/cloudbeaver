@@ -12,17 +12,17 @@ export type OutputBuffer = ArrayLike<number>;
 export type InputBuffer = ArrayLike<number>;
 
 export interface RandomOptions {
-    random?: InputBuffer;
+  random?: InputBuffer;
 }
 export interface RngOptions {
-    rng?: () => InputBuffer;
+  rng?: () => InputBuffer;
 }
 
 export interface V1BaseOptions {
-    node?: InputBuffer;
-    clockseq?: number;
-    msecs?: number | Date;
-    nsecs?: number;
+  node?: InputBuffer;
+  clockseq?: number;
+  msecs?: number | Date;
+  nsecs?: number;
 }
 export type V4Options = RandomOptions | RngOptions;
 

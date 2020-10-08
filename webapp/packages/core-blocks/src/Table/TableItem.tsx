@@ -17,7 +17,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { TableContext } from './TableContext';
 import { TableItemContext, ITableItemContext } from './TableItemContext';
 
-type ExpandProps = {
+interface ExpandProps {
   item: any;
 }
 
@@ -28,7 +28,7 @@ type Props = React.PropsWithChildren<{
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
-}>
+}>;
 
 export const TableItem = observer(function TableItem({
   item,

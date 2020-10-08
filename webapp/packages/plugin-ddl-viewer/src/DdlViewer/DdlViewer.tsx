@@ -25,7 +25,7 @@ const styles = css`
   }
 `;
 
-export type DdlViewerTabPanelProps = {
+export interface DdlViewerTabPanelProps {
   nodeId: string;
 }
 

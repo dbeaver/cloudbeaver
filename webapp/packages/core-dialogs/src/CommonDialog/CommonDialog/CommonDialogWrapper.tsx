@@ -13,7 +13,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { commonDialogStyle } from './styles';
 
-export type CommonDialogWrapperProps = {
+export interface CommonDialogWrapperProps {
   title?: string;
   icon?: string;
   viewBox?: string;
@@ -25,7 +25,7 @@ export type CommonDialogWrapperProps = {
   children?: React.ReactNode;
 }
 
-export function CommonDialogWrapper({
+export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function CommonDialogWrapper({
   title,
   icon,
   viewBox,
@@ -35,7 +35,7 @@ export function CommonDialogWrapper({
   className,
   onReject,
   children,
-}: CommonDialogWrapperProps) {
+}) {
 
   return styled(useStyles(commonDialogStyle))(
     <dialog className={className}>
@@ -57,4 +57,4 @@ export function CommonDialogWrapper({
       </footer>
     </dialog>
   );
-}
+};

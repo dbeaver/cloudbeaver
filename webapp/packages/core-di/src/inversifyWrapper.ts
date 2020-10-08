@@ -13,7 +13,7 @@ import { ValueToken } from './InjectionToken';
 export interface IDiWrapper {
   injector: IServiceInjector;
   collection: IServiceCollection;
-  registerChildContainer(container: DIContainer): void;
+  registerChildContainer: (container: DIContainer) => void;
 }
 
 const mainContainer = new DIContainer();

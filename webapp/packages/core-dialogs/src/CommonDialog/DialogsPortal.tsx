@@ -47,7 +47,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
   );
 });
 
-type NestedDialogType = {
+interface NestedDialogType {
   dialog: DialogInternal;
   resolveDialog: (dialog: DialogInternal, result: any) => void;
   rejectDialog: (dialog: DialogInternal) => void;
@@ -64,9 +64,9 @@ function NestedDialog({
   const dialogState = useDialogState({ visible });
   const styles = useStyles(dialogStyles);
 
-  if (!dialogState.visible &&
-    dialogState.visible !== lastVisibility.current &&
-    !dialog.options?.persistent
+  if (!dialogState.visible
+    && dialogState.visible !== lastVisibility.current
+    && !dialog.options?.persistent
   ) {
     rejectDialog(dialog);
   } else {

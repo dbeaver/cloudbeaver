@@ -15,21 +15,21 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type DBDriver = Pick<
-  DriverInfo,
-  | 'id'
-  | 'name'
-  | 'icon'
-  | 'description'
-  | 'defaultPort'
-  | 'defaultDatabase'
-  | 'defaultServer'
-  | 'defaultUser'
-  | 'sampleURL'
-  | 'embedded'
-  | 'anonymousAccess'
-  | 'promotedScore'
-  | 'defaultAuthModel'
->
+DriverInfo,
+| 'id'
+| 'name'
+| 'icon'
+| 'description'
+| 'defaultPort'
+| 'defaultDatabase'
+| 'defaultServer'
+| 'defaultUser'
+| 'sampleURL'
+| 'embedded'
+| 'anonymousAccess'
+| 'promotedScore'
+| 'defaultAuthModel'
+>;
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver> {
@@ -55,8 +55,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
 
   compare(driverA: DBDriver, driverB: DBDriver): number {
 
-    if (driverA.promotedScore === driverB.promotedScore)
-    {
+    if (driverA.promotedScore === driverB.promotedScore) {
       return (driverA.name || '').localeCompare((driverB.name || ''));
     }
 

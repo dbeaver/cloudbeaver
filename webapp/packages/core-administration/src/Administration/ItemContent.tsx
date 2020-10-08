@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 
-type Props = {
+interface Props {
   activeItemName: string | null;
   activeItemSub: string | null;
   activeItemSubParam: string | null;

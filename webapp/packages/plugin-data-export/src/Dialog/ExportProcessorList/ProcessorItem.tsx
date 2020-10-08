@@ -15,9 +15,9 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-type ProcessorItemProps = {
+interface ProcessorItemProps {
   processor: DataTransferProcessorInfo;
-  onSelect(processorId: string): void;
+  onSelect: (processorId: string) => void;
 }
 
 const styles = css`

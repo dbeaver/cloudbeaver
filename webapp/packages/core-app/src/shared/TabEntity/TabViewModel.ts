@@ -23,6 +23,7 @@ export class TabViewModel implements ITab {
   get title(): string {
     return this.tabModel.title;
   }
+
   get icon(): string | undefined {
     return this.tabModel.icon;
   }
@@ -31,8 +32,8 @@ export class TabViewModel implements ITab {
   onActivate = () => this.tabContainer.activateTab(this.tabId);
 
   constructor(@inject(TabToken) private tabModel: ITab,
-              private entity: Entity,
-              @inject(TabContainerToken) private tabContainer: ITabContainerEntity) {
+    private entity: Entity,
+    @inject(TabContainerToken) private tabContainer: ITabContainerEntity) {
 
     this.tabId = this.entity.id;
     this.panel = () => TabContext(tabContainer.getTabServiceInjector(this.tabId), this.tabModel.panel);

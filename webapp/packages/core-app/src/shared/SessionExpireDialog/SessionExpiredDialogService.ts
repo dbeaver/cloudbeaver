@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -40,6 +39,6 @@ export class SessionExpiredDialogService extends Bootstrap {
         onAction: () => location.reload(),
       }, { title: 'app_root_session_expired_title', persistent: true, type: ENotificationType.Error });
     }
-  
+
   }
 }

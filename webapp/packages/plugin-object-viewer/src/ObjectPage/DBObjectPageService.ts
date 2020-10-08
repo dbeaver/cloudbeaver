@@ -18,7 +18,7 @@ import { ObjectPage, ObjectPageOptions, ObjectPageCallback } from './ObjectPage'
 export class DBObjectPageService {
   @observable pages = new Map<string, ObjectPage<any>>();
 
-  @computed get orderedPages(): ObjectPage<any>[] {
+  @computed get orderedPages(): Array<ObjectPage<any>> {
     return Array.from(this.pages.values())
       .sort(this.comparePages.bind(this));
   }
@@ -55,7 +55,7 @@ export class DBObjectPageService {
       tab.handlerState.pagesState.set(page.key, state);
     }
     await this.callHandlerCallback(tab, page => page.onSelect);
-  }
+  };
 
   async restorePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
     for (const page of this.pages.values()) {

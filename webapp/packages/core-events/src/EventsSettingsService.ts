@@ -15,7 +15,7 @@ const defaultSettings = {
 
 };
 
-export type EventsSettings = typeof defaultSettings
+export type EventsSettings = typeof defaultSettings;
 
 @injectable()
 export class EventsSettingsService {

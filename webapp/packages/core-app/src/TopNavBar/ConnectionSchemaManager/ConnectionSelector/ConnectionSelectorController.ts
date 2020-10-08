@@ -47,14 +47,15 @@ export class ConnectionSelectorController {
   get isConnectionSelectorVisible() {
     return !!this.currentConnection;
   }
+
   get isObjectContainerSelectorVisible() {
-    return !!this.connectionSelectorService.currentObjectCatalogId ||
-      !!this.connectionSelectorService.currentObjectSchemaId;
+    return !!this.connectionSelectorService.currentObjectCatalogId
+      || !!this.connectionSelectorService.currentObjectSchemaId;
   }
 
   @computed get objectContainerSelectionDisabled(): boolean {
-    return !this.connectionSelectorService.isConnectionChangeable ||
-      this.getObjectContainerItems().length === 0;
+    return !this.connectionSelectorService.isConnectionChangeable
+      || this.getObjectContainerItems().length === 0;
   }
 
   private get currentObjectContainerTitle(): string | undefined {

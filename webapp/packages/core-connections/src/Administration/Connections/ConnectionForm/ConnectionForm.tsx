@@ -119,11 +119,11 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   model: IConnectionFormModel;
   configurationWizard?: boolean;
-  onBack?(): void;
-  onCancel?(): void;
+  onBack?: () => void;
+  onCancel?: () => void;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
@@ -178,46 +178,46 @@ export const ConnectionForm = observer(function ConnectionForm({
           {controller.isLoading
             ? <Loader />
             : (
-              <>
-                <TabPanel tabId='options'>
-                  <Options
-                    model={model}
-                    type={controller.connectionType}
-                    disabled={controller.isDisabled}
-                    onTypeChange={controller.setType}
-                    onSave={controller.save}
-                  />
-                </TabPanel>
-                {model.connection.driverId && (
-                  <TabPanel tabId='driver_properties'>
-                    {state => (
-                      <DriverProperties
-                        driverId={model.connection.driverId}
-                        state={model.connection.properties}
-                        loadProperties={state.selectedId === 'driver_properties'}
-                      />
-                    )}
+                <>
+                  <TabPanel tabId='options'>
+                    <Options
+                      model={model}
+                      type={controller.connectionType}
+                      disabled={controller.isDisabled}
+                      onTypeChange={controller.setType}
+                      onSave={controller.save}
+                    />
                   </TabPanel>
-                )}
-                <TabPanel tabId='access'>
-                  {(state) => {
-                    if (state.selectedId === 'access') {
-                      controller.loadAccessSubjects();
-                    } else {
-                      return null;
-                    }
+                  {model.connection.driverId && (
+                    <TabPanel tabId='driver_properties'>
+                      {state => (
+                        <DriverProperties
+                          driverId={model.connection.driverId}
+                          state={model.connection.properties}
+                          loadProperties={state.selectedId === 'driver_properties'}
+                        />
+                      )}
+                    </TabPanel>
+                  )}
+                  <TabPanel tabId='access'>
+                    {(state) => {
+                      if (state.selectedId === 'access') {
+                        controller.loadAccessSubjects();
+                      } else {
+                        return null;
+                      }
 
-                    return (
-                      <ConnectionAccess
-                        model={model}
-                        disabled={controller.isDisabled}
-                        onChange={controller.handleAccessChange}
-                      />
-                    );
-                  }}
-                </TabPanel>
-              </>
-            )}
+                      return (
+                        <ConnectionAccess
+                          model={model}
+                          disabled={controller.isDisabled}
+                          onChange={controller.handleAccessChange}
+                        />
+                      );
+                    }}
+                  </TabPanel>
+                </>
+              )}
           {controller.error.responseMessage && (
             <ErrorMessage
               text={controller.error.responseMessage}

@@ -41,8 +41,7 @@ function getName(obj: any): string {
     if (obj.constructor) {
       return obj.constructor.name || 'unknown';
     }
-  }
-  else if (typeof obj === 'function') {
+  } else if (typeof obj === 'function') {
     return obj.name || 'unknown';
   }
   return 'unexpected';

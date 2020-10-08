@@ -37,7 +37,7 @@ const styles = composes(
 type Props = React.PropsWithChildren<{
   className?: string;
   long?: boolean;
-}>
+}>;
 
 export function InputGroup({
   children,

@@ -1,18 +1,19 @@
 module.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
+
+  plugins: [
+    '@typescript-eslint',
+    'eslint-plugin-import-helpers',
+  ],
+
   extends: [
     // 'airbnb-typescript',
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     'plugin:@typescript-eslint/recommended',
-  ],
-
-  plugins: [
-    'import',
-    '@typescript-eslint',
-    'eslint-plugin-import-helpers',
-    'jest',
+    'standard-with-typescript'
   ],
 
   settings: {
@@ -38,21 +39,24 @@ module.exports = {
   },
 
   parserOptions: {
+    ecmaVersion: 2019,
+    sourceType: "module",
+    // tsconfigRootDir: __dirname,
+    // project: './packages/**/tsconfig.json',
     ecmaFeatures: {
-      "jsx": true
+      jsx: true
     }
   },
-
-  // parserOptions: {
-  //   tsconfigRootDir: __dirname,
-  //   project: './packages/**/tsconfig.json',
-  // },
 
   rules: {
     'arrow-parens': ['error', 'as-needed', { 'requireForBlockBody': true }],
     'curly': ['error', 'all'],
     'class-methods-use-this': 'off',
     'default-case': 'off',
+    'react/require-render-return': 'off',
+    'react/no-string-refs': 'off',
+    'react/no-deprecated': 'off',
+    'react/no-direct-mutation-state': 'off',
     'react/prop-types': 'off',
     'react/display-name': 'off',
     'react/jsx-no-literals': 'off',
@@ -91,8 +95,8 @@ module.exports = {
     'react/jsx-equals-spacing': ['error', 'never'],
     'react/jsx-first-prop-new-line': ['warn', 'multiline'],
     'react/jsx-fragments': ['error', 'syntax'],
-    'brace-style': 'off', // prefer 1tbs or stroustrup styles, avoid allman style
-    'operator-linebreak': 'warn',
+    // 'brace-style': ["error", "1tbs", { "allowSingleLine": false }],
+    'operator-linebreak': ['warn', 'before'],
     'consistent-return': 'off',
     'comma-dangle': ['warn', { // the rule enforces consistent use of trailing commas in object and array literals
       'arrays': 'always-multiline',
@@ -101,8 +105,10 @@ module.exports = {
       'exports': 'only-multiline',
       'functions': 'only-multiline'
     }],
+    "semi": "off",
     'eqeqeq': 'warn',
     'radix': 'off',
+    'no-unmodified-loop-condition': 'off',
     'no-use-before-define': 'off',
     'no-constant-condition': 'off',
     'no-console': 'off',
@@ -131,7 +137,8 @@ module.exports = {
         code: 120,
         ignoreTrailingComments: true,
         ignoreStrings: true,
-        ignoreTemplateLiterals: true
+        ignoreTemplateLiterals: true,
+        ignorePattern: "^export\\s(const\\s\\w+:?.+=\\s*function\\s|function\\s)\\w+\\s*\\(\\s*\\{$"
       }
     ],
     'lines-between-class-members': 'off',
@@ -144,6 +151,41 @@ module.exports = {
       }
     ],
     'padded-blocks': 'off',
+    'import/no-duplicates': 'off',
+    'standard/no-callback-literal': 'off',
+    '@typescript-eslint/dot-notation': 'off',
+    '@typescript-eslint/no-throw-literal': 'off',
+    '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
+    '@typescript-eslint/prefer-includes': 'off',
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
+    '@typescript-eslint/prefer-readonly': 'off',
+    '@typescript-eslint/prefer-reduce-type-parameter': 'off',
+    '@typescript-eslint/require-array-sort-compare': 'off',
+    '@typescript-eslint/restrict-plus-operands': 'off',
+    '@typescript-eslint/return-await': 'off',
+
+    
+    '@typescript-eslint/indent': [
+      'warn', 2, {
+        'MemberExpression': 1,
+        "FunctionDeclaration": {"body": 1, "parameters": 1},
+        "FunctionExpression": {"body": 1, "parameters": 1},
+        "CallExpression": {"arguments": 1},
+        'ArrayExpression': 1,
+        'SwitchCase': 1,
+        'ObjectExpression': 1,
+        'ImportDeclaration': 1,
+        "offsetTernaryExpressions": true
+      }
+    ],
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-base-to-string': 'off',
+    '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+    '@typescript-eslint/no-implied-eval': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/promise-function-async': 'off',
+    '@typescript-eslint/space-before-function-paren': ["error", { "anonymous": "always", "named": "never", "asyncArrow": "always" }],
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
@@ -153,6 +195,20 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/strict-boolean-expressions': ['off'],
+    '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'allow' }],
+    // '@typescript-eslint/no-extraneous-class': [],
+    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/member-delimiter-style": ['warn', {
+      "multiline": {
+        "delimiter": "semi",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",
+        "requireLast": false
+      }
+    }],
     'import/named': 'off',
     'import/export': 'off',
     'import/extensions': 'off',
@@ -170,18 +226,6 @@ module.exports = {
         alphabetize: { order: 'asc', ignoreCase: true },
       },
     ],
-    'indent': [
-      'warn', 2, {
-        'FunctionDeclaration': { 'parameters': 'first' },
-        'FunctionExpression': { 'parameters': 'first' },
-        'CallExpression': { 'arguments': 'first' },
-        'ArrayExpression': 1,
-        'SwitchCase': 1
-      }
-    ],
-  },
-
-  env: {
-    'jest/globals': true,
-  },
+    'indent': 'off'
+  }
 }

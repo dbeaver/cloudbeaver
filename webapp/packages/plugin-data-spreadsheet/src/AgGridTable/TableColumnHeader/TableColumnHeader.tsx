@@ -13,7 +13,7 @@ import { AgEvent, GridApi, Column } from '@ag-grid-community/core';
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
 import { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
-type HeaderProps = {
+interface HeaderProps {
   api: GridApi;
   reactContainer: HTMLElement;
   column: Column;

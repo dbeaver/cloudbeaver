@@ -105,12 +105,12 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   property: IProperty;
   value?: string;
-  onNameChange(staticId: string, newId: string): void;
-  onValueChange(staticId: string, value: string): void;
-  onRemove(staticId: string): void;
+  onNameChange: (staticId: string, newId: string) => void;
+  onValueChange: (staticId: string, value: string) => void;
+  onRemove: (staticId: string) => void;
   error?: boolean;
 }
 

@@ -22,9 +22,9 @@ import { AuthProviderService } from './AuthProviderService';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
-type AdminUserNew = AdminUserInfo & { [NEW_USER_SYMBOL]: boolean }
+type AdminUserNew = AdminUserInfo & { [NEW_USER_SYMBOL]: boolean };
 
-type UserCreateOptions = {
+interface UserCreateOptions {
   userId: string;
   roles: string[];
   credentials: Record<string, any>;
@@ -84,7 +84,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
       }
 
       await this.setConnections(userId, grantedConnections);
-      const user = await this.refresh(userId)as AdminUserNew;
+      const user = await this.refresh(userId) as AdminUserNew;
       user[NEW_USER_SYMBOL] = true;
     } catch (exception) {
       this.delete(userId);

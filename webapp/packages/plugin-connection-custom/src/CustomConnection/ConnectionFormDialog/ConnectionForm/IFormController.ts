@@ -15,6 +15,6 @@ export interface IFormController {
   config: ConnectionConfig;
   connectionType: ConnectionType;
   isConnecting: boolean;
-  onChangeType(type: ConnectionType): void;
-  onChange<T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]): void;
+  onChangeType: (type: ConnectionType) => void;
+  onChange: <T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]) => void;
 }

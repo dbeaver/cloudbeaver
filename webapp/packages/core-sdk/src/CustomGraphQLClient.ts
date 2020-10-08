@@ -17,10 +17,6 @@ export class CustomGraphQLClient extends GraphQLClient {
   private isRequestsBlocked = false;
   private requestsBlockedReason?: Error | string;
 
-  constructor(endpoint: string) {
-    super(endpoint);
-  }
-
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.interceptors.push(interceptor);
   }
@@ -38,13 +34,13 @@ export class CustomGraphQLClient extends GraphQLClient {
   }
 
   private blockRequestsReasonHandler(): void {
-    if(!this.isRequestsBlocked) {
-      return;
+    if (!this.isRequestsBlocked) {
+
     } else {
-      if(this.requestsBlockedReason instanceof Error) {
+      if (this.requestsBlockedReason instanceof Error) {
         throw this.requestsBlockedReason;
-      } else { 
-        throw new Error(this.requestsBlockedReason)
+      } else {
+        throw new Error(this.requestsBlockedReason);
       }
     }
   }

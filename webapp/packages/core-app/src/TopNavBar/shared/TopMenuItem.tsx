@@ -60,7 +60,7 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
         as="button"
         {...props}
         disabled={menuItem.isDisabled}
-        onClick={() => menuItem.onClick && menuItem.onClick()}
+        onClick={() => menuItem.onClick?.()}
       >
         <div>{translate(menuItem.title)}</div>
       </Button>
@@ -74,7 +74,7 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
       disabled={menuItem.isDisabled}
       style={[...style, topMenuStyles]}
       placement="bottom-end"
-      onClick={() => menuItem.onClick && menuItem.onClick()}
+      onClick={() => menuItem.onClick?.()}
     >
       {menuItem.icon && (
         <menu-trigger-icon as="div">

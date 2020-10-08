@@ -37,11 +37,11 @@ export class SqlEditorController implements IInitializableController {
 
   handleExecute = () => {
     this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), false);
-  }
+  };
 
   handleExecuteNewTab = () => {
     this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), true);
-  }
+  };
 
   readonly options: EditorConfiguration = {
     theme: 'material',
@@ -75,7 +75,7 @@ export class SqlEditorController implements IInitializableController {
     options: this.options,
     onBeforeChange: this.handleQueryChange.bind(this),
     editorDidMount: this.handleEditorConfigure.bind(this),
-  }
+  };
 
   @computed get value() {
     return this.tab.handlerState.query;
@@ -104,7 +104,7 @@ export class SqlEditorController implements IInitializableController {
     }
 
     const delimiters = [];
-    if (this.dialect && this.dialect.scriptDelimiter) {
+    if (this.dialect?.scriptDelimiter) {
       delimiters.push(this.dialect.scriptDelimiter);
     }
 
@@ -183,8 +183,8 @@ export class SqlEditorController implements IInitializableController {
 
   private isLineEndedWithDelimiter(delimiters: string[], line: string) {
     for (const delimiter of delimiters) {
-      if (line.length === 0 || (line.length - delimiter.length >= 0 &&
-        line.substr(line.length - delimiter.length, delimiter.length) === delimiter)) {
+      if (line.length === 0 || (line.length - delimiter.length >= 0
+        && line.substr(line.length - delimiter.length, delimiter.length) === delimiter)) {
         return true;
       }
     }

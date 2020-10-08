@@ -10,7 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-
 const checkboxStyles = composes(
   css`
   checkbox {
@@ -75,9 +74,9 @@ interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElemen
   indeterminate?: boolean;
 }
 
-export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({label, className, ...rest} ) { 
-  return styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled &&
-    checkboxState.disabled, rest.checked && checkboxState.checked))(
+export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({ label, className, ...rest }) {
+  return styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled
+    && checkboxState.disabled, rest.checked && checkboxState.checked))(
     <checkbox-container className={className} as='div'>
       <checkbox as='div'>
         <checkbox-input as='input' type='checkbox' {...rest} />
@@ -91,5 +90,5 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       </checkbox>
       {label && rest.id && <checkbox-label as='label' htmlFor={rest.id}>{label}</checkbox-label>}
     </checkbox-container>
-  )
+  );
 };

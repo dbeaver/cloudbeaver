@@ -46,7 +46,7 @@ const styles = composes(
   `
 );
 
-type ObjectFoldersProps = {
+interface ObjectFoldersProps {
   tab: ITab<IObjectViewerTabState>;
 }
 

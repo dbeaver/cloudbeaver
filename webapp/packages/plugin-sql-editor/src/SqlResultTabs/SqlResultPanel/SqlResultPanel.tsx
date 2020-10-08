@@ -41,10 +41,10 @@ const style = css`
   }
 `;
 
-type SqlResultPanelProps = {
+interface SqlResultPanelProps {
   tab: ITab<ISqlEditorTabState>;
   panelInit: IResultDataTab;
-};
+}
 
 export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit }: SqlResultPanelProps) {
   const [presentationId, setPresentation] = useState('');

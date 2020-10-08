@@ -16,7 +16,7 @@ const styles = css`
 
 type Props = React.PropsWithChildren<{
   className?: string;
-}>
+}>;
 
 export function AdministrationTools({ children, className }: Props) {
 

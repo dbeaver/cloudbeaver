@@ -9,25 +9,26 @@
 import { injectable } from '@cloudbeaver/core-di';
 
 import { ConfigurationWizardService } from '../../ConfigurationWizardService';
+import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 @injectable()
 export class ServerConfigurationPageController {
-  get state() {
+  get state(): IServerConfigurationPageState {
     return this.serverConfigurationService.state;
   }
 
   constructor(
-    private configurationWizardService: ConfigurationWizardService,
-    private serverConfigurationService: ServerConfigurationService,
+    private readonly configurationWizardService: ConfigurationWizardService,
+    private readonly serverConfigurationService: ServerConfigurationService,
   ) {
   }
 
-  onChange = () => {
+  onChange = (): void => {
     if (!this.state.serverConfig.authenticationEnabled) {
       this.state.serverConfig.anonymousAccessEnabled = true;
     }
-  }
+  };
 
-  finish = () => this.configurationWizardService.next()
+  finish = async (): Promise<void> => await this.configurationWizardService.next();
 }

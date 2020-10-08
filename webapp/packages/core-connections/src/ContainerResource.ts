@@ -13,9 +13,9 @@ import {
   DatabaseObjectInfo,
 } from '@cloudbeaver/core-sdk';
 
-export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>
+export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>;
 
-type ObjectContainerParams = {
+interface ObjectContainerParams {
   connectionId: string;
   catalogId?: string;
 }

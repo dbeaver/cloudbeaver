@@ -30,9 +30,7 @@ export class ErrorModel {
     // text error
     if (!error) {
       this.textToCopy = this.reason;
-    }
-    // GQL Error
-    else if (error instanceof GQLError) {
+    } else if (error instanceof GQLError) { // GQL Error
       this.errors = (error.response?.errors || [])
         .map((error) => {
           const errorInfo: IErrorInfo = {
@@ -52,8 +50,7 @@ export class ErrorModel {
         this.htmlBody = error.errorText;
       }
 
-    }
-    else if (error instanceof ServerInternalError) {
+    } else if (error instanceof ServerInternalError) {
       this.errors = [
         {
           message: error.message,
@@ -61,9 +58,7 @@ export class ErrorModel {
         },
       ];
       this.textToCopy = `${error.message}\n${error.stackTrace}`;
-    }
-    // Common Error
-    else if (error instanceof Error) {
+    } else if (error instanceof Error) { // Common Error
       this.errors = [
         {
           message: error.message,

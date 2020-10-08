@@ -17,12 +17,12 @@ import { TableRow, SomeTableRows } from './TableRow';
  *  when user edit data in e table this class store changes until they will be applied
  */
 export class TableEditor {
-  readonly onRowsUpdate: Observable<number[]>
-  readonly onCancelChanges: Observable<null>
+  readonly onRowsUpdate: Observable<number[]>;
+  readonly onCancelChanges: Observable<null>;
 
   @observable private editedRows = new Map<number, EditedRow>();
-  private rowsUpdateSubject: Subject<number[]>
-  private cancelChangesSubject: Subject<null>
+  private rowsUpdateSubject: Subject<number[]>;
+  private cancelChangesSubject: Subject<null>;
 
   constructor(private dataModel: TableDataModel) {
     this.rowsUpdateSubject = new Subject();

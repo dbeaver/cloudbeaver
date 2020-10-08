@@ -9,11 +9,16 @@
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AdministrationScreenService } from '../../../AdministrationScreenService';
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
+
+export interface IValidationStatusContext {
+  getState: () => boolean;
+  invalidate: () => void;
+}
 
 @injectable()
 export class ServerConfigurationService {
@@ -49,18 +54,18 @@ export class ServerConfigurationService {
     this.validationTask = new Executor();
   }
 
-  isDone() {
+  isDone(): boolean {
     return this.isFormFilled();
   }
 
-  async validate() {
+  async validate(): Promise<boolean> {
     const context = await this.validationTask.execute(true);
     const state = await context.getContext(this.validationStatusContext);
 
     return state.getState();
   }
 
-  validationStatusContext = (context: IContextProvider<boolean>) => {
+  validationStatusContext = (): IValidationStatusContext => {
     let state = this.isFormFilled();
 
     const invalidate = () => {
@@ -72,18 +77,18 @@ export class ServerConfigurationService {
       getState,
       invalidate,
     };
-  }
+  };
 
   private isFormFilled() {
     return !!(
-      this.state?.serverConfig.serverName &&
-      this.state.serverConfig.adminName &&
-      this.state.serverConfig.adminName.length > 5 &&
-      this.state.serverConfig.adminPassword
+      this.state?.serverConfig.serverName
+      && this.state.serverConfig.adminName
+      && this.state.serverConfig.adminName.length > 5
+      && this.state.serverConfig.adminPassword
     );
   }
 
-  async apply() {
+  async apply(): Promise<void> {
     if (!this.state) {
       throw new Error('No state available');
     }

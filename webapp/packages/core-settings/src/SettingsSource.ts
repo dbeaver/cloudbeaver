@@ -9,7 +9,7 @@
 import { ISettingsSource } from './ISettingsSource';
 
 export class SettingsSource implements ISettingsSource {
-  protected store = new Map<string, any>()
+  protected store = new Map<string, any>();
 
   constructor(protected fallback?: ISettingsSource) {}
 

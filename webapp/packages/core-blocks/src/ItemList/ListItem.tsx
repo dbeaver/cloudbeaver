@@ -14,9 +14,9 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { Styles } from './styles';
 
 type Props = React.PropsWithChildren<{
-  onClick(): void;
+  onClick: () => void;
   className?: string;
-}>
+}>;
 
 export function ListItem({
   children,

@@ -16,7 +16,7 @@ import { Icon } from '../Icons/Icon';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
-type Props = {
+interface Props {
   onExpand?: (item: any, state: boolean) => void;
   className?: string;
   disabled?: boolean;

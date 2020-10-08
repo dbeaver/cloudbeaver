@@ -70,7 +70,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
         as="button"
         {...props}
         disabled={menuItem.isDisabled}
-        onClick={() => menuItem.onClick && menuItem.onClick()}
+        onClick={() => menuItem.onClick?.()}
       >
         {menuItem.icon && (
           <menu-trigger-icon as="div">

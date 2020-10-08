@@ -11,8 +11,8 @@ import { createContext } from 'react';
 export interface ITableItemContext {
   item: any;
   selectDisabled: boolean;
-  isSelected(): boolean;
-  isExpanded(): boolean;
+  isSelected: () => boolean;
+  isExpanded: () => boolean;
 }
 
 export const TableItemContext = createContext<ITableItemContext | undefined>(undefined);

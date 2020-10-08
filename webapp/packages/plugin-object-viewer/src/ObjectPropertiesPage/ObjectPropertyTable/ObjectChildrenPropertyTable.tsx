@@ -14,7 +14,7 @@ import { TableHeader, TableBody, Table } from '@cloudbeaver/core-blocks';
 import { Header } from './Header';
 import { Item } from './Item';
 
-type ObjectChildrenPropertyTableProps = {
+interface ObjectChildrenPropertyTableProps {
   nodeIds: string[];
 }
 

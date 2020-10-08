@@ -20,7 +20,7 @@ import { SqlEditorController } from './SqlEditorController';
 type SqlEditorProps = PropsWithChildren<{
   tabId: string;
   className?: string;
-}>
+}>;
 
 const styles = css`
   sql-editor {

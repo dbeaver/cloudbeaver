@@ -15,10 +15,10 @@ import { Style } from '@cloudbeaver/core-theming';
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectPage } from './ObjectPage';
 
-export type DBObjectPageTabProps = {
+export interface DBObjectPageTabProps {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage;
-  onSelect(tab: ITab<IObjectViewerTabState>, page: ObjectPage): void;
+  onSelect: (tab: ITab<IObjectViewerTabState>, page: ObjectPage) => void;
   style: Style[];
 }
 

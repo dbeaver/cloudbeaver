@@ -62,13 +62,13 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     } finally {
       this.isAuthenticating = false;
     }
-  }
+  };
 
   showDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   private async loadAuthModel() {
     try {

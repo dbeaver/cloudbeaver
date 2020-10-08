@@ -20,8 +20,8 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 @injectable()
 export class DataViewerTableService {
   constructor(private tableViewerStorageService: TableViewerStorageService,
-              private connectionInfoResource: ConnectionInfoResource,
-              private graphQLService: GraphQLService) {
+    private connectionInfoResource: ConnectionInfoResource,
+    private graphQLService: GraphQLService) {
   }
 
   has(tableId: string): boolean {

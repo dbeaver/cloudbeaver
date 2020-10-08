@@ -93,8 +93,8 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   async load() {
     await this.serverConfigResource.load(null);
 
-    if (this.administrationScreenService.isConfigurationMode &&
-      !this.screenService.isActive(AdministrationScreenService.setupName)) {
+    if (this.administrationScreenService.isConfigurationMode
+      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }
@@ -104,8 +104,8 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
       this.administrationScreenService.activationEvent.execute(false);
     }
 
-    if (this.administrationScreenService.isConfigurationMode &&
-      !this.screenService.isActive(AdministrationScreenService.setupName)) {
+    if (this.administrationScreenService.isConfigurationMode
+      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }
@@ -149,13 +149,13 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
 
   private async isAccessProvided() {
     await this.serverConfigResource.load(null);
-    if (!await this.permissionsService.hasAsync(EAdminPermission.admin) &&
-          !this.administrationScreenService.isConfigurationMode) {
+    if (!await this.permissionsService.hasAsync(EAdminPermission.admin)
+          && !this.administrationScreenService.isConfigurationMode) {
       return false;
     }
 
-    if (!this.administrationScreenService.isConfigurationMode &&
-        this.screenService.isActive(AdministrationScreenService.setupName)) {
+    if (!this.administrationScreenService.isConfigurationMode
+        && this.screenService.isActive(AdministrationScreenService.setupName)) {
       return false;
     }
 

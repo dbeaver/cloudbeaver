@@ -9,7 +9,7 @@
 import { createContext } from 'react';
 
 export interface IFormContext {
-  onChange(value: string | number | boolean | null | undefined, name: string | undefined): void;
+  onChange: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

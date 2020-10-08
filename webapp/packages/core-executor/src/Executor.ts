@@ -11,8 +11,8 @@ import { IExecutor } from './IExecutor';
 import { IExecutorHandler } from './IExecutorHandler';
 
 export class Executor<T> implements IExecutor<T> {
-  private handlers: IExecutorHandler<any>[] = [];
-  private postHandlers: IExecutorHandler<any>[] = [];
+  private handlers: Array<IExecutorHandler<any>> = [];
+  private postHandlers: Array<IExecutorHandler<any>> = [];
 
   constructor(
     private defaultData?: T | null

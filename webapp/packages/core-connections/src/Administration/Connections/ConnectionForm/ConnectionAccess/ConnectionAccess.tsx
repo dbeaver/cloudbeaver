@@ -36,7 +36,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   model: IConnectionFormModel;
   disabled: boolean;
   onChange?: () => void;

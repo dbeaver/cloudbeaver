@@ -20,7 +20,7 @@ import { verticalTabStyles } from './verticalTabStyles';
 type VerticalTabHeaderProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> & {
   tab: ITab;
   style: Style[];
-}
+};
 
 export const VerticalTabHeader = observer(function VerticalTabHeader({ tab, style, ...props }: VerticalTabHeaderProps) {
 

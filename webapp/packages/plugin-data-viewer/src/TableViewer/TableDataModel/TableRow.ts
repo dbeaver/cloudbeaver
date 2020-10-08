@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type CellValue = string | number | Record<any, unknown>
+export type CellValue = string | number | Record<any, unknown>;
 
-export type TableRow = CellValue[]
+export type TableRow = CellValue[];
 
 export type SomeTableRows = Map<number, TableRow>; // number - row number in the table
 
-export type RowValues = {
+export interface RowValues {
   [columnNumber: number]: CellValue;
 }

@@ -16,7 +16,7 @@ const defaultSettings = {
   'app.logViewer.maxFailedRequests': 3,
 };
 
-export type CoreSettings = typeof defaultSettings
+export type CoreSettings = typeof defaultSettings;
 
 @injectable()
 export class CoreSettingsService {

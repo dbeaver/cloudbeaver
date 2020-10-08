@@ -14,10 +14,10 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Driver, IDriver } from './Driver';
 
-type DriverSelectorProps = {
+interface DriverSelectorProps {
   drivers: IDriver[];
   className?: string;
-  onSelect(driverId: string): void;
+  onSelect: (driverId: string) => void;
 }
 
 export const DriverSelector = observer(function DriverSelector({ drivers, className, onSelect }: DriverSelectorProps) {

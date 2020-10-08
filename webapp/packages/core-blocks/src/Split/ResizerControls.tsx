@@ -10,7 +10,7 @@ import { Resizer } from 'go-split';
 
 import { SplitControls } from './SplitControls';
 
-type ResizerControlsProps = {
+interface ResizerControlsProps {
   className?: string;
 }
 

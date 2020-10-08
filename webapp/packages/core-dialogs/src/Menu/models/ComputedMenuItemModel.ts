@@ -31,9 +31,11 @@ export class ComputedMenuItemModel implements IMenuItem {
     }
     return this.options.titleGetter ? this.options.titleGetter() || '' : '';
   }
+
   @computed get isDisabled() {
     return this.options.isDisabled ? this.options.isDisabled() : false;
   }
+
   @computed get icon() {
     if (this.options.icon) {
       return this.options.icon;

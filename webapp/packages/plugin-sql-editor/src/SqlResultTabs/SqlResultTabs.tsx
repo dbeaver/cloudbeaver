@@ -46,7 +46,7 @@ const styles = composes(
   `
 );
 
-type SqlDataResultProps = {
+interface SqlDataResultProps {
   tab: TabClass<ISqlEditorTabState>;
 }
 

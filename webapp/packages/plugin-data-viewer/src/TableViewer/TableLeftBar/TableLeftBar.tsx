@@ -18,12 +18,12 @@ import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
 
-type Props = {
+interface Props {
   presentationId: string;
   supportedDataFormat: ResultDataFormat[];
   model: IDatabaseDataModel<any>;
   className?: string;
-  onPresentationChange(id: string): void;
+  onPresentationChange: (id: string) => void;
 }
 
 const styles = composes(

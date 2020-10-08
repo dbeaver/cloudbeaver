@@ -154,8 +154,7 @@ implements IInitializableController, IDestructibleController {
         this.errorMessage = exception.message;
         this.exception = exception;
         this.hasDetails = !!exception.stackTrace;
-      }
-      else if (exception instanceof GQLError) {
+      } else if (exception instanceof GQLError) {
         this.errorMessage = exception.errorText;
         this.exception = exception;
         this.hasDetails = exception.hasDetails();
@@ -184,7 +183,7 @@ implements IInitializableController, IDestructibleController {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
+  };
 
   private async requestDataAsync(
     sqlExecutingState: SqlExecutionState,

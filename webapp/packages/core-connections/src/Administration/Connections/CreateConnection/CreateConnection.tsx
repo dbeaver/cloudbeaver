@@ -23,11 +23,11 @@ import { CreateConnectionController } from './CreateConnectionController';
 import { CustomConnection } from './CustomConnection';
 import { SearchDatabase } from './SearchDatabase';
 
-type Props = {
- method: string;
- configurationWizard: boolean;
- onChange: (method: string) => void;
- onCancel(): void;
+interface Props {
+  method: string;
+  configurationWizard: boolean;
+  onChange: (method: string) => void;
+  onCancel: () => void;
 }
 
 const styles = composes(

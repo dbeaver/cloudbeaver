@@ -28,7 +28,7 @@ const styles = css`
   }
 `;
 
-type DriverPropertiesProps = {
+interface DriverPropertiesProps {
   driverId: string;
   state: Record<string, string>;
   loadProperties: boolean;

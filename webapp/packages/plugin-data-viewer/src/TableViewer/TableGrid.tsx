@@ -19,7 +19,7 @@ import { DataModelWrapper } from './DataModelWrapper';
 type TableGridProps = PropsWithChildren<{
   model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
   presentation: DataPresentationOptions;
-}>
+}>;
 
 const styles = css`
   Presentation, error {

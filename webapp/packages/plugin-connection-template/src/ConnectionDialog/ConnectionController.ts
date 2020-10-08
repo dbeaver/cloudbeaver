@@ -28,23 +28,23 @@ export interface IConnectionController {
   template: Connection | null;
   credentials: any;
   isConnecting: boolean;
-  onConnect(): void;
+  onConnect: () => void;
 }
 
 @injectable()
 export class ConnectionController
 implements IInitializableController, IDestructibleController, IConnectionController {
-  @observable step = ConnectionStep.ConnectionTemplateSelect
+  @observable step = ConnectionStep.ConnectionTemplateSelect;
   @observable isLoading = true;
   @observable isConnecting = false;
-  @observable template: Connection | null = null
+  @observable template: Connection | null = null;
   @observable authModel?: DatabaseAuthModel;
-  @observable credentials: any = { }
-  @observable hasDetails = false
-  @observable responseMessage: string | null = null
+  @observable credentials: any = { };
+  @observable hasDetails = false;
+  @observable responseMessage: string | null = null;
 
   private exception: GQLError | null = null;
-  private onClose!: () => void
+  private onClose!: () => void;
   private isDistructed = false;
 
   get templateConnections() {
@@ -87,7 +87,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     if (step === ConnectionStep.ConnectionTemplateSelect) {
       this.template = null;
     }
-  }
+  };
 
   onConnect = async () => {
     if (!this.template) {
@@ -113,7 +113,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     } finally {
       this.isConnecting = false;
     }
-  }
+  };
 
   onTemplateSelect = async (templateId: string) => {
     this.template = this.templateConnections.find(template => template.id === templateId)!;
@@ -126,13 +126,13 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     if (!this.authModel) {
       this.onConnect();
     }
-  }
+  };
 
   onShowDetails = () => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
+  };
 
   private clearError() {
     this.responseMessage = null;

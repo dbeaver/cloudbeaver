@@ -22,7 +22,7 @@ export type TabProps = PropsWithChildren<{
   style?: DynamicStyle[] | DynamicStyle;
   onOpen?: (tabId: string) => void;
   onClose?: (tabId: string) => void;
-}>
+}>;
 
 export function Tab({
   tabId,

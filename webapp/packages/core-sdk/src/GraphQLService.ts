@@ -15,7 +15,7 @@ import { getSdk } from './sdk';
 
 @injectable()
 export class GraphQLService {
-  sdk: ReturnType<typeof getSdk>
+  sdk: ReturnType<typeof getSdk>;
 
   readonly client: CustomGraphQLClient;
 

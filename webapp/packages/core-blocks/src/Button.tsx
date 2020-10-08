@@ -58,14 +58,14 @@ const buttonMod = {
 };
 
 type ButtonProps = (
-    React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
-    & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
-  ) & {
-  mod?: (keyof typeof buttonMod)[];
+  React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
+  & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
+) & {
+  mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
   download?: boolean;
-}
+};
 
 export function Button({
   children,

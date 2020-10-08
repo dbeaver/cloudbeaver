@@ -12,8 +12,8 @@ import { CheckCircle, Frown } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 type IconProps = HTMLProps<HTMLDivElement> & {
-    type: ENotificationType;
-  }
+  type: ENotificationType;
+};
 
 export function NotificationMark({ type, ...props }: IconProps) {
   return (

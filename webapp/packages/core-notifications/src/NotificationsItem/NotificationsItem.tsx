@@ -14,7 +14,7 @@ import { INotification } from '@cloudbeaver/core-events';
 import { NotificationItemController } from './NotificationItemController';
 import { Snackbar } from './Snackbar/Snackbar';
 
-type Props = {
+interface Props {
   notification: INotification<any>;
 }
 

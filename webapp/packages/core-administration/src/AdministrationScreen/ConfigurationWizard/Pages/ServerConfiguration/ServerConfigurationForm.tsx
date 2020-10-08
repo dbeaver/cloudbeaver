@@ -44,7 +44,7 @@ const boxStyles = css`
   }
 `;
 
-type Props = {
+interface Props {
   serverConfig: ServerConfigInput;
   onChange: () => void;
   onSave: () => void;

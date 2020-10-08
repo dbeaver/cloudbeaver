@@ -42,5 +42,5 @@ export class ExceptionsCatcherService {
       return this.baseCatcher(event, source, lineno, colno, _error);
     }
     return true;
-  }
+  };
 }

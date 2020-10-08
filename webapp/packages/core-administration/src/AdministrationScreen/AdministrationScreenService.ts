@@ -22,15 +22,15 @@ const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 @injectable()
 export class AdministrationScreenService {
 
-  static screenName = 'administration'
-  static itemRouteName = 'administration.item'
-  static itemSubRouteName = 'administration.item.sub'
-  static itemSubParamRouteName = 'administration.item.sub.param'
+  static screenName = 'administration';
+  static itemRouteName = 'administration.item';
+  static itemSubRouteName = 'administration.item.sub';
+  static itemSubParamRouteName = 'administration.item.sub.param';
 
-  static setupName = 'setup'
-  static setupItemRouteName = 'setup.item'
-  static setupItemSubRouteName = 'setup.item.sub'
-  static setupItemSubParamRouteName = 'setup.item.sub.param'
+  static setupName = 'setup';
+  static setupItemRouteName = 'setup.item';
+  static setupItemSubRouteName = 'setup.item.sub';
+  static setupItemSubParamRouteName = 'setup.item.sub.param';
 
   @observable itemState: Map<string, any>;
 
@@ -58,6 +58,7 @@ export class AdministrationScreenService {
   get isConfigurationMode() {
     return !!this.serverConfigResource.data?.configurationMode;
   }
+
   readonly activationEvent: IExecutor<boolean>;
 
   constructor(
@@ -128,7 +129,7 @@ export class AdministrationScreenService {
   }
 
   isAdministrationRouteActive() {
-    return this.screenService.isActive(AdministrationScreenService.screenName) ||
-    this.screenService.isActive(AdministrationScreenService.setupName);
+    return this.screenService.isActive(AdministrationScreenService.screenName)
+    || this.screenService.isActive(AdministrationScreenService.setupName);
   }
 }

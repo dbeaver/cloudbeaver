@@ -25,8 +25,8 @@ export const FinishPageDrawerItem = observer(function FinishPageDrawerItem({
   return styled(useStyles(...style))(
     <Tab
       tabId={item.name}
-      disabled={disabled ||
-        (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
+      disabled={disabled
+        || (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
       onOpen={() => onSelect(item.name)}
     >
       <TabIcon icon='/icons/confirmation.svg' viewBox='0 0 16 16' />

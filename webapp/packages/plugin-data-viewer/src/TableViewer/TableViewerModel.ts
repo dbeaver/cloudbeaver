@@ -33,10 +33,10 @@ export type AgGridRow = any[];
 
 export type SortMode = 'asc' | 'desc' | null;
 
-export type SortModel = {
+export type SortModel = Array<{
   colId: string;
   sort: SortMode;
-}[];
+}>;
 
 export interface IRequestDataOptions {
   sorting?: SortModel;
@@ -70,12 +70,12 @@ export interface ITableViewerModelOptions {
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   noLoaderWhileRequestingDataAsync?: boolean;
   access?: DatabaseDataAccessMode;
-  requestDataAsync(
+  requestDataAsync: (
     model: TableViewerModel,
     rowOffset: number,
     count: number
-  ): Promise<IRequestDataResult>;
-  saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult>;
+  ) => Promise<IRequestDataResult>;
+  saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 }
 
 export interface IRequestDataResult {
@@ -102,14 +102,17 @@ export class TableViewerModel {
     rowOffset: number,
     count: number
   ) => Promise<IRequestDataResult>;
+
   _saveChanges: (model: TableViewerModel, diffs: RowDiff[]) => Promise<IRequestDataResult>;
 
   get isEmpty(): boolean {
     return this.tableDataModel.isEmpty();
   }
+
   get isLoaderVisible(): boolean {
     return this._isLoaderVisible;
   }
+
   get isFullyLoaded(): boolean {
     return !this._hasMoreRows;
   }
@@ -128,10 +131,10 @@ export class TableViewerModel {
   readonly onReset: Observable<never>;
   readonly onChunkSizeChange: Observable<never>;
 
-  private resetSubject: Subject<never>
-  private chunkChangeSubject: Subject<never>
+  private resetSubject: Subject<never>;
+  private chunkChangeSubject: Subject<never>;
 
-  @observable private _hasMoreRows = true
+  @observable private _hasMoreRows = true;
   @observable private _isLoaderVisible = false;
   @observable private _chunkSize: number = this.getDefaultRowsCount();
   @observable private queryWhereFilter: string | null = null;
@@ -161,19 +164,19 @@ export class TableViewerModel {
     this.onChunkSizeChange = this.chunkChangeSubject.asObservable();
   }
 
-  cancelFetch = (): void => { }
+  cancelFetch = (): void => { };
 
   refresh = async (): Promise<void> => {
     this.resetData();
     await this.onRequestData(0, this.getChunkSize());
     this.resetSubject.next();
-  }
+  };
 
   onShowDetails = (): void => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
+  };
 
   getQueryWhereFilter(): string | null {
     return this.queryWhereFilter;
@@ -382,9 +385,9 @@ export class TableViewerModel {
   private getDefaultRowsCount(count?: number) {
     return count
       ? Math.max(
-        fetchingSettings.fetchMin,
-        Math.min(count, fetchingSettings.fetchMax)
-      )
+          fetchingSettings.fetchMin,
+          Math.min(count, fetchingSettings.fetchMax)
+        )
       : fetchingSettings.fetchDefault;
   }
 }

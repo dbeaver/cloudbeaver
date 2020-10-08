@@ -17,18 +17,18 @@ import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
-type Props = {
+interface Props {
   checked?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
-const checkboxStyles = css `
+const checkboxStyles = css`
   Checkbox {
     margin-left: -10px;
     margin-right: -10px;
   }
-`
+`;
 
 export const TableItemSelect = observer(function TableItemSelect({ checked, disabled, className }: Props) {
   const tableContext = useContext(TableContext);

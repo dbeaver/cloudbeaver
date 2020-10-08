@@ -12,13 +12,13 @@ import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseList } from './DatabaseList';
 
-type Props = {
+interface Props {
   databases: AdminConnectionSearchInfo[];
   hosts: string;
   disabled?: boolean;
-  onSelect(database: AdminConnectionSearchInfo): void;
-  onChange(hosts: string): void;
-  onSearch?(): Promise<void>;
+  onSelect: (database: AdminConnectionSearchInfo) => void;
+  onChange: (hosts: string) => void;
+  onSearch?: () => Promise<void>;
   className?: string;
 }
 

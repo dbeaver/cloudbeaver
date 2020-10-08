@@ -11,7 +11,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ROOT_NODE_PATH } from './NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
 
-type Hook = {
+interface Hook {
   children: string[] | undefined;
   isLoaded: boolean;
   isLoading: boolean;

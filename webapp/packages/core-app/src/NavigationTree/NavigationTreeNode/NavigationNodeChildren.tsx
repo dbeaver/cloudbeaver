@@ -17,7 +17,7 @@ type NavigationNodeChildrenProps = PropsWithChildren<{
     id: string;
     parentId: string;
   }>;
-}>
+}>;
 
 export const NavigationNodeChildren = observer(function NavigationNodeChildren({
   parentId,

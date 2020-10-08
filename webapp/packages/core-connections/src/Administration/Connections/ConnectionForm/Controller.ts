@@ -69,7 +69,7 @@ implements IInitializableController, IDestructibleController {
 
   setType = (type: EConnectionType) => {
     this.connectionType = type;
-  }
+  };
 
   save = async () => {
     this.isSaving = true;
@@ -91,7 +91,7 @@ implements IInitializableController, IDestructibleController {
     } finally {
       this.isSaving = false;
     }
-  }
+  };
 
   test = async () => {
     this.isSaving = true;
@@ -104,13 +104,13 @@ implements IInitializableController, IDestructibleController {
     } finally {
       this.isSaving = false;
     }
-  }
+  };
 
   onShowDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   handleAccessChange = () => this.accessChanged = true;
 
@@ -127,7 +127,7 @@ implements IInitializableController, IDestructibleController {
       this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
     }
     this.isLoading = false;
-  }
+  };
 
   private async saveSubjectPermissions(connectionId: string) {
     if (!this.accessChanged || !this.model.grantedSubjects) {

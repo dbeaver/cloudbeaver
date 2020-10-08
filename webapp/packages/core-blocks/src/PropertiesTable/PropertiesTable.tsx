@@ -18,15 +18,15 @@ import { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';
 
-type PropertiesState = Record<string, string>
+type PropertiesState = Record<string, string>;
 
-type PropertiesTableProps = {
+interface PropertiesTableProps {
   properties: IProperty[];
   propertiesState?: PropertiesState;
-  onKeyChange?(id: string, name: string): void;
-  onChange?(state: PropertiesState): void;
-  onAdd?(): void;
-  onRemove?(id: string): void;
+  onKeyChange?: (id: string, name: string) => void;
+  onChange?: (state: PropertiesState) => void;
+  onAdd?: () => void;
+  onRemove?: (id: string) => void;
   className?: string;
 }
 
@@ -50,6 +50,7 @@ export const PropertiesTable = observer(function PropertiesTable({
 
     if (state[property.key] !== undefined) {
       state[key] = state[property.key];
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete state[property.key];
     }
 
@@ -81,6 +82,7 @@ export const PropertiesTable = observer(function PropertiesTable({
     }
 
     if (state[property.key] !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete state[property.key];
     }
 

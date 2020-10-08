@@ -58,27 +58,27 @@ const radioMod = {
 };
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {
-  mod?: (keyof typeof radioMod)[];
-}
+  mod?: Array<keyof typeof radioMod>;
+};
 
 type ControlledProps = BaseProps & {
   value?: string | number;
   checked?: boolean;
-  onChange?(value: string | number, name: string): any;
+  onChange?: (value: string | number, name: string) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   value: TState[TKey];
   state: TState;
-  onChange?(value: TState[TKey], name: TKey): any;
+  onChange?: (value: TState[TKey], name: TKey) => any;
 
   checked?: never;
-}
+};
 
-type RadioType = {
+interface RadioType {
   (props: ControlledProps): JSX.Element;
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }

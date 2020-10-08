@@ -16,36 +16,36 @@ export enum AdministrationItemType {
   ConfigurationWizard
 }
 
-export type AdministrationItemDrawerProps = {
+export interface AdministrationItemDrawerProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
-  onSelect(id: string): void;
+  onSelect: (id: string) => void;
   style: Style[];
   disabled?: boolean;
 }
-export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>
+export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>;
 
-export type AdministrationItemContentProps = {
+export interface AdministrationItemContentProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
   sub?: IAdministrationItemSubItem;
   param?: string | null;
 }
-export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>
+export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>;
 
 export type AdministrationItemSubContentProps = AdministrationItemContentProps & {
   sub: IAdministrationItemSubItem;
   param: string | null;
-}
-export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>
+};
+export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
-export type AdministrationItemEvent = (configurationWizard: boolean) => Promise<void> | void
-export type AdministrationItemCanActivateEvent = (configurationWizard: boolean) => Promise<boolean> | boolean
-export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean) => Promise<void> | void
+export type AdministrationItemEvent = (configurationWizard: boolean) => Promise<void> | void;
+export type AdministrationItemCanActivateEvent = (configurationWizard: boolean) => Promise<boolean> | boolean;
+export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean) => Promise<void> | void;
 export type AdministrationItemSubCanActivateEvent = (
   param: string | null,
   configurationWizard: boolean
-) => Promise<boolean> | boolean
+) => Promise<boolean> | boolean;
 
 export interface IAdministrationItemSubItem {
   name: string;
@@ -72,8 +72,8 @@ export interface IAdministrationItemOptions {
   configurationWizardOptions?: IConfigurationWizardItemOptions;
   order?: number;
   sub?: IAdministrationItemSubItem[];
-  getDrawerComponent(): AdministrationItemDrawerComponent;
-  getContentComponent(): AdministrationItemContentComponent;
+  getDrawerComponent: () => AdministrationItemDrawerComponent;
+  getContentComponent: () => AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;
   canActivate?: AdministrationItemCanActivateEvent;
 }
