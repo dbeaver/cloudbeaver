@@ -16,7 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
-    "importsNotUsedAsValues": "preserve",
+    "importsNotUsedAsValues": "remove",
     "jsx": "preserve",
     "target": "ES6",
     "module": "none",

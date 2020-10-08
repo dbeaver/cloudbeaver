@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import { AdministrationItemService } from '../../../AdministrationItem/AdministrationItemService';
-import { AdministrationItemType } from '../../../AdministrationItem/IAdministrationItem';
-import { ConfigurationWizardService } from '../ConfigurationWizardService';
 import { FinishPage } from './Finish/FinishPage';
 import { FinishPageDrawerItem } from './Finish/FinishPageDrawerItem';
 import { ServerConfigurationDrawerItem } from './ServerConfiguration/ServerConfigurationDrawerItem';

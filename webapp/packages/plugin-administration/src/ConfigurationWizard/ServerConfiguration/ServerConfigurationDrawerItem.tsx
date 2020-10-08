@@ -8,11 +8,10 @@
 
 import styled from 'reshadow';
 
+import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { AdministrationItemDrawerProps } from '../../../../AdministrationItem/IAdministrationItem';
 
 export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerProps> = function ServerConfigurationDrawerItem({
   item, onSelect, style, disabled,

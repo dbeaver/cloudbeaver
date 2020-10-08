@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ConfigurationWizardService } from '../../ConfigurationWizardService';
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 import { ServerConfigurationService } from './ServerConfigurationService';
 

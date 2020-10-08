@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 import core, { bootstrap } from '@cloudbeaver/core-bootstrap';
+import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
@@ -15,6 +16,7 @@ import { defaultProductManifest } from './manifest';
 
 const PLUGINS = [
   core,
+  administration,
   spreadsheet,
   authentication,
   connectionCustom,

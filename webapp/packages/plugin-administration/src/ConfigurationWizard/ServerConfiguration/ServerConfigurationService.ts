@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { AdministrationScreenService } from '../../../AdministrationScreenService';
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
 export interface IValidationStatusContext {
