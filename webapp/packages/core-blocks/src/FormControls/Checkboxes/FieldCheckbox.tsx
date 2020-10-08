@@ -7,6 +7,7 @@
  */
 
 import styled, { use } from 'reshadow';
+import { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -14,6 +15,12 @@ import { baseFormControlStyles } from '../baseFormControlStyles';
 import { Checkbox } from './Checkbox';
 import { CheckboxType, CheckboxControlledProps, CheckboxObjectProps} from './Checkbox';
 
+const fieldCheckboxStyles = css `
+  field {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+`
 
 export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   name,
@@ -29,8 +36,8 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
 
-  return styled(useStyles(baseFormControlStyles))(
-    <field as="div" {...use({ long })}>
+  return styled(useStyles(baseFormControlStyles, fieldCheckboxStyles))(
+    <field className={className} as="div" {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <Checkbox
         {...rest}
@@ -39,7 +46,6 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
         checked={checkedControlled}
         checkboxLabel={checkboxLabel}
         state={state}
-        className={className}
         onChange={onChange}
         {...use({ mod })}
       />
