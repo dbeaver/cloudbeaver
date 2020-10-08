@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -141,9 +142,11 @@ public class WebServiceUtils {
             dsConfig.setUrl(driver.getDataSourceProvider().getConnectionURL(driver, dsConfig));
         }
         if (config.getProperties() != null) {
+            Map<String, String> newProps = new LinkedHashMap<>();
             for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
-                dsConfig.setProperty(pe.getKey(), CommonUtils.toString(pe.getValue()));
+                newProps.put(pe.getKey(), CommonUtils.toString(pe.getValue()));
             }
+            dsConfig.setProperties(newProps);
         }
         dsConfig.setUserName(config.getUserName());
         dsConfig.setUserPassword(config.getUserPassword());
