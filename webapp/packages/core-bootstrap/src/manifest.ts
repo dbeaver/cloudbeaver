@@ -37,7 +37,7 @@ import {
   CoreSettingsService,
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
-  SessionExpireService
+  SessionExpiredDialogService
 } from '@cloudbeaver/core-app';
 import {
   AuthInfoService,
@@ -75,7 +75,7 @@ import {
   ServerSettingsService,
   ServerConfigResource,
   PermissionsResource,
-  SessionResource,
+  SessionResource, SessionExpireService
 } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -120,6 +120,7 @@ export const coreManifest: PluginManifest = {
     CoreSettingsService,
     CommonDialogService,
     SessionExpireService,
+    SessionExpiredDialogService,
     ConnectionsLocaleService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,

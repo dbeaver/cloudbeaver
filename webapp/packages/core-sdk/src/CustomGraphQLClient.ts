@@ -14,7 +14,8 @@ import { IResponseInterceptor } from './IResponseInterceptor';
 
 export class CustomGraphQLClient extends GraphQLClient {
   private interceptors: IResponseInterceptor[] = [];
-  private isRequestsBlockedData: { status: boolean; reason: Error | string } = { status: false, reason: '' };
+  private isRequestsBlocked = false;
+  private requestsBlockedReason?: Error | string;
 
   constructor(endpoint: string) {
     super(endpoint);
@@ -32,23 +33,24 @@ export class CustomGraphQLClient extends GraphQLClient {
   }
 
   blockRequests(reason: Error | string): void {
-    this.isRequestsBlockedData.status = true;
-    this.isRequestsBlockedData.reason = reason;
+    this.isRequestsBlocked = true;
+    this.requestsBlockedReason = reason;
   }
 
-  blockRequestsReasonHandler(): void {
-    if(this.isRequestsBlockedData.reason instanceof Error) {
-      throw this.isRequestsBlockedData.reason;
-    } else { 
-      throw new Error(this.isRequestsBlockedData.reason)
+  private blockRequestsReasonHandler(): void {
+    if(!this.isRequestsBlocked) {
+      return;
+    } else {
+      if(this.requestsBlockedReason instanceof Error) {
+        throw this.requestsBlockedReason;
+      } else { 
+        throw new Error(this.requestsBlockedReason)
+      }
     }
   }
 
   private async overrideRequest<T>(query: string, variables?: Variables): Promise<T> {
-    if(this.isRequestsBlockedData.status) {
-      this.blockRequestsReasonHandler();
-    }
-
+    this.blockRequestsReasonHandler();
     try {
       const response = await this.rawRequest<T>(query, variables);
 
