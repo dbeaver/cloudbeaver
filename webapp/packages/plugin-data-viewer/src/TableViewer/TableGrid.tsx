@@ -39,13 +39,13 @@ export const TableGrid = observer(function TableGrid({
   const translate = useTranslate();
 
   // TODO: probably must be implemented in presentation component
-  if (model.deprecatedModel.errorMessage.length > 0) {
+  if (model.message.length > 0) {
     return styled(styles)(
       <error as="div">
-        {model.deprecatedModel.errorMessage}
+        {model.message}
         <br /><br />
-        {model.deprecatedModel.hasDetails && (
-          <Button type='button' mod={['outlined']} onClick={model.deprecatedModel.onShowDetails}>
+        {model.details && (
+          <Button type='button' mod={['outlined']} onClick={model.showDetails}>
             {translate('ui_errors_details')}
           </Button>
         )}

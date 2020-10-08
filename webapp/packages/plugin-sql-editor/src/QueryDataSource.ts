@@ -62,7 +62,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return this;
   }
 
-  getResults(response: SqlExecuteInfo): IDataContainerResult[] | null {
+  getResults(response: SqlExecuteInfo, limit: number): IDataContainerResult[] | null {
     this.requestInfo = {
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
@@ -75,7 +75,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return response.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < this.count,
+      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
@@ -88,6 +88,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     if (!this.options) {
       return prevResults;
     }
+    const limit = this.count;
 
     const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.options.tabId);
     this.metadata.start(
@@ -95,7 +96,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       this.options.group.sqlQueryParams,
       {
         offset: this.offset,
-        limit: this.count,
+        limit,
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
       },
@@ -105,7 +106,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     this.sqlProcess = this.metadata.resultDataProcess;
     const response = await this.metadata.resultDataProcess.promise;
 
-    const results = this.getResults(response);
+    const results = this.getResults(response, limit);
 
     if (!results) {
       return prevResults;

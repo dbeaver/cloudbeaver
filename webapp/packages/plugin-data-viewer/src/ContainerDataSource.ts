@@ -45,6 +45,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       throw new Error('containerNodePath must be provided for table');
     }
     const executionContext = await this.ensureContextCreated();
+    const limit = this.count;
 
     const { readDataFromContainer } = await this.graphQLService.sdk.readDataFromContainer({
       connectionId: executionContext.connectionId,
@@ -52,7 +53,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       containerNodePath: this.options.containerNodePath,
       filter: {
         offset: this.offset,
-        limit: this.count,
+        limit,
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
       },
@@ -70,7 +71,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     return readDataFromContainer.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < this.count,
+      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,

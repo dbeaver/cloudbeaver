@@ -131,7 +131,7 @@ implements IInitializableController, IDestructibleController {
           this.source
         )
           .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
-          .setResults(this.source.getResults(response) || [])
+          .setResults(this.source.getResults(response, fetchingSettings.fetchDefault) || [])
           .deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
