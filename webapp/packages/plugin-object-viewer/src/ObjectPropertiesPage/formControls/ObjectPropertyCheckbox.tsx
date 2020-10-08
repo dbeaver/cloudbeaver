@@ -40,8 +40,7 @@ const styles = css`
     line-height: 26px;
   }
   Checkbox {
-    margin-top: -10px;
-    margin-bottom: -10px;
+    margin: -10px;
   }
 `;
 

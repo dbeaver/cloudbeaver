@@ -59,6 +59,10 @@ const styles = css`
   TabPanel {
     flex-direction: column;
   }
+  FieldCheckbox {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
 `;
 
 export const Options = observer(function Options({

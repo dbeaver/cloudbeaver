@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react';
 import { useContext, useCallback } from 'react';
 import styled from 'reshadow';
+import { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -21,6 +22,13 @@ type Props = {
   disabled?: boolean;
   className?: string;
 }
+
+const checkboxStyles = css `
+  Checkbox {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+`
 
 export const TableItemSelect = observer(function TableItemSelect({ checked, disabled, className }: Props) {
   const tableContext = useContext(TableContext);
@@ -38,7 +46,7 @@ export const TableItemSelect = observer(function TableItemSelect({ checked, disa
     return null;
   }
 
-  return styled(styles)(
+  return styled(styles, checkboxStyles)(
     <Checkbox
       className={className}
       disabled={context.selectDisabled || disabled}

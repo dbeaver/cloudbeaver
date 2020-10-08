@@ -39,8 +39,6 @@ const checkboxStyles = composes(
     checkbox-container {
       display: flex;
       align-items: center;
-      margin-right: -10px;
-      margin-left: -10px;
     }
   `
 );

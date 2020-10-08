@@ -30,7 +30,7 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
 
   return styled(useStyles(baseFormControlStyles))(
-    <field as="div" className={className} {...use({ long })}>
+    <field as="div" {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <Checkbox
         {...rest}
