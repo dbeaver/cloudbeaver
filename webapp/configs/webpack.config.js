@@ -44,6 +44,7 @@ module.exports = (env, argv) => {
           hot: argv.mode !== 'production',
         },
       },
+      'cache-loader',
       {
         loader: 'css-loader',
         options: {
@@ -107,6 +108,7 @@ module.exports = (env, argv) => {
           test: /\.(ts|js)x?$/,
           exclude: /node_modules/,
           use: [
+            'cache-loader',
             // 'reshadow/webpack/loader',
             babelLoader
           ]
@@ -138,15 +140,6 @@ module.exports = (env, argv) => {
         },
       ]
     },
-    // externals: [
-    //   function (context, request, callback) {
-    //     if (/^@cloudbeaver\/.+$/.test(request)) {
-    //       return callback(null, request, 'amd');
-    //     }
-
-    //     callback();
-    //   },
-    // ],
     devtool: 'cheap-module-source-map',
     plugins: [
       new ForkTsCheckerWebpackPlugin({
