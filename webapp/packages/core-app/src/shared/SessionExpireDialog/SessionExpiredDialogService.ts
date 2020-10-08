@@ -8,7 +8,7 @@
 
 
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { SessionExpireService } from '@cloudbeaver/core-root';
@@ -16,19 +16,22 @@ import { SessionExpireService } from '@cloudbeaver/core-root';
 import { SessionExpiredDialog } from './SessionExpiredDialog';
 
 @injectable()
-export class SessionExpiredDialogService {
+export class SessionExpiredDialogService extends Bootstrap {
   constructor(
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private sessionExpireService: SessionExpireService
   ) {
+    super();
   }
 
-  subscribe(): void {
-    this.sessionExpireService.onSessionExpire.subscribe(this.sessionExpiredInterceptor.bind(this));
+  register(): void {
+    this.sessionExpireService.onSessionExpire.subscribe(this.handleSessionExpired.bind(this));
   }
 
-  private async sessionExpiredInterceptor(): Promise<any> {
+  load(): void | Promise<void> { }
+
+  private async handleSessionExpired(): Promise<void> {
     try {
       await this.commonDialogService.open(SessionExpiredDialog, null);
     } finally {
