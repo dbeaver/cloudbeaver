@@ -39,8 +39,8 @@ const checkboxStyles = composes(
     checkbox-container {
       display: flex;
       align-items: center;
-      margin-left: -10px;
       margin-right: -10px;
+      margin-left: -10px;
     }
   `
 );
@@ -77,16 +77,12 @@ interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElemen
   indeterminate?: boolean;
 }
 
-export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = ({label, ...rest} ) => 
-  styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled &&
+export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({label, className, ...rest} ) { 
+  return styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled &&
     checkboxState.disabled, rest.checked && checkboxState.checked))(
-    <checkbox-container as='div'>
+    <checkbox-container className={className} as='div'>
       <checkbox as='div'>
-        <checkbox-input
-          as='input'
-          type='checkbox'
-          {...rest}
-        />
+        <checkbox-input as='input' type='checkbox' {...rest} />
         <checkbox-background as='div'>
           <checkbox-checkmark as='svg' viewBox='0 0 24 24'>
             <checkbox-checkmark-path as='path' fill='none' d='M1.73,12.91 8.1,19.28 22.79,4.59' />
@@ -97,4 +93,5 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = ({label, ...rest} 
       </checkbox>
       {label && rest.id && <checkbox-label as='label' htmlFor={rest.id}>{label}</checkbox-label>}
     </checkbox-container>
-  );
+  )
+};

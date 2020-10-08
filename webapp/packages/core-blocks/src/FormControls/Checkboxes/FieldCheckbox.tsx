@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -16,7 +15,7 @@ import { Checkbox } from './Checkbox';
 import { CheckboxType, CheckboxControlledProps, CheckboxObjectProps} from './Checkbox';
 
 
-export const FieldCheckbox: CheckboxType = observer(function FieldCheckbox({
+export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   name,
   value,
   state,
@@ -40,9 +39,10 @@ export const FieldCheckbox: CheckboxType = observer(function FieldCheckbox({
         checked={checkedControlled}
         checkboxLabel={checkboxLabel}
         state={state}
+        className={className}
         onChange={onChange}
         {...use({ mod })}
       />
     </field>
   );
-});
+};

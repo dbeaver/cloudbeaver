@@ -55,7 +55,6 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
   const context = useContext(FormContext);
-
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
       state[name] = event.target.checked;
@@ -77,6 +76,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       id={value || name}
       checked={checked}
       label={checkboxLabel}
+      className={className}
       onChange={handleChange}
       {...use({ mod })}
     />
