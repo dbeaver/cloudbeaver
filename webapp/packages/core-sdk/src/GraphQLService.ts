@@ -28,4 +28,8 @@ export class GraphQLService {
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.client.registerInterceptor(interceptor);
   }
+
+  blockRequests(reason: Error | string): void {
+    this.client.blockRequests(reason);
+  }
 }

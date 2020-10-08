@@ -15,6 +15,7 @@ import {
   ENotificationType, INotification, INotificationExtraProps, INotificationOptions, NotificationComponent
 } from './INotification';
 
+
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
@@ -93,6 +94,7 @@ export class NotificationService {
 
   logException(exception: Error | GQLError, message?: string, silent?: boolean): void {
     const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
+
     if (!silent) {
       this.logError({
         title: message || exceptionMessage,
