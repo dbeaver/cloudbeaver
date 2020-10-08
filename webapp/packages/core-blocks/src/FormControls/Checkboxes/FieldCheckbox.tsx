@@ -13,14 +13,14 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from '../baseFormControlStyles';
 import { Checkbox } from './Checkbox';
-import { CheckboxType, CheckboxControlledProps, CheckboxObjectProps} from './Checkbox';
+import { CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
 
-const fieldCheckboxStyles = css `
+const fieldCheckboxStyles = css`
   field {
     margin-left: -10px;
     margin-right: -10px;
   }
-`
+`;
 
 export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   name,
@@ -41,8 +41,8 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
       <field-label as="div">{children}</field-label>
       <Checkbox
         {...rest}
+        value={value}
         name={name}
-        id={value || name}
         checked={checkedControlled}
         checkboxLabel={checkboxLabel}
         state={state}
