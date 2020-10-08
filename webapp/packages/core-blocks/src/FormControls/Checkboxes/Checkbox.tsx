@@ -14,21 +14,21 @@ import { FormContext } from '../FormContext';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
+export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
   value?: string;
   checkboxLabel?: string;
   mod?: 'surface';
   long?: boolean;
 }
 
-type ControlledProps = BaseProps & {
+export type CheckboxControlledProps = CheckboxBaseProps & {
   checked?: boolean;
   indeterminate?: boolean;
   onChange?(value: boolean, name?: string): any;
   state?: never;
 }
 
-type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
+export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
   name: TKey;
   state: TState;
   onChange?(value: boolean, name: TKey): any;
@@ -36,9 +36,9 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   indeterminate?: boolean;
 }
 
-type CheckboxType = {
-  (props: ControlledProps): JSX.Element;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
+export type CheckboxType = {
+  (props: CheckboxControlledProps): JSX.Element;
+  <TKey extends keyof TState, TState>(props: CheckboxObjectProps<TKey, TState>): JSX.Element;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
@@ -52,9 +52,8 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   mod,
   long,
   onChange,
-  disabled,
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
+}: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
   const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +76,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       name={name}
       id={value || name}
       checked={checked}
-      disabled={disabled}
+      label={checkboxLabel}
       onChange={handleChange}
       {...use({ mod })}
     />

@@ -43,6 +43,7 @@
      $mdc-checkbox-mark-color: $mdc-theme-on-primary;
      @include mdc-checkbox-density(-1);
      @include mdc-checkbox-ink-color($mdc-checkbox-mark-color, $query);
+     @include mdc-checkbox-disabled-ink-color(rgba($mdc-checkbox-mark-color, .50), $query);
      @include mdc-checkbox-container-colors($mdc-checkbox-border-color, transparent,  $mdc-theme-primary, $mdc-theme-primary )
    }
  }
