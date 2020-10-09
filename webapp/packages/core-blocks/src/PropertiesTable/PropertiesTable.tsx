@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer, useLocalStore } from 'mobx-react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -97,6 +98,9 @@ export const PropertiesTable = observer(function PropertiesTable({
     []
   );
 
+  const alphabetOrderProperties = useMemo(() => computed(() => properties.slice().sort(
+    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''))), [properties]);
+
   return styled(useStyles(PROPERTIES_TABLE_STYLES))(
     <properties as="div" className={className}>
       <properties-header as="div">
@@ -111,7 +115,7 @@ export const PropertiesTable = observer(function PropertiesTable({
         </properties-header-right>
       </properties-header>
       <properties-list as="div">
-        {properties.map(property => (
+        {alphabetOrderProperties.get().map(property => (
           <PropertyItem
             key={property.id}
             property={property}
