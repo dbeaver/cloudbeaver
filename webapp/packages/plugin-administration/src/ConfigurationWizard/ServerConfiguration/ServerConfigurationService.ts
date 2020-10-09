@@ -11,7 +11,8 @@ import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { GraphQLService, ServerConfig } from '@cloudbeaver/core-sdk';
 
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
@@ -23,35 +24,33 @@ export interface IValidationStatusContext {
 @injectable()
 export class ServerConfigurationService {
 
-  readonly state: IServerConfigurationPageState;
+  state: IServerConfigurationPageState;
   readonly validationTask: IExecutor<boolean>;
 
   constructor(
-    private administrationScreenService: AdministrationScreenService,
-    private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private usersResource: UsersResource
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+    private readonly usersResource: UsersResource
   ) {
-    this.state = this.administrationScreenService.getItemState<IServerConfigurationPageState>('welcome', () => ({
-      serverConfig: {
-        serverName: 'CloudBeaver',
-        adminName: 'cbadmin',
-        adminPassword: '',
-        anonymousAccessEnabled: true,
-        authenticationEnabled: false,
-        customConnectionsEnabled: false,
-      },
-      navigatorConfig: {
-        hideFolders: false,
-        hideSchemas: false,
-        hideVirtualModel: false,
-        mergeEntities: false,
-        showOnlyEntities: false,
-        showSystemObjects: false,
-        showUtilityObjects: false,
-      },
-    }));
+    this.state = this.administrationScreenService
+      .getItemState(
+        'server-configuration',
+        () => this.getConfig(),
+      );
     this.validationTask = new Executor();
+  }
+
+  async loadConfig() {
+    const config = await this.serverConfigResource.load(null);
+
+    this.state = this.administrationScreenService
+      .getItemState(
+        'server-configuration',
+        () => this.getConfig(config),
+        !config?.configurationMode
+      );
   }
 
   isDone(): boolean {
@@ -79,15 +78,6 @@ export class ServerConfigurationService {
     };
   };
 
-  private isFormFilled() {
-    return !!(
-      this.state?.serverConfig.serverName
-      && this.state.serverConfig.adminName
-      && this.state.serverConfig.adminName.length > 5
-      && this.state.serverConfig.adminPassword
-    );
-  }
-
   async apply(): Promise<void> {
     if (!this.state) {
       throw new Error('No state available');
@@ -96,12 +86,73 @@ export class ServerConfigurationService {
     try {
       await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.state.navigatorConfig });
       await this.graphQLService.sdk.configureServer({ configuration: this.state.serverConfig });
+
+      if (!this.serverConfigResource.data?.configurationMode) {
+        await this.serverConfigResource.refresh(null);
+      }
       this.usersResource.refreshAllLazy();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 
       throw exception;
     }
+  }
+
+  private isFormFilled() {
+    if (!this.state?.serverConfig.serverName) {
+      return false;
+    }
+    if (this.administrationScreenService.isConfigurationMode) {
+      if (!this.state.serverConfig.adminName
+      || this.state.serverConfig.adminName.length < 6
+      || !this.state.serverConfig.adminPassword
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private getConfig(config?: ServerConfig | null): IServerConfigurationPageState {
+    if (!config || config?.configurationMode) {
+      return {
+        serverConfig: {
+          serverName: 'CloudBeaver',
+          adminName: 'cbadmin',
+          adminPassword: '',
+          anonymousAccessEnabled: true,
+          authenticationEnabled: false,
+          customConnectionsEnabled: false,
+        },
+        navigatorConfig: {
+          hideFolders: false,
+          hideSchemas: false,
+          hideVirtualModel: false,
+          mergeEntities: false,
+          showOnlyEntities: false,
+          showSystemObjects: false,
+          showUtilityObjects: false,
+        },
+      };
+    }
+
+    return {
+      serverConfig: {
+        serverName: config.name,
+        anonymousAccessEnabled: config.anonymousAccessEnabled,
+        authenticationEnabled: config.authenticationEnabled,
+        customConnectionsEnabled: config.supportsCustomConnections,
+      },
+      navigatorConfig: {
+        hideFolders: false,
+        hideSchemas: false,
+        hideVirtualModel: false,
+        mergeEntities: false,
+        showOnlyEntities: false,
+        showSystemObjects: false,
+        showUtilityObjects: false,
+      },
+    };
   }
 
 }

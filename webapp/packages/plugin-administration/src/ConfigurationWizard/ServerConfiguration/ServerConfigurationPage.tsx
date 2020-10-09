@@ -9,12 +9,13 @@
 import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ServerConfigurationForm } from './ServerConfigurationForm';
 import { ServerConfigurationPageController } from './ServerConfigurationPageController';
+import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = composes(
   css`
@@ -50,18 +51,25 @@ const styles = composes(
 
 export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
   const translate = useTranslate();
+  const service = useService(ServerConfigurationService);
   const controller = useController(ServerConfigurationPageController);
 
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
-          <p>{translate('administration_configuration_wizard_configuration_message')}</p>
+          {!controller.editing && (
+            <>
+              <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
+              <p>{translate('administration_configuration_wizard_configuration_message')}</p>
+            </>
+          )}
           <ServerConfigurationForm
             serverConfig={controller.state.serverConfig}
+            validationTask={service.validationTask}
+            editing={controller.editing}
             onChange={controller.onChange}
-            onSave={controller.finish}
+            onSubmit={controller.finish}
           />
         </layout-grid-cell>
       </layout-grid-inner>

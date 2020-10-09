@@ -115,9 +115,9 @@ export class AdministrationScreenService {
   }
 
   getItemState<T>(name: string): T | undefined
-  getItemState<T>(name: string, defaultState: () => T): T
-  getItemState<T>(name: string, defaultState?: () => T): T | undefined {
-    if (!this.itemState.has(name) && defaultState) {
+  getItemState<T>(name: string, defaultState: () => T, update?: boolean): T
+  getItemState<T>(name: string, defaultState?: () => T, update?: boolean): T | undefined {
+    if ((!this.itemState.has(name) || update) && defaultState) {
       this.itemState.set(name, defaultState());
     }
 
