@@ -26,9 +26,6 @@ export class DriverPropertiesService {
       throw new Error('Driver properties loading failed');
     }
 
-    const propertiesSortedByAlphabet = response.driver[0].driverProperties?.sort(
-      (a,b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''));
-
-    return propertiesSortedByAlphabet as ObjectPropertyInfo[];
+    return response.driver[0].driverProperties! as ObjectPropertyInfo[];
   }
 }
