@@ -11,11 +11,11 @@ import { useMemo } from 'react';
 import { Icon } from './Icons';
 import { StaticImage } from './StaticImage';
 
-export type IconOrImageProps = {
+export interface IconOrImageProps {
   icon: string;
   className?: string;
   viewBox?: string;
-};
+}
 
 export const IconOrImage = function IconOrImage({ icon, className, viewBox }: IconOrImageProps) {
 

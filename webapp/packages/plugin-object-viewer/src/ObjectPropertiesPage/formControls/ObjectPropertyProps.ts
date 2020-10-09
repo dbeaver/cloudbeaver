@@ -13,4 +13,4 @@ import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 export type ObjectPropertyProps = PropsWithChildren<{
   objectProperty?: ObjectPropertyInfo;
   className?: string;
-}>
+}>;

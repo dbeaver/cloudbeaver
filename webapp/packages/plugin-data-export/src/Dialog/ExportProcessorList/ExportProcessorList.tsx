@@ -13,9 +13,9 @@ import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { ProcessorItem } from './ProcessorItem';
 
-type ExportProcessorListProps = {
+interface ExportProcessorListProps {
   processors: DataTransferProcessorInfo[];
-  onSelect(processorId: string): void;
+  onSelect: (processorId: string) => void;
   className?: string;
 }
 

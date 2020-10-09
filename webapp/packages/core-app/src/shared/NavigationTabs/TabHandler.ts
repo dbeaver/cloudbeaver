@@ -11,42 +11,42 @@ import { DynamicStyle } from '@cloudbeaver/core-theming';
 
 import { ITab } from './ITab';
 
-export type TabHandlerTabProps<T = any> = {
+export interface TabHandlerTabProps<T = any> {
   tab: ITab<T>;
   handler: TabHandler<T>;
-  onSelect(tabId: string): void;
-  onClose?(tabId: string): void;
+  onSelect: (tabId: string) => void;
+  onClose?: (tabId: string) => void;
   style: DynamicStyle | DynamicStyle[];
 }
-export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>
+export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>;
 
-export type TabHandlerPanelProps<T = any> = {
+export interface TabHandlerPanelProps<T = any> {
   tab: ITab<T>;
   handler: TabHandler<T>;
 }
-export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandlerPanelProps<T>>
+export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandlerPanelProps<T>>;
 
-export type TabHandlerEvent<T = any> = (tab: ITab<T>) => Promise<void> | void
-export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean
+export type TabHandlerEvent<T = any> = (tab: ITab<T>) => Promise<void> | void;
+export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;
 
-export type TabHandlerOptions<TState = any> = {
+export interface TabHandlerOptions<TState = any> {
   key: string;
-  getTabComponent(): TabHandlerTabComponent<TState>;
-  getPanelComponent(): TabHandlerPanelComponent<TState>;
+  getTabComponent: () => TabHandlerTabComponent<TState>;
+  getPanelComponent: () => TabHandlerPanelComponent<TState>;
   onSelect?: TabHandlerEvent<TState>;
   onClose?: TabHandlerEvent<TState>;
   onRestore?: TabRestoreEvent<TState>;
-  extensions?: IExtension<ITab<TState>>[];
+  extensions?: Array<IExtension<ITab<TState>>>;
 }
 
 export class TabHandler<TState = any> {
-  key: string
+  key: string;
   getTabComponent: () => TabHandlerTabComponent<TState>;
   getPanelComponent: () => TabHandlerPanelComponent<TState>;
-  onSelect?: TabHandlerEvent<TState>
-  onClose?: TabHandlerEvent<TState>
-  onRestore?: TabRestoreEvent<TState>
-  extensions?: IExtension<ITab<TState>>[];
+  onSelect?: TabHandlerEvent<TState>;
+  onClose?: TabHandlerEvent<TState>;
+  onRestore?: TabRestoreEvent<TState>;
+  extensions?: Array<IExtension<ITab<TState>>>;
 
   constructor(options: TabHandlerOptions<TState>) {
     this.key = options.key;

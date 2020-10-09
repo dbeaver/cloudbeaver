@@ -24,25 +24,25 @@ const styles = css`
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & {
   mod?: 'surface';
   long?: boolean;
-}
+};
 
 type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
-  onChange?(value: string, name?: string): any;
+  onChange?: (value: string, name?: string) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?(value: string, name: TKey): any;
+  onChange?: (value: string, name: TKey) => any;
 
   value?: never;
-}
+};
 
-type TextareaType = {
+interface TextareaType {
   (props: ControlledProps): JSX.Element;
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }

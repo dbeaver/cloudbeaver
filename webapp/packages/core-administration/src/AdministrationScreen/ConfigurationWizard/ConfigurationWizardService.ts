@@ -9,7 +9,7 @@
 import { computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
@@ -47,8 +47,8 @@ export class ConfigurationWizardService {
 
   @computed get canFinish(): boolean {
     return this.steps.every((step) => {
-      if (step.configurationWizardOptions?.isDone &&
-          !step.configurationWizardOptions?.isDone()) {
+      if (step.configurationWizardOptions?.isDone
+          && !step.configurationWizardOptions?.isDone()) {
         return false;
       }
 
@@ -78,7 +78,6 @@ export class ConfigurationWizardService {
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
     private screenService: ScreenService,
-    private sessionResource: SessionResource,
     private serverConfigResource: ServerConfigResource
   ) { }
 

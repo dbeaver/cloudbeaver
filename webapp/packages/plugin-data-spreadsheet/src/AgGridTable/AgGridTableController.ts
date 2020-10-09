@@ -51,7 +51,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     revertCellValue: this.revertCellValue.bind(this),
     onEditSave: this.onEditSave.bind(this),
     onEditCancel: this.onEditCancel.bind(this),
-  }
+  };
 
   /**
    * ag-grid options that is set and not changed during AgGridComponent lifetime
@@ -91,7 +91,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private columnApi?: ColumnApi;
   private gridModel!: TableViewerModel;
   private resizeTask?: any;
-  private subscriptions: Subscription[] = []
+  private subscriptions: Subscription[] = [];
 
   init(gridModel: TableViewerModel) {
     this.gridModel = gridModel;

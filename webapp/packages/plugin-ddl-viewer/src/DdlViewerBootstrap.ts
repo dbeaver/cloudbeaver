@@ -15,7 +15,7 @@ import { DdlViewerTabService } from './DdlViewerTabService';
 export class DdlViewerBootstrap {
 
   constructor(private objectFoldersService: ObjectFoldersService,
-              private ddlViewerTabService: DdlViewerTabService) {
+    private ddlViewerTabService: DdlViewerTabService) {
   }
 
   bootstrap() {

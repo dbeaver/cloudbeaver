@@ -17,20 +17,23 @@ export interface ITabNavigationContext {
   readonly isNewlyCreated: boolean;
   readonly handlerPriority: number;
   readonly tab: ITab | null;
-  openNewTab<T = any>(options: ITabOptions<T>): ITab<T>;
-  registerTab(tab: ITab): void;
+  openNewTab: <T = any>(options: ITabOptions<T>) => ITab<T>;
+  registerTab: (tab: ITab) => void;
 }
 
 export class TabNavigationContext implements ITabNavigationContext {
   get isNewlyCreated() {
     return this._isNewlyCreated;
   }
+
   get handlerPriority() {
     return this._handlerPriority;
   }
+
   get tab() {
     return this._tab;
   }
+
   private _isNewlyCreated = false;
   private _handlerPriority = 0;
   private _tab: ITab | null = null;

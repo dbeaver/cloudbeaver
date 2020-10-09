@@ -27,7 +27,7 @@ export class GQLError extends Error {
       this.errorText = clientError.response.error;
     } else {
       this.errorText = clientError.response.errors?.map(e => e.message).join('</br>') || 'unknown error';
-      const firstError = clientError.response.errors && clientError.response.errors[0];
+      const firstError = clientError.response.errors?.[0];
       this.errorCode = firstError?.extensions?.webErrorCode;
     }
   }

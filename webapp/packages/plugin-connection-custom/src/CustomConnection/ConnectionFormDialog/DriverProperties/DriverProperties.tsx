@@ -26,11 +26,11 @@ const styles = css`
   }
 `;
 
-type DriverPropertyState = {
+interface DriverPropertyState {
   [key: string]: string;
 }
 
-type DriverPropertiesProps = {
+interface DriverPropertiesProps {
   driver: DBDriver;
   state: DriverPropertyState;
   loadProperties: boolean;

@@ -83,7 +83,7 @@ export class NavigationTreeService {
       context,
       extensions: this.navNodeExtensionsService.extensions,
     };
-  }
+  };
 
   private async ensureConnectionInit(navNodeId: string) {
     const node = this.navNodeManagerService.getNode(navNodeId);

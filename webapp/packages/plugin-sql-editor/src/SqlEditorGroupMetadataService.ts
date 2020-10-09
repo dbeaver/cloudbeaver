@@ -16,7 +16,7 @@ import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProce
 
 @injectable()
 export class SqlEditorGroupMetadataService {
-  private metadata: MetadataMap<string, ISqlEditorGroupMetadata>
+  private metadata: MetadataMap<string, ISqlEditorGroupMetadata>;
 
   constructor(
     private graphQLService: GraphQLService,

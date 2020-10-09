@@ -17,7 +17,7 @@ import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
 export class NavNodeExtensionsService {
-  readonly extensions: IExtension<string>[];
+  readonly extensions: Array<IExtension<string>>;
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,

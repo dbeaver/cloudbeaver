@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ILocaleProvider {
-  (locale: string): Promise<string[][]> | string[][];
-}
+export type ILocaleProvider = (locale: string) => Promise<string[][]> | string[][];

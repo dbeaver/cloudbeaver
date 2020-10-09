@@ -13,32 +13,32 @@ import { DynamicStyle } from '@cloudbeaver/core-theming';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 
-export type ObjectPageTabProps<T = unknown> = {
+export interface ObjectPageTabProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage<T>;
-  onSelect(): void;
+  onSelect: () => void;
   style: DynamicStyle | DynamicStyle[];
 }
-export type ObjectPageTabComponent<T> = React.FunctionComponent<ObjectPageTabProps<T>>
+export type ObjectPageTabComponent<T> = React.FunctionComponent<ObjectPageTabProps<T>>;
 
-export type ObjectPagePanelProps<T = unknown> = {
+export interface ObjectPagePanelProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage<T>;
 }
-export type ObjectPagePanelComponent<T> = React.FunctionComponent<ObjectPagePanelProps<T>>
+export type ObjectPagePanelComponent<T> = React.FunctionComponent<ObjectPagePanelProps<T>>;
 
-export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void
+export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void;
 export type ObjectPageRestoreCallback<T> = (
   tab: ITab<IObjectViewerTabState>,
   pageState: T
-) => Promise<boolean> | boolean
+) => Promise<boolean> | boolean;
 
 export interface ObjectPageOptions<T = unknown> {
   key: string;
   priority: number;
   order?: number;
-  getTabComponent(): ObjectPageTabComponent<T>;
-  getPanelComponent(): ObjectPagePanelComponent<T>;
+  getTabComponent: () => ObjectPageTabComponent<T>;
+  getPanelComponent: () => ObjectPagePanelComponent<T>;
   onSelect?: ObjectPageCallback<T>;
   onClose?: ObjectPageCallback<T>;
   onRestore?: ObjectPageRestoreCallback<T>;

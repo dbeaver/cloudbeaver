@@ -15,7 +15,7 @@ import { LogViewerService } from './LogViewerService';
 export class LogViewerMenuService {
 
   constructor(private mainMenuService: MainMenuService,
-              private logViewerService: LogViewerService) {
+    private logViewerService: LogViewerService) {
   }
 
   registerMenuItems() {

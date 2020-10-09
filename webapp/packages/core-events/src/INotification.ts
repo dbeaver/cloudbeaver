@@ -13,7 +13,7 @@ export enum ENotificationType {
   Custom =' Custom'
 }
 
-export type INotificationExtraProps<T = never> = {
+export interface INotificationExtraProps<T = never> {
   source?: T;
   [key: string]: any;
 }
@@ -23,11 +23,11 @@ export type NotificationComponentProps<
 > = TProps & {
   notification: INotification<TProps>;
   onClose: () => void;
-}
+};
 
 export type NotificationComponent<
   TProps extends INotificationExtraProps<any> = INotificationExtraProps,
-> = React.FunctionComponent<NotificationComponentProps<TProps>>
+> = React.FunctionComponent<NotificationComponentProps<TProps>>;
 
 export interface INotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   readonly id: number;

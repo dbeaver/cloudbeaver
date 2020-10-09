@@ -17,10 +17,9 @@ export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
 
 @injectable()
 export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
-  Map<TKey, TValue>,
-  ResourceKey<TKey>
->
-{
+Map<TKey, TValue>,
+ResourceKey<TKey>
+> {
   readonly onItemAdd: Observable<ResourceKey<TKey>>;
   readonly onItemDelete: Observable<ResourceKey<TKey>>;
 
@@ -83,7 +82,7 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   }
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
-    return this.tasks.some(task=> this.includes(key, task.param));
+    return this.tasks.some(task => this.includes(key, task.param));
   }
 
   get(key: TKey): TValue | undefined;
@@ -126,19 +125,19 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
   }
 
   async refresh(key: TKey): Promise<TValue>;
-  async refresh(key: ResourceKeyList<TKey>): Promise<Array<TValue>>;
-  async refresh(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue>;
-  async refresh(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue> {
+  async refresh(key: ResourceKeyList<TKey>): Promise<TValue[]>;
+  async refresh(key: ResourceKey<TKey>): Promise<TValue[]| TValue>;
+  async refresh(key: ResourceKey<TKey>): Promise<TValue[]| TValue> {
     await this.loadData(key, true);
-    return this.get(key) as Array<TValue>| TValue;
+    return this.get(key) as TValue[]| TValue;
   }
 
   async load(key: TKey): Promise<TValue>;
-  async load(key: ResourceKeyList<TKey>): Promise<Array<TValue>>;
-  async load(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue>;
-  async load(key: ResourceKey<TKey>): Promise<Array<TValue>| TValue> {
+  async load(key: ResourceKeyList<TKey>): Promise<TValue[]>;
+  async load(key: ResourceKey<TKey>): Promise<TValue[]| TValue>;
+  async load(key: ResourceKey<TKey>): Promise<TValue[]| TValue> {
     await this.loadData(key);
-    return this.get(key) as Array<TValue>| TValue;
+    return this.get(key) as TValue[]| TValue;
   }
 
   has(key: TKey): boolean {

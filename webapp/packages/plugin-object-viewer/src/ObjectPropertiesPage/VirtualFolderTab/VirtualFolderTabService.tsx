@@ -53,7 +53,7 @@ export class VirtualFolderTabService {
   }
 
   private createEntity(tabData: VirtualFolderTabData): TabEntity {
-    const mixins: MixinProvider<any>[] = [
+    const mixins: Array<MixinProvider<any>> = [
       {
         token: VirtualFolderTabData,
         value: tabData,

@@ -9,17 +9,17 @@
 import { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 export type TableColumn = Pick<
-  SqlResultColumn,
-  | 'dataKind'
-  | 'entityName'
-  | 'fullTypeName'
-  | 'icon'
-  | 'label'
-  | 'maxLength'
-  | 'name'
-  | 'position'
-  | 'precision'
-  | 'readOnly'
-  | 'scale'
-  | 'typeName'
->
+SqlResultColumn,
+| 'dataKind'
+| 'entityName'
+| 'fullTypeName'
+| 'icon'
+| 'label'
+| 'maxLength'
+| 'name'
+| 'position'
+| 'precision'
+| 'readOnly'
+| 'scale'
+| 'typeName'
+>;

@@ -43,8 +43,8 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
   load(): void | Promise<void> { }
 
   private getMenuTitle(): string {
-    if(this.templateConnectionsResource.isLoading()){
-      return 'ui_processing_loading'
+    if (this.templateConnectionsResource.isLoading()) {
+      return 'ui_processing_loading';
     }
     return 'basicConnection_main_menu_item';
   }

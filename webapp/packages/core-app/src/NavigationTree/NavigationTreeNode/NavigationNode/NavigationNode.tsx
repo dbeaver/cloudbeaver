@@ -25,7 +25,7 @@ type NodeProps = PropsWithChildren<{
   isLoading: boolean;
   isLoaded: boolean;
   isOutdated: boolean;
-}>
+}>;
 
 const KEY = {
   ENTER: 'Enter',

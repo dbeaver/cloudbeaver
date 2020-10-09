@@ -71,28 +71,28 @@ const switchState = {
 };
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
-  mod?: (keyof typeof switchMod)[];
+  mod?: Array<keyof typeof switchMod>;
   label?: string;
   description?: string;
   long?: boolean;
-}
+};
 
 type ControlledProps = BaseProps & {
   checked?: boolean;
-  onChange?(value: boolean, name?: string): any;
+  onChange?: (value: boolean, name?: string) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?(value: boolean, name: TKey): any;
+  onChange?: (value: boolean, name: TKey) => any;
 
   checked?: never;
-}
+};
 
-type SwitchType = {
+interface SwitchType {
   (props: ControlledProps): JSX.Element;
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
 }

@@ -8,7 +8,7 @@
 
 import { Route } from 'router5';
 
-export type ScreenRoute = Omit<Route, 'children'>
+export type ScreenRoute = Omit<Route, 'children'>;
 
 export interface IScreen {
   name: string;
@@ -19,4 +19,4 @@ export interface IScreen {
   onDeactivate?: () => void | Promise<void>;
 }
 
-export type ScreenComponent = React.FunctionComponent
+export type ScreenComponent = React.FunctionComponent;

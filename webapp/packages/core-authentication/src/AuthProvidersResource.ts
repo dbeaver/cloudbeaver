@@ -16,7 +16,7 @@ import {
   AuthProviderInfo
 } from '@cloudbeaver/core-sdk';
 
-export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>
+export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>;
 
 @injectable()
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], null> {

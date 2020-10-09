@@ -13,8 +13,8 @@ export interface ITab {
   title: string;
   icon?: string;
 
-  onClose?(): void;
-  onActivate(): void;
+  onClose?: () => void;
+  onActivate: () => void;
 
   panel: () => ReactElement | null;
 }

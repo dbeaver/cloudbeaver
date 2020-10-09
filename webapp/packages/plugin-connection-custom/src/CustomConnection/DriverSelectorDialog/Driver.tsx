@@ -29,9 +29,9 @@ const styles = css`
   }
 `;
 
-type DriverProps = {
+interface DriverProps {
   driver: IDriver;
-  onSelect(driverId: string): void;
+  onSelect: (driverId: string) => void;
 }
 
 export const Driver = observer(function Driver({ driver, onSelect }: DriverProps) {

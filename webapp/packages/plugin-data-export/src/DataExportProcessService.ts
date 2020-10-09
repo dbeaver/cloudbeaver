@@ -15,12 +15,12 @@ import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
 import { IExportContext } from './IExportContext';
 
-type Process = {
+interface Process {
   taskId: string;
   process: Deferred<string>;
 }
 
-export type ExportProcess = {
+export interface ExportProcess {
   taskId: string;
   context: IExportContext;
   parameters: DataTransferParameters;

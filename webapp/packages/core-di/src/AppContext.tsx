@@ -12,7 +12,7 @@ import { IServiceInjector } from './IApp';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 
-type AppContextProps = PropsWithChildren<{ app: IServiceInjector }>
+type AppContextProps = PropsWithChildren<{ app: IServiceInjector }>;
 
 export function AppContext({ app, children }: AppContextProps) {
   return <appContext.Provider value={app}>{children}</appContext.Provider>;

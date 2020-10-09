@@ -16,8 +16,8 @@ export function useObjectFolder(objectId: string) {
 
   const children = navNodeManagerService.getTree(objectId) || [];
 
-  const isLoading = !dbObjectService.isLoaded(resourceKeyList(children)) &&
-      dbObjectService.isDataLoading(resourceKeyList(children));
+  const isLoading = !dbObjectService.isLoaded(resourceKeyList(children))
+      && dbObjectService.isDataLoading(resourceKeyList(children));
 
   return { isLoading };
 }

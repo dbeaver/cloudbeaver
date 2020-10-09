@@ -99,22 +99,22 @@ export class ConnectionSchemaManagerService {
   }
 
   get isConnectionChangeable(): boolean {
-    return !!this.activeItem?.changeConnectionId &&
-      !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeConnectionId
+      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   get isObjectCatalogChangeable(): boolean {
-    return !!this.activeItem?.changeCatalogId &&
-      !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeCatalogId
+      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   get isObjectSchemaChangeable(): boolean {
-    return !!this.activeItem?.changeSchemaId &&
-      !this.connectionsManagerService.connectionObjectContainers.isLoading();
+    return !!this.activeItem?.changeSchemaId
+      && !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
   @observable private activeItem: IActiveItem<any> | null = null;
-  @observable private activeItemHistory: IActiveItem<any>[] = [];
+  @observable private activeItemHistory: Array<IActiveItem<any>> = [];
 
   constructor(
     private navigationTabsService: NavigationTabsService,
@@ -208,7 +208,7 @@ export class ConnectionSchemaManagerService {
     };
     const handler = this.navigationTabsService.getTabHandler(tab.handlerId);
 
-    if (handler && handler.extensions) {
+    if (handler?.extensions) {
       this.setExtensions(item, handler.extensions);
     }
 
@@ -219,7 +219,7 @@ export class ConnectionSchemaManagerService {
     this.removeActiveItem(tab.id);
   }
 
-  private setExtensions<T>(item: IActiveItem<T>, extensions: IExtension<T>[]) {
+  private setExtensions<T>(item: IActiveItem<T>, extensions: Array<IExtension<T>>) {
     for (const extension of extensions) {
       if (isConnectionProvider(extension)) {
         item.getCurrentConnectionId = extension;

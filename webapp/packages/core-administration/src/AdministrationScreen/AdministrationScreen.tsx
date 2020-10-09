@@ -25,7 +25,7 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
     (item: string) => administrationScreenService.navigateToItem(item),
     [administrationScreenService]
   );
-  
+
   if (!usePermission(EAdminPermission.admin)) {
     return <Translate token='root_permission_denied' />;
   }

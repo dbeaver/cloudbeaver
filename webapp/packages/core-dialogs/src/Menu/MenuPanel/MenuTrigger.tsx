@@ -47,13 +47,13 @@ export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
       <MenuPanel panel={panel} menu={menu} style={style} />
     </>
   );
-}
+};
 
 /**
  * MenuPanel
  */
 
-type MenuPanelProps = {
+interface MenuPanelProps {
   panel: IMenuPanel;
   menu: MenuStateReturn; // from reakit useMenuState
   style?: Style[];
@@ -82,7 +82,7 @@ type MenuPanelElementProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
   item: IMenuItem;
   menu: MenuStateReturn; // from reakit useMenuState
   style?: Style[];
-}
+};
 
 const MenuPanelElement = observer(function MenuPanelElement({
   item, menu, style = [],
@@ -132,7 +132,7 @@ const MenuPanelElement = observer(function MenuPanelElement({
 type MenuInnerTriggerProps = Omit<React.ButtonHTMLAttributes<any>, 'style'> & {
   menuItem: IMenuItem;
   style?: Style[];
-}
+};
 
 export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
   props: MenuInnerTriggerProps,

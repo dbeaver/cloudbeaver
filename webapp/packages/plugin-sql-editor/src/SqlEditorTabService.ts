@@ -53,20 +53,20 @@ export class SqlEditorTabService {
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
-        key: sqlEditorTabHandlerKey,
-        getTabComponent: () => SqlEditorTab,
-        getPanelComponent: () => SqlEditorPanel,
-        onRestore: this.handleTabRestore.bind(this),
-        onClose: this.handleTabClose.bind(this),
-        extensions: [
-          connectionProvider(this.getConnectionId.bind(this)),
-          objectCatalogProvider(this.getObjectCatalogId.bind(this)),
-          objectSchemaProvider(this.getObjectSchemaId.bind(this)),
-          connectionSetter(this.setConnectionId.bind(this)),
-          objectCatalogSetter(this.setObjectCatalogId.bind(this)),
-          objectSchemaSetter(this.setObjectSchemaId.bind(this)),
-        ],
-      });
+      key: sqlEditorTabHandlerKey,
+      getTabComponent: () => SqlEditorTab,
+      getPanelComponent: () => SqlEditorPanel,
+      onRestore: this.handleTabRestore.bind(this),
+      onClose: this.handleTabClose.bind(this),
+      extensions: [
+        connectionProvider(this.getConnectionId.bind(this)),
+        objectCatalogProvider(this.getObjectCatalogId.bind(this)),
+        objectSchemaProvider(this.getObjectSchemaId.bind(this)),
+        connectionSetter(this.setConnectionId.bind(this)),
+        objectCatalogSetter(this.setObjectCatalogId.bind(this)),
+        objectSchemaSetter(this.setObjectSchemaId.bind(this)),
+      ],
+    });
   }
 
   registerTabHandler() { }
@@ -109,14 +109,14 @@ export class SqlEditorTabService {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
 
-    if (typeof tab.handlerState.query !== 'string' ||
-        typeof tab.handlerState.connectionId !== 'string' ||
-        typeof tab.handlerState.contextId !== 'string' ||
-        typeof tab.handlerState.objectCatalogId !== 'string' ||
-        typeof tab.handlerState.order !== 'number' ||
-        !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId) ||
-        !Array.isArray(tab.handlerState.queryTabGroups) ||
-        !Array.isArray(tab.handlerState.resultTabs)
+    if (typeof tab.handlerState.query !== 'string'
+        || typeof tab.handlerState.connectionId !== 'string'
+        || typeof tab.handlerState.contextId !== 'string'
+        || typeof tab.handlerState.objectCatalogId !== 'string'
+        || typeof tab.handlerState.order !== 'number'
+        || !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId)
+        || !Array.isArray(tab.handlerState.queryTabGroups)
+        || !Array.isArray(tab.handlerState.resultTabs)
     ) {
       return false;
     }
@@ -209,7 +209,7 @@ export class SqlEditorTabService {
     await this.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
   }
 
-  private async destroySqlContext(connectionId: string, contextId: string): Promise<void> {
+  private async destroySqlContext(connectionId: string, contextId: string) {
     const connection = this.connectionInfoResource.get(connectionId);
     if (!connection) {
       // connection was closed before, nothing to destroy
@@ -274,7 +274,7 @@ function findMinimalFree(array: number[], base: number): number {
 export function isSQLEditorTab(tab: ITab): tab is ITab<ISqlEditorTabState>;
 export function isSQLEditorTab(
   predicate: (tab: ITab<ISqlEditorTabState>) => boolean
-): (tab: ITab) => tab is ITab<ISqlEditorTabState>
+): (tab: ITab) => tab is ITab<ISqlEditorTabState>;
 export function isSQLEditorTab(
   tab: ITab | ((tab: ITab<ISqlEditorTabState>) => boolean)
 ): boolean | ((tab: ITab) => tab is ITab<ISqlEditorTabState>) {

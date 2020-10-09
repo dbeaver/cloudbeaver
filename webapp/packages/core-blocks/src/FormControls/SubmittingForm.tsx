@@ -11,8 +11,8 @@ import { useCallback, forwardRef, useMemo } from 'react';
 import { FormContext } from './FormContext';
 
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange'> & {
-  onChange?(value: string | number | boolean, name: string | undefined): void;
-}
+  onChange?: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+};
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
   {

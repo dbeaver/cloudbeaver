@@ -22,7 +22,7 @@ const styles = css`
   }
 `;
 
-type ObjectPropertyTableProps = {
+interface ObjectPropertyTableProps {
   objectId: string;
   parentId: string;
 }

@@ -21,23 +21,23 @@ export abstract class CachedResource<
   TData,
   TParam,
 > {
-  @observable 
+  @observable
   data: TData;
 
   readonly onDataUpdate: Observable<TData>;
   readonly onDataOutdated: Observable<TParam>;
 
-  @observable 
+  @observable
   protected outdated = new Set<TParam>();
 
-  @observable 
+  @observable
   protected loading = false;
 
   protected outdatedSubject: Subject<TParam>;
   protected dataSubject: Subject<TData>;
 
   @observable.shallow
-  protected tasks: IResourceTask<TParam>[] = [];
+  protected tasks: Array<IResourceTask<TParam>> = [];
 
   constructor(defaultValue: TData) {
     this.data = defaultValue;
@@ -98,18 +98,18 @@ export abstract class CachedResource<
     update: (param: TParam) => Promise<T>,
     exitCheck?: () => boolean
   ): Promise<T | undefined> {
-    if (exitCheck && exitCheck()) {
+    if (exitCheck?.()) {
       return;
     }
 
     return this.task(param, async () => {
       // repeated because previous task maybe has been load requested data
-      if (exitCheck && exitCheck()) {
+      if (exitCheck?.()) {
         return;
       }
-      
+
       return await this.taskWrapper(param, update);
-    })
+    });
   }
 
   protected async loadData(param: TParam, refresh?: boolean): Promise<void> {
@@ -124,7 +124,7 @@ export abstract class CachedResource<
       }
 
       await this.taskWrapper(param, this.loadingTask);
-    })
+    });
   }
 
   private async loadingTask(param: TParam) {
@@ -149,7 +149,7 @@ export abstract class CachedResource<
     const task: IResourceTask<TParam> = {
       param,
       task: this.wrappedTask(param, action),
-    }
+    };
     this.tasks.push(task);
 
     try {
@@ -162,7 +162,7 @@ export abstract class CachedResource<
   private async wrappedTask<T>(param: TParam, task: (param: TParam) => Promise<T>): Promise<T> {
     const queue = this.tasks.filter(task => this.includes(param, task.param));
 
-    for(const task of queue) {
+    for (const task of queue) {
       try {
         await task.task;
       } catch {}

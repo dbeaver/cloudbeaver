@@ -31,7 +31,7 @@ const tabStyles = css`
 
 type ObjectPropertiesProps = PropsWithChildren<{
   objectId: string;
-}>
+}>;
 
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,

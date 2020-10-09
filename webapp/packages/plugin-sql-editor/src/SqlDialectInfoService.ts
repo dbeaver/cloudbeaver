@@ -15,11 +15,12 @@ import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 @injectable()
 export class SqlDialectInfoService {
 
-  @observable private dialectInfo = new Map<string, SqlDialectInfo>()
+  @observable private dialectInfo = new Map<string, SqlDialectInfo>();
 
-  constructor(private graphQLService: GraphQLService,
-              private notificationService: NotificationService) {
-  }
+  constructor(
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService
+  ) { }
 
   getDialectInfo(connectionId: string): SqlDialectInfo | undefined {
     return this.dialectInfo.get(connectionId);

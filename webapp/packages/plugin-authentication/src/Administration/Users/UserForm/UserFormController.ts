@@ -20,7 +20,7 @@ import {
 
 @injectable()
 export class UserFormController implements IInitializableController, IDestructibleController {
-  readonly selectedConnections = observable<string, boolean>(new Map())
+  readonly selectedConnections = observable<string, boolean>(new Map());
   @observable grantedConnections: AdminConnectionGrantInfo[] = [];
   @observable isSaving = false;
   @observable isLoading = true;
@@ -107,13 +107,13 @@ export class UserFormController implements IInitializableController, IDestructib
     } finally {
       this.isSaving = false;
     }
-  }
+  };
 
   showDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 
   handleConnectionsAccessChange = () => this.connectionAccessChanged = true;
 
@@ -140,7 +140,7 @@ export class UserFormController implements IInitializableController, IDestructib
     }
     await this.loadConnections();
     this.isLoading = false;
-  }
+  };
 
   private validate() {
     if (!this.credentials.login) {
@@ -198,8 +198,8 @@ export class UserFormController implements IInitializableController, IDestructib
         const connectionPermission = this.grantedConnections.find(
           connectionPermission => connectionPermission.connectionId === connectionId
         );
-        return this.selectedConnections.get(connectionId) &&
-          connectionPermission?.subjectType !== AdminSubjectType.Role;
+        return this.selectedConnections.get(connectionId)
+          && connectionPermission?.subjectType !== AdminSubjectType.Role;
       });
   }
 

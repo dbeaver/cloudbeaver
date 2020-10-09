@@ -30,11 +30,11 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   isExporting: boolean;
-  onCancel(): void;
-  onExport(): void;
-  onBack(): void;
+  onCancel: () => void;
+  onExport: () => void;
+  onBack: () => void;
 }
 
 export const ProcessorConfigureDialogFooter = observer(

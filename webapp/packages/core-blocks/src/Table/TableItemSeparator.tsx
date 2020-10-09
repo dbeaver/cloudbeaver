@@ -16,7 +16,7 @@ type Props = React.PropsWithChildren<{
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
-}>
+}>;
 
 export const TableItemSeparator = observer(function TableItemSeparator({
   colSpan,

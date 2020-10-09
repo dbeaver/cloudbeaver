@@ -17,9 +17,9 @@ import { CellValue, SomeTableRows, TableRow } from './TableRow';
  * Keep this data in consistence with server side. Don't try to modify this data if it is not inline with server changes
  */
 export class TableDataModel {
-  readonly onRowsUpdate: Observable<number[]>
+  readonly onRowsUpdate: Observable<number[]>;
 
-  private rowsUpdateSubject: Subject<number[]>
+  private rowsUpdateSubject: Subject<number[]>;
   private rows: TableRow[] = [];
   private columns: TableColumn[] = [];
 
@@ -42,8 +42,8 @@ export class TableDataModel {
 
   isChunkLoaded(offset: number, count: number) {
     return (
-      (this.rows.length > offset && !!this.rows[offset]) &&
-      (this.rows.length > offset + count - 1 && !!this.rows[offset + count - 1])
+      (this.rows.length > offset && !!this.rows[offset])
+      && (this.rows.length > offset + count - 1 && !!this.rows[offset + count - 1])
     );
   }
 

@@ -43,8 +43,8 @@ export class DataExportMenuService {
       {
         id: 'export',
         isPresent(context) {
-          return context.contextType === NavigationTreeContextMenuService.nodeContextType &&
-            context.data.objectFeatures.includes(EObjectFeature.dataContainer);
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+            && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
         order: 2,
         title: 'data_transfer_dialog_export',

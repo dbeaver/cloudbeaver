@@ -17,22 +17,22 @@ export interface IDataPresentationProps {
   className?: string;
 }
 
-export type DataPresentationComponent = React.FunctionComponent<IDataPresentationProps>
+export type DataPresentationComponent = React.FunctionComponent<IDataPresentationProps>;
 
 export type PresentationTabProps = TabProps & {
   presentation: DataPresentationOptions;
   model: IDatabaseDataModel<any>;
-}
-export type PresentationTabComponent = React.FunctionComponent<PresentationTabProps>
+};
+export type PresentationTabComponent = React.FunctionComponent<PresentationTabProps>;
 
-export type DataPresentationOptions = {
+export interface DataPresentationOptions {
   id: string;
   dataFormat: ResultDataFormat;
   title?: string;
   icon?: string;
   getPresentationComponent: () => DataPresentationComponent;
   getTabComponent?: () => PresentationTabComponent;
-  onActivate?(): void;
+  onActivate?: () => void;
 }
 
 @injectable()
@@ -41,7 +41,7 @@ export class DataPresentationService {
     return this.dataPresentations.values().next().value;
   }
 
-  private dataPresentations: Map<string, DataPresentationOptions>
+  private dataPresentations: Map<string, DataPresentationOptions>;
 
   constructor() {
     this.dataPresentations = new Map();

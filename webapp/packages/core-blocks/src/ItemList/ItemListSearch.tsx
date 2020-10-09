@@ -21,10 +21,10 @@ type Props = React.PropsWithChildren<{
   value?: string;
   placeholder?: string;
   disabled?: boolean;
-  onChange?(value: string): void;
-  onSearch?(value: string): void;
+  onChange?: (value: string) => void;
+  onSearch?: (value: string) => void;
   className?: string;
-}>
+}>;
 
 export function ItemListSearch({
   value, placeholder, disabled, onChange, onSearch, className,

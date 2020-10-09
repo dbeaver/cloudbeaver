@@ -17,7 +17,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
 
-type Props = {
+interface Props {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
   disabled?: boolean;

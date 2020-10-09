@@ -11,8 +11,8 @@ import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()
 export class UsersAdministrationNavigationService {
-  static ItemName = 'users'
-  static AddItemName = 'add'
+  static ItemName = 'users';
+  static AddItemName = 'add';
 
   constructor(
     private administrationScreenService: AdministrationScreenService,

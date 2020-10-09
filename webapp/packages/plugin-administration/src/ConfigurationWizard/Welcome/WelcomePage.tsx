@@ -47,7 +47,7 @@ const styles = composes(
   `
 );
 
-export function WelcomePage() {
+export const WelcomePage: React.FC = function WelcomePage() {
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
@@ -59,4 +59,4 @@ export function WelcomePage() {
       </layout-grid-inner>
     </layout-grid>
   );
-}
+};

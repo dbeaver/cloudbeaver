@@ -92,30 +92,30 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   mod?: 'surface';
   long?: boolean;
   searchable?: boolean;
-  keySelector(item: TValue): TKey;
-  valueSelector(item: TValue): string;
-  onSwitch?(state: boolean): void;
-}
+  keySelector: (item: TValue) => TKey;
+  valueSelector: (item: TValue) => string;
+  onSwitch?: (state: boolean) => void;
+};
 
 type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
   name?: string;
   value?: string;
-  onSelect?(value: TKey, name: string | undefined, prev: TKey): void;
-  onChange?(value: string, name: string | undefined): any;
+  onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
+  onChange?: (value: string, name: string | undefined) => any;
 
   state?: never;
-}
+};
 
 type ObjectProps<TValue, TKey extends keyof TState, TState> = BaseProps<TState[TKey], TValue> & {
   name: TKey;
   state: TState;
-  onSelect?(value: TState[TKey], name: TKey | undefined, prev: TState[TKey]): void;
-  onChange?(value: string, name: TKey | undefined): any;
+  onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
+  onChange?: (value: string, name: TKey | undefined) => any;
 
   value?: never;
-}
+};
 
-type ComboboxType = {
+interface ComboboxType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): JSX.Element;
 }
@@ -192,7 +192,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     [value, state, name, menu, context, onSelect]
   );
 
-  useLayoutEffect(() => onSwitch && onSwitch(menu.visible), [onSwitch, menu.visible]);
+  useLayoutEffect(() => onSwitch?.(menu.visible), [onSwitch, menu.visible]);
 
   const selectedItem = items.find(item => keySelector(item) === value);
   const filteredItems = items.filter(

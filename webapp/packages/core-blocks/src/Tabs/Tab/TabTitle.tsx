@@ -12,7 +12,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 type TabTitleProps = React.PropsWithChildren<{
   className?: string;
-}>
+}>;
 
 export function TabTitle({ children, className }: TabTitleProps) {
   return styled(useStyles())(

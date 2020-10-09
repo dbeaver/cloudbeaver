@@ -14,7 +14,7 @@ type Props = React.PropsWithChildren<{
   title?: string;
   min?: boolean;
   className?: string;
-}>
+}>;
 
 export function TableColumnHeader({
   title, children, min, className,

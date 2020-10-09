@@ -24,9 +24,9 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   driver: DBDriver;
-  onSelect(driverId: string): void;
+  onSelect: (driverId: string) => void;
 }
 
 export const Driver = observer(function Driver({ driver, onSelect }: Props) {

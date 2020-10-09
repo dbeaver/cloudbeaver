@@ -25,14 +25,14 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   databases: AdminConnectionSearchInfo[];
   hosts: string;
   disabled?: boolean;
   className?: string;
-  onSelect(database: AdminConnectionSearchInfo): void;
-  onChange(hosts: string): void;
-  onSearch?(): Promise<void>;
+  onSelect: (database: AdminConnectionSearchInfo) => void;
+  onChange: (hosts: string) => void;
+  onSearch?: () => Promise<void>;
 }
 
 export const DatabaseList = observer(function DatabaseList({

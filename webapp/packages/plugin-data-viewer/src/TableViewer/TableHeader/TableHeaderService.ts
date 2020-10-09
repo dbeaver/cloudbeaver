@@ -14,10 +14,11 @@ import { TableWhereFilter } from './TableWhereFilter';
 
 @injectable()
 export class TableHeaderService extends Bootstrap {
-  readonly tableHeaderPlaceholder = new PlaceholderContainer<DataModelWrapper>()
+  readonly tableHeaderPlaceholder = new PlaceholderContainer<DataModelWrapper>();
 
   register() {
     this.tableHeaderPlaceholder.add(TableWhereFilter, 1);
   }
+
   load(): void | Promise<void> { }
 }

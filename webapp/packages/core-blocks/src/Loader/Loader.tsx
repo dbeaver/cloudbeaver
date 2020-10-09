@@ -15,7 +15,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { Button } from '../Button';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
-export type LoaderProps = {
+export interface LoaderProps {
   /** if false, nothing will be rendered, by default true */
   loading?: boolean;
   /** disable cancel button */

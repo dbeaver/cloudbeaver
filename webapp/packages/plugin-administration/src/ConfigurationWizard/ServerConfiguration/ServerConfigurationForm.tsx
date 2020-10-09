@@ -7,18 +7,16 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, InputGroup, InputField, useFocus, Switch
+  SubmittingForm, InputGroup, InputField, useFocus, Switch, Button
 } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { IExecutor } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { ServerConfigurationService } from './ServerConfigurationService';
 
 export const formStyles = css`
   SubmittingForm {
@@ -30,6 +28,11 @@ export const formStyles = css`
   group {
     box-sizing: border-box;
     display: flex;
+  }
+  Button {
+    margin: 12px;
+    margin-left: 24px;
+    float: right;
   }
 `;
 
@@ -44,33 +47,40 @@ const boxStyles = css`
   }
 `;
 
-type Props = {
+interface Props {
   serverConfig: ServerConfigInput;
+  validationTask?: IExecutor<boolean>;
+  editing?: boolean;
   onChange: () => void;
-  onSave: () => void;
+  onSubmit: () => void;
 }
 
 export const ServerConfigurationForm = observer(function ServerConfigurationForm({
   serverConfig,
+  validationTask,
+  editing,
   onChange,
-  onSave,
+  onSubmit,
 }: Props) {
-  const service = useService(ServerConfigurationService);
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  useEffect(() => {
-    const validate = () => {
-      focusedRef.current?.checkValidity();
-      focusedRef.current?.reportValidity();
-    };
-    service.validationTask.addHandler(validate);
+  const validate = useCallback(() => {
+    focusedRef.current?.checkValidity();
+    focusedRef.current?.reportValidity();
+  }, []);
 
-    return () => service.validationTask.removeHandler(validate);
-  }, [service]);
+  useEffect(() => {
+    if (!validationTask) {
+      return;
+    }
+    validationTask.addHandler(validate);
+
+    return () => validationTask.removeHandler(validate);
+  }, [validationTask]);
 
   return styled(useStyles(formStyles, boxStyles))(
-    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={onSave}>
+    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={onSubmit}>
       <box as="div">
         <box-element as='div'>
           <group as="div">
@@ -88,31 +98,37 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               {translate('administration_configuration_wizard_configuration_server_name')}
             </InputField>
           </group>
-          <group as="div">
-            <InputGroup long>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
-          </group>
-          <InputField
-            type="text"
-            name="adminName"
-            state={serverConfig}
-            mod='surface'
-            minLength={6}
-            required
-            long
-          >
-            {translate('administration_configuration_wizard_configuration_admin_name')}
-          </InputField>
-          <InputField
-            type="password"
-            name="adminPassword"
-            state={serverConfig}
-            autoComplete='new-password'
-            mod='surface'
-            required
-            long
-          >
-            {translate('administration_configuration_wizard_configuration_admin_password')}
-          </InputField>
+          {editing
+            ? <group as="div"><Button mod={['raised']}>Save</Button></group>
+            : (
+                <>
+                  <group as="div">
+                    <InputGroup long>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
+                  </group>
+                  <InputField
+                    type="text"
+                    name="adminName"
+                    state={serverConfig}
+                    mod='surface'
+                    minLength={6}
+                    required
+                    long
+                  >
+                    {translate('administration_configuration_wizard_configuration_admin_name')}
+                  </InputField>
+                  <InputField
+                    type="password"
+                    name="adminPassword"
+                    state={serverConfig}
+                    autoComplete='new-password'
+                    mod='surface'
+                    required
+                    long
+                  >
+                    {translate('administration_configuration_wizard_configuration_admin_password')}
+                  </InputField>
+                </>
+              )}
         </box-element>
         <box-element as='div'>
           <group as="div">

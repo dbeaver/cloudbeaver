@@ -15,7 +15,7 @@ import { getSdk } from './sdk';
 
 @injectable()
 export class GraphQLService {
-  sdk: ReturnType<typeof getSdk>
+  sdk: ReturnType<typeof getSdk>;
 
   readonly client: CustomGraphQLClient;
 
@@ -27,5 +27,9 @@ export class GraphQLService {
 
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.client.registerInterceptor(interceptor);
+  }
+
+  blockRequests(reason: Error | string): void {
+    this.client.blockRequests(reason);
   }
 }

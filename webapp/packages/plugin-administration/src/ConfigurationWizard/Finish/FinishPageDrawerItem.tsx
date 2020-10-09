@@ -9,24 +9,22 @@
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
+import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AdministrationItemDrawerProps } from '../../../../AdministrationItem/IAdministrationItem';
-
-export const FinishPageDrawerItem = observer(function FinishPageDrawerItem({
+export const FinishPageDrawerItem: React.FC<AdministrationItemDrawerProps> = observer(function FinishPageDrawerItem({
   item,
   onSelect,
   style,
   disabled,
-}: AdministrationItemDrawerProps) {
-
+}) {
   return styled(useStyles(...style))(
     <Tab
       tabId={item.name}
-      disabled={disabled ||
-        (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled())}
+      disabled={disabled
+        || (item.configurationWizardOptions?.isDisabled?.())}
       onOpen={() => onSelect(item.name)}
     >
       <TabIcon icon='/icons/confirmation.svg' viewBox='0 0 16 16' />

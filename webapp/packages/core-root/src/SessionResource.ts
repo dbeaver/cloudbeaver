@@ -38,6 +38,7 @@ export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'la
 export class SessionResource extends CachedDataResource<SessionState | null, null> {
   @observable
   private loaded: boolean;
+
   constructor(
     private graphQLService: GraphQLService,
     private serverConfiguration: ServerConfigResource,
@@ -58,7 +59,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, nul
 
   protected async loader(key: null): Promise<SessionState> {
     await this.serverConfiguration.load(null);
-    
+
     const { session } = await this.graphQLService.sdk.openSession();
 
     this.loaded = true;

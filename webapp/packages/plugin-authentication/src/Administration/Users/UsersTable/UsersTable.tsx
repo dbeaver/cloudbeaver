@@ -27,7 +27,7 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   users: AdminUserInfo[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;

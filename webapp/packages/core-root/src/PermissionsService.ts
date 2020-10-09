@@ -19,7 +19,7 @@ export enum EPermission {
 @injectable()
 export class PermissionsService {
   get onUpdate(): Observable<Set<string>> {
-    return this.permissions.onDataUpdate
+    return this.permissions.onDataUpdate;
   }
 
   constructor(

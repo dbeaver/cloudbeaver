@@ -20,7 +20,7 @@ export enum EMainMenu {
 export class MainMenuService {
 
   readonly onConnectionClick: Observable<unknown>;
-  
+
   private menuOptions = new StaticMenu();
   private mainMenuToken = 'mainMenu';
   private connectionClick: Subject<unknown>;

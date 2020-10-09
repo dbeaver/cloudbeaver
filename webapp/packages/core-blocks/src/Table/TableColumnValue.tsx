@@ -21,9 +21,9 @@ type Props = React.PropsWithChildren<{
   centerContent?: boolean;
   flex?: boolean;
   expand?: boolean;
-  onClick?(): void;
-  onDoubleClick?(): void;
-}>
+  onClick?: () => void;
+  onDoubleClick?: () => void;
+}>;
 
 export const TableColumnValue = observer(function TableColumnValue({
   align,

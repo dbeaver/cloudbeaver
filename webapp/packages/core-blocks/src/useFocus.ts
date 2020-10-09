@@ -10,7 +10,7 @@ import {
   useRef, useEffect, useState, useLayoutEffect
 } from 'react';
 
-type FocusOptions = {
+interface FocusOptions {
   focusFirstChild?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -21,8 +21,10 @@ export function useFocus<T extends HTMLElement>({
   onFocus,
   onBlur,
 }: FocusOptions): [React.RefObject<T>, boolean] {
+  const handlersRef = useRef({ onFocus, onBlur });
   const [focus, setFocus] = useState(false);
   const reference = useRef<T>(null);
+  handlersRef.current = { onFocus, onBlur };
 
   useLayoutEffect(() => {
     if (reference.current !== null && focusFirstChild) {
@@ -41,16 +43,16 @@ export function useFocus<T extends HTMLElement>({
     }
 
     const focusHandler = () => {
-      if (onFocus) {
-        onFocus();
+      if (handlersRef.current.onFocus) {
+        handlersRef.current.onFocus();
       }
 
       setFocus(true);
     };
 
     const blurHandler = () => {
-      if (onBlur) {
-        onBlur();
+      if (handlersRef.current.onBlur) {
+        handlersRef.current.onBlur();
       }
 
       setFocus(false);
@@ -65,7 +67,7 @@ export function useFocus<T extends HTMLElement>({
       element.removeEventListener('focusin', focusHandler);
       element.removeEventListener('focusout', blurHandler);
     };
-  }, [onFocus, onBlur]);
+  }, []);
 
   return [reference, focus];
 }

@@ -30,7 +30,7 @@ const styles = css`
   }
 `;
 
-type Props = {
+interface Props {
   name: string;
   viewBox?: string;
 }

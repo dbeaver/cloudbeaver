@@ -17,7 +17,7 @@ import { SessionService } from './SessionService';
 export class ServerService {
   readonly settings = new ServerSettingsService(this.sessionService.settings);
 
-  private lastConfig: any = null
+  private lastConfig: any = null;
   constructor(
     readonly config: ServerConfigResource,
     private sessionService: SessionService,

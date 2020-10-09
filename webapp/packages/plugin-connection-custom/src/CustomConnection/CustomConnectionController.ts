@@ -19,9 +19,9 @@ export enum ConnectionStep {
 
 @injectable()
 export class CustomConnectionController implements IInitializableController {
-  @observable step = ConnectionStep.Driver
+  @observable step = ConnectionStep.Driver;
   @observable isLoading = true;
-  @observable driver: DBDriver | null = null
+  @observable driver: DBDriver | null = null;
 
   @computed
   get drivers(): DBDriver[] {
@@ -41,13 +41,13 @@ export class CustomConnectionController implements IInitializableController {
 
   onStep = (step: ConnectionStep) => {
     this.step = step;
-  }
+  };
 
   onDriverSelect = (driverId: string) => {
     this.driver = this.dbDriverResource.get(driverId)!;
 
     this.step = ConnectionStep.Connection;
-  }
+  };
 
   private async loadDBDrivers() {
     try {
@@ -61,8 +61,7 @@ export class CustomConnectionController implements IInitializableController {
 
   private sortDrivers(driverA: DBDriver, driverB: DBDriver): number {
 
-    if (driverA.promotedScore === driverB.promotedScore)
-    {
+    if (driverA.promotedScore === driverB.promotedScore) {
       return (driverA.name || '').localeCompare((driverB.name || ''));
     }
 

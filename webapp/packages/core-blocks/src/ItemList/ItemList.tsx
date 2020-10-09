@@ -15,7 +15,7 @@ import { Styles, ITEM_LIST_STYLES_ARRAY } from './styles';
 type ItemListProps = React.PropsWithChildren<{
   className?: string;
   styles?: Style[];
-}>
+}>;
 
 export function ItemList({
   children, className, styles,

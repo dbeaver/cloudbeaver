@@ -7,8 +7,8 @@
  */
 
 export interface IDatabaseDataEditor {
-  isEdited(): boolean;
-  getChanges(): void;
-  applyChanges(): void;
-  cancelChanges(skipUpdate?: boolean): void;
+  isEdited: () => boolean;
+  getChanges: () => void;
+  applyChanges: () => void;
+  cancelChanges: (skipUpdate?: boolean) => void;
 }

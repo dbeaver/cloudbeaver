@@ -13,7 +13,7 @@ import { Style } from '@cloudbeaver/core-theming';
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';
 
-type Props = {
+interface Props {
   tabId: string;
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;

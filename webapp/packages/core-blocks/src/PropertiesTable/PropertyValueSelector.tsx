@@ -60,9 +60,9 @@ const styles = composes(
 type Props = React.PropsWithChildren<{
   propertyName?: string;
   values: string[];
-  onSelect(value: string): void;
-  onSwitch(state: boolean): void;
-}>
+  onSelect: (value: string) => void;
+  onSwitch: (state: boolean) => void;
+}>;
 
 export const PropertyValueSelector = observer(function PropertyValueSelector({
   propertyName,

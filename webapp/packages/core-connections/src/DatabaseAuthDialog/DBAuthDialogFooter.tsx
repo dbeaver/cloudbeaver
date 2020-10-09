@@ -23,9 +23,9 @@ const styles = css`
   }
 `;
 
-export type Props = {
+export interface Props {
   isAuthenticating: boolean;
-  onLogin(): void;
+  onLogin: () => void;
 }
 
 export const DBAuthDialogFooter = observer(function DBAuthDialogFooter({

@@ -43,7 +43,7 @@ const itemStyles = css`
     }
   `;
 
-type ItemProps = {
+interface ItemProps {
   objectId: string;
   columns: number;
 }

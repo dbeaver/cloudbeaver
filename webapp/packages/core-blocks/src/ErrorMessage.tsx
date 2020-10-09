@@ -42,11 +42,11 @@ const styles = composes(
   `
 );
 
-type ErrorMessageProps = {
+interface ErrorMessageProps {
   hasDetails?: boolean;
   text: string;
   className?: string;
-  onShowDetails?(): void;
+  onShowDetails?: () => void;
 }
 
 export const ErrorMessage = observer(function ErrorMessage({

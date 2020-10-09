@@ -9,7 +9,7 @@
 import { RowSelection } from './RowSelection';
 
 export class TableSelection {
-  private selectedMap = new Map<number, RowSelection>()
+  private selectedMap = new Map<number, RowSelection>();
 
   getSelectedRows(): RowSelection[] {
     return Array
@@ -96,7 +96,7 @@ export class TableSelection {
     }
   }
 
-  private selectColumn(rowId: number, rowSelection: RowSelection | undefined = undefined, columns: string[]) {
+  private selectColumn(rowId: number, rowSelection: RowSelection | undefined, columns: string[]) {
     if (!rowSelection) {
       rowSelection = new RowSelection(rowId);
       this.selectedMap.set(rowId, rowSelection);

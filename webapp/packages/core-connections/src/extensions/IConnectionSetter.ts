@@ -10,9 +10,7 @@ import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-exte
 
 const connectionSetterSymbol = Symbol('@extension/ConnectionSetter');
 
-export interface IConnectionSetter<T = never> {
-  (connectionId: string, context: T): Promise<boolean> | boolean;
-}
+export type IConnectionSetter<T = never> = (connectionId: string, context: T) => Promise<boolean> | boolean;
 
 export function connectionSetter<T>(setter: IConnectionSetter<T>) {
   return createExtension<T>(setter, connectionSetterSymbol);

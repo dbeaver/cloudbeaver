@@ -14,8 +14,8 @@ import { ObjectPage } from './ObjectPage/ObjectPage';
 export interface IObjectViewerTabContext {
   tab: ITab<IObjectViewerTabState> | null;
   page?: ObjectPage<any>;
-  isPageActive(page: ObjectPage<any>): boolean;
-  trySwitchPage<T>(page: ObjectPage<T>, state?: T): boolean;
+  isPageActive: (page: ObjectPage<any>) => boolean;
+  trySwitchPage: <T>(page: ObjectPage<T>, state?: T) => boolean;
   tabInfo: ITabNavigationContext;
   nodeInfo: INodeNavigationContext;
 }

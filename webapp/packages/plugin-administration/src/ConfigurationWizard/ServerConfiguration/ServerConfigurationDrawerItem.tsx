@@ -8,19 +8,18 @@
 
 import styled from 'reshadow';
 
+import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AdministrationItemDrawerProps } from '../../../../AdministrationItem/IAdministrationItem';
-
-export function ServerConfigurationDrawerItem({
+export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerProps> = function ServerConfigurationDrawerItem({
   item, onSelect, style, disabled,
-}: AdministrationItemDrawerProps) {
+}) {
   return styled(useStyles(...style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon='/icons/cog-outline.svg' />
       <TabTitle><Translate token='administration_configuration_wizard_configuration' /></TabTitle>
     </Tab>
   );
-}
+};

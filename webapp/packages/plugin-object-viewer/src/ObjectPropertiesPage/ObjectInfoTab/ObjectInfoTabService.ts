@@ -16,13 +16,12 @@ export class ObjectInfoTabService {
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,
-  )
-  {}
+  ) {}
 
   createTabEntity(navNodeId: string): TabEntity | null {
     const node = this.navNodeManagerService.getNode(navNodeId);
-    const isDatabaseObject = node?.features?.includes(ENodeFeature.item) ||
-      node?.features?.includes(ENodeFeature.container);
+    const isDatabaseObject = node?.features?.includes(ENodeFeature.item)
+      || node?.features?.includes(ENodeFeature.container);
     if (!isDatabaseObject) {
       return null;
     }

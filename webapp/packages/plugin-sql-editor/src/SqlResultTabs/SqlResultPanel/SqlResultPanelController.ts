@@ -131,7 +131,7 @@ implements IInitializableController, IDestructibleController {
           this.source
         )
           .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
-          .setResults(this.source.getResults(response) || [])
+          .setResults(this.source.getResults(response, fetchingSettings.fetchDefault) || [])
           .deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
@@ -154,8 +154,7 @@ implements IInitializableController, IDestructibleController {
         this.errorMessage = exception.message;
         this.exception = exception;
         this.hasDetails = !!exception.stackTrace;
-      }
-      else if (exception instanceof GQLError) {
+      } else if (exception instanceof GQLError) {
         this.errorMessage = exception.errorText;
         this.exception = exception;
         this.hasDetails = exception.hasDetails();
@@ -184,7 +183,7 @@ implements IInitializableController, IDestructibleController {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
-  }
+  };
 
   private async requestDataAsync(
     sqlExecutingState: SqlExecutionState,

@@ -35,7 +35,7 @@ import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
 @injectable()
 export class ObjectViewerTabService {
-  readonly tabHandler: TabHandler<IObjectViewerTabState>
+  readonly tabHandler: TabHandler<IObjectViewerTabState>;
 
   constructor(
     private connectionInfoResource: ConnectionInfoResource,
@@ -48,19 +48,19 @@ export class ObjectViewerTabService {
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
-        key: objectViewerTabHandlerKey,
-        getTabComponent: () => ObjectViewerTab,
-        getPanelComponent: () => ObjectViewerPanel,
-        onRestore: this.restoreObjectTab.bind(this),
-        onSelect: this.selectObjectTab.bind(this),
-        onClose: this.closeObjectTab.bind(this),
+      key: objectViewerTabHandlerKey,
+      getTabComponent: () => ObjectViewerTab,
+      getPanelComponent: () => ObjectViewerPanel,
+      onRestore: this.restoreObjectTab.bind(this),
+      onSelect: this.selectObjectTab.bind(this),
+      onClose: this.closeObjectTab.bind(this),
 
-        extensions: [
-          connectionProvider(this.getConnection.bind(this)),
-          objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
-          objectSchemaProvider(this.getDBObjectSchema.bind(this)),
-        ],
-      });
+      extensions: [
+        connectionProvider(this.getConnection.bind(this)),
+        objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
+        objectSchemaProvider(this.getDBObjectSchema.bind(this)),
+      ],
+    });
   }
 
   registerTabHandler(): void {
@@ -70,7 +70,7 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.subscribe(this.removeTabs.bind(this));
   }
 
-  isPageActive(tab:ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
+  isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
     return tab.handlerState.pageId === page.key;
   }
 
@@ -138,7 +138,7 @@ export class ObjectViewerTabService {
       tabInfo,
       nodeInfo,
     };
-  }
+  };
 
   private async updateConnectionInfoTabs(key: ResourceKey<string>) {
     if (isResourceKeyList(key)) {
@@ -179,7 +179,7 @@ export class ObjectViewerTabService {
           isObjectViewerTab(tab => tab.handlerState.objectId === objectId)
         );
 
-        if (tab && tab.restored && this.navigationTabsService.currentTabId === tab.id) {
+        if (tab?.restored && this.navigationTabsService.currentTabId === tab.id) {
           await this.navigationTabsService.selectTab(tab.id);
         }
       }
@@ -188,7 +188,7 @@ export class ObjectViewerTabService {
         isObjectViewerTab(tab => tab.handlerState.objectId === key)
       );
 
-      if (tab && tab.restored && this.navigationTabsService.currentTabId === tab.id) {
+      if (tab?.restored && this.navigationTabsService.currentTabId === tab.id) {
         await this.navigationTabsService.selectTab(tab.id);
       }
     }
@@ -277,13 +277,13 @@ export class ObjectViewerTabService {
 
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
-      typeof tab.handlerState?.folderId === 'string' &&
-      typeof tab.handlerState.parentId === 'string' &&
-      Array.isArray(tab.handlerState.parents) &&
-      typeof tab.handlerState.objectId === 'string' &&
-      typeof tab.handlerState.pagesState === 'object' &&
-      (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string') &&
-      (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
+      typeof tab.handlerState?.folderId === 'string'
+      && typeof tab.handlerState.parentId === 'string'
+      && Array.isArray(tab.handlerState.parents)
+      && typeof tab.handlerState.objectId === 'string'
+      && typeof tab.handlerState.pagesState === 'object'
+      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
+      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
 
@@ -328,7 +328,7 @@ export class ObjectViewerTabService {
 export function isObjectViewerTab(tab: ITab): tab is ITab<IObjectViewerTabState>;
 export function isObjectViewerTab(
   predicate: (tab: ITab<IObjectViewerTabState>) => boolean
-): (tab: ITab) => tab is ITab<IObjectViewerTabState>
+): (tab: ITab) => tab is ITab<IObjectViewerTabState>;
 export function isObjectViewerTab(
   tab: ITab | ((tab: ITab<IObjectViewerTabState>) => boolean)
 ): boolean | ((tab: ITab) => tab is ITab<IObjectViewerTabState>) {

@@ -22,6 +22,7 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
       return tabEntity.getViewModel();
     });
   }
+
   get currentTabId(): string | null {
     return this._activeTabId;
   }
@@ -29,7 +30,7 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
   @observable private _activeTabId: string | null = null;
   private tabsOrder = observable.array<string>();
 
-  constructor(providers: MixinProvider<any>[], id?: string) {
+  constructor(providers: Array<MixinProvider<any>>, id?: string) {
     super(providers, id);
     this.addMixin(TabContainerToken, this);
   }

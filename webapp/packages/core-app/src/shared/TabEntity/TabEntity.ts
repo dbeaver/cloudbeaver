@@ -17,7 +17,7 @@ import { TabViewModel } from './TabViewModel';
 export class TabEntity extends Entity {
 
   constructor(tab: ITab | ITypedConstructor<ITab>,
-              providers: MixinProvider<any>[] = []) {
+    providers: Array<MixinProvider<any>> = []) {
     super(providers, isConstructor(tab) ? undefined : tab.tabId);
     this.addMixin(TabToken, tab);
     this.addMixin(TabViewModel);

@@ -37,7 +37,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   item: string;
 }
 

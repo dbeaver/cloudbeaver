@@ -9,7 +9,7 @@
 import React from 'react';
 
 type ShadowInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'children'> & {
-  onChange?(value: string): any;
+  onChange?: (value: string) => any;
   children?: string;
   className?: string;
 };
@@ -23,7 +23,7 @@ export const ShadowInput = React.forwardRef(function ShadowInput({
     <input
       ref={ref}
       value={children}
-      onChange={e => onChange && onChange(e.target.value)}
+      onChange={e => onChange?.(e.target.value)}
       {...rest}
     />
   );

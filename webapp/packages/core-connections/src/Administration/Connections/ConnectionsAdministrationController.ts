@@ -19,8 +19,8 @@ import { ConnectionsAdministrationNavService } from './ConnectionsAdministration
 @injectable()
 export class ConnectionsAdministrationController {
   @observable isProcessing = false;
-  readonly selectedItems = observable<string, boolean>(new Map())
-  readonly expandedItems = observable<string, boolean>(new Map())
+  readonly selectedItems = observable<string, boolean>(new Map());
+  readonly expandedItems = observable<string, boolean>(new Map());
   @computed
   get connections() {
     return Array.from(this.connectionsResource.data.values())
@@ -64,7 +64,7 @@ export class ConnectionsAdministrationController {
     } catch (exception) {
       this.notificationService.logException(exception, 'Connections update failed');
     }
-  }
+  };
 
   delete = async () => {
     if (this.isProcessing) {
@@ -107,5 +107,5 @@ export class ConnectionsAdministrationController {
     } finally {
       this.isProcessing = false;
     }
-  }
+  };
 }

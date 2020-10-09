@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type Locale = { [key: string]: string };
+export interface Locale { [key: string]: string }

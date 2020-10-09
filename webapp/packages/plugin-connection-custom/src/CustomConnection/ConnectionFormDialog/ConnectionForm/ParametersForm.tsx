@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { formStyles } from './formStyles';
 import { IFormController } from './IFormController';
 
-type ParametersFormProps = {
+interface ParametersFormProps {
   controller: IFormController;
   embedded?: boolean;
 }

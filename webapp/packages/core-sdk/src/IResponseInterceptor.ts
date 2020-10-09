@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IResponseInterceptor {
-  (response: Promise<any>): Promise<any>;
-}
+export type IResponseInterceptor = (response: Promise<any>) => Promise<any>;

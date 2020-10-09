@@ -25,18 +25,18 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   readonly supportedDataFormats: ResultDataFormat[];
   readonly countGain: number;
 
-  isLoading(): boolean;
+  isLoading: () => boolean;
 
-  getResult(index: number): TResult | null;
+  getResult: (index: number) => TResult | null;
 
-  setCountGain(count: number): this;
-  setAccess(access: DatabaseDataAccessMode): this;
-  setSlice(offset: number, count: number): this;
-  setOptions(options: TOptions): this;
-  setDataFormat(dataFormat: ResultDataFormat): this;
-  setSupportedDataFormats(dataFormats: ResultDataFormat[]): this;
+  setCountGain: (count: number) => this;
+  setAccess: (access: DatabaseDataAccessMode) => this;
+  setSlice: (offset: number, count: number) => this;
+  setOptions: (options: TOptions) => this;
+  setDataFormat: (dataFormat: ResultDataFormat) => this;
+  setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
 
-  refresh(): Promise<void>;
-  reload(): Promise<void>;
-  requestData(): Promise<void>;
+  refresh: () => Promise<void>;
+  reload: () => Promise<void>;
+  requestData: () => Promise<void>;
 }

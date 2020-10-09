@@ -21,7 +21,7 @@ export class LogViewTabController {
     return this.logViewerService.getLog();
   }
 
-  clearLog = () => this.logViewerService.clearLog()
+  clearLog = () => this.logViewerService.clearLog();
 
   constructor(private logViewerService: LogViewerService) {
   }

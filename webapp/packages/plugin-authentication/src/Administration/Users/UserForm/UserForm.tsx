@@ -15,7 +15,7 @@ import {
   TabTitle, Loader, SubmittingForm, TabPanel,
   ErrorMessage, Button,
   InputField,
-  Checkbox,
+  FieldCheckbox,
   useFocus,
   InputGroup
 } from '@cloudbeaver/core-blocks';
@@ -124,7 +124,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   user: AdminUserInfo;
   editing?: boolean;
   onCancel: () => void;
@@ -239,7 +239,7 @@ export const UserForm = observer(function UserForm({
                   </group>
                   {controller.roles.map((role, i) => (
                     <group key={role.roleId} as="div">
-                      <Checkbox
+                      <FieldCheckbox
                         value={role.roleId}
                         name='role'
                         checkboxLabel={role.roleName || role.roleId}

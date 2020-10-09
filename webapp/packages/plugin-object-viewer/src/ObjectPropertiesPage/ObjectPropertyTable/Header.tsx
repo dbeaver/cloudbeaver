@@ -21,17 +21,17 @@ const styles = css`
   }
 `;
 
-type HeaderProps = {
-  properties: Pick<
-    ObjectPropertyInfo,
-    | 'value'
-    | 'id'
-    | 'features'
-    | 'category'
-    | 'dataType'
-    | 'description'
-    | 'displayName'
-    >[];
+interface HeaderProps {
+  properties: Array<Pick<
+  ObjectPropertyInfo,
+  | 'value'
+  | 'id'
+  | 'features'
+  | 'category'
+  | 'dataType'
+  | 'description'
+  | 'displayName'
+  >>;
 }
 
 export const Header = observer(function Header({ properties }: HeaderProps) {

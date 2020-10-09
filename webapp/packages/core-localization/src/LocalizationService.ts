@@ -34,7 +34,7 @@ export class LocalizationService extends Bootstrap {
   @observable.shallow
   private localeMap: Map<string, Map<string, string>> = new Map();
 
-  private localeProviders: ILocaleProvider[] = []
+  private localeProviders: ILocaleProvider[] = [];
 
   constructor(
     private notificationService: NotificationService,
@@ -65,7 +65,7 @@ export class LocalizationService extends Bootstrap {
       return translation;
     }
     return token;
-  }
+  };
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));

@@ -38,7 +38,7 @@ const styles = composes(
   `
 );
 
-type Props = {
+interface Props {
   context: DataModelWrapper;
 }
 

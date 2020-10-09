@@ -70,7 +70,7 @@ export class ContextMenu {
   }
 
   private constructMenuItems<T>(
-    menuItems: IContextMenuItem<any>[],
+    menuItems: Array<IContextMenuItem<any>>,
     context: IMenuContext<T>
   ): ComputedMenuItemModel[] {
 
@@ -96,7 +96,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   iconGetter?: () => string | undefined;
 
   constructor(private options: IContextMenuItem<T>,
-              private context: IMenuContext<T>) {
+    private context: IMenuContext<T>) {
     // doesn't depend on context
     this.title = options.title;
     this.titleGetter = options.titleGetter;
@@ -129,6 +129,6 @@ class ContextMenuPanel implements IMenuPanel {
   private items?: ComputedMenuItemModel[];
 
   constructor(public id: string,
-              private itemsGetter: () => ComputedMenuItemModel[]) {
+    private itemsGetter: () => ComputedMenuItemModel[]) {
   }
 }

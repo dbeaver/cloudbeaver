@@ -8,6 +8,8 @@
 
 import { IContextProvider } from './ExecutionContext';
 
-export interface IExecutorHandler<T> {
-  (contexts: IContextProvider<T>, data: T): void | false | Promise<void | false>;
-}
+export type IExecutorHandler<T> = (
+  contexts: IContextProvider<T>,
+  data: T
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+) => void | false | Promise<void | false>;

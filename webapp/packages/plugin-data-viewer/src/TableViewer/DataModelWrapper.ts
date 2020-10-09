@@ -6,8 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { GQLError, ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
@@ -26,8 +29,30 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
    */
   readonly deprecatedModel: TableViewerModel;
 
+  /**
+   * @deprecated will be refactored
+   */
+  get message() {
+    if (this.deprecatedModel.errorMessage.length > 0) {
+      return this.deprecatedModel.errorMessage;
+    }
+
+    return this.errorMessage;
+  }
+
+  /**
+   * @deprecated will be refactored
+   */
+  get details() {
+    return this.deprecatedModel.hasDetails || this.hasDetails;
+  }
+
+  @observable private errorMessage: string;
+  @observable private exception: Error | null;
+  @observable private hasDetails: boolean;
+
   constructor(
-    commonDialogService: CommonDialogService,
+    private commonDialogService: CommonDialogService,
     options: ITableViewerModelOptions,
     source: IDatabaseDataSource<any>
   ) {
@@ -36,6 +61,9 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
       this.id = options.tableId;
     }
     this.countGain = this.getDefaultRowsCount();
+    this.exception = null;
+    this.errorMessage = '';
+    this.hasDetails = false;
     this.deprecatedModel = new TableViewerModel(options, commonDialogService);
   }
 
@@ -46,7 +74,7 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   async reload(): Promise<void> {
-    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+    if (this.source.dataFormat === ResultDataFormat.Resultset) {
       await this.deprecatedModel.refresh();
     }
     this.setSlice(0, this.countGain);
@@ -54,7 +82,7 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   async refresh(): Promise<void> {
-    if(this.source.dataFormat === ResultDataFormat.Resultset) { 
+    if (this.source.dataFormat === ResultDataFormat.Resultset) {
       await this.deprecatedModel.refresh();
       return;
     }
@@ -80,15 +108,46 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   }
 
   async requestData(): Promise<void> {
-    this.results = await this.source.requestData(this.results);
+    this.clearErrors();
+    try {
+      this.results = await this.source.requestData(this.results);
+    } catch (exception) {
+      this.showError(exception);
+      throw exception;
+    }
+  }
+
+  showDetails = (): void => {
+    if (this.exception) {
+      this.commonDialogService.open(ErrorDetailsDialog, this.exception);
+    } else {
+      this.deprecatedModel.onShowDetails();
+    }
+  };
+
+  private showError(exception: any) {
+    this.exception = null;
+    this.hasDetails = false;
+    if (exception instanceof GQLError) {
+      this.errorMessage = exception.errorText;
+      this.exception = exception;
+      this.hasDetails = exception.hasDetails();
+    } else {
+      this.errorMessage = `${exception.name}: ${exception.message}`;
+    }
+  }
+
+  private clearErrors() {
+    this.errorMessage = '';
+    this.exception = null;
   }
 
   private getDefaultRowsCount(count?: number) {
     return count
       ? Math.max(
-        fetchingSettings.fetchMin,
-        Math.min(count, fetchingSettings.fetchMax)
-      )
+          fetchingSettings.fetchMin,
+          Math.min(count, fetchingSettings.fetchMax)
+        )
       : fetchingSettings.fetchDefault;
   }
 }

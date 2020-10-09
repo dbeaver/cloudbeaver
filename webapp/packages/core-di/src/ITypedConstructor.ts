@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ITypedConstructor<T> {
-  new (...args: any[]): T;
-}
+export type ITypedConstructor<T> = new (...args: any[]) => T;

@@ -20,7 +20,7 @@ import { SNACKBAR_COMMON_STYLES } from './SnackbarCommonStyles';
 type Props = NotificationComponentProps<{
   onAction: () => void;
   actionText: string;
-}>
+}>;
 
 export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
   notification, onAction, actionText,

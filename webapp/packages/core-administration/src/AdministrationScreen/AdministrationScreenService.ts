@@ -22,15 +22,15 @@ const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 @injectable()
 export class AdministrationScreenService {
 
-  static screenName = 'administration'
-  static itemRouteName = 'administration.item'
-  static itemSubRouteName = 'administration.item.sub'
-  static itemSubParamRouteName = 'administration.item.sub.param'
+  static screenName = 'administration';
+  static itemRouteName = 'administration.item';
+  static itemSubRouteName = 'administration.item.sub';
+  static itemSubParamRouteName = 'administration.item.sub.param';
 
-  static setupName = 'setup'
-  static setupItemRouteName = 'setup.item'
-  static setupItemSubRouteName = 'setup.item.sub'
-  static setupItemSubParamRouteName = 'setup.item.sub.param'
+  static setupName = 'setup';
+  static setupItemRouteName = 'setup.item';
+  static setupItemSubRouteName = 'setup.item.sub';
+  static setupItemSubParamRouteName = 'setup.item.sub.param';
 
   @observable itemState: Map<string, any>;
 
@@ -58,6 +58,7 @@ export class AdministrationScreenService {
   get isConfigurationMode() {
     return !!this.serverConfigResource.data?.configurationMode;
   }
+
   readonly activationEvent: IExecutor<boolean>;
 
   constructor(
@@ -114,9 +115,9 @@ export class AdministrationScreenService {
   }
 
   getItemState<T>(name: string): T | undefined
-  getItemState<T>(name: string, defaultState: () => T): T
-  getItemState<T>(name: string, defaultState?: () => T): T | undefined {
-    if (!this.itemState.has(name) && defaultState) {
+  getItemState<T>(name: string, defaultState: () => T, update?: boolean): T
+  getItemState<T>(name: string, defaultState?: () => T, update?: boolean): T | undefined {
+    if ((!this.itemState.has(name) || update) && defaultState) {
       this.itemState.set(name, defaultState());
     }
 
@@ -128,7 +129,7 @@ export class AdministrationScreenService {
   }
 
   isAdministrationRouteActive() {
-    return this.screenService.isActive(AdministrationScreenService.screenName) ||
-    this.screenService.isActive(AdministrationScreenService.setupName);
+    return this.screenService.isActive(AdministrationScreenService.screenName)
+    || this.screenService.isActive(AdministrationScreenService.setupName);
   }
 }

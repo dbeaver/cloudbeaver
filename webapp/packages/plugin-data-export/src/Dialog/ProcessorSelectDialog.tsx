@@ -39,12 +39,12 @@ const styles = css`
   }
 `;
 
-type ProcessorSelectDialogProps = {
+interface ProcessorSelectDialogProps {
   context: IExportContext;
   processors: DataTransferProcessorInfo[];
   isLoading: boolean;
-  onSelect(processorId: string): void;
-  onClose(): void;
+  onSelect: (processorId: string) => void;
+  onClose: () => void;
 }
 
 export const ProcessorSelectDialog = observer(

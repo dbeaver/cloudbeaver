@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import { AdministrationItemService } from '../../../AdministrationItem/AdministrationItemService';
-import { AdministrationItemType } from '../../../AdministrationItem/IAdministrationItem';
-import { ConfigurationWizardService } from '../ConfigurationWizardService';
 import { FinishPage } from './Finish/FinishPage';
 import { FinishPageDrawerItem } from './Finish/FinishPageDrawerItem';
 import { ServerConfigurationDrawerItem } from './ServerConfiguration/ServerConfigurationDrawerItem';
@@ -42,7 +40,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
     });
     this.administrationItemService.create({
       name: 'configuration',
-      type: AdministrationItemType.ConfigurationWizard,
+      type: AdministrationItemType.Default,
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
         isDone: this.serverConfigurationService.isDone.bind(this.serverConfigurationService),
@@ -50,6 +48,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         onConfigurationFinish: this.serverConfigurationService.apply.bind(this.serverConfigurationService),
       },
       order: 1.1,
+      onActivate: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
     });

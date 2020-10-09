@@ -25,12 +25,12 @@ const styles = css`
   }
 `;
 
-type DriverSelectorDialogProps = {
+interface DriverSelectorDialogProps {
   title: string;
   drivers: IDriver[];
   isLoading: boolean;
-  onSelect(driverId: string): void;
-  onClose(): void;
+  onSelect: (driverId: string) => void;
+  onClose: () => void;
 }
 
 export const DriverSelectorDialog = observer(

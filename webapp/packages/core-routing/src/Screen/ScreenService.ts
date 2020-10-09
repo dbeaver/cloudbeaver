@@ -74,14 +74,14 @@ export class ScreenService {
   private async onRouteChange(state: SubscribeState) {
     if (state.previousRoute) {
       const previousScreen = this.getScreenByRoute(state.previousRoute.name);
-      if (previousScreen && previousScreen.onDeactivate) {
+      if (previousScreen?.onDeactivate) {
         await previousScreen.onDeactivate();
       }
     }
 
     const nextScreen = this.getScreenByRoute(state.route.name);
 
-    if (nextScreen && nextScreen.onActivate) {
+    if (nextScreen?.onActivate) {
       await nextScreen.onActivate();
     }
   }

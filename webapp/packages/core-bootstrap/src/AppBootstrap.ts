@@ -11,10 +11,11 @@ import {
   NavigationTabsService,
   NavigationTreeContextMenuService,
   LogViewerMenuService,
-  ConnectionSchemaManagerService, SessionExpireService
+  ConnectionSchemaManagerService
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 /**
@@ -39,7 +40,6 @@ export class AppBootstrap {
   register(): void | Promise<void> {
     this.exceptionsCatcherService.subscribe();
     this.sessionExpireService.subscribe();
-
     this.connectionSchemaManagerService.registerCallbacks();
     this.navigationTreeContextMenuService.registerMenuItems();
     this.connectionDialogService.registerMenuItems();

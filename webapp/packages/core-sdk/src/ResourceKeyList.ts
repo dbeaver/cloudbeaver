@@ -14,7 +14,7 @@ export class ResourceKeyList<TKey> {
   }
 
   includes(key: ResourceKeyList<TKey> | TKey): boolean {
-    if(isResourceKeyList(key)){
+    if (isResourceKeyList(key)) {
       return key.list.some(key => this.list.includes(key));
     }
     return this.list.includes(key);

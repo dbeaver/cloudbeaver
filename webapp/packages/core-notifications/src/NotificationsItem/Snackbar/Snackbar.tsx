@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NotificationMark } from './NotificationMark';
 
-type SnackbarProps = {
+interface SnackbarProps {
   type?: ENotificationType;
   text: string;
   closeAfter?: number;
@@ -53,8 +53,12 @@ export function Snackbar({
       }, closeAfter);
     }
     return () => {
-      if (timeOutId) { clearTimeout(timeOutId); }
-      if (timeOutClosingId) { clearTimeout(timeOutClosingId); }
+      if (timeOutId) {
+        clearTimeout(timeOutId);
+      }
+      if (timeOutClosingId) {
+        clearTimeout(timeOutClosingId);
+      }
     };
   }, []);
 

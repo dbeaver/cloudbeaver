@@ -9,12 +9,11 @@
 import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
+import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { Button } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-
-import { ConfigurationWizardService } from '../../ConfigurationWizardService';
 
 const styles = composes(
   css`

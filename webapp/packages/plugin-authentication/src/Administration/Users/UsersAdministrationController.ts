@@ -20,8 +20,8 @@ import { UsersAdministrationNavigationService } from './UsersAdministrationNavig
 @injectable()
 export class UsersAdministrationController {
   @observable isDeleting = false;
-  readonly selectedItems = observable<string, boolean>(new Map())
-  readonly expandedItems = observable<string, boolean>(new Map())
+  readonly selectedItems = observable<string, boolean>(new Map());
+  readonly expandedItems = observable<string, boolean>(new Map());
   readonly error = new GQLErrorCatcher();
 
   @computed get users() {
@@ -63,7 +63,7 @@ export class UsersAdministrationController {
       metaParameters: {},
     } as AdminUserInfo;
     this.usersAdministrationNavigationService.navToAdd();
-  }
+  };
 
   cancelCreate = () => {
     if (!this.creatingUser) {
@@ -72,7 +72,7 @@ export class UsersAdministrationController {
 
     this.creatingUser = null;
     this.usersAdministrationNavigationService.navToRoot();
-  }
+  };
 
   update = async () => {
     try {
@@ -82,7 +82,7 @@ export class UsersAdministrationController {
         this.notificationService.logException(exception, 'Users update failed');
       }
     }
-  }
+  };
 
   delete = async () => {
     if (this.isDeleting) {
@@ -123,11 +123,11 @@ export class UsersAdministrationController {
     } finally {
       this.isDeleting = false;
     }
-  }
+  };
 
   showDetails = () => {
     if (this.error.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
-  }
+  };
 }

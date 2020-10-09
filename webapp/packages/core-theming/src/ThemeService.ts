@@ -57,7 +57,7 @@ export class ThemeService {
   };
 
   constructor(private notificationService: NotificationService,
-              private settingsService: SettingsService) {
+    private settingsService: SettingsService) {
     this.loadAllThemes();
   }
 

@@ -10,15 +10,15 @@ import { observable } from 'mobx';
 
 import { TableRow, RowValues } from './TableRow';
 
-export type RowDiff = {
+export interface RowDiff {
   rowIndex: number;
   source: TableRow;
   values: RowValues;
 }
 
 export class EditedRow {
-  readonly newRow: TableRow
-  @observable private editedCells = new Set<number>()
+  readonly newRow: TableRow;
+  @observable private editedCells = new Set<number>();
 
   constructor(readonly rowIndex: number, readonly source: TableRow) {
     this.newRow = [...source];
@@ -53,12 +53,12 @@ export class EditedRow {
   getDiff(): RowDiff {
     const values = Array.from(this.editedCells.keys())
       .reduce<RowValues>(
-        (values, columnIndex) => ({
-          ...values,
-          [columnIndex]: this.newRow[columnIndex],
-        }),
-        {}
-      );
+      (values, columnIndex) => ({
+        ...values,
+        [columnIndex]: this.newRow[columnIndex],
+      }),
+      {}
+    );
 
     return {
       rowIndex: this.rowIndex,

@@ -14,8 +14,6 @@ import {
   ConfigurationWizardService,
   WizardTopAppBarService,
   AdministrationScreenServiceBootstrap,
-  ConfigurationWizardPagesBootstrapService,
-  ServerConfigurationService,
 } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
@@ -37,7 +35,7 @@ import {
   CoreSettingsService,
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
-  SessionExpireService
+  SessionExpiredDialogService
 } from '@cloudbeaver/core-app';
 import {
   AuthInfoService,
@@ -75,7 +73,7 @@ import {
   ServerSettingsService,
   ServerConfigResource,
   PermissionsResource,
-  SessionResource,
+  SessionResource, SessionExpireService
 } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -97,9 +95,7 @@ export const coreManifest: PluginManifest = {
     AdministrationScreenServiceBootstrap,
     AdministrationItemService,
     AdministrationTopAppBarBootstrapService,
-    ConfigurationWizardPagesBootstrapService,
     ConfigurationWizardService,
-    ServerConfigurationService,
     WizardTopAppBarService,
     ActiveViewService,
     ProductSettingsService,
@@ -120,6 +116,7 @@ export const coreManifest: PluginManifest = {
     CoreSettingsService,
     CommonDialogService,
     SessionExpireService,
+    SessionExpiredDialogService,
     ConnectionsLocaleService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,

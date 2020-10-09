@@ -40,4 +40,4 @@ export const TextPlaceholder: React.FC = function TextPlaceholder(props) {
       </span>
     </div>
   );
-}
+};

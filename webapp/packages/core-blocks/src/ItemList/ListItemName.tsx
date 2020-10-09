@@ -15,7 +15,7 @@ import { Styles } from './styles';
 
 type Props = React.PropsWithChildren<{
   className?: string;
-}>
+}>;
 
 export function ListItemName({
   children,

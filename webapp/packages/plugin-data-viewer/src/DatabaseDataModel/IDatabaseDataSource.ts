@@ -36,17 +36,17 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly supportedDataFormats: ResultDataFormat[];
   readonly canCancel: boolean;
 
-  isLoading(): boolean;
-  setSlice(offset: number, count: number): this;
-  setOptions(options: TOptions): this;
-  setDataFormat(dataFormat: ResultDataFormat): this;
-  setSupportedDataFormats(dataFormats: ResultDataFormat[]): this;
-  requestData(
+  isLoading: () => boolean;
+  setSlice: (offset: number, count: number) => this;
+  setOptions: (options: TOptions) => this;
+  setDataFormat: (dataFormat: ResultDataFormat) => this;
+  setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
+  requestData: (
     prevResults: TResult[]
-  ): Promise<TResult[]> | TResult[];
-  saveData(
+  ) => Promise<TResult[]> | TResult[];
+  saveData: (
     prevResults: TResult[],
     data: DataUpdate
-  ): Promise<TResult[]> | TResult[];
-  cancel(): Promise<boolean>;
+  ) => Promise<TResult[]> | TResult[];
+  cancel: () => Promise<boolean>;
 }

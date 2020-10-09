@@ -39,7 +39,7 @@ const styles = css`
   }
 `;
 
-export type ErrorDialogPayload = {
+export interface ErrorDialogPayload {
   message: string;
   onShowDetails?: () => void;
 }

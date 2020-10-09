@@ -15,10 +15,10 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
-type Props = {
+interface Props {
   template: Connection;
   dbDriver?: DBDriver;
-  onSelect(connectionId: string): void;
+  onSelect: (connectionId: string) => void;
 }
 
 const styles = css`

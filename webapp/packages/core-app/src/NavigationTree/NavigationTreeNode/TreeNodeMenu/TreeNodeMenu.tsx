@@ -19,7 +19,7 @@ import { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { NavigationTreeContextMenuService } from '../../NavigationTreeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
-type TreeNodeMenuProps = {
+interface TreeNodeMenuProps {
   node: NavNode;
   isSelected: boolean;
 }
@@ -35,8 +35,8 @@ export const TreeNodeMenu = observer(function TreeNodeMenu({
     [node]
   );
   const isHidden = useMemo(
-    () => computed(() => !menuPanel.menuItems.length ||
-      menuPanel.menuItems.every(item => item.isHidden)),
+    () => computed(() => !menuPanel.menuItems.length
+      || menuPanel.menuItems.every(item => item.isHidden)),
     [menuPanel]
   );
 

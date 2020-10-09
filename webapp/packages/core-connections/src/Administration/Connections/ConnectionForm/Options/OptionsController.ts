@@ -40,7 +40,7 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^.*?\s(|\(.*?\)\s)connection$/
+  private nameTemplate = /^.*?\s(|\(.*?\)\s)connection$/;
 
   constructor(
     private notificationService: NotificationService,
@@ -53,11 +53,16 @@ implements IInitializableController {
     this.loadDrivers();
   }
 
-  onSelectDriver = (driverId: string | null, name: 'driverId', prevValue: string | null) => this.loadDriver(driverId, prevValue);
+  onSelectDriver = (
+    driverId: string | null,
+    name: string | undefined,
+    prevValue: string | null
+  ) => this.loadDriver(driverId, prevValue);
+
   onFormChange = () => {
     this.updateName();
     this.resetPassword();
-  }
+  };
 
   @action
   private setDefaults(prevDriverId: string | null) {
@@ -92,6 +97,7 @@ implements IInitializableController {
 
   private cleanCredentials() {
     for (const property of Object.keys(this.model.credentials)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete this.model.credentials[property];
     }
   }
@@ -122,9 +128,9 @@ implements IInitializableController {
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
       .filter(Boolean);
 
-    if (this.model.connection.name === undefined ||
-        (this.nameTemplate.test(this.model.connection.name) &&
-            databaseNames.some(driver => this.model.connection.name.startsWith(driver)))
+    if (this.model.connection.name === undefined
+        || (this.nameTemplate.test(this.model.connection.name)
+            && databaseNames.some(driver => this.model.connection.name.startsWith(driver)))
     ) {
       this.model.connection.name = this.getNameTemplate();
     }

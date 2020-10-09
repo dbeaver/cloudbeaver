@@ -10,9 +10,7 @@ import { createExtension, isExtension, IExtension } from '@cloudbeaver/core-exte
 
 const objectSchemaSetterSymbol = Symbol('@extension/ObjectSchemaSetter');
 
-export interface IObjectSchemaSetter<T = never> {
-  (schemaId: string, context: T): Promise<boolean> | boolean;
-}
+export type IObjectSchemaSetter<T = never> = (schemaId: string, context: T) => Promise<boolean> | boolean;
 
 export function objectSchemaSetter<T>(provider: IObjectSchemaSetter<T>) {
   return createExtension<T>(provider, objectSchemaSetterSymbol);

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import { TLocalizationToken } from './TLocalizationToken';
 import { useTranslate } from './useTranslate';
 
-type Props = {
+interface Props {
   token: TLocalizationToken;
 }
 

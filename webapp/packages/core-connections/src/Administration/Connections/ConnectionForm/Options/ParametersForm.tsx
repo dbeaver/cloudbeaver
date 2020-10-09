@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { formStyles } from './formStyles';
 
-type ParametersFormProps = {
+interface ParametersFormProps {
   connection: ConnectionInfo;
   disabled?: boolean;
   embedded?: boolean;

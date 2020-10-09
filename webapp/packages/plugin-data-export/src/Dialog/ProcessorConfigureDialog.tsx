@@ -45,16 +45,16 @@ const styles = composes(
   `
 );
 
-type ProcessorSelectDialogProps = {
+interface ProcessorSelectDialogProps {
   processor: DataTransferProcessorInfo;
   properties: IProperty[];
   processorProperties: any;
   error: GQLErrorCatcher;
   isExporting: boolean;
-  onShowDetails(): void;
-  onClose(): void;
-  onBack(): void;
-  onExport(): void;
+  onShowDetails: () => void;
+  onClose: () => void;
+  onBack: () => void;
+  onExport: () => void;
 }
 
 export const ProcessorConfigureDialog = observer(

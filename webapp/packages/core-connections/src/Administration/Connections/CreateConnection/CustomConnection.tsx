@@ -16,9 +16,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { DBDriverResource } from '../../../DBDriverResource';
 import { DriverList } from './DriverList';
 
-type Props = {
+interface Props {
   className?: string;
-  onSelect(driverId: string): void;
+  onSelect: (driverId: string) => void;
 }
 
 export const CustomConnection = observer(function CustomConnection({
@@ -27,7 +27,9 @@ export const CustomConnection = observer(function CustomConnection({
 }: Props) {
   const dbDriverResource = useService(DBDriverResource);
 
-  useEffect(() => { dbDriverResource.loadAll(); }, []);
+  useEffect(() => {
+    dbDriverResource.loadAll();
+  }, []);
   const loading = dbDriverResource.isLoading();
   const drivers = useMemo(() => computed(() => (
     Array.from(dbDriverResource.data.values())

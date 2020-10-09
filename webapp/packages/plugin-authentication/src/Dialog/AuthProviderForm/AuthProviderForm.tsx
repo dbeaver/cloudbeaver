@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { formStyles } from './formStyles';
 
-type Props = {
+interface Props {
   provider: AuthProvider;
   credentials: any;
   authenticate: boolean;

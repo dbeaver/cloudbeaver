@@ -30,10 +30,10 @@ Button:not(:first-child) {
 }
 `;
 
-type ConnectionDialogFooterProps = {
+interface ConnectionDialogFooterProps {
   isConnecting: boolean;
-  onConnect(): void;
-  onBack(): void;
+  onConnect: () => void;
+  onBack: () => void;
 }
 
 export const ConnectionDialogFooter = observer(

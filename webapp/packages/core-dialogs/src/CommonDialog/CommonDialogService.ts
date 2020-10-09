@@ -10,32 +10,30 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
-export type DialogOptions = {
+export interface DialogOptions {
   persistent?: boolean;
 }
 
-export type DialogComponentProps<TPayload, TResult> = {
+export interface DialogComponentProps<TPayload, TResult> {
   payload: TPayload;
   options?: DialogOptions;
-  resolveDialog(result: TResult | null): void;
-  rejectDialog(): void; // the dialog was closed by cancel button or backdrop click
+  resolveDialog: (result: TResult | null) => void;
+  rejectDialog: () => void; // the dialog was closed by cancel button or backdrop click
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult> = React.ElementType<
-  DialogComponentProps<TPayload, TResult>
->
+export type DialogComponent<TPayload, TResult> = React.ElementType<DialogComponentProps<TPayload, TResult>>;
 
 export interface DialogInternal {
   component: DialogComponent<any, any>;
   payload: any;
   options?: DialogOptions;
-  resolve(result: any): void;
+  resolve: (result: any) => void;
 }
 
 @injectable()
 export class CommonDialogService {
-  dialogs: DialogInternal[] = observable([])
+  dialogs: DialogInternal[] = observable([]);
 
   // note that if dialog is closed by user it will be resolved with null
   async open<TPayload, TResult>(

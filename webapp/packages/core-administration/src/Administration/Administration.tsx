@@ -70,8 +70,8 @@ type Props = React.PropsWithChildren<{
   activeItem: string | null;
   activeItemSub: string | null;
   activeItemSubParam: string | null;
-  onItemSelect(name: string): void;
-}>
+  onItemSelect: (name: string) => void;
+}>;
 
 export const Administration = observer(function Administration({
   configurationWizard, activeItem, activeItemSub, activeItemSubParam, onItemSelect, children,

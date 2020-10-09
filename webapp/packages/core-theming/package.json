@@ -22,7 +22,8 @@
     "@material/ripple": "^4.0.0",
     "@material/theme": "^4.0.0",
     "@material/typography": "^4.0.0",
-    "@material/switch": "^4.0.0"
+    "@material/switch": "^4.0.0",
+    "@material/checkbox": "^4.0.0"
   },
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",

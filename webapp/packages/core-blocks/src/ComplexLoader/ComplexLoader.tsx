@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-export type ComplexLoaderProps<T> = {
+export interface ComplexLoaderProps<T> {
   loader: () => Promise<T>;
   placeholder: React.ReactElement;
   keepLoading?: boolean;

@@ -47,9 +47,9 @@ const styles = composes(
     }
   `
 );
-type Props = {
+interface Props {
   database: AdminConnectionSearchInfo;
-  onSelect(database: AdminConnectionSearchInfo): void;
+  onSelect: (database: AdminConnectionSearchInfo) => void;
 }
 
 export const Database = observer(function Database({ database, onSelect }: Props) {

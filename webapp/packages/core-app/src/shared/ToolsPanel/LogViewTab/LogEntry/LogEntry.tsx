@@ -16,9 +16,9 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { ILogEntry } from '../ILogEntry';
 import { LogEntryController } from './LogEntryController';
 
-export type LogEntryProps = {
+export interface LogEntryProps {
   item: ILogEntry;
-};
+}
 
 const style = css`
   message-cell {

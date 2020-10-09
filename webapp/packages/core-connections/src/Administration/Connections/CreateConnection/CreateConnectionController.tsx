@@ -64,11 +64,11 @@ export class CreateConnectionController {
     } finally {
       this.isProcessing = false;
     }
-  }
+  };
 
   onSearchChange = (hosts: string) => {
     this.hosts = hosts;
-  }
+  };
 
   onDriverSelect = (driverId: string) => {
     this.connection = {
@@ -79,7 +79,7 @@ export class CreateConnectionController {
       properties: {},
     } as Partial<ConnectionInfo> as any;
     this.availableDrivers = [driverId];
-  }
+  };
 
   onDatabaseSelect = (database: AdminConnectionSearchInfo) => {
     this.connection = {
@@ -92,10 +92,10 @@ export class CreateConnectionController {
       properties: {},
     } as Partial<ConnectionInfo> as any;
     this.availableDrivers = database.possibleDrivers;
-  }
+  };
 
   back = () => {
     this.connection = null;
     this.availableDrivers = [];
-  }
+  };
 }

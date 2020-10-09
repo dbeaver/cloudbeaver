@@ -12,12 +12,12 @@ import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
 import { TabsContext } from './TabsContext';
 
-type TabProps = {
+interface TabProps {
   tabId: string;
   className?: string;
   children?: React.ReactNode | ((state: TabStateReturn) => React.ReactNode);
   lazy?: boolean;
-};
+}
 
 export const TabPanel = observer(function TabPanel({
   tabId,

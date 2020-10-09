@@ -18,7 +18,7 @@ import { orderAdministrationItems } from './orderAdministrationItems';
 
 @injectable()
 export class AdministrationItemService {
-  @observable items: IAdministrationItem[] = []
+  @observable items: IAdministrationItem[] = [];
 
   getDefaultItem(configurationWizard: boolean) {
     const items = this.items.filter(filterConfigurationWizard(configurationWizard));
@@ -32,8 +32,8 @@ export class AdministrationItemService {
 
   getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {
     const item = this.items.find(item => (
-      filterConfigurationWizard(configurationWizard)(item) &&
-      item.name === name
+      filterConfigurationWizard(configurationWizard)(item)
+      && item.name === name
     ));
     if (!item) {
       return null;
@@ -55,9 +55,9 @@ export class AdministrationItemService {
     const type = options.type ?? AdministrationItemType.Administration;
 
     if (this.items.some(item => item.name === options.name && (
-      item.type === type ||
-      item.type === AdministrationItemType.Default ||
-      type === AdministrationItemType.Default
+      item.type === type
+      || item.type === AdministrationItemType.Default
+      || type === AdministrationItemType.Default
     ))) {
       throw new Error(`Administration item "${options.name}" already exists in the same visibility scope`);
     }
@@ -65,8 +65,8 @@ export class AdministrationItemService {
     const item: IAdministrationItem = {
       ...options,
       type,
-      sub: options.sub || [],
-      order: options.order || Number.MAX_SAFE_INTEGER,
+      sub: options.sub ?? [],
+      order: options.order ?? Number.MAX_SAFE_INTEGER,
     };
     this.items.push(item);
   }
@@ -83,7 +83,7 @@ export class AdministrationItemService {
 
     if (itemSub) {
       const sub = this.getItemSub(item, itemSub);
-      if (sub && sub.onActivate) {
+      if (sub?.onActivate) {
         await sub.onActivate(param, configurationWizard);
       }
     }

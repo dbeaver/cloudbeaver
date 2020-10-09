@@ -11,8 +11,8 @@ import { observable, action } from 'mobx';
 import { GQLError } from './GQLError';
 
 export class GQLErrorCatcher {
-  @observable hasDetails = false
-  @observable responseMessage: string | null = null
+  @observable hasDetails = false;
+  @observable responseMessage: string | null = null;
   @observable exception: GQLError | null = null;
 
   @action catch(exception: any): boolean {

@@ -23,13 +23,13 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { SqlEditorStyles } from '../theme';
 import { CodeEditorController } from './CodeEditorController';
 
-export type CodeEditorProps = {
+export interface CodeEditorProps {
   bindings?: Omit<IControlledCodeMirror, 'value'>;
   value?: string;
   dialect?: SqlDialectInfo;
   readonly?: boolean;
   className?: string;
-};
+}
 
 export const CodeEditor = observer(function CodeEditor(props: CodeEditorProps) {
   const controller = useController(CodeEditorController, props.bindings);

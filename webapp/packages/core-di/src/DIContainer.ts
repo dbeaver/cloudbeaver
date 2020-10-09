@@ -17,7 +17,7 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     defaultScope: 'Singleton',
   });
 
-  private parent: DIContainer | null = null
+  private parent: DIContainer | null = null;
 
   constructor(parent?: DIContainer) {
     if (parent) {

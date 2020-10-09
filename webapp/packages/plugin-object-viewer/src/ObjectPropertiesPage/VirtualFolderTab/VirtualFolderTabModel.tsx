@@ -23,7 +23,7 @@ export class VirtualFolderTabModel implements ITab {
   onActivate = () => this.virtualFolderTabMixin.onActivate();
 
   constructor(private tabEntity: Entity,
-              private virtualFolderTabMixin: VirtualFolderTabMixin) {
+    private virtualFolderTabMixin: VirtualFolderTabMixin) {
     this.tabId = this.tabEntity.id;
     this.title = this.virtualFolderTabMixin.getTitle();
   }

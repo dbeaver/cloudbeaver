@@ -17,7 +17,7 @@ type Props = React.PropsWithChildren<{
   currentTabId?: string | null;
   manual?: boolean;
   onChange?: (tabId: string) => any;
-}>
+}>;
 
 export function TabsState({
   selectedId,
@@ -44,7 +44,7 @@ export function TabsState({
     state.select(currentTabId);
   }, [currentTabId]); // hack currentId and selectedId not works
 
-  const handleChange = useCallback((tabId: string) => onChange && onChange(tabId), [onChange]);
+  const handleChange = useCallback((tabId: string) => onChange?.(tabId), [onChange]);
 
   const value = useMemo<ITabsContext>(() => ({
     state,
