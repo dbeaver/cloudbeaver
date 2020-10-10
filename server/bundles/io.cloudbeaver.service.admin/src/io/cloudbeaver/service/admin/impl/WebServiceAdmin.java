@@ -307,6 +307,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 config.getServerName(),
                 config.getAdminName(),
                 config.getAdminPassword(),
+                config.getSessionExpireTime(),
                 appConfig);
             // Refresh active session
             webSession.forceUserRefresh(null);

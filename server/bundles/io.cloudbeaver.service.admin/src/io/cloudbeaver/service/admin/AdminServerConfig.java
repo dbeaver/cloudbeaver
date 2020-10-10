@@ -34,6 +34,8 @@ public class AdminServerConfig {
     private boolean authenticationEnabled;
     private boolean customConnectionsEnabled;
 
+    private long sessionExpireTime;
+
     public AdminServerConfig(Map<String, Object> params) {
         this.serverName = JSONUtils.getString(params, "serverName");
         this.adminName = JSONUtils.getString(params, "adminName");
@@ -42,6 +44,8 @@ public class AdminServerConfig {
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled");
         this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled");
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled");
+
+        this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
     }
 
     public String getServerName() {
@@ -90,5 +94,13 @@ public class AdminServerConfig {
 
     public void setCustomConnectionsEnabled(boolean customConnectionsEnabled) {
         this.customConnectionsEnabled = customConnectionsEnabled;
+    }
+
+    public long getSessionExpireTime() {
+        return sessionExpireTime;
+    }
+
+    public void setSessionExpireTime(long sessionExpireTime) {
+        this.sessionExpireTime = sessionExpireTime;
     }
 }

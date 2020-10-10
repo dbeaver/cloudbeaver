@@ -88,6 +88,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public long getSessionExpireTime() {
+        return application.getMaxSessionIdleTime();
+    }
+
+    @Property
     public WebServerLanguage[] getSupportedLanguages() {
         List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];

@@ -51,6 +51,8 @@ input ServerConfigInput {
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean
     customConnectionsEnabled: Boolean
+
+    sessionExpireTime: Int
 }
 
 extend type Query {

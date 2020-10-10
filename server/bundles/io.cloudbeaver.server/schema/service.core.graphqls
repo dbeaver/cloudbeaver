@@ -82,6 +82,7 @@ type ServerConfig {
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
+    sessionExpireTime: Int
 
     configurationMode: Boolean
     developmentMode: Boolean

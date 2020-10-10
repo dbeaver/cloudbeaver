@@ -407,6 +407,7 @@ public class CBApplication extends BaseApplicationImpl {
         String newServerName,
         String adminName,
         String adminPassword,
+        long sessionExpireTime,
         CBAppConfig appConfig) throws DBException
     {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
@@ -417,7 +418,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, appConfig);
+        saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
         if (appConfig.isAnonymousAccessEnabled()) {
@@ -457,7 +458,7 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
 
         File runtimeConfigFile = getRuntimeConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
@@ -471,7 +472,10 @@ public class CBApplication extends BaseApplicationImpl {
                     json.name("server");
                     json.beginObject();
                     if (!CommonUtils.isEmpty(newServerName)) {
-                        JSONUtils.field(json, "serverName", newServerName);
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
+                    }
+                    if (sessionExpireTime > 0) {
+                        JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
                     }
                     json.endObject();
                 }
