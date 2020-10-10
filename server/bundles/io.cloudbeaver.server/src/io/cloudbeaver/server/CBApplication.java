@@ -58,6 +58,8 @@ public class CBApplication extends BaseApplicationImpl {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
+    private static final boolean RECONFIGURATION_ALLOWED = true;
+
     static {
         Log.setDefaultDebugStream(System.out);
     }
@@ -407,7 +409,7 @@ public class CBApplication extends BaseApplicationImpl {
         String adminPassword,
         CBAppConfig appConfig) throws DBException
     {
-        if (!isConfigurationMode()) {
+        if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
 
