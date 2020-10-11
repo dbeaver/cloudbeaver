@@ -146,6 +146,7 @@ export const PropertyItem = observer(function PropertyItem({
           ref={keyInputRef}
           type='text'
           name={property.id}
+          placeholder={property.keyPlaceholder}
           readOnly={!isKeyEditable}
           autoComplete='none'
           onChange={handleKeyChange}
@@ -157,6 +158,7 @@ export const PropertyItem = observer(function PropertyItem({
         <ShadowInput
           type='text'
           name={`${property.id}_value`}
+          placeholder={property.valuePlaceholder}
           autoComplete='none'
           onChange={handleValueChange}
           {...use({ focus, edited })}

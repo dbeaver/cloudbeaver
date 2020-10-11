@@ -49,7 +49,9 @@ export const PropertiesTable = observer(function PropertiesTable({
       return;
     }
 
-    if (state[property.key] !== undefined) {
+    const isUnique = properties.filter(({ key }) => key === property.key).length === 1;
+
+    if (state[property.key] !== undefined && isUnique) {
       state[key] = state[property.key];
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete state[property.key];

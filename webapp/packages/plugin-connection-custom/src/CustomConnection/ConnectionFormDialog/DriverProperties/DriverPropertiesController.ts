@@ -49,7 +49,8 @@ export class DriverPropertiesController implements IInitializableController {
   addProperty = (key?: string, value?: string) => {
     this.driverProperties.unshift({
       id: uuid(),
-      key: key ?? 'property',
+      key: key ?? '',
+      keyPlaceholder: 'property',
       defaultValue: value ?? '',
       new: !key,
     });
@@ -62,11 +63,12 @@ export class DriverPropertiesController implements IInitializableController {
     this.isLoading = true;
     try {
       const driverProperties = await this.driverPropertiesService.loadDriverProperties(this.driver.id);
-      this.driverProperties = observable(driverProperties.map(property => ({
+      this.driverProperties = observable(driverProperties.map<IProperty>(property => ({
         id: property.id!,
         key: property.id!,
         displayName: property.displayName!,
         defaultValue: property.defaultValue,
+        valuePlaceholder: property.defaultValue,
         description: property.description,
         validValues: property.validValues,
       })));

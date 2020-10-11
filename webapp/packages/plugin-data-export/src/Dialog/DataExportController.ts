@@ -101,13 +101,14 @@ export class DataExportController implements IInitializableController, IDestruct
       .data
       .get(processorId)!;
 
-    this.properties = this.processor.properties?.map(property => ({
+    this.properties = this.processor.properties?.map<IProperty>(property => ({
       id: property.id!,
       key: property.id!,
-      displayName: property.displayName!,
+      displayName: property.displayName,
       description: property.description,
       validValues: property.validValues,
       defaultValue: property.defaultValue,
+      valuePlaceholder: property.defaultValue,
     })) || [];
 
     this.processorProperties = {};

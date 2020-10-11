@@ -12,6 +12,8 @@ export interface IProperty {
   displayName?: string;
   defaultValue?: string;
   description?: string;
+  keyPlaceholder?: string;
+  valuePlaceholder?: string;
   validValues?: string[];
   new?: boolean;
 }
