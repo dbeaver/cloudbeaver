@@ -1,4 +1,6 @@
 export default [
+  ['administration_server_configuration_save_confirmation_title', 'Server settings update'],
+  ['administration_server_configuration_save_confirmation_message', 'You are about to change critical settings, the application will be restarted.'],
   ['administration_configuration_wizard_welcome', 'Welcome'],
   ['administration_configuration_wizard_welcome_step_description', 'Welcome to CloudBeaver'],
   ['administration_configuration_wizard_welcome_title', 'Welcome to CloudBeaver, cloud database management system!'],

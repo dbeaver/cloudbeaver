@@ -105,15 +105,11 @@ export class ConfigurationWizardService {
       return false;
     }
 
-    if (step.configurationWizardOptions?.onValidate) {
-      const isValid = await step.configurationWizardOptions.onValidate();
+    if (step.configurationWizardOptions?.onFinish) {
+      const isValid = await step.configurationWizardOptions.onFinish();
       if (!isValid) {
         return false;
       }
-    }
-
-    if (step.configurationWizardOptions?.onFinish) {
-      await step.configurationWizardOptions.onFinish();
     }
     return true;
   }
@@ -162,7 +158,6 @@ export class ConfigurationWizardService {
       }
     }
 
-    await this.serverConfigResource.update();
     this.administrationScreenService.clearItemsState();
     this.screenService.navigateToRoot();
   }

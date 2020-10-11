@@ -8,6 +8,7 @@
 
 import { AdministrationScreenService, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 import { ServerConfigurationService } from './ServerConfigurationService';
@@ -25,6 +26,7 @@ export class ServerConfigurationPageController {
   constructor(
     private readonly configurationWizardService: ConfigurationWizardService,
     private readonly serverConfigurationService: ServerConfigurationService,
+    private readonly commonDialogService: CommonDialogService,
     private readonly administrationScreenService: AdministrationScreenService
   ) {
   }
@@ -33,19 +35,33 @@ export class ServerConfigurationPageController {
     this.serverConfigurationService.loadConfig();
   };
 
-  onChange = (): void => {
+  change = (): void => {
     if (!this.state.serverConfig.authenticationEnabled) {
       this.state.serverConfig.anonymousAccessEnabled = true;
     }
   };
 
-  finish = async (): Promise<void> => {
+  save = async (): Promise<void> => {
     if (this.administrationScreenService.isConfigurationMode) {
-      await this.configurationWizardService.next();
+      await this.finishConfiguration();
     } else {
-      if (this.serverConfigurationService.validate()) {
-        await this.serverConfigurationService.apply();
-      }
+      await this.updateConfiguration();
     }
   };
+
+  private async updateConfiguration(): Promise<void> {
+    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'administration_server_configuration_save_confirmation_title',
+      message: 'administration_server_configuration_save_confirmation_message',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+    await this.serverConfigurationService.save();
+  }
+
+  private async finishConfiguration(): Promise<void> {
+    await this.configurationWizardService.next();
+  }
 }

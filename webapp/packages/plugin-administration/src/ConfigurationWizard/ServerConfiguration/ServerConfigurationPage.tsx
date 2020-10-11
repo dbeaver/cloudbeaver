@@ -87,7 +87,7 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
             </message-box>
           ) : (
             <AdministrationTools>
-              <IconButton name="admin-save" viewBox="0 0 28 28" onClick={controller.finish} />
+              <IconButton name="admin-save" viewBox="0 0 28 28" onClick={controller.save} />
               <IconButton name="admin-cancel" viewBox="0 0 28 28" onClick={controller.reset} />
             </AdministrationTools>
           )}
@@ -95,8 +95,8 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
             serverConfig={controller.state.serverConfig}
             validationTask={service.validationTask}
             editing={controller.editing}
-            onChange={controller.onChange}
-            onSubmit={controller.finish}
+            onChange={controller.change}
+            onSubmit={controller.save}
           />
         </layout-grid-cell>
       </layout-grid-inner>

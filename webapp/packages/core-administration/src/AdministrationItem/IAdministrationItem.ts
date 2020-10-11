@@ -57,11 +57,10 @@ export interface IAdministrationItemSubItem {
 export interface IConfigurationWizardItemOptions {
   description: string;
   defaultRoute?: IRouteParams;
-  onValidate?: () => Promise<boolean> | boolean;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
   isDone?: () => boolean;
-  onFinish?: () => Promise<void> | void;
+  onFinish?: () => Promise<boolean> | boolean;
   onConfigurationFinish?: () => Promise<void> | void;
 }
 

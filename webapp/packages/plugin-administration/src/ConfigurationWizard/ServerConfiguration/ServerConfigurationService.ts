@@ -43,7 +43,7 @@ export class ServerConfigurationService {
     this.validationTask = new Executor();
   }
 
-  async loadConfig() {
+  async loadConfig(): Promise<void> {
     const config = await this.serverConfigResource.load(null);
 
     this.state = this.administrationScreenService
@@ -56,13 +56,6 @@ export class ServerConfigurationService {
 
   isDone(): boolean {
     return this.isFormFilled();
-  }
-
-  async validate(): Promise<boolean> {
-    const context = await this.validationTask.execute(true);
-    const state = await context.getContext(this.validationStatusContext);
-
-    return state.getState();
   }
 
   validationStatusContext = (): IValidationStatusContext => {
@@ -79,9 +72,13 @@ export class ServerConfigurationService {
     };
   };
 
-  async apply(): Promise<void> {
+  async save(): Promise<boolean> {
     if (!this.state) {
       throw new Error('No state available');
+    }
+
+    if (!await this.validate()) {
+      return false;
     }
 
     try {
@@ -92,16 +89,26 @@ export class ServerConfigurationService {
           sessionExpireTime: (this.state.serverConfig.sessionExpireTime ?? 30) * 1000 * 60,
         },
       });
-
-      if (!this.serverConfigResource.data?.configurationMode) {
-        await this.serverConfigResource.refresh(null);
-      }
+      await this.serverConfigResource.update();
       this.usersResource.refreshAllLazy();
+
+      return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 
       throw exception;
     }
+  }
+
+  async handleConfigurationFinish(): Promise<void> {
+    await this.save();
+  }
+
+  async validate(): Promise<boolean> {
+    const context = await this.validationTask.execute(true);
+    const state = await context.getContext(this.validationStatusContext);
+
+    return state.getState();
   }
 
   private isFormFilled() {

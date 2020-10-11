@@ -20,11 +20,6 @@ export const customConnectionPluginManifest: PluginManifest = {
   providers: [
     CustomConnectionService,
     LocaleService,
+    CustomConnectionPluginBootstrap,
   ],
-
-  initialize(services): void {
-    services
-      .resolveServiceByClass(CustomConnectionPluginBootstrap)
-      .bootstrap();
-  },
 };
