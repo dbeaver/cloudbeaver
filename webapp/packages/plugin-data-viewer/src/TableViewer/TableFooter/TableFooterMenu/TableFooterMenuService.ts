@@ -15,7 +15,6 @@ import { DataModelWrapper } from '../../DataModelWrapper';
 
 @injectable()
 export class TableFooterMenuService {
-
   static nodeContextType = 'NodeWithParent';
   private tableFooterMenuToken = 'tableFooterMenu';
 

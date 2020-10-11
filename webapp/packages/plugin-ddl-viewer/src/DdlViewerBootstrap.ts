@@ -13,7 +13,6 @@ import { DdlViewerTabService } from './DdlViewerTabService';
 
 @injectable()
 export class DdlViewerBootstrap {
-
   constructor(private objectFoldersService: ObjectFoldersService,
     private ddlViewerTabService: DdlViewerTabService) {
   }

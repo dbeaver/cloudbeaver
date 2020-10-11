@@ -14,7 +14,6 @@ import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class SqlDialectInfoService {
-
   @observable private dialectInfo = new Map<string, SqlDialectInfo>();
 
   constructor(

@@ -15,7 +15,7 @@ import {
   isResourceKeyList,
   AdminConnectionGrantInfo
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
@@ -37,7 +37,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
-    private authInfoService: AuthInfoService,
+    private authInfoService: AuthInfoService
   ) {
     super(new Map());
     this.metadata = new MetadataMap(() => false);

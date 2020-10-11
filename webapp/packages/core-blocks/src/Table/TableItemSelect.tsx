@@ -8,8 +8,7 @@
 
 import { observer } from 'mobx-react';
 import { useContext, useCallback } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 

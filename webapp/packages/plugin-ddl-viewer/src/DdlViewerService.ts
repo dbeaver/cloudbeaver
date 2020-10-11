@@ -40,5 +40,4 @@ export class DdlViewerService {
     const response = await this.graphQLService.sdk.metadataGetNodeDDL({ nodeId });
     return response.metadataGetNodeDDL || '';
   }
-
 }

@@ -23,7 +23,7 @@ export class AuthInfoService {
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
     private authProviderService: AuthProviderService,
-    private sessionService: SessionService,
+    private sessionService: SessionService
   ) { }
 
   get userInfo(): UserAuthInfo | null {

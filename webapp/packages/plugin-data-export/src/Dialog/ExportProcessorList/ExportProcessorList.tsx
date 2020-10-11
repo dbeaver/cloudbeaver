@@ -24,7 +24,6 @@ export const ExportProcessorList = observer(function ExportProcessorList({
   onSelect,
   className,
 }: ExportProcessorListProps) {
-
   return (
     <ItemList className={className}>
       {processors.map(processor => <ProcessorItem key={processor.id} processor={processor} onSelect={onSelect} />)}

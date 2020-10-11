@@ -10,7 +10,6 @@ import { TopNavBar } from '../TopNavBar/TopNavBar';
 import { Main } from './Main';
 
 export function AppScreen() {
-
   return (
     <>
       <TopNavBar />

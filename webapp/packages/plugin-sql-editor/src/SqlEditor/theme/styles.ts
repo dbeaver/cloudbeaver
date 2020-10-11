@@ -8,7 +8,7 @@
 
 import { ThemeSelector } from '@cloudbeaver/core-theming';
 
-export const SqlEditorStyles: ThemeSelector = async (theme) => {
+export const SqlEditorStyles: ThemeSelector = async theme => {
   let styles: any;
 
   switch (theme) {

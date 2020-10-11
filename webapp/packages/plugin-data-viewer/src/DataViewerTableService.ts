@@ -35,7 +35,7 @@ export class DataViewerTableService {
   async create(
     tabId: string,
     connectionId: string,
-    containerNodePath = '',
+    containerNodePath = ''
   ): Promise<TableViewerModel> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
 
@@ -66,7 +66,6 @@ export class DataViewerTableService {
     defaultCatalog?: string,
     defaultSchema?: string
   ): Promise<IExecutionContext> {
-
     const response = await this.graphQLService.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,
@@ -117,7 +116,6 @@ export class DataViewerTableService {
       throw new Error('containerNodePath must be provided for table');
     }
     if (!model.executionContext) {
-
       // it is first data request
       const executionContext: IExecutionContext = await this.createExecutionContext(model.connectionId);
       model.executionContext = executionContext;

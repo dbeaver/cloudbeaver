@@ -34,7 +34,7 @@ export class AppBootstrap {
     private sessionExpireService: SessionExpireService,
     private navigationTreeContextMenuService: NavigationTreeContextMenuService,
     private navigationTabsService: NavigationTabsService,
-    private connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private connectionSchemaManagerService: ConnectionSchemaManagerService
   ) { }
 
   register(): void | Promise<void> {
@@ -48,7 +48,6 @@ export class AppBootstrap {
 
   async load() {
     await this.themeService.init();
-
   }
 
   async doAfterPluginsInit() {

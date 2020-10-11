@@ -6,14 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { use } from 'reshadow';
-import { css } from 'reshadow';
+import styled, { use, css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from '../baseFormControlStyles';
-import { Checkbox } from './Checkbox';
-import { CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
+import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
 
 const fieldCheckboxStyles = css`
   field {
@@ -35,7 +33,6 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   onChange,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
-
   return styled(useStyles(baseFormControlStyles, fieldCheckboxStyles))(
     <field className={className} as="div" {...use({ long })}>
       <field-label as="div">{children}</field-label>

@@ -32,7 +32,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource,
     private commonDialogService: CommonDialogService,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(connectionId: string, onClose: () => void) {

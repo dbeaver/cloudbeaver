@@ -23,7 +23,7 @@ import { NavNodeInfoResource } from './NavNodeInfoResource';
 export class NavTreeResource extends CachedMapResource<string, string[]> {
   constructor(
     private graphQLService: GraphQLService,
-    private navNodeInfoResource: NavNodeInfoResource,
+    private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
     this.onDataOutdated.subscribe(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));

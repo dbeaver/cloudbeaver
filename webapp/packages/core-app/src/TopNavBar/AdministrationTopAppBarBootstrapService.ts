@@ -14,7 +14,6 @@ import { SettingsMenu } from './SettingsMenu/SettingsMenu';
 
 @injectable()
 export class AdministrationTopAppBarBootstrapService extends Bootstrap {
-
   constructor(
     private administrationTopAppBarService: AdministrationTopAppBarService,
     private wizardTopAppBarService: WizardTopAppBarService

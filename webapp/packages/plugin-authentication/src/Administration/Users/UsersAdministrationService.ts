@@ -20,7 +20,7 @@ export class UsersAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
-    private usersResource: UsersResource,
+    private usersResource: UsersResource
   ) {
     super();
   }

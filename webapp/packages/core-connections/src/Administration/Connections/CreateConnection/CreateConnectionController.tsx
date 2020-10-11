@@ -37,7 +37,7 @@ export class CreateConnectionController {
   constructor(
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) {
     this.credentials = {};
     this.databases = [];

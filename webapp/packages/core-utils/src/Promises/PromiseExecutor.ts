@@ -26,5 +26,4 @@ export class PromiseExecutor<T> {
     };
     this.promise = new Promise<T>(executor);
   }
-
 }

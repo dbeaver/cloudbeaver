@@ -15,9 +15,8 @@ import { ITabContainerEntity, TabContainerToken } from './TabContainerToken';
 import { TabEntity } from './TabEntity';
 
 export class TabContainerEntity extends Entity implements ITabContainer, ITabContainerEntity {
-
   @computed get tabs(): ITab[] {
-    return this.tabsOrder.map((id) => {
+    return this.tabsOrder.map(id => {
       const tabEntity = this.getTabEntity(id);
       return tabEntity.getViewModel();
     });

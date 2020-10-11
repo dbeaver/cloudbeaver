@@ -16,7 +16,7 @@ import {
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaSetter,
-  ITabOptions,
+  ITabOptions
 } from '@cloudbeaver/core-app';
 import {
   ConnectionInfoResource,
@@ -108,7 +108,6 @@ export class SqlEditorTabService {
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
-
     if (typeof tab.handlerState.query !== 'string'
         || typeof tab.handlerState.connectionId !== 'string'
         || typeof tab.handlerState.contextId !== 'string'
@@ -233,7 +232,6 @@ export class SqlEditorTabService {
     defaultCatalog?: string,
     defaultSchema?: string
   ): Promise<IExecutionContext> {
-
     const response = await this.gql.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,

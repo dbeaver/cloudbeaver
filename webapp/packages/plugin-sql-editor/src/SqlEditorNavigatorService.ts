@@ -51,7 +51,6 @@ export class SqlEditorNavigatorService {
     private connectionInfoResource: ConnectionInfoResource,
     private sqlEditorTabService: SqlEditorTabService
   ) {
-
     this.navigator = new Executor<SQLCreateAction | SQLEditorAction>()
       .addHandler(this.navigateHandler.bind(this));
     this.connectionsManagerService.onCloseConnection.subscribe(this.handleConnectionClose.bind(this));

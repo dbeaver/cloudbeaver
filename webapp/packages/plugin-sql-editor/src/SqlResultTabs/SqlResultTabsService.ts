@@ -23,7 +23,7 @@ export class SqlResultTabsService {
   private tabExecutionContext: MetadataMap<string, SqlExecutionState>;
 
   constructor(
-    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
@@ -148,7 +148,6 @@ export class SqlResultTabsService {
   private getTabNameForOrder(order: number, groupOrder: number) {
     return `Result - ${groupOrder} (${order})`;
   }
-
 }
 
 function findMinimalFree(array: number[], base: number): number {

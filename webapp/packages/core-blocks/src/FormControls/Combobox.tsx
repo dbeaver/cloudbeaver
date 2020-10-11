@@ -14,7 +14,7 @@ import {
   useMenuState,
   Menu,
   MenuItem,
-  MenuButton,
+  MenuButton
 } from 'reakit/Menu';
 import styled, { css, use } from 'reshadow';
 

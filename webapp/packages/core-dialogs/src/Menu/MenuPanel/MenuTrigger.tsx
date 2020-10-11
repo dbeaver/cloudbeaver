@@ -12,7 +12,7 @@ import {
 } from 'react';
 import {
   MenuButton,
-  Menu, MenuItem, MenuStateReturn, useMenuState,
+  Menu, MenuItem, MenuStateReturn, useMenuState
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
@@ -64,7 +64,6 @@ const MenuPanel = observer(function MenuPanel({
   menu,
   style = [],
 }: MenuPanelProps) {
-
   return styled(useStyles(menuPanelStyles, ...style))(
     <Menu {...menu} aria-label={panel.id}>
       {menu.visible && panel.menuItems.map(item => (
@@ -138,7 +137,6 @@ export const MenuInnerTrigger = forwardRef(function MenuInnerTrigger(
   props: MenuInnerTriggerProps,
   ref: Ref<HTMLButtonElement>
 ) {
-
   const {
     menuItem, style = [], ...rest
   } = props;

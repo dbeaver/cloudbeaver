@@ -31,12 +31,12 @@ import {
   AgGridEvent,
   CellPositionUtils,
   RowPositionUtils,
-  ValueService,
+  ValueService
 } from '@ag-grid-community/core';
 
 import { INDEX_COLUMN_DEF } from '../../AgGridTableController';
 import {
-  IAgColumnClickEvent, COLUMN_CLICK_EVENT_TYPE,
+  IAgColumnClickEvent, COLUMN_CLICK_EVENT_TYPE
 } from '../../TableColumnHeader/TableColumnHeader';
 import { TableSelection } from '../../TableSelection/TableSelection';
 
@@ -214,7 +214,7 @@ export class RangeController implements IRangeController {
       const isRangeSelected = this.selection?.isRangeSelected(
         this.temporaryRange!.firstRow,
         this.temporaryRange!.lastRow,
-        this.temporaryRange!.columns,
+        this.temporaryRange!.columns
       );
       return isRangeSelected ? 0 : 1;
     }

@@ -20,7 +20,6 @@ import { AdministrationScreenService } from '../AdministrationScreenService';
 
 @injectable()
 export class ConfigurationWizardService {
-
   @computed get steps(): IAdministrationItem[] {
     return this.administrationItemService.items
       .filter(filterConfigurationWizard(true))
@@ -46,7 +45,7 @@ export class ConfigurationWizardService {
   }
 
   @computed get canFinish(): boolean {
-    return this.steps.every((step) => {
+    return this.steps.every(step => {
       if (step.configurationWizardOptions?.isDone
           && !step.configurationWizardOptions?.isDone()) {
         return false;
@@ -158,7 +157,6 @@ export class ConfigurationWizardService {
 
   private async finish() {
     for (const step of this.steps) {
-
       if (step?.configurationWizardOptions?.onConfigurationFinish) {
         await step.configurationWizardOptions.onConfigurationFinish();
       }

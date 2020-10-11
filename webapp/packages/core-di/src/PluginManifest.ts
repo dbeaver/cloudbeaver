@@ -7,7 +7,7 @@
  */
 
 import {
-  IServiceConstructor, IServiceCollection, IServiceInjector,
+  IServiceConstructor, IServiceCollection, IServiceInjector
 } from './IApp';
 
 export interface PluginManifest {

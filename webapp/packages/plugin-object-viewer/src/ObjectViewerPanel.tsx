@@ -34,7 +34,7 @@ const styles = composes(
     tab-outer:only-child {
       display: none;
     }
-  `,
+  `
 );
 const stylesArray = [styles];
 

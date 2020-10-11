@@ -39,6 +39,5 @@ export class SessionExpiredDialogService extends Bootstrap {
         onAction: () => location.reload(),
       }, { title: 'app_root_session_expired_title', persistent: true, type: ENotificationType.Error });
     }
-
   }
 }

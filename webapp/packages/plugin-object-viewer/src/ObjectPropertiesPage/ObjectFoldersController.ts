@@ -17,7 +17,6 @@ import { ObjectFoldersTabContainer } from './ObjectFoldersTabsContainer/ObjectFo
 
 @injectable()
 export class ObjectFoldersController implements IInitializableController, IDestructibleController {
-
   private tabContainer!: ObjectFoldersTabContainer;
   private navigationTab!: ITab<IObjectViewerTabState>;
   private disposer!: ReturnType<typeof autorun>;

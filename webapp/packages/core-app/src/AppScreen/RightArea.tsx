@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles,
+  Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';

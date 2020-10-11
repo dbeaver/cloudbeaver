@@ -20,7 +20,7 @@ export class NavNodeExtensionsService {
   readonly extensions: Array<IExtension<string>>;
 
   constructor(
-    private navNodeManagerService: NavNodeManagerService,
+    private navNodeManagerService: NavNodeManagerService
   ) {
     this.extensions = [
       connectionProvider(this.getConnection.bind(this)),

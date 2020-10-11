@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import {
-  MouseEvent, KeyboardEvent, useCallback, PropsWithChildren,
+  MouseEvent, KeyboardEvent, useCallback, PropsWithChildren
 } from 'react';
 import styled, { use } from 'reshadow';
 

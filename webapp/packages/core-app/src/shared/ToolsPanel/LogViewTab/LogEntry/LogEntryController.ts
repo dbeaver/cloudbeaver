@@ -14,7 +14,6 @@ import { LogEntryDetailsDialog } from './LogEntryDetailsDialog';
 
 @injectable()
 export class LogEntryController implements IInitializableController {
-
   get hasDetails() {
     return Boolean(this.item.stackTrace);
   }
@@ -29,5 +28,4 @@ export class LogEntryController implements IInitializableController {
   init(item: ILogEntry) {
     this.item = item;
   }
-
 }

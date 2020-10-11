@@ -16,7 +16,7 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
   @observable private loaded = false;
 
   constructor(
-    private graphQLService: GraphQLService,
+    private graphQLService: GraphQLService
   ) {
     super(new Map());
   }

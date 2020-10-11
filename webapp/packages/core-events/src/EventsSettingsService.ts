@@ -19,7 +19,6 @@ export type EventsSettings = typeof defaultSettings;
 
 @injectable()
 export class EventsSettingsService {
-
   readonly settings = this.pluginManagerService.getPluginSettings('core_events', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }

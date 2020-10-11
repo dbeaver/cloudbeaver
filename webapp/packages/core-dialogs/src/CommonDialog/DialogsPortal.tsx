@@ -11,7 +11,7 @@ import { useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogBackdrop,
-  useDialogState,
+  useDialogState
 } from 'reakit/Dialog';
 import styled from 'reshadow';
 

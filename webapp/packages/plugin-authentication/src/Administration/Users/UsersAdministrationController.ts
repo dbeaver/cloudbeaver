@@ -47,7 +47,7 @@ export class UsersAdministrationController {
     private notificationService: NotificationService,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
-    private usersAdministrationNavigationService: UsersAdministrationNavigationService,
+    private usersAdministrationNavigationService: UsersAdministrationNavigationService
   ) { }
 
   create = () => {
@@ -109,7 +109,6 @@ export class UsersAdministrationController {
     this.isDeleting = true;
 
     try {
-
       await this.usersResource.delete(resourceKeyList(deletionList));
       this.selectedItems.clear();
 

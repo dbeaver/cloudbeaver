@@ -19,7 +19,6 @@ type Props = React.PropsWithChildren<{
 }>;
 
 export function AdministrationTools({ children, className }: Props) {
-
   return styled(styles)(
     <administration-tools as='div' className={className}>
       {children}

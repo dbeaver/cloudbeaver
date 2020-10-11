@@ -19,7 +19,7 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
 
   constructor(
     private graphQLService: GraphQLService,
-    private sessionResource: SessionResource,
+    private sessionResource: SessionResource
   ) {
     super(new Set());
     this.loaded = false;

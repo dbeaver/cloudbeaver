@@ -11,11 +11,9 @@ import { TabContainerEntity } from '@cloudbeaver/core-app';
 import { NodePropertiesMixin } from './NodePropertiesMixin';
 
 export class ObjectFoldersTabContainer extends TabContainerEntity {
-
   constructor(nodeId: string) {
     super([], nodeId);
     const nodePropertiesMixin = new NodePropertiesMixin(nodeId);
     this.addMixin(NodePropertiesMixin, nodePropertiesMixin);
   }
-
 }

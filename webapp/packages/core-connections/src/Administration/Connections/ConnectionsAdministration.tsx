@@ -76,7 +76,7 @@ const styles = composes(
 export const ConnectionsAdministration: React.FC<AdministrationItemContentProps> = observer(function ConnectionsAdministration({
   sub,
   param,
-  configurationWizard
+  configurationWizard,
 }) {
   const controller = useController(ConnectionsAdministrationController);
 

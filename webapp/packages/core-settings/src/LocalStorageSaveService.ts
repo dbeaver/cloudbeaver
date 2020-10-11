@@ -9,7 +9,7 @@
 import {
   autorun,
   set,
-  toJS,
+  toJS
 } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';

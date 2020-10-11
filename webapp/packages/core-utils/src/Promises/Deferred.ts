@@ -100,7 +100,7 @@ export class DeferredFromPromise<T> extends Deferred<T> {
     super();
     promise.then(
       value => this.toResolved(value),
-      (err) => {
+      err => {
         if (err instanceof PromiseCancelledError) {
           this.toCancelled(err.reason);
         } else {

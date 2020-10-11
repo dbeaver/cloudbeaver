@@ -23,7 +23,6 @@ type VerticalTabHeaderProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'
 };
 
 export const VerticalTabHeader = observer(function VerticalTabHeader({ tab, style, ...props }: VerticalTabHeaderProps) {
-
   return styled(useStyles(verticalTabStyles, ...style))(
     <Tab
       tabId={tab.tabId}

@@ -15,7 +15,7 @@ import { GraphQLService, CachedDataResource, ServerConfig } from '@cloudbeaver/c
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null, null> {
   @observable private loaded: boolean;
   constructor(
-    private graphQLService: GraphQLService,
+    private graphQLService: GraphQLService
   ) {
     super(null);
     this.loaded = false;

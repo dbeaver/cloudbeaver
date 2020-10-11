@@ -30,7 +30,6 @@ const styles = css`
 
 export const LogEntryDetailsDialog: DialogComponent<ILogEntry, null> = observer(
   function LogEntryDetailsDialog(props: DialogComponentProps<ILogEntry, null>) {
-
     return styled(useStyles(styles))(
       <CommonDialogWrapper
         title={`${props.payload.type} ${props.payload.time}`}

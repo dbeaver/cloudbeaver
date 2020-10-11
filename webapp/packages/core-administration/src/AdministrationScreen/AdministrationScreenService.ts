@@ -21,7 +21,6 @@ const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 
 @injectable()
 export class AdministrationScreenService {
-
   static screenName = 'administration';
   static itemRouteName = 'administration.item';
   static itemSubRouteName = 'administration.item.sub';

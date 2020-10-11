@@ -31,5 +31,4 @@ export class ObjectFolderTabModel implements ITab {
     this.tabId = node.id;
     this.panel = () => objectPropertyTablePanel(node.parentId, node.id);
   }
-
 }

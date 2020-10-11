@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedMapResource,
-  DriverInfo,
+  DriverInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -54,7 +54,6 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
   }
 
   compare(driverA: DBDriver, driverB: DBDriver): number {
-
     if (driverA.promotedScore === driverB.promotedScore) {
       return (driverA.name || '').localeCompare((driverB.name || ''));
     }

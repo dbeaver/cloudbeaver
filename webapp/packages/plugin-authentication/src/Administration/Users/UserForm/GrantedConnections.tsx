@@ -78,7 +78,7 @@ export const GrantedConnections = observer(function GrantedConnections({
           <TableColumnHeader />
         </TableHeader>
         <TableBody>
-          {connections.map((connection) => {
+          {connections.map(connection => {
             const connectionPermission = getConnectionPermission(connection.id);
             const driver = driversResource.get(connection.driverId);
             const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;

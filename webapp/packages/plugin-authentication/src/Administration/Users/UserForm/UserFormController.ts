@@ -115,7 +115,7 @@ export class UserFormController implements IInitializableController, IDestructib
     }
   };
 
-  handleConnectionsAccessChange = () => this.connectionAccessChanged = true;
+  handleConnectionsAccessChange = () => { this.connectionAccessChanged = true; };
 
   loadConnectionsAccess = async () => {
     if (this.isLoading || this.connectionAccessLoaded) {
@@ -194,7 +194,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private getGrantedConnections() {
     return Array.from(this.selectedConnections.keys())
-      .filter((connectionId) => {
+      .filter(connectionId => {
         const connectionPermission = this.grantedConnections.find(
           connectionPermission => connectionPermission.connectionId === connectionId
         );

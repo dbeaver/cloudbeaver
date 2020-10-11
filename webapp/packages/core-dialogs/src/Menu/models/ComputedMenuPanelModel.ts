@@ -16,7 +16,6 @@ export interface IComputedMenuPanelOptions {
 }
 
 export class ComputedMenuPanelModel implements IMenuPanel {
-
   id: string;
 
   @computed get menuItems() {

@@ -21,13 +21,12 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) {
     super();
   }
 
   register() {
-
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Default,

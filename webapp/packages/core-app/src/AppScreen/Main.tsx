@@ -9,7 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import {
-  splitStyles, Split, ResizerControls, Pane,
+  splitStyles, Split, ResizerControls, Pane
 } from '@cloudbeaver/core-blocks';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 

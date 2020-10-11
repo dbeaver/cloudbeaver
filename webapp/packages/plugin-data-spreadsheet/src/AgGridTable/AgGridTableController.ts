@@ -20,7 +20,7 @@ import {
   GridOptions,
   CellClassParams,
   SortChangedEvent,
-  RowNode,
+  RowNode
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
@@ -299,7 +299,6 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
           return 'cell-edited';
         }
         return '';
-
       },
     })),
   ];

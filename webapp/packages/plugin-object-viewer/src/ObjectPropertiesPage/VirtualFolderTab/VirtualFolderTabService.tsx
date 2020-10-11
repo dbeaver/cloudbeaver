@@ -15,7 +15,6 @@ import { VirtualFolderTabModel } from './VirtualFolderTabModel';
 
 @injectable()
 export class VirtualFolderTabService {
-
   constructor(private navNodeManagerService: NavNodeManagerService) { }
 
   createTabEntities(nodeId: string): TabEntity[] {
@@ -62,5 +61,4 @@ export class VirtualFolderTabService {
     ];
     return new TabEntity(VirtualFolderTabModel, mixins);
   }
-
 }

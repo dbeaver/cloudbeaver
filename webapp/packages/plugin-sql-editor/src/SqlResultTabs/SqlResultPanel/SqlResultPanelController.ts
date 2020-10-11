@@ -23,7 +23,7 @@ import {
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
-  DatabaseDataAccessMode,
+  DatabaseDataAccessMode
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { IResultDataTab, IQueryTabGroup } from '../../ISqlEditorTabState';
@@ -43,7 +43,6 @@ export enum EPanelState {
 @injectable()
 export class SqlResultPanelController
 implements IInitializableController, IDestructibleController {
-
   @observable state: EPanelState = EPanelState.PENDING;
   @observable executionResult = '';
   @observable errorMessage?: string;
@@ -138,7 +137,6 @@ implements IInitializableController, IDestructibleController {
         tableModel.setColumns(initialState.columns);
         tableModel.updateInfo(initialState.statusMessage, initialState.duration);
       }
-
     } catch (exception) {
       if (exception instanceof PromiseCancelledError) {
         this.state = EPanelState.MESSAGE_RESULT;
@@ -240,5 +238,4 @@ implements IInitializableController, IDestructibleController {
 
     return this.sqlResultService.sqlExecuteInfoToData(response, this.panelInit.indexInResultSet);
   }
-
 }

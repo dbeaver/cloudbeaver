@@ -26,7 +26,7 @@ export class NotificationService {
   }
 
   constructor(
-    private settings: EventsSettingsService,
+    private settings: EventsSettingsService
   ) {}
 
   notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(

@@ -38,7 +38,6 @@ export class TableViewerStorageService {
     options: ITableViewerModelOptions,
     source: IDatabaseDataSource<any, any>
   ): DataModelWrapper {
-
     return this.add(new DataModelWrapper(
       this.commonDialogService,
       options,
@@ -47,7 +46,7 @@ export class TableViewerStorageService {
   }
 
   add<TOptions, TResult extends IDatabaseDataResult>(
-    model: IDatabaseDataModel<TOptions, TResult>,
+    model: IDatabaseDataModel<TOptions, TResult>
   ): IDatabaseDataModel<TOptions, TResult> {
     this.tableModelMap.set(model.id, model);
     return this.tableModelMap.get(model.id)!;

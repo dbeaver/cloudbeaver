@@ -33,7 +33,7 @@ export class DataExportProcessService {
 
   constructor(
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
+    private notificationService: NotificationService
   ) { }
 
   async cancel(exportId: string): Promise<void> {

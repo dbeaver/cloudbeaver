@@ -20,7 +20,6 @@ type ItemListProps = React.PropsWithChildren<{
 export function ItemList({
   children, className, styles,
 }: ItemListProps) {
-
   return styled(useStyles(...(styles || ITEM_LIST_STYLES_ARRAY)))(
     <item-list as="div" className={className}>
       <Styles.Provider value={styles || ITEM_LIST_STYLES_ARRAY}>

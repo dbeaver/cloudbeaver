@@ -22,7 +22,7 @@ export class DataExportMenuService {
   constructor(
     private commonDialogService: CommonDialogService,
     private tableFooterMenuService: TableFooterMenuService,
-    private contextMenuService: ContextMenuService,
+    private contextMenuService: ContextMenuService
   ) { }
 
   register() {
@@ -48,7 +48,7 @@ export class DataExportMenuService {
         },
         order: 2,
         title: 'data_transfer_dialog_export',
-        onClick: (context) => {
+        onClick: context => {
           const node = context.data;
           const connectionId = NodeManagerUtils.nodeIdToConnectionId(node.id);
           this.commonDialogService.open(DataExportDialog, {

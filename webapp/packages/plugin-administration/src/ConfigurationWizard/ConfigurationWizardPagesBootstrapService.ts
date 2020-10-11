@@ -22,7 +22,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
     private configurationWizardService: ConfigurationWizardService,
-    private serverConfigurationService: ServerConfigurationService,
+    private serverConfigurationService: ServerConfigurationService
   ) {
     super();
   }

@@ -23,7 +23,6 @@ export interface ITabBuilder {
 
 @injectable()
 export class ObjectFoldersService {
-
   private tabBuilders: ITabBuilder[] = [];
 
   // todo temporary solution while only ObjectFolders supports entities
@@ -56,7 +55,7 @@ export class ObjectFoldersService {
       .forEach(tabEntity => tabContainer.addTabEntity(tabEntity));
 
     const tabs = this.getTabs(nodeId);
-    tabs.forEach((tab) => {
+    tabs.forEach(tab => {
       const tabEntity = new TabEntity(tab);
       tabContainer.addTabEntity(tabEntity);
     });
@@ -73,7 +72,7 @@ export class ObjectFoldersService {
    */
   getTabs(nodeId: string): ITab[] {
     const tabList: ITab[] = [];
-    this.tabBuilders.forEach((builder) => {
+    this.tabBuilders.forEach(builder => {
       const tab = builder.build(nodeId);
       if (tab) {
         const tabs = Array.isArray(tab) ? tab : [tab];

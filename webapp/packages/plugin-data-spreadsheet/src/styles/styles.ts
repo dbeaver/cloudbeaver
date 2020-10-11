@@ -8,7 +8,7 @@
 
 import { ThemeSelector } from '@cloudbeaver/core-theming';
 
-export const agGridStyles: ThemeSelector = async (theme) => {
+export const agGridStyles: ThemeSelector = async theme => {
   let styles: any;
 
   switch (theme) {

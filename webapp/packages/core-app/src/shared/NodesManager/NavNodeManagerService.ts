@@ -99,7 +99,7 @@ export class NavNodeManagerService extends Bootstrap {
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
     private sessionResource: SessionResource,
-    private serverService: ServerService,
+    private serverService: ServerService
   ) {
     super();
     this.activeNavigationNodes = [];

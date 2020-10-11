@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import {
   ObjectPropertyCheckbox,
   ObjectPropertyInput,
-  ObjectPropertyProps,
+  ObjectPropertyProps
 } from '../formControls';
 import { filterProperty, matchType } from '../helpers';
 

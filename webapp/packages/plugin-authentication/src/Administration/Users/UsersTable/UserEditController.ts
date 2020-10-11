@@ -31,7 +31,7 @@ implements IInitializableController, IDestructibleController {
 
   constructor(
     private notificationService: NotificationService,
-    private usersResource: UsersResource,
+    private usersResource: UsersResource
   ) { }
 
   init(id: string) {

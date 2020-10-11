@@ -44,7 +44,6 @@ export function InputGroup({
   className,
   long,
 }: Props) {
-
   return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className}>
       <field-label as='label' {...use({ long })}>{children}</field-label>

@@ -119,19 +119,19 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
         {controller.isLoading
           ? <Loader />
           : (
-              <SubmittingForm onSubmit={controller.onCreateConnection}>
-                <TabPanel tabId='options'>
-                  <ConnectionForm driver={driver} controller={controller} />
-                </TabPanel>
-                <TabPanel tabId='driver_properties'>
-                  <DriverProperties
-                    driver={driver}
-                    state={controller.config.properties!}
-                    loadProperties={loadProperties}
-                  />
-                </TabPanel>
-              </SubmittingForm>
-            )}
+            <SubmittingForm onSubmit={controller.onCreateConnection}>
+              <TabPanel tabId='options'>
+                <ConnectionForm driver={driver} controller={controller} />
+              </TabPanel>
+              <TabPanel tabId='driver_properties'>
+                <DriverProperties
+                  driver={driver}
+                  state={controller.config.properties!}
+                  loadProperties={loadProperties}
+                />
+              </TabPanel>
+            </SubmittingForm>
+          )}
         {controller.error.responseMessage && (
           <ErrorMessage
             text={controller.error.responseMessage}

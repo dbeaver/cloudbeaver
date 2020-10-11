@@ -34,7 +34,6 @@ export class TabViewModel implements ITab {
   constructor(@inject(TabToken) private tabModel: ITab,
     private entity: Entity,
     @inject(TabContainerToken) private tabContainer: ITabContainerEntity) {
-
     this.tabId = this.entity.id;
     this.panel = () => TabContext(tabContainer.getTabServiceInjector(this.tabId), this.tabModel.panel);
   }

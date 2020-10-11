@@ -8,17 +8,16 @@
 
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
-  AsyncTaskInfo, GraphQLService, ServerInternalError, DataTransferParameters,
+  AsyncTaskInfo, GraphQLService, ServerInternalError, DataTransferParameters
 } from '@cloudbeaver/core-sdk';
 import {
-  CancellablePromise, cancellableTimeout, Deferred, EDeferredState,
+  CancellablePromise, cancellableTimeout, Deferred, EDeferredState
 } from '@cloudbeaver/core-utils';
 
 const DELAY_BETWEEN_TRIES = 1000;
 
 // TODO: seems we need special abstraction over async tasks to manage it
 export class ExportFromContainerProcess extends Deferred<string> {
-
   private taskId?: string;
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync

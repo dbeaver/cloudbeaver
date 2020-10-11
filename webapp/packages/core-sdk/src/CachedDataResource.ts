@@ -15,7 +15,6 @@ export abstract class CachedDataResource<
   TData,
   TParam,
 > extends CachedResource<TData, TParam> {
-
   async refresh(param: TParam): Promise<TData> {
     await this.loadData(param, true);
     return this.data;

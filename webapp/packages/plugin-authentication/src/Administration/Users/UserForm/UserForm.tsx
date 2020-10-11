@@ -140,15 +140,15 @@ export const UserForm = observer(function UserForm({
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const handleLoginChange = useCallback(
-    (value: string) => controller.credentials.login = value,
+    (value: string) => { controller.credentials.login = value; },
     []
   );
   const handlePasswordChange = useCallback(
-    (value: string) => controller.credentials.password = value,
+    (value: string) => { controller.credentials.password = value; },
     []
   );
   const handlePasswordRepeatChange = useCallback(
-    (value: string) => controller.credentials.passwordRepeat = value,
+    (value: string) => { controller.credentials.passwordRepeat = value; },
     []
   );
   const handleRoleChange = useCallback(

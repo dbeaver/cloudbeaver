@@ -52,7 +52,7 @@ implements IInitializableController, IDestructibleController {
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(
@@ -112,7 +112,7 @@ implements IInitializableController, IDestructibleController {
     }
   };
 
-  handleAccessChange = () => this.accessChanged = true;
+  handleAccessChange = () => { this.accessChanged = true; };
 
   loadAccessSubjects = async () => {
     if (this.accessLoaded || this.isLoading) {
@@ -122,7 +122,6 @@ implements IInitializableController, IDestructibleController {
     this.isLoading = true;
     try {
       this.model.grantedSubjects = await this.connectionsResource.loadAccessSubjects(this.model.connection.id);
-
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
     }

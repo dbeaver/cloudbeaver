@@ -12,7 +12,7 @@ import {
   EObjectFeature,
   NodeManagerUtils,
   NavNode, ConnectionSchemaManagerService,
-  isObjectCatalogProvider, isObjectSchemaProvider,
+  isObjectCatalogProvider, isObjectSchemaProvider
 } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -31,7 +31,7 @@ export class SqlEditorBootstrap {
     private sqlEditorTabService: SqlEditorTabService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
-    private activeViewService: ActiveViewService,
+    private activeViewService: ActiveViewService
   ) {}
 
   async bootstrap() {
@@ -86,7 +86,7 @@ export class SqlEditorBootstrap {
         this.sqlEditorNavigatorService.openNewEditor(
           connectionId,
           catalogId,
-          schemaId,
+          schemaId
         );
         return;
       }
@@ -95,7 +95,7 @@ export class SqlEditorBootstrap {
     this.sqlEditorNavigatorService.openNewEditor(
       this.connectionSchemaManagerService.currentConnectionId,
       this.connectionSchemaManagerService.currentObjectCatalogId,
-      this.connectionSchemaManagerService.currentObjectSchemaId,
+      this.connectionSchemaManagerService.currentObjectSchemaId
     );
   }
 }

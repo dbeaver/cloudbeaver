@@ -5,7 +5,6 @@ import { showErrorPage } from './ErrorPage';
 import { renderLayout } from './renderLayout';
 
 export async function bootstrap(plugins: PluginManifest[]) {
-
   const app = new App(plugins);
   app.registerServices();
 

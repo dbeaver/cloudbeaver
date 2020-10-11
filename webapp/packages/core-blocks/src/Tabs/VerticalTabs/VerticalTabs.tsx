@@ -24,7 +24,6 @@ type VerticalTabsProps = Omit<React.DOMAttributes<HTMLDivElement>, 'style'> & {
 };
 
 export const VerticalTabs = observer(function VerticalTabs({ tabContainer, style, ...props }: VerticalTabsProps) {
-
   return styled(useStyles(verticalTabStyles, ...style))(
     <TabsState currentTabId={tabContainer.currentTabId} orientation='vertical'>
       <vertical-tabs as="div" {...props}>

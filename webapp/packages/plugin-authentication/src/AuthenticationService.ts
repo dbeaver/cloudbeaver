@@ -19,7 +19,7 @@ export class AuthenticationService extends Bootstrap {
     private serverService: ServerService,
     private sessionService: SessionService,
     private authDialogService: AuthDialogService,
-    private authInfoService: AuthInfoService,
+    private authInfoService: AuthInfoService
   ) {
     super();
   }

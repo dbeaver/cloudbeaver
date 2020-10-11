@@ -12,7 +12,6 @@ import { LogViewerService } from './LogViewerService';
 
 @injectable()
 export class LogViewTabController {
-
   get isActive(): boolean {
     return this.logViewerService.isActive;
   }
@@ -25,5 +24,4 @@ export class LogViewTabController {
 
   constructor(private logViewerService: LogViewerService) {
   }
-
 }

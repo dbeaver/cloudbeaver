@@ -13,7 +13,6 @@ import { LogViewerService } from './LogViewerService';
 
 @injectable()
 export class LogViewerMenuService {
-
   constructor(private mainMenuService: MainMenuService,
     private logViewerService: LogViewerService) {
   }

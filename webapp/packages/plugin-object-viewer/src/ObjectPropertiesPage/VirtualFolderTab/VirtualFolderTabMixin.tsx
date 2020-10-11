@@ -15,7 +15,6 @@ import { VirtualFolderTabData } from './VirtualFolderTabData';
 
 @injectable()
 export class VirtualFolderTabMixin {
-
   @observable isActivated = false;
 
   constructor(
@@ -43,7 +42,5 @@ export class VirtualFolderTabMixin {
     } finally {
       this.isActivated = true;
     }
-
   }
-
 }

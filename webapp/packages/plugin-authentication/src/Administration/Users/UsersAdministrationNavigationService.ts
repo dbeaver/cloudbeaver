@@ -15,7 +15,7 @@ export class UsersAdministrationNavigationService {
   static AddItemName = 'add';
 
   constructor(
-    private administrationScreenService: AdministrationScreenService,
+    private administrationScreenService: AdministrationScreenService
   ) {}
 
   navToRoot() {

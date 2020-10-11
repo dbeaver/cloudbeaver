@@ -22,7 +22,6 @@ const ddlViewerTabId = 'ddl-viewer';
 
 @injectable()
 export class DdlViewerTabService {
-
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private objectViewerTabService: ObjectViewerTabService,

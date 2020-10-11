@@ -18,7 +18,7 @@ import {
   isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  ObjectPropertyInfo,
+  ObjectPropertyInfo
 } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -36,7 +36,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   private connectionCreateSubject: Subject<ConnectionInfo>;
 
   constructor(
-    private graphQLService: GraphQLService,
+    private graphQLService: GraphQLService
   ) {
     super(new Map());
     this.connectionCreateSubject = new Subject<ConnectionInfo>();

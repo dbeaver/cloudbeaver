@@ -7,7 +7,7 @@
  */
 
 import {
-  forwardRef, useImperativeHandle, useState, useCallback, useRef, useEffect,
+  forwardRef, useImperativeHandle, useState, useCallback, useRef, useEffect
 } from 'react';
 import styled, { css } from 'reshadow';
 

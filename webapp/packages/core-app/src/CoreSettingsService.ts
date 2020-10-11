@@ -20,7 +20,6 @@ export type CoreSettings = typeof defaultSettings;
 
 @injectable()
 export class CoreSettingsService {
-
   readonly settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }

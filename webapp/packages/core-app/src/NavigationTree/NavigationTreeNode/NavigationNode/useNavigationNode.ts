@@ -84,7 +84,7 @@ export function useNavigationNode(node: NavNode, nodeLoading: boolean, nodeLoade
       setProcessing(true);
       navigationTreeService
         .loadNestedNodes(node.id)
-        .then((state) => {
+        .then(state => {
           setProcessing(false);
           if (!state) {
             switchExpand(false);

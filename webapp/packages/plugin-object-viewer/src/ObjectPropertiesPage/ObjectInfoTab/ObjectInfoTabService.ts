@@ -13,9 +13,8 @@ import { ObjectInfoTabModel } from './ObjectInfoTabModel';
 
 @injectable()
 export class ObjectInfoTabService {
-
   constructor(
-    private navNodeManagerService: NavNodeManagerService,
+    private navNodeManagerService: NavNodeManagerService
   ) {}
 
   createTabEntity(navNodeId: string): TabEntity | null {
@@ -28,5 +27,4 @@ export class ObjectInfoTabService {
 
     return new TabEntity(ObjectInfoTabModel);
   }
-
 }

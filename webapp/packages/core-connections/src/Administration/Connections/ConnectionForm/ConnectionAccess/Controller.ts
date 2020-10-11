@@ -31,7 +31,7 @@ implements IInitializableController {
 
   constructor(
     private usersResource: UsersResource,
-    private rolesResource: RolesResource,
+    private rolesResource: RolesResource
   ) { }
 
   init(model: IConnectionFormModel) {

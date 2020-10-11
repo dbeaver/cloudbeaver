@@ -18,7 +18,6 @@ import { IConnectionFormModel } from '../IConnectionFormModel';
 @injectable()
 export class OptionsController
 implements IInitializableController {
-
   @computed get drivers() {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
@@ -45,7 +44,7 @@ implements IInitializableController {
   constructor(
     private notificationService: NotificationService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(model: IConnectionFormModel) {

@@ -21,7 +21,6 @@ export type InjectionToken<T> = ITypedConstructor<T> | ValueToken<T>;
 export function createValueToken<T extends Record<string, any>>(
   obj: string | ITypedConstructor<T> | T
 ): ValueToken<T> {
-
   // just fake function to keep type T
   const token = () => null as unknown as T;
   const name = getName(obj);

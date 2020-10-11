@@ -18,7 +18,6 @@ import { ConfigurationWizardScreen } from './ConfigurationWizard/ConfigurationWi
 
 @injectable()
 export class AdministrationScreenServiceBootstrap extends Bootstrap {
-
   constructor(
     private screenService: ScreenService,
     private permissionsService: PermissionsService,

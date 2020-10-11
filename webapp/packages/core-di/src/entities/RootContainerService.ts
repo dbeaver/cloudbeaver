@@ -14,7 +14,6 @@ import { Entity } from './Entity';
  * Method 'register' will be added during app bootstrap when root container is created
  */
 export class RootContainerService {
-
   private readonly register: (container: DIContainer) => void;
 
   constructor(register: (container: DIContainer) => void) {
@@ -26,5 +25,4 @@ export class RootContainerService {
     // eslint-disable-next-line dot-notation
     this.register(entity['container']);
   }
-
 }

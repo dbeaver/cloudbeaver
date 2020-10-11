@@ -19,7 +19,6 @@ import { ILogEntry } from './ILogEntry';
 
 @injectable()
 export class LogViewerService {
-
   @observable _isActive = false;
 
   get isActive(): boolean {

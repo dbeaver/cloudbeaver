@@ -114,7 +114,6 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     defaultCatalog?: string,
     defaultSchema?: string
   ): Promise<IExecutionContext> {
-
     const response = await this.graphQLService.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,

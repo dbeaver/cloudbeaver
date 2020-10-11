@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedDataResource,
-  DatabaseObjectInfo,
+  DatabaseObjectInfo
 } from '@cloudbeaver/core-sdk';
 
 export type ObjectContainer = Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>;

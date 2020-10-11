@@ -22,7 +22,6 @@ import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerServic
 
 @injectable()
 export class ConnectionSelectorController {
-
   connectionMenu: IMenuItem;
   objectContainerMenu: IMenuItem;
 
@@ -79,9 +78,8 @@ export class ConnectionSelectorController {
   constructor(
     private connectionSelectorService: ConnectionSchemaManagerService,
     private dbDriverResource: DBDriverResource,
-    private connectionInfo: ConnectionInfoResource,
+    private connectionInfo: ConnectionInfoResource
   ) {
-
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
       isDisabled: () => !this.connectionSelectorService.isConnectionChangeable,
@@ -106,7 +104,7 @@ export class ConnectionSelectorController {
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return Array.from(this.connectionInfo.data.values()).map((item) => {
+    return Array.from(this.connectionInfo.data.values()).map(item => {
       const menuItem: IMenuItem = {
         id: item.id,
         title: item.name || item.id,
@@ -122,7 +120,7 @@ export class ConnectionSelectorController {
     }
     return this.connectionSelectorService.objectContainerList
       .filter(item => !!item.name)
-      .map((item) => {
+      .map(item => {
         if (item.features?.includes(EObjectFeature.catalog)) {
           const title = NodeManagerUtils.concatSchemaAndCatalog(
             item.name,

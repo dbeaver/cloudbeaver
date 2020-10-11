@@ -12,7 +12,6 @@ import { LocalStorageSaveService } from './LocalStorageSaveService';
 
 @injectable()
 export class SettingsService {
-
   constructor(private localStorageSaveService: LocalStorageSaveService) { }
 
   /**

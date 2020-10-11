@@ -12,10 +12,9 @@ import { ConnectionConfig, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class CustomConnectionService {
-
   constructor(
     private graphQLService: GraphQLService,
-    private connectionInfoResource: ConnectionInfoResource,
+    private connectionInfoResource: ConnectionInfoResource
   ) {
   }
 

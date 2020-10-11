@@ -8,7 +8,7 @@
 
 import { IMenuPanel } from '../IMenuPanel';
 import {
-  ComputedMenuItemModel, IComputedMenuItemOptions,
+  ComputedMenuItemModel, IComputedMenuItemOptions
 } from '../models/ComputedMenuItemModel';
 import { ComputedMenuPanelModel } from '../models/ComputedMenuPanelModel';
 import { MenuOptionsStore } from '../models/MenuOptionsStore';

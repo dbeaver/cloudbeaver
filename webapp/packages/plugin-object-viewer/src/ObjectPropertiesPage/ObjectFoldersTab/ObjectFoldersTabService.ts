@@ -14,7 +14,6 @@ import { ObjectFolderTabModel } from './ObjectFolderTabModel';
 
 @injectable()
 export class ObjectFoldersTabService {
-
   constructor(private navNodeManagerService: NavNodeManagerService) {
   }
 
@@ -25,12 +24,12 @@ export class ObjectFoldersTabService {
   private tabBuilder(nodeId: string): ITab[] {
     const children = this.navNodeManagerService.getTree(nodeId) || [];
 
-    const folderTabs = children.filter((nodeId) => {
+    const folderTabs = children.filter(nodeId => {
       const node = this.navNodeManagerService.getNode(nodeId);
       return node ? node.folder : false;
     });
 
-    const tabList: ITab[] = folderTabs.map((nodeId) => {
+    const tabList: ITab[] = folderTabs.map(nodeId => {
       const node = this.navNodeManagerService.getNode(nodeId);
       if (!node) {
         throw Error(`node not found: ${nodeId}`);

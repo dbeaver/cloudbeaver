@@ -41,7 +41,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, nul
 
   constructor(
     private graphQLService: GraphQLService,
-    private serverConfiguration: ServerConfigResource,
+    private serverConfiguration: ServerConfigResource
   ) {
     super(null);
     this.serverConfiguration.onDataOutdated.subscribe(this.markOutdated.bind(this));

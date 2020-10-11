@@ -18,7 +18,7 @@ export function createExtension<T>(
 
 export function isExtension<T>(
   obj: Record<any, any> | IExtension<T>,
-  key?: symbol,
+  key?: symbol
 ): obj is IExtension<T> {
   if (!(EXTENSION_SYMBOL in obj)) {
     return false;

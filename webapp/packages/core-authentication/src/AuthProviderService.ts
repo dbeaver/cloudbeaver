@@ -14,9 +14,8 @@ import { AuthProvidersResource } from './AuthProvidersResource';
 
 @injectable()
 export class AuthProviderService {
-
   constructor(
-    private providers: AuthProvidersResource,
+    private providers: AuthProvidersResource
   ) { }
 
   async processCredentials(providerId: string, credentials: Record<string, any>) {

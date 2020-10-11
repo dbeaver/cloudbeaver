@@ -25,7 +25,6 @@ export const TableItemSeparator = observer(function TableItemSeparator({
   onClick,
   onDoubleClick,
 }: Props) {
-
   return styled(useStyles())(
     <tr {...use({ noHover: true })} className={className} onClick={onClick} onDoubleClick={onDoubleClick}>
       <td colSpan={colSpan} {...use({ expandArea: true })}>

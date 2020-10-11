@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import {
-  useState, useCallback, ChangeEvent, useRef, useEffect,
+  useState, useCallback, ChangeEvent, useRef, useEffect
 } from 'react';
 import styled, { css } from 'reshadow';
 

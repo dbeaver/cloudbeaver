@@ -23,7 +23,7 @@ export class PermissionsService {
   }
 
   constructor(
-    private permissions: PermissionsResource,
+    private permissions: PermissionsResource
   ) {
   }
 

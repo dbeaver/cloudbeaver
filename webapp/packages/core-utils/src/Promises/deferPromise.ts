@@ -30,7 +30,7 @@ export function deferPromise<T>(executor: PromiseExecutor<T>, timeout: number): 
 }
 
 export function cancellableTimeout(timeout: number): CancellablePromise<void> {
-  return new CancellablePromise<void>((resolve) => {
+  return new CancellablePromise<void>(resolve => {
     const token = setTimeout(() => resolve(), timeout);
     return () => {
       clearTimeout(token);

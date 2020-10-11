@@ -36,7 +36,6 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   onReject,
   children,
 }) {
-
   return styled(useStyles(commonDialogStyle))(
     <dialog className={className}>
       <header>

@@ -20,9 +20,8 @@ export class ServerService {
   private lastConfig: any = null;
   constructor(
     readonly config: ServerConfigResource,
-    private sessionService: SessionService,
+    private sessionService: SessionService
   ) {
-
     this.config.onDataUpdate.subscribe(this.refreshConfigAsync.bind(this));
   }
 

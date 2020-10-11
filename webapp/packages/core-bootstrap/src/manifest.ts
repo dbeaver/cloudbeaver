@@ -13,7 +13,7 @@ import {
   AdministrationItemService,
   ConfigurationWizardService,
   WizardTopAppBarService,
-  AdministrationScreenServiceBootstrap,
+  AdministrationScreenServiceBootstrap
 } from '@cloudbeaver/core-administration';
 import {
   ConnectionDialogsService,
@@ -43,7 +43,7 @@ import {
   AuthProvidersResource,
   RolesManagerService,
   RolesResource,
-  UsersResource,
+  UsersResource
 } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
@@ -57,7 +57,7 @@ import {
   ConnectionsResource,
   ConnectionsLocaleService,
   DriverPropertiesService,
-  ConnectionsAdministrationNavService,
+  ConnectionsAdministrationNavService
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';

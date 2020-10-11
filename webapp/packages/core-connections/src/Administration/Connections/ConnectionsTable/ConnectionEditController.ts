@@ -51,7 +51,7 @@ implements IInitializableController, IDestructibleController {
   constructor(
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
-    private dbDriverResource: DBDriverResource,
+    private dbDriverResource: DBDriverResource
   ) { }
 
   init(id: string) {

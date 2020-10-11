@@ -18,7 +18,6 @@ import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
 export class ConnectionDialogsService {
-
   constructor(
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
@@ -27,7 +26,6 @@ export class ConnectionDialogsService {
   ) {}
 
   registerMenuItems() {
-
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuConnectionsPanel,
       {

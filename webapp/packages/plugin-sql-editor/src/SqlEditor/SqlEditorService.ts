@@ -11,7 +11,6 @@ import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/c
 
 @injectable()
 export class SqlEditorService {
-
   constructor(private gql: GraphQLService) {
   }
 
@@ -21,7 +20,6 @@ export class SqlEditorService {
     query: string,
     cursor: number
   ): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
-
     const result = await this.gql.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,

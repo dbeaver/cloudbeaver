@@ -44,7 +44,6 @@ export class ContextMenu {
     params: IContextMenuItem<T>,
     context: IMenuContext<T>
   ): ComputedMenuItemModel {
-
     // depends on context
     const modelOptions = new ComputedMenuItemOptionsWithContext(params, context);
     const model = new ComputedMenuItemModel(modelOptions);
@@ -60,20 +59,17 @@ export class ContextMenu {
     panelId: string,
     context: IMenuContext<T>
   ): IMenuPanel {
-
     const panel = this.menuStore.getPanel(panelId);
     return new ContextMenuPanel(
       `${panelId}-${context.contextId!}-panel`,
       () => this.constructMenuItems(panel.menuItems.values, context)
     );
-
   }
 
   private constructMenuItems<T>(
     menuItems: Array<IContextMenuItem<any>>,
     context: IMenuContext<T>
   ): ComputedMenuItemModel[] {
-
     return menuItems
       .filter(item => item.isPresent(context)) // show menu items based on context
       .map(item => this.constructMenuItemWithContext(item, context));
@@ -118,7 +114,6 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
 }
 
 class ContextMenuPanel implements IMenuPanel {
-
   get menuItems() {
     if (!this.items) {
       this.items = this.itemsGetter();

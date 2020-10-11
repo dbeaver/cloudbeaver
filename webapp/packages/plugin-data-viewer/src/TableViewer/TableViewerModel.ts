@@ -310,7 +310,6 @@ export class TableViewerModel {
         isFullyLoaded: response.isFullyLoaded,
       };
       return data;
-
     } catch (e) {
       this.showError(e);
       throw e;
@@ -360,7 +359,6 @@ export class TableViewerModel {
       this.tableEditor.applyChanges(data.rows);
       this.clearErrors();
       this.updateInfo(data.statusMessage, data.duration);
-
     } finally {
       this._isLoaderVisible = false;
     }
@@ -385,9 +383,9 @@ export class TableViewerModel {
   private getDefaultRowsCount(count?: number) {
     return count
       ? Math.max(
-          fetchingSettings.fetchMin,
-          Math.min(count, fetchingSettings.fetchMax)
-        )
+        fetchingSettings.fetchMin,
+        Math.min(count, fetchingSettings.fetchMax)
+      )
       : fetchingSettings.fetchDefault;
   }
 }

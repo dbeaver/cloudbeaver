@@ -60,7 +60,6 @@ export class CustomConnectionController implements IInitializableController {
   }
 
   private sortDrivers(driverA: DBDriver, driverB: DBDriver): number {
-
     if (driverA.promotedScore === driverB.promotedScore) {
       return (driverA.name || '').localeCompare((driverB.name || ''));
     }

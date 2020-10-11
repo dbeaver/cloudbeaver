@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom';
 import { Body } from '@cloudbeaver/core-app';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
-export function renderLayout(serviceInjector: IServiceInjector) {
+export function renderLayout(serviceInjector: IServiceInjector): void {
   ReactDOM.render(
     <AppContext app={serviceInjector}>
       <Body />

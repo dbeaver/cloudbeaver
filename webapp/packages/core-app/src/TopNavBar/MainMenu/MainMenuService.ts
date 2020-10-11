@@ -18,7 +18,6 @@ export enum EMainMenu {
 
 @injectable()
 export class MainMenuService {
-
   readonly onConnectionClick: Observable<unknown>;
 
   private menuOptions = new StaticMenu();

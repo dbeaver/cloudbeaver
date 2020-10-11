@@ -14,7 +14,6 @@ import { ISqlQueryParams } from '../ISqlEditorTabState';
 
 @injectable()
 export class SqlResultService {
-
   constructor(private graphQLService: GraphQLService) { }
 
   async saveChanges(
@@ -22,7 +21,6 @@ export class SqlResultService {
     resultId: string,
     diff: RowDiff[]
   ): Promise<SqlExecuteInfo> {
-
     const response = await this.graphQLService.sdk.updateResultsDataBatch({
       connectionId: sqlQueryParams.connectionId,
       contextId: sqlQueryParams.contextId,
@@ -50,5 +48,4 @@ export class SqlResultService {
     };
     return dataResults;
   }
-
 }

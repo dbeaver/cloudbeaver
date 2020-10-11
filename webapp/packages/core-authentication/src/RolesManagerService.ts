@@ -13,7 +13,7 @@ import { RolesResource } from './RolesResource';
 @injectable()
 export class RolesManagerService {
   constructor(
-    readonly roles: RolesResource,
+    readonly roles: RolesResource
   ) {
   }
 }

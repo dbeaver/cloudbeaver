@@ -7,7 +7,7 @@
  */
 
 import CodeMirror, {
-  EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction,
+  EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
 import { computed } from 'mobx';
 import { IControlledCodeMirror } from 'react-codemirror2';
@@ -26,7 +26,6 @@ const showHint = CodeMirror.showHint;
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
-
   @computed get dialect(): SqlDialectInfo | undefined {
     return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.connectionId);
   }
@@ -87,7 +86,7 @@ export class SqlEditorController implements IInitializableController {
   constructor(
     private sqlResultTabsService: SqlResultTabsService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private sqlEditorService: SqlEditorService,
+    private sqlEditorService: SqlEditorService
   ) { }
 
   init(tab: ITab<ISqlEditorTabState>) {
@@ -137,7 +136,7 @@ export class SqlEditorController implements IInitializableController {
           this.tab.handlerState.query,
           cursorPosition
         )
-        .then((proposals) => {
+        .then(proposals => {
           if (!proposals) {
             return;
           }

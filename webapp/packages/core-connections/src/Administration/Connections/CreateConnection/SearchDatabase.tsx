@@ -31,7 +31,6 @@ export const SearchDatabase = observer(function SearchDatabase({
   onSearch,
   className,
 }: Props) {
-
   return (
     <DatabaseList
       databases={databases}

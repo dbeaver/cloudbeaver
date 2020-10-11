@@ -45,7 +45,7 @@ export class NavigationTreeContextMenuService {
         },
         order: 1,
         title: 'app_navigationTree_openNodeTab',
-        onClick: (context) => {
+        onClick: context => {
           const node = context.data;
           this.navNodeManagerService.navToNode(node.id, node.parentId);
         },
@@ -61,7 +61,7 @@ export class NavigationTreeContextMenuService {
         },
         order: Number.MAX_SAFE_INTEGER,
         title: 'app_navigationTree_refreshNode',
-        onClick: (context) => {
+        onClick: context => {
           const node = context.data;
           this.navNodeManagerService.refreshTree(node.id);
         },

@@ -15,7 +15,6 @@ import { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
 export class ScreenService {
-
   get screen() {
     return this.getScreenByRoute(this.routerService.route);
   }

@@ -10,7 +10,7 @@ import {
   NavNodeManagerService,
   INodeNavigationData,
   ITab,
-  NodeManagerUtils,
+  NodeManagerUtils
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -35,7 +35,6 @@ export class DataViewerTabService {
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService
   ) {
-
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
       priority: 2,

@@ -14,10 +14,9 @@ import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 
 @injectable()
 export class ConnectionAuthService {
-
   constructor(
     private connectionInfoResource: ConnectionInfoResource,
-    private commonDialogService: CommonDialogService,
+    private commonDialogService: CommonDialogService
   ) {}
 
   async auth(connectionId: string) {

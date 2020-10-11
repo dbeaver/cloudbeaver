@@ -11,9 +11,8 @@ import { GraphQLService, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DriverPropertiesService {
-
   constructor(
-    private graphQLService: GraphQLService,
+    private graphQLService: GraphQLService
   ) {
   }
 

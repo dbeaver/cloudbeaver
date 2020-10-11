@@ -25,7 +25,7 @@ export class AuthMenuService extends Bootstrap {
     private settingsMenuService: SettingsMenuService,
     private notificationService: NotificationService,
     private topNavService: TopNavService,
-    private administrationTopAppBarService: AdministrationTopAppBarService,
+    private administrationTopAppBarService: AdministrationTopAppBarService
   ) {
     super();
   }

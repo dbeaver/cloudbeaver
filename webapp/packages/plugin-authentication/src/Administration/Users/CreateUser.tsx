@@ -43,7 +43,6 @@ export function CreateUser({
   user,
   onCancel,
 }: Props) {
-
   return styled(useStyles(styles))(
     <user-create as='div'>
       <title-bar as='div'><Translate token='authentication_administration_user_connections_user_add' /></title-bar>

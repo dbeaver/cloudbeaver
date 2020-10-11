@@ -86,7 +86,7 @@ export class SettingsMenuService extends Bootstrap {
       }
     );
 
-    this.themeService.themes.forEach((theme) => {
+    this.themeService.themes.forEach(theme => {
       this.addMenuItem(
         this.themeMenuToken,
         {
@@ -94,7 +94,7 @@ export class SettingsMenuService extends Bootstrap {
           title: theme.name,
           isDisabled: () => theme.id === this.themeService.currentThemeId,
           onClick: () => this.themeService.changeThemeAsync(theme.id),
-        },
+        }
       );
     });
   }
@@ -116,7 +116,7 @@ export class SettingsMenuService extends Bootstrap {
       }
     );
 
-    config.supportedLanguages.forEach((lang) => {
+    config.supportedLanguages.forEach(lang => {
       this.addMenuItem(
         this.langMenuToken,
         {

@@ -48,7 +48,7 @@ export class App {
         plugin.registerServices(this.getServiceCollection());
       }
       if (plugin.providers?.length) {
-        plugin.providers.forEach((provider) => {
+        plugin.providers.forEach(provider => {
           // console.log('provider', provider.name);
           this.diWrapper.collection.addServiceByClass(provider);
         });

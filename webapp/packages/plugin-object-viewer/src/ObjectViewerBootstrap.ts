@@ -13,7 +13,6 @@ import { ObjectViewerTabService } from './ObjectViewerTabService';
 
 @injectable()
 export class ObjectViewerBootstrap {
-
   constructor(
     private objectViewerTabService: ObjectViewerTabService,
     private objectPropertiesPageService: ObjectPropertiesPageService

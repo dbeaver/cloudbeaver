@@ -145,9 +145,9 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
   private getDefaultRowsCount(count?: number) {
     return count
       ? Math.max(
-          fetchingSettings.fetchMin,
-          Math.min(count, fetchingSettings.fetchMax)
-        )
+        fetchingSettings.fetchMin,
+        Math.min(count, fetchingSettings.fetchMax)
+      )
       : fetchingSettings.fetchDefault;
   }
 }

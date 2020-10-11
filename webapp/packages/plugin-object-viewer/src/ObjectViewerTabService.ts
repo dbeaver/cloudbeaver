@@ -17,7 +17,7 @@ import {
   objectCatalogProvider,
   objectSchemaProvider,
   NavNodeManagerService,
-  DBObjectService,
+  DBObjectService
 } from '@cloudbeaver/core-app';
 import { connectionProvider, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -45,7 +45,6 @@ export class ObjectViewerTabService {
     private notificationService: NotificationService,
     private navigationTabsService: NavigationTabsService
   ) {
-
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,

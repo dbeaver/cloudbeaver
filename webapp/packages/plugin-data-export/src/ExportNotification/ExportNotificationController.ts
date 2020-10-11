@@ -78,7 +78,7 @@ export class ExportNotificationController implements IInitializableController {
     private commonDialogService: CommonDialogService,
     private dataExportProcessService: DataExportProcessService,
     private navNodeManagerService: NavNodeManagerService,
-    private localization: LocalizationService,
+    private localization: LocalizationService
   ) {}
 
   init(notification: INotification<{ source: string }>): void {

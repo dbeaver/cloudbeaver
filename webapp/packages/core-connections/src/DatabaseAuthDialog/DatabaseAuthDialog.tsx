@@ -81,15 +81,15 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
       {(!connection.isLoaded() || connection.isLoading())
         ? <Loader />
         : (
-            <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-              <ObjectPropertyInfoForm
-                autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
-                properties={connection.connectionInfo?.authProperties}
-                credentials={controller.credentials}
-                disabled={controller.isAuthenticating}
-              />
-            </SubmittingForm>
-          )}
+          <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
+            <ObjectPropertyInfoForm
+              autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
+              properties={connection.connectionInfo?.authProperties}
+              credentials={controller.credentials}
+              disabled={controller.isAuthenticating}
+            />
+          </SubmittingForm>
+        )}
       {controller.error.responseMessage && (
         <ErrorMessage
           text={controller.error.responseMessage}

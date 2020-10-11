@@ -8,7 +8,7 @@
 
 import { SplitContext } from 'go-split';
 import {
-  useCallback, useContext, useState, useEffect,
+  useCallback, useContext, useState, useEffect
 } from 'react';
 import styled, { use } from 'reshadow';
 

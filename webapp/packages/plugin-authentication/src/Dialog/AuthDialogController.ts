@@ -40,7 +40,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private notificationService: NotificationService,
     private authProvidersResource: AuthProvidersResource,
     private authInfoService: AuthInfoService,
-    private commonDialogService: CommonDialogService,
+    private commonDialogService: CommonDialogService
   ) { }
 
   init(onClose: () => void) {

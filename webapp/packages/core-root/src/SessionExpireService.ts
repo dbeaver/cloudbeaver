@@ -21,7 +21,7 @@ export class SessionExpireService {
 
   onSessionExpire = new Subject();
   constructor(
-    private graphQLService: GraphQLService,
+    private graphQLService: GraphQLService
   ) {
   }
 

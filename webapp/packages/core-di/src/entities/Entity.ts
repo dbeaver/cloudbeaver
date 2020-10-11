@@ -82,7 +82,7 @@ export class Entity {
    * Destroy mixins in the reverse order of addition
    */
   destroyEntity() {
-    this.mixins.reverse().forEach((token) => {
+    this.mixins.reverse().forEach(token => {
       const mixin = this.getMixin(token) as IDestroyableMixin;
       if (mixin.destruct) {
         mixin.destruct();
@@ -91,7 +91,7 @@ export class Entity {
   }
 
   protected addProviders(providers: Array<MixinProvider<any>>) {
-    providers.forEach((provider) => {
+    providers.forEach(provider => {
       if (typeof provider === 'function') {
         this.addMixin(provider);
       } else {
@@ -114,7 +114,6 @@ export class Entity {
   getMixin<T>(token: InjectionToken<T>): T {
     return this.container.getServiceByToken<T>(token);
   }
-
 }
 
 export type MixinProvider<T extends Record<string, any>> = ITypedConstructor<T> | {

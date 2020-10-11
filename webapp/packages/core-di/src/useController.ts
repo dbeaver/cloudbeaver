@@ -7,12 +7,12 @@
  */
 
 import {
-  useContext, useEffect, useRef, useMemo,
+  useContext, useEffect, useRef, useMemo
 } from 'react';
 
 import { appContext } from './AppContext';
 import {
-  IServiceConstructor, IInitializableController, IDestructibleController, ExtractInitArgs,
+  IServiceConstructor, IInitializableController, IDestructibleController, ExtractInitArgs
 } from './IApp';
 
 export function useController<T extends IInitializableController>(

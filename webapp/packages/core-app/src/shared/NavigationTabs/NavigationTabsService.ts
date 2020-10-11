@@ -8,7 +8,7 @@
 
 import {
   observable, action,
-  computed, IKeyValueMap,
+  computed, IKeyValueMap
 } from 'mobx';
 import { Subject } from 'rxjs';
 
@@ -127,7 +127,7 @@ export class NavigationTabsService {
   }
 
   @action registerTabHandler<TState>(
-    options: TabHandlerOptions<TState>,
+    options: TabHandlerOptions<TState>
   ): TabHandler<TState> {
     const tabHandler = new TabHandler(options);
     this.handlers.set(options.key, tabHandler);

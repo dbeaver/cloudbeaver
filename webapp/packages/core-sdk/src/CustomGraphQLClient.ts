@@ -34,9 +34,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   }
 
   private blockRequestsReasonHandler(): void {
-    if (!this.isRequestsBlocked) {
-
-    } else {
+    if (this.isRequestsBlocked) {
       if (this.requestsBlockedReason instanceof Error) {
         throw this.requestsBlockedReason;
       } else {

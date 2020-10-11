@@ -24,7 +24,6 @@ const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
 
 @injectable()
 export class CodeEditorController {
-
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 

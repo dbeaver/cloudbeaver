@@ -14,7 +14,7 @@ import { AuthDialog } from './AuthDialog';
 @injectable()
 export class AuthDialogService {
   constructor(
-    private commonDialogService: CommonDialogService,
+    private commonDialogService: CommonDialogService
   ) { }
 
   async showLoginForm(persistent = false) {

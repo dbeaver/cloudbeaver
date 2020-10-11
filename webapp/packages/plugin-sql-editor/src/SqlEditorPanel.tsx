@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { TabHandlerPanelProps } from '@cloudbeaver/core-app';
 import {
-  splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles,
+  splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles
 } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 

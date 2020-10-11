@@ -41,7 +41,6 @@ export const DriverSelectorDialog = observer(
     onSelect,
     onClose,
   }: DriverSelectorDialogProps) {
-
     return styled(styles)(
       <CommonDialogWrapper
         title={title}

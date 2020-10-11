@@ -45,7 +45,6 @@ interface IActiveItem<T> {
 
 @injectable()
 export class ConnectionSchemaManagerService {
-
   get currentConnectionId(): string | undefined {
     if (!this.activeItem?.getCurrentConnectionId) {
       return;
@@ -121,7 +120,7 @@ export class ConnectionSchemaManagerService {
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
-    private notificationService: NotificationService,
+    private notificationService: NotificationService
   ) {
 
   }
@@ -195,7 +194,7 @@ export class ConnectionSchemaManagerService {
       } catch (exception) {
         this.notificationService.logException(
           exception,
-          `Can't load objectContainers for ${connectionId}@${catalogId}`,
+          `Can't load objectContainers for ${connectionId}@${catalogId}`
         );
       }
     }

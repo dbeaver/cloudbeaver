@@ -28,7 +28,6 @@ interface Props {
 }
 
 export const User = observer(function User({ user }: Props) {
-
   return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit}>
       <TableColumnValue centerContent flex>

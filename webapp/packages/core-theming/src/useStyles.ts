@@ -64,7 +64,7 @@ export function useStyles(
     if (themedStyles.length > 0) {
       Promise
         .all(themedStyles)
-        .then((styles) => {
+        .then(styles => {
           loadedStyles.current = flat([staticStyles, styles]);
           forceUpdate(patch + 1);
         });

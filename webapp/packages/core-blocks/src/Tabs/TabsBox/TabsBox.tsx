@@ -29,7 +29,6 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
   className,
   style = [],
 }: TabsBoxProps, ref) {
-
   return styled(useStyles(...style))(
     <TabsState currentTabId={currentTabId}>
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>

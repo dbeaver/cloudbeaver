@@ -17,7 +17,6 @@ import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
-
   constructor(
     private mainMenuService: MainMenuService,
     private templateConnectionsResource: TemplateConnectionsResource,

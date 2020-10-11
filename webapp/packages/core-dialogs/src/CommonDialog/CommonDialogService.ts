@@ -39,7 +39,7 @@ export class CommonDialogService {
   async open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
-    options?: DialogOptions,
+    options?: DialogOptions
   ): Promise<TResult | null> {
     return new Promise<TResult>((resolve, reject) => {
       const dialogInternal: DialogInternal = {

@@ -13,11 +13,10 @@ import { AppScreen } from './AppScreen';
 
 @injectable()
 export class AppScreenService extends Bootstrap {
-
   static screenName = 'app';
 
   constructor(
-    private screenService: ScreenService,
+    private screenService: ScreenService
   ) {
     super();
   }

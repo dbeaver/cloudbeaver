@@ -19,7 +19,6 @@ export interface IErrorModelOptions {
 }
 
 export class ErrorModel {
-
   reason: string;
   errors: IErrorInfo[] = [];
   textToCopy = '';
@@ -32,7 +31,7 @@ export class ErrorModel {
       this.textToCopy = this.reason;
     } else if (error instanceof GQLError) { // GQL Error
       this.errors = (error.response?.errors || [])
-        .map((error) => {
+        .map(error => {
           const errorInfo: IErrorInfo = {
             message: error.message,
             stackTrace: error.extensions?.stackTrace || '',
@@ -49,7 +48,6 @@ export class ErrorModel {
       if (error.isTextBody) {
         this.htmlBody = error.errorText;
       }
-
     } else if (error instanceof ServerInternalError) {
       this.errors = [
         {

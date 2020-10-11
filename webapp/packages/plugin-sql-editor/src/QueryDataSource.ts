@@ -100,7 +100,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
       },
-      this.dataFormat,
+      this.dataFormat
     );
 
     this.sqlProcess = this.metadata.resultDataProcess;

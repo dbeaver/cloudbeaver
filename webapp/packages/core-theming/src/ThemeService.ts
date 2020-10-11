@@ -33,7 +33,6 @@ const DEFAULT_THEME_ID = 'light';
 
 @injectable()
 export class ThemeService {
-
   @computed get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
   }

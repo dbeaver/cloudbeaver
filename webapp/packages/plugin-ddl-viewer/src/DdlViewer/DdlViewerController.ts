@@ -18,7 +18,6 @@ import { DdlViewerService } from '../DdlViewerService';
 
 @injectable()
 export class DdlViewerController implements IInitializableController, IDestructibleController {
-
   @observable isLoading = true;
   @observable metadata = '';
   @observable dialect?: SqlDialectInfo;

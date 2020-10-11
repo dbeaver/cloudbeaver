@@ -21,7 +21,6 @@ interface ObjectChildrenPropertyTableProps {
 export const ObjectChildrenPropertyTable = observer(function ObjectPropertyTable({
   nodeIds,
 }: ObjectChildrenPropertyTableProps) {
-
   const firstChild = nodeIds[0] || '';
   const properties = useDatabaseObjectInfo(firstChild).dbObject?.properties;
 

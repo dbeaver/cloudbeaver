@@ -18,7 +18,6 @@ export type RouterState = State;
 
 @injectable()
 export class RouterService extends Bootstrap {
-
   get route() {
     return this.currentRoute;
   }

@@ -11,7 +11,7 @@ import {
   AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter, ResultDataFormat
 } from '@cloudbeaver/core-sdk';
 import {
-  CancellablePromise, cancellableTimeout, Deferred, EDeferredState,
+  CancellablePromise, cancellableTimeout, Deferred, EDeferredState
 } from '@cloudbeaver/core-utils';
 
 import { ISqlQueryParams } from '../ISqlEditorTabState';
@@ -19,7 +19,6 @@ import { ISqlQueryParams } from '../ISqlEditorTabState';
 const DELAY_BETWEEN_TRIES = 1000;
 
 export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
-
   private taskId?: string;
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
@@ -109,7 +108,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   private async executeQueryAsync(
     sqlQueryParams: ISqlQueryParams,
     filter: SqlDataFilter,
-    dataFormat: ResultDataFormat,
+    dataFormat: ResultDataFormat
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
       connectionId: sqlQueryParams.connectionId,

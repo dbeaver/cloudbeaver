@@ -11,7 +11,7 @@ import { useContext, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TableContext,
+  TableContext
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
