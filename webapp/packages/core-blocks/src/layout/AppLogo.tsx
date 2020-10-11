@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { Icon } from '../Icons/Icon';
+import { IconOrImage } from '../IconOrImage';
 
 const styles = css`
   logo {
@@ -20,9 +20,9 @@ const styles = css`
     cursor: pointer;
   }
 
-  Icon {
+  IconOrImage {
     height: 24px;
-    width: auto;
+    width: 150px;
     margin-bottom: 2px;
   }
 `;
@@ -35,7 +35,7 @@ interface Props {
 export const AppLogo: React.FC<Props> = function AppLogo({ title, onClick }) {
   return styled(styles)(
     <logo as="div" title={title} onClick={onClick}>
-      <Icon name="logo" viewBox="0 0 361 73" />
+      <IconOrImage icon="/icons/logo.svg" />
     </logo>
   );
 };
