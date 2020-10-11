@@ -23,7 +23,7 @@ export class ConfigurationWizardService {
   @computed get steps(): IAdministrationItem[] {
     return this.administrationItemService.items
       .filter(filterConfigurationWizard(true))
-      .sort(orderAdministrationItems);
+      .sort(orderAdministrationItems(true));
   }
 
   @computed get stepsToFinish(): IAdministrationItem[] {

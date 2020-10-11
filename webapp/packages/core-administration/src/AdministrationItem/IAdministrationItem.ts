@@ -56,6 +56,7 @@ export interface IAdministrationItemSubItem {
 
 export interface IConfigurationWizardItemOptions {
   description: string;
+  order?: number;
   defaultRoute?: IRouteParams;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;

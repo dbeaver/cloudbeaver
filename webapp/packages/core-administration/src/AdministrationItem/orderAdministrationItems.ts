@@ -8,6 +8,15 @@
 
 import { IAdministrationItem } from './IAdministrationItem';
 
-export function orderAdministrationItems(itemA: IAdministrationItem, itemB: IAdministrationItem) {
-  return itemA.order - itemB.order;
+export function orderAdministrationItems(configuration: boolean) {
+  return (itemA: IAdministrationItem, itemB: IAdministrationItem) => {
+    if (configuration) {
+      return (
+        itemA.configurationWizardOptions?.order ?? itemA.order
+      ) - (
+        itemB.configurationWizardOptions?.order ?? itemB.order
+      );
+    }
+    return itemA.order - itemB.order;
+  };
 }

@@ -27,7 +27,7 @@ export class AdministrationItemService {
       return null;
     }
 
-    return items.sort(orderAdministrationItems)[0].name;
+    return items.sort(orderAdministrationItems(configurationWizard))[0].name;
   }
 
   getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {

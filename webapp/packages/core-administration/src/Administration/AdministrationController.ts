@@ -19,7 +19,7 @@ export class AdministrationController {
     return this.administrationItemService
       .items
       .filter(filterConfigurationWizard(configurationWizard))
-      .sort(orderAdministrationItems);
+      .sort(orderAdministrationItems(configurationWizard));
   }
 
   constructor(

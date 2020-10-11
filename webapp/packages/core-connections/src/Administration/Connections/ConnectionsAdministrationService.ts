@@ -30,7 +30,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Default,
-      order: 3,
+      order: 2,
       configurationWizardOptions: {
         defaultRoute: { sub: 'create', param: 'search-database' },
         description: 'connections_administration_configuration_wizard_step_description',

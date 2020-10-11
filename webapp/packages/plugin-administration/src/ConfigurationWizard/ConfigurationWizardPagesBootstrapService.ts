@@ -43,13 +43,14 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       type: AdministrationItemType.Default,
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
+        order: 1.1,
         isDone: this.serverConfigurationService.isDone.bind(this.serverConfigurationService),
         onFinish: this.serverConfigurationService.validate.bind(this.serverConfigurationService),
         onConfigurationFinish: this.serverConfigurationService.handleConfigurationFinish.bind(
           this.serverConfigurationService
         ),
       },
-      order: 1.1,
+      order: 4,
       onActivate: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
