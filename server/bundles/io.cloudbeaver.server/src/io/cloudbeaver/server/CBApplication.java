@@ -414,14 +414,16 @@ public class CBApplication extends BaseApplicationImpl {
             throw new DBException("Application must be in configuration mode");
         }
 
-        database.finishConfiguration(adminName, adminPassword);
+        if (isConfigurationMode()) {
+            database.finishConfiguration(adminName, adminPassword);
+        }
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
         saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
-        if (appConfig.isAnonymousAccessEnabled()) {
+        if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
 
