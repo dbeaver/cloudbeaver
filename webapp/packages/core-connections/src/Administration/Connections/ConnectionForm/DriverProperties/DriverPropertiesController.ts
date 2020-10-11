@@ -49,7 +49,7 @@ export class DriverPropertiesController implements IInitializableController {
       id: uuid(),
       key: key ?? 'property',
       defaultValue: value ?? '',
-      new: !key,
+      new: !key
     });
   };
 
@@ -63,10 +63,10 @@ export class DriverPropertiesController implements IInitializableController {
       this.driverProperties = observable(driverProperties.map(property => ({
         id: property.id!,
         key: property.id!,
-        displayName: property.displayName!,
+        displayName: property.displayName,
         defaultValue: property.defaultValue,
         description: property.description,
-        validValues: property.validValues,
+        validValues: property.validValues
       })));
 
       for (const key of Object.keys(this.state)) {

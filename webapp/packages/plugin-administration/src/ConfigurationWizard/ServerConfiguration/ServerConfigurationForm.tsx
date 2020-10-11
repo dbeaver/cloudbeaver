@@ -51,17 +51,19 @@ interface Props {
   serverConfig: ServerConfigInput;
   validationTask?: IExecutor<boolean>;
   editing?: boolean;
+  className?: string;
   onChange: () => void;
   onSubmit: () => void;
 }
 
-export const ServerConfigurationForm = observer(function ServerConfigurationForm({
+export const ServerConfigurationForm: React.FC<Props> = observer(function ServerConfigurationForm({
   serverConfig,
   validationTask,
   editing,
+  className,
   onChange,
   onSubmit,
-}: Props) {
+}) {
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
@@ -80,7 +82,7 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
   }, [validationTask]);
 
   return styled(useStyles(formStyles, boxStyles))(
-    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={onSubmit}>
+    <SubmittingForm ref={focusedRef} name='server_config' className={className} onSubmit={onSubmit}>
       <box as="div">
         <box-element as='div'>
           <group as="div">
@@ -98,37 +100,47 @@ export const ServerConfigurationForm = observer(function ServerConfigurationForm
               {translate('administration_configuration_wizard_configuration_server_name')}
             </InputField>
           </group>
-          {editing
-            ? <group as="div"><Button mod={['raised']}>Save</Button></group>
-            : (
-                <>
-                  <group as="div">
-                    <InputGroup long>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
-                  </group>
-                  <InputField
-                    type="text"
-                    name="adminName"
-                    state={serverConfig}
-                    mod='surface'
-                    minLength={6}
-                    required
-                    long
-                  >
-                    {translate('administration_configuration_wizard_configuration_admin_name')}
-                  </InputField>
-                  <InputField
-                    type="password"
-                    name="adminPassword"
-                    state={serverConfig}
-                    autoComplete='new-password'
-                    mod='surface'
-                    required
-                    long
-                  >
-                    {translate('administration_configuration_wizard_configuration_admin_password')}
-                  </InputField>
-                </>
-              )}
+          <group as="div">
+            <InputField
+              type="number"
+              name='sessionExpireTime'
+              state={serverConfig}
+              mod='surface'
+              required
+              long
+            >
+              {translate('administration_configuration_wizard_configuration_server_session_expire_time')}
+            </InputField>
+          </group>
+          {!editing && (
+            <>
+              <group as="div">
+                <InputGroup long>{translate('administration_configuration_wizard_configuration_admin')}</InputGroup>
+              </group>
+              <InputField
+                type="text"
+                name="adminName"
+                state={serverConfig}
+                mod='surface'
+                minLength={6}
+                required
+                long
+              >
+                {translate('administration_configuration_wizard_configuration_admin_name')}
+              </InputField>
+              <InputField
+                type="password"
+                name="adminPassword"
+                state={serverConfig}
+                autoComplete='new-password'
+                mod='surface'
+                required
+                long
+              >
+                {translate('administration_configuration_wizard_configuration_admin_password')}
+              </InputField>
+            </>
+          )}
         </box-element>
         <box-element as='div'>
           <group as="div">

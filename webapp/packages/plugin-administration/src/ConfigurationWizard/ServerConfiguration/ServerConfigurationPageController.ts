@@ -25,9 +25,13 @@ export class ServerConfigurationPageController {
   constructor(
     private readonly configurationWizardService: ConfigurationWizardService,
     private readonly serverConfigurationService: ServerConfigurationService,
-    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly administrationScreenService: AdministrationScreenService
   ) {
   }
+
+  reset = (): void => {
+    this.serverConfigurationService.loadConfig();
+  };
 
   onChange = (): void => {
     if (!this.state.serverConfig.authenticationEnabled) {

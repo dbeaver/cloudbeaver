@@ -73,11 +73,11 @@ const styles = composes(
   `
 );
 
-export const ConnectionsAdministration = observer(function ConnectionsAdministration({
+export const ConnectionsAdministration: React.FC<AdministrationItemContentProps> = observer(function ConnectionsAdministration({
   sub,
   param,
-  configurationWizard,
-}: AdministrationItemContentProps) {
+  configurationWizard
+}) {
   const controller = useController(ConnectionsAdministrationController);
 
   return styled(useStyles(styles))(

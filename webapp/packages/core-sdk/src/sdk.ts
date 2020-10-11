@@ -439,6 +439,7 @@ export interface ServerConfig {
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
   supportsWorkspaces?: Maybe<Scalars['Boolean']>;
+  sessionExpireTime?: Maybe<Scalars['Int']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
   developmentMode?: Maybe<Scalars['Boolean']>;
   supportedLanguages: ServerLanguage[];
@@ -773,6 +774,7 @@ export interface ServerConfigInput {
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
+  sessionExpireTime?: Maybe<Scalars['Int']>;
 }
 
 export enum AuthCredentialEncryption {
@@ -1337,7 +1339,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
   );
 }
@@ -2202,6 +2204,7 @@ export const ServerConfigDocument = `
     supportsCustomConnections
     supportsConnectionBrowser
     supportsWorkspaces
+    sessionExpireTime
     anonymousAccessEnabled
     authenticationEnabled
     configurationMode

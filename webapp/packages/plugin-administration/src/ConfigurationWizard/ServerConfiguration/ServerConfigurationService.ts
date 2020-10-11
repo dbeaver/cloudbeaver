@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -23,8 +25,7 @@ export interface IValidationStatusContext {
 
 @injectable()
 export class ServerConfigurationService {
-
-  state: IServerConfigurationPageState;
+  @observable state: IServerConfigurationPageState;
   readonly validationTask: IExecutor<boolean>;
 
   constructor(
@@ -37,7 +38,7 @@ export class ServerConfigurationService {
     this.state = this.administrationScreenService
       .getItemState(
         'server-configuration',
-        () => this.getConfig(),
+        () => this.getConfig()
       );
     this.validationTask = new Executor();
   }
@@ -85,7 +86,12 @@ export class ServerConfigurationService {
 
     try {
       await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.state.navigatorConfig });
-      await this.graphQLService.sdk.configureServer({ configuration: this.state.serverConfig });
+      await this.graphQLService.sdk.configureServer({
+        configuration: {
+          ...this.state.serverConfig,
+          sessionExpireTime: (this.state.serverConfig.sessionExpireTime ?? 30) * 1000 * 60,
+        },
+      });
 
       if (!this.serverConfigResource.data?.configurationMode) {
         await this.serverConfigResource.refresh(null);
@@ -100,6 +106,9 @@ export class ServerConfigurationService {
 
   private isFormFilled() {
     if (!this.state?.serverConfig.serverName) {
+      return false;
+    }
+    if ((this.state.serverConfig.sessionExpireTime ?? 0) < 1) {
       return false;
     }
     if (this.administrationScreenService.isConfigurationMode) {
@@ -123,6 +132,7 @@ export class ServerConfigurationService {
           anonymousAccessEnabled: true,
           authenticationEnabled: false,
           customConnectionsEnabled: false,
+          sessionExpireTime: 30,
         },
         navigatorConfig: {
           hideFolders: false,
@@ -142,6 +152,7 @@ export class ServerConfigurationService {
         anonymousAccessEnabled: config.anonymousAccessEnabled,
         authenticationEnabled: config.authenticationEnabled,
         customConnectionsEnabled: config.supportsCustomConnections,
+        sessionExpireTime: (config.sessionExpireTime ?? 1800000) / 1000 / 60,
       },
       navigatorConfig: {
         hideFolders: false,
@@ -154,5 +165,4 @@ export class ServerConfigurationService {
       },
     };
   }
-
 }
