@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle
+  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, Loader
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -121,7 +121,8 @@ export const AuthDialog = observer(function AuthDialog({
               authenticate={controller.isAuthenticating}
             />
           )}
-          {!controller.provider && <>Select available provider</>}
+          {controller.isLoading && <Loader />}
+          {!controller.isLoading && !controller.provider && <>Select available provider</>}
         </SubmittingForm>
         {controller.error.responseMessage && (
           <ErrorMessage
