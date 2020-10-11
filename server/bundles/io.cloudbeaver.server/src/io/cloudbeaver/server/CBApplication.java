@@ -423,7 +423,7 @@ public class CBApplication extends BaseApplicationImpl {
         saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
-        if (appConfig.isAnonymousAccessEnabled()) {
+        if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
 
