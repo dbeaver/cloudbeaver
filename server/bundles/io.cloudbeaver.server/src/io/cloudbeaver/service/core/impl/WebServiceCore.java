@@ -268,7 +268,6 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
 
-        DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
         sessionRegistry.addDataSource(newDataSource);
 
