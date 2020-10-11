@@ -43,12 +43,14 @@ const styles = composes(
       display: flex;
       box-sizing: border-box;
       flex: 1;
-      margin: 0px 1px;
       padding: 4px 0;
 
       & ShadowInput {
         padding: 0 36px;
       }
+    }
+    property-value {
+      margin-left: 2px;
     }
     property-name {
       flex: 0 0 auto;

@@ -28,7 +28,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
     properties-header {
       box-sizing: border-box;
       display: inline-flex;
-      padding: 2px;
+      padding: 2px 0;
       position: sticky;
       z-index: 1;
       top: 0;
@@ -39,7 +39,9 @@ export const PROPERTIES_TABLE_STYLES = composes(
       box-sizing: border-box;
       flex: 1;
       padding: 4px 36px;
-      margin: 0px 1px;
+    }
+    properties-header-value, properties-header-right {
+      margin-left: 2px;
     }
     properties-header-name {
       flex: 0 0 auto;
@@ -47,7 +49,6 @@ export const PROPERTIES_TABLE_STYLES = composes(
     }
     properties-header-right {
       flex: 0 0 auto;
-      margin: 0px 1px;
     }
 
     properties-list {
