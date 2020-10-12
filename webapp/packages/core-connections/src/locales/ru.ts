@@ -15,7 +15,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Названия хостов'],
   ['connections_connection_address', 'Адрес'],
   ['connections_connection_name', 'Название'],
-  ['connections_connection_description', 'Описапние'],
+  ['connections_connection_description', 'Описание'],
   ['connections_connection_driver', 'Драйвер'],
   ['connections_connection_host', 'Хост'],
   ['connections_connection_port', 'Порт'],
@@ -25,4 +25,5 @@ export default [
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
   ['connections_driver_search_placeholder', 'Введите название драйвера...'],
+  ['connections_not_found', 'Подключения к базам данных не найдены'],
 ];
