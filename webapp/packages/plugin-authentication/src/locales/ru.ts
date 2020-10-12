@@ -25,4 +25,6 @@ export default [
   ['authentication_user_role_not_set', 'Должна быть выбрана минимум одна роль'],
   ['authentication_user_password_not_set', 'Пароль не задан'],
   ['authentication_user_passwords_not_match', 'Пароли не совпадают'],
+  ['authentication_user_login_already_exists', 'Пользователь с таким именем уже существует'],
+  ['authentication_user_login_cant_be_used', 'Данное имя нельзя использовать'],
 ];
