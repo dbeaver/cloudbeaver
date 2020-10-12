@@ -59,10 +59,6 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
   }
 
   async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {
-    if (this.isNew(userId)) {
-      return [];
-    }
-
     const { grantedConnections } = await this.graphQLService.sdk.getUserGrantedConnections({ userId });
 
     return grantedConnections;
@@ -127,18 +123,14 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
         if (this.isActiveUser(key.list[i])) {
           throw new Error('You can\'t delete current logged user');
         }
-        if (!this.isNew(key.list[i])) {
-          await this.graphQLService.sdk.deleteUser({ userId: key.list[i] });
-        }
+        await this.graphQLService.sdk.deleteUser({ userId: key.list[i] });
         this.data.delete(key.list[i]);
       }
     } else {
       if (this.isActiveUser(key)) {
         throw new Error('You can\'t delete current logged user');
       }
-      if (!this.isNew(key)) {
-        await this.graphQLService.sdk.deleteUser({ userId: key });
-      }
+      await this.graphQLService.sdk.deleteUser({ userId: key });
       this.data.delete(key);
     }
     this.markUpdated(key);
