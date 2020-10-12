@@ -27,7 +27,10 @@ echo "Copy server packages"
 
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server
 cp -p ./scripts/* ./cloudbeaver
-cp -rp ../samples/sample-databases/GlobalConfiguration cloudbeaver/workspace
+mkdir cloudbeaver/samples
+mkdir cloudbeaver/samples/db
+cp -rp ../samples/sample-databases/db cloudbeaver/samples/db
+cp -rp ../samples/sample-databases/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
 cp -p ../samples/sample-databases/*.conf cloudbeaver/conf/
 mv drivers cloudbeaver
 

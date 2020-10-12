@@ -11,7 +11,7 @@
 			"read-only": false,
 			"template": false,
 			"configuration": {
-				"database": "${project.path}/db/Chinook.sqlitedb",
+				"database": "${application.path}/samples/db/Chinook.sqlitedb",
 				"type": "dev",
 				"auth-model": "native"
 			}
