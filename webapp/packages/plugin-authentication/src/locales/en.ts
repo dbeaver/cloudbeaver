@@ -25,6 +25,6 @@ export default [
   ['authentication_user_role_not_set', 'At least one role must be selected'],
   ['authentication_user_password_not_set', 'Password is required'],
   ['authentication_user_passwords_not_match', "Passwords don't match"],
-  ['authentication_user_login_already_exists', 'A user with this name already exists'],
+  ['authentication_user_login_already_exists', 'The user with this name already exists'],
   ['authentication_user_login_cant_be_used', 'Sorry, that name cannot be used'],
 ];

@@ -49,7 +49,7 @@ export const DatabaseList = observer(function DatabaseList({
     }
   }, [onSearch]);
 
-  const placeholderMessage = isSearched ? 'ui_no_matches_placeholder' : 'connections_administration_search_database_tip';
+  const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
 
   return styled(styles)(
     <SubmittingForm className={className} onSubmit={onSearch}>
