@@ -33,5 +33,9 @@ export class ActiveViewService {
     this.activeView = provider;
   }
 
-  blur() { }
+  blur<T>(provider: IActiveItemProvider<T>) {
+    // if (this.activeView === provider) {
+    //   this.activeView = null;
+    // }
+  }
 }

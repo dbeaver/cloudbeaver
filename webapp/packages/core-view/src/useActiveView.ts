@@ -20,8 +20,8 @@ export function useActiveView<T>(provider: IActiveItemProvider<T>): [() => void,
   }, [provider]);
 
   const handleBlur = useCallback(() => {
-    activeViewService.blur();
-  }, []);
+    activeViewService.blur(provider);
+  }, [provider]);
 
   return [handleFocus, handleBlur];
 }
