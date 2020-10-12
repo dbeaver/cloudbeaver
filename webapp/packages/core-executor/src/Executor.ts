@@ -25,16 +25,18 @@ export class Executor<T> implements IExecutor<T> {
 
     const context = new ExecutionContext(data);
 
-    for (const handler of this.handlers) {
-      const result = await handler(context, data);
+    try {
+      for (const handler of this.handlers) {
+        const result = await handler(context, data);
 
-      if (result === false) {
-        return context;
+        if (result === false) {
+          return context;
+        }
       }
-    }
-
-    for (const handler of this.postHandlers) {
-      await handler(context, data);
+    } finally {
+      for (const handler of this.postHandlers) {
+        await handler(context, data);
+      }
     }
     return context;
   }
