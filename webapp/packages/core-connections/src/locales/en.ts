@@ -26,4 +26,5 @@ export default [
   ['connections_connection_create_fail', 'Failed to create connection'],
   ['connections_connection_save_fail', 'Failed to save connection'],
   ['connections_driver_search_placeholder', 'Type driver name...'],
+  ['connections_not_found', 'No database connections were found'],
 ];
