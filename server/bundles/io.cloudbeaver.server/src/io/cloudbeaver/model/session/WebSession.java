@@ -203,28 +203,32 @@ public class WebSession implements DBASession {
 
     private void initNavigatorModel() {
         CBPlatform platform = CBPlatform.getInstance();
+        DBPProject globalProject = platform.getWorkspace().getActiveProject();
 
         String projectName;
-        File porojectsRoot;
+        File projectPath;
         if (user != null) {
             projectName = user.getUserId();
-            porojectsRoot = new File(platform.getWorkspace().getAbsolutePath(), "user-projects");
+            projectPath = new File(
+                new File(platform.getWorkspace().getAbsolutePath(), "user-projects"),
+                projectName);
         } else {
             projectName = getSessionId();
-            porojectsRoot = new File(platform.getWorkspace().getAbsolutePath(), "session-projects");
+            // For anonymous sessions use path of global project
+            projectPath = globalProject.getAbsolutePath();
         }
         projectName = CommonUtils.escapeFileName(projectName);
         sessionProject = new ProjectMetadata(
             platform.getWorkspace(),
             projectName,
-            new File(porojectsRoot, projectName));
+            projectPath);
         if (user == null) {
             sessionProject.setInMemory(true);
         }
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         {
             // Copy global datasources.
-            for (DBPDataSourceContainer ds : platform.getWorkspace().getActiveProject().getDataSourceRegistry().getDataSources()) {
+            for (DBPDataSourceContainer ds : globalProject.getDataSourceRegistry().getDataSources()) {
                 if (!ds.isTemplate() && isDataSourceAccessible(ds)) {
                     DataSourceDescriptor dsCopy = new DataSourceDescriptor((DataSourceDescriptor) ds, dataSourceRegistry, false);
                     dsCopy.setTemporary(true);
