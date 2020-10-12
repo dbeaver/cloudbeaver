@@ -35,7 +35,7 @@ export function useFocus<T extends HTMLElement>({
         firstFocusable.focus();
       }
     }
-  }, [focusFirstChild]);
+  }, [focusFirstChild, reference.current]);
 
   useEffect(() => {
     if (!reference.current) {
@@ -67,7 +67,7 @@ export function useFocus<T extends HTMLElement>({
       element.removeEventListener('focusin', focusHandler);
       element.removeEventListener('focusout', blurHandler);
     };
-  }, []);
+  }, [reference.current]);
 
   return [reference, focus];
 }
