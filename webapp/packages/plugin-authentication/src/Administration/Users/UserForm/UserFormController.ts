@@ -146,10 +146,14 @@ export class UserFormController implements IInitializableController, IDestructib
     if (!this.credentials.login.trim()) {
       this.notificationService.logError({ title: 'authentication_user_login_not_set' });
       return;
-    } else if (this.rolesManagerService.roles.has(this.credentials.login)) {
+    }
+
+    if (this.rolesManagerService.roles.has(this.credentials.login)) {
       this.notificationService.logError({ title: 'authentication_user_login_cant_be_used' });
       return;
-    } else if (this.usersResource.has(this.credentials.login)) {
+    }
+
+    if (this.usersResource.has(this.credentials.login)) {
       this.notificationService.logError({ title: 'authentication_user_login_already_exists' });
       return;
     }
