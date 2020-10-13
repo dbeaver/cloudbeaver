@@ -45,7 +45,7 @@ interface CellKeyDownEvent extends AgGridEvent{
 }
 
 const EVENT_KEY_CODE = {
-  C: 'C' || 'c',
+  C: 'c',
 };
 
 interface TemporarySelectionRange {
@@ -103,7 +103,7 @@ export class RangeController implements IRangeController {
   }
 
   private handleDocumentCopy(event: KeyboardEvent) {
-    if (event.key === EVENT_KEY_CODE.C && (event.ctrlKey || event.metaKey)) {
+    if (event.key.toLowerCase() === EVENT_KEY_CODE.C && (event.ctrlKey || event.metaKey)) {
       this.copySelectedData();
     }
   }
