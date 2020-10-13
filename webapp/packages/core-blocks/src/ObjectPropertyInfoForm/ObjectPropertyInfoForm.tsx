@@ -23,20 +23,25 @@ interface Props {
   disabled?: boolean;
   autofillToken?: string;
   className?: string;
+  onFocus?: (name: string) => void;
 }
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
-export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
+export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
   disabled,
   autofillToken = '',
   className,
-}: Props) {
+  onFocus,
+}) {
   const style = useStyles(formStyles);
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    if (onFocus) {
+      onFocus(e.target.name);
+    }
     if (e.target.type !== 'password') {
       return;
     }
@@ -46,7 +51,7 @@ export const ObjectPropertyInfoForm = observer(function ObjectPropertyInfoForm({
     if (property?.value === e.target.value) {
       credentials[e.target.name] = '';
     }
-  }, [properties, credentials]);
+  }, [properties, credentials, onFocus]);
 
   if (!properties || properties.length === 0) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;

@@ -17,16 +17,13 @@ import {
   ResourceKey,
   isResourceKeyList,
   AdminConnectionGrantInfo,
-  AdminConnectionSearchInfo,
-  ObjectPropertyInfo
+  AdminConnectionSearchInfo
 } from '@cloudbeaver/core-sdk';
-import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
-export const SEARCH_CONNECTION_SYMBOL = Symbol('search-connection');
 
 export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean };
-export type ConnectionSearch = ConnectionNew & { [SEARCH_CONNECTION_SYMBOL]: AdminConnectionSearchInfo };
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
@@ -44,7 +41,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     this.metadata = new MetadataMap(() => false);
   }
 
-  has(id: string) {
+  has(id: string): boolean {
     if (this.metadata.has(id)) {
       return this.metadata.get(id);
     }
@@ -52,23 +49,19 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return this.data.has(id);
   }
 
-  isNew(id: string) {
+  isNew(id: string): boolean {
     if (!this.has(id)) {
       return false;
     }
     return NEW_CONNECTION_SYMBOL in this.get(id)!;
   }
 
-  isSearched(id: string) {
-    return isSearchedConnection(this.get(id));
-  }
-
-  async loadAll() {
+  async loadAll(): Promise<Map<string, ConnectionInfo>> {
     await this.load('all');
     return this.data;
   }
 
-  async searchDatabases(hosts: string[]) {
+  async searchDatabases(hosts: string[]): Promise<AdminConnectionSearchInfo[]> {
     const { databases } = await this.graphQLService.sdk.searchDatabases({ hosts });
 
     return databases;
@@ -95,13 +88,13 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     });
   }
 
-  async update(id: string, config: ConnectionConfig) {
+  async update(id: string, config: ConnectionConfig): Promise<ConnectionInfo> {
     await this.performUpdate(id, () => this.updateConnection(id, config));
     await this.graphQLService.sdk.refreshSessionConnections();
     return this.get(id)!;
   }
 
-  async delete(key: ResourceKey<string>) {
+  async delete(key: ResourceKey<string>): Promise<void> {
     await this.performUpdate(key, () => this.deleteConnectionTask(key));
     await this.graphQLService.sdk.refreshSessionConnections();
   }
@@ -112,7 +105,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return subjects;
   }
 
-  async setAccessSubjects(connectionId: string, subjects: string[]) {
+  async setAccessSubjects(connectionId: string, subjects: string[]): Promise<void> {
     await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
@@ -157,10 +150,4 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
     this.set(id, connection as ConnectionInfo);
   }
-}
-
-export function isSearchedConnection(
-  connection: ConnectionInfo | undefined
-): connection is ConnectionSearch {
-  return !!connection && SEARCH_CONNECTION_SYMBOL in connection;
 }

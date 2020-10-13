@@ -440,6 +440,7 @@ export interface ServerConfig {
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
   supportsWorkspaces?: Maybe<Scalars['Boolean']>;
   sessionExpireTime?: Maybe<Scalars['Int']>;
+  localHostAddress?: Maybe<Scalars['String']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
   developmentMode?: Maybe<Scalars['Boolean']>;
   supportedLanguages: ServerLanguage[];
@@ -517,6 +518,7 @@ export interface ConnectionInfo {
   connected: Scalars['Boolean'];
   provided: Scalars['Boolean'];
   readOnly: Scalars['Boolean'];
+  saveCredentials: Scalars['Boolean'];
   connectTime?: Maybe<Scalars['String']>;
   connectionError?: Maybe<ServerError>;
   serverVersion?: Maybe<Scalars['String']>;
@@ -739,6 +741,7 @@ export interface AdminConnectionGrantInfo {
 }
 
 export interface AdminConnectionSearchInfo {
+  displayName: Scalars['String'];
   host: Scalars['String'];
   port: Scalars['Int'];
   possibleDrivers: Array<Scalars['ID']>;
@@ -932,7 +935,7 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
 
 export interface CreateConnectionConfigurationQuery {
   connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   );
 }
@@ -953,7 +956,7 @@ export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetConnectionsQuery {
   connections: Array<(
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   )>;
 }
@@ -962,7 +965,7 @@ export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']>;
 }>;
 
-export interface SearchDatabasesQuery { databases: Array<Pick<AdminConnectionSearchInfo, 'host' | 'port' | 'possibleDrivers' | 'defaultDriver'>> }
+export interface SearchDatabasesQuery { databases: Array<Pick<AdminConnectionSearchInfo, 'displayName' | 'host' | 'port' | 'possibleDrivers' | 'defaultDriver'>> }
 
 export type SetConnectionAccessQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -978,7 +981,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
 
 export interface UpdateConnectionConfigurationQuery {
   connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
     & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
   );
 }
@@ -1039,7 +1042,7 @@ export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthModelsQuery {
   models: Array<(
     Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
-    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> }
+    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'features'>> }
   )>;
 }
 
@@ -1524,6 +1527,7 @@ export const CreateConnectionConfigurationDocument = `
     template
     connected
     readOnly
+    saveCredentials
     host
     port
     databaseName
@@ -1564,6 +1568,7 @@ export const GetConnectionsDocument = `
     template
     connected
     readOnly
+    saveCredentials
     host
     port
     databaseName
@@ -1584,6 +1589,7 @@ export const GetConnectionsDocument = `
 export const SearchDatabasesDocument = `
     query searchDatabases($hosts: [String!]!) {
   databases: searchConnections(hostNames: $hosts) {
+    displayName
     host
     port
     possibleDrivers
@@ -1606,6 +1612,7 @@ export const UpdateConnectionConfigurationDocument = `
     template
     connected
     readOnly
+    saveCredentials
     host
     port
     databaseName
@@ -1757,7 +1764,6 @@ export const GetAuthModelsDocument = `
       description
       category
       dataType
-      value
       validValues
       defaultValue
       features

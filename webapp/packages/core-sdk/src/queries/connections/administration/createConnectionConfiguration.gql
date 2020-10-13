@@ -8,6 +8,7 @@ query createConnectionConfiguration($config: ConnectionConfig!) {
     template
     connected
     readOnly
+    saveCredentials
 
     host
     port

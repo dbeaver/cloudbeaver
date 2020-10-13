@@ -94,7 +94,7 @@ export class CreateConnectionController {
     this.availableDrivers = database.possibleDrivers;
   };
 
-  back = () => {
+  back = (): void => {
     this.connection = null;
     this.availableDrivers = [];
   };

@@ -8,6 +8,7 @@ query getConnections {
     template
     connected
     readOnly
+    saveCredentials
 
     host
     port

@@ -98,12 +98,6 @@ const styles = composes(
       }
     }
 
-    ErrorMessage {
-      position: sticky;
-      bottom: 0;
-      padding: 8px 24px;
-    }
-
     fill {
       flex: 1;
     }
@@ -121,14 +115,12 @@ const styles = composes(
 
 interface Props {
   model: IConnectionFormModel;
-  configurationWizard?: boolean;
   onBack?: () => void;
   onCancel?: () => void;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
   model,
-  configurationWizard,
   onBack = () => {},
   onCancel = () => {},
 }: Props) {
@@ -145,7 +137,7 @@ export const ConnectionForm = observer(function ConnectionForm({
           <Tab tabId='driver_properties' disabled={!controller.driver}>
             <TabTitle>{translate('customConnection_properties')}</TabTitle>
           </Tab>
-          <Tab tabId='access' disabled={!controller.driver || configurationWizard}>
+          <Tab tabId='access' disabled={!controller.driver || !controller.isTabAvailable('access')}>
             <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
           </Tab>
           <fill as="div" />
@@ -218,13 +210,6 @@ export const ConnectionForm = observer(function ConnectionForm({
                 </TabPanel>
               </>
             )}
-          {controller.error.responseMessage && (
-            <ErrorMessage
-              text={controller.error.responseMessage}
-              hasDetails={controller.error.hasDetails}
-              onShowDetails={controller.onShowDetails}
-            />
-          )}
         </content-box>
       </box>
     </TabsState>

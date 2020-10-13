@@ -69,12 +69,15 @@ export const Database = observer(function Database({ database, onSelect }: Props
       })
   ), [database]);
 
+  const host = database.host + ':' + database.port;
+  const name = database.displayName !== database.host ? database.displayName + ' (' + host + ')' : host;
+
   return styled(useStyles(styles))(
     <ListItem onClick={select}>
       <ListItemIcon>
         {orderedDrivers.map(driverId => <StaticImage key={driverId} icon={drivers.get(driverId)?.icon} />)}
       </ListItemIcon>
-      <ListItemName>{database.host}:{database.port}</ListItemName>
+      <ListItemName>{name}</ListItemName>
     </ListItem>
   );
 });

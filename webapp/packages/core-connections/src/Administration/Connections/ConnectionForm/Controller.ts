@@ -8,13 +8,12 @@
 
 import { observable, computed } from 'mobx';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import {
-  injectable, IInitializableController, IDestructibleController
+  injectable, IInitializableController
 } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ConnectionConfig, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource } from '../../ConnectionsResource';
@@ -23,7 +22,7 @@ import { IConnectionFormModel } from './IConnectionFormModel';
 
 @injectable()
 export class Controller
-implements IInitializableController, IDestructibleController {
+implements IInitializableController {
   @observable connectionType = EConnectionType.Parameters;
   @observable isLoading = false;
   @observable isSaving = false;
@@ -37,34 +36,36 @@ implements IInitializableController, IDestructibleController {
     return this.dbDriverResource.get(this.model.connection.driverId) || null;
   }
 
-  readonly error = new GQLErrorCatcher();
-
   @computed private get accessLoaded() {
     return !!this.model.grantedSubjects;
   }
 
   private accessChanged = false;
-  private isDistructed = false;
   private model!: IConnectionFormModel;
   private close!: () => void;
 
   constructor(
+    private administrationScreenService: AdministrationScreenService,
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
-    private commonDialogService: CommonDialogService,
     private dbDriverResource: DBDriverResource
   ) { }
 
   init(
     model: IConnectionFormModel,
     close: () => void
-  ) {
+  ): void {
     this.model = model;
     this.close = close;
   }
 
-  destruct(): void {
-    this.isDistructed = true;
+  isTabAvailable(tabId: string): boolean {
+    if (this.administrationScreenService.isConfigurationMode) {
+      if (tabId === 'access') {
+        return false;
+      }
+    }
+    return true;
   }
 
   setType = (type: EConnectionType) => {
@@ -73,7 +74,6 @@ implements IInitializableController, IDestructibleController {
 
   save = async () => {
     this.isSaving = true;
-    this.error.clear();
     try {
       if (this.model.editing) {
         const connection = await this.connectionsResource.update(this.model.connection.id, this.getConnectionConfig());
@@ -95,20 +95,13 @@ implements IInitializableController, IDestructibleController {
 
   test = async () => {
     this.isSaving = true;
-    this.error.clear();
     try {
-      await this.connectionsResource.test(this.getConnectionConfig());
+      await this.connectionsResource.test(this.getConnectionConfig(true));
       this.notificationService.logInfo({ title: 'Connection is established' });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_test_fail');
     } finally {
       this.isSaving = false;
-    }
-  };
-
-  onShowDetails = () => {
-    if (this.error.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   };
 
@@ -139,7 +132,7 @@ implements IInitializableController, IDestructibleController {
     this.accessChanged = false;
   }
 
-  private getConnectionConfig(): ConnectionConfig {
+  private getConnectionConfig(withCredentials?: boolean): ConnectionConfig {
     const config: ConnectionConfig = {};
 
     if (this.model.editing) {
@@ -162,8 +155,8 @@ implements IInitializableController, IDestructibleController {
     }
     if (this.model.connection.authModel || this.driver!.defaultAuthModel) {
       config.authModelId = this.model.connection.authModel || this.driver!.defaultAuthModel;
-      config.saveCredentials = this.isCredentialsChanged();
-      if (config.saveCredentials) {
+      config.saveCredentials = withCredentials || this.model.connection.saveCredentials;
+      if (this.isCredentialsChanged()) {
         config.credentials = this.model.credentials;
       }
     }
@@ -179,16 +172,10 @@ implements IInitializableController, IDestructibleController {
       return true;
     }
     for (const property of this.model.connection.authProperties) {
-      if (this.model.credentials[property.id!] !== property.value) {
+      if (property.value !== null && this.model.credentials[property.id!] !== property.value) {
         return true;
       }
     }
     return false;
-  }
-
-  private showError(exception: Error, message: string) {
-    if (!this.error.catch(exception) || this.isDistructed) {
-      this.notificationService.logException(exception, message);
-    }
   }
 }

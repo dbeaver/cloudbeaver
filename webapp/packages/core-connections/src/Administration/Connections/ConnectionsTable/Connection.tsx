@@ -7,18 +7,16 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Checkbox
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionsResource, isSearchedConnection, SEARCH_CONNECTION_SYMBOL } from '../../ConnectionsResource';
 import { ConnectionEdit } from './ConnectionEdit';
 
 interface Props {

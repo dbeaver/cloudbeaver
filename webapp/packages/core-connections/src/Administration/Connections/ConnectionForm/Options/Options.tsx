@@ -169,7 +169,18 @@ export const Options = observer(function Options({
                 properties={controller.authModel.properties}
                 credentials={model.credentials}
                 disabled={disabled}
+                onFocus={controller.resetPassword}
               />
+              <group as="div">
+                <FieldCheckbox
+                  name="saveCredentials"
+                  value={model.connection.id + 'authNeeded'}
+                  state={model.connection}
+                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                  disabled={disabled}
+                  mod='surface'
+                />
+              </group>
             </>
           )}
         </box-element>

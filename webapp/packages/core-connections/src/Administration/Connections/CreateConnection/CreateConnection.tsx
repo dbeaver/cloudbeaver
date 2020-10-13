@@ -183,7 +183,6 @@ export const CreateConnection = observer(function CreateConnection({
         <connection-create-content as='div'>
           <ConnectionForm
             model={controller as IConnectionFormModel}
-            configurationWizard={configurationWizard}
             onBack={controller.back}
             onCancel={handleConnectionCancel}
           />

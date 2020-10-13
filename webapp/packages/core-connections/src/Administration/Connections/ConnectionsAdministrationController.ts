@@ -11,9 +11,9 @@ import { observable, computed } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { ConnectionInfo, resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource, isSearchedConnection } from '../ConnectionsResource';
+import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 @injectable()
@@ -22,9 +22,8 @@ export class ConnectionsAdministrationController {
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   @computed
-  get connections() {
+  get connections(): ConnectionInfo[] {
     return Array.from(this.connectionsResource.data.values())
-      .filter(connection => !isSearchedConnection(connection))
       .sort((a, b) => {
         const isANew = this.connectionsResource.isNew(a.id);
         const isBNew = this.connectionsResource.isNew(b.id);
@@ -42,7 +41,7 @@ export class ConnectionsAdministrationController {
   }
 
   @computed
-  get isLoading() {
+  get isLoading(): boolean {
     return this.connectionsResource.isLoading() || this.isProcessing;
   }
 
@@ -53,12 +52,12 @@ export class ConnectionsAdministrationController {
     private connectionsAdministrationNavService: ConnectionsAdministrationNavService
   ) { }
 
-  setCreateMethod = (method: string) => this.connectionsAdministrationNavService.navToCreate(method);
-  cancelCreate = () => this.connectionsAdministrationNavService.navToRoot();
+  setCreateMethod = (method: string): void => this.connectionsAdministrationNavService.navToCreate(method);
+  cancelCreate = (): void => this.connectionsAdministrationNavService.navToRoot();
 
-  create = () => this.connectionsAdministrationNavService.navToCreate('driver');
+  create = (): void => this.connectionsAdministrationNavService.navToCreate('driver');
 
-  update = async () => {
+  update = async (): Promise<void> => {
     try {
       await this.connectionsResource.refresh('all');
     } catch (exception) {
@@ -66,7 +65,7 @@ export class ConnectionsAdministrationController {
     }
   };
 
-  delete = async () => {
+  delete = async (): Promise<void> => {
     if (this.isProcessing) {
       return;
     }

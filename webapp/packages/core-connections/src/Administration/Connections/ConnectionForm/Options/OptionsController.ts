@@ -10,31 +10,32 @@ import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
-import { DBDriverResource } from '../../../../DBDriverResource';
+import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class OptionsController
 implements IInitializableController {
-  @computed get drivers() {
+  @computed get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
   }
 
-  @computed get driver() {
+  @computed get driver(): DBDriver | undefined {
     return this.dbDriverResource.get(this.model.connection.driverId);
   }
 
-  @computed get authModel() {
+  @computed get authModel(): DatabaseAuthModel | null {
     if (!this.model.connection?.authModel && !this.driver) {
       return null;
     }
     return this.dbAuthModelsResource.get(this.model.connection?.authModel || this.driver!.defaultAuthModel) || null;
   }
 
-  @computed get authModelLoading() {
+  @computed get authModelLoading(): boolean {
     return this.dbAuthModelsResource.isLoading();
   }
 
@@ -47,7 +48,7 @@ implements IInitializableController {
     private dbDriverResource: DBDriverResource
   ) { }
 
-  init(model: IConnectionFormModel) {
+  init(model: IConnectionFormModel): void {
     this.model = model;
     this.loadDrivers();
   }
@@ -56,11 +57,11 @@ implements IInitializableController {
     driverId: string | null,
     name: string | undefined,
     prevValue: string | null
-  ) => this.loadDriver(driverId, prevValue);
+  ): Promise<void> => this.loadDriver(driverId, prevValue);
 
-  onFormChange = () => {
+  onFormChange = (value?: unknown, name?: string): void => {
     this.updateName();
-    this.resetPassword();
+    this.resetPassword(name || '');
   };
 
   @action
@@ -71,23 +72,23 @@ implements IInitializableController {
     this.cleanCredentials();
   }
 
-  private resetPassword() {
-    if (this.isCredentialsChanged()) {
-      for (const property of this.model.connection.authProperties) {
-        if (property.features.includes('password') && this.model.credentials[property.id!] === property.value) {
-          this.model.credentials[property.id!] = '';
-          return;
-        }
+  resetPassword = (name: string): void => {
+    const passwordProperty = this.model.connection.authProperties.find(property => property.features.includes('password'));
+
+    if (passwordProperty && (this.isCredentialsChanged() || passwordProperty.id === name)) {
+      if (this.model.credentials[passwordProperty.id!] === passwordProperty.value) {
+        this.model.credentials[passwordProperty.id!] = '';
+        this.model.connection.saveCredentials = false;
       }
     }
-  }
+  };
 
   private isCredentialsChanged() {
-    if (!this.model.connection.authProperties.length) {
-      return true;
+    if (!Object.keys(this.model.credentials).length) {
+      return false;
     }
     for (const property of this.model.connection.authProperties) {
-      if (this.model.credentials[property.id!] !== property.value) {
+      if (property.value !== null && this.model.credentials[property.id!] !== property.value) {
         return true;
       }
     }
