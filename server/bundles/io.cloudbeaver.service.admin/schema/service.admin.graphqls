@@ -11,6 +11,7 @@ type AdminConnectionGrantInfo {
 }
 
 type AdminConnectionSearchInfo {
+    displayName: String!
     host: String!
     port: Int!
     possibleDrivers: [ID!]!
