@@ -45,7 +45,7 @@ interface CellKeyDownEvent extends AgGridEvent{
 }
 
 const EVENT_KEY_CODE = {
-  C: 'C',
+  C: 'C' || 'c',
 };
 
 interface TemporarySelectionRange {
