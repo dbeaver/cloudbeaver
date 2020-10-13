@@ -96,7 +96,7 @@ implements IInitializableController {
   test = async () => {
     this.isSaving = true;
     try {
-      await this.connectionsResource.test(this.getConnectionConfig(true));
+      await this.connectionsResource.test(this.getConnectionConfig());
       this.notificationService.logInfo({ title: 'Connection is established' });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_test_fail');
@@ -132,7 +132,7 @@ implements IInitializableController {
     this.accessChanged = false;
   }
 
-  private getConnectionConfig(withCredentials?: boolean): ConnectionConfig {
+  private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
 
     if (this.model.editing) {
@@ -155,7 +155,7 @@ implements IInitializableController {
     }
     if (this.model.connection.authModel || this.driver!.defaultAuthModel) {
       config.authModelId = this.model.connection.authModel || this.driver!.defaultAuthModel;
-      config.saveCredentials = withCredentials || this.model.connection.saveCredentials;
+      config.saveCredentials = this.model.connection.saveCredentials;
       if (this.isCredentialsChanged()) {
         config.credentials = this.model.credentials;
       }
