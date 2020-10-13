@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback, useLayoutEffect } from 'react';
+import { useCallback } from 'react';
 import {
   useMenuState,
   Menu,
@@ -79,11 +79,10 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
     },
     [menu, onSelect]
   );
-  useLayoutEffect(() => onSwitch(menu.visible), [menu.visible]);
 
   return styled(useStyles(styles))(
     <>
-      <MenuButton {...menu}>{children}</MenuButton>
+      <MenuButton {...menu} onClick={() => onSwitch(!menu.visible)}>{children}</MenuButton>
       <Menu {...menu} aria-label={propertyName}>
         {values.map(value => (
           <MenuItem key={value} type='button' {...menu} onClick={() => handleMenuSelect(value)}>
