@@ -49,6 +49,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -235,8 +236,8 @@ public class CBApplication extends BaseApplicationImpl {
             log.debug("\tServer is in configuration mode!");
         }
         {
-            log.debug("\tLocal host addresses:");
             determineLocalAddresses();
+            log.debug("\tLocal host addresses:");
             for (InetAddress ia : localInetAddresses) {
                 log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
             }
@@ -274,6 +275,16 @@ public class CBApplication extends BaseApplicationImpl {
 //            for (InetAddress addr : allMyIps) {
 //                System.out.println("Local addr: " + addr);
 //            }
+            String dockerHostAddress = System.getenv(CBConstants.VAR_HOST_DOCKER_INTERNAL);
+            if (!CommonUtils.isEmpty(dockerHostAddress)) {
+                try {
+                    InetAddress dockerAddress = InetAddress.getByName(dockerHostAddress);
+                    localInetAddresses.add(dockerAddress);
+                    log.debug("\tRun in Docker container (" + dockerAddress + ")");
+                } catch (UnknownHostException e) {
+                    // Ignore
+                }
+            }
             boolean hasLoopbackAddress = false;
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();

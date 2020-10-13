@@ -68,4 +68,5 @@ public class CBConstants {
     public static final String VAR_CB_LOCAL_HOST_ADDR = "CB_LOCAL_HOST_ADDR";
 
 
+    public static final String VAR_HOST_DOCKER_INTERNAL = "host.docker.internal";
 }
