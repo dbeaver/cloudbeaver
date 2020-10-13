@@ -275,16 +275,14 @@ public class CBApplication extends BaseApplicationImpl {
 //            for (InetAddress addr : allMyIps) {
 //                System.out.println("Local addr: " + addr);
 //            }
-            String dockerHostAddress = System.getenv(CBConstants.VAR_HOST_DOCKER_INTERNAL);
-            if (!CommonUtils.isEmpty(dockerHostAddress)) {
-                try {
-                    InetAddress dockerAddress = InetAddress.getByName(dockerHostAddress);
-                    localInetAddresses.add(dockerAddress);
-                    log.debug("\tRun in Docker container (" + dockerAddress + ")");
-                } catch (UnknownHostException e) {
-                    // Ignore
-                }
+            try {
+                InetAddress dockerAddress = InetAddress.getByName(CBConstants.VAR_HOST_DOCKER_INTERNAL);
+                localInetAddresses.add(dockerAddress);
+                log.debug("\tRun in Docker container (" + dockerAddress + ")");
+            } catch (UnknownHostException e) {
+                // Ignore - not a docker env
             }
+
             boolean hasLoopbackAddress = false;
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();
