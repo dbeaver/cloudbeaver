@@ -93,6 +93,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public String getLocalHostAddress() {
+        return application.getLocalHostAddress();
+    }
+
+    @Property
     public WebServerLanguage[] getSupportedLanguages() {
         List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];

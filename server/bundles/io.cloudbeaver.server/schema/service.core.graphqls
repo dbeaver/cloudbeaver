@@ -83,6 +83,7 @@ type ServerConfig {
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
     sessionExpireTime: Int
+    localHostAddress: String
 
     configurationMode: Boolean
     developmentMode: Boolean

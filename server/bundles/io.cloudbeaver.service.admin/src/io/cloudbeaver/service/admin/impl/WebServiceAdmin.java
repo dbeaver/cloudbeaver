@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -250,11 +249,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public List<AdminConnectionSearchInfo> searchConnections(@NotNull WebSession webSession, @NotNull List<String> hostNames) throws DBWebException {
         ConnectionSearcher searcher = new ConnectionSearcher(webSession, hostNames.toArray(new String[0]));
-        try {
-            searcher.run(webSession.getProgressMonitor());
-        } catch (InvocationTargetException e) {
-            throw new DBWebException("Error searching connections", e.getTargetException());
-        }
+        searcher.run(webSession.getProgressMonitor());
         return searcher.getFoundConnections();
     }
 

@@ -65,4 +65,7 @@ public class CBConstants {
 
     public static final String DEFAUL_APP_ANONYMOUS_ROLE_NAME = "user";
 
+    public static final String VAR_CB_LOCAL_HOST_ADDR = "CB_LOCAL_HOST_ADDR";
+
+
 }

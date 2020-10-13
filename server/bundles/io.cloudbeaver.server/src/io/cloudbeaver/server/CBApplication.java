@@ -46,10 +46,11 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class controls all aspects of the application's execution
@@ -93,6 +94,8 @@ public class CBApplication extends BaseApplicationImpl {
 
     private boolean develMode = false;
     private boolean configurationMode = false;
+    private String localHostAddress;
+    private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
     public CBApplication() {
     }
@@ -181,6 +184,15 @@ public class CBApplication extends BaseApplicationImpl {
         configurationMode = CommonUtils.isEmpty(serverName);
         //|| CommonUtils.isEmpty(databaseConfiguration.getUser()) || CommonUtils.isEmpty(databaseConfiguration.getPassword());
 
+        // Determine address for local host
+        localHostAddress = System.getenv(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
+        if (CommonUtils.isEmpty(localHostAddress)) {
+            localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
+        }
+        if (CommonUtils.isEmpty(localHostAddress) || "127.0.0.1".equals(localHostAddress) || "::0".equals(localHostAddress)) {
+            localHostAddress = "localhost";
+        }
+
         final Runtime runtime = Runtime.getRuntime();
 
         Location instanceLoc = Platform.getInstanceLocation();
@@ -222,6 +234,13 @@ public class CBApplication extends BaseApplicationImpl {
         if (configurationMode) {
             log.debug("\tServer is in configuration mode!");
         }
+        {
+            log.debug("\tLocal host addresses:");
+            determineLocalAddresses();
+            for (InetAddress ia : localInetAddresses) {
+                log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
+            }
+        }
 
         {
             try {
@@ -246,6 +265,33 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("Shutdown");
 
         return null;
+    }
+
+    private void determineLocalAddresses() {
+        try {
+//            InetAddress localHost = InetAddress.getLocalHost();
+//            InetAddress[] allMyIps = InetAddress.getAllByName(localHost.getCanonicalHostName());
+//            for (InetAddress addr : allMyIps) {
+//                System.out.println("Local addr: " + addr);
+//            }
+            boolean hasLoopbackAddress = false;
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress localInetAddress = enumIpAddr.nextElement();
+                    boolean loopbackAddress = localInetAddress.isLoopbackAddress();
+                    if (loopbackAddress ? !hasLoopbackAddress : !localInetAddress.isLinkLocalAddress()) {
+                        if (loopbackAddress) {
+                            hasLoopbackAddress = true;
+                        }
+                        localInetAddresses.add(localInetAddress);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+
     }
 
     @NotNull
@@ -401,6 +447,23 @@ public class CBApplication extends BaseApplicationImpl {
 
     public boolean isConfigurationMode() {
         return configurationMode;
+    }
+
+    public String getLocalHostAddress() {
+        return localHostAddress;
+    }
+
+    public boolean isLocalInetAddress(String hostName) {
+        for (InetAddress addr : localInetAddresses) {
+            if (addr.getHostAddress().equals(hostName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<InetAddress> getLocalInetAddresses() {
+        return localInetAddresses;
     }
 
     public synchronized void finishConfiguration(

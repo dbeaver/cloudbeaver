@@ -20,18 +20,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminConnectionSearchInfo {
-    private final String host;
+    private final String displayName;
+    private final String hostAddr;
     private final int port;
     private List<String> possibleDrivers = new ArrayList<>();
     private String defaultDriver;
 
-    public AdminConnectionSearchInfo(String host, int driverPort) {
-        this.host = host;
+    public AdminConnectionSearchInfo(String displayName, String hostAddr, int driverPort) {
+        this.displayName = displayName;
+        this.hostAddr = hostAddr;
         this.port = driverPort;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getHostAddr() {
+        return hostAddr;
+    }
+
     public String getHost() {
-        return host;
+        return hostAddr;
     }
 
     public int getPort() {

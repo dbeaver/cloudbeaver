@@ -81,7 +81,6 @@ public class CBPlatform extends BasePlatformImpl {
     private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
-
     public static CBPlatform getInstance() {
         if (instance == null) {
             synchronized (CBPlatform.class) {
