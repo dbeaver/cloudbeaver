@@ -132,10 +132,20 @@ export class SqlEditorNavigatorService {
       if (data.type === SQLEditorNavigationAction.select) {
         tab.handlerState.currentResultTabId = data.resultId;
       } else if (data.type === SQLEditorNavigationAction.close) {
+        const resultTabGroupId = tab.handlerState.resultTabs
+          .find(resultTab => resultTab.resultTabId === data.resultId)?.groupId;
+
         tab.handlerState.resultTabs.splice(
           tab.handlerState.resultTabs.findIndex(result => result.resultTabId === data.resultId),
           1
         );
+
+        const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
+
+        if (isGroupEmpty) {
+          tab.handlerState.queryTabGroups.splice(
+            tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId), 1);
+        }
 
         if (tab.handlerState.currentResultTabId === data.resultId) {
           if (tab.handlerState.resultTabs.length > 0) {
