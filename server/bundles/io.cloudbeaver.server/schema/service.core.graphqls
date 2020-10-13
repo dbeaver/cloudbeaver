@@ -188,6 +188,7 @@ type ConnectionInfo {
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
+    saveCredentials: Boolean!
 
     connectTime: String
     connectionError: ServerError

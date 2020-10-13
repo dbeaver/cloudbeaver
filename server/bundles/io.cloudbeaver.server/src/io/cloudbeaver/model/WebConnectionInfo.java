@@ -136,6 +136,11 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isSaveCredentials() {
+        return dataSourceContainer.isSavePassword();
+    }
+
+    @Property
     public String getConnectTime() {
         return CBConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
     }
