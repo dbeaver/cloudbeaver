@@ -21,7 +21,7 @@ const styles = css`
   }
 
   IconOrImage {
-    height: 28px;
+    height: 30px;
     width: 150px;
     margin-bottom: 2px;
   }
