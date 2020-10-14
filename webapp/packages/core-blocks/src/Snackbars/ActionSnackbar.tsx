@@ -43,7 +43,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
           {notification.message && <message as="div">{translate(notification.message)}</message>}
         </body-text-block>
         <notification-footer as='div'>
-          <body-time as='span'>{timeStringFromTimestamp}</body-time>
+          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
           <actions as="div">
             <Button type="button" mod={['outlined']} onClick={onAction}>
               {translate(actionText)}
