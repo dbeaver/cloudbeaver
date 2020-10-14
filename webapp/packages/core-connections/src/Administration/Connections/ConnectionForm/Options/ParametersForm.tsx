@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
-import { InputField } from '@cloudbeaver/core-blocks';
+import { FormGroup, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -24,7 +24,7 @@ interface ParametersFormProps {
 
 const styles = css`
   layout-grid-inner {
-    max-width: 650px;
+    max-width: 630px;
   }
 `;
 
@@ -39,7 +39,7 @@ export const ParametersForm = observer(function ParametersForm({
     <>
       {!embedded && (
         <layout-grid-inner as="div">
-          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 7 })}>
+          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 8 })}>
             <InputField
               type="text"
               name="host"
@@ -51,21 +51,21 @@ export const ParametersForm = observer(function ParametersForm({
               <sub-label as="div">{translate('customConnection_custom_obligatory')}</sub-label>
             </InputField>
           </layout-grid-cell>
-          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 5 })}>
+          <layout-grid-cell as='div' {...use({ 'span-tablet': 12, 'span-desktop': 4 })}>
             <InputField
               type="number"
               name="port"
               state={connection}
               disabled={disabled}
-              {...use({ short: true })}
               mod='surface'
+              short
             >
               {translate('customConnection_custom_port')}
             </InputField>
           </layout-grid-cell>
         </layout-grid-inner>
       )}
-      <group as="div">
+      <FormGroup>
         <InputField
           type="text"
           name="databaseName"
@@ -75,7 +75,7 @@ export const ParametersForm = observer(function ParametersForm({
         >
           {translate('customConnection_custom_database')}
         </InputField>
-      </group>
+      </FormGroup>
     </>
   );
 });

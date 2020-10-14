@@ -28,8 +28,4 @@ export const formStyles = css`
     composes: theme-typography--caption from global;
     line-height: 14px;
   }
-  group {
-    box-sizing: border-box;
-    display: flex;
-  }
 `;

@@ -37,6 +37,9 @@ const switchStyles = composes(
   }
   `,
   css`
+    field {
+      max-width: 450px;
+    }
     field label {
       width: auto;
     }

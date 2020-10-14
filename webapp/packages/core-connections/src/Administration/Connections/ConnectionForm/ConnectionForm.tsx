@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   TabsState, TabList, Tab,
   TabTitle, Loader, TabPanel,
-  ErrorMessage, Button
+  Button, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -28,10 +28,6 @@ const styles = composes(
   css`
     Tab {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
-
-    ErrorMessage {
-      composes: theme-background-secondary from global;
     }
 
     TabList {
@@ -71,33 +67,6 @@ const styles = composes(
       flex-direction: column;
     }
 
-    TabList {
-      align-items: center;
-      box-sizing: border-box;
-      display: inline-flex;
-      width: 100%;
-      padding-left: 24px;
-      outline: none;
-    }
-
-    TabPanel {
-      overflow: auto !important;
-    }
-
-    Tab {
-      composes: theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
-
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
-
-      & TabTitle {
-        padding: 0 24px !important;
-      }
-    }
-
     fill {
       flex: 1;
     }
@@ -127,7 +96,7 @@ export const ConnectionForm = observer(function ConnectionForm({
   const controller = useController(Controller, model, onCancel);
   const translate = useTranslate();
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, BORDER_TAB_STYLES))(
     <TabsState selectedId='options'>
       <box as='div'>
         <TabList>

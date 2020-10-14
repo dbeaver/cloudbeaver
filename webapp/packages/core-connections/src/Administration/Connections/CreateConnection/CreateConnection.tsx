@@ -7,11 +7,11 @@
  */
 
 import { observer } from 'mobx-react';
-import { useMemo, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage, Icon
+  TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -52,7 +52,7 @@ const styles = composes(
     connection-create {
       display: flex;
       flex-direction: column;
-      height: 550px;
+      height: 570px;
       overflow: hidden;
     }
 
@@ -116,33 +116,6 @@ const styles = composes(
         width: 16px;
       }
     }
-
-    TabList {
-      align-items: center;
-      box-sizing: border-box;
-      display: inline-flex;
-      padding-left: 24px;
-      outline: none;
-      flex: auto 0 0;
-    }
-
-    TabPanel {
-      overflow: auto !important;
-    }
-
-    Tab {
-      composes: theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
-
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
-
-      & TabTitle {
-        padding: 0 24px !important;
-      }
-    }
   `
 );
 
@@ -192,7 +165,7 @@ export const CreateConnection = observer(function CreateConnection({
     );
   }
 
-  return styled(style)(
+  return styled(style, BORDER_TAB_STYLES)(
     <connection-create as='div'>
       <TabsState currentTabId={method} onChange={onChange}>
         <title-bar as='div'>

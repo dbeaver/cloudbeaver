@@ -17,7 +17,7 @@ import {
   InputField,
   FieldCheckbox,
   useFocus,
-  InputGroup
+  InputGroup, FormBox, FormBoxElement, FormGroup, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -41,7 +41,7 @@ const styles = composes(
       composes: theme-background-secondary from global;
     }
 
-    box {
+    FormBox {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
 
@@ -58,33 +58,6 @@ const styles = composes(
       flex: 1;
       display: flex;
       flex-direction: column;
-    }
-
-    TabList {
-      align-items: center;
-      box-sizing: border-box;
-      display: inline-flex;
-      width: 100%;
-      padding-left: 24px;
-      outline: none;
-    }
-
-    TabPanel {
-      overflow: auto !important;
-    }
-
-    Tab {
-      composes: theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
-
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
-
-      & TabTitle {
-        padding: 0 24px !important;
-      }
     }
 
     ErrorMessage {
@@ -110,16 +83,6 @@ const styles = composes(
     layout-grid {
       flex: 1;
       width: 100%;
-    }
-
-    flex-box {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-    }
-
-    flex-box-element {
-      min-width: 450px;
     }
   `
 );
@@ -156,7 +119,7 @@ export const UserForm = observer(function UserForm({
     []
   );
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, BORDER_TAB_STYLES))(
     <TabsState selectedId='info'>
       <box as='div'>
         <TabList>
@@ -187,12 +150,12 @@ export const UserForm = observer(function UserForm({
         <content-box as='div'>
           <SubmittingForm ref={focusedRef} onSubmit={controller.save}>
             <TabPanel tabId='info'>
-              <flex-box as="div">
-                <flex-box-element as='div'>
-                  <group as="div">
+              <FormBox>
+                <FormBoxElement>
+                  <FormGroup>
                     <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-                  </group>
-                  <group as="div">
+                  </FormGroup>
+                  <FormGroup>
                     <InputField
                       type='text'
                       name='login'
@@ -204,8 +167,8 @@ export const UserForm = observer(function UserForm({
                     >
                       {translate('authentication_user_name')}
                     </InputField>
-                  </group>
-                  <group as="div">
+                  </FormGroup>
+                  <FormGroup>
                     <InputField
                       type='password'
                       name='password'
@@ -218,8 +181,8 @@ export const UserForm = observer(function UserForm({
                     >
                       {translate('authentication_user_password')}
                     </InputField>
-                  </group>
-                  <group as="div">
+                  </FormGroup>
+                  <FormGroup>
                     <InputField
                       type='password'
                       name='password_repeat'
@@ -231,14 +194,14 @@ export const UserForm = observer(function UserForm({
                     >
                       {translate('authentication_user_password_repeat')}
                     </InputField>
-                  </group>
-                </flex-box-element>
-                <flex-box-element as='div'>
-                  <group as="div">
+                  </FormGroup>
+                </FormBoxElement>
+                <FormBoxElement>
+                  <FormGroup>
                     <InputGroup>{translate('authentication_user_role')}</InputGroup>
-                  </group>
+                  </FormGroup>
                   {controller.roles.map((role, i) => (
-                    <group key={role.roleId} as="div">
+                    <FormGroup key={role.roleId}>
                       <FieldCheckbox
                         value={role.roleId}
                         name='role'
@@ -248,10 +211,10 @@ export const UserForm = observer(function UserForm({
                         mod='surface'
                         onChange={checked => handleRoleChange(role.roleId, checked)}
                       />
-                    </group>
+                    </FormGroup>
                   ))}
-                </flex-box-element>
-              </flex-box>
+                </FormBoxElement>
+              </FormBox>
             </TabPanel>
             {controller.isLoading && <Loader overlay />}
             <TabPanel tabId='connections_access'>

@@ -11,7 +11,7 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader
+  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
 import { DBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
@@ -43,28 +43,11 @@ const styles = composes(
       max-height: 550px;
       min-height: 550px;
     }
-    SubmittingForm, BaseTabPanel {
+    SubmittingForm {
       flex: 1;
       display: flex;
       flex-direction: column;
       height: 100%;
-    }
-
-    TabList {
-      box-sizing: border-box;
-      display: inline-flex;
-      width: 100%;
-      padding-left: 24px;
-      outline: none;
-    }
-    Tab {
-      composes: theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
-
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
     }
     ErrorMessage {
       position: sticky;
@@ -91,7 +74,7 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
   const controller = useController(ConnectionFormDialogController, driver, onClose);
   const [loadProperties, setLoadProperties] = useState(false);
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, BORDER_TAB_STYLES))(
     <TabsState selectedId='options'>
       <CommonDialogWrapper
         title={title}

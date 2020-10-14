@@ -39,6 +39,9 @@ const checkboxStyles = composes(
       display: flex;
       align-items: center;
     }
+    checkbox-label {
+      composes: theme-typography--body2 from global;
+    }
   `
 );
 

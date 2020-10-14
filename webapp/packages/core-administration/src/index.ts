@@ -1,4 +1,5 @@
 export * from './Administration/AdministrationTools/AdministrationTools';
+export * from './Administration/AdministrationTools/AdministrationToolsStyles';
 export * from './AdministrationItem/AdministrationItemService';
 export * from './AdministrationItem/IAdministrationItem';
 export * from './AdministrationScreen/AdministrationScreenService';

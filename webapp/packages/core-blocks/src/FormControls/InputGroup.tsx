@@ -21,7 +21,7 @@ const styles = composes(
   css`
     field-label {
       composes: theme-typography--body2 from global;
-      margin-left: 150px;
+      margin-left: 180px;
       text-align: left;
       font-weight: initial;
       padding-bottom: 8px;
@@ -34,19 +34,19 @@ const styles = composes(
     }
   `
 );
-type Props = React.PropsWithChildren<{
+interface Props {
   className?: string;
   long?: boolean;
-}>;
+}
 
-export function InputGroup({
+export const InputGroup: React.FC<Props> = function InputGroup({
   children,
   className,
   long,
-}: Props) {
+}) {
   return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className}>
       <field-label as='label' {...use({ long })}>{children}</field-label>
     </field>
   );
-}
+};

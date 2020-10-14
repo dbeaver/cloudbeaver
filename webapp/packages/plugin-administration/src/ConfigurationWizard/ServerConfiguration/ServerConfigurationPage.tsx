@@ -9,19 +9,22 @@
 import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
-import { AdministrationTools } from '@cloudbeaver/core-administration';
-import { IconButton } from '@cloudbeaver/core-blocks';
+import { AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
+import { FormBox, FormBoxElement, IconButton, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
+import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ServerConfigurationForm } from './ServerConfigurationForm';
+import { ServerConfigurationAdminForm } from './Form/ServerConfigurationAdminForm';
+import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
+import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = composes(
   css`
-  AdministrationTools, layout-grid-cell {
+  layout-grid-cell {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   }
 
@@ -44,25 +47,19 @@ const styles = composes(
       border: solid 1px;
     }
 
-    message-box, AdministrationTools {
+    message-box {
       border-bottom: solid 1px;
     }
 
-    message-box, ServerConfigurationForm {
+    message-box, SubmittingForm {
       padding: 16px 24px;
     }
 
-    AdministrationTools {
+    SubmittingForm {
+      flex: 1;
       display: flex;
-      padding: 0 16px;
-      align-items: center;
-      border-bottom: solid 1px;
-    }
-
-    IconButton {
-      height: 32px;
-      width: 32px;
-      margin-right: 16px;
+      overflow: auto;
+      flex-direction: row;
     }
 
     p {
@@ -73,10 +70,12 @@ const styles = composes(
 
 export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
   const translate = useTranslate();
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const controller = useController(ServerConfigurationPageController);
+  useFormValidator(service.validationTask, focusedRef);
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
@@ -91,13 +90,17 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
               <IconButton name="admin-cancel" viewBox="0 0 28 28" onClick={controller.reset} />
             </AdministrationTools>
           )}
-          <ServerConfigurationForm
-            serverConfig={controller.state.serverConfig}
-            validationTask={service.validationTask}
-            editing={controller.editing}
-            onChange={controller.change}
-            onSubmit={controller.save}
-          />
+          <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
+            <FormBox>
+              <FormBoxElement>
+                <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
+                {!controller.editing && <ServerConfigurationAdminForm serverConfig={controller.state.serverConfig} />}
+              </FormBoxElement>
+              <FormBoxElement>
+                <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
+              </FormBoxElement>
+            </FormBox>
+          </SubmittingForm>
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

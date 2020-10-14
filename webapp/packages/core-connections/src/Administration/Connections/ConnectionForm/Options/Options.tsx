@@ -14,14 +14,13 @@ import {
   InputField,
   useFocus,
   ObjectPropertyInfoForm,
-  Checkbox,
   Textarea,
   InputGroup,
   RadioGroup,
   TabsState,
   TabPanel,
   Combobox,
-  SubmittingForm, FieldCheckbox
+  SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -48,14 +47,6 @@ const styles = css`
     flex-direction: column;
     flex: 1;
   }
-  box {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-  }
-  box-element {
-    min-width: 450px;
-  }
   TabPanel {
     flex-direction: column;
   }
@@ -75,9 +66,9 @@ export const Options = observer(function Options({
 
   return styled(useStyles(styles, formStyles))(
     <SubmittingForm ref={focusedRef} onChange={controller.onFormChange} onSubmit={onSave}>
-      <box as="div">
-        <box-element as='div'>
-          <group as="div">
+      <FormBox>
+        <FormBoxElement>
+          <FormGroup>
             <FieldCheckbox
               name="template"
               value={model.connection.id}
@@ -86,8 +77,8 @@ export const Options = observer(function Options({
               disabled={model.editing || disabled}
               mod='surface'
             />
-          </group>
-          <group as="div">
+          </FormGroup>
+          <FormGroup>
             <Combobox
               name='driverId'
               state={model.connection}
@@ -101,8 +92,8 @@ export const Options = observer(function Options({
             >
               {translate('connections_connection_driver')}
             </Combobox>
-          </group>
-          <group as="div">
+          </FormGroup>
+          <FormGroup>
             <InputField
               type="text"
               name="name"
@@ -112,8 +103,8 @@ export const Options = observer(function Options({
             >
               {translate('connections_connection_name')}
             </InputField>
-          </group>
-          <group as="div">
+          </FormGroup>
+          <FormGroup>
             <Textarea
               name="description"
               rows={3}
@@ -123,9 +114,9 @@ export const Options = observer(function Options({
             >
               {translate('connections_connection_description')}
             </Textarea>
-          </group>
-        </box-element>
-        <box-element as='div'>
+          </FormGroup>
+        </FormBoxElement>
+        <FormBoxElement>
           <connection-type as="div">
             <RadioGroup name='type' value={type} onChange={onTypeChange}>
               <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
@@ -145,7 +136,7 @@ export const Options = observer(function Options({
               />
             </TabPanel>
             <TabPanel tabId={EConnectionType.URL}>
-              <group as="div">
+              <FormGroup>
                 <InputField
                   type="text"
                   name="url"
@@ -156,14 +147,14 @@ export const Options = observer(function Options({
                 >
                   {translate('customConnection_url_JDBC')}
                 </InputField>
-              </group>
+              </FormGroup>
             </TabPanel>
           </TabsState>
           {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
-              <group as="div">
+              <FormGroup>
                 <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
-              </group>
+              </FormGroup>
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
                 properties={controller.authModel.properties}
@@ -171,7 +162,7 @@ export const Options = observer(function Options({
                 disabled={disabled}
                 onFocus={controller.resetPassword}
               />
-              <group as="div">
+              <FormGroup>
                 <FieldCheckbox
                   name="saveCredentials"
                   value={model.connection.id + 'authNeeded'}
@@ -180,11 +171,11 @@ export const Options = observer(function Options({
                   disabled={disabled}
                   mod='surface'
                 />
-              </group>
+              </FormGroup>
             </>
           )}
-        </box-element>
-      </box>
+        </FormBoxElement>
+      </FormBox>
     </SubmittingForm>
   );
 });

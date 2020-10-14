@@ -6,22 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
-
-const styles = css`
-  administration-tools {
-    height: 48px;
-  }
-`;
-
-type Props = React.PropsWithChildren<{
+interface Props {
   className?: string;
-}>;
+}
 
-export function AdministrationTools({ children, className }: Props) {
-  return styled(styles)(
+export const AdministrationTools: React.FC<Props> = function AdministrationTools({ children, className }) {
+  return (
     <administration-tools as='div' className={className}>
       {children}
     </administration-tools>
   );
-}
+};

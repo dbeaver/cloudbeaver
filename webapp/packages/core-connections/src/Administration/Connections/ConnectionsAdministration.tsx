@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationTools, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
@@ -21,7 +21,7 @@ import { CreateConnection } from './CreateConnection/CreateConnection';
 
 const styles = composes(
   css`
-    AdministrationTools, layout-grid-cell {
+    layout-grid-cell {
       composes: theme-background-surface theme-text-on-surface from global;
     }
 
@@ -50,15 +50,7 @@ const styles = composes(
     }
 
     AdministrationTools {
-      display: flex;
-      padding: 0 16px;
-      align-items: center;
-    }
-
-    IconButton {
-      height: 32px;
-      width: 32px;
-      margin-right: 16px;
+      border: none;
     }
 
     actions {
@@ -80,7 +72,7 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
 }) {
   const controller = useController(ConnectionsAdministrationController);
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>

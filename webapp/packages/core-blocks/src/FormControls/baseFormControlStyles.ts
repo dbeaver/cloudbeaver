@@ -28,9 +28,9 @@ export const baseFormControlStyles = css`
   field-label {
     composes: theme-typography--body1 from global;
     box-sizing: border-box;
-    width: 150px;
+    width: 180px;
     text-align: right;
-    padding-right: 24px;
+    padding: 0 16px;
     line-height: 16px;
     font-weight: 500;
   }
@@ -48,6 +48,15 @@ export const baseFormControlStyles = css`
     }
     & field-description {
       padding-left: 200px;
+    }
+  } 
+
+  field[|short] {
+    & field-label {
+      width: auto;
+    }
+    & field-description {
+      padding-left: auto;
     }
   } 
 `;

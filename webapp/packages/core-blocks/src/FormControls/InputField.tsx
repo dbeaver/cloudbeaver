@@ -18,6 +18,7 @@ import { FormContext } from './FormContext';
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
   mod?: 'surface';
   long?: boolean;
+  short?: boolean;
 };
 
 type ControlledProps = BaseProps & {
@@ -50,6 +51,7 @@ export const InputField: InputFieldType = observer(function InputField({
   className,
   mod,
   long,
+  short,
   onChange,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -70,7 +72,7 @@ export const InputField: InputFieldType = observer(function InputField({
   const value = state ? state[name] : valueControlled;
 
   return styled(useStyles(baseFormControlStyles))(
-    <field as="div" className={className} {...use({ long })}>
+    <field as="div" className={className} {...use({ long, short })}>
       <field-label as='label'>{children} {required && '*'}</field-label>
       <input
         {...rest}
