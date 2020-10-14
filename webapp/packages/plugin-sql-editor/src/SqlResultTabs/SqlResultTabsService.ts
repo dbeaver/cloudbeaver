@@ -15,6 +15,7 @@ import { ISqlEditorGroupMetadata } from '../ISqlEditorGroupMetadata';
 import {
   IQueryTabGroup, ISqlEditorTabState, ISqlQueryParams, IResultDataTab
 } from '../ISqlEditorTabState';
+import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorGroupMetadataService } from '../SqlEditorGroupMetadataService';
 import { SqlExecutionState } from '../SqlExecutionState';
 
@@ -23,21 +24,33 @@ export class SqlResultTabsService {
   private tabExecutionContext: MetadataMap<string, SqlExecutionState>;
 
   constructor(
-    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService
+    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+    private sqlDialectInfoService: SqlDialectInfoService
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
 
-  getTabExecutionContext(tabId: string) {
+  getTabExecutionContext(tabId: string): SqlExecutionState {
     return this.tabExecutionContext.get(tabId);
   }
 
-  async executeEditorQuery(tabId: string, editorState: ISqlEditorTabState, query: string, inNewTab: boolean) {
+  async executeEditorQuery(
+    tabId: string,
+    editorState: ISqlEditorTabState,
+    query: string,
+    inNewTab: boolean
+  ): Promise<void> {
     if (!query.trim()) {
       return;
     }
 
     const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
+    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(editorState.connectionId);
+
+    if (dialectInfo?.scriptDelimiter && query.endsWith(dialectInfo?.scriptDelimiter)) {
+      query = query.slice(0, query.length - dialectInfo.scriptDelimiter.length);
+    }
+
     let tabGroup: IQueryTabGroup;
 
     const sqlQueryParams: ISqlQueryParams = {
