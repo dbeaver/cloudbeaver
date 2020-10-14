@@ -46,6 +46,7 @@ const styles = css`
     display: flex;
     flex-direction: column;
     flex: 1;
+    padding-top: 16px;
   }
   TabPanel {
     flex-direction: column;
