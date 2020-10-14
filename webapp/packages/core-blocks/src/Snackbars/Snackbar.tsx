@@ -18,25 +18,30 @@ import { NotificationMark } from './NotificationMark';
 
 interface SnackbarProps {
   type?: ENotificationType;
-  text: string;
+  message?: string;
+  title: string;
   closeAfter?: number;
   disableShowDetails?: boolean;
+  createdAt?: number;
   onClose?: () => void;
   onShowDetails?: () => void;
 }
 
 export function Snackbar({
   type,
-  text,
+  message,
+  title,
   closeAfter,
   disableShowDetails,
   onClose,
   onShowDetails,
+  createdAt,
 }: SnackbarProps) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
   const translate = useTranslate();
+  const timeStringFromTimestamp = createdAt ? new Date(createdAt).toLocaleTimeString() : '';
 
   useEffect(() => {
     setMounted(true);
@@ -62,29 +67,37 @@ export function Snackbar({
     };
   }, []);
 
-  return styled(styles)(
+  return styled(styles)`
+    body-text-block {
+      padding-right: ${!closeAfter && onclose ? '25px' : 'unset'}
+    }
+  `(
     <notification as="div" {...use({ mounted, closing })}>
-      <notification-header as="div">
-        {type && <NotificationMark type={type} />}
-        <message as="div">{translate(text)}</message>
-        {!closeAfter && onClose && (
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
-        )}
-      </notification-header>
+      {type && <NotificationMark type={type} />}
       <notification-body as="div">
-        {onShowDetails && (
-          <actions as="div">
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={disableShowDetails}
-              onClick={onShowDetails}
-            >
-              {translate('ui_errors_details')}
-            </Button>
-          </actions>
-        )}
+        <body-text-block as='div'>
+          <text-block-title as='h2'>{translate(title)}</text-block-title>
+          {message && <message as="div">{translate(message)}</message>}
+        </body-text-block>
+        <notification-footer as='div'>
+          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
+          {onShowDetails && (
+            <actions as="div">
+              <Button
+                type="button"
+                mod={['outlined']}
+                disabled={disableShowDetails}
+                onClick={onShowDetails}
+              >
+                {translate('ui_errors_details')}
+              </Button>
+            </actions>
+          )}
+        </notification-footer>
       </notification-body>
+      {!closeAfter && onClose && (
+        <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
+      )}
     </notification>
   );
 }

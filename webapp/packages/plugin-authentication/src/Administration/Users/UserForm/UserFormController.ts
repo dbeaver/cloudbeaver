@@ -86,7 +86,7 @@ export class UserFormController implements IInitializableController, IDestructib
           grantedConnections: this.getGrantedConnections(),
         });
         this.collapse();
-        this.notificationService.logInfo({ title: 'authentication_administration_user_created' });
+        this.notificationService.logSuccessInfo({ title: 'authentication_administration_user_created' });
       } else {
         if (this.credentials.password) {
           await this.usersResource.updateCredentials(this.user.userId, { password: this.credentials.password });
@@ -94,7 +94,7 @@ export class UserFormController implements IInitializableController, IDestructib
         await this.updateRoles();
         await this.saveConnectionPermissions();
         await this.usersResource.refresh(this.user.userId);
-        this.notificationService.logInfo({ title: 'authentication_administration_user_updated' });
+        this.notificationService.logSuccessInfo({ title: 'authentication_administration_user_updated' });
       }
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {

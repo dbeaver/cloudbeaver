@@ -8,8 +8,9 @@
 
 import { HTMLProps } from 'react';
 
-import { CheckCircle, Frown } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
+
+import { IconOrImage } from '../IconOrImage';
 
 type IconProps = HTMLProps<HTMLDivElement> & {
   type: ENotificationType;
@@ -18,10 +19,9 @@ type IconProps = HTMLProps<HTMLDivElement> & {
 export function NotificationMark({ type, ...props }: IconProps) {
   return (
     <div {...props}>
-      {/* todo change to info icon */}
-      {type === ENotificationType.Info && <CheckCircle />}
-      {type === ENotificationType.Error && <Frown />}
-      {type === ENotificationType.Success && <CheckCircle />}
+      {type === ENotificationType.Info && <IconOrImage icon='/icons/info_icon.svg' />}
+      {type === ENotificationType.Error && <IconOrImage icon='/icons/error_icon.svg' />}
+      {type === ENotificationType.Success && <IconOrImage icon='/icons/success_icon.svg' />}
     </div>
   );
 }

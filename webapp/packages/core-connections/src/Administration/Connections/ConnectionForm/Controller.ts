@@ -79,12 +79,12 @@ implements IInitializableController, IDestructibleController {
         const connection = await this.connectionsResource.update(this.model.connection.id, this.getConnectionConfig());
         await this.saveSubjectPermissions(connection.id);
 
-        this.notificationService.logInfo({ title: `Connection ${connection.name} updated` });
+        this.notificationService.logSuccessInfo({ title: `Connection ${connection.name} updated` });
       } else {
         const connection = await this.connectionsResource.create(this.getConnectionConfig());
         await this.saveSubjectPermissions(connection.id);
         this.close();
-        this.notificationService.logInfo({ title: `Connection ${connection.name} created` });
+        this.notificationService.logSuccessInfo({ title: `Connection ${connection.name} created` });
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_create_fail');
@@ -98,7 +98,7 @@ implements IInitializableController, IDestructibleController {
     this.error.clear();
     try {
       await this.connectionsResource.test(this.getConnectionConfig());
-      this.notificationService.logInfo({ title: 'Connection is established' });
+      this.notificationService.logSuccessInfo({ title: 'Connection is established' });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_test_fail');
     } finally {

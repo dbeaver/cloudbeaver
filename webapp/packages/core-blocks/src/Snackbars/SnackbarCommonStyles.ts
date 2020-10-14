@@ -21,13 +21,12 @@ export const SNACKBAR_COMMON_STYLES = composes(
       composes: theme-elevation-z5 from global;
       position: relative;
       display: flex;
-      flex-direction: column;
       box-sizing: border-box;
       overflow: hidden;
       width: 500px;
       margin-bottom: 16px;
       margin-left: 16px;
-      padding: 18px 24px;
+      padding: 16px 16px;
       line-height: 1.5;
       opacity: 0;
       border-radius: 4px;
@@ -43,25 +42,53 @@ export const SNACKBAR_COMMON_STYLES = composes(
       }
     }
 
-    notification-header {
+    notification-body {
       display: flex;
+      flex-direction: column;
+      flex: 1 0 0;
+      & body-text-block {
+        margin-top: 8px;
+        & text-block-title {
+          font-size: 20px;
+          line-height: 25px;
+          font-weight: 700;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 8px;
+        }
+        & message {
+          font-size: 16px;
+          display: flex;
+          align-items: center;
+          opacity: 0.8;
+          flex: 1;
+          overflow: auto;
+          max-height: 200px;
+          padding-right: 24px;
+          margin-bottom: 8px;
+          word-break: break-word;
+        }
+      }
     }
-
-    message {
-      flex: 1;
-      overflow: auto;
-      max-height: 200px;
-      padding-right: 24px;
-      word-break: break-word;
+    
+    notification-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      & footer-time {
+        font-size: 12px;
+        color: #8b8b8b;
+      }
     }
 
     NotificationMark {
       display: block;
       box-sizing: border-box;
       overflow: hidden;
-      width: 24px;
-      height: 24px;
+      max-width: 55px;
+      max-height: 55px;
       font-size: 24px;
+      padding-right: 12px; 
       font-style: normal;
       line-height: 0;
       text-align: center;
@@ -97,7 +124,14 @@ export const SNACKBAR_COMMON_STYLES = composes(
       }
     }
     IconButton {
-      color: rgba(0, 0, 0, 0.45);
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      height: 22px;
+      width: 22px;
+      &:hover {
+        opacity: 0.7;
+      }
     }
   `
 );
