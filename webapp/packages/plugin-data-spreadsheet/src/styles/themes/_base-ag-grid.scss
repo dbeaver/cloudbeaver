@@ -43,6 +43,11 @@
         background-color: #ff99006b;
       }
 
+      .cell-null > :global(span) {
+        text-transform: uppercase;
+        opacity: 0.65;
+      }
+
       .ag-row.ag-row-hover {
         background-color: transparent;
         @include stripes-background($mdc-theme-secondary);

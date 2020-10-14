@@ -230,7 +230,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   }
 
   private cloneRows(rows: AgGridRow[]): AgGridRow[] {
-    return rows.map(row => [...row].map(v => (v === null ? '' : v))); // TODO: temporary fix dbeaver-corp/dbeaver-web#663
+    return rows.map(row => [...row]);
   }
 }
 
@@ -291,14 +291,22 @@ function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
           return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
         }
 
+        if (params.value === 'null') {
+          return '[null]';
+        }
+
         return params.value;
       },
       cellClass: (params: any) => {
+        const classes: string[] = [];
         const context: AgGridContext = params.context;
         if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
-          return 'cell-edited';
+          classes.push('cell-edited');
         }
-        return '';
+        if (params.value === 'null') {
+          classes.push('cell-null');
+        }
+        return classes.join(' ');
       },
     })),
   ];
