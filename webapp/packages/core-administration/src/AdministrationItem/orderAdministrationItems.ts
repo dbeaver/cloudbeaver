@@ -9,7 +9,7 @@
 import { IAdministrationItem } from './IAdministrationItem';
 
 export function orderAdministrationItems(configuration: boolean) {
-  return (itemA: IAdministrationItem, itemB: IAdministrationItem) => {
+  return (itemA: IAdministrationItem, itemB: IAdministrationItem): number => {
     if (configuration) {
       return (
         itemA.configurationWizardOptions?.order ?? itemA.order

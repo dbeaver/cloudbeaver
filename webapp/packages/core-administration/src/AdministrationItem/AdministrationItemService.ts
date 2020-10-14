@@ -35,6 +35,7 @@ export class AdministrationItemService {
       filterConfigurationWizard(configurationWizard)(item)
       && item.name === name
     ));
+
     if (!item) {
       return null;
     }
@@ -51,14 +52,16 @@ export class AdministrationItemService {
     return sub;
   }
 
-  create(options: IAdministrationItemOptions) {
+  create(options: IAdministrationItemOptions, replace?: boolean): void {
     const type = options.type ?? AdministrationItemType.Administration;
 
-    if (this.items.some(item => item.name === options.name && (
+    const existedIndex = this.items.findIndex(item => item.name === options.name && (
       item.type === type
       || item.type === AdministrationItemType.Default
       || type === AdministrationItemType.Default
-    ))) {
+    ));
+
+    if (!replace && existedIndex !== -1) {
       throw new Error(`Administration item "${options.name}" already exists in the same visibility scope`);
     }
 
@@ -68,7 +71,11 @@ export class AdministrationItemService {
       sub: options.sub ?? [],
       order: options.order ?? Number.MAX_SAFE_INTEGER,
     };
-    this.items.push(item);
+    if (replace && existedIndex !== -1) {
+      this.items.splice(existedIndex, 1, item);
+    } else {
+      this.items.push(item);
+    }
   }
 
   async activate(name: string, itemSub: string | null, param: string | null, configurationWizard: boolean) {
