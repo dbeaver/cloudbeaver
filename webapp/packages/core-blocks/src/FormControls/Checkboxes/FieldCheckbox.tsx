@@ -14,9 +14,8 @@ import { baseFormControlStyles } from '../baseFormControlStyles';
 import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
 
 const fieldCheckboxStyles = css`
-  field {
-    margin-left: -10px;
-    margin-right: -10px;
+  Checkbox {
+    margin: -10px;
   }
 `;
 

@@ -22,12 +22,6 @@ interface ParametersFormProps {
   embedded?: boolean;
 }
 
-const styles = css`
-  layout-grid-inner {
-    max-width: 630px;
-  }
-`;
-
 export const ParametersForm = observer(function ParametersForm({
   connection,
   embedded,
@@ -35,7 +29,7 @@ export const ParametersForm = observer(function ParametersForm({
 }: ParametersFormProps) {
   const translate = useTranslate();
 
-  return styled(useStyles(formStyles, styles))(
+  return styled(useStyles(formStyles))(
     <>
       {!embedded && (
         <layout-grid-inner as="div">

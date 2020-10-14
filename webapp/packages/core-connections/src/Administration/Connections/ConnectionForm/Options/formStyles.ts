@@ -19,7 +19,7 @@ export const formStyles = css`
     flex: 1;
   }
   connection-type {
-    margin-left: 150px;
+    margin-left: 180px;
   }
   Radio {
     composes: theme-typography--body1 from global;

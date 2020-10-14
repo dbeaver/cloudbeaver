@@ -49,6 +49,7 @@ const styles = css`
   }
   TabPanel {
     flex-direction: column;
+    max-width: 630px;
   }
 `;
 
