@@ -29,7 +29,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
   const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
   const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
-  const translatedTitle = useMemo(() => translate(notification.title), [notification.title, translate]);
+  const translatedTitle = translate(notification.title);
 
   useEffect(() => {
     setMounted(true);

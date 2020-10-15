@@ -42,7 +42,7 @@ export function Snackbar({
   const [closing, setClosing] = useState(false);
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
-  const translatedTitle = useMemo(() => translate(title), [title, translate]);
+  const translatedTitle = translate(title);
 
   useEffect(() => {
     setMounted(true);

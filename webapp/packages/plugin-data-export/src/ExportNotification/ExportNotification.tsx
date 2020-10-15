@@ -37,7 +37,7 @@ const styles = css`
   }
   loader-container {
     & Loader {
-      width: 35px;
+      width: 40px;
       height: 40px;
     }
   }
@@ -55,7 +55,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
   const [mounted, setMounted] = useState(false);
   const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
   const exportNotificationType = controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
-  const translatedStatus = useMemo(() => translate(controller.status), [controller.status, translate]);
+  const translatedStatus = translate(controller.status);
 
   useEffect(() => {
     setMounted(true);
