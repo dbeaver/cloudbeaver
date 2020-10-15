@@ -8,11 +8,11 @@
 
 import { observer } from 'mobx-react';
 
+import { Snackbar } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { INotification } from '@cloudbeaver/core-events';
 
 import { NotificationItemController } from './NotificationItemController';
-import { Snackbar } from './Snackbar/Snackbar';
 
 interface Props {
   notification: INotification<any>;
@@ -28,8 +28,10 @@ export const NotificationsItem = observer(function Notification({ notification }
 
   return (
     <Snackbar
-      text={notification.title}
+      title={notification.title}
+      message={notification.message}
       type={notification.type}
+      time={notification.timestamp}
       disableShowDetails={controller.isDetailsDialogOpen}
       closeAfter={controller.closeAfter}
       onClose={controller.handleClose}

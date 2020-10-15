@@ -21,13 +21,12 @@ export const SNACKBAR_COMMON_STYLES = composes(
       composes: theme-elevation-z5 from global;
       position: relative;
       display: flex;
-      flex-direction: column;
       box-sizing: border-box;
       overflow: hidden;
       width: 500px;
       margin-bottom: 16px;
       margin-left: 16px;
-      padding: 18px 24px;
+      padding: 16px 16px;
       line-height: 1.5;
       opacity: 0;
       border-radius: 4px;
@@ -43,61 +42,70 @@ export const SNACKBAR_COMMON_STYLES = composes(
       }
     }
 
-    notification-header {
+    notification-body {
       display: flex;
+      flex-direction: column;
+      flex: 1 0 0;
+      & body-text-block {
+        margin-top: 8px;
+        padding-right: 24px;
+        & message {
+          font-size: 16px;
+          opacity: 0.8;
+          overflow: auto;
+          max-height: 200px;
+          margin-bottom: 8px;
+          word-break: break-word;
+        }
+      }
+    }
+    
+    text-block-title {
+      composes: theme-typography--headline6 from global;
+      max-width: 392px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1.55rem;
+      font-weight: 700;
+      margin: 0;
+      padding: 0;
+      margin-bottom: 8px;
     }
 
-    message {
-      flex: 1;
-      overflow: auto;
-      max-height: 200px;
-      padding-right: 24px;
-      word-break: break-word;
+    notification-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    footer-time {
+      composes: theme-typography--caption from global;
+      opacity: 0.7;
     }
 
     NotificationMark {
-      display: block;
-      box-sizing: border-box;
-      overflow: hidden;
-      width: 24px;
-      height: 24px;
-      font-size: 24px;
-      font-style: normal;
-      line-height: 0;
-      text-align: center;
-      text-transform: none;
-      vertical-align: -0.125em;
-      text-rendering: optimizeLegibility;
-
-      &[type='Info'] :global(svg) {
-        fill: #52c41a !important;
-      }
-      & :global(svg) {
-        fill: #ed3b26 !important;
-      }
-    }
-
-    NotificationMark + message {
-      padding-left: 24px;
+      padding-right: 12px; 
     }
 
     actions {
       display: flex;
-
-      &:not(:empty) {
-        margin-top: 24px;
-      }
-
       & Button {
         margin-left: 16px;
-
         &:first-child {
           margin-left: auto;
         }
       }
     }
     IconButton {
-      color: rgba(0, 0, 0, 0.45);
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      height: 22px;
+      width: 22px;
+      &:hover {
+        opacity: 0.7;
+      }
     }
   `
 );

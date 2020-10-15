@@ -7,14 +7,14 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import {
-  Button, Loader, IconButton, SNACKBAR_COMMON_STYLES
+  Button, Loader, IconButton, SNACKBAR_COMMON_STYLES, NotificationMark
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { NotificationComponentProps } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { EDeferredState } from '@cloudbeaver/core-utils';
@@ -35,8 +35,11 @@ const styles = css`
       margin: 0;
     }
   }
-  IconButton {
-    color: rgba(0, 0, 0, 0.45);
+  loader-container {
+    & Loader {
+      width: 40px;
+      height: 40px;
+    }
   }
 `;
 
@@ -50,6 +53,9 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
   const [mounted, setMounted] = useState(false);
+  const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
+  const exportNotificationType = controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
+  const translatedStatus = translate(controller.status);
 
   useEffect(() => {
     setMounted(true);
@@ -57,61 +63,73 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
 
   return styled(useStyles(SNACKBAR_COMMON_STYLES, styles))(
     <notification as="div" {...use({ mounted })}>
-      <notification-header as="div">
-        <Loader loading={controller.isPending} hideMessage />
-        <message as="div">{translate(controller.status)}</message>
-        {!controller.isPending && (
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={controller.delete} />
-        )}
-      </notification-header>
+      {!controller.isPending && <NotificationMark type={exportNotificationType} />}
+      {controller.isPending && (
+        <loader-container as='div'>
+          <Loader fullSize hideMessage />
+        </loader-container>
+      )}
       <notification-body as="div">
-        <source-name as="div">
-          {controller.sourceName}
-          <pre title={controller.task?.context.sourceName}>{controller.task?.context.sourceName}</pre>
-        </source-name>
-        <actions as="div">
-          {controller.isSuccess && (
-            <>
+        <body-text-block as='div'>
+          <text-block-title title={translatedStatus} as="h2">{translatedStatus}</text-block-title>
+          <message as="div">
+            {controller.sourceName}
+            {controller.task?.context.sourceName && (
+              <pre title={controller.task?.context.sourceName}>
+                {controller.task?.context.sourceName}
+              </pre>
+            )}
+          </message>
+        </body-text-block>
+        <notification-footer as='div'>
+          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
+          <actions as="div">
+            {controller.isSuccess && (
+              <>
+                <Button
+                  type="button"
+                  mod={['outlined']}
+                  onClick={controller.delete}
+                >
+                  {translate('data_transfer_notification_delete')}
+                </Button>
+                <Button
+                  tag='a'
+                  href={controller.downloadUrl}
+                  mod={['unelevated']}
+                  download
+                  onClick={controller.download}
+                >
+                  {translate('data_transfer_notification_download')}
+                </Button>
+              </>
+            )}
+            {controller.hasDetails && (
               <Button
                 type="button"
                 mod={['outlined']}
-                onClick={controller.delete}
+                disabled={controller.isDetailsDialogOpen}
+                onClick={controller.showDetails}
               >
-                {translate('data_transfer_notification_delete')}
+                {translate('ui_errors_details')}
               </Button>
+            )}
+            {controller.isPending && (
               <Button
-                tag='a'
-                href={controller.downloadUrl}
-                mod={['unelevated']}
-                download
-                onClick={controller.download}
+                type="button"
+                mod={['outlined']}
+                disabled={controller.process?.getState() === EDeferredState.CANCELLING}
+                onClick={controller.cancel}
               >
-                {translate('data_transfer_notification_download')}
+                {translate('ui_processing_cancel')}
               </Button>
-            </>
-          )}
-          {controller.hasDetails && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={controller.isDetailsDialogOpen}
-              onClick={controller.showDetails}
-            >
-              {translate('ui_errors_details')}
-            </Button>
-          )}
-          {controller.isPending && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={controller.process?.getState() === EDeferredState.CANCELLING}
-              onClick={controller.cancel}
-            >
-              {translate('ui_processing_cancel')}
-            </Button>
-          )}
-        </actions>
+            )}
+          </actions>
+        </notification-footer>
       </notification-body>
+      {!controller.isPending && (
+        <IconButton name="cross" viewBox="0 0 16 16" onClick={controller.delete} />
+      )}
     </notification>
   );
 });

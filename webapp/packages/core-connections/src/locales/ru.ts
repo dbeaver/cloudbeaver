@@ -22,7 +22,7 @@ export default [
   ['connections_connection_port', 'Порт'],
   ['connections_connection_template', 'Шаблон'],
   ['connections_connection_test', 'Проверить подключение'],
-  ['connections_connection_test_fail', 'Не удалось выполнить тестовое подключение'],
+  ['connections_connection_test_fail', 'Не удалось выполнить подключение'],
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
   ['connections_driver_search_placeholder', 'Введите название драйвера...'],

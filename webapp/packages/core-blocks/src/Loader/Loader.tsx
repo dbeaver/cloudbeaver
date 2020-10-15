@@ -29,6 +29,7 @@ export interface LoaderProps {
   /** smallest spinner icon and hide loading message */
   small?: boolean;
   className?: string;
+  fullSize?: boolean;
   onCancel?: () => void;
 }
 
@@ -43,6 +44,7 @@ export function Loader({
   hideMessage,
   secondary,
   small,
+  fullSize,
   className,
   loading = true,
   onCancel,
@@ -68,7 +70,7 @@ export function Loader({
   }
 
   return styled(style)(
-    <loader as="div" className={className} {...use({ small })}>
+    <loader as="div" className={className} {...use({ small, fullSize })}>
       <icon as="div"><img src={spinnerURL} /></icon>
       {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}
       {onCancel && (

@@ -217,7 +217,7 @@ export class SqlEditorTabService {
     try {
       await this.gql.sdk.sqlContextDestroy({ connectionId, contextId });
     } catch (exception) {
-      this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`, true);
+      this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`, '', true);
     }
   }
 
