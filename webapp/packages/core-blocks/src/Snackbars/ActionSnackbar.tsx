@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Button, IconButton } from '@cloudbeaver/core-blocks';
@@ -29,6 +29,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
   const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
   const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
+  const translatedTitle = useMemo(() => translate(notification.title), [notification.title, translate]);
 
   useEffect(() => {
     setMounted(true);
@@ -39,7 +40,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
       <NotificationMark type={notification.type} />
       <notification-body as="div">
         <body-text-block as='div'>
-          <text-block-title title={translate(notification.title)} as='h2'>{translate(notification.title)}</text-block-title>
+          <text-block-title title={translatedTitle} as='h2'>{translatedTitle}</text-block-title>
           {notification.message && <message as="div">{translate(notification.message)}</message>}
         </body-text-block>
         <notification-footer as='div'>

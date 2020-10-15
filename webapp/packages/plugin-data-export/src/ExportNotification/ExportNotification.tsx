@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import {
@@ -55,6 +55,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
   const [mounted, setMounted] = useState(false);
   const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
   const exportNotificationType = controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
+  const translatedStatus = useMemo(() => translate(controller.status), [controller.status, translate]);
 
   useEffect(() => {
     setMounted(true);
@@ -70,7 +71,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
       )}
       <notification-body as="div">
         <body-text-block as='div'>
-          <text-block-title title={translate(controller.status)} as="h2">{translate(controller.status)}</text-block-title>
+          <text-block-title title={translatedStatus} as="h2">{translatedStatus}</text-block-title>
           <message as="div">
             {controller.sourceName}
             {controller.task?.context.sourceName && (

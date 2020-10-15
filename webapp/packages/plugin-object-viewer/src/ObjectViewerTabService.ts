@@ -270,7 +270,7 @@ export class ObjectViewerTabService {
 
       await this.dbObjectService.loadChildren(folderId, resourceKeyList(folderChildren));
     } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Object Viewer while tab selecting');
+      this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while tab selecting');
     }
   }
 
@@ -319,7 +319,7 @@ export class ObjectViewerTabService {
         this.navigationTabsService.selectTab(tab.id);
       }
     } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Object Viewer while processing action with database node');
+      this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
     }
   }
 }

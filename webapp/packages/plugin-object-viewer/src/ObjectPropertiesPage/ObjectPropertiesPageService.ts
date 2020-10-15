@@ -64,7 +64,7 @@ export class ObjectPropertiesPageService {
 
       tabContext.trySwitchPage(this.page);
     } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Object Viewer while processing action with database node');
+      this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
     }
   }
 }

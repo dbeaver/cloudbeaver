@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Button, IconButton, SNACKBAR_COMMON_STYLES } from '@cloudbeaver/core-blocks';
@@ -42,6 +42,7 @@ export function Snackbar({
   const [closing, setClosing] = useState(false);
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
+  const translatedTitle = useMemo(() => translate(title), [title, translate]);
 
   useEffect(() => {
     setMounted(true);
@@ -72,7 +73,7 @@ export function Snackbar({
       {type && <NotificationMark type={type} />}
       <notification-body as="div">
         <body-text-block as='div'>
-          <text-block-title title={translate(title)} as='h2'>{translate(title)}</text-block-title>
+          <text-block-title title={translatedTitle} as='h2'>{translatedTitle}</text-block-title>
           {message && <message as="div">{translate(message)}</message>}
         </body-text-block>
         <notification-footer as='div'>

@@ -72,7 +72,7 @@ export class DataViewerTabService {
       //   tabInfo.trySwitchHandler(this.tabHandler);
       // }
     } catch (exception) {
-      this.notificationService.logException(exception, 'Error in Data Viewer while processing action with database node');
+      this.notificationService.logException(exception, 'Data Viewer Error', 'Error in Data Viewer while processing action with database node');
     }
   }
 
