@@ -75,22 +75,16 @@ export const SNACKBAR_COMMON_STYLES = composes(
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      & footer-time {
-        font-size: 12px;
-        color: #8b8b8b;
-      }
+    }
+
+    footer-time {
+      font-size: 12px;
+      composes: theme-typography--caption from global;
+      opacity: 0.7;
     }
 
     NotificationMark {
-      max-width: 55px;
-      max-height: 55px;
       padding-right: 12px; 
-      &[type='Info'] :global(svg) {
-        fill: #52c41a !important;
-      }
-      & :global(svg) {
-        fill: #ed3b26 !important;
-      }
     }
 
     actions {

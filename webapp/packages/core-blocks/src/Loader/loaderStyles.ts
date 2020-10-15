@@ -50,6 +50,13 @@ export const loaderStyles = css`
     }
   }
 
+  loader[|fullSize] {
+    & icon {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
   @keyframes rotation {
     from {
         transform: rotate(0deg);

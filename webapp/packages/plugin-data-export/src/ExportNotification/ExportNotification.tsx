@@ -35,6 +35,12 @@ const styles = css`
       margin: 0;
     }
   }
+  loader-container {
+    & Loader {
+      width: 35px;
+      height: 40px;
+    }
+  }
 `;
 
 type Props = NotificationComponentProps<{
@@ -57,9 +63,13 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
   return styled(useStyles(SNACKBAR_COMMON_STYLES, styles))(
     <notification as="div" {...use({ mounted })}>
       <NotificationMark type={exportNotificationType} />
+      {controller.isPending && (
+        <loader-container as='div'>
+          <Loader fullSize hideMessage />
+        </loader-container>
+      )}
       <notification-body as="div">
         <body-text-block as='div'>
-          <Loader loading={controller.isPending} hideMessage />
           <text-block-title as="h2">{translate(controller.status)}</text-block-title>
           <message as="div">
             {controller.sourceName}
