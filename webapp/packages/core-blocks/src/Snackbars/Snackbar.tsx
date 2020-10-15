@@ -22,7 +22,7 @@ interface SnackbarProps {
   title: string;
   closeAfter?: number;
   disableShowDetails?: boolean;
-  createdAt?: number;
+  time?: number;
   onClose?: () => void;
   onShowDetails?: () => void;
 }
@@ -35,13 +35,13 @@ export function Snackbar({
   disableShowDetails,
   onClose,
   onShowDetails,
-  createdAt,
+  time,
 }: SnackbarProps) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
   const translate = useTranslate();
-  const timeStringFromTimestamp = createdAt ? new Date(createdAt).toLocaleTimeString() : '';
+  const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
 
   useEffect(() => {
     setMounted(true);
@@ -67,11 +67,7 @@ export function Snackbar({
     };
   }, []);
 
-  return styled(styles)`
-    body-text-block {
-      padding-right: ${!closeAfter && onclose ? '25px' : 'unset'}
-    }
-  `(
+  return styled(styles)(
     <notification as="div" {...use({ mounted, closing })}>
       {type && <NotificationMark type={type} />}
       <notification-body as="div">

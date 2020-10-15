@@ -102,7 +102,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       try {
         await this.connectionInfoResource.init(connection.id, this.credentials);
 
-        this.notificationService.logSuccessInfo({ title: `Connection ${connection.name} established` });
+        this.notificationService.logSuccess({ title: `Connection ${connection.name} established` });
         this.onClose();
       } catch (exception) {
         this.showError(exception, 'Failed to establish connection');

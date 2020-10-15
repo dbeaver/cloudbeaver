@@ -28,7 +28,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
-  const timeStringFromTimestamp = notification.createdAt ? new Date(notification.createdAt).toLocaleTimeString() : '';
+  const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
 
   useEffect(() => {
     setMounted(true);

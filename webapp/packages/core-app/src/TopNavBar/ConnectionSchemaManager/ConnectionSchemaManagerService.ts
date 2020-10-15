@@ -179,13 +179,13 @@ export class ConnectionSchemaManagerService {
     try {
       await this.connectionInfo.load(connectionId);
     } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load connection info', true);
+      this.notificationService.logException(exception, 'Can\'t load connection info', '', true);
     }
 
     try {
       await this.dbDriverResource.loadAll();
     } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
+      this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
 
     if (this.activeItem?.changeCatalogId || this.activeItem?.changeSchemaId) {

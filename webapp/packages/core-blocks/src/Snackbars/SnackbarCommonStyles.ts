@@ -48,29 +48,29 @@ export const SNACKBAR_COMMON_STYLES = composes(
       flex: 1 0 0;
       & body-text-block {
         margin-top: 8px;
-        & text-block-title {
-          font-size: 20px;
-          line-height: 25px;
-          font-weight: 700;
-          margin: 0;
-          padding: 0;
-          margin-bottom: 8px;
-        }
+        padding-right: 24px;
         & message {
           font-size: 16px;
-          display: flex;
-          align-items: center;
           opacity: 0.8;
-          flex: 1;
           overflow: auto;
           max-height: 200px;
-          padding-right: 24px;
           margin-bottom: 8px;
           word-break: break-word;
         }
       }
     }
     
+    text-block-title {
+      composes: theme-typography--headline6 from global;
+      line-height: 1.55rem;
+      font-weight: 700;
+      overflow: auto;
+      max-height: 200px;
+      margin: 0;
+      padding: 0;
+      margin-bottom: 8px;
+    }
+
     notification-footer {
       display: flex;
       align-items: flex-end;
@@ -82,30 +82,15 @@ export const SNACKBAR_COMMON_STYLES = composes(
     }
 
     NotificationMark {
-      display: block;
-      box-sizing: border-box;
-      overflow: hidden;
       max-width: 55px;
       max-height: 55px;
-      font-size: 24px;
       padding-right: 12px; 
-      font-style: normal;
-      line-height: 0;
-      text-align: center;
-      text-transform: none;
-      vertical-align: -0.125em;
-      text-rendering: optimizeLegibility;
-
       &[type='Info'] :global(svg) {
         fill: #52c41a !important;
       }
       & :global(svg) {
         fill: #ed3b26 !important;
       }
-    }
-
-    NotificationMark + message {
-      padding-left: 24px;
     }
 
     actions {

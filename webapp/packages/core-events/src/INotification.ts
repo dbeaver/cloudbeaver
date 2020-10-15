@@ -34,7 +34,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   type: ENotificationType;
   title: string;
   message?: string;
-  createdAt?: number;
+  timestamp: number;
   details?: string | Error;
   persistent?: boolean;
   isSilent: boolean;
@@ -51,6 +51,6 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   isSilent?: boolean;
   persistent?: boolean;
   extraProps?: TProps;
-  createdAt?: number;
+  timestamp?: number;
   customComponent?: () => NotificationComponent<TProps>;
 }

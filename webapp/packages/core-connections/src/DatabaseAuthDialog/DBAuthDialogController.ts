@@ -82,7 +82,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     try {
       this.dbDriverResource.loadAll();
     } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers', true);
+      this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
   }
 }

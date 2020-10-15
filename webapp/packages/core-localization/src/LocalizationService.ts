@@ -142,7 +142,7 @@ export class LocalizationService extends Bootstrap {
       }
       this.localeMap.set(localeKey, locale);
     } catch (error) {
-      this.notificationService.logException(error, 'Locale is not found', true);
+      this.notificationService.logException(error, 'Locale is not found', '', true);
     }
   }
 }
