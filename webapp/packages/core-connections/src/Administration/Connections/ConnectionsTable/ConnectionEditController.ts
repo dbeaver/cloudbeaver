@@ -68,7 +68,7 @@ implements IInitializableController, IDestructibleController {
       // we create a copy to protect the current value from mutation
       this.connection = JSON.parse(JSON.stringify(await this.connectionsResource.load(this.connectionId)));
     } catch (exception) {
-      this.notificationService.logException(exception, "Can't load ConnectionInfo", `Can't load ConnectionInfo ${this.connectionId}`);
+      this.notificationService.logException(exception, `Can't load ConnectionInfo ${this.connectionId}`);
     } finally {
       this.isLoading = false;
     }

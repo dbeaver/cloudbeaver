@@ -106,7 +106,7 @@ export class ConnectionsManagerService {
       await this.connectionInfo.close(id);
       await this.afterConnectionClose(id);
     } catch (exception) {
-      this.notificationService.logException(exception, "Can't close connection", `Can't close connection: ${connection.name}`);
+      this.notificationService.logException(exception, `Can't close connection: ${connection.name}`);
     }
   }
 

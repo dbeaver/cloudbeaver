@@ -92,7 +92,7 @@ export class SqlEditorNavigatorService {
       }
       return;
     } catch (exception) {
-      this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing connection close');
+      this.notificationService.logException(exception, 'Error in SQL Editor while processing connection close');
     }
   }
 
@@ -157,7 +157,7 @@ export class SqlEditorNavigatorService {
       }
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception) {
-      this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing action with editor');
+      this.notificationService.logException(exception, 'Error in SQL Editor while processing action with editor');
     }
   }
 }

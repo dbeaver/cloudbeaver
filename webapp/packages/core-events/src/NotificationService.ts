@@ -50,7 +50,6 @@ export class NotificationService {
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
       persistent: options.persistent,
-      timestamp: options.timestamp || Date.now(),
       type,
       close: this.close.bind(this, id),
       showDetails: this.showDetails.bind(this, id),
@@ -88,21 +87,16 @@ export class NotificationService {
     this.notify(notification, ENotificationType.Info);
   }
 
-  logSuccess<T>(notification: INotificationOptions<T>): void {
-    this.notify(notification, ENotificationType.Success);
-  }
-
   logError<T>(notification: INotificationOptions<T>): void {
     this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
+  logException(exception: Error | GQLError, message?: string, silent?: boolean): void {
     const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
 
     if (!silent) {
       this.logError({
-        title: title || exception.name,
-        message: message || exceptionMessage,
+        title: message || exceptionMessage,
         details: hasDetails(exception) ? exception : undefined,
         isSilent: silent,
       });

@@ -155,7 +155,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
     if (this.getState() === EDeferredState.CANCELLING) {
       this.toCancelled();
       const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
-      this.notificationService.logException(error, 'Query execution Error', message);
+      this.notificationService.logException(error, message);
     } else {
       this.toRejected(error);
     }

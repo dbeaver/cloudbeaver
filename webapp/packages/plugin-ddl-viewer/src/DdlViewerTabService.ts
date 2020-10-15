@@ -55,7 +55,7 @@ export class DdlViewerTabService {
         this.ddlViewerService.loadDdlMetadata(tabContext.nodeInfo.nodeId);
       }
     } catch (exception) {
-      this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with ddl-viewer');
+      this.notificationService.logException(exception, 'Error in Object Viewer while processing action with ddl-viewer');
     }
   }
 

@@ -77,7 +77,7 @@ implements IInitializableController, IDestructibleController {
     try {
       await this.customConnectionService.testConnectionAsync(this.getConnectionConfig());
 
-      this.notificationService.logSuccess({ title: 'Connection is established' });
+      this.notificationService.logInfo({ title: 'Connection is established' });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_test_fail');
     } finally {
@@ -91,7 +91,7 @@ implements IInitializableController, IDestructibleController {
     try {
       const connection = await this.customConnectionService.createConnectionAsync(this.getConnectionConfig());
 
-      this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
+      this.notificationService.logInfo({ title: `Connection ${connection.name} created` });
       this.onClose();
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_connection_create_fail');
