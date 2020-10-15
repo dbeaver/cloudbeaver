@@ -11,7 +11,8 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect, TextPlaceholder
+  Table,
+  TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect, TextPlaceholder, Loader
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -28,6 +29,7 @@ const styles = composes(
   `,
   css`
     box {
+      position: relative;
       flex: 1;
     }
     TableColumnHeader {
@@ -97,6 +99,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
           ))}
         </TableBody>
       </Table>
+      <Loader loading={controller.isLoading} overlay />
     </box>
   );
 });

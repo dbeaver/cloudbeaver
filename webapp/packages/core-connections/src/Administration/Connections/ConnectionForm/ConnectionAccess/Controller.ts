@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 
 import { UsersResource, RolesResource } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
-import { AdminSubjectType } from '@cloudbeaver/core-sdk';
+import { AdminRoleInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
@@ -19,12 +19,16 @@ export class Controller
 implements IInitializableController {
   @observable selectedSubjects: Map<string, boolean> = new Map();
 
-  @computed get users() {
+  @computed get users(): AdminUserInfo[] {
     return Array.from(this.usersResource.data.values());
   }
 
-  @computed get roles() {
+  @computed get roles(): AdminRoleInfo[] {
     return Array.from(this.rolesResource.data.values());
+  }
+
+  get isLoading(): boolean {
+    return this.usersResource.isLoading() || this.rolesResource.isLoading();
   }
 
   private model!: IConnectionFormModel;
@@ -34,12 +38,12 @@ implements IInitializableController {
     private rolesResource: RolesResource
   ) { }
 
-  init(model: IConnectionFormModel) {
+  init(model: IConnectionFormModel): void {
     this.model = model;
     this.loadSubjects();
   }
 
-  onSelect = (subjectId: string, state: boolean) => {
+  onSelect = (subjectId: string, state: boolean): void => {
     if (!state) {
       const index = this.model.grantedSubjects!.findIndex(subject => subject.subjectId === subjectId);
       if (index > -1) {
