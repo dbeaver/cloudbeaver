@@ -62,10 +62,12 @@ export const SNACKBAR_COMMON_STYLES = composes(
     
     text-block-title {
       composes: theme-typography--headline6 from global;
+      max-width: 392px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
       line-height: 1.55rem;
       font-weight: 700;
-      overflow: auto;
-      max-height: 200px;
       margin: 0;
       padding: 0;
       margin-bottom: 8px;
@@ -78,7 +80,6 @@ export const SNACKBAR_COMMON_STYLES = composes(
     }
 
     footer-time {
-      font-size: 12px;
       composes: theme-typography--caption from global;
       opacity: 0.7;
     }
@@ -91,7 +92,6 @@ export const SNACKBAR_COMMON_STYLES = composes(
       display: flex;
       & Button {
         margin-left: 16px;
-
         &:first-child {
           margin-left: auto;
         }

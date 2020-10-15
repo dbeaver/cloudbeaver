@@ -72,7 +72,7 @@ export function Snackbar({
       {type && <NotificationMark type={type} />}
       <notification-body as="div">
         <body-text-block as='div'>
-          <text-block-title as='h2'>{translate(title)}</text-block-title>
+          <text-block-title title={translate(title)} as='h2'>{translate(title)}</text-block-title>
           {message && <message as="div">{translate(message)}</message>}
         </body-text-block>
         <notification-footer as='div'>

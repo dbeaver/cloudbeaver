@@ -39,7 +39,7 @@ export const ActionSnackbar: React.FC<Props> = function ActionSnackbar({
       <NotificationMark type={notification.type} />
       <notification-body as="div">
         <body-text-block as='div'>
-          <text-block-title as='h2'>{translate(notification.title)}</text-block-title>
+          <text-block-title title={translate(notification.title)} as='h2'>{translate(notification.title)}</text-block-title>
           {notification.message && <message as="div">{translate(notification.message)}</message>}
         </body-text-block>
         <notification-footer as='div'>
