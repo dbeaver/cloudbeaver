@@ -60,7 +60,7 @@ implements IInitializableController {
   ): Promise<void> => this.loadDriver(driverId, prevValue);
 
   onFormChange = (value?: unknown, name?: string): void => {
-    this.updateName();
+    this.updateName(name);
     this.resetPassword(name || '');
   };
 
@@ -124,7 +124,11 @@ implements IInitializableController {
     this.updateName();
   }
 
-  private updateName() {
+  private updateName(name?: string) {
+    if (name === 'name') {
+      return;
+    }
+
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
       .filter(Boolean);
 
