@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import styled, { css } from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
 import { TableHeader, TableBody, Table } from '@cloudbeaver/core-blocks';
@@ -18,13 +19,19 @@ interface ObjectChildrenPropertyTableProps {
   nodeIds: string[];
 }
 
+const styles = css`
+  Table {
+    flex: auto;
+  }
+`;
+
 export const ObjectChildrenPropertyTable = observer(function ObjectPropertyTable({
   nodeIds,
 }: ObjectChildrenPropertyTableProps) {
   const firstChild = nodeIds[0] || '';
   const properties = useDatabaseObjectInfo(firstChild).dbObject?.properties;
 
-  return (
+  return styled(styles)(
     <Table>
       <TableHeader>
         <Header properties={properties || []} />
