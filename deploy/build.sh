@@ -21,6 +21,9 @@ echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
 mvn clean package -Dheadless-platform
+if [[ "$?" -ne 0 ]] ; then
+  echo 'Could not perform package'; exit $rc
+fi
 cd ../../../deploy
 
 echo "Copy server packages"
