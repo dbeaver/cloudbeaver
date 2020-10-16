@@ -9,6 +9,7 @@
 import { Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
 
@@ -27,7 +28,8 @@ export class ConnectionsManagerService {
     readonly connectionObjectContainers: ContainerResource,
     private sessionResource: SessionResource,
     private notificationService: NotificationService,
-    private connectionAuthService: ConnectionAuthService
+    private connectionAuthService: ConnectionAuthService,
+    private commonDialogService: CommonDialogService
   ) {
     this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
   }
@@ -76,6 +78,15 @@ export class ConnectionsManagerService {
     const connection = await this.connectionInfo.load(id);
 
     if (!connection.features.includes(EConnectionFeature.manageable)) {
+      return;
+    }
+
+    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'app_shared_navigationTree_delete_connection_confirm',
+      message: `Would you like to delete ${connection.name} connection?`,
+      confirmActionText: 'ui_delete',
+    });
+    if (!confirmed) {
       return;
     }
 

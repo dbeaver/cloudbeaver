@@ -11,6 +11,7 @@ export default [
     'app_shared_navigationTabsBar_placeholder',
     'Нет открытых объектов для отображения. Дважды нажмите на элемент в дереве навигации, чтобы открыть его.',
   ],
+  ['app_shared_navigationTree_delete_connection_confirm', 'Потвердите удаление подключения'],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_refreshNode', 'Обновить'],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],
