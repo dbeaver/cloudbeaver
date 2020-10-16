@@ -30,6 +30,7 @@ const style = css`
 export interface ConfirmationDialogPayload {
   title: string;
   message: string;
+  confirmActionText?: string;
 }
 
 export function ConfirmationDialog({
@@ -66,7 +67,7 @@ export function ConfirmationDialog({
           mod={['unelevated']}
           onClick={handleResolve}
         >
-          <Translate token='ui_processing_ok' />
+          <Translate token={payload.confirmActionText || 'ui_processing_ok'} />
         </Button>
       </footer>
     </dialog>
