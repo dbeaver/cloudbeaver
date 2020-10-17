@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import {
-  MouseEvent, KeyboardEvent, useCallback, PropsWithChildren
+  MouseEvent, useCallback, PropsWithChildren
 } from 'react';
 import styled, { use } from 'reshadow';
 
@@ -58,8 +58,8 @@ export const NavigationNode = observer(function NavigationNode({
   );
 
   const handleEnter = useCallback(
-    (event: KeyboardEvent<HTMLDivElement>) => {
-      switch (event.key) {
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      switch ((event as unknown as KeyboardEvent).code) {
         case KEY.ENTER:
           controller.handleSelect(event.ctrlKey);
           break;
