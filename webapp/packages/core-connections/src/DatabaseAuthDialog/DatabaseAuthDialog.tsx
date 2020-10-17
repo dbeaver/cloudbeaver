@@ -59,7 +59,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   payload,
   options,
   rejectDialog,
-}: DialogComponentProps<string, null>) {
+}: DialogComponentProps<string>) {
   const connection = useConnectionInfo(payload);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');

@@ -89,7 +89,12 @@ export class NavigationTreeService {
     const node = this.navNodeManagerService.getNode(navNodeId);
 
     if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
-      await this.connectionAuthService.auth(NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId));
+      const connection = await this.connectionAuthService.auth(
+        NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
+      );
+      if (!connection.connected) {
+        throw new Error('Connection not established');
+      }
     }
   }
 }

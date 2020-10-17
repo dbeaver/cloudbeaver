@@ -9,7 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { ConnectionInfoResource } from './ConnectionInfoResource';
+import { Connection, ConnectionInfoResource } from './ConnectionInfoResource';
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
 
 @injectable()
@@ -19,7 +19,7 @@ export class ConnectionAuthService {
     private commonDialogService: CommonDialogService
   ) {}
 
-  async auth(connectionId: string) {
+  async auth(connectionId: string): Promise<Connection> {
     let connection = this.connectionInfoResource.get(connectionId);
 
     if (!connection?.connected) {

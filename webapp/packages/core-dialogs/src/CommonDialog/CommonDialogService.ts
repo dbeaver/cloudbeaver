@@ -14,15 +14,20 @@ export interface DialogOptions {
   persistent?: boolean;
 }
 
-export interface DialogComponentProps<TPayload, TResult> {
+export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
   payload: TPayload;
   options?: DialogOptions;
-  resolveDialog: (result: TResult | null) => void;
+  resolveDialog: (result: TResult) => void;
   rejectDialog: () => void; // the dialog was closed by cancel button or backdrop click
   className?: string;
 }
 
 export type DialogComponent<TPayload, TResult> = React.ElementType<DialogComponentProps<TPayload, TResult>>;
+
+export enum DialogueStateResult {
+  Resolved,
+  Rejected
+}
 
 export interface DialogInternal {
   component: DialogComponent<any, any>;
@@ -35,12 +40,12 @@ export interface DialogInternal {
 export class CommonDialogService {
   dialogs: DialogInternal[] = observable([]);
 
-  // note that if dialog is closed by user it will be resolved with null
+  // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
   async open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
     options?: DialogOptions
-  ): Promise<TResult | null> {
+  ): Promise<TResult | DialogueStateResult> {
     return new Promise<TResult>((resolve, reject) => {
       const dialogInternal: DialogInternal = {
         component,
@@ -53,12 +58,12 @@ export class CommonDialogService {
   }
 
   rejectDialog(dialog: DialogInternal): void {
-    dialog.resolve(null);
+    dialog.resolve(DialogueStateResult.Rejected);
     this.removeDialog(dialog);
   }
 
   resolveDialog<TResult>(dialog: DialogInternal, result: TResult): void {
-    dialog.resolve(result);
+    dialog.resolve(result ?? DialogueStateResult.Resolved);
     this.removeDialog(dialog);
   }
 
