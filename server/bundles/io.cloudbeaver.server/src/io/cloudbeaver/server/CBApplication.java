@@ -23,7 +23,9 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
+import io.cloudbeaver.service.DBWServiceInitializer;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -242,6 +244,17 @@ public class CBApplication extends BaseApplicationImpl {
                 log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
             }
         }
+        {
+            // Perform services initialization
+            for (DBWServiceInitializer wsi : WebServiceRegistry.getInstance().getWebServices(DBWServiceInitializer.class)) {
+                try {
+                    wsi.initializeService(this);
+                } catch (Exception e) {
+                    log.warn("Error initializing web service " + wsi.getClass().getName(), e);
+                }
+            }
+
+        }
 
         {
             try {
@@ -278,7 +291,7 @@ public class CBApplication extends BaseApplicationImpl {
             try {
                 InetAddress dockerAddress = InetAddress.getByName(CBConstants.VAR_HOST_DOCKER_INTERNAL);
                 localInetAddresses.add(dockerAddress);
-                log.debug("\tRun in Docker container (" + dockerAddress + ")");
+                log.debug("\tRun in Docker container (" + dockerAddress + ")?");
             } catch (UnknownHostException e) {
                 // Ignore - not a docker env
             }
