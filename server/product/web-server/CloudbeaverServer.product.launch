@@ -189,8 +189,8 @@
         <setEntry value="io.cloudbeaver.resources.drivers.ee@default:default"/>
         <setEntry value="io.cloudbeaver.server@default:default"/>
         <setEntry value="io.cloudbeaver.service.admin@default:default"/>
-        <setEntry value="io.cloudbeaver.service.auth.aws@default:default"/>
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
+        <setEntry value="io.cloudbeaver.service.aws.auth@default:default"/>
         <setEntry value="io.cloudbeaver.service.data.transfer@default:default"/>
         <setEntry value="io.cloudbeaver.service.erd@default:default"/>
         <setEntry value="io.cloudbeaver.service.metadata@default:default"/>
