@@ -21,12 +21,12 @@ import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 
 interface TreeNodeMenuProps {
   node: NavNode;
-  isSelected: boolean;
+  selected?: boolean;
 }
 
 export const TreeNodeMenu = observer(function TreeNodeMenu({
   node,
-  isSelected,
+  selected,
 }: TreeNodeMenuProps) {
   const navigationTreeContextMenuService = useService(NavigationTreeContextMenuService);
 
@@ -45,7 +45,7 @@ export const TreeNodeMenu = observer(function TreeNodeMenu({
   }
 
   return styled(treeNodeMenuStyles)(
-    <MenuTrigger panel={menuPanel} {...use({ isSelected })} modal>
+    <MenuTrigger panel={menuPanel} {...use({ selected })}>
       <Icon name="snack" viewBox="0 0 16 10" />
     </MenuTrigger>
   );

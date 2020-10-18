@@ -10,9 +10,9 @@ import { css } from 'reshadow';
 
 import { composes } from '@cloudbeaver/core-theming';
 
-export const navigationNodeStyles = composes(
+export const TREE_NODE_STYLES = composes(
   css`
-    control {
+    TreeNodeControl {
       composes: theme-ripple theme-ripple-selectable from global;
     }
   `,
@@ -21,34 +21,27 @@ export const navigationNodeStyles = composes(
       box-sizing: border-box;
       width: fit-content;
       min-width: 100%;
-      height: 20px;
 
-      &[use|isExpanded] {
-        & + nested {
+      &[use|expanded] {
+        & > TreeNodeNested {
           display: block;
         }
 
-        & arrow Icon {
-          height: 16px;
-          width: 16px;
+        & > TreeNodeControl > TreeNodeExpand {
           transform: rotate(90deg);
         }
       }
 
-      & control {
+      & TreeNodeControl {
+        box-sizing: border-box;
+        height: 20px;
         display: flex;
         align-items: center;
         padding: 0px 5px;
         user-select: none;
         white-space: nowrap;
-        height: inherit;
         position: initial;
         outline: none;
-        
-        &:hover > portal, 
-        &[aria-selected=true] > portal {
-          visibility: visible;
-        }
 
         &::before {
           left: 0;
@@ -59,39 +52,31 @@ export const navigationNodeStyles = composes(
       }
     }
 
-    arrow {
+    TreeNodeExpand {
+      box-sizing: border-box;
+      flex-shrink: 0;
       cursor: pointer;
       opacity: 0.5;
       width: 16px;
       height: 16px;
-
-      &[hidden] + icon {
-        margin-left: 20px;
-      }
     }
 
-    icon {
+    TreeNodeIcon {
+      box-sizing: border-box;
+      flex-shrink: 0;
       margin-left: 4px;
       width: 16px;
       height: 16px;
-
-      & StaticImage {
-        height: 100%;
-      }
     }
 
-    name {
+    TreeNodeName {
+      box-sizing: border-box;
       margin-left: 4px;
       padding-right: 16px;
     }
 
-    portal {
-      margin-left: auto;
-      margin-right: 16px;
-      visibility: hidden;
-    }
-
-    nested {
+    TreeNodeNested {
+      box-sizing: border-box;
       padding: 2px 0;
       padding-left: 16px;
       display: none;

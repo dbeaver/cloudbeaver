@@ -13,17 +13,17 @@ import { NavTreeResource } from './NodesManager/NavTreeResource';
 
 interface Hook {
   children: string[] | undefined;
-  isLoaded: boolean;
-  isLoading: boolean;
-  isOutdated: boolean;
+  isLoaded: () => boolean;
+  isLoading: () => boolean;
+  isOutdated: () => boolean;
 }
 
 export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
   const navTreeResource = useService(NavTreeResource);
   const children = navTreeResource.get(navNodeId);
-  const isLoading = navTreeResource.isDataLoading(navNodeId);
-  const isLoaded = navTreeResource.isLoaded(navNodeId);
-  const isOutdated = navTreeResource.isOutdated(navNodeId);
+  const isLoading = () => navTreeResource.isDataLoading(navNodeId);
+  const isLoaded = () => navTreeResource.isLoaded(navNodeId);
+  const isOutdated = () => navTreeResource.isOutdated(navNodeId);
 
   return {
     children,
