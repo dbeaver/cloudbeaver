@@ -17,6 +17,7 @@ import { TreeNodeContext } from './TreeNodeContext';
 
 const styles = css`
   Icon {
+    cursor: pointer;
     height: 100%;
     width: 100%;
   }

@@ -55,7 +55,6 @@ export const TREE_NODE_STYLES = composes(
     TreeNodeExpand {
       box-sizing: border-box;
       flex-shrink: 0;
-      cursor: pointer;
       opacity: 0.5;
       width: 16px;
       height: 16px;
@@ -78,7 +77,7 @@ export const TREE_NODE_STYLES = composes(
     TreeNodeNested {
       box-sizing: border-box;
       padding: 2px 0;
-      padding-left: 16px;
+      padding-left: 20px;
       display: none;
     }
   `
