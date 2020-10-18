@@ -14,16 +14,23 @@ import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { useActiveView } from '@cloudbeaver/core-view';
 
-import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { useChildren } from '../shared/useChildren';
-import { NavigationTreeNode } from './NavigationTreeNode/NavigationTreeNode';
+import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { NavigationTreeService } from './NavigationTreeService';
 
 const navigationTreeStyles = css`
-  tree {
-    padding-top: 16px;
+  inside-box {
+    flex: 1;
+    position: relative;
     min-width: 240px;
-    width: 100%;
+    overflow: auto;
+  }
+  tree {
+    position: relative;
+    box-sizing: border-box;
+    padding-top: 16px;
+    min-width: 100%;
+    width: max-content;
     outline: none;
   }
 
@@ -32,7 +39,7 @@ const navigationTreeStyles = css`
     height: 100%;
     width: 100%;
 
-    & tree {
+    & message {
       margin: auto;
       text-align: center;
     }
@@ -56,31 +63,33 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
-    if (nodeChildren.isLoading) {
+    if (nodeChildren.isLoading()) {
       return styled(navigationTreeStyles)(
-        <center as="div">
-          <tree as="div"><Loader /></tree>
-        </center>
+        <inside-box as="div">
+          <center as="div"><Loader /></center>
+        </inside-box>
       );
     }
 
     return styled(navigationTreeStyles)(
-      <center as="div">
-        <tree as="div">
+      <inside-box as="div">
+        <center as="div">
           <message as="div">
             No connections.<br />
             Use the top menu to setup connection to your database.
           </message>
-        </tree>
-      </center>
+        </center>
+      </inside-box>
     );
   }
 
   return styled(navigationTreeStyles)(
-    <tree ref={ref} as="div" tabIndex={0}>
-      {nodeChildren.children.map(id => (
-        <NavigationTreeNode key={id} id={id} parentId={ROOT_NODE_PATH} />
-      ))}
-    </tree>
+    <inside-box as='div'>
+      <tree ref={ref} as="div" tabIndex={0}>
+        {nodeChildren.children.map(id => (
+          <NavigationNodeElement key={id} nodeId={id} />
+        ))}
+      </tree>
+    </inside-box>
   );
 });

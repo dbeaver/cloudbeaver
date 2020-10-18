@@ -14,6 +14,10 @@ export const treeNodeMenuStyles = css`
     padding: 0;
     height: 20px;
 
+    &:before {
+      display: none;
+    }
+
     & Icon {
       cursor: pointer;
       width: 16px;
@@ -21,7 +25,7 @@ export const treeNodeMenuStyles = css`
       fill: #dedede;
     }
 
-    &[use|isSelected] Icon, 
+    &[|selected] Icon, 
     &:hover Icon, 
     &:focus Icon {
       fill: #338fcc;

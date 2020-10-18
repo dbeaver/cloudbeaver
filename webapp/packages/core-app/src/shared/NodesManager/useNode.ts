@@ -13,9 +13,9 @@ import { NavNodeInfoResource } from './NavNodeInfoResource';
 export function useNode(navNodeId: string) {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(navNodeId);
-  const isLoading = navNodeInfoResource.isDataLoading(navNodeId);
-  const isLoaded = navNodeInfoResource.isLoaded(navNodeId);
-  const isOutdated = navNodeInfoResource.isOutdated(navNodeId);
+  const isLoading = () => navNodeInfoResource.isDataLoading(navNodeId);
+  const isLoaded = () => navNodeInfoResource.isLoaded(navNodeId);
+  const isOutdated = () => navNodeInfoResource.isOutdated(navNodeId);
 
   return {
     node, isLoading, isLoaded, isOutdated,

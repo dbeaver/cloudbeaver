@@ -64,9 +64,15 @@ const MenuPanel = observer(function MenuPanel({
   menu,
   style = [],
 }: MenuPanelProps) {
-  return styled(useStyles(menuPanelStyles, ...style))(
+  const styles = useStyles(menuPanelStyles, ...style);
+
+  if (!menu.visible) {
+    return null;
+  }
+
+  return styled(styles)(
     <Menu {...menu} aria-label={panel.id}>
-      {menu.visible && panel.menuItems.map(item => (
+      {panel.menuItems.map(item => (
         <MenuPanelElement key={item.id} item={item} menu={menu} style={style} />
       ))}
     </Menu>

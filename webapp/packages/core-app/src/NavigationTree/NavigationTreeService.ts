@@ -52,8 +52,8 @@ export class NavigationTreeService {
     return false;
   }
 
-  selectNode(id: string, isMultiple?: boolean) {
-    if (!isMultiple) {
+  selectNode(id: string, multiple?: boolean) {
+    if (!multiple) {
       for (const id of this.selectedNodes) {
         this.nodeSelectSubject.next([id, false]);
       }
