@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback, useContext } from 'react';
+import { useContext } from 'react';
 
 import { TreeNodeContext } from './TreeNodeContext';
 
@@ -25,30 +25,24 @@ export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeContro
 }) {
   const context = useContext(TreeNodeContext);
 
-  const handleEnter = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      switch ((event as unknown as KeyboardEvent).code) {
-        case KEY.ENTER:
-          context?.select(event.ctrlKey || event.metaKey);
-          break;
-      }
-      return true;
-    },
-    [context]
-  );
-
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      context?.select();
-    },
-    [context]
-  );
-
   if (!context) {
     throw new Error('Context not provided');
   }
+
+  const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    switch ((event as unknown as KeyboardEvent).code) {
+      case KEY.ENTER:
+        context?.select(event.ctrlKey || event.metaKey);
+        break;
+    }
+    return true;
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    context?.select();
+  };
 
   return (
     <div

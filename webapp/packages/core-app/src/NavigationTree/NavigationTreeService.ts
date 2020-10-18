@@ -35,6 +35,7 @@ export class NavigationTreeService {
   ) {
     this.nodeSelectSubject = new Subject();
     this.onNodeSelect = this.nodeSelectSubject.asObservable();
+    this.getView = this.getView.bind(this);
   }
 
   async navToNode(id: string, parentId: string) {
@@ -73,7 +74,7 @@ export class NavigationTreeService {
     return this.selectedNodes.includes(navNodeId);
   }
 
-  getView = (): IActiveView<string> | null => {
+  getView(): IActiveView<string> | null {
     const context = this.selectedNodes[0];
     if (!context) {
       return null;
@@ -83,7 +84,7 @@ export class NavigationTreeService {
       context,
       extensions: this.navNodeExtensionsService.extensions,
     };
-  };
+  }
 
   private async ensureConnectionInit(navNodeId: string) {
     const node = this.navNodeManagerService.getNode(navNodeId);

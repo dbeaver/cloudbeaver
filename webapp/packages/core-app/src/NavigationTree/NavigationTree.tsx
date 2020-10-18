@@ -24,6 +24,7 @@ const navigationTreeStyles = css`
     position: relative;
     min-width: 240px;
     overflow: auto;
+    outline: none;
   }
   tree {
     position: relative;
@@ -31,7 +32,6 @@ const navigationTreeStyles = css`
     padding-top: 16px;
     min-width: 100%;
     width: max-content;
-    outline: none;
   }
 
   center {
@@ -65,14 +65,14 @@ export const NavigationTree = observer(function NavigationTree() {
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
     if (nodeChildren.isLoading()) {
       return styled(navigationTreeStyles)(
-        <inside-box as="div">
+        <inside-box ref={ref} as='div' tabIndex={0}>
           <center as="div"><Loader /></center>
         </inside-box>
       );
     }
 
     return styled(navigationTreeStyles)(
-      <inside-box as="div">
+      <inside-box ref={ref} as='div' tabIndex={0}>
         <center as="div">
           <message as="div">
             No connections.<br />
@@ -84,8 +84,8 @@ export const NavigationTree = observer(function NavigationTree() {
   }
 
   return styled(navigationTreeStyles)(
-    <inside-box as='div'>
-      <tree ref={ref} as="div" tabIndex={0}>
+    <inside-box ref={ref} as='div' tabIndex={0}>
+      <tree as="div">
         {nodeChildren.children.map(id => (
           <NavigationNodeElement key={id} nodeId={id} />
         ))}
