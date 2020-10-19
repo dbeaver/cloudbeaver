@@ -35,11 +35,7 @@ export class ServerConfigurationService {
     private readonly notificationService: NotificationService,
     private readonly usersResource: UsersResource
   ) {
-    this.state = this.administrationScreenService
-      .getItemState(
-        'server-configuration',
-        () => this.getConfig()
-      );
+    this.state = this.getConfig();
     this.validationTask = new Executor();
   }
 

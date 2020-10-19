@@ -10,9 +10,9 @@ import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService } from '@cloudbeaver/core-root';
 
+import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
 
@@ -21,9 +21,9 @@ export class AuthMenuService extends Bootstrap {
   constructor(
     private serverService: ServerService,
     private authDialogService: AuthDialogService,
+    private authenticationService: AuthenticationService,
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
-    private notificationService: NotificationService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService
   ) {
@@ -49,7 +49,7 @@ export class AuthMenuService extends Bootstrap {
         order: Number.MAX_SAFE_INTEGER,
         isHidden: () => !this.serverService.config.data?.authenticationEnabled || !this.authInfoService.userInfo,
         title: 'authentication_logout',
-        onClick: this.logout.bind(this),
+        onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
     );
 
@@ -58,12 +58,4 @@ export class AuthMenuService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
-
-  private async logout() {
-    try {
-      await this.authInfoService.logout();
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t logout');
-    }
-  }
 }

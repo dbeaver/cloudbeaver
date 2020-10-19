@@ -13,7 +13,7 @@ import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, Loader
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -80,18 +80,23 @@ const styles = composes(
   `
 );
 
-export const AuthDialog = observer(function AuthDialog({
+export const AuthDialog: DialogComponent<string | null, null> = observer(function AuthDialog({
+  payload,
   options,
   rejectDialog,
-}: DialogComponentProps<null, null>) {
+}) {
   const controller = useController(AuthDialogController, rejectDialog);
   const translate = useTranslate();
 
+  if (payload) {
+    controller.selectProvider(payload);
+  }
+
   return styled(useStyles(styles))(
-    <TabsState currentTabId={controller.provider?.id || null}>
+    <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
         title={translate('authentication_login_dialog_title')}
-        header={(
+        header={!payload && (
           <TabList aria-label='Auth providers'>
             {controller.providers.map(provider => (
               <Tab
