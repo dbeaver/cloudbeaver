@@ -24,6 +24,17 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 1.2.0 - 2020-10-19
+
+- User authentication support was added
+- Administrative panel was added
+- Connection editor UI was added
+- Database search feature was added
+- Data editor: filters panel was added
+- Main toolbar was redesigned
+- Docker environment support was added
+- A lot of minor fixes and improvements
+
 ### CloudBeaver 1.1.0 - 2020-07-14
 
 - Connection management and authentication redesign
