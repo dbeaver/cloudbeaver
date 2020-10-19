@@ -28,6 +28,7 @@ export * from './FormControls/FormBox';
 export * from './FormControls/FormBoxElement';
 export * from './FormControls/Combobox';
 export * from './FormControls/FormContext';
+export * from './FormControls/FormFieldDescription';
 export * from './FormControls/FormGroup';
 export * from './FormControls/InputField';
 export * from './FormControls/InputGroup';

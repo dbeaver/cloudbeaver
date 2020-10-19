@@ -11,6 +11,7 @@ import styled, { use, css } from 'reshadow';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from '../baseFormControlStyles';
+import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
 
 const fieldCheckboxStyles = css`
@@ -20,30 +21,24 @@ const fieldCheckboxStyles = css`
 `;
 
 export const FieldCheckbox: CheckboxType = function FieldCheckbox({
-  name,
-  value,
-  state,
-  checkboxLabel,
   checked: checkedControlled,
   children,
   className,
-  mod,
   long,
-  onChange,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
-  return styled(useStyles(baseFormControlStyles, fieldCheckboxStyles))(
+  const styles = useStyles(baseFormControlStyles, fieldCheckboxStyles);
+
+  if (!isControlPresented(rest.name, rest.state)) {
+    return null;
+  }
+
+  return styled(styles)(
     <field className={className} as="div" {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <Checkbox
         {...rest}
-        value={value}
-        name={name}
         checked={checkedControlled}
-        checkboxLabel={checkboxLabel}
-        state={state}
-        onChange={onChange}
-        {...use({ mod })}
       />
     </field>
   );

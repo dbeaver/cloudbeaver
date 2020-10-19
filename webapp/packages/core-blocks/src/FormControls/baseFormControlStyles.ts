@@ -39,6 +39,7 @@ export const baseFormControlStyles = css`
     composes: theme-typography--caption from global;
     flex-basis: 100%;
     padding-top: 8px;
+    padding-bottom: 8px;
     padding-left: 150px;
   }
 
@@ -49,7 +50,7 @@ export const baseFormControlStyles = css`
     & field-description {
       padding-left: 200px;
     }
-  } 
+  }
 
   field[|short] {
     & field-label {
@@ -58,5 +59,10 @@ export const baseFormControlStyles = css`
     & field-description {
       padding-left: auto;
     }
-  } 
+  }
+  
+  field-label + field-description {
+    padding-left: 0!important;
+    flex-basis: auto;
+  }
 `;
