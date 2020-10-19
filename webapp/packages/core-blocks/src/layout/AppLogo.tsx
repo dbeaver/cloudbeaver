@@ -21,8 +21,8 @@ const styles = css`
   }
 
   IconOrImage {
-    height: 30px;
-    width: 150px;
+    height: 34px;
+    width: 154px;
     margin-bottom: 2px;
   }
 `;
