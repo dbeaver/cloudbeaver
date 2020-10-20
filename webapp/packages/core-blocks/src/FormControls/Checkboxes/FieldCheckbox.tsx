@@ -25,11 +25,12 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   children,
   className,
   long,
+  autoHide,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
   const styles = useStyles(baseFormControlStyles, fieldCheckboxStyles);
 
-  if (!isControlPresented(rest.name, rest.state)) {
+  if (autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;
   }
 

@@ -26,6 +26,7 @@ export type CheckboxControlledProps = CheckboxBaseProps & {
   indeterminate?: boolean;
   onChange?: (value: boolean, name?: string) => any;
   state?: never;
+  autoHide?: never;
 };
 
 export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
@@ -34,6 +35,7 @@ export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBas
   onChange?: (value: boolean, name: TKey) => any;
   checked?: never;
   indeterminate?: boolean;
+  autoHide?: boolean;
 };
 
 export interface CheckboxType {
@@ -51,6 +53,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   className,
   mod,
   long,
+  autoHide,
   onChange,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
@@ -74,7 +77,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     }
   }, [state, name, value, onChange, context]);
 
-  if (!isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 

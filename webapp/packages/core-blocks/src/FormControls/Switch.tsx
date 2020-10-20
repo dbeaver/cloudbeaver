@@ -86,12 +86,14 @@ type ControlledProps = BaseProps & {
   onChange?: (value: boolean, name?: string) => any;
 
   state?: never;
+  autoHide?: never;
 };
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: boolean, name: TKey) => any;
+  autoHide?: boolean;
 
   checked?: never;
 };
@@ -113,6 +115,7 @@ export const Switch: SwitchType = observer(function Switch({
   onChange,
   mod = [],
   long,
+  autoHide,
   disabled,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -138,7 +141,7 @@ export const Switch: SwitchType = observer(function Switch({
     }
   }, [state, name, context, onChange]);
 
-  if (!isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 
