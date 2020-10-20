@@ -47,7 +47,7 @@ const styles = composes(
     ObjectPropertyInfoForm {
       align-items: center;
       justify-content: center;
-      display: block;
+      display: inline-flex;
     }
     FormBox {
       align-items: center;
