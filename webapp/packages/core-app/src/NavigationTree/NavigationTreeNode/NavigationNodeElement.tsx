@@ -18,11 +18,11 @@ interface NavigationTreeNodeProps {
 export const NavigationNodeElement = observer(function NavigationNodeElement({
   nodeId,
 }: NavigationTreeNodeProps) {
-  const node = useNode(nodeId);
+  const { node } = useNode(nodeId);
 
-  if (!node.node) {
+  if (!node) {
     return null;
   }
 
-  return <NavigationNode node={node.node} component={NavigationNodeElement} />;
+  return <NavigationNode node={node} component={NavigationNodeElement} />;
 });

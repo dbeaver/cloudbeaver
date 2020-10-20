@@ -15,26 +15,29 @@ import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
-interface NavigationTreeNodeProps {
+interface Props {
   node: NavNode;
   component: React.FC<{
     nodeId: string;
   }>;
 }
 
-export const NavigationNode = observer(function NavigationNode({
+export const NavigationNode: React.FC<Props> = observer(function NavigationNode({
   node,
   component,
-}: NavigationTreeNodeProps) {
+}) {
   const {
-    loading,
+    control,
     selected,
+    loading,
     expanded,
     leaf,
     handleExpand,
     handleOpen,
     handleSelect,
   } = useNavigationNode(node);
+
+  const Control = control || NavigationNodeControl;
 
   return (
     <TreeNode
@@ -46,7 +49,7 @@ export const NavigationNode = observer(function NavigationNode({
       onOpen={handleOpen}
       onSelect={handleSelect}
     >
-      <NavigationNodeControl node={node} />
+      <Control node={node} />
       <NavigationNodeNested nodeId={node.id} component={component} />
     </TreeNode>
   );

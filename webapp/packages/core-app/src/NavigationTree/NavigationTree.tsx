@@ -9,14 +9,15 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useFocus } from '@cloudbeaver/core-blocks';
+import { useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { useActiveView } from '@cloudbeaver/core-view';
 
-import { useChildren } from '../shared/useChildren';
-import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { ElementsTree } from './ElementsTree';
 import { NavigationTreeService } from './NavigationTreeService';
+import { useNavigationNode } from './useNavigationTree';
 
 const navigationTreeStyles = css`
   inside-box {
@@ -26,9 +27,8 @@ const navigationTreeStyles = css`
     overflow: auto;
     outline: none;
   }
-  tree {
-    position: relative;
-    box-sizing: border-box;
+
+  ElementsTree {
     padding-top: 16px;
     min-width: 100%;
     width: max-content;
@@ -44,6 +44,7 @@ const navigationTreeStyles = css`
       text-align: center;
     }
   }
+
   message {
     box-sizing: border-box;
     max-width: 240px;
@@ -55,41 +56,29 @@ export const NavigationTree = observer(function NavigationTree() {
   const navTreeService = useService(NavigationTreeService);
   const [onFocus, onBlur] = useActiveView(navTreeService.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
-  const nodeChildren = useChildren();
   const isEnabled = usePermission(EPermission.public);
+  const { isSelected, handleOpen, handleSelect } = useNavigationNode();
 
   if (!isEnabled) {
     return null;
   }
 
-  if (!nodeChildren.children || nodeChildren.children.length === 0) {
-    if (nodeChildren.isLoading()) {
-      return styled(navigationTreeStyles)(
-        <inside-box ref={ref} as='div' tabIndex={0}>
-          <center as="div"><Loader /></center>
-        </inside-box>
-      );
-    }
-
-    return styled(navigationTreeStyles)(
-      <inside-box ref={ref} as='div' tabIndex={0}>
-        <center as="div">
-          <message as="div">
-            No connections.<br />
-            Use the top menu to setup connection to your database.
-          </message>
-        </center>
-      </inside-box>
-    );
-  }
-
   return styled(navigationTreeStyles)(
     <inside-box ref={ref} as='div' tabIndex={0}>
-      <tree as="div">
-        {nodeChildren.children.map(id => (
-          <NavigationNodeElement key={id} nodeId={id} />
-        ))}
-      </tree>
+      <ElementsTree
+        root={ROOT_NODE_PATH}
+        emptyPlaceholder={() => styled(navigationTreeStyles)(
+          <center as="div">
+            <message as="div">
+              No connections.<br />
+              Use the top menu to setup connection to your database.
+            </message>
+          </center>
+        )}
+        isSelected={isSelected}
+        onOpen={handleOpen}
+        onSelect={handleSelect}
+      />
     </inside-box>
   );
 });

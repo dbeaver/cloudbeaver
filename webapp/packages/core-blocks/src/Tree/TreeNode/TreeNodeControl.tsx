@@ -41,7 +41,7 @@ export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeContro
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    context?.select();
+    context?.select(event.ctrlKey || event.metaKey);
   };
 
   return (
