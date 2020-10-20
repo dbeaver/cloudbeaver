@@ -10,10 +10,11 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm
+  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { useConnectionInfo } from '../useConnectionInfo';
@@ -42,6 +43,7 @@ const styles = composes(
       flex: 1;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
     ObjectPropertyInfoForm {
       align-items: center;
@@ -51,6 +53,10 @@ const styles = composes(
       position: sticky;
       bottom: 0;
       padding: 8px 24px;
+    }
+    FieldCheckbox {
+      flex: unset;
+      min-height: unset;
     }
   `
 );
@@ -64,6 +70,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
+  const translate = useTranslate();
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -85,9 +92,19 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
             <ObjectPropertyInfoForm
               autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
               properties={connection.connectionInfo?.authProperties}
-              credentials={controller.credentials}
+              credentials={controller.config.credentials}
               disabled={controller.isAuthenticating}
             />
+            <FieldCheckbox
+              name="saveCredentials"
+              value={connection.connectionInfo?.name || ''}
+              checkboxLabel={translate('connections_connection_edit_save_credentials')}
+              disabled={controller.isAuthenticating}
+              mod='surface'
+              checked={controller.config.saveCredentials}
+              onChange={value => controller.onChange('saveCredentials', value)}
+            />
+
           </SubmittingForm>
         )}
       {controller.error.responseMessage && (

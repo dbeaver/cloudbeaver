@@ -16,11 +16,15 @@ import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
+import { IDBAuthConfig } from './DBAuthConfig';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   @observable isAuthenticating = false;
-  @observable credentials = {};
+  @observable config: IDBAuthConfig = {
+    credentials: {},
+    saveCredentials: false,
+  };
 
   readonly error = new GQLErrorCatcher();
 
@@ -46,6 +50,10 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     this.isDistructed = true;
   }
 
+  onChange = (property: keyof IDBAuthConfig, value: any) => {
+    this.config[property] = value;
+  };
+
   login = async () => {
     if (this.isAuthenticating) {
       return;
@@ -53,7 +61,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      await this.connectionInfoResource.init(this.connectionId, this.credentials);
+      await this.connectionInfoResource.init(this.connectionId, this.config);
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {

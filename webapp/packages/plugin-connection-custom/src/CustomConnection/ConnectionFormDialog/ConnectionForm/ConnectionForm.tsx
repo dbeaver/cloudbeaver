@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import {
-  Radio, InputField, useFocus, ObjectPropertyInfoForm, InputGroup
+  Radio, InputField, useFocus, ObjectPropertyInfoForm, InputGroup, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
 import { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -86,6 +86,17 @@ export const ConnectionForm = observer(function ConnectionForm({
             credentials={controller.config.credentials}
             disabled={controller.isConnecting}
           />
+          <group as="div">
+            <FieldCheckbox
+              name="saveCredentials"
+              value={controller.authModel.displayName}
+              checked={controller.config.saveCredentials}
+              checkboxLabel={translate('connections_connection_edit_save_credentials')}
+              disabled={controller.isConnecting}
+              mod='surface'
+              onChange={value => controller.onChange('saveCredentials', value)}
+            />
+          </group>
         </>
       )}
     </connection-form>

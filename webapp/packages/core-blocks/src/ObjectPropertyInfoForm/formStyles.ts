@@ -10,7 +10,6 @@ import { css } from 'reshadow';
 
 export const formStyles = css`
   form-body {
-    flex: 1;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

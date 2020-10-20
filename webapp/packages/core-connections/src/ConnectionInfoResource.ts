@@ -20,6 +20,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
+import { IDBAuthConfig } from './DatabaseAuthDialog/DBAuthConfig';
 
 export type Connection = Pick<
 ConnectionInfo,
@@ -72,9 +73,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return observedConnection;
   }
 
-  async init(id: string, credentials?: any): Promise<Connection> {
+  async init(id: string, config?: IDBAuthConfig): Promise<Connection> {
     await this.performUpdate(id, async () => {
-      const connection = await this.initConnection(id, credentials);
+      const connection = await this.initConnection(id, config);
       this.set(id, connection);
       return connection;
     });
@@ -151,8 +152,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return authProperties;
   }
 
-  private async initConnection(id: string, credentials?: any): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.initConnection({ id, credentials });
+  private async initConnection(id: string, config?: IDBAuthConfig): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.initConnection({ id, ...config });
 
     return connection;
   }
