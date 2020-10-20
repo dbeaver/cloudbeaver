@@ -18,6 +18,7 @@ export const formStyles = css`
   }
   connection-type {
     padding: 12px;
+    margin-left: 160px;
   }
   Radio {
     composes: theme-typography--body1 from global;
