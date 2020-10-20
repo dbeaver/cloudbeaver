@@ -172,6 +172,8 @@ public class CBDatabase {
         // Create new admin user
         if (!CommonUtils.isEmpty(adminName) && !CommonUtils.isEmpty(adminPassword)) {
             createAdminUser(adminName, adminPassword);
+        } else {
+            grantAdminPermissionsToUser(adminName);
         }
     }
 
@@ -344,14 +346,19 @@ public class CBDatabase {
             serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
         }
 
-        // Grant all roles
-        WebRole[] allRoles = serverController.readAllRoles();
-        serverController.setUserRoles(
-            adminUser.getUserId(),
-            Arrays.stream(allRoles).map(WebRole::getRoleId).toArray(String[]::new),
-            adminUser.getUserId());
+        grantAdminPermissionsToUser(adminUser.getUserId());
 
         return adminUser;
+    }
+
+    private void grantAdminPermissionsToUser(String userId) throws DBCException {
+        // Grant all roles
+        DBWSecurityController securityController = application.getSecurityController();
+        WebRole[] allRoles = securityController.readAllRoles();
+        securityController.setUserRoles(
+            userId,
+            Arrays.stream(allRoles).map(WebRole::getRoleId).toArray(String[]::new),
+            userId);
     }
 
     void shutdown() {

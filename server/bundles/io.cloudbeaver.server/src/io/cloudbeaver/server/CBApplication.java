@@ -554,6 +554,7 @@ public class CBApplication extends BaseApplicationImpl {
                 .setPrettyPrinting()
                 .create();
             try (JsonWriter json = gson.newJsonWriter(out)) {
+                json.setLenient(true);
                 json.beginObject();
                 {
                     json.name("server");
@@ -572,6 +573,11 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
                     JSONUtils.field(json, "authenticationEnabled", appConfig.isAuthenticationEnabled());
                     JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
+
+                    if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
+                        JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
+                    }
+
                     json.endObject();
                 }
                 json.endObject();

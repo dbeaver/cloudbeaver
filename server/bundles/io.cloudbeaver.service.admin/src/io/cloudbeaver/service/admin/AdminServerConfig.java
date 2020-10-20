@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Map;
@@ -41,9 +43,10 @@ public class AdminServerConfig {
         this.adminName = JSONUtils.getString(params, "adminName");
         this.adminPassword = JSONUtils.getString(params, "adminPassword");
 
-        this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled");
-        this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled");
-        this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled");
+        CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
+        this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+        this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled", appConfig.isAuthenticationEnabled());
+        this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
 
         this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
     }
