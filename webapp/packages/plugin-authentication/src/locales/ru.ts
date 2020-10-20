@@ -14,6 +14,7 @@ export default [
   ['authentication_administration_user_info', 'Общее'],
   ['authentication_administration_item', 'Пользователи'],
   ['authentication_administration_confirm_user_deletion', 'Подтвердите удаление'],
+  ['authentication_administration_confirm_connection_deletion', 'Подтвердите удаление'],
   ['authentication_administration_user_updated', 'User updated'],
   ['authentication_administration_user_created', 'Пользователь создан успешно'],
   ['authentication_user_name', 'Имя'],
