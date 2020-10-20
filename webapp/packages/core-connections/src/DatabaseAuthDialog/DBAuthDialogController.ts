@@ -53,10 +53,6 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     this.isDistructed = true;
   }
 
-  onChange = (property: keyof IDBAuthConfig, value: any) => {
-    this.config[property] = value;
-  };
-
   login = async () => {
     if (this.isAuthenticating) {
       return;
