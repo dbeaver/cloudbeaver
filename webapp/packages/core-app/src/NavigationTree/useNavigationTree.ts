@@ -13,13 +13,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavigationTreeService } from './NavigationTreeService';
 
-interface INavigationNode {
+interface INavigationTree {
   isSelected: (node: NavNode) => boolean;
   handleOpen: (node: NavNode) => Promise<void>;
   handleSelect: (node: NavNode, isMultiple: boolean) => boolean;
 }
 
-export function useNavigationNode(): INavigationNode {
+export function useNavigationTree(): INavigationTree {
   const navigationTreeService = useService(NavigationTreeService);
 
   const handleOpen = useCallback(

@@ -17,7 +17,7 @@ import { useActiveView } from '@cloudbeaver/core-view';
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { ElementsTree } from './ElementsTree';
 import { NavigationTreeService } from './NavigationTreeService';
-import { useNavigationNode } from './useNavigationTree';
+import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
   inside-box {
@@ -57,7 +57,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const [onFocus, onBlur] = useActiveView(navTreeService.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
-  const { isSelected, handleOpen, handleSelect } = useNavigationNode();
+  const { isSelected, handleOpen, handleSelect } = useNavigationTree();
 
   if (!isEnabled) {
     return null;
