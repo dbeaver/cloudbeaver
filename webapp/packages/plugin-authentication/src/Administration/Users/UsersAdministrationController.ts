@@ -99,7 +99,8 @@ export class UsersAdministrationController {
 
     const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'authentication_administration_confirm_user_deletion',
-      message: `Would you like to delete users: ${deletionList.join(', ')}`,
+      message: `You're going to delete these users: ${deletionList.join(', ')}. Are you sure?`,
+      confirmActionText: 'ui_delete',
     });
 
     if (!confirmed) {
