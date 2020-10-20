@@ -32,6 +32,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -306,12 +307,23 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
             }
+
+            // Patch configuration by services
+            for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
+                try {
+                    wsc.configureServer(CBApplication.getInstance(), webSession, appConfig);
+                } catch (Exception e) {
+                    log.warn("Error configuring server by web service " + wsc.getClass().getName(), e);
+                }
+            }
+
             CBApplication.getInstance().finishConfiguration(
                 config.getServerName(),
                 adminName,
                 adminPassword,
                 config.getSessionExpireTime(),
                 appConfig);
+
             // Refresh active session
             webSession.forceUserRefresh(null);
         } catch (Throwable e) {

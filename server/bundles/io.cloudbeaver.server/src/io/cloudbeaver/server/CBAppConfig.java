@@ -90,12 +90,26 @@ public class CBAppConfig {
         return defaultAuthProvider;
     }
 
+    public Map<String, Object> getPlugins() {
+        return plugins;
+    }
+
     public Map<String, Object> getPluginConfig(String pluginId) {
+        return getPluginConfig(pluginId, false);
+    }
+
+    public Map<String, Object> getPluginConfig(String pluginId, boolean create) {
         Object config = plugins.get(pluginId);
         if (config instanceof Map) {
             return (Map<String, Object>) config;
         } else {
-            return Collections.emptyMap();
+            if (create) {
+                Map<String, Object> newConfig = new LinkedHashMap<>();
+                plugins.put(pluginId, newConfig);
+                return newConfig;
+            } else {
+                return Collections.emptyMap();
+            }
         }
     }
 
