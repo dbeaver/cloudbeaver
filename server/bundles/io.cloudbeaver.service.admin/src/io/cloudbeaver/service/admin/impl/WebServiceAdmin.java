@@ -298,10 +298,18 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
             appConfig.setAuthenticationEnabled(config.isAuthenticationEnabled());
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
+            String adminName = config.getAdminName();
+            String adminPassword = config.getAdminPassword();
+            if (CommonUtils.isEmpty(adminName)) {
+                // Grant admin permissions to the current user
+                WebUser curUser = webSession.getUser();
+                adminName = curUser == null ? null : curUser.getUserId();
+                adminPassword = null;
+            }
             CBApplication.getInstance().finishConfiguration(
                 config.getServerName(),
-                config.getAdminName(),
-                config.getAdminPassword(),
+                adminName,
+                adminPassword,
                 config.getSessionExpireTime(),
                 appConfig);
             // Refresh active session
