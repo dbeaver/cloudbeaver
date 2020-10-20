@@ -83,7 +83,7 @@ export class ConnectionsManagerService {
 
     const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'app_shared_navigationTree_delete_connection_confirm',
-      message: `Would you like to delete ${connection.name} connection?`,
+      message: `You're going to delete ${connection.name} connection. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
     if (!confirmed) {
