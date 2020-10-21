@@ -75,7 +75,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                 }
             } else {
-                DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
+                DBNNode parentNode = navigatorModel.getNodeByPath(monitor, session.getSingletonProject(), parentPath);
                 if (parentNode == null) {
                     throw new DBWebException("Node '" + parentPath + "' not found");
                 }
