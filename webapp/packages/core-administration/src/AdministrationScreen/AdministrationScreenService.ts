@@ -124,8 +124,12 @@ export class AdministrationScreenService {
   }
 
   getItemState<T>(name: string): T | undefined
-  getItemState<T>(name: string, defaultState: () => T, update?: boolean): T
-  getItemState<T>(name: string, defaultState?: () => T, update?: boolean): T | undefined {
+  getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T
+  getItemState<T>(
+    name: string, defaultState?: () => T,
+    update?: boolean,
+    validate?: (state: T) => boolean
+  ): T | undefined {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
@@ -133,8 +137,17 @@ export class AdministrationScreenService {
       this.clearItemsState();
       this.info.mode = this.isConfigurationMode;
     }
-    if ((!this.itemState.has(name) || update) && defaultState) {
-      this.itemState.set(name, defaultState());
+
+    if (defaultState) {
+      if (!this.itemState.has(name) || update) {
+        this.itemState.set(name, defaultState());
+      } else if (validate) {
+        const state = this.itemState.get(name)!;
+
+        if (!validate(state)) {
+          this.itemState.set(name, defaultState());
+        }
+      }
     }
 
     return this.itemState.get(name);
