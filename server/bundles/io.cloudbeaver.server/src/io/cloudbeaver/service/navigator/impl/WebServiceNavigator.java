@@ -57,7 +57,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
-        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -109,7 +108,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     @NotNull
     public WebNavigatorNodeInfo getNavigatorNodeInfo(WebSession session, String nodePath) throws DBWebException {
-        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
@@ -142,7 +140,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public WebStructContainers getStructContainers(WebConnectionInfo connection, String catalog) throws DBWebException {
-        WebServiceUtils.checkServerConfigured();
 
         DBPDataSource dataSource = connection.getDataSource();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
