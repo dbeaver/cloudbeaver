@@ -8,6 +8,7 @@
 
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerService, SessionService } from '@cloudbeaver/core-root';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
@@ -19,12 +20,47 @@ export class AuthenticationService extends Bootstrap {
     private serverService: ServerService,
     private sessionService: SessionService,
     private authDialogService: AuthDialogService,
-    private authInfoService: AuthInfoService
+    private authInfoService: AuthInfoService,
+    private notificationService: NotificationService,
   ) {
     super();
   }
 
-  async auth() {
+  async authUser(provider: string | null = null): Promise<void> {
+    if (this.authenticating) {
+      return;
+    }
+    this.authenticating = true;
+    try {
+      const config = await this.serverService.config.load(null);
+      if (!config) {
+        throw new Error('Can\'t configure Authentication');
+      }
+
+      if (!config.authenticationEnabled) {
+        return;
+      }
+
+      const userInfo = await this.authInfoService.updateAuthInfo();
+      if (userInfo) {
+        return;
+      }
+
+      await this.authDialogService.showLoginForm(false, provider);
+    } finally {
+      this.authenticating = false;
+    }
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.authInfoService.logout();
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t logout');
+    }
+  }
+
+  private async auth() {
     if (this.authenticating) {
       return;
     }

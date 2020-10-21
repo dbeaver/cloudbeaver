@@ -34,6 +34,7 @@ export const ServerConfigurationConfigurationForm: React.FC<Props> = observer(fu
           mod={['primary']}
           disabled={!serverConfig.authenticationEnabled}
           long
+          autoHide
         >
           {translate('administration_configuration_wizard_configuration_anonymous_access')}
         </Switch>
@@ -45,6 +46,7 @@ export const ServerConfigurationConfigurationForm: React.FC<Props> = observer(fu
           description={translate('administration_configuration_wizard_configuration_authentication_description')}
           mod={['primary']}
           long
+          autoHide
         >
           {translate('administration_configuration_wizard_configuration_authentication')}
         </Switch>
@@ -56,6 +58,7 @@ export const ServerConfigurationConfigurationForm: React.FC<Props> = observer(fu
           description={translate('administration_configuration_wizard_configuration_custom_connections_description')}
           mod={['primary']}
           long
+          autoHide
         >
           {translate('administration_configuration_wizard_configuration_custom_connections')}
         </Switch>

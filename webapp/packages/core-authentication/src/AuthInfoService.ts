@@ -24,7 +24,9 @@ export class AuthInfoService {
     private notificationService: NotificationService,
     private authProviderService: AuthProviderService,
     private sessionService: SessionService
-  ) { }
+  ) {
+    this.sessionService.session.onDataUpdate.subscribe(this.updateAuthInfo.bind(this));
+  }
 
   get userInfo(): UserAuthInfo | null {
     return this.user;

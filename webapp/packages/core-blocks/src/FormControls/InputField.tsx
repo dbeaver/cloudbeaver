@@ -14,6 +14,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
+import { isControlPresented } from './isControlPresented';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
   mod?: 'surface';
@@ -27,19 +28,21 @@ type ControlledProps = BaseProps & {
   onChange?: (value: string, name?: string) => any;
 
   state?: never;
+  autoHide?: never;
 };
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: string, name: TKey) => any;
+  autoHide?: boolean;
 
   value?: never;
 };
 
 interface InputFieldType {
-  (props: ControlledProps): JSX.Element;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
+  (props: ControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
 export const InputField: InputFieldType = observer(function InputField({
@@ -52,9 +55,11 @@ export const InputField: InputFieldType = observer(function InputField({
   mod,
   long,
   short,
+  autoHide,
   onChange,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const styles = useStyles(baseFormControlStyles);
   const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +76,11 @@ export const InputField: InputFieldType = observer(function InputField({
 
   const value = state ? state[name] : valueControlled;
 
-  return styled(useStyles(baseFormControlStyles))(
+  if (autoHide && !isControlPresented(name, state)) {
+    return null;
+  }
+
+  return styled(styles)(
     <field as="div" className={className} {...use({ long, short })}>
       <field-label as='label'>{children} {required && '*'}</field-label>
       <input

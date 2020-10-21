@@ -11,6 +11,7 @@ import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { FormContext } from '../FormContext';
+import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
 export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
@@ -25,6 +26,7 @@ export type CheckboxControlledProps = CheckboxBaseProps & {
   indeterminate?: boolean;
   onChange?: (value: boolean, name?: string) => any;
   state?: never;
+  autoHide?: never;
 };
 
 export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
@@ -33,11 +35,12 @@ export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBas
   onChange?: (value: boolean, name: TKey) => any;
   checked?: never;
   indeterminate?: boolean;
+  autoHide?: boolean;
 };
 
 export interface CheckboxType {
-  (props: CheckboxControlledProps): JSX.Element;
-  <TKey extends keyof TState, TState>(props: CheckboxObjectProps<TKey, TState>): JSX.Element;
+  (props: CheckboxControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends keyof TState, TState>(props: CheckboxObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
@@ -50,13 +53,21 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   className,
   mod,
   long,
+  autoHide,
   onChange,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
   const context = useContext(FormContext);
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
-      state[name] = event.target.checked;
+      if (Array.isArray(state[name])) {
+        state[name] = (state[name] as string[]).filter(item => item !== value);
+        if (event.target.checked) {
+          state[name].push(value);
+        }
+      } else {
+        state[name] = event.target.checked;
+      }
     }
     if (onChange) {
       onChange(event.target.checked, name);
@@ -64,9 +75,17 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     if (context) {
       context.onChange(event.target.checked, name);
     }
-  }, [state, name, onChange, context]);
+  }, [state, name, value, onChange, context]);
 
-  const checked = state ? state[name] : checkedControlled;
+  if (autoHide && !isControlPresented(name, state)) {
+    return null;
+  }
+
+  let checked = state ? state[name] : checkedControlled;
+
+  if (Array.isArray(checked)) {
+    checked = checked.includes(value);
+  }
 
   return styled()(
     <CheckboxMarkup

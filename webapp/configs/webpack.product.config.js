@@ -13,15 +13,23 @@ var package = require(resolve("package.json"))
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
     entry: main,
     output: {
-        filename: 'index.js',
-        chunkFilename: '[name].bundle.js',
+        filename: 'index.[contenthash].js',
+        chunkFilename: '[name].[contenthash].bundle.js',
         library: package.name,
         libraryTarget: 'umd',
         path: outputDir,
     },
     optimization: {
+        runtimeChunk: 'single',
+        moduleIds: 'hashed',
         splitChunks: {
-            chunks: 'all',
+            cacheGroups: {
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                name: 'vendors',
+                chunks: 'all',
+              },
+            },
         },
         usedExports: true,
         sideEffects: true,

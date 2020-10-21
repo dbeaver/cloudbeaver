@@ -14,6 +14,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
+import { isControlPresented } from './isControlPresented';
 
 const switchStyles = composes(
   css`
@@ -85,19 +86,21 @@ type ControlledProps = BaseProps & {
   onChange?: (value: boolean, name?: string) => any;
 
   state?: never;
+  autoHide?: never;
 };
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: boolean, name: TKey) => any;
+  autoHide?: boolean;
 
   checked?: never;
 };
 
 interface SwitchType {
-  (props: ControlledProps): JSX.Element;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
+  (props: ControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
 export const Switch: SwitchType = observer(function Switch({
@@ -112,10 +115,19 @@ export const Switch: SwitchType = observer(function Switch({
   onChange,
   mod = [],
   long,
+  autoHide,
   disabled,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const context = useContext(FormContext);
+  const checked = state ? state[name] : checkedControlled;
+  const styles = useStyles(
+    baseFormControlStyles,
+    switchStyles,
+    ...mod.map(mod => switchMod[mod]),
+    disabled && switchState.disabled,
+    checked && switchState.checked
+  );
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
@@ -129,15 +141,11 @@ export const Switch: SwitchType = observer(function Switch({
     }
   }, [state, name, context, onChange]);
 
-  const checked = state ? state[name] : checkedControlled;
+  if (autoHide && !isControlPresented(name, state)) {
+    return null;
+  }
 
-  return styled(useStyles(
-    baseFormControlStyles,
-    switchStyles,
-    ...mod.map(mod => switchMod[mod]),
-    disabled && switchState.disabled,
-    checked && switchState.checked
-  ))(
+  return styled(styles)(
     <field as="div" className={className} {...use({ long })}>
       <field-label as="div">{children}</field-label>
       <switch-control as='div'>

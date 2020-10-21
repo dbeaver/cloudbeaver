@@ -18,6 +18,11 @@ import { AdministrationItemService } from '../AdministrationItem/AdministrationI
 import { IRouteParams } from './IRouteParams';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
+const ADMINISTRATION_INFO = 'administration_mode';
+
+interface IAdministrationScreenInfo {
+  mode: boolean;
+}
 
 @injectable()
 export class AdministrationScreenService {
@@ -31,6 +36,7 @@ export class AdministrationScreenService {
   static setupItemSubRouteName = 'setup.item.sub';
   static setupItemSubParamRouteName = 'setup.item.sub.param';
 
+  @observable info: IAdministrationScreenInfo;
   @observable itemState: Map<string, any>;
 
   @computed get activeItem(): string | null {
@@ -67,10 +73,14 @@ export class AdministrationScreenService {
     private autoSaveService: LocalStorageSaveService,
     private serverConfigResource: ServerConfigResource
   ) {
+    this.info = {
+      mode: false,
+    };
     this.itemState = new Map();
     this.activationEvent = new Executor();
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
+    this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
   }
 
   navigateToRoot() {
@@ -116,6 +126,13 @@ export class AdministrationScreenService {
   getItemState<T>(name: string): T | undefined
   getItemState<T>(name: string, defaultState: () => T, update?: boolean): T
   getItemState<T>(name: string, defaultState?: () => T, update?: boolean): T | undefined {
+    if (!this.serverConfigResource.isLoaded()) {
+      throw new Error('Administration screen getItemState can be used only after server configuration loaded');
+    }
+    if (this.info.mode !== this.isConfigurationMode) {
+      this.clearItemsState();
+      this.info.mode = this.isConfigurationMode;
+    }
     if ((!this.itemState.has(name) || update) && defaultState) {
       this.itemState.set(name, defaultState());
     }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -17,10 +17,14 @@ import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
 import { NavigationTreeService } from '../NavigationTreeService';
+import { TreeContext } from '../TreeContext';
 
 interface INavigationNode {
-  loading: boolean;
+  control?: React.FC<{
+    node: NavNode;
+  }>;
   selected: boolean;
+  loading: boolean;
   expanded: boolean;
   leaf: boolean;
   handleExpand: () => void;
@@ -29,8 +33,8 @@ interface INavigationNode {
 }
 
 export function useNavigationNode(node: NavNode): INavigationNode {
+  const context = useContext(TreeContext);
   const navigationTreeService = useService(NavigationTreeService);
-  const [selected, switchSelect] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isExpanded, switchExpand] = useState(false);
   const { isLoading, isOutdated } = useNode(node.id);
@@ -64,15 +68,13 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   const handleOpen = async () => {
     setProcessing(true);
     try {
-      await navigationTreeService.navToNode(node.id, node.parentId);
+      await context?.onOpen?.(node);
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleSelect = (multiple?: boolean) => {
-    switchSelect(navigationTreeService.selectNode(node.id, multiple));
-  };
+  const handleSelect = (multiple = false) => context?.onSelect?.(node, multiple);
 
   // TODO: probably should be refactored
   useEffect(() => {
@@ -89,20 +91,16 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     }
   }, [expanded, children.isOutdated(), children.isLoading(), children.isLoaded(), isOutdated(), node]);
 
-  // Here we subscribe to selected nodes if current node selected (mobx)
-  if (selected && !navigationTreeService.isNodeSelected(node.id)) {
-    switchSelect(false);
-  }
-
   useEffect(() => () => {
-    if (navigationTreeService.isNodeSelected(node.id)) {
-      navigationTreeService.selectNode(node.id, true);
+    if (node && context?.isSelected?.(node)) {
+      context.onSelect?.(node, true);
     }
-  }, [navigationTreeService, node]);
+  }, [context, node]);
 
   return {
+    control: context?.control,
+    selected: context?.isSelected?.(node) || false,
     loading,
-    selected,
     expanded,
     leaf,
     handleExpand,

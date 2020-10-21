@@ -22,7 +22,7 @@ export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult> = React.ElementType<DialogComponentProps<TPayload, TResult>>;
+export type DialogComponent<TPayload, TResult> = React.FC<DialogComponentProps<TPayload, TResult>>;
 
 export enum DialogueStateResult {
   Resolved,

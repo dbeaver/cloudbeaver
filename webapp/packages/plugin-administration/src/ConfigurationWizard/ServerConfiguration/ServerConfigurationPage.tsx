@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { use, css } from 'reshadow';
 
 import { AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { FormBox, FormBoxElement, IconButton, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { FormBox, FormBoxElement, IconButton, Loader, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -44,6 +44,8 @@ const styles = composes(
 
     layout-grid-cell {
       position: relative;
+      display: flex;
+      flex-direction: column;
       border: solid 1px;
     }
 
@@ -62,6 +64,10 @@ const styles = composes(
       flex-direction: row;
     }
 
+    FormBox {
+      flex: 0;
+    }
+
     p {
       line-height: 2;
     }
@@ -70,12 +76,13 @@ const styles = composes(
 
 export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
   const translate = useTranslate();
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const controller = useController(ServerConfigurationPageController);
   useFormValidator(service.validationTask, focusedRef);
 
-  return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
+  return styled(style)(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
@@ -91,15 +98,23 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
             </AdministrationTools>
           )}
           <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
-            <FormBox>
-              <FormBoxElement>
-                <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
-                {!controller.editing && <ServerConfigurationAdminForm serverConfig={controller.state.serverConfig} />}
-              </FormBoxElement>
-              <FormBoxElement>
-                <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
-              </FormBoxElement>
-            </FormBox>
+            {service.loading ? (
+              <Loader />
+            ) : (
+              <>
+                <FormBox>
+                  <FormBoxElement>
+                    <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
+                    {!controller.editing && (
+                      <ServerConfigurationAdminForm serverConfig={controller.state.serverConfig} />
+                    )}
+                  </FormBoxElement>
+                  <FormBoxElement>
+                    <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
+                  </FormBoxElement>
+                </FormBox>
+              </>
+            )}
           </SubmittingForm>
         </layout-grid-cell>
       </layout-grid-inner>

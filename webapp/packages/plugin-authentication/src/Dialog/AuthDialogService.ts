@@ -17,7 +17,7 @@ export class AuthDialogService {
     private commonDialogService: CommonDialogService
   ) { }
 
-  async showLoginForm(persistent = false) {
-    await this.commonDialogService.open(AuthDialog, null, { persistent });
+  async showLoginForm(persistent = false, provider: string | null = null): Promise<void> {
+    await this.commonDialogService.open(AuthDialog, provider, { persistent });
   }
 }

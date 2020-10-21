@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
 import org.jkiss.dbeaver.model.navigator.DBNContainer;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -52,6 +53,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private static final List<WebNavigatorNodeInfo> EMPTY_NODE_LIST = Collections.emptyList();
 
     public static final String ROOT_DATABASES = "databases";
+    private static final boolean SHOW_EXTRA_NODES = false;
 
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(WebSession session, String parentPath, Integer offset, Integer limit, Boolean onlyFolders) throws DBWebException {
@@ -61,16 +63,19 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             DBNNode[] nodeChildren;
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
+            DBNModel navigatorModel = session.getNavigatorModel();
             if (isRootPath) {
-                DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getSingletonProject());
+                DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getSingletonProject());
                 nodeChildren = projectNode.getDatabases().getChildren(monitor);
-                // Inject extra nodes
-                List<DBNNode> extraNodes = projectNode.getExtraNodes();
-                if (!extraNodes.isEmpty()) {
-                    nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
+                if (SHOW_EXTRA_NODES) {
+                    // Inject extra nodes. Disabled because we use different root path for extra nodes
+                    List<DBNNode> extraNodes = projectNode.getExtraNodes();
+                    if (!extraNodes.isEmpty()) {
+                        nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
+                    }
                 }
             } else {
-                DBNNode parentNode = session.getNavigatorModel().getNodeByPath(monitor, parentPath);
+                DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
                 if (parentNode == null) {
                     throw new DBWebException("Node '" + parentPath + "' not found");
                 }
@@ -85,7 +90,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
             if (isRootPath) {
                 // Add navigator extensions
-                for (DBNNode extraNode : session.getNavigatorModel().getRoot().getExtraNodes()) {
+                for (DBNNode extraNode : navigatorModel.getRoot().getExtraNodes()) {
                     result.add(new WebNavigatorNodeInfo(session, extraNode));
                 }
             }
