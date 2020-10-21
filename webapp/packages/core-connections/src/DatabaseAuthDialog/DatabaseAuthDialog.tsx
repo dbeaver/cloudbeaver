@@ -99,7 +99,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                 <FormGroup>
                   <FieldCheckbox
                     name="saveCredentials"
-                    value={connection.connectionInfo?.name || 'DBAuthSaveCredentials'}
+                    value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
                     checkboxLabel={translate('connections_connection_edit_save_credentials')}
                     disabled={controller.isAuthenticating}
                     state={controller.config}

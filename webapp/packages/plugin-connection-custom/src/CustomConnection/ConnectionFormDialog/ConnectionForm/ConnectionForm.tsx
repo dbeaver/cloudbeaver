@@ -28,10 +28,12 @@ interface ConnectionFormProps {
 const connectionFormStyles = css`
   SubmittingForm {
     flex: 1;
-    padding: 4px 24px 18px;
   }
   FormBoxElement {
     flex: 1;
+  }
+  FormBox {
+    padding: 4px 24px 18px;
   }
   connection-type {
     padding: 12px;
@@ -105,7 +107,7 @@ export const ConnectionForm = observer(function ConnectionForm({
               <FormGroup>
                 <FieldCheckbox
                   name="saveCredentials"
-                  value={controller.authModel.displayName}
+                  value={controller.authModel.id}
                   state={controller.config}
                   checkboxLabel={translate('connections_connection_edit_save_credentials')}
                   disabled={controller.isConnecting}
