@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer, useLocalStore } from 'mobx-react';
-import { useRef } from 'react';
+import { observer } from 'mobx-react';
+import { useMemo, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -50,7 +50,7 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
     handlersRef.current.onOpen?.();
   };
 
-  const nodeContext = useLocalStore<ITreeNodeContext, ITreeNodeContext>(source => source, {
+  const nodeContext = useMemo<ITreeNodeContext>(() => ({
     loading,
     selected,
     expanded,
@@ -58,16 +58,7 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
     expand: handleExpand,
     select: handleSelect,
     open: handleOpen,
-  });
-  // const nodeContext = useMemo<ITreeNodeContext>(() => ({
-  //   loading,
-  //   selected,
-  //   expanded,
-  //   leaf,
-  //   expand: handleExpand,
-  //   select: handleSelect,
-  //   open: handleOpen,
-  // }), [loading, selected, expanded, leaf, handleExpand, handleSelect, handleOpen]);
+  }), [loading, selected, expanded, leaf, handleExpand, handleSelect, handleOpen]);
 
   return styled(useStyles(TREE_NODE_STYLES))(
     <node as="div" {...use({ expanded })} className={className}>
