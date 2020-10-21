@@ -17,7 +17,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionType } from '../ConnectionFormDialogController';
-import { formStyles } from './formStyles';
 import { IFormController } from './IFormController';
 import { ParametersForm } from './ParametersForm';
 
@@ -34,6 +33,15 @@ const connectionFormStyles = css`
   FormBoxElement {
     flex: 1;
   }
+  connection-type {
+    padding: 12px;
+    margin-left: 160px;
+  }
+  Radio {
+    composes: theme-typography--body2 from global;
+    font-weight: 500;
+    padding: 0 12px;
+  }
 `;
 
 export const ConnectionForm = observer(function ConnectionForm({
@@ -43,7 +51,7 @@ export const ConnectionForm = observer(function ConnectionForm({
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  return styled(useStyles(formStyles, connectionFormStyles))(
+  return styled(useStyles(connectionFormStyles))(
     <SubmittingForm ref={focusedRef}>
       <FormBox>
         <FormBoxElement>

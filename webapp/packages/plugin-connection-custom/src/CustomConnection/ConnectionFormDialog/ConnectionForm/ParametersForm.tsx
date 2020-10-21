@@ -7,13 +7,12 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { use } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { formStyles } from './formStyles';
 import { IFormController } from './IFormController';
 
 interface ParametersFormProps {
@@ -21,13 +20,19 @@ interface ParametersFormProps {
   embedded?: boolean;
 }
 
+const parametersFormStyles = css`
+  sub-label {
+    composes: theme-typography--caption from global;
+    line-height: 14px;
+  }`;
+
 export const ParametersForm = observer(function ParametersForm({
   controller,
   embedded,
 }: ParametersFormProps) {
   const translate = useTranslate();
 
-  return styled(useStyles(formStyles))(
+  return styled(useStyles(parametersFormStyles))(
     <>
       {!embedded && (
         <layout-grid-inner as="div">
