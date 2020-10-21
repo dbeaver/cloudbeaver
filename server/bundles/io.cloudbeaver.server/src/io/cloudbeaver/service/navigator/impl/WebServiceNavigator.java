@@ -74,7 +74,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                 }
             } else {
-                DBNNode parentNode = navigatorModel.getNodeByPath(monitor, session.getSingletonProject(), parentPath);
+                DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
                 if (parentNode == null) {
                     throw new DBWebException("Node '" + parentPath + "' not found");
                 }
@@ -111,7 +111,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, session.getSingletonProject(), nodePath);
+            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
