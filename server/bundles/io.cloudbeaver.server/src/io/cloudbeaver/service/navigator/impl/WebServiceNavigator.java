@@ -111,7 +111,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, session.getSingletonProject(), nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
