@@ -29,7 +29,7 @@ interface INavigationNode {
   leaf: boolean;
   handleExpand: () => void;
   handleOpen: () => void;
-  handleSelect: (isMultiple?: boolean) => void;
+  handleSelect: (isMultiple?: boolean) => boolean;
 }
 
 export function useNavigationNode(node: NavNode): INavigationNode {
@@ -74,7 +74,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     }
   };
 
-  const handleSelect = (multiple = false) => context?.onSelect?.(node, multiple);
+  const handleSelect = (multiple = false) => context?.onSelect?.(node, multiple) || false;
 
   // TODO: probably should be refactored
   useEffect(() => {

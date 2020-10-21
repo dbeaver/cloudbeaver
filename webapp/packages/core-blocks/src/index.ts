@@ -19,6 +19,7 @@ export * from './Tree/TreeNode/TreeNodeExpand';
 export * from './Tree/TreeNode/TreeNodeIcon';
 export * from './Tree/TreeNode/TreeNodeName';
 export * from './Tree/TreeNode/TreeNodeNested';
+export * from './Tree/TreeNode/TreeNodeSelect';
 export * from './Tree/TreeNode/TreeNodeStyles';
 export * from './Button';
 export * from './FormControls/Checkboxes/Checkbox';

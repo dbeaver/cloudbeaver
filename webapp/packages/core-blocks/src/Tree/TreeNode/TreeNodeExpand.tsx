@@ -20,14 +20,22 @@ const styles = css`
     cursor: pointer;
     height: 100%;
     width: 100%;
+
+    &[name="angle"] {
+      transform: rotate(-90deg);
+    }
   }
 `;
 
 interface Props {
+  leaf?: boolean;
+  big?: boolean;
   className?: string;
 }
 
 export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand({
+  leaf,
+  big,
   className,
 }) {
   const context = useContext(TreeNodeContext);
@@ -36,8 +44,10 @@ export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand(
     throw new Error('Context not provided');
   }
 
-  const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
-    context.expand();
+  const handleExpand = () => {
+    if (!context.leaf && !leaf) {
+      context.expand();
+    }
   };
 
   const preventDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -47,8 +57,9 @@ export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand(
 
   return styled(styles)(
     <arrow as="div" className={className} onClick={handleExpand} onDoubleClick={preventDoubleClick}>
-      {context.loading && <Loader small />}
-      {!context.loading && !context.leaf && <Icon name="arrow" viewBox="0 0 16 16" />}
+      {context.loading && <Loader small fullSize />}
+      {!context.loading && !context.leaf && !leaf && big && <Icon name="angle" viewBox="0 0 15 8" />}
+      {!context.loading && !context.leaf && !leaf && !big && <Icon name="arrow" viewBox="0 0 16 16" />}
     </arrow>
   );
 });

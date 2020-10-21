@@ -17,6 +17,7 @@ const KEY = {
 
 interface Props {
   className?: string;
+  big?: boolean;
 }
 
 export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeControl({

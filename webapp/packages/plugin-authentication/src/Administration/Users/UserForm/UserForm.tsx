@@ -115,7 +115,7 @@ export const UserForm = observer(function UserForm({
     []
   );
   const handleRoleChange = useCallback(
-    (roleId: string, value: boolean) => controller.credentials.roles.set(roleId, value),
+    (roleId: string, value: boolean) => { controller.credentials.roles.set(roleId, value); },
     []
   );
 

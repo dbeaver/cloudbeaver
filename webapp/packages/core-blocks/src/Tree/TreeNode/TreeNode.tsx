@@ -22,7 +22,7 @@ interface Props {
   leaf?: boolean;
   className?: string;
   onExpand?: () => void;
-  onSelect?: (multiple?: boolean) => void;
+  onSelect?: (multiple?: boolean) => boolean;
   onOpen?: () => void;
 }
 
@@ -42,9 +42,7 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
     handlersRef.current.onExpand?.();
   };
 
-  const handleSelect = (multiple?: boolean) => {
-    handlersRef.current.onSelect?.(multiple);
-  };
+  const handleSelect = (multiple?: boolean): boolean => handlersRef.current.onSelect?.(multiple) || false;
 
   const handleOpen = () => {
     handlersRef.current.onOpen?.();

@@ -24,8 +24,8 @@ const styles = css`
   }
   portal {
     box-sizing: border-box;
-    margin-left: auto;
-    margin-right: 16px;
+    margin-left: auto !important;
+    margin-right: 16px !important;
     visibility: hidden;
   }
 `;

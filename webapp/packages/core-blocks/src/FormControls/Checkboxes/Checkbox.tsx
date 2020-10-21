@@ -21,10 +21,14 @@ export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>
   long?: boolean;
 };
 
+type CheckboxOnChangeEvent<T> =
+  ((value: boolean, name: T) => void) |
+  ((value: boolean, name: T) => boolean);
+
 export type CheckboxControlledProps = CheckboxBaseProps & {
   checked?: boolean;
   indeterminate?: boolean;
-  onChange?: (value: boolean, name?: string) => any;
+  onChange?: CheckboxOnChangeEvent<string | undefined>;
   state?: never;
   autoHide?: never;
 };
@@ -32,7 +36,7 @@ export type CheckboxControlledProps = CheckboxBaseProps & {
 export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
   name: TKey;
   state: TState;
-  onChange?: (value: boolean, name: TKey) => any;
+  onChange?: CheckboxOnChangeEvent<TKey>;
   checked?: never;
   indeterminate?: boolean;
   autoHide?: boolean;
@@ -70,7 +74,11 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       }
     }
     if (onChange) {
-      onChange(event.target.checked, name);
+      const checked = onChange(event.target.checked, name);
+
+      if (typeof checked === 'boolean') {
+        event.target.checked = checked;
+      }
     }
     if (context) {
       context.onChange(event.target.checked, name);
