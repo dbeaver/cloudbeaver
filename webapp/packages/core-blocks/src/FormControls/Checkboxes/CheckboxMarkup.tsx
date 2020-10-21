@@ -41,6 +41,7 @@ const checkboxStyles = composes(
     }
     checkbox-label {
       composes: theme-typography--body2 from global;
+      cursor: pointer;
     }
   `
 );

@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer, useLocalStore } from 'mobx-react';
+import { observer } from 'mobx-react';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
@@ -53,12 +54,10 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
 
-  const context = useLocalStore<ITreeContext, ITreeContext>(source => source, {
-    control,
-    onOpen,
-    onSelect,
-    isSelected,
-  });
+  const context = useMemo<ITreeContext>(
+    () => ({ control, onOpen, onSelect, isSelected }),
+    [control, onOpen, onSelect, isSelected]
+  );
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
     if (nodeChildren.isLoading()) {

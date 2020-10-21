@@ -28,7 +28,6 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { EConnectionType } from '../EConnectionType';
 import { IConnectionFormModel } from '../IConnectionFormModel';
-import { formStyles } from './formStyles';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
 
@@ -52,6 +51,12 @@ const styles = css`
     flex-direction: column;
     max-width: 630px;
   }
+  connection-type {
+    margin-left: 180px;
+  }
+  Radio {
+    composes: theme-typography--body2 from global;
+  }
 `;
 
 export const Options = observer(function Options({
@@ -66,7 +71,7 @@ export const Options = observer(function Options({
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  return styled(useStyles(styles, formStyles))(
+  return styled(useStyles(styles))(
     <SubmittingForm ref={focusedRef} onChange={controller.onFormChange} onSubmit={onSave}>
       <FormBox>
         <FormBoxElement>

@@ -26,6 +26,7 @@ export interface IValidationStatusContext {
 @injectable()
 export class ServerConfigurationService {
   @observable state: IServerConfigurationPageState;
+  @observable loading: boolean;
   readonly validationTask: IExecutor<boolean>;
 
   constructor(
@@ -35,19 +36,27 @@ export class ServerConfigurationService {
     private readonly notificationService: NotificationService,
     private readonly usersResource: UsersResource
   ) {
+    this.loading = true;
     this.state = this.getConfig();
     this.validationTask = new Executor();
   }
 
   async loadConfig(): Promise<void> {
-    const config = await this.serverConfigResource.load(null);
+    this.loading = true;
+    try {
+      const config = await this.serverConfigResource.load(null);
 
-    this.state = this.administrationScreenService
-      .getItemState(
-        'server-configuration',
-        () => this.getConfig(config),
-        !config?.configurationMode
-      );
+      this.state = this.administrationScreenService
+        .getItemState(
+          'server-configuration',
+          () => this.getConfig(config),
+          !config?.configurationMode
+        );
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load server configuration');
+    } finally {
+      this.loading = false;
+    }
   }
 
   isDone(): boolean {

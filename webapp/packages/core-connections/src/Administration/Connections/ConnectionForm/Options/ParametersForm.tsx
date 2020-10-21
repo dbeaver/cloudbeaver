@@ -7,20 +7,24 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { use, css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { FormGroup, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { formStyles } from './formStyles';
-
 interface ParametersFormProps {
   connection: ConnectionInfo;
   disabled?: boolean;
   embedded?: boolean;
 }
+
+const parametersFormStyles = css`
+  sub-label {
+    composes: theme-typography--caption from global;
+    line-height: 14px;
+  }`;
 
 export const ParametersForm = observer(function ParametersForm({
   connection,
@@ -29,7 +33,7 @@ export const ParametersForm = observer(function ParametersForm({
 }: ParametersFormProps) {
   const translate = useTranslate();
 
-  return styled(useStyles(formStyles))(
+  return styled(useStyles(parametersFormStyles))(
     <>
       {!embedded && (
         <layout-grid-inner as="div">

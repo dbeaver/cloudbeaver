@@ -120,7 +120,7 @@ export class NavNodeManagerService extends Bootstrap {
     this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.subscribe(this.connectionCreateHandler.bind(this));
-    this.sessionResource.onDataUpdate.subscribe(this.updateRootChildren.bind(this));
+    this.sessionResource.onDataUpdate.subscribe(this.refreshRoot.bind(this));
   }
 
   load(): void {}
@@ -319,7 +319,13 @@ export class NavNodeManagerService extends Bootstrap {
     };
   };
 
-  private async updateRootChildren() {
+  async updateRoot(): Promise<void> {
+    if (await this.isNavTreeEnabled()) {
+      await this.navTree.refresh(ROOT_NODE_PATH);
+    }
+  }
+
+  async refreshRoot(): Promise<void> {
     this.navTree.delete(ROOT_NODE_PATH);
     if (await this.isNavTreeEnabled()) {
       await this.navTree.refresh(ROOT_NODE_PATH);

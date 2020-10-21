@@ -10,10 +10,11 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm
+  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { useConnectionInfo } from '../useConnectionInfo';
@@ -46,6 +47,10 @@ const styles = composes(
     ObjectPropertyInfoForm {
       align-items: center;
       justify-content: center;
+      display: inline-flex;
+    }
+    FormBox {
+      align-items: center;
     }
     ErrorMessage {
       position: sticky;
@@ -64,6 +69,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
+  const translate = useTranslate();
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -82,12 +88,26 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         ? <Loader />
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-            <ObjectPropertyInfoForm
-              autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
-              properties={connection.connectionInfo?.authProperties}
-              credentials={controller.credentials}
-              disabled={controller.isAuthenticating}
-            />
+            <FormBox>
+              <FormBoxElement>
+                <ObjectPropertyInfoForm
+                  autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
+                  properties={connection.connectionInfo?.authProperties}
+                  credentials={controller.config.credentials}
+                  disabled={controller.isAuthenticating}
+                />
+                <FormGroup>
+                  <FieldCheckbox
+                    name="saveCredentials"
+                    value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
+                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    disabled={controller.isAuthenticating}
+                    state={controller.config}
+                    mod='surface'
+                  />
+                </FormGroup>
+              </FormBoxElement>
+            </FormBox>
           </SubmittingForm>
         )}
       {controller.error.responseMessage && (

@@ -39,6 +39,7 @@ implements IInitializableController, IDestructibleController {
     url: '',
     properties: {},
     credentials: {},
+    saveCredentials: false,
   };
 
   readonly error = new GQLErrorCatcher();
@@ -126,6 +127,7 @@ implements IInitializableController, IDestructibleController {
     if (this.authModel) {
       config.authModelId = this.config.authModelId;
       config.credentials = this.config.credentials;
+      config.saveCredentials = this.config.saveCredentials;
     }
     if (Object.keys(this.config.properties).length > 0) {
       config.properties = this.config.properties;
