@@ -14,10 +14,17 @@ import {
   isResourceKeyList,
   ResourceKeyList,
   resourceKeyList,
-  NavNodeChildrenQuery
+  NavNodeChildrenQuery as fake
 } from '@cloudbeaver/core-sdk';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource';
+
+// TODO: so much dirty
+export interface NodePath {
+  parentPath: string;
+}
+
+type NavNodeChildrenQuery = fake & NodePath;
 
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
@@ -179,7 +186,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
     if (Array.isArray(data)) {
       this.navNodeInfoResource.set(
-        resourceKeyList(data.map(data => data.navNodeInfo.id)),
+        resourceKeyList(data.map(data => data.parentPath)),
         data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat()
       );
 
@@ -187,27 +194,27 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         resourceKeyList(data.map(data => data.navNodeChildren.map(node => node.id)).flat()),
         data.map(
           data => data.navNodeChildren.map(
-            node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.navNodeInfo.id)
+            node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
           )
         ).flat()
       );
 
       this.set(
-        resourceKeyList(data.map(data => data.navNodeInfo.id)),
+        resourceKeyList(data.map(data => data.parentPath)),
         data.map(data => data.navNodeChildren.map(node => node.id))
       );
     } else {
       this.navNodeInfoResource.set(
-        data.navNodeInfo.id,
+        data.parentPath,
         this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)
       );
 
       this.navNodeInfoResource.set(
         resourceKeyList(data.navNodeChildren.map(node => node.id)),
-        data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.navNodeInfo.id))
+        data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath))
       );
 
-      this.set(data.navNodeInfo.id, data.navNodeChildren.map(node => node.id));
+      this.set(data.parentPath, data.navNodeChildren.map(node => node.id));
     }
   }
 
@@ -216,6 +223,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       parentPath,
     });
 
-    return { navNodeChildren, navNodeInfo };
+    return { navNodeChildren, navNodeInfo, parentPath };
   }
 }
