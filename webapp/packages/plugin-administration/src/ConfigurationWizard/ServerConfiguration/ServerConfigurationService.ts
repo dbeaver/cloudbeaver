@@ -52,6 +52,8 @@ export class ServerConfigurationService {
           () => this.getConfig(config),
           !config?.configurationMode
         );
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load server configuration');
     } finally {
       this.loading = false;
     }
