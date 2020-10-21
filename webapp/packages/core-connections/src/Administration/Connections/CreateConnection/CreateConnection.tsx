@@ -13,22 +13,17 @@ import styled, { css } from 'reshadow';
 import {
   TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
 import { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
+import { CreateConnectionService } from '../CreateConnectionService';
 import { CreateConnectionController } from './CreateConnectionController';
+import { CreateConnectionMethod } from './CreateConnectionMethod';
 import { CustomConnection } from './CustomConnection';
 import { SearchDatabase } from './SearchDatabase';
-
-interface Props {
-  method: string;
-  configurationWizard: boolean;
-  onChange: (method: string) => void;
-  onCancel: () => void;
-}
 
 const styles = composes(
   css`
@@ -44,8 +39,8 @@ const styles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
 
-    connection-create-footer {
-      composes: theme-background-secondary from global;
+    connection-create-footer, connection-create-content {
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
   css`
@@ -119,6 +114,13 @@ const styles = composes(
   `
 );
 
+interface Props {
+  method: string;
+  configurationWizard: boolean;
+  onChange: (method: string) => void;
+  onCancel: () => void;
+}
+
 export const CreateConnection = observer(function CreateConnection({
   method,
   configurationWizard,
@@ -126,6 +128,7 @@ export const CreateConnection = observer(function CreateConnection({
   onCancel,
 }: Props) {
   const style = useStyles(styles);
+  const service = useService(CreateConnectionService);
   const controller = useController(CreateConnectionController);
   const translate = useTranslate();
 
@@ -180,6 +183,11 @@ export const CreateConnection = observer(function CreateConnection({
           <Tab tabId='search-database'>
             <TabTitle>{translate('connections_connection_create_search_database')}</TabTitle>
           </Tab>
+          {service.methodList.map(method => (
+            <Tab key={method.key} tabId={method.key}>
+              <TabTitle>{translate(method.title)}</TabTitle>
+            </Tab>
+          ))}
         </TabList>
       </TabsState>
       <connection-create-content as='div'>
@@ -194,6 +202,7 @@ export const CreateConnection = observer(function CreateConnection({
             onChange={controller.onSearchChange}
           />
         )}
+        <CreateConnectionMethod methodId={method} />
         {controller.isProcessing && <Loader overlay />}
       </connection-create-content>
       <connection-create-footer as='div' />

@@ -15,15 +15,23 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Database } from './Database';
 
-const styles = css`
-  SubmittingForm {
-    display: flex;
-    flex-direction: column;
-  }
-`;
+const styles = composes(
+  css`
+    SubmittingForm {
+      composes: theme-background-surface theme-text-on-surface from global;
+    }
+  `,
+  css`
+    SubmittingForm {
+      display: flex;
+      flex-direction: column;
+    }
+  `
+);
 
 interface Props {
   databases: AdminConnectionSearchInfo[];
@@ -51,7 +59,7 @@ export const DatabaseList = observer(function DatabaseList({
 
   const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
 
-  return styled(styles)(
+  return styled(useStyles(styles))(
     <SubmittingForm className={className} onSubmit={onSearch}>
       <ItemList>
         <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} disabled={disabled} onChange={onChange} onSearch={searchHandler} />

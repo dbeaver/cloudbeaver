@@ -57,7 +57,7 @@ import {
   ConnectionsResource,
   ConnectionsLocaleService,
   DriverPropertiesService,
-  ConnectionsAdministrationNavService
+  ConnectionsAdministrationNavService, CreateConnectionService
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
@@ -144,6 +144,7 @@ export const coreManifest: PluginManifest = {
     DatabaseAuthModelsResource,
     ConnectionAuthService,
     ConnectionsAdministrationNavService,
+    CreateConnectionService,
     ConnectionsAdministrationService,
     ConnectionsResource,
     NavigationTreeContextMenuService,

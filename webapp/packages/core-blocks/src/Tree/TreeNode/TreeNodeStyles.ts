@@ -31,24 +31,24 @@ export const TREE_NODE_STYLES = composes(
           transform: rotate(90deg);
         }
       }
+    }
+    
+    TreeNodeControl {
+      box-sizing: border-box;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0px 5px;
+      user-select: none;
+      white-space: nowrap;
+      position: initial;
+      outline: none;
 
-      & TreeNodeControl {
-        box-sizing: border-box;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        padding: 0px 5px;
-        user-select: none;
-        white-space: nowrap;
-        position: initial;
-        outline: none;
-
-        &::before {
-          left: 0;
-          top: auto;
-          height: inherit;
-          width: 100%;
-        }
+      &::before {
+        left: 0;
+        top: auto;
+        height: inherit;
+        width: 100%;
       }
     }
 

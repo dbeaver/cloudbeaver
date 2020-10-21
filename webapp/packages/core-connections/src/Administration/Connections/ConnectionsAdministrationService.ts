@@ -14,6 +14,7 @@ import { DBDriverResource } from '../../DBDriverResource';
 import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
+import { CreateConnectionService } from './CreateConnectionService';
 
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
@@ -21,7 +22,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private dbDriverResource: DBDriverResource
+    private dbDriverResource: DBDriverResource,
+    private readonly createConnectionService: CreateConnectionService
   ) {
     super();
   }
@@ -36,7 +38,10 @@ export class ConnectionsAdministrationService extends Bootstrap {
         description: 'connections_administration_configuration_wizard_step_description',
       },
       sub: [
-        { name: 'create' },
+        {
+          name: 'create',
+          onActivate: this.activateCreateMethod.bind(this),
+        },
       ],
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
@@ -45,6 +50,17 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
+
+  private async activateCreateMethod(param: string | null) {
+    if (!param) {
+      return;
+    }
+
+    const method = this.createConnectionService.methods.get(param);
+    if (method) {
+      method.onOpen?.();
+    }
+  }
 
   private async loadConnections() {
     try {
