@@ -64,6 +64,10 @@ const styles = composes(
       flex-direction: row;
     }
 
+    FormBox {
+      flex: 0;
+    }
+
     p {
       line-height: 2;
     }
