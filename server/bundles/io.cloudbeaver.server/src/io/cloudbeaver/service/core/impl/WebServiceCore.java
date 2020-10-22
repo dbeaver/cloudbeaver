@@ -35,6 +35,9 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
@@ -275,6 +278,32 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addConnection(connectionInfo);
 
         return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException {
+        try {
+            DBNModel navigatorModel = webSession.getNavigatorModel();
+            DBPDataSourceRegistry dataSourceRegistry = webSession.getSingletonProject().getDataSourceRegistry();
+
+            DBNNode srcNode = navigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            if (srcNode == null) {
+                throw new DBException("Node '" + nodePath + "' not found");
+            }
+            if (!(srcNode instanceof DBNDataSource)) {
+                throw new DBException("Node '" + nodePath + "' is not a datasource node");
+            }
+            DBPDataSourceContainer dataSourceTemplate = ((DBNDataSource)srcNode).getDataSourceContainer();
+
+            DBPDataSourceContainer newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
+
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+            dataSourceRegistry.addDataSource(newDataSource);
+
+            return new WebConnectionInfo(webSession, newDataSource);
+        } catch (DBException e) {
+            throw new DBWebException("Error copying connection", e);
+        }
     }
 
     @Override

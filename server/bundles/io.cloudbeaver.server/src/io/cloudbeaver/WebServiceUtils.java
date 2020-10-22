@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
@@ -84,6 +85,11 @@ public class WebServiceUtils {
             throw new DBWebException("No activate data source registry");
         }
         return registry;
+    }
+
+    @NotNull
+    public static DBNModel getGlobalNavigatorModel() throws DBWebException {
+        return DBWorkbench.getPlatform().getNavigatorModel();
     }
 
     public static InputStream openStaticResource(String path) {

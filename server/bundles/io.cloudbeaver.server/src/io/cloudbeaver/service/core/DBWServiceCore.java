@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,6 +95,8 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException;
+    @WebAction()
+    WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException;
 
     @WebAction
     WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
