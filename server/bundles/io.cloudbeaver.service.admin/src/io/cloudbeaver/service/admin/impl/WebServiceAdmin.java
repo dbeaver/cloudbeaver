@@ -35,11 +35,16 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -262,6 +267,32 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         registry.flushConfig();
 
         return new WebConnectionInfo(webSession, dataSource);
+    }
+
+    @Override
+    public WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException {
+        try {
+            DBNModel globalNavigatorModel = webSession.getNavigatorModel();
+            DBPDataSourceRegistry globalDataSourceRegistry = WebServiceUtils.getDataSourceRegistry();
+
+            DBNNode srcNode = globalNavigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            if (srcNode == null) {
+                throw new DBException("Node '" + nodePath + "' not found");
+            }
+            if (!(srcNode instanceof DBNDataSource)) {
+                throw new DBException("Node '" + nodePath + "' is not a datasource node");
+            }
+            DBPDataSourceContainer dataSourceTemplate = ((DBNDataSource)srcNode).getDataSourceContainer();
+
+            DBPDataSourceContainer newDataSource = globalDataSourceRegistry.createDataSource(dataSourceTemplate);
+
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+            globalDataSourceRegistry.addDataSource(newDataSource);
+
+            return new WebConnectionInfo(webSession, newDataSource);
+        } catch (DBException e) {
+            throw new DBWebException("Error copying connection", e);
+        }
     }
 
     @Override
