@@ -15,7 +15,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { Button } from '../Button';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
-export interface LoaderProps {
+interface Props {
   /** if false, nothing will be rendered, by default true */
   loading?: boolean;
   /** disable cancel button */
@@ -38,7 +38,7 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
-export function Loader({
+export const Loader: React.FC<Props> = function Loader({
   cancelDisabled,
   overlay,
   hideMessage,
@@ -48,7 +48,7 @@ export function Loader({
   className,
   loading = true,
   onCancel,
-}: LoaderProps) {
+}) {
   const style = useStyles(loaderStyles, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
   const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
@@ -86,4 +86,4 @@ export function Loader({
       )}
     </loader>
   );
-}
+};

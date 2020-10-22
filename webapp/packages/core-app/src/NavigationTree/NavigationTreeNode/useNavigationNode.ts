@@ -43,7 +43,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   const children = useChildren(node.id);
   const loading = isLoading() || children.isLoading() || processing;
 
-  let leaf = isLeaf(node) || children.children?.length === 0;
+  let leaf = isLeaf(node) || (children.children?.length === 0 && !children.isOutdated());
   let expanded = isExpanded && !leaf;
 
   if (node.objectFeatures.includes(EObjectFeature.dataSource) && !connectionInfo?.connected) {
