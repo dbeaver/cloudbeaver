@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.registry.RegistryConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ public class WebServiceRegistry {
 
     private static final String TAG_SERVICE = "service"; //$NON-NLS-1$
     private static final String TAG_AUTH_MODEL = "authProvider"; //$NON-NLS-1$
+    private static final String TAG_AUTH_MODEL_DISABLE = "authProviderDisable"; //$NON-NLS-1$
 
     private static WebServiceRegistry instance = null;
 
@@ -63,6 +65,18 @@ public class WebServiceRegistry {
                 } else if (TAG_AUTH_MODEL.equals(ext.getName())) {
                     WebAuthProviderDescriptor providerDescriptor = new WebAuthProviderDescriptor(ext);
                     this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
+                }
+            }
+
+            for (IConfigurationElement ext : extConfigs) {
+                // Disable auth providers
+                if (TAG_AUTH_MODEL_DISABLE.equals(ext.getName())) {
+                    String providerId = ext.getAttribute(RegistryConstants.ATTR_ID);
+                    if (!this.authProviders.containsKey(providerId)) {
+                        log.warn("Can't disable auth provider '" + providerId + "' - no such provider found");
+                    } else {
+                        this.authProviders.remove(providerId);
+                    }
                 }
             }
         }
