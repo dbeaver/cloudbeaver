@@ -92,11 +92,13 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
     controller.selectProvider(payload);
   }
 
+  const showTabs = !payload && controller.providers.length > 1;
+
   return styled(useStyles(styles))(
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
         title={translate('authentication_login_dialog_title')}
-        header={!payload && (
+        header={showTabs && (
           <TabList aria-label='Auth providers'>
             {controller.providers.map(provider => (
               <Tab
