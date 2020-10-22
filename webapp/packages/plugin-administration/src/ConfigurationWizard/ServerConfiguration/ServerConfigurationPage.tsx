@@ -61,7 +61,7 @@ const styles = composes(
       flex: 1;
       display: flex;
       overflow: auto;
-      flex-direction: row;
+      flex-direction: column;
     }
 
     FormBox {
