@@ -1,0 +1,16 @@
+mutation createConnectionFromNode($nodePath: String!) {
+  connection: copyConnectionFromNode(nodePath: $nodePath) {
+    id
+    name
+    description
+    driverId
+    connected
+    readOnly
+
+    authNeeded
+    authModel
+
+    features
+    supportedDataFormats
+  }
+}

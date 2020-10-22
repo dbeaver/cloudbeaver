@@ -1031,6 +1031,12 @@ export type CreateConnectionMutationVariables = Exact<{
 
 export interface CreateConnectionMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
 
+export type CreateConnectionFromNodeMutationVariables = Exact<{
+  nodePath: Scalars['String'];
+}>;
+
+export interface CreateConnectionFromNodeMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
 }>;
@@ -1743,6 +1749,22 @@ export const CreateConnectionDocument = `
   }
 }
     `;
+export const CreateConnectionFromNodeDocument = `
+    mutation createConnectionFromNode($nodePath: String!) {
+  connection: copyConnectionFromNode(nodePath: $nodePath) {
+    id
+    name
+    description
+    driverId
+    connected
+    readOnly
+    authNeeded
+    authModel
+    features
+    supportedDataFormats
+  }
+}
+    `;
 export const CreateConnectionFromTemplateDocument = `
     mutation createConnectionFromTemplate($templateId: ID!) {
   connection: createConnectionFromTemplate(templateId: $templateId) {
@@ -2421,6 +2443,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
+    },
+    createConnectionFromNode(variables: CreateConnectionFromNodeMutationVariables): Promise<CreateConnectionFromNodeMutation> {
+      return withWrapper(() => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables));
     },
     createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables): Promise<CreateConnectionFromTemplateMutation> {
       return withWrapper(() => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables));
