@@ -18,7 +18,6 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
@@ -123,7 +122,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @Override
     public boolean refreshNavigatorNode(WebSession session, String nodePath) throws DBWebException {
-        WebServiceUtils.checkServerConfigured();
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
