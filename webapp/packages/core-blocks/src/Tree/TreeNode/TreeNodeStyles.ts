@@ -52,9 +52,6 @@ export const TREE_NODE_STYLES = composes(
 
         & > * {
           margin-right: 4px;
-        }
-
-        & > :not(:first-child) {
           margin-left: 4px;
         }
       }
@@ -113,17 +110,14 @@ export const TREE_NODE_STYLES = composes(
         display: block;
       }
 
-      & TreeNodeNested {
-        padding-left: 50px;
-      }
-
       & > * {
         margin-right: 10px;
-      }
-
-      & > :not(:first-child) {
         margin-left: 10px;
       }
+    }
+
+    node TreeNodeControl[big] + TreeNodeNested {
+      padding-left: 36px;
     }
   `
 );
