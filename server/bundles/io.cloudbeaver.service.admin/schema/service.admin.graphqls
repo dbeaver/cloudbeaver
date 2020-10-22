@@ -85,6 +85,7 @@ extend type Query {
     searchConnections( hostNames: [String!]! ): [AdminConnectionSearchInfo!]!
 
     createConnectionConfiguration( config: ConnectionConfig! ): ConnectionInfo!
+    copyConnectionConfiguration( nodePath: String! ): ConnectionInfo!
     updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
     deleteConnectionConfiguration( id: ID! ): Boolean
 

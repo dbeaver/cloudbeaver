@@ -327,6 +327,9 @@ extend type Mutation {
 
     createConnectionFromTemplate( templateId: ID! ): ConnectionInfo!
 
+    # Copies connection configuration from node
+    copyConnectionFromNode( nodePath: String! ): ConnectionInfo!
+
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
