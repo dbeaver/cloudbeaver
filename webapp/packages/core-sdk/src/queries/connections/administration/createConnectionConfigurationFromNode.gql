@@ -1,0 +1,29 @@
+query createConnectionConfigurationFromNode($nodePath: String!) {
+  connection: copyConnectionConfiguration(nodePath: $nodePath) {
+    id
+    name
+    description
+    driverId
+
+    template
+    connected
+    readOnly
+    saveCredentials
+
+    host
+    port
+    databaseName
+    url
+    properties
+    
+    features
+
+    authNeeded
+    authModel
+    authProperties {
+      id
+      value
+      features
+    }
+  }
+}

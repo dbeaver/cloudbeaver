@@ -23,6 +23,7 @@ export interface Query {
   connectionInfo: ConnectionInfo;
   /** @deprecated Field no longer supported */
   connectionState: ConnectionInfo;
+  copyConnectionConfiguration: ConnectionInfo;
   createConnectionConfiguration: ConnectionInfo;
   createRole: AdminRoleInfo;
   createUser: AdminUserInfo;
@@ -79,6 +80,10 @@ export interface QueryConnectionInfoArgs {
 
 export interface QueryConnectionStateArgs {
   id: Scalars['ID'];
+}
+
+export interface QueryCopyConnectionConfigurationArgs {
+  nodePath: Scalars['String'];
 }
 
 export interface QueryCreateConnectionConfigurationArgs {
@@ -242,6 +247,7 @@ export interface Mutation {
   changeSessionLanguage?: Maybe<Scalars['Boolean']>;
   closeConnection: ConnectionInfo;
   closeSession?: Maybe<Scalars['Boolean']>;
+  copyConnectionFromNode: ConnectionInfo;
   createConnection: ConnectionInfo;
   createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
@@ -294,6 +300,10 @@ export interface MutationChangeSessionLanguageArgs {
 
 export interface MutationCloseConnectionArgs {
   id: Scalars['ID'];
+}
+
+export interface MutationCopyConnectionFromNodeArgs {
+  nodePath: Scalars['String'];
 }
 
 export interface MutationCreateConnectionArgs {
@@ -940,6 +950,17 @@ export interface CreateConnectionConfigurationQuery {
   );
 }
 
+export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
+  nodePath: Scalars['String'];
+}>;
+
+export interface CreateConnectionConfigurationFromNodeQuery {
+  connection: (
+    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
+    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
+  );
+}
+
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -1520,6 +1541,33 @@ export const SetUserCredentialsDocument = `
 export const CreateConnectionConfigurationDocument = `
     query createConnectionConfiguration($config: ConnectionConfig!) {
   connection: createConnectionConfiguration(config: $config) {
+    id
+    name
+    description
+    driverId
+    template
+    connected
+    readOnly
+    saveCredentials
+    host
+    port
+    databaseName
+    url
+    properties
+    features
+    authNeeded
+    authModel
+    authProperties {
+      id
+      value
+      features
+    }
+  }
+}
+    `;
+export const CreateConnectionConfigurationFromNodeDocument = `
+    query createConnectionConfigurationFromNode($nodePath: String!) {
+  connection: copyConnectionConfiguration(nodePath: $nodePath) {
     id
     name
     description
@@ -2340,6 +2388,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createConnectionConfiguration(variables: CreateConnectionConfigurationQueryVariables): Promise<CreateConnectionConfigurationQuery> {
       return withWrapper(() => client.request<CreateConnectionConfigurationQuery>(CreateConnectionConfigurationDocument, variables));
+    },
+    createConnectionConfigurationFromNode(variables: CreateConnectionConfigurationFromNodeQueryVariables): Promise<CreateConnectionConfigurationFromNodeQuery> {
+      return withWrapper(() => client.request<CreateConnectionConfigurationFromNodeQuery>(CreateConnectionConfigurationFromNodeDocument, variables));
     },
     deleteConnectionConfiguration(variables: DeleteConnectionConfigurationQueryVariables): Promise<DeleteConnectionConfigurationQuery> {
       return withWrapper(() => client.request<DeleteConnectionConfigurationQuery>(DeleteConnectionConfigurationDocument, variables));

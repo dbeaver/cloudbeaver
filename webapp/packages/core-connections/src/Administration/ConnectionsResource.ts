@@ -50,10 +50,11 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   }
 
   isNew(id: string): boolean {
-    if (!this.has(id)) {
+    const connection = this.get(id);
+    if (!connection) {
       return false;
     }
-    return NEW_CONNECTION_SYMBOL in this.get(id)!;
+    return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
   }
 
   async loadAll(): Promise<Map<string, ConnectionInfo>> {
@@ -71,9 +72,15 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
     await this.graphQLService.sdk.refreshSessionConnections();
 
+    return this.add(connection as ConnectionInfo, true);
+  }
+
+  async add(connection: ConnectionInfo, isNew = false): Promise<ConnectionInfo> {
+    await this.graphQLService.sdk.refreshSessionConnections();
+
     const newConnection: ConnectionNew = {
       ...connection as ConnectionInfo,
-      [NEW_CONNECTION_SYMBOL]: true,
+      [NEW_CONNECTION_SYMBOL]: isNew,
     };
     this.set(newConnection.id, newConnection);
 
