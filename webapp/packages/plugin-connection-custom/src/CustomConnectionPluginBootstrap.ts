@@ -26,7 +26,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
       id: 'сustomConnection',
-      order: 1,
+      order: 2,
       title: 'app_shared_connectionMenu_custom',
       isHidden: () => !this.serverConfigResource.data?.supportsCustomConnections,
       onClick: () => this.openConnectionsDialog(),
