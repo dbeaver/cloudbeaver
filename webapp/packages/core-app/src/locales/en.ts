@@ -1,7 +1,7 @@
 export default [
   ['app_shared_connectionMenu_newConnection', 'New connection'],
   ['app_shared_connectionMenu_connection', 'Connection'],
-  ['app_shared_connectionMenu_custom', 'New...'],
+  ['app_shared_connectionMenu_custom', 'Manual'],
   ['app_shared_connectionMenu_disconnect', 'Disconnect'],
   ['app_shared_toolsMenu_tools', 'Tools'],
   ['app_shared_toolsMenu_logViewer', 'Log viewer'],

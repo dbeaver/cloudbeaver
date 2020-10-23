@@ -31,7 +31,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
     this.mainMenuService.onConnectionClick.subscribe(this.loadTemplateConnections.bind(this));
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
       id: 'mainMenuConnect',
-      order: 2,
+      order: 1,
       titleGetter: this.getMenuTitle.bind(this),
       onClick: this.openConnectionsDialog.bind(this),
       isHidden: () => !this.permissionsService.has(EPermission.public),
