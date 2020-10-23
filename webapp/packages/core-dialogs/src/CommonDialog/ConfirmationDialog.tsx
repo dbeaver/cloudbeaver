@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Icon, Button } from '@cloudbeaver/core-blocks';
@@ -14,7 +13,7 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { commonDialogStyle } from './CommonDialog/styles';
-import { DialogComponentProps } from './CommonDialogService';
+import { DialogComponent } from './CommonDialogService';
 
 const style = css`
   footer {
@@ -33,22 +32,19 @@ export interface ConfirmationDialogPayload {
   confirmActionText?: string;
 }
 
-export function ConfirmationDialog({
+export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = function ConfirmationDialog({
   payload,
   resolveDialog,
   rejectDialog,
   className,
-}: DialogComponentProps<ConfirmationDialogPayload, boolean>) {
-  const handleReject = useCallback(() => resolveDialog(false), [resolveDialog]);
-  const handleResolve = useCallback(() => resolveDialog(true), [resolveDialog]);
-
+}) {
   return styled(useStyles(commonDialogStyle, style))(
     <dialog className={className}>
       <header>
         <header-title as="div">
           <h1><Translate token={payload.title} /></h1>
           <reject as="div">
-            <Icon name="cross" viewBox="0 0 16 16" onClick={handleReject} />
+            <Icon name="cross" viewBox="0 0 16 16" onClick={rejectDialog} />
           </reject>
         </header-title>
       </header>
@@ -57,7 +53,7 @@ export function ConfirmationDialog({
         <Button
           type="button"
           mod={['outlined']}
-          onClick={handleReject}
+          onClick={rejectDialog}
         >
           <Translate token='ui_processing_cancel' />
         </Button>
@@ -65,11 +61,11 @@ export function ConfirmationDialog({
         <Button
           type="button"
           mod={['unelevated']}
-          onClick={handleResolve}
+          onClick={() => resolveDialog()}
         >
           <Translate token={payload.confirmActionText || 'ui_processing_ok'} />
         </Button>
       </footer>
     </dialog>
   );
-}
+};

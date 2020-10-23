@@ -8,7 +8,7 @@
 
 import { AdministrationScreenService, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { IServerConfigurationPageState } from './IServerConfigurationPageState';
 import { ServerConfigurationService } from './ServerConfigurationService';
@@ -50,12 +50,12 @@ export class ServerConfigurationPageController {
   };
 
   private async updateConfiguration(): Promise<void> {
-    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+    const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'administration_server_configuration_save_confirmation_title',
       message: 'administration_server_configuration_save_confirmation_message',
     });
 
-    if (!confirmed) {
+    if (result === DialogueStateResult.Rejected) {
       return;
     }
     await this.serverConfigurationService.save();

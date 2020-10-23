@@ -10,7 +10,7 @@ import { observable, computed } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList, AdminUserInfo } from '@cloudbeaver/core-sdk';
@@ -97,13 +97,13 @@ export class UsersAdministrationController {
       return;
     }
 
-    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+    const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'authentication_administration_confirm_user_deletion',
       message: `You're going to delete these users: ${deletionList.join(', ')}. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
 
-    if (!confirmed) {
+    if (result === DialogueStateResult.Rejected) {
       return;
     }
 

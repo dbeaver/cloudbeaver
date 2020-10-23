@@ -9,7 +9,7 @@
 import { action, observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
@@ -265,7 +265,7 @@ export class TableViewerModel {
           message = exception.errorText;
         }
 
-        const tryAgain = await this.commonDialogService.open(
+        const state = await this.commonDialogService.open(
           ErrorDialog,
           {
             message,
@@ -275,7 +275,7 @@ export class TableViewerModel {
           }
         );
 
-        if (!tryAgain) {
+        if (state === DialogueStateResult.Rejected) {
           return;
         }
       }

@@ -7,11 +7,10 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, SanitizedHTML } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -44,10 +43,10 @@ export interface ErrorDialogPayload {
   onShowDetails?: () => void;
 }
 
-export const ErrorDialog = observer(function ErrorDialog({
+export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(function ErrorDialog({
   rejectDialog, resolveDialog, payload,
-}: DialogComponentProps<ErrorDialogPayload, boolean>) {
-  const handleRetry = useCallback(() => resolveDialog(true), [resolveDialog]);
+}) {
+  const handleRetry = () => resolveDialog();
   const translate = useTranslate();
 
   return styled(useStyles(styles))(

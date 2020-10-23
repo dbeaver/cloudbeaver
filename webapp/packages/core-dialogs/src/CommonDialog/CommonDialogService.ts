@@ -17,12 +17,14 @@ export interface DialogOptions {
 export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
   payload: TPayload;
   options?: DialogOptions;
-  resolveDialog: (result: TResult) => void;
+  resolveDialog: (result?: TResult) => void;
   rejectDialog: () => void; // the dialog was closed by cancel button or backdrop click
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult> = React.FC<DialogComponentProps<TPayload, TResult>>;
+export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<
+DialogComponentProps<TPayload, TResult>
+>;
 
 export enum DialogueStateResult {
   Resolved,

@@ -9,7 +9,7 @@
 import { Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
 
@@ -81,12 +81,12 @@ export class ConnectionsManagerService {
       return;
     }
 
-    const confirmed = await this.commonDialogService.open(ConfirmationDialog, {
+    const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'app_shared_navigationTree_delete_connection_confirm',
       message: `You're going to delete ${connection.name} connection. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
-    if (!confirmed) {
+    if (result === DialogueStateResult.Rejected) {
       return;
     }
 
