@@ -218,13 +218,28 @@ public class WebSession implements DBASession {
             projectPath = globalProject.getAbsolutePath();
         }
         projectName = CommonUtils.escapeFileName(projectName);
-        sessionProject = new ProjectMetadata(
+
+        // Cleanup current data
+        if (this.navigatorModel != null) {
+            this.navigatorModel.dispose();
+            this.navigatorModel = null;
+        }
+
+        if (this.sessionProject != null) {
+            this.sessionProject.dispose();
+            this.sessionProject = null;
+        }
+
+        this.sessionProject = new ProjectMetadata(
             platform.getWorkspace(),
             projectName,
             projectPath);
         if (user == null) {
             sessionProject.setInMemory(true);
         }
+        this.navigatorModel = new DBNModel(platform, this);
+        this.navigatorModel.initialize();
+
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         {
             // Copy global datasources.
@@ -236,9 +251,6 @@ public class WebSession implements DBASession {
                 }
             }
         }
-
-        this.navigatorModel = new DBNModel(platform, this);
-        this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
 
