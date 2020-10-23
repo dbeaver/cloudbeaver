@@ -29,6 +29,7 @@ export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean 
 export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
   readonly onConnectionCreate: Observable<ConnectionInfo>;
 
+  private changed: boolean;
   private metadata: MetadataMap<string, boolean>;
   private connectionCreateSubject: Subject<ConnectionInfo>;
 
@@ -36,6 +37,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     private graphQLService: GraphQLService
   ) {
     super(new Map());
+    this.changed = false;
     this.connectionCreateSubject = new Subject<ConnectionInfo>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
     this.metadata = new MetadataMap(() => false);
@@ -70,14 +72,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
   async create(config: ConnectionConfig): Promise<ConnectionInfo> {
     const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
-    await this.graphQLService.sdk.refreshSessionConnections();
 
     return this.add(connection as ConnectionInfo, true);
   }
 
   async add(connection: ConnectionInfo, isNew = false): Promise<ConnectionInfo> {
-    await this.graphQLService.sdk.refreshSessionConnections();
-
+    this.changed = true;
     const newConnection: ConnectionNew = {
       ...connection as ConnectionInfo,
       [NEW_CONNECTION_SYMBOL]: isNew,
@@ -97,13 +97,22 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
 
   async update(id: string, config: ConnectionConfig): Promise<ConnectionInfo> {
     await this.performUpdate(id, () => this.updateConnection(id, config));
-    await this.graphQLService.sdk.refreshSessionConnections();
+    this.changed = true;
     return this.get(id)!;
   }
 
   async delete(key: ResourceKey<string>): Promise<void> {
     await this.performUpdate(key, () => this.deleteConnectionTask(key));
-    await this.graphQLService.sdk.refreshSessionConnections();
+    this.changed = true;
+  }
+
+  async updateSessionConnections(): Promise<void> {
+    if (!this.changed) {
+      return;
+    }
+
+    // await this.graphQLService.sdk.refreshSessionConnections();
+    this.changed = false;
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
