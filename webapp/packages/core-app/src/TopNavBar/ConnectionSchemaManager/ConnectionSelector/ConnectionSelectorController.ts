@@ -48,8 +48,7 @@ export class ConnectionSelectorController {
   }
 
   get isObjectContainerSelectorVisible() {
-    return !!this.connectionSelectorService.currentObjectCatalogId
-      || !!this.connectionSelectorService.currentObjectSchemaId;
+    return this.getObjectContainerItems().length !== 0 && !this.objectContainerSelectionDisabled;
   }
 
   @computed get objectContainerSelectionDisabled(): boolean {
@@ -58,10 +57,16 @@ export class ConnectionSelectorController {
   }
 
   private get currentObjectContainerTitle(): string | undefined {
-    return NodeManagerUtils.concatSchemaAndCatalog(
+    const value = NodeManagerUtils.concatSchemaAndCatalog(
       this.connectionSelectorService.currentObjectCatalogId,
       this.connectionSelectorService.currentObjectSchemaId
     );
+
+    if (!value) {
+      return 'app_topnavbar_connection_schema_manager_not_selected';
+    }
+
+    return value;
   }
 
   @computed private get currentObjectContainerIcon(): string {
@@ -92,12 +97,12 @@ export class ConnectionSelectorController {
     });
 
     this.objectContainerMenu = new ComputedMenuItemModel({
-      id: 'connectionsDropdown',
+      id: 'objectContainerDropdown',
       isDisabled: () => this.objectContainerSelectionDisabled,
       titleGetter: () => this.currentObjectContainerTitle,
       iconGetter: () => this.currentObjectContainerIcon,
       panel: new ComputedMenuPanelModel({
-        id: 'connectionsDropdownPanel',
+        id: 'objectContainerDropdownPanel',
         menuItemsGetter: () => this.getObjectContainerItems(),
       }),
     });
@@ -118,7 +123,7 @@ export class ConnectionSelectorController {
     if (!this.connectionSelectorService.objectContainerList) {
       return [];
     }
-    return this.connectionSelectorService.objectContainerList
+    const list = this.connectionSelectorService.objectContainerList
       .filter(item => !!item.name)
       .map(item => {
         if (item.features?.includes(EObjectFeature.catalog)) {
@@ -153,5 +158,7 @@ export class ConnectionSelectorController {
         };
         return menuItem;
       });
+
+    return list;
   }
 }

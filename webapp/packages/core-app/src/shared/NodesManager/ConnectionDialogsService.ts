@@ -25,7 +25,7 @@ export class ConnectionDialogsService {
     private connectionInfoResource: ConnectionInfoResource
   ) {}
 
-  registerMenuItems() {
+  registerMenuItems(): void {
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuConnectionsPanel,
       {
