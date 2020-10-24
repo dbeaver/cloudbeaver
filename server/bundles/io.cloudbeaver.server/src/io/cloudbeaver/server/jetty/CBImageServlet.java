@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -56,9 +57,12 @@ public class CBImageServlet extends HttpServlet {
 
             response.setContentType("image/" + iconExt);
             setExpireTime(response, 60 * 60 * 24 * 3); // 3 days
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             try (InputStream is = new BufferedInputStream(iconURL.openStream())) {
-                IOUtils.copyStream(is, response.getOutputStream());
+                IOUtils.copyStream(is, buffer);
             }
+            response.setContentLength(buffer.size());
+            response.getOutputStream().write(buffer.toByteArray());
         } catch (Exception e) {
             log.error(e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error reading image " + iconId + ": " + e.getMessage());
