@@ -55,7 +55,7 @@ public class CBImageServlet extends HttpServlet {
             }
 
             response.setContentType("image/" + iconExt);
-            setExpireTime(response, 60 * 60 * 24 * 30); // Month
+            setExpireTime(response, 60 * 60 * 24 * 3); // 3 days
             try (InputStream is = new BufferedInputStream(iconURL.openStream())) {
                 IOUtils.copyStream(is, response.getOutputStream());
             }
