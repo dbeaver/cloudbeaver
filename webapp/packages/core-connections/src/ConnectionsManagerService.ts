@@ -11,7 +11,6 @@ import { Subject } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionResource } from '@cloudbeaver/core-root';
 
 import { ConnectionAuthService } from './ConnectionAuthService';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
@@ -26,12 +25,10 @@ export class ConnectionsManagerService {
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
     readonly connectionObjectContainers: ContainerResource,
-    private sessionResource: SessionResource,
     private notificationService: NotificationService,
     private connectionAuthService: ConnectionAuthService,
     private commonDialogService: CommonDialogService
   ) {
-    this.sessionResource.onDataUpdate.subscribe(this.restoreConnections.bind(this));
   }
 
   async requireConnection(connectionId?: string) {
@@ -129,29 +126,6 @@ export class ConnectionsManagerService {
   private async afterConnectionClose(id: string) {
     // this.navNodeManagerService.removeTree(id);
     this.onCloseConnection.next(id);
-  }
-
-  private async restoreConnections() {
-    const config = await this.sessionResource.load(null);
-    if (!config) {
-      return;
-    }
-
-    const restoredConnections = new Set<string>();
-    // TODO: connections must be string[]
-    for (const connection of config.connections) {
-      this.addConnection(connection);
-      restoredConnections.add(connection.id);
-    }
-
-    const unrestoredConnectionIdList = Array.from(this.connectionInfo.data.values())
-      .map(connection => connection.id)
-      .filter(connectionId => !restoredConnections.has(connectionId));
-
-    for (const connectionId of unrestoredConnectionIdList) {
-      await this.afterConnectionClose(connectionId);
-      this.connectionInfo.delete(connectionId);
-    }
   }
 
   private addConnection(connection: Connection) {

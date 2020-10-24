@@ -337,16 +337,10 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
-    await this.navTree.load(ROOT_NODE_PATH);
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
     this.markTreeOutdated(nodeId);
 
-    await this.navNodeInfoResource.refresh(nodeId);
-    const tree = this.navTree.get(ROOT_NODE_PATH);
-
-    if (!tree?.includes(nodeId)) {
-      this.navTree.refresh(ROOT_NODE_PATH);
-    }
+    await this.navTree.refresh(ROOT_NODE_PATH);
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {

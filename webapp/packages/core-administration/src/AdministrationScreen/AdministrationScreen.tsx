@@ -35,9 +35,7 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
       <AdministrationTopAppBar />
       <Administration
         configurationWizard={false}
-        activeItem={administrationScreenService.activeItem}
-        activeItemSub={administrationScreenService.activeItemSub}
-        activeItemSubParam={administrationScreenService.activeItemSubParam}
+        activeScreen={administrationScreenService.activeScreen}
         onItemSelect={handleSelect}
       />
     </>

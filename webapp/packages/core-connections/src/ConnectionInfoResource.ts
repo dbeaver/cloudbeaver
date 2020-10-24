@@ -9,17 +9,14 @@
 import { Observable, Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionResource } from '@cloudbeaver/core-root';
 import {
   ConnectionInfo,
   GraphQLService,
   CachedMapResource,
   ObjectPropertyInfo,
-  ResourceKey,
-  isResourceKeyList,
-  resourceKeyList, ConnectionConfig
+  ConnectionConfig
 } from '@cloudbeaver/core-sdk';
-
-import { ConnectionsResource } from './Administration/ConnectionsResource';
 
 export type Connection = Pick<
 ConnectionInfo,
@@ -41,15 +38,30 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   private connectionCreateSubject: Subject<Connection>;
   constructor(
     private graphQLService: GraphQLService,
-    private connectionsResource: ConnectionsResource
+    sessionResource: SessionResource
   ) {
     super(new Map());
     this.connectionCreateSubject = new Subject<Connection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
-    connectionsResource.onConnectionCreate.subscribe(this.createHandler.bind(this));
-    connectionsResource.onItemAdd.subscribe(this.addHandler.bind(this));
-    connectionsResource.onItemDelete.subscribe(this.delete.bind(this));
-    connectionsResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
+    sessionResource.onDataUpdate.subscribe(() => this.refreshSession(true));
+  }
+
+  async refreshSession(sessionUpdate?: boolean): Promise<void> {
+    const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
+
+    const restoredConnections = new Set<string>();
+    for (const connection of connections) {
+      this.add(connection, sessionUpdate);
+      restoredConnections.add(connection.id);
+    }
+
+    const unrestoredConnectionIdList = Array.from(this.data.values())
+      .map(connection => connection.id)
+      .filter(connectionId => !restoredConnections.has(connectionId));
+
+    for (const connectionId of unrestoredConnectionIdList) {
+      this.delete(connectionId);
+    }
   }
 
   async createFromTemplate(templateId: string): Promise<Connection> {
@@ -70,15 +82,20 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  add(connection: Connection): Connection {
+  add(connection: Connection, update?: boolean): Connection {
+    const exists = this.data.has(connection.id);
     this.set(connection.id, connection);
 
     const observedConnection = this.get(connection.id)!;
-    this.connectionCreateSubject.next(observedConnection);
+
+    if (!update && !exists) {
+      this.connectionCreateSubject.next(observedConnection);
+    }
+
     return observedConnection;
   }
 
-  async init(id: string, credentials?: any): Promise<Connection> {
+  async init(id: string, credentials?: Record<string, any>): Promise<Connection> {
     await this.performUpdate(id, async () => {
       const connection = await this.initConnection(id, credentials);
       this.set(id, connection);
@@ -88,7 +105,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.get(id)!;
   }
 
-  async close(connectionId: string) {
+  async close(connectionId: string): Promise<Connection> {
     await this.performUpdate(connectionId, async () => {
       const connection = await this.closeConnection(connectionId);
       this.set(connectionId, connection);
@@ -97,7 +114,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.get(connectionId)!;
   }
 
-  async deleteConnection(connectionId: string) {
+  async deleteConnection(connectionId: string): Promise<void> {
     await this.performUpdate(connectionId, async () => {
       await this.graphQLService.sdk.deleteConnection({ id: connectionId });
     });
@@ -126,29 +143,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.set(connectionId, { ...oldConnection, ...connection });
 
     return this.data;
-  }
-
-  private async createHandler(connection: ConnectionInfo) {
-    if (connection.template) {
-      return;
-    }
-
-    await this.load(connection.id);
-    const observedConnection = this.get(connection.id) as Connection;
-    this.connectionCreateSubject.next(observedConnection);
-  }
-
-  private async addHandler(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      this.load(resourceKeyList(key.list.filter(id => !this.connectionsResource.get(id)?.template)));
-      return;
-    }
-
-    if (this.connectionsResource.get(key)?.template) {
-      return;
-    }
-
-    this.load(key);
   }
 
   private async getAuthProperties(id: string): Promise<ObjectPropertyInfo[]> {

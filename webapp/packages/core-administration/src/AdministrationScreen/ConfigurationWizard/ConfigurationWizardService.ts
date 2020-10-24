@@ -70,7 +70,7 @@ export class ConfigurationWizardService {
   }
 
   @computed get currentStep(): IAdministrationItem | undefined {
-    return this.steps.find(step => step.name === this.administrationScreenService.activeItem);
+    return this.steps.find(step => step.name === this.administrationScreenService.activeScreen?.item);
   }
 
   constructor(

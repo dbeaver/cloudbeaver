@@ -13,6 +13,7 @@ import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-blocks'
 import { useController } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import { AdministrationController } from './AdministrationController';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
@@ -67,21 +68,19 @@ const administrationStyles = composes(
 
 type Props = React.PropsWithChildren<{
   configurationWizard: boolean;
-  activeItem: string | null;
-  activeItemSub: string | null;
-  activeItemSubParam: string | null;
+  activeScreen: IAdministrationItemRoute | null;
   onItemSelect: (name: string) => void;
 }>;
 
-export const Administration = observer(function Administration({
-  configurationWizard, activeItem, activeItemSub, activeItemSubParam, onItemSelect, children,
-}: Props) {
+export const Administration: React.FC<Props> = observer(function Administration({
+  configurationWizard, activeScreen, onItemSelect, children,
+}) {
   const controller = useController(AdministrationController);
   const items = controller.getItems(configurationWizard);
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
     <container as='div'>
-      <TabsState currentTabId={activeItem} orientation='vertical'>
+      <TabsState currentTabId={activeScreen?.item} orientation='vertical'>
         <drawer as='div'>
           <TabList aria-label="Administration items">
             {items.map(item => (
@@ -98,9 +97,7 @@ export const Administration = observer(function Administration({
         <content as='div'>
           {children}
           <ItemContent
-            activeItemName={activeItem}
-            activeItemSub={activeItemSub}
-            activeItemSubParam={activeItemSubParam}
+            activeScreen={activeScreen}
             configurationWizard={configurationWizard}
           />
         </content>

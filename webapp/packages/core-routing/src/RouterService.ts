@@ -18,27 +18,33 @@ export type RouterState = State;
 
 @injectable()
 export class RouterService extends Bootstrap {
-  get route() {
+  get state(): RouterState {
+    return this.currentState;
+  }
+
+  get route(): string {
     return this.currentRoute;
   }
 
-  get params() {
+  get params(): Record<string, any> {
     return this.currentParams;
   }
 
   readonly router: Router;
 
+  @observable private currentState: RouterState;
   @observable private currentRoute = '';
   @observable private currentParams: Record<string, any> = {};
 
   constructor() {
     super();
     this.router = createRouter();
+    this.currentState = this.router.getState();
 
     this.configure();
   }
 
-  start() {
+  start(): void {
     this.router.start();
   }
 
@@ -60,6 +66,7 @@ export class RouterService extends Bootstrap {
   }
 
   private onRouteChange(state: SubscribeState) {
+    this.currentState = state.route;
     this.currentRoute = state.route.name;
     this.currentParams = state.route.params;
   }

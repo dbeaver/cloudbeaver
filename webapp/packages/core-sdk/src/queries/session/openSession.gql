@@ -4,18 +4,5 @@ mutation openSession {
     lastAccessTime
     cacheExpired
     locale
-    connections {
-      id
-      name
-      driverId
-      connected
-      readOnly
-
-      authNeeded
-      authModel
-
-      features
-      supportedDataFormats
-    }
   }
 }

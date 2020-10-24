@@ -8,7 +8,7 @@
 
 import { Style } from '@cloudbeaver/core-theming';
 
-import { IRouteParams } from '../AdministrationScreen/IRouteParams';
+import { IRouteParams } from './IRouteParams';
 
 export enum AdministrationItemType {
   Default,
@@ -39,9 +39,16 @@ export type AdministrationItemSubContentProps = AdministrationItemContentProps &
 };
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
-export type AdministrationItemEvent = (configurationWizard: boolean) => Promise<void> | void;
-export type AdministrationItemCanActivateEvent = (configurationWizard: boolean) => Promise<boolean> | boolean;
-export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean) => Promise<void> | void;
+export type AdministrationItemEvent = (configurationWizard: boolean, administration: boolean) => Promise<void> | void;
+export type AdministrationItemCanActivateEvent = (
+  configurationWizard: boolean,
+  administration: boolean
+) => Promise<boolean> | boolean;
+export type AdministrationItemSubEvent = (
+  param: string | null,
+  configurationWizard: boolean,
+  administration: boolean
+) => Promise<void> | void;
 export type AdministrationItemSubCanActivateEvent = (
   param: string | null,
   configurationWizard: boolean
@@ -51,6 +58,7 @@ export interface IAdministrationItemSubItem {
   name: string;
   getComponent?: () => AdministrationItemSubContentComponent;
   onActivate?: AdministrationItemSubEvent;
+  onDeActivate?: AdministrationItemSubEvent;
   canActivate?: AdministrationItemSubCanActivateEvent;
 }
 
@@ -75,6 +83,7 @@ export interface IAdministrationItemOptions {
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;
+  onDeActivate?: AdministrationItemEvent;
   canActivate?: AdministrationItemCanActivateEvent;
 }
 

@@ -1,0 +1,18 @@
+query getSessionConnections {
+  state: sessionState {
+    connections {
+      id
+      name
+      description
+      driverId
+      connected
+      readOnly
+
+      authNeeded
+      authModel
+
+      features
+      supportedDataFormats
+    }
+  }
+}

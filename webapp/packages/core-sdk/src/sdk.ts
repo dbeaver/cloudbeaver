@@ -1349,14 +1349,13 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
+export type GetSessionConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export interface GetSessionConnectionsQuery { state: { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> } }
+
 export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
-export interface OpenSessionMutation {
-  session: (
-    Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
-  );
-}
+export interface OpenSessionMutation { session: Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'> }
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
@@ -2240,16 +2239,13 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
-export const OpenSessionDocument = `
-    mutation openSession {
-  session: openSession {
-    createTime
-    lastAccessTime
-    cacheExpired
-    locale
+export const GetSessionConnectionsDocument = `
+    query getSessionConnections {
+  state: sessionState {
     connections {
       id
       name
+      description
       driverId
       connected
       readOnly
@@ -2258,6 +2254,16 @@ export const OpenSessionDocument = `
       features
       supportedDataFormats
     }
+  }
+}
+    `;
+export const OpenSessionDocument = `
+    mutation openSession {
+  session: openSession {
+    createTime
+    lastAccessTime
+    cacheExpired
+    locale
   }
 }
     `;
@@ -2542,6 +2548,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
+    },
+    getSessionConnections(variables?: GetSessionConnectionsQueryVariables): Promise<GetSessionConnectionsQuery> {
+      return withWrapper(() => client.request<GetSessionConnectionsQuery>(GetSessionConnectionsDocument, variables));
     },
     openSession(variables?: OpenSessionMutationVariables): Promise<OpenSessionMutation> {
       return withWrapper(() => client.request<OpenSessionMutation>(OpenSessionDocument, variables));
