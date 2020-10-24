@@ -208,16 +208,15 @@ public class WebSession implements DBASession {
         String projectName;
         File projectPath;
         if (user != null) {
-            projectName = user.getUserId();
+            projectName = CommonUtils.escapeFileName(user.getUserId());
             projectPath = new File(
                 new File(platform.getWorkspace().getAbsolutePath(), "user-projects"),
                 projectName);
         } else {
-            projectName = getSessionId();
+            projectName = CommonUtils.escapeFileName(getSessionId());
             // For anonymous sessions use path of global project
             projectPath = globalProject.getAbsolutePath();
         }
-        projectName = CommonUtils.escapeFileName(projectName);
 
         // Cleanup current data
         if (this.navigatorModel != null) {
