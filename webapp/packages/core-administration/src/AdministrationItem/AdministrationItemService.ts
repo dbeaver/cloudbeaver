@@ -9,18 +9,20 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { RouterState } from '@cloudbeaver/core-routing';
 
 import { filterConfigurationWizard } from './filterConfigurationWizard';
 import {
   IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem, AdministrationItemType
 } from './IAdministrationItem';
+import { IAdministrationItemRoute } from './IAdministrationItemRoute';
 import { orderAdministrationItems } from './orderAdministrationItems';
 
 @injectable()
 export class AdministrationItemService {
   @observable items: IAdministrationItem[] = [];
 
-  getDefaultItem(configurationWizard: boolean) {
+  getDefaultItem(configurationWizard: boolean): string | null {
     const items = this.items.filter(filterConfigurationWizard(configurationWizard));
 
     if (items.length === 0) {
@@ -28,6 +30,14 @@ export class AdministrationItemService {
     }
 
     return items.sort(orderAdministrationItems(configurationWizard))[0].name;
+  }
+
+  getAdministrationItemRoute(state: RouterState, configurationMode = false): IAdministrationItemRoute {
+    return {
+      item: state.params.item || this.getDefaultItem(configurationMode),
+      sub: state.params.sub || null,
+      param: state.params.param || null,
+    };
   }
 
   getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {
@@ -78,37 +88,57 @@ export class AdministrationItemService {
     }
   }
 
-  async activate(name: string, itemSub: string | null, param: string | null, configurationWizard: boolean) {
-    const item = this.getItem(name, configurationWizard);
+  async activate(
+    screen: IAdministrationItemRoute,
+    configurationWizard: boolean,
+    outside: boolean
+  ): Promise<void> {
+    const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
       return;
     }
 
-    if (item.onActivate) {
-      await item.onActivate(configurationWizard);
-    }
+    await item.onActivate?.(configurationWizard, outside);
 
-    if (itemSub) {
-      const sub = this.getItemSub(item, itemSub);
-      if (sub?.onActivate) {
-        await sub.onActivate(param, configurationWizard);
-      }
+    if (screen.sub) {
+      await this.getItemSub(item, screen.sub)?.onActivate?.(screen.param, configurationWizard, outside);
     }
   }
 
-  async canActivate(name: string, itemSub: string | null, param: string | null, configurationWizard: boolean) {
-    const item = this.getItem(name, configurationWizard);
+  async deActivate(
+    screen: IAdministrationItemRoute,
+    configurationWizard: boolean,
+    outside: boolean
+  ): Promise<void> {
+    const item = this.getItem(screen.item, configurationWizard);
+    if (!item) {
+      return;
+    }
+
+    await item.onDeActivate?.(configurationWizard, outside);
+
+    if (screen.sub) {
+      await this.getItemSub(item, screen.sub)?.onDeActivate?.(screen.param, configurationWizard, outside);
+    }
+  }
+
+  async canActivate(
+    screen: IAdministrationItemRoute,
+    configurationWizard: boolean,
+    outside: boolean
+  ): Promise<boolean> {
+    const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
       return false;
     }
 
-    if (item.canActivate && !await item.canActivate(configurationWizard)) {
+    if (item.canActivate && !await item.canActivate(configurationWizard, outside)) {
       return false;
     }
 
-    if (itemSub) {
-      const sub = this.getItemSub(item, itemSub);
-      if (sub?.canActivate && !await sub.canActivate(param, configurationWizard)) {
+    if (screen.sub) {
+      const sub = this.getItemSub(item, screen.sub);
+      if (sub?.canActivate && !await sub.canActivate(screen.param, configurationWizard)) {
         return false;
       }
     }

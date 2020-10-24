@@ -39,9 +39,7 @@ export const ConfigurationWizardScreen = observer(function ConfigurationWizardSc
     <>
       <WizardTopAppBar />
       <Administration
-        activeItem={administrationScreenService.activeItem}
-        activeItemSub={administrationScreenService.activeItemSub}
-        activeItemSubParam={administrationScreenService.activeItemSubParam}
+        activeScreen={administrationScreenService.activeScreen}
         configurationWizard
         onItemSelect={handleSelect}
       >

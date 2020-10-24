@@ -10,6 +10,7 @@ import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
@@ -23,12 +24,13 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource,
-    private readonly createConnectionService: CreateConnectionService
+    private readonly createConnectionService: CreateConnectionService,
+    private connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
   }
 
-  register() {
+  register(): void {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Default,
@@ -46,6 +48,14 @@ export class ConnectionsAdministrationService extends Bootstrap {
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onActivate: this.loadConnections.bind(this),
+      onDeActivate: async (configuration: boolean, outside: boolean) => {
+        if (outside) {
+          const updated = await this.connectionsResource.updateSessionConnections();
+          if (updated) {
+            await this.connectionInfoResource.refreshSession();
+          }
+        }
+      },
     });
   }
 

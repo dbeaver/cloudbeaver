@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Route } from 'router5';
+import { Route, State as RouterState } from 'router5';
 
 export type ScreenRoute = Omit<Route, 'children'>;
 
@@ -15,8 +15,8 @@ export interface IScreen {
   routes: ScreenRoute[];
   component: ScreenComponent;
   root?: boolean;
-  onActivate?: () => void | Promise<void>;
-  onDeactivate?: () => void | Promise<void>;
+  onActivate?: (state: RouterState, prevState?: RouterState) => void | Promise<void>;
+  onDeactivate?: (state: RouterState, nextState: RouterState) => void | Promise<void>;
 }
 
 export type ScreenComponent = React.FunctionComponent;

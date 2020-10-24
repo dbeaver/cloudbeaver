@@ -12,27 +12,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedDataResource,
-  SessionInfo,
-  ConnectionInfo
+  SessionInfo
 } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
 
-export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'> & {
-  connections: Array<Pick<
-  ConnectionInfo,
-  'id' |
-  'name' |
-  'description' |
-  'connected' |
-  'readOnly' |
-  'driverId' |
-  'authModel' |
-  'authNeeded' |
-  'features' |
-  'supportedDataFormats'
-  >>;
-};
+export type SessionState = Pick<SessionInfo, 'createTime' | 'cacheExpired' | 'lastAccessTime' | 'locale'>;
 
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null, null> {

@@ -11,38 +11,35 @@ import { observer } from 'mobx-react';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
+import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 
 interface Props {
-  activeItemName: string | null;
-  activeItemSub: string | null;
-  activeItemSubParam: string | null;
+  activeScreen: IAdministrationItemRoute | null;
   configurationWizard: boolean;
 }
 
-export const ItemContent = observer(function ItemContent({
-  activeItemName,
-  activeItemSub,
-  activeItemSubParam,
+export const ItemContent: React.FC<Props> = observer(function ItemContent({
+  activeScreen,
   configurationWizard,
-}: Props) {
+}) {
   const administrationItemService = useService(AdministrationItemService);
 
-  if (!activeItemName) {
+  if (!activeScreen?.item) {
     return null;
   }
 
-  const item = administrationItemService.getItem(activeItemName, configurationWizard);
+  const item = administrationItemService.getItem(activeScreen.item, configurationWizard);
 
   if (!item) {
     return null;
   }
 
-  if (activeItemSub) {
-    const sub = administrationItemService.getItemSub(item, activeItemSub);
+  if (activeScreen.sub) {
+    const sub = administrationItemService.getItemSub(item, activeScreen.sub);
     if (sub) {
       const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
-      return <Component item={item} sub={sub} param={activeItemSubParam} configurationWizard={configurationWizard} />;
+      return <Component item={item} sub={sub} param={activeScreen.param} configurationWizard={configurationWizard} />;
     }
   }
 

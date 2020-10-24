@@ -106,13 +106,14 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     this.changed = true;
   }
 
-  async updateSessionConnections(): Promise<void> {
+  async updateSessionConnections(): Promise<boolean> {
     if (!this.changed) {
-      return;
+      return false;
     }
 
-    // await this.graphQLService.sdk.refreshSessionConnections();
+    await this.graphQLService.sdk.refreshSessionConnections();
     this.changed = false;
+    return true;
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {

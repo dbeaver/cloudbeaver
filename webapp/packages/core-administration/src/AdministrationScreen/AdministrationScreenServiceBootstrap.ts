@@ -26,10 +26,10 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     private serverConfigResource: ServerConfigResource
   ) {
     super();
-    this.permissionsService.onUpdate.subscribe(this.checkPermissions.bind(this));
+    this.permissionsService.onUpdate.subscribe(() => this.checkPermissions(this.screenService.routerService.state));
   }
 
-  register() {
+  register(): void {
     this.screenService.create({
       name: AdministrationScreenService.screenName,
       routes: [
@@ -89,64 +89,80 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     });
   }
 
-  async load() {
+  async load(): Promise<void> {
     await this.serverConfigResource.load(null);
 
     if (this.administrationScreenService.isConfigurationMode
-      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
+      && !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }
 
-  private async handleDeactivate() {
-    if (!this.administrationScreenService.isAdministrationRouteActive()) {
-      this.administrationScreenService.activationEvent.execute(false);
+  private async handleDeactivate(state: RouterState, nextState: RouterState) {
+    if (nextState && !this.administrationScreenService.isAdministrationRouteActive(nextState.name)) {
+      await this.administrationScreenService.activationEvent.execute(false);
+    }
+
+    const toScreen = this.administrationScreenService.getScreen(nextState);
+    const screen = this.administrationScreenService.getScreen(state);
+    if (screen) {
+      await this.administrationItemService.deActivate(
+        screen,
+        this.administrationScreenService.isConfigurationMode,
+        screen.item !== toScreen?.item
+      );
     }
 
     if (this.administrationScreenService.isConfigurationMode
-      && !this.screenService.isActive(AdministrationScreenService.setupName)) {
+      && !this.screenService.isActive(state.name, AdministrationScreenService.setupName)) {
       this.administrationScreenService.navigateToRoot();
     }
   }
 
-  private async handleCanActivate(toState: RouterState, fromState: RouterState) {
+  private async handleCanActivate(toState: RouterState) {
     if (!toState.params?.item) {
       return false;
     }
 
+    const fromScreen = this.administrationScreenService.getScreen(this.screenService.routerService.state);
+    const screen = this.administrationScreenService.getScreen(toState);
+    if (!screen) {
+      return false;
+    }
+
     return this.administrationItemService.canActivate(
-      toState.params?.item,
-      toState.params?.sub,
-      toState.params?.param,
-      this.administrationScreenService.isConfigurationMode
+      screen,
+      this.administrationScreenService.isConfigurationMode,
+      screen.item !== fromScreen?.item
     );
   }
 
-  private async handleActivate() {
-    if (!await this.checkPermissions()) {
+  private async handleActivate(state: RouterState, prevState?: RouterState) {
+    if (!await this.checkPermissions(state)) {
       return;
     }
-    this.administrationScreenService.activationEvent.execute(true);
+    await this.administrationScreenService.activationEvent.execute(true);
 
-    if (this.administrationScreenService.activeItem) {
+    const screen = this.administrationScreenService.getScreen(state);
+    const fromScreen = this.administrationScreenService.getScreen(prevState);
+    if (screen) {
       await this.administrationItemService.activate(
-        this.administrationScreenService.activeItem,
-        this.administrationScreenService.activeItemSub,
-        this.administrationScreenService.activeItemSubParam,
-        this.administrationScreenService.isConfigurationMode
+        screen,
+        this.administrationScreenService.isConfigurationMode,
+        screen.item !== fromScreen?.item
       );
     }
   }
 
-  private async checkPermissions() {
-    if (!await this.isAccessProvided()) {
+  private async checkPermissions(state: RouterState) {
+    if (!await this.isAccessProvided(state)) {
       this.screenService.navigateToRoot();
       return false;
     }
     return true;
   }
 
-  private async isAccessProvided() {
+  private async isAccessProvided(state: RouterState) {
     await this.serverConfigResource.load(null);
     if (!await this.permissionsService.hasAsync(EAdminPermission.admin)
           && !this.administrationScreenService.isConfigurationMode) {
@@ -154,7 +170,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     }
 
     if (!this.administrationScreenService.isConfigurationMode
-        && this.screenService.isActive(AdministrationScreenService.setupName)) {
+        && this.screenService.isActive(state.name, AdministrationScreenService.setupName)) {
       return false;
     }
 

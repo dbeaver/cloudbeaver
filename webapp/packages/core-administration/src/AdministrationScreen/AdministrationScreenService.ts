@@ -11,11 +11,12 @@ import { computed, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { ScreenService, RouterService } from '@cloudbeaver/core-routing';
+import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
-import { IRouteParams } from './IRouteParams';
+import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import { IRouteParams } from '../AdministrationItem/IRouteParams';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 const ADMINISTRATION_INFO = 'administration_mode';
@@ -39,28 +40,11 @@ export class AdministrationScreenService {
   @observable info: IAdministrationScreenInfo;
   @observable itemState: Map<string, any>;
 
-  @computed get activeItem(): string | null {
-    if (!this.isAdministrationRouteActive()) {
-      return null;
-    }
-    return this.routerService.params.item || this.administrationItemService.getDefaultItem(this.isConfigurationMode);
+  @computed get activeScreen(): IAdministrationItemRoute | null {
+    return this.getScreen(this.screenService.routerService.state);
   }
 
-  @computed get activeItemSub(): string | null {
-    if (!this.isAdministrationRouteActive()) {
-      return null;
-    }
-    return this.routerService.params.sub || null;
-  }
-
-  @computed get activeItemSubParam(): string | null {
-    if (!this.isAdministrationRouteActive()) {
-      return null;
-    }
-    return this.routerService.params.param || null;
-  }
-
-  get isConfigurationMode() {
+  get isConfigurationMode(): boolean {
     return !!this.serverConfigResource.data?.configurationMode;
   }
 
@@ -68,7 +52,6 @@ export class AdministrationScreenService {
 
   constructor(
     private screenService: ScreenService,
-    private routerService: RouterService,
     private administrationItemService: AdministrationItemService,
     private autoSaveService: LocalStorageSaveService,
     private serverConfigResource: ServerConfigResource
@@ -83,15 +66,23 @@ export class AdministrationScreenService {
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
   }
 
-  navigateToRoot() {
+  getScreen(state?: RouterState): IAdministrationItemRoute | null {
+    if (!state || !this.isAdministrationRouteActive(state.name)) {
+      return null;
+    }
+
+    return this.administrationItemService.getAdministrationItemRoute(state, this.isConfigurationMode);
+  }
+
+  navigateToRoot(): void {
     if (this.isConfigurationMode) {
-      this.routerService.router.navigate(AdministrationScreenService.setupName);
+      this.screenService.navigate(AdministrationScreenService.setupName);
     } else {
-      this.routerService.router.navigate(AdministrationScreenService.screenName);
+      this.screenService.navigate(AdministrationScreenService.screenName);
     }
   }
 
-  navigateTo(item: string, params?: IRouteParams) {
+  navigateTo(item: string, params?: IRouteParams): void {
     if (!params) {
       this.navigateToItem(item);
     } else {
@@ -99,27 +90,27 @@ export class AdministrationScreenService {
     }
   }
 
-  navigateToItem(item: string) {
+  navigateToItem(item: string): void {
     if (this.isConfigurationMode) {
-      this.routerService.router.navigate(AdministrationScreenService.setupItemRouteName, { item });
+      this.screenService.navigate(AdministrationScreenService.setupItemRouteName, item);
     } else {
-      this.routerService.router.navigate(AdministrationScreenService.itemRouteName, { item });
+      this.screenService.navigate(AdministrationScreenService.itemRouteName, item);
     }
   }
 
-  navigateToItemSub(item: string, sub: string, param?: string) {
+  navigateToItemSub(item: string, sub: string, param?: string): void {
     if (!param) {
       if (this.isConfigurationMode) {
-        this.routerService.router.navigate(AdministrationScreenService.setupItemSubRouteName, { item, sub });
+        this.screenService.navigate(AdministrationScreenService.setupItemSubRouteName, item, sub);
       } else {
-        this.routerService.router.navigate(AdministrationScreenService.itemSubRouteName, { item, sub });
+        this.screenService.navigate(AdministrationScreenService.itemSubRouteName, item, sub);
       }
       return;
     }
     if (this.isConfigurationMode) {
-      this.routerService.router.navigate(AdministrationScreenService.setupItemSubParamRouteName, { item, sub, param });
+      this.screenService.navigate(AdministrationScreenService.setupItemSubParamRouteName, item, sub, param);
     } else {
-      this.routerService.router.navigate(AdministrationScreenService.itemSubParamRouteName, { item, sub, param });
+      this.screenService.navigate(AdministrationScreenService.itemSubParamRouteName, item, sub, param);
     }
   }
 
@@ -153,12 +144,12 @@ export class AdministrationScreenService {
     return this.itemState.get(name);
   }
 
-  clearItemsState() {
+  clearItemsState(): void {
     this.itemState.clear();
   }
 
-  isAdministrationRouteActive() {
-    return this.screenService.isActive(AdministrationScreenService.screenName)
-    || this.screenService.isActive(AdministrationScreenService.setupName);
+  isAdministrationRouteActive(routeName: string): boolean {
+    return this.screenService.isActive(routeName, AdministrationScreenService.screenName)
+    || this.screenService.isActive(routeName, AdministrationScreenService.setupName);
   }
 }

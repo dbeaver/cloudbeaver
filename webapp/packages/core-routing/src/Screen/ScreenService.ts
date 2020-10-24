@@ -15,7 +15,7 @@ import { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
 export class ScreenService {
-  get screen() {
+  get screen(): IScreen | undefined {
     return this.getScreenByRoute(this.routerService.route);
   }
 
@@ -23,12 +23,12 @@ export class ScreenService {
   private routeScreenMap = new Map<string, string>();
 
   constructor(
-    private routerService: RouterService
+    readonly routerService: RouterService
   ) {
     this.routerService.subscribe(this.onRouteChange.bind(this));
   }
 
-  navigateToRoot() {
+  navigateToRoot(): void {
     const screen = Array.from(this.screens.values())
       .find(screen => screen.root);
 
@@ -37,7 +37,11 @@ export class ScreenService {
     }
   }
 
-  create(screen: IScreen) {
+  navigate(screen: string, item?: string, sub?: string, param?: string): void {
+    this.routerService.router.navigate(screen, { item, sub, param });
+  }
+
+  create(screen: IScreen): void {
     if (this.screens.has(screen.name)) {
       return;
     }
@@ -46,22 +50,29 @@ export class ScreenService {
     this.addRoutes(screen.name, screen.routes);
   }
 
-  addRoutes(screen: string, routes: ScreenRoute[]) {
+  addRoutes(screen: string, routes: ScreenRoute[]): void {
     for (const route of routes) {
       this.routerService.router.add(route);
       this.routeScreenMap.set(route.name, screen);
     }
   }
 
-  isActive(name: string): boolean {
-    return this.screen?.name === name;
+  isActive(name: string): boolean;
+  isActive(routeName: string, name: string): boolean;
+  isActive(routeName: string, name?: string): boolean {
+    if (name === undefined) {
+      name = routeName;
+      routeName = this.routerService.route;
+    }
+    const screen = this.getScreenByRoute(routeName);
+    return screen?.name === name;
   }
 
-  buildUrl(screen: string) {
+  buildUrl(screen: string): string {
     return this.routerService.router.buildUrl(screen);
   }
 
-  getScreenByRoute(route: string) {
+  getScreenByRoute(route: string): IScreen | undefined {
     const screen = this.routeScreenMap.get(route);
     if (!screen) {
       return undefined;
@@ -72,16 +83,9 @@ export class ScreenService {
 
   private async onRouteChange(state: SubscribeState) {
     if (state.previousRoute) {
-      const previousScreen = this.getScreenByRoute(state.previousRoute.name);
-      if (previousScreen?.onDeactivate) {
-        await previousScreen.onDeactivate();
-      }
+      await this.getScreenByRoute(state.previousRoute.name)?.onDeactivate?.(state.previousRoute, state.route);
     }
 
-    const nextScreen = this.getScreenByRoute(state.route.name);
-
-    if (nextScreen?.onActivate) {
-      await nextScreen.onActivate();
-    }
+    await this.getScreenByRoute(state.route.name)?.onActivate?.(state.route, state.previousRoute);
   }
 }
