@@ -8,12 +8,10 @@
 
 import { useContext, useEffect, useState } from 'react';
 
-import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
 import { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
-import { NodeManagerUtils } from '../../shared/NodesManager/NodeManagerUtils';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
 import { NavigationTreeService } from '../NavigationTreeService';
@@ -38,15 +36,19 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   const [processing, setProcessing] = useState(false);
   const [isExpanded, switchExpand] = useState(false);
   const { isLoading, isOutdated } = useNode(node.id);
-  const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-  const { connectionInfo } = useConnectionInfo(connectionId);
   const children = useChildren(node.id);
   const loading = isLoading() || children.isLoading() || processing;
 
   let leaf = isLeaf(node) || (children.children?.length === 0 && !children.isOutdated());
   let expanded = isExpanded && !leaf;
 
-  if (node.objectFeatures.includes(EObjectFeature.dataSource) && !connectionInfo?.connected) {
+  if (
+    node.objectFeatures.includes(EObjectFeature.dataSource)
+    && (
+      !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
+      || (!children.children && isOutdated())
+    )
+  ) {
     leaf = false;
     expanded = false;
   }

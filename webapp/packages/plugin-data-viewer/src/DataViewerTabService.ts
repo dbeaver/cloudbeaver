@@ -14,7 +14,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState
 } from '@cloudbeaver/plugin-object-viewer';
@@ -51,7 +51,7 @@ export class DataViewerTabService {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
-  private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
       const {
         nodeInfo,

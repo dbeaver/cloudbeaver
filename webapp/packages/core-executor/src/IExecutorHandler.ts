@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IContextProvider } from './ExecutionContext';
+import { IExecutionContextProvider } from './ExecutionContext';
 
 export type IExecutorHandler<T> = (
-  contexts: IContextProvider<T>,
+  contexts: IExecutionContextProvider<T>,
   data: T
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => void | false | Promise<void | false>;

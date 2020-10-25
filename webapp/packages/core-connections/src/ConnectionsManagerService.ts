@@ -106,7 +106,7 @@ export class ConnectionsManagerService {
 
   async closeConnectionAsync(id: string): Promise<void> {
     const connection = this.connectionInfo.get(id);
-    if (!connection) {
+    if (!connection || !connection.connected) {
       return;
     }
 

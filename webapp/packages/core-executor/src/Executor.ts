@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ExecutionContext, IContextProvider } from './ExecutionContext';
+import { ExecutionContext, IExecutionContextProvider } from './ExecutionContext';
 import { IExecutor } from './IExecutor';
 import { IExecutorHandler } from './IExecutorHandler';
 
@@ -18,7 +18,7 @@ export class Executor<T> implements IExecutor<T> {
     private defaultData?: T | null
   ) { }
 
-  async execute(data: T): Promise<IContextProvider<T>> {
+  async execute(data: T): Promise<IExecutionContextProvider<T>> {
     if ((data === undefined || data === null) && this.defaultData !== undefined && this.defaultData !== null) {
       data = this.defaultData;
     }

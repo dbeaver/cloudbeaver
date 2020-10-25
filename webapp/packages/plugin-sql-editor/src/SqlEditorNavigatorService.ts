@@ -10,7 +10,7 @@ import { NavigationTabsService } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlExecutionState } from './SqlExecutionState';
@@ -97,7 +97,7 @@ export class SqlEditorNavigatorService {
   }
 
   private async navigateHandler(
-    contexts: IContextProvider<SQLCreateAction | SQLEditorAction>,
+    contexts: IExecutionContextProvider<SQLCreateAction | SQLEditorAction>,
     data: SQLCreateAction | SQLEditorAction
   ) {
     try {

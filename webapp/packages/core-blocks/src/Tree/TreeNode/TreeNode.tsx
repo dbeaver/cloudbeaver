@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, memo } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -26,7 +25,7 @@ interface Props {
   onOpen?: () => void;
 }
 
-export const TreeNode: React.FC<Props> = observer(function TreeNode({
+export const TreeNode: React.FC<Props> = memo(function TreeNode({
   loading = false,
   selected = false,
   expanded = false,
@@ -38,15 +37,18 @@ export const TreeNode: React.FC<Props> = observer(function TreeNode({
   const handlersRef = useRef(handlers);
   handlersRef.current = handlers;
 
-  const handleExpand = () => {
+  const handleExpand = useCallback(() => {
     handlersRef.current.onExpand?.();
-  };
+  }, []);
 
-  const handleSelect = (multiple?: boolean): boolean => handlersRef.current.onSelect?.(multiple) || false;
+  const handleSelect = useCallback(
+    (multiple?: boolean): boolean => handlersRef.current.onSelect?.(multiple) || false,
+    []
+  );
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     handlersRef.current.onOpen?.();
-  };
+  }, []);
 
   const nodeContext = useMemo<ITreeNodeContext>(() => ({
     loading,

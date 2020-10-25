@@ -11,7 +11,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutor, Executor, IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   PermissionsService, EPermission, SessionResource, ServerService
 } from '@cloudbeaver/core-root';
@@ -119,7 +119,7 @@ export class NavNodeManagerService extends Bootstrap {
   register(): void {
     this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
-    this.connectionInfo.onConnectionCreate.subscribe(this.connectionCreateHandler.bind(this));
+    this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
     this.sessionResource.onDataUpdate.subscribe(this.refreshRoot.bind(this));
   }
 
@@ -253,7 +253,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   navigationNavNodeContext = async (
-    contexts: IContextProvider<INodeNavigationData>,
+    contexts: IExecutionContextProvider<INodeNavigationData>,
     data: INodeNavigationData
   ): Promise<INodeNavigationContext> => {
     let nodeId = data.nodeId;
@@ -332,7 +332,7 @@ export class NavNodeManagerService extends Bootstrap {
     }
   }
 
-  private async connectionCreateHandler(connection: Connection) {
+  private async connectionCreateHandler(context: IExecutionContextProvider<Connection>, connection: Connection) {
     if (!await this.isNavTreeEnabled()) {
       return;
     }
@@ -340,7 +340,11 @@ export class NavNodeManagerService extends Bootstrap {
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
     this.markTreeOutdated(nodeId);
 
-    await this.navTree.refresh(ROOT_NODE_PATH);
+    const tree = await this.navTree.load(ROOT_NODE_PATH);
+
+    if (!tree.includes(nodeId)) {
+      await this.navTree.refresh(ROOT_NODE_PATH);
+    }
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
@@ -382,7 +386,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async navigateHandler(
-    contexts: IContextProvider<INodeNavigationData>,
+    contexts: IExecutionContextProvider<INodeNavigationData>,
     data: INodeNavigationData
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void | false> {

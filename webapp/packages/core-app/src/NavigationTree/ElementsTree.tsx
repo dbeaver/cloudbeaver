@@ -74,6 +74,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
           <NavigationNodeElement key={id} nodeId={id} />
         ))}
       </tree>
+      <Loader loading={nodeChildren.isLoading()} overlay />
     </TreeContext.Provider>
   );
 });

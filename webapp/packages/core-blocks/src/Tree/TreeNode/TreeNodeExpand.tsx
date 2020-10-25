@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useContext } from 'react';
 import styled from 'reshadow';
 import { css } from 'reshadow';
@@ -33,7 +32,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand({
+export const TreeNodeExpand: React.FC<Props> = function TreeNodeExpand({
   leaf,
   big,
   className,
@@ -62,4 +61,4 @@ export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand(
       {!context.loading && !context.leaf && !leaf && !big && <Icon name="arrow" viewBox="0 0 16 16" />}
     </arrow>
   );
-});
+};

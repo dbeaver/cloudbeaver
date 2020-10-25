@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Observable, Subject } from 'rxjs';
+import { action } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
   ConnectionInfo,
@@ -34,24 +35,22 @@ ConnectionInfo,
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
-  readonly onConnectionCreate: Observable<Connection>;
-  private connectionCreateSubject: Subject<Connection>;
+  readonly onConnectionCreate: IExecutor<Connection>;
   constructor(
     private graphQLService: GraphQLService,
     sessionResource: SessionResource
   ) {
     super(new Map());
-    this.connectionCreateSubject = new Subject<Connection>();
-    this.onConnectionCreate = this.connectionCreateSubject.asObservable();
+    this.onConnectionCreate = new Executor();
     sessionResource.onDataUpdate.subscribe(() => this.refreshSession(true));
   }
 
-  async refreshSession(sessionUpdate?: boolean): Promise<void> {
+  @action async refreshSession(sessionUpdate?: boolean): Promise<void> {
     const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
 
     const restoredConnections = new Set<string>();
     for (const connection of connections) {
-      this.add(connection, sessionUpdate);
+      await this.add(connection, sessionUpdate);
       restoredConnections.add(connection.id);
     }
 
@@ -64,32 +63,32 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
   }
 
-  async createFromTemplate(templateId: string): Promise<Connection> {
+  @action async createFromTemplate(templateId: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({ templateId });
     return this.add(connection);
   }
 
-  async createConnection(config: ConnectionConfig): Promise<Connection> {
+  @action async createConnection(config: ConnectionConfig): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnection({
       config,
     });
     return this.add(connection);
   }
 
-  async createFromNode(nodeId: string): Promise<Connection> {
+  @action async createFromNode(nodeId: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromNode({ nodePath: nodeId });
 
     return this.add(connection);
   }
 
-  add(connection: Connection, update?: boolean): Connection {
+  @action async add(connection: Connection, update?: boolean): Promise<Connection> {
     const exists = this.data.has(connection.id);
     this.set(connection.id, connection);
 
     const observedConnection = this.get(connection.id)!;
 
     if (!update && !exists) {
-      this.connectionCreateSubject.next(observedConnection);
+      await this.onConnectionCreate.execute(observedConnection);
     }
 
     return observedConnection;
