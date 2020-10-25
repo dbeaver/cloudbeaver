@@ -61,7 +61,7 @@ public class WebDatabaseAuthModel {
 
     @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
-        DBPPropertySource credentialsSource = model.createCredentialsSource(null);
+        DBPPropertySource credentialsSource = model.createCredentialsSource(null, null);
         return Arrays.stream(credentialsSource.getProperties())
             .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
             .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);

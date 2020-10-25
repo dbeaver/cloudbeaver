@@ -132,7 +132,7 @@ public class WebServiceUtils {
         navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
-        saveAuthProperties(newDataSource, config.getCredentials());
+        saveAuthProperties(newDataSource, newDataSource.getConnectionConfiguration(), config.getCredentials());
         newDataSource.setSavePassword(config.isSaveCredentials());
 
         return newDataSource;
@@ -159,10 +159,8 @@ public class WebServiceUtils {
         dsConfig.setUserPassword(config.getUserPassword());
     }
 
-    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
+    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties) {
         if (!CommonUtils.isEmpty(authProperties)) {
-            DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
-
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
@@ -187,7 +185,7 @@ public class WebServiceUtils {
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
         if (config.isSaveCredentials()) {
-            saveAuthProperties(dataSource, config.getCredentials());
+            saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials());
         }
         dataSource.setSavePassword(config.isSaveCredentials());
     }

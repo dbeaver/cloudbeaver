@@ -22,12 +22,15 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.auth.AuthProperty;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -246,9 +249,23 @@ public class WebConnectionInfo {
             return new WebPropertyInfo[0];
         }
 
-        DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer);
-        return Arrays.stream(credentialsSource.getProperties())
+        // Fill session and user provided credentials
+        boolean hasContextCredentials = session.hasContextCredentials();
+        DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
+        session.provideAuthParameters(dataSourceContainer, configWithAuth);
+
+
+        DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
+        WebPropertyInfo[] authProps = Arrays.stream(credentialsSource.getProperties())
+            .filter(p -> {
+                if (hasContextCredentials && p instanceof ObjectPropertyDescriptor) {
+                    AuthProperty authProperty = ((ObjectPropertyDescriptor) p).getAnnotation(AuthProperty.class);
+                    if (authProperty != null) return !authProperty.contextProvided();
+                }
+                return true;
+            })
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
+        return authProps;
     }
 
     @Property

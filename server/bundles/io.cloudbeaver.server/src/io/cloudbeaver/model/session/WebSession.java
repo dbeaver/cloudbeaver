@@ -40,6 +40,8 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProvider;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -600,6 +602,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    public boolean hasContextCredentials() {
+        return getAdapter(DBAAuthCredentialsProvider.class) != null;
+    }
+
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
@@ -620,6 +626,21 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             if (authProperties != null) {
                 authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
             }
+
+            // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)
+            // FIXME: get rid of this. It is a hack because native auth model keeps settings in special props
+            //DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+            if (configuration.getAuthModel() instanceof AuthModelDatabaseNative) {
+                String userName = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_NAME);
+                if (userName != null) {
+                    configuration.setUserName(userName);
+                }
+                String userPassword = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD);
+                if (userPassword != null) {
+                    configuration.setUserPassword(userPassword);
+                }
+            }
+            //WebServiceUtils.saveAuthProperties(dataSourceContainer, configuration, null);
 
 //            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 //
