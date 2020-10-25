@@ -16,16 +16,19 @@
  */
 package io.cloudbeaver;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.util.Map;
 
 /**
  * Auth provider
  */
-public interface DBWAuthProvider<AUTH_SESSION> {
+public interface DBWAuthProvider<AUTH_SESSION extends DBASession> {
 
     AUTH_SESSION openSession(
+        WebSession mainSession,
         Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         Map<String, Object> userCredentials, // Saved user credentials (e.g. associated 3rd party provider user name or realm)
         Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)

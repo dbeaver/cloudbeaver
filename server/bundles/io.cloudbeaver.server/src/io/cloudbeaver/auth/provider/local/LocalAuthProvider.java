@@ -17,6 +17,7 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
@@ -27,14 +28,14 @@ import java.util.Map;
 /**
  * Auth provider
  */
-public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
+public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
 
     public static final String PROVIDER_ID = "local";
     public static final String CRED_USER = "user";
     public static final String CRED_PASSWORD = "password";
 
     @Override
-    public LocalAuthToken openSession(Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
+    public LocalAuthSession openSession(WebSession mainSession, Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
         String userName = CommonUtils.toString(authParameters.get(CRED_USER), null);
         String storedPasswordHash = CommonUtils.toString(userCredentials.get(CRED_PASSWORD), null);
         if (CommonUtils.isEmpty(storedPasswordHash)) {
@@ -48,16 +49,16 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthToken> {
         if (!storedPasswordHash.equals(clientPasswordHash)) {
             throw new DBException("Invalid user name or password");
         }
-        return new LocalAuthToken(userName);
+        return new LocalAuthSession(mainSession.getSessionId(), userName);
     }
 
     @Override
-    public void closeSession(LocalAuthToken localAuthToken) throws DBException {
+    public void closeSession(LocalAuthSession localAuthSession) throws DBException {
 
     }
 
     @Override
-    public void refreshSession(LocalAuthToken localAuthToken) throws DBException {
+    public void refreshSession(LocalAuthSession localAuthSession) throws DBException {
 
     }
 

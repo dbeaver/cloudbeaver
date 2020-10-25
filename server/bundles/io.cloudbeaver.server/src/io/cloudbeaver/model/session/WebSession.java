@@ -16,9 +16,6 @@
  */
 package io.cloudbeaver.model.session;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWSecurityController;
@@ -30,15 +27,16 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProvider;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -68,7 +66,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession implements DBASession, DBAAuthCredentialsProvider {
+public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -603,33 +601,56 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider {
     }
 
     // Auth credentials provider
+    // Adds auth properties passed from web (by user)
     @Override
     public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
-        if (dataSourceContainer.isSavePassword()) {
-            return true;
-        }
         try {
             WebConnectionInfo webConnectionInfo = getWebConnectionInfo(dataSourceContainer.getId());
-            Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
 
-            if (authProperties.isEmpty()) {
-                return true;
+            // Properties from nested auth sessions
+            DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
+            if (nestedProvider != null) {
+                if (!nestedProvider.provideAuthParameters(dataSourceContainer, configuration)) {
+                    return false;
+                }
             }
 
-            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+            // Properties passed from web
+            Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
+            if (authProperties != null) {
+                authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
+            }
 
-            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-            Gson credGson = new GsonBuilder()
-                .setLenient()
-                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-                .create();
-
-            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
-        } catch (DBWebException e) {
+//            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+//
+//            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+//            Gson credGson = new GsonBuilder()
+//                .setLenient()
+//                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+//                .create();
+//
+//            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
+//            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        } catch (DBException e) {
             log.error(e);
         }
         return true;
+    }
+
+    // May be called to extract auth information from session
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        for (Object attrValue : attributes.values()) {
+            if (adapter.isInstance(attrValue)) {
+                return adapter.cast(attrValue);
+            } else if (attrValue instanceof IAdaptable) {
+                T result = ((IAdaptable) attrValue).getAdapter(adapter);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     ///////////////////////////////////////////////////////

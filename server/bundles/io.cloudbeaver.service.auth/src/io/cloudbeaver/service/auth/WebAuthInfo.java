@@ -18,17 +18,19 @@ package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import org.eclipse.core.runtime.IAdaptable;
+import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.time.OffsetDateTime;
 
 /**
  * WebAuthInfo
  */
-public class WebAuthInfo {
+public class WebAuthInfo implements IAdaptable {
 
     private WebUser user;
     private String authProvider;
-    private Object authToken;
+    private DBASession authSession;
     private OffsetDateTime loginTime;
     private String message;
 
@@ -52,12 +54,12 @@ public class WebAuthInfo {
         this.authProvider = authProvider;
     }
 
-    public Object getAuthToken() {
-        return authToken;
+    public DBASession getAuthSession() {
+        return authSession;
     }
 
-    public void setAuthToken(Object authToken) {
-        this.authToken = authToken;
+    public void setAuthSession(DBASession authSession) {
+        this.authSession = authSession;
     }
 
     public OffsetDateTime getLoginTime() {
@@ -76,7 +78,17 @@ public class WebAuthInfo {
         this.message = message;
     }
 
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        // Needed to extract auth context from web session
+        if (adapter.isInstance(authSession)) {
+            return adapter.cast(authSession);
+        }
+        return null;
+    }
+
     public static WebAuthInfo getFromSession(WebSession webSession) {
         return webSession.getAttribute(DBWServiceAuth.ATTR_USER_AUTH);
     }
+
 }

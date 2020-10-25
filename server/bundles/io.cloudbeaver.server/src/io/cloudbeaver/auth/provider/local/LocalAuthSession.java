@@ -16,20 +16,43 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
-import io.cloudbeaver.DBWAuthProvider;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.app.DBPProject;
 
 /**
- * Auth provider
+ * Local auth provider
  */
-public class LocalAuthToken {
+public class LocalAuthSession implements DBASession {
 
+    private final String sessionId;
     private final String userId;
 
-    public LocalAuthToken(String userId) {
+    LocalAuthSession(String sessionId, String userId) {
+        this.sessionId = sessionId;
         this.userId = userId;
     }
 
     public String getUserId() {
         return userId;
     }
+
+    @NotNull
+    @Override
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    @Override
+    public boolean isApplicationSession() {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public DBPProject getSingletonProject() {
+        return null;
+    }
+
 }

@@ -30,6 +30,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthInfo;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
 
@@ -81,10 +82,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
             Map<String, Object> userCredentials = serverController.getUserCredentials(userId, authProvider);
 
-            Object authToken = authProviderInstance.openSession(
+            DBASession authSession = authProviderInstance.openSession(
+                webSession,
                 providerConfig,
-                userCredentials,
-                authParameters);
+                userCredentials, authParameters);
 
             if (user == null) {
                 user = new WebUser(userId);
@@ -98,7 +99,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             WebAuthInfo authInfo = new WebAuthInfo(user);
             authInfo.setLoginTime(OffsetDateTime.now());
             authInfo.setAuthProvider(authProvider.getId());
-            authInfo.setAuthToken(authToken);
+            authInfo.setAuthSession(authSession);
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
 
             webSession.setAttribute(ATTR_USER_AUTH, authInfo);

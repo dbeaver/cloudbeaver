@@ -20,14 +20,14 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.util.Map;
 
 /**
  * Auth provider
  */
-public interface DBWAuthProviderExternal<AUTH_SESSION> extends DBWAuthProvider<AUTH_SESSION> {
+public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBWAuthProvider<AUTH_SESSION> {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
