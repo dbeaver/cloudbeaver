@@ -943,23 +943,13 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export interface CreateConnectionConfigurationQuery {
-  connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  );
-}
+export interface CreateConnectionConfigurationQuery { connection: AdminConnectionFragment }
 
 export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   nodePath: Scalars['String'];
 }>;
 
-export interface CreateConnectionConfigurationFromNodeQuery {
-  connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  );
-}
+export interface CreateConnectionConfigurationFromNodeQuery { connection: AdminConnectionFragment }
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -975,12 +965,7 @@ export interface GetConnectionAccessQuery { subjects: Array<Pick<AdminConnection
 
 export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetConnectionsQuery {
-  connections: Array<(
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  )>;
-}
+export interface GetConnectionsQuery { connections: AdminConnectionFragment[] }
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']>;
@@ -1000,12 +985,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export interface UpdateConnectionConfigurationQuery {
-  connection: (
-    Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-    & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
-  );
-}
+export interface UpdateConnectionConfigurationQuery { connection: AdminConnectionFragment }
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1148,6 +1128,11 @@ export type NavGetStructContainersQueryVariables = Exact<{
 }>;
 
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
+
+export type AdminConnectionFragment = (
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
+  & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
+);
 
 export type NavNodeInfoFragment = (
   Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
@@ -1417,6 +1402,33 @@ export type SqlResultCloseMutationVariables = Exact<{
 
 export interface SqlResultCloseMutation { result: Mutation['sqlResultClose'] }
 
+export const AdminConnectionFragmentDoc = `
+    fragment AdminConnection on ConnectionInfo {
+  id
+  name
+  description
+  driverId
+  template
+  connected
+  readOnly
+  saveCredentials
+  host
+  port
+  databaseName
+  url
+  properties
+  features
+  authNeeded
+  authModel
+  authProperties {
+    id
+    value
+    features
+  }
+  features
+  supportedDataFormats
+}
+    `;
 export const NavNodeInfoFragmentDoc = `
     fragment NavNodeInfo on NavigatorNodeInfo {
   id
@@ -1603,57 +1615,17 @@ export const SetUserCredentialsDocument = `
 export const CreateConnectionConfigurationDocument = `
     query createConnectionConfiguration($config: ConnectionConfig!) {
   connection: createConnectionConfiguration(config: $config) {
-    id
-    name
-    description
-    driverId
-    template
-    connected
-    readOnly
-    saveCredentials
-    host
-    port
-    databaseName
-    url
-    properties
-    features
-    authNeeded
-    authModel
-    authProperties {
-      id
-      value
-      features
-    }
+    ...AdminConnection
   }
 }
-    `;
+    ${AdminConnectionFragmentDoc}`;
 export const CreateConnectionConfigurationFromNodeDocument = `
     query createConnectionConfigurationFromNode($nodePath: String!) {
   connection: copyConnectionConfiguration(nodePath: $nodePath) {
-    id
-    name
-    description
-    driverId
-    template
-    connected
-    readOnly
-    saveCredentials
-    host
-    port
-    databaseName
-    url
-    properties
-    features
-    authNeeded
-    authModel
-    authProperties {
-      id
-      value
-      features
-    }
+    ...AdminConnection
   }
 }
-    `;
+    ${AdminConnectionFragmentDoc}`;
 export const DeleteConnectionConfigurationDocument = `
     query deleteConnectionConfiguration($id: ID!) {
   deleteConnectionConfiguration(id: $id)
@@ -1671,31 +1643,10 @@ export const GetConnectionAccessDocument = `
 export const GetConnectionsDocument = `
     query getConnections {
   connections: allConnections {
-    id
-    name
-    description
-    driverId
-    template
-    connected
-    readOnly
-    saveCredentials
-    host
-    port
-    databaseName
-    url
-    properties
-    authNeeded
-    authModel
-    authProperties {
-      id
-      value
-      features
-    }
-    features
-    supportedDataFormats
+    ...AdminConnection
   }
 }
-    `;
+    ${AdminConnectionFragmentDoc}`;
 export const SearchDatabasesDocument = `
     query searchDatabases($hosts: [String!]!) {
   databases: searchConnections(hostNames: $hosts) {
@@ -1715,31 +1666,10 @@ export const SetConnectionAccessDocument = `
 export const UpdateConnectionConfigurationDocument = `
     query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
   connection: updateConnectionConfiguration(id: $id, config: $config) {
-    id
-    name
-    description
-    driverId
-    template
-    connected
-    readOnly
-    saveCredentials
-    host
-    port
-    databaseName
-    url
-    properties
-    authNeeded
-    authModel
-    authProperties {
-      id
-      value
-      features
-    }
-    features
-    supportedDataFormats
+    ...AdminConnection
   }
 }
-    `;
+    ${AdminConnectionFragmentDoc}`;
 export const CloseConnectionDocument = `
     mutation closeConnection($id: ID!) {
   connection: closeConnection(id: $id) {

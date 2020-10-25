@@ -10,18 +10,18 @@ import { observable, computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminConnectionSearchInfo, ConnectionInfo } from '@cloudbeaver/core-sdk';
+import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../../DBDriverResource';
-import { ConnectionsResource } from '../../ConnectionsResource';
+import { AdminConnection, ConnectionsResource } from '../../ConnectionsResource';
 
 @injectable()
 export class CreateConnectionController {
   @observable hosts = 'localhost';
   @observable isProcessing = false;
   @observable databases: AdminConnectionSearchInfo[];
-  @observable connection: ConnectionInfo | null;
+  @observable connection: AdminConnection | null;
   @observable availableDrivers: string[];
   @observable credentials: Record<string, string | number>;
   @observable grantedSubjects = [];
@@ -77,7 +77,7 @@ export class CreateConnectionController {
       template: false,
       authProperties: [],
       properties: {},
-    } as Partial<ConnectionInfo> as any;
+    } as Partial<AdminConnection> as any;
     this.availableDrivers = [driverId];
   };
 
@@ -90,7 +90,7 @@ export class CreateConnectionController {
       port: `${database.port}`,
       authProperties: [],
       properties: {},
-    } as Partial<ConnectionInfo> as any;
+    } as Partial<AdminConnection> as any;
     this.availableDrivers = database.possibleDrivers;
   };
 

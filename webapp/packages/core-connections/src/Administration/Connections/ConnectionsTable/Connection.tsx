@@ -14,13 +14,13 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { AdminConnection } from '../../ConnectionsResource';
 import { ConnectionEdit } from './ConnectionEdit';
 
 interface Props {
-  connection: ConnectionInfo;
+  connection: AdminConnection;
 }
 
 const styles = css`

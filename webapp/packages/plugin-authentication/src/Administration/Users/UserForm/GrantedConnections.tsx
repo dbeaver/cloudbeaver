@@ -14,10 +14,10 @@ import {
   Table, TableHeader, TableColumnHeader, TableBody,
   TableItem, TableColumnValue, TableItemSelect, StaticImage, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { AdminConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminSubjectType, ConnectionInfo, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import { AdminSubjectType, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 const styles = composes(
@@ -42,7 +42,7 @@ const styles = composes(
 
 interface Props {
   grantedConnections: AdminConnectionGrantInfo[];
-  connections: ConnectionInfo[];
+  connections: AdminConnection[];
   selectedConnection: Map<string, boolean>;
   disabled: boolean;
   onChange?: () => void;

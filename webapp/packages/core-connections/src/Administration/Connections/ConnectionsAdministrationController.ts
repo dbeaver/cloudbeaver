@@ -11,9 +11,9 @@ import { observable, computed } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ConnectionInfo, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource } from '../ConnectionsResource';
+import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 @injectable()
@@ -22,7 +22,7 @@ export class ConnectionsAdministrationController {
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   @computed
-  get connections(): ConnectionInfo[] {
+  get connections(): AdminConnection[] {
     return Array.from(this.connectionsResource.data.values())
       .sort((a, b) => {
         const isANew = this.connectionsResource.isNew(a.id);

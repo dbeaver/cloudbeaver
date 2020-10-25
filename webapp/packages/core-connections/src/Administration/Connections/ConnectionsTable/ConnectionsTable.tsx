@@ -13,9 +13,9 @@ import {
   Table, TableHeader, TableColumnHeader, TableBody
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { AdminConnection } from '../../ConnectionsResource';
 import { Connection } from './Connection';
 
 const styles = composes(
@@ -38,7 +38,7 @@ const styles = composes(
 );
 
 interface Props {
-  connections: ConnectionInfo[];
+  connections: AdminConnection[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
 }

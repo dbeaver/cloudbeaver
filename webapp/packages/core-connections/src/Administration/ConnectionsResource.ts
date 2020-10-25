@@ -11,7 +11,7 @@ import { Observable, Subject } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
-  ConnectionInfo,
+  AdminConnectionFragment,
   ConnectionConfig,
   CachedMapResource,
   ResourceKey,
@@ -23,22 +23,23 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
-export type ConnectionNew = ConnectionInfo & { [NEW_CONNECTION_SYMBOL]: boolean };
+export type AdminConnection = AdminConnectionFragment;
+export type ConnectionNew = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean };
 
 @injectable()
-export class ConnectionsResource extends CachedMapResource<string, ConnectionInfo> {
-  readonly onConnectionCreate: Observable<ConnectionInfo>;
+export class ConnectionsResource extends CachedMapResource<string, AdminConnection> {
+  readonly onConnectionCreate: Observable<AdminConnection>;
 
   private changed: boolean;
   private metadata: MetadataMap<string, boolean>;
-  private connectionCreateSubject: Subject<ConnectionInfo>;
+  private connectionCreateSubject: Subject<AdminConnection>;
 
   constructor(
     private graphQLService: GraphQLService
   ) {
     super(new Map());
     this.changed = false;
-    this.connectionCreateSubject = new Subject<ConnectionInfo>();
+    this.connectionCreateSubject = new Subject<AdminConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
     this.metadata = new MetadataMap(() => false);
   }
@@ -59,7 +60,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
   }
 
-  async loadAll(): Promise<Map<string, ConnectionInfo>> {
+  async loadAll(): Promise<Map<string, AdminConnection>> {
     await this.load('all');
     return this.data;
   }
@@ -70,16 +71,16 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     return databases;
   }
 
-  async create(config: ConnectionConfig): Promise<ConnectionInfo> {
+  async create(config: ConnectionConfig): Promise<AdminConnection> {
     const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
 
-    return this.add(connection as ConnectionInfo, true);
+    return this.add(connection, true);
   }
 
-  async add(connection: ConnectionInfo, isNew = false): Promise<ConnectionInfo> {
+  async add(connection: AdminConnection, isNew = false): Promise<AdminConnection> {
     this.changed = true;
     const newConnection: ConnectionNew = {
-      ...connection as ConnectionInfo,
+      ...connection,
       [NEW_CONNECTION_SYMBOL]: isNew,
     };
     this.set(newConnection.id, newConnection);
@@ -95,7 +96,7 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     });
   }
 
-  async update(id: string, config: ConnectionConfig): Promise<ConnectionInfo> {
+  async update(id: string, config: ConnectionConfig): Promise<AdminConnection> {
     await this.performUpdate(id, () => this.updateConnection(id, config));
     this.changed = true;
     return this.get(id)!;
@@ -126,12 +127,12 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
     await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, ConnectionInfo>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminConnection>> {
     const { connections } = await this.graphQLService.sdk.getConnections();
     this.data.clear();
 
     for (const connection of connections) {
-      this.set(connection.id, connection as ConnectionInfo);
+      this.set(connection.id, connection);
     }
     this.markUpdated(key);
 
@@ -165,6 +166,6 @@ export class ConnectionsResource extends CachedMapResource<string, ConnectionInf
   private async updateConnection(id: string, config: ConnectionConfig) {
     const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({ id, config });
 
-    this.set(id, connection as ConnectionInfo);
+    this.set(id, connection);
   }
 }

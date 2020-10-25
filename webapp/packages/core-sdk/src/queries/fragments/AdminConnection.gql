@@ -1,0 +1,30 @@
+fragment AdminConnection on ConnectionInfo {
+  id
+  name
+  description
+  driverId
+
+  template
+  connected
+  readOnly
+  saveCredentials
+
+  host
+  port
+  databaseName
+  url
+  properties
+    
+  features
+
+  authNeeded
+  authModel
+  authProperties {
+    id
+    value
+    features
+  }
+
+  features
+  supportedDataFormats
+}
