@@ -22,7 +22,7 @@ export default [
   ['authentication_user_password', 'User password'],
   ['authentication_user_password_repeat', 'Repeat password'],
   ['authentication_user_role', 'User role'],
-  ['authentication_user_login_not_set', 'Login cant\'t be empty'],
+  ['authentication_user_login_not_set', 'Login can\'t be empty'],
   ['authentication_user_role_not_set', 'At least one role must be selected'],
   ['authentication_user_password_not_set', 'Password is required'],
   ['authentication_user_passwords_not_match', "Passwords don't match"],
