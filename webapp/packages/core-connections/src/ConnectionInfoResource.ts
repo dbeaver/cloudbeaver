@@ -12,26 +12,14 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
-  ConnectionInfo,
+  UserConnectionFragment,
   GraphQLService,
   CachedMapResource,
-  ObjectPropertyInfo,
-  ConnectionConfig
+  ConnectionConfig,
+  UserConnectionAuthPropertiesFragment
 } from '@cloudbeaver/core-sdk';
 
-export type Connection = Pick<
-ConnectionInfo,
-'id' |
-'name' |
-'description' |
-'connected' |
-'readOnly' |
-'driverId' |
-'authModel' |
-'authNeeded' |
-'features' |
-'supportedDataFormats'
-> & { authProperties?: ObjectPropertyInfo[] };
+export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
@@ -120,7 +108,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.delete(connectionId);
   }
 
-  async loadAuthModel(connectionId: string): Promise<ObjectPropertyInfo[]> {
+  async loadAuthModel(connectionId: string): Promise<UserConnectionAuthPropertiesFragment[]> {
     const connection = await this.load(connectionId);
 
     if (connection?.authProperties) {
@@ -144,7 +132,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.data;
   }
 
-  private async getAuthProperties(id: string): Promise<ObjectPropertyInfo[]> {
+  private async getAuthProperties(id: string): Promise<UserConnectionAuthPropertiesFragment[]> {
     const { connection: { authProperties } } = await this.graphQLService.sdk.connectionAuthProperties({ id });
 
     return authProperties;

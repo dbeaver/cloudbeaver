@@ -8,13 +8,12 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, NavigatorNodeInfo, DatabaseObjectInfo
+  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, NavNodeInfoFragment
 } from '@cloudbeaver/core-sdk';
 
 import { NavNode } from './EntityTypes';
 
-type NavNodeInfo = Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-& { object?: Pick<DatabaseObjectInfo, 'features'> };
+type NavNodeInfo = NavNodeInfoFragment;
 
 export const ROOT_NODE_PATH = '';
 

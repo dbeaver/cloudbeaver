@@ -1,8 +1,5 @@
 mutation openSession {
   session: openSession {
-    createTime
-    lastAccessTime
-    cacheExpired
-    locale
+    ...SessionState
   }
 }

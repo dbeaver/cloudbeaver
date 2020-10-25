@@ -1,16 +1,5 @@
 query navNodeInfo($nodePath: ID!) {
   navNodeInfo(nodePath: $nodePath) {
-    id
-    name
-    hasChildren
-    nodeType
-    icon
-    folder
-    inline
-    navigable
-    features
-    object {
-      features
-    }
+    ...NavNodeInfo
   }
 }

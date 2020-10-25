@@ -1011,37 +1011,37 @@ export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export interface CloseConnectionMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface CloseConnectionMutation { connection: UserConnectionFragment }
 
 export type ConnectionAuthPropertiesQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export interface ConnectionAuthPropertiesQuery { connection: { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>> } }
+export interface ConnectionAuthPropertiesQuery { connection: { authProperties: UserConnectionAuthPropertiesFragment[] } }
 
 export type ConnectionInfoQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-export interface ConnectionInfoQuery { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface ConnectionInfoQuery { connection: UserConnectionFragment }
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export interface CreateConnectionMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface CreateConnectionMutation { connection: UserConnectionFragment }
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
 }>;
 
-export interface CreateConnectionFromNodeMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface CreateConnectionFromNodeMutation { connection: UserConnectionFragment }
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
 }>;
 
-export interface CreateConnectionFromTemplateMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface CreateConnectionFromTemplateMutation { connection: UserConnectionFragment }
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1084,7 +1084,7 @@ export type InitConnectionMutationVariables = Exact<{
   credentials?: Maybe<Scalars['Object']>;
 }>;
 
-export interface InitConnectionMutation { connection: Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'> }
+export interface InitConnectionMutation { connection: UserConnectionFragment }
 
 export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -1148,6 +1148,19 @@ export type NavGetStructContainersQueryVariables = Exact<{
 }>;
 
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
+
+export type NavNodeInfoFragment = (
+  Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
+  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
+);
+
+export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>;
+
+export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
+
+export type UserConnectionFragment = Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>;
+
+export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>;
 
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
@@ -1267,7 +1280,7 @@ export interface GetChildrenDbObjectInfoQuery {
     Pick<NavigatorNodeInfo, 'id'>
     & { object?: Maybe<(
       Pick<DatabaseObjectInfo, 'features'>
-      & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
+      & { properties?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
     )>; }
   )>;
 }
@@ -1280,7 +1293,7 @@ export type GetDbObjectInfoQueryVariables = Exact<{
 export interface GetDbObjectInfoQuery {
   objectInfo: { object?: Maybe<(
     Pick<DatabaseObjectInfo, 'features'>
-    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>>>> }
+    & { properties?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
   )>; };
 }
 
@@ -1288,26 +1301,13 @@ export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
 }>;
 
-export interface NavNodeChildrenQuery {
-  navNodeChildren: Array<(
-    Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-    & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  )>; navNodeInfo: (
-    Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-    & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  );
-}
+export interface NavNodeChildrenQuery { navNodeChildren: NavNodeInfoFragment[]; navNodeInfo: NavNodeInfoFragment }
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
 }>;
 
-export interface NavNodeInfoQuery {
-  navNodeInfo: (
-    Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-    & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
-  );
-}
+export interface NavNodeInfoQuery { navNodeInfo: NavNodeInfoFragment }
 
 export type NavRefreshNodeQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -1351,11 +1351,11 @@ export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguag
 
 export type GetSessionConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface GetSessionConnectionsQuery { state: { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> } }
+export interface GetSessionConnectionsQuery { state: { connections: UserConnectionFragment[] } }
 
 export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
-export interface OpenSessionMutation { session: Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'> }
+export interface OpenSessionMutation { session: SessionStateFragment }
 
 export type ReadSessionLogQueryVariables = Exact<{
   maxEntries: Scalars['Int'];
@@ -1379,12 +1379,7 @@ export interface SessionPermissionsQuery { permissions: Query['sessionPermission
 
 export type SessionStateQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface SessionStateQuery {
-  sessionState: (
-    Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'locale' | 'cacheExpired'>
-    & { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'driverId' | 'connected' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
-  );
-}
+export interface SessionStateQuery { sessionState: SessionStateFragment }
 
 export type TouchSessionMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -1422,6 +1417,68 @@ export type SqlResultCloseMutationVariables = Exact<{
 
 export interface SqlResultCloseMutation { result: Mutation['sqlResultClose'] }
 
+export const NavNodeInfoFragmentDoc = `
+    fragment NavNodeInfo on NavigatorNodeInfo {
+  id
+  name
+  hasChildren
+  nodeType
+  icon
+  folder
+  inline
+  navigable
+  features
+  object {
+    features
+  }
+}
+    `;
+export const NavNodePropertiesFragmentDoc = `
+    fragment NavNodeProperties on ObjectPropertyInfo {
+  id
+  category
+  dataType
+  description
+  displayName
+  features
+  value
+}
+    `;
+export const SessionStateFragmentDoc = `
+    fragment SessionState on SessionInfo {
+  createTime
+  lastAccessTime
+  cacheExpired
+  locale
+}
+    `;
+export const UserConnectionFragmentDoc = `
+    fragment UserConnection on ConnectionInfo {
+  id
+  name
+  description
+  driverId
+  connected
+  readOnly
+  authNeeded
+  authModel
+  features
+  supportedDataFormats
+}
+    `;
+export const UserConnectionAuthPropertiesFragmentDoc = `
+    fragment UserConnectionAuthProperties on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  features
+}
+    `;
 export const AsyncTaskCancelDocument = `
     mutation asyncTaskCancel($taskId: String!) {
   result: asyncTaskCancel(id: $taskId)
@@ -1686,100 +1743,47 @@ export const UpdateConnectionConfigurationDocument = `
 export const CloseConnectionDocument = `
     mutation closeConnection($id: ID!) {
   connection: closeConnection(id: $id) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const ConnectionAuthPropertiesDocument = `
     query connectionAuthProperties($id: ID!) {
   connection: connectionInfo(id: $id) {
     authProperties {
-      id
-      displayName
-      description
-      category
-      dataType
-      value
-      validValues
-      defaultValue
-      features
+      ...UserConnectionAuthProperties
     }
   }
 }
-    `;
+    ${UserConnectionAuthPropertiesFragmentDoc}`;
 export const ConnectionInfoDocument = `
     query connectionInfo($id: ID!) {
   connection: connectionInfo(id: $id) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const CreateConnectionDocument = `
     mutation createConnection($config: ConnectionConfig!) {
   connection: createConnection(config: $config) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const CreateConnectionFromNodeDocument = `
     mutation createConnectionFromNode($nodePath: String!) {
   connection: copyConnectionFromNode(nodePath: $nodePath) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const CreateConnectionFromTemplateDocument = `
     mutation createConnectionFromTemplate($templateId: ID!) {
   connection: createConnectionFromTemplate(templateId: $templateId) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const DeleteConnectionDocument = `
     mutation deleteConnection($id: ID!) {
   deleteConnection(id: $id)
@@ -1852,19 +1856,10 @@ export const GetDriverByIdDocument = `
 export const InitConnectionDocument = `
     mutation initConnection($id: ID!, $credentials: Object) {
   connection: initConnection(id: $id, credentials: $credentials) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const RefreshSessionConnectionsDocument = `
     mutation refreshSessionConnections {
   refreshSessionConnections
@@ -2108,86 +2103,41 @@ export const GetChildrenDbObjectInfoDocument = `
     object {
       features
       properties(filter: $filter) {
-        id
-        category
-        dataType
-        description
-        displayName
-        features
-        value
+        ...NavNodeProperties
       }
     }
   }
 }
-    `;
+    ${NavNodePropertiesFragmentDoc}`;
 export const GetDbObjectInfoDocument = `
     query getDBObjectInfo($navNodeId: ID!, $filter: ObjectPropertyFilter) {
   objectInfo: navNodeInfo(nodePath: $navNodeId) {
     object {
       features
       properties(filter: $filter) {
-        id
-        category
-        dataType
-        description
-        displayName
-        features
-        value
+        ...NavNodeProperties
       }
     }
   }
 }
-    `;
+    ${NavNodePropertiesFragmentDoc}`;
 export const NavNodeChildrenDocument = `
     query navNodeChildren($parentPath: ID!) {
   navNodeChildren(parentPath: $parentPath) {
-    id
-    name
-    hasChildren
-    nodeType
-    icon
-    folder
-    inline
-    navigable
-    features
-    object {
-      features
-    }
+    ...NavNodeInfo
   }
   navNodeInfo(nodePath: $parentPath) {
-    id
-    name
-    hasChildren
-    nodeType
-    icon
-    folder
-    inline
-    navigable
-    features
-    object {
-      features
-    }
+    ...NavNodeInfo
   }
 }
-    `;
+    ${NavNodeInfoFragmentDoc}`;
 export const NavNodeInfoDocument = `
     query navNodeInfo($nodePath: ID!) {
   navNodeInfo(nodePath: $nodePath) {
-    id
-    name
-    hasChildren
-    nodeType
-    icon
-    folder
-    inline
-    navigable
-    features
-    object {
-      features
-    }
+    ...NavNodeInfo
   }
 }
-    `;
+    ${NavNodeInfoFragmentDoc}`;
 export const NavRefreshNodeDocument = `
     query navRefreshNode($nodePath: ID!) {
   navRefreshNode(nodePath: $nodePath)
@@ -2243,30 +2193,18 @@ export const GetSessionConnectionsDocument = `
     query getSessionConnections {
   state: sessionState {
     connections {
-      id
-      name
-      description
-      driverId
-      connected
-      readOnly
-      authNeeded
-      authModel
-      features
-      supportedDataFormats
+      ...UserConnection
     }
   }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const OpenSessionDocument = `
     mutation openSession {
   session: openSession {
-    createTime
-    lastAccessTime
-    cacheExpired
-    locale
+    ...SessionState
   }
 }
-    `;
+    ${SessionStateFragmentDoc}`;
 export const ReadSessionLogDocument = `
     query readSessionLog($maxEntries: Int!, $clearEntries: Boolean!) {
   log: readSessionLog(maxEntries: $maxEntries, clearEntries: $clearEntries) {
@@ -2317,23 +2255,10 @@ export const SessionPermissionsDocument = `
 export const SessionStateDocument = `
     query sessionState {
   sessionState {
-    createTime
-    lastAccessTime
-    locale
-    cacheExpired
-    connections {
-      id
-      name
-      driverId
-      connected
-      authNeeded
-      authModel
-      features
-      supportedDataFormats
-    }
+    ...SessionState
   }
 }
-    `;
+    ${SessionStateFragmentDoc}`;
 export const TouchSessionDocument = `
     mutation touchSession {
   touchSession

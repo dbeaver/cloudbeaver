@@ -1,0 +1,9 @@
+fragment NavNodeProperties on ObjectPropertyInfo {
+  id
+  category
+  dataType
+  description
+  displayName
+  features
+  value
+}

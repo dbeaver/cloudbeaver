@@ -1,16 +1,5 @@
 mutation createConnection($config: ConnectionConfig!) {
   connection: createConnection(config: $config) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-
-    authNeeded
-    authModel
-
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }

@@ -7,13 +7,7 @@ query getChildrenDBObjectInfo(
     object {
       features
       properties(filter: $filter) {
-        id
-        category
-        dataType
-        description
-        displayName
-        features
-        value
+        ...NavNodeProperties
       }
     }
   }

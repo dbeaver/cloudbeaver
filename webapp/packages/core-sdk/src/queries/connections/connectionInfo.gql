@@ -1,16 +1,5 @@
 query connectionInfo($id: ID!) {
   connection: connectionInfo(id: $id) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-
-    authNeeded
-    authModel
-
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }
