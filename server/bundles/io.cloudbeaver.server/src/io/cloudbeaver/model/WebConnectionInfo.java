@@ -47,6 +47,7 @@ public class WebConnectionInfo {
     private String connectTime;
     private String serverVersion;
     private String clientVersion;
+    private Map<String, Object> savedAuthProperties;
 
     public WebConnectionInfo(WebSession session, DBPDataSourceContainer ds) {
         this.session = session;
@@ -252,8 +253,16 @@ public class WebConnectionInfo {
 
     @Property
     public Map<String, Object> getCredentials() {
-        dataSourceContainer.getConnectionConfiguration().getCredentialsProvider().getCredentials();
+        //dataSourceContainer.getConnectionConfiguration().getCredentialsProvider().getCredentials();
         return null;
+    }
+
+    public Map<String, Object> getSavedAuthProperties() {
+        return savedAuthProperties;
+    }
+
+    public void setSavedAuthProperties(Map<String, Object> authProperties) {
+        this.savedAuthProperties = authProperties;
     }
 
 }

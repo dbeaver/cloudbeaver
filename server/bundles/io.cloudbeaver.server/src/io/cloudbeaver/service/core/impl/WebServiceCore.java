@@ -222,18 +222,17 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
+        connectionInfo.setSavedAuthProperties(authProperties);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
         if (dataSourceContainer.isConnected()) {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
         }
-
-        WebServiceUtils.initAuthProperties(dataSourceContainer, authProperties);
+//
+//        WebServiceUtils.initAuthProperties(dataSourceContainer, authProperties);
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
-            // Set "save-password" to true to avoid password requests
-            dataSourceContainer.setSavePassword(true);
             dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);

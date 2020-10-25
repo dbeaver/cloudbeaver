@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.model.session;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWSecurityController;
@@ -35,6 +38,9 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProvider;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -44,6 +50,7 @@ import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.registry.ProjectMetadata;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -61,7 +68,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession implements DBASession {
+public class WebSession implements DBASession, DBAAuthCredentialsProvider {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -240,6 +247,7 @@ public class WebSession implements DBASession {
         this.navigatorModel.initialize();
 
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
+        ((DataSourceRegistry)dataSourceRegistry).setAuthCredentialsProvider(this);
         {
             // Copy global datasources.
             for (DBPDataSourceContainer ds : globalProject.getDataSourceRegistry().getDataSources()) {
@@ -592,6 +600,36 @@ public class WebSession implements DBASession {
         synchronized (attributes) {
             attributes.put(name, value);
         }
+    }
+
+    // Auth credentials provider
+    @Override
+    public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+        if (dataSourceContainer.isSavePassword()) {
+            return true;
+        }
+        try {
+            WebConnectionInfo webConnectionInfo = getWebConnectionInfo(dataSourceContainer.getId());
+            Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
+
+            if (authProperties.isEmpty()) {
+                return true;
+            }
+
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+
+            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+            Gson credGson = new GsonBuilder()
+                .setLenient()
+                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+                .create();
+
+            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        } catch (DBWebException e) {
+            log.error(e);
+        }
+        return true;
     }
 
     ///////////////////////////////////////////////////////

@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
@@ -131,7 +132,7 @@ public class WebServiceUtils {
         navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
-        initAuthProperties(newDataSource, config.getCredentials());
+        saveAuthProperties(newDataSource, config.getCredentials());
         newDataSource.setSavePassword(config.isSaveCredentials());
 
         return newDataSource;
@@ -158,10 +159,9 @@ public class WebServiceUtils {
         dsConfig.setUserPassword(config.getUserPassword());
     }
 
-    public static void initAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
+    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, Map<String, Object> authProperties) {
         if (!CommonUtils.isEmpty(authProperties)) {
             DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
-            //DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
 
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
@@ -169,9 +169,10 @@ public class WebServiceUtils {
             if (!authProperties.isEmpty()) {
 
                 // Make new Gson parser with type adapters to deserialize into existing credentials
+                InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
                 Gson credGson = new GsonBuilder()
                     .setLenient()
-                    .registerTypeAdapter(credentials.getClass(), credentials)
+                    .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
                     .create();
 
                 credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
@@ -186,7 +187,7 @@ public class WebServiceUtils {
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
         if (config.isSaveCredentials()) {
-            initAuthProperties(dataSource, config.getCredentials());
+            saveAuthProperties(dataSource, config.getCredentials());
         }
         dataSource.setSavePassword(config.isSaveCredentials());
     }
