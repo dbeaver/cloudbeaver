@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IContextProvider } from './ExecutionContext';
+import { IExecutionContextProvider } from './ExecutionContext';
 import { IExecutorHandler } from './IExecutorHandler';
 
 export interface IExecutor<T> {
-  execute: (data: T) => Promise<IContextProvider<T>>;
+  execute: (data: T) => Promise<IExecutionContextProvider<T>>;
   addHandler: (handler: IExecutorHandler<T>) => void;
   removeHandler: (handler: IExecutorHandler<T>) => void;
   addPostHandler: (handler: IExecutorHandler<T>) => void;

@@ -11,11 +11,12 @@ import styled, { css, use } from 'reshadow';
 
 import { FormGroup, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ConnectionInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { AdminConnection } from '../../../ConnectionsResource';
+
 interface ParametersFormProps {
-  connection: ConnectionInfo;
+  connection: AdminConnection;
   disabled?: boolean;
   embedded?: boolean;
 }

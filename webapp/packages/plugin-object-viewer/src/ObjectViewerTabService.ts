@@ -22,7 +22,7 @@ import {
 import { connectionProvider, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { IObjectViewerTabContext } from './IObjectViewerTabContext';
@@ -74,7 +74,7 @@ export class ObjectViewerTabService {
   }
 
   objectViewerTabContext = async (
-    contexts: IContextProvider<INodeNavigationData>,
+    contexts: IExecutionContextProvider<INodeNavigationData>,
     data: INodeNavigationData
   ): Promise<IObjectViewerTabContext> => {
     const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
@@ -308,7 +308,7 @@ export class ObjectViewerTabService {
     await this.dbObjectPageService.closePages(tab);
   }
 
-  private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
       const { tab, tabInfo, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
 

@@ -1,15 +1,7 @@
 query connectionAuthProperties($id: ID!) {
   connection: connectionInfo(id: $id) {
     authProperties {
-      id
-      displayName
-      description
-      category
-      dataType
-      value
-      validValues
-      defaultValue
-      features
+      ...UserConnectionAuthProperties
     }
   }
 }

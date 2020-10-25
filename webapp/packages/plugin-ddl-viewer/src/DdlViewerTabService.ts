@@ -12,7 +12,7 @@ import {
 import { ITab } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ObjectViewerTabService } from '@cloudbeaver/plugin-object-viewer';
 
 import { ddlViewer } from './DdlViewer/DdlViewer';
@@ -47,7 +47,7 @@ export class DdlViewerTabService {
     return ddlTab;
   }
 
-  private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
       const tabContext = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 

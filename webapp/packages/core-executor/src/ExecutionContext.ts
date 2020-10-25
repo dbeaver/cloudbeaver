@@ -6,14 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IContextProvider<TData> {
+export interface IExecutionContextProvider<TData> {
   hasContext: (token: IContextLoader<TData>) => boolean;
   getContext: <T>(token: IContextLoader<T, TData>) => Promise<T>;
 }
 
-export type IContextLoader<T = any, TData = any> = (contexts: IContextProvider<TData>, data: TData) => Promise<T> | T;
+export type IContextLoader<T = any, TData = any> = (
+  contexts: IExecutionContextProvider<TData>,
+  data: TData
+) => Promise<T> | T;
 
-export class ExecutionContext<TData> implements IContextProvider<TData> {
+export class ExecutionContext<TData> implements IExecutionContextProvider<TData> {
   private contexts = new Map<IContextLoader<any, TData>, any>();
 
   constructor(private data: TData) { }

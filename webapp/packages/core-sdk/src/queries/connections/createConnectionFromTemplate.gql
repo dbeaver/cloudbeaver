@@ -1,16 +1,5 @@
 mutation createConnectionFromTemplate($templateId: ID!) {
   connection: createConnectionFromTemplate(templateId: $templateId) {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-
-    authNeeded
-    authModel
-
-    features
-    supportedDataFormats
+    ...UserConnection
   }
 }

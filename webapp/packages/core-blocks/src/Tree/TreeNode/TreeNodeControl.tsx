@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useContext } from 'react';
 
 import { TreeNodeContext } from './TreeNodeContext';
@@ -20,7 +19,7 @@ interface Props {
   big?: boolean;
 }
 
-export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeControl({
+export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
   className,
   children,
 }) {
@@ -57,4 +56,4 @@ export const TreeNodeControl: React.FC<Props> = observer(function TreeNodeContro
       {children}
     </div>
   );
-});
+};

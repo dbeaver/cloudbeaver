@@ -31,6 +31,7 @@ const navigationTreeStyles = css`
   ElementsTree {
     padding-top: 16px;
     min-width: 100%;
+    min-height: 100%;
     width: max-content;
   }
 

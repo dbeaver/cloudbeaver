@@ -54,6 +54,21 @@ const styles = composes(
     }
   `,
   css`
+    box {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      overflow: auto;
+    }
+
+    content-box {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      overflow: auto;
+    }
+
     SubmittingForm {
       flex: 1;
       display: flex;

@@ -1,20 +1,5 @@
 query sessionState {
   sessionState {
-    createTime
-    lastAccessTime
-    locale
-    cacheExpired
-    connections {
-      id
-      name
-      driverId
-      connected
-
-      authNeeded
-      authModel
-
-      features
-      supportedDataFormats
-    }
+    ...SessionState
   }
 }

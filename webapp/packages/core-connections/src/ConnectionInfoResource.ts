@@ -6,52 +6,39 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Observable, Subject } from 'rxjs';
+import { action } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
-  ConnectionInfo,
+  UserConnectionFragment,
   GraphQLService,
   CachedMapResource,
-  ObjectPropertyInfo,
-  ConnectionConfig
+  ConnectionConfig,
+  UserConnectionAuthPropertiesFragment
 } from '@cloudbeaver/core-sdk';
 
-export type Connection = Pick<
-ConnectionInfo,
-'id' |
-'name' |
-'description' |
-'connected' |
-'readOnly' |
-'driverId' |
-'authModel' |
-'authNeeded' |
-'features' |
-'supportedDataFormats'
-> & { authProperties?: ObjectPropertyInfo[] };
+export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
-  readonly onConnectionCreate: Observable<Connection>;
-  private connectionCreateSubject: Subject<Connection>;
+  readonly onConnectionCreate: IExecutor<Connection>;
   constructor(
     private graphQLService: GraphQLService,
     sessionResource: SessionResource
   ) {
     super(new Map());
-    this.connectionCreateSubject = new Subject<Connection>();
-    this.onConnectionCreate = this.connectionCreateSubject.asObservable();
+    this.onConnectionCreate = new Executor();
     sessionResource.onDataUpdate.subscribe(() => this.refreshSession(true));
   }
 
-  async refreshSession(sessionUpdate?: boolean): Promise<void> {
+  @action async refreshSession(sessionUpdate?: boolean): Promise<void> {
     const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
 
     const restoredConnections = new Set<string>();
     for (const connection of connections) {
-      this.add(connection, sessionUpdate);
+      await this.add(connection, sessionUpdate);
       restoredConnections.add(connection.id);
     }
 
@@ -64,32 +51,32 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
   }
 
-  async createFromTemplate(templateId: string): Promise<Connection> {
+  @action async createFromTemplate(templateId: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({ templateId });
     return this.add(connection);
   }
 
-  async createConnection(config: ConnectionConfig): Promise<Connection> {
+  @action async createConnection(config: ConnectionConfig): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnection({
       config,
     });
     return this.add(connection);
   }
 
-  async createFromNode(nodeId: string): Promise<Connection> {
+  @action async createFromNode(nodeId: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromNode({ nodePath: nodeId });
 
     return this.add(connection);
   }
 
-  add(connection: Connection, update?: boolean): Connection {
+  @action async add(connection: Connection, update?: boolean): Promise<Connection> {
     const exists = this.data.has(connection.id);
     this.set(connection.id, connection);
 
     const observedConnection = this.get(connection.id)!;
 
     if (!update && !exists) {
-      this.connectionCreateSubject.next(observedConnection);
+      await this.onConnectionCreate.execute(observedConnection);
     }
 
     return observedConnection;
@@ -121,7 +108,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.delete(connectionId);
   }
 
-  async loadAuthModel(connectionId: string): Promise<ObjectPropertyInfo[]> {
+  async loadAuthModel(connectionId: string): Promise<UserConnectionAuthPropertiesFragment[]> {
     const connection = await this.load(connectionId);
 
     if (connection?.authProperties) {
@@ -145,7 +132,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.data;
   }
 
-  private async getAuthProperties(id: string): Promise<ObjectPropertyInfo[]> {
+  private async getAuthProperties(id: string): Promise<UserConnectionAuthPropertiesFragment[]> {
     const { connection: { authProperties } } = await this.graphQLService.sdk.connectionAuthProperties({ id });
 
     return authProperties;

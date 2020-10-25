@@ -12,10 +12,10 @@ import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, ConnectionInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
 import { DBDriverResource } from '../../../DBDriverResource';
-import { ConnectionsResource } from '../../ConnectionsResource';
+import { AdminConnection, ConnectionsResource } from '../../ConnectionsResource';
 
 @injectable()
 export class ConnectionEditController
@@ -23,7 +23,7 @@ implements IInitializableController, IDestructibleController {
   @observable grantedSubjects: AdminConnectionGrantInfo[] | null = null;
   @observable isLoading = true;
   @observable credentials: Record<string, string> = {};
-  @observable connection: ConnectionInfo | null = null;
+  @observable connection: AdminConnection | null = null;
 
   @computed get isDisabled() {
     return this.isLoading;

@@ -14,18 +14,24 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { UserForm } from './UserForm/UserForm';
 
-interface Props {
-  user: AdminUserInfo;
-  onCancel: () => void;
-}
-
 const styles = composes(
   css`
     title-bar {
       composes: theme-border-color-background from global;
     }
+
+    user-create-footer, user-create-content {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
   `,
   css`
+    user-create {
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      overflow: hidden;
+    }
+
     title-bar {
       composes: theme-typography--headline6 from global;
       box-sizing: border-box;
@@ -36,17 +42,38 @@ const styles = composes(
       font-weight: 400;
       flex: auto 0 0;
     }
+
+    user-create-footer {
+      padding-bottom: 48px;
+      flex: auto 0 0;
+    }
+
+    user-create-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+    }
   `
 );
 
-export function CreateUser({
+interface Props {
+  user: AdminUserInfo;
+  onCancel: () => void;
+}
+
+export const CreateUser: React.FC<Props> = function CreateUser({
   user,
   onCancel,
-}: Props) {
+}) {
   return styled(useStyles(styles))(
     <user-create as='div'>
       <title-bar as='div'><Translate token='authentication_administration_user_connections_user_add' /></title-bar>
-      <UserForm user={user} onCancel={onCancel} />
+      <user-create-content as='div'>
+        <UserForm user={user} onCancel={onCancel} />
+      </user-create-content>
+      <user-create-footer as='div' />
     </user-create>
   );
-}
+};

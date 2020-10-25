@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import { useContext } from 'react';
 import styled from 'reshadow';
 import { css } from 'reshadow';
@@ -26,7 +25,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect({
+export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
   className,
 }) {
   const context = useContext(TreeNodeContext);
@@ -49,4 +48,4 @@ export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect(
       <Checkbox checked={context.selected} onChange={() => context.select(true)} />
     </div>
   );
-});
+};

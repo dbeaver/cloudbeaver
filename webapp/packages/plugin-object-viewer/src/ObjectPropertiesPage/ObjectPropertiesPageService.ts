@@ -11,7 +11,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IContextProvider } from '@cloudbeaver/core-executor';
+import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
 import { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
@@ -50,7 +50,7 @@ export class ObjectPropertiesPageService {
     // await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
   }
 
-  private async navigationHandler(contexts: IContextProvider<INodeNavigationData>) {
+  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
     if (!this.page) { // TODO: it will be never true, because navHandler registers after page creation
       return;
     }
