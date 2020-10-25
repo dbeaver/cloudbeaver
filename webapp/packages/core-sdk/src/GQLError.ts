@@ -20,7 +20,7 @@ export class GQLError extends Error {
 
   constructor(clientError: ClientError) {
     super(clientError.message);
-    this.name = 'GQLError';
+    this.name = 'Server Error';
     this.response = clientError.response;
     this.request = clientError.request;
     if (typeof clientError.response.error === 'string') {
