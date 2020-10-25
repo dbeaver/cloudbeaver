@@ -162,9 +162,20 @@ public class WebServiceUtils {
         if (!CommonUtils.isEmpty(authProperties)) {
             DBPConnectionConfiguration configuration = dataSourceContainer.getConnectionConfiguration();
             //DBPAuthModelDescriptor authModelDescriptor = configuration.getAuthModelDescriptor();
+
+            // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
-            credentials = gson.fromJson(gson.toJsonTree(authProperties), credentials.getClass());
+            if (!authProperties.isEmpty()) {
+
+                // Make new Gson parser with type adapters to deserialize into existing credentials
+                Gson credGson = new GsonBuilder()
+                    .setLenient()
+                    .registerTypeAdapter(credentials.getClass(), credentials)
+                    .create();
+
+                credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
+            }
 
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         }
