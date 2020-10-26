@@ -334,7 +334,7 @@ extend type Mutation {
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, credentials: Object ): ConnectionInfo!
+    initConnection( id: ID!, credentials: Object, saveCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID! ): ConnectionInfo!

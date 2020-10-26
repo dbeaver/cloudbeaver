@@ -60,7 +60,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      await this.connectionInfoResource.init(this.connectionId, this.config.credentials);
+      await this.connectionInfoResource.init(this.connectionId, this.config.credentials, this.config.saveCredentials);
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
