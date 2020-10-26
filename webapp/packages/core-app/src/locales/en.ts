@@ -18,7 +18,7 @@ export default [
     'app_shared_navigationTabsBar_placeholder',
     'There are no objects to show. Double click on an object in the navigation tree to open it.',
   ],
-  ['app_shared_navigationTree_delete_connection_confirm', 'Confirm connection deletion'],
+  ['app_shared_navigationTree_delete_connection_confirm', 'Delete confirmation'],
   ['app_log_view_clear_log', 'Clear logs'],
   ['app_log_view_entry_type', 'Type'],
   ['app_log_view_entry_timestamp', 'Timestamp'],
