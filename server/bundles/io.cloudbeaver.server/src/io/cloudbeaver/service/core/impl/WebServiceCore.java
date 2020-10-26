@@ -308,16 +308,31 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
+        DBPDataSourceContainer dataSource = null;
+        if (!CommonUtils.isEmpty(connectionConfig.getConnectionId())) {
+            dataSource = sessionRegistry.getDataSource(connectionConfig.getConnectionId());
+            if (dataSource == null) {
+                // If called for new connection in admin mode then this connection may absent in session registry yet
+                dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionConfig.getConnectionId());
+            }
+        }
 
-        DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
-        newDataSource.setSavePassword(true); // We need for test to avoid password callback
+        DBPDataSourceContainer testDataSource;
+        if (dataSource != null) {
+            testDataSource = dataSource.createCopy(dataSource.getRegistry());
+            WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), connectionConfig);
+        } else {
+            testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
+        }
+        webSession.provideAuthParameters(testDataSource, testDataSource.getConnectionConfiguration());
+        testDataSource.setSavePassword(true); // We need for test to avoid password callback
         try {
-            ConnectionTestJob ct = new ConnectionTestJob(newDataSource, param -> {});
+            ConnectionTestJob ct = new ConnectionTestJob(testDataSource, param -> {});
             ct.run(webSession.getProgressMonitor());
             if (ct.getConnectError() != null) {
                 throw new DBWebException("Connection failed", ct.getConnectError());
             }
-            WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
+            WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, testDataSource);
             connectionInfo.setConnectError(ct.getConnectError());
             connectionInfo.setServerVersion(ct.getServerVersion());
             connectionInfo.setClientVersion(ct.getClientVersion());

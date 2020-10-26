@@ -27,6 +27,7 @@ import java.util.Map;
  */
 public class WebConnectionConfig {
 
+    private String connectionId;
     private String templateId;
     private String driverId;
 
@@ -53,6 +54,7 @@ public class WebConnectionConfig {
     }
 
     public WebConnectionConfig(Map<String, Object> params) {
+        connectionId = JSONUtils.getString(params, "connectionId");
         templateId = JSONUtils.getString(params, "templateId");
         String dataSourceId = JSONUtils.getString(params, "dataSourceId");
         if (CommonUtils.isEmpty(templateId) && !CommonUtils.isEmpty(dataSourceId)) {
@@ -81,10 +83,9 @@ public class WebConnectionConfig {
         saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
     }
 
-    @Deprecated
     @Property
-    public String getDataSourceId() {
-        return templateId;
+    public String getConnectionId() {
+        return connectionId;
     }
 
     @Property

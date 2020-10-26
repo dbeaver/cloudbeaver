@@ -138,7 +138,7 @@ public class WebServiceUtils {
         return newDataSource;
     }
 
-    private static void setConnectionConfiguration(DBPDriver driver, DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
+    public static void setConnectionConfiguration(DBPDriver driver, DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
         if (!CommonUtils.isEmpty(config.getUrl())) {
             dsConfig.setUrl(config.getUrl());
         } else {
@@ -157,6 +157,7 @@ public class WebServiceUtils {
         }
         dsConfig.setUserName(config.getUserName());
         dsConfig.setUserPassword(config.getUserPassword());
+        dsConfig.setAuthModelId(config.getAuthModelId());
     }
 
     public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties) {

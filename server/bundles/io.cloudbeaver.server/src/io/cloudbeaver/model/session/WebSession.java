@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -448,6 +449,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         return connectionInfo;
     }
 
+    @Nullable
+    public WebConnectionInfo findWebConnectionInfo(String connectionID) {
+        synchronized (connections) {
+            return connections.get(connectionID);
+        }
+    }
+
     public void addConnection(WebConnectionInfo connectionInfo) {
         synchronized (connections) {
             connections.put(connectionInfo.getId(), connectionInfo);
@@ -615,8 +623,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     @Override
     public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
         try {
-            WebConnectionInfo webConnectionInfo = getWebConnectionInfo(dataSourceContainer.getRegistry(), dataSourceContainer.getId());
-
             // Properties from nested auth sessions
             DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
             if (nestedProvider != null) {
@@ -626,9 +632,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             }
 
             // Properties passed from web
-            Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
-            if (authProperties != null) {
-                authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
+            WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
+            if (webConnectionInfo != null) {
+                // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
+                Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
+                if (authProperties != null) {
+                    authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
+                }
             }
 
             // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)
