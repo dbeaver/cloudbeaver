@@ -624,6 +624,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
         try {
             // Properties from nested auth sessions
+            // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
             DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
             if (nestedProvider != null) {
                 if (!nestedProvider.provideAuthParameters(dataSourceContainer, configuration)) {

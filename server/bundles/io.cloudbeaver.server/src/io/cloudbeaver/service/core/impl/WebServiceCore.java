@@ -321,6 +321,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (dataSource != null) {
             testDataSource = dataSource.createCopy(dataSource.getRegistry());
             WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), connectionConfig);
+            WebServiceUtils.saveAuthProperties(testDataSource, testDataSource.getConnectionConfiguration(), connectionConfig.getCredentials());
         } else {
             testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         }
