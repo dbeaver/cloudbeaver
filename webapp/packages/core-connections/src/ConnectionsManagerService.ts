@@ -79,8 +79,8 @@ export class ConnectionsManagerService {
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'app_shared_navigationTree_delete_connection_confirm',
-      message: `You're going to delete ${connection.name} connection. Are you sure?`,
+      title: 'ui_data_delete_confirmation',
+      message: `You're going to delete "${connection.name}" connection. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
     if (result === DialogueStateResult.Rejected) {
