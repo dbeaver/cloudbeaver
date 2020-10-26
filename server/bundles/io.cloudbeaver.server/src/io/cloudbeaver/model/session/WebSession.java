@@ -425,12 +425,17 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
+        return getWebConnectionInfo(sessionProject.getDataSourceRegistry(), connectionID);
+    }
+
+    @NotNull
+    public WebConnectionInfo getWebConnectionInfo(DBPDataSourceRegistry registry, String connectionID) throws DBWebException {
         WebConnectionInfo connectionInfo;
         synchronized (connections) {
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = sessionProject.getDataSourceRegistry().getDataSource(connectionID);
+            DBPDataSourceContainer dataSource = registry.getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -442,7 +447,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
         return connectionInfo;
     }
-
 
     public void addConnection(WebConnectionInfo connectionInfo) {
         synchronized (connections) {
@@ -611,7 +615,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     @Override
     public boolean provideAuthParameters(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
         try {
-            WebConnectionInfo webConnectionInfo = getWebConnectionInfo(dataSourceContainer.getId());
+            WebConnectionInfo webConnectionInfo = getWebConnectionInfo(dataSourceContainer.getRegistry(), dataSourceContainer.getId());
 
             // Properties from nested auth sessions
             DBAAuthCredentialsProvider nestedProvider = getAdapter(DBAAuthCredentialsProvider.class);
