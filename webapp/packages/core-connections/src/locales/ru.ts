@@ -7,7 +7,7 @@ export default [
   ['connections_administration_configuration_wizard_step_description', 'Подключения к базам'],
   ['connections_connection_create_custom', 'Настроить'],
   ['connections_connection_create_search_database', 'Найти'],
-  ['connections_connection_edit_save_credentials', ' Запомнить пароль'],
+  ['connections_connection_edit_save_credentials', ' Запомнить данные'],
   ['connections_connection_edit_authentication', 'Авторизация'],
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],

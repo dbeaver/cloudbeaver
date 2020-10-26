@@ -321,6 +321,7 @@ export interface MutationDeleteConnectionArgs {
 export interface MutationInitConnectionArgs {
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  saveCredentials?: Maybe<Scalars['Boolean']>;
 }
 
 export interface MutationOpenConnectionArgs {
@@ -1062,6 +1063,7 @@ export interface GetDriverByIdQuery { driverList: Array<Pick<DriverInfo, 'id' | 
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  saveCredentials?: Maybe<Scalars['Boolean']>;
 }>;
 
 export interface InitConnectionMutation { connection: UserConnectionFragment }
@@ -1784,8 +1786,8 @@ export const GetDriverByIdDocument = `
 }
     `;
 export const InitConnectionDocument = `
-    mutation initConnection($id: ID!, $credentials: Object) {
-  connection: initConnection(id: $id, credentials: $credentials) {
+    mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
+  connection: initConnection(id: $id, credentials: $credentials, saveCredentials: $saveCredentials) {
     ...UserConnection
   }
 }
