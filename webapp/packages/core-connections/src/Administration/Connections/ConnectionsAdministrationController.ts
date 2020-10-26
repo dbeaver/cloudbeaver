@@ -84,8 +84,8 @@ export class ConnectionsAdministrationController {
       .filter(Boolean);
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'authentication_administration_confirm_connection_deletion',
-      message: `You're going to delete these connections: ${connectionNames.join(', ')}. Are you sure?`,
+      title: 'ui_data_delete_confirmation',
+      message: `You're going to delete these connections: ${connectionNames.map(name => `"${name}"`).join(', ')}. Are you sure?`,
       confirmActionText: 'ui_delete',
     });
 
