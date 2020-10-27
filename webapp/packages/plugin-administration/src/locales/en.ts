@@ -22,7 +22,7 @@ export default [
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable custom connections'],
-  ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create custom connections. Otherwise only administrator can create connections'],
+  ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create custom connections. Otherwise, all new connections can be created from the administration part only'],
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Hide Folders'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Hide Schemas'],
