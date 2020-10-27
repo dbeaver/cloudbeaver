@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -14,7 +14,8 @@
     "analyse": "webpack --config ../../configs/webpack.product.config --profile --json > ./lib/stats.json",
     "postanalyse": "webpack-bundle-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "version:new": "yarn version --no-git-tag-version"
   },
   "dependencies": {
     "@cloudbeaver/core-bootstrap": "0.1.0",
