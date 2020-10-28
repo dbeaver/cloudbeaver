@@ -142,8 +142,8 @@ export class ServerConfigurationService {
           adminName: 'cbadmin',
           adminPassword: '',
           anonymousAccessEnabled: true,
-          authenticationEnabled: false,
-          customConnectionsEnabled: false,
+          authenticationEnabled: true,
+          customConnectionsEnabled: true,
           sessionExpireTime: 30,
         },
         navigatorConfig: {

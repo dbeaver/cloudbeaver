@@ -47,7 +47,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
           required
           long
         >
-          {translate('administration_configuration_wizard_configuration_server_session_expire_time')}
+          {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
         </InputField>
       </FormGroup>
     </>

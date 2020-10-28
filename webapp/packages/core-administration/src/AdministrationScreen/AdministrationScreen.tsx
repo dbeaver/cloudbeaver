@@ -10,7 +10,6 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
 import { usePermission } from '@cloudbeaver/core-root';
 
 import { Administration } from '../Administration/Administration';
@@ -26,18 +25,18 @@ export const AdministrationScreen = observer(function AdministrationScreen() {
     [administrationScreenService]
   );
 
-  if (!usePermission(EAdminPermission.admin)) {
-    return <Translate token='root_permission_denied' />;
-  }
+  const accessProvided = usePermission(EAdminPermission.admin);
 
   return (
     <>
       <AdministrationTopAppBar />
-      <Administration
-        configurationWizard={false}
-        activeScreen={administrationScreenService.activeScreen}
-        onItemSelect={handleSelect}
-      />
+      {accessProvided && (
+        <Administration
+          configurationWizard={false}
+          activeScreen={administrationScreenService.activeScreen}
+          onItemSelect={handleSelect}
+        />
+      )}
     </>
   );
 });

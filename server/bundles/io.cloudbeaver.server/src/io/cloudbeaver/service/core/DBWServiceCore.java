@@ -88,7 +88,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties) throws DBWebException;
+    WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties, Boolean saveCredentials) throws DBWebException;
 
     @WebAction
     WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;

@@ -69,10 +69,9 @@ export const Options = observer(function Options({
 }: Props) {
   const controller = useController(OptionsController, model);
   const translate = useTranslate();
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   return styled(useStyles(styles))(
-    <SubmittingForm ref={focusedRef} onChange={controller.onFormChange} onSubmit={onSave}>
+    <SubmittingForm onChange={controller.onFormChange} onSubmit={onSave}>
       <FormBox>
         <FormBoxElement>
           <FormGroup>

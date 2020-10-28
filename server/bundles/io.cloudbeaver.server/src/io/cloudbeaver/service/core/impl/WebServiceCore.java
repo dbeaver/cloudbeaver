@@ -220,7 +220,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties) throws DBWebException {
+    public WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties, Boolean saveCredentials) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
         connectionInfo.setSavedAuthProperties(authProperties);
 
@@ -238,6 +238,14 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
+        }
+        if (saveCredentials != null && saveCredentials) {
+            // Save credentials in the datasource
+            if (!CommonUtils.isEmpty(authProperties)) {
+                authProperties.forEach((s, o) ->
+                    dataSourceContainer.getConnectionConfiguration().setAuthProperty(s, CommonUtils.toString(o)));
+            }
+            dataSourceContainer.setSavePassword(true);
         }
 
         return connectionInfo;

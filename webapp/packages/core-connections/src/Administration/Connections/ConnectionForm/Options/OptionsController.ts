@@ -88,7 +88,8 @@ implements IInitializableController {
       return false;
     }
     for (const property of this.model.connection.authProperties) {
-      if (property.value !== null && this.model.credentials[property.id!] !== property.value) {
+      // commented because of case when name changed, password should be reset
+      if (/* property.value !== null && */this.model.credentials[property.id!] !== property.value) {
         return true;
       }
     }

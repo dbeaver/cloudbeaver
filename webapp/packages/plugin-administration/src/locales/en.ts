@@ -13,7 +13,7 @@ export default [
   ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
   ['administration_configuration_wizard_configuration_server_info', 'Server Info'],
   ['administration_configuration_wizard_configuration_server_name', 'Server Name'],
-  ['administration_configuration_wizard_configuration_server_session_expire_time', 'Session Expire Time'],
+  ['administration_configuration_wizard_configuration_server_session_lifetime', 'Session lifetime'],
   ['administration_configuration_wizard_configuration_admin', 'Administrator'],
   ['administration_configuration_wizard_configuration_admin_name', 'Admin user name'],
   ['administration_configuration_wizard_configuration_admin_password', 'Admin password'],

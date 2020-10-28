@@ -43,6 +43,7 @@ import {
   AuthProvidersResource,
   RolesManagerService,
   RolesResource,
+  UserInfoResource,
   UsersResource
 } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
@@ -106,6 +107,7 @@ export const coreManifest: PluginManifest = {
     AuthProvidersResource,
     RolesManagerService,
     RolesResource,
+    UserInfoResource,
     UsersResource,
     ServerSettingsService,
     ServerConfigResource,

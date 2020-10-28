@@ -9,12 +9,10 @@ See out [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.
 
 ![](https://github.com/dbeaver/cloudbeaver/wiki/images/demo_screenshot_1.png)
 
-## Build CloudBeaver
+## Run in Docker
 
-CloudBeaver is the multi-platform server side application.
-It can run on Linux, Windows and MacOS X.
-
-[Detailed instructions](https://github.com/dbeaver/cloudbeaver/wiki/Build-and-deploy)
+- [Official Docker repository](https://hub.docker.com/r/dbeaver/cloudbeaver)
+- [Running instructions](https://github.com/dbeaver/cloudbeaver/wiki/Run-Docker-Container)
 
 ## Demo server
 
