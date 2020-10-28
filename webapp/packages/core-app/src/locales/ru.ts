@@ -1,7 +1,7 @@
 export default [
   ['app_shared_connectionMenu_connection', 'Подключение'],
   ['app_shared_connectionMenu_custom', 'Создать...'],
-  ['app_shared_connectionMenu_disconnect', 'Отключить'],
+  ['app_shared_connectionMenu_disconnect', 'Отключить все'],
   ['app_shared_toolsMenu_tools', 'Инструменты'],
   ['app_shared_toolsMenu_logViewer', 'Просмотр лога'],
   ['app_shared_settingsMenu_config', 'Настройки'],
@@ -14,6 +14,7 @@ export default [
   ],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_refreshNode', 'Обновить'],
+  ['app_navigationTree_context_disconnect', 'Отключить'],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],
   ['app_shared_inlineEditor_dialog_apply', 'Применить'],
   ['app_shared_inlineEditor_dialog_cancel', 'Отменить'],
