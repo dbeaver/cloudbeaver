@@ -1,8 +1,8 @@
 const fs = require('fs');
 const { resolve } = require('path');
 
-function withTimestamp(value) {
-  return `${value}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`
+function withTimestamp(version) {
+  return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`
 }
 
 function getCloudbeaverDeps(package) {
