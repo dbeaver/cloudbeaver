@@ -76,7 +76,7 @@ export class AuthenticationService extends Bootstrap {
       throw new Error('Can\'t configure Authentication');
     }
 
-    if (config.anonymousAccessEnabled || !config.authenticationEnabled) {
+    if (config.anonymousAccessEnabled || !config.authenticationEnabled || config.configurationMode) {
       return;
     }
 
