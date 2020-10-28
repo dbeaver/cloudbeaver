@@ -201,6 +201,7 @@ export class AdministrationScreenService {
     if (!await this.checkPermissions(state)) {
       return;
     }
+
     await this.activationEvent.execute(true);
 
     const screen = this.getScreen(state);
@@ -215,6 +216,10 @@ export class AdministrationScreenService {
   }
 
   private async checkPermissions(state: RouterState) {
+    if (!this.isAdministrationRouteActive(state.name)) {
+      return;
+    }
+
     if (!await this.isAccessProvided(state)) {
       this.screenService.navigateToRoot();
       return false;
