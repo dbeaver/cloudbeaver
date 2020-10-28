@@ -47,7 +47,7 @@ export class AuthMenuService extends Bootstrap {
       {
         id: 'logout',
         order: Number.MAX_SAFE_INTEGER,
-        isHidden: () => !this.serverService.config.data?.authenticationEnabled || !this.authInfoService.userInfo,
+        isHidden: () => !this.authInfoService.userInfo,
         title: 'authentication_logout',
         onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
