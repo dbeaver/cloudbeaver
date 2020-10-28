@@ -13,13 +13,21 @@ import { useService } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-declare const version: string; // declared in webpack DefinePlugin // todo move to enviroment?
+declare const _VERSION_: string; // declared in webpack DefinePlugin
 
 export const Logo = observer(function Logo() {
   const serverService = useService(ServerService);
   const screenService = useService(ScreenService);
 
-  const title = `Frontend: ${version}\nBackend: ${serverService.config.data?.version}`;
+  const backendVersion = serverService.config.data?.version.slice(0, 5);
+  const frontendVersion = _VERSION_?.slice(0, 5) || '';
+
+  const isSameVersion = backendVersion === frontendVersion;
+
+  const backendVersionTitle = `CloudBeaver: ${backendVersion}`;
+  const commonVersionTitle = `CloudBeaver: ${frontendVersion}(${backendVersion})`;
+
+  const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
   return <AppLogo title={title} onClick={() => screenService.navigateToRoot()} />;
 });
