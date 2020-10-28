@@ -28,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -88,8 +89,12 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) {
-        return processor.createContext(defaultCatalog, defaultSchema);
+    public WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException {
+        try {
+            return processor.createContext(defaultCatalog, defaultSchema);
+        } catch (DBCException e) {
+            throw new DBWebException("Error creating execution context", e);
+        }
     }
 
     @Override
@@ -99,7 +104,11 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException {
-        sqlContext.setDefaults(catalogName, schemaName);
+        try {
+            sqlContext.setDefaults(catalogName, schemaName);
+        } catch (DBCException e) {
+            throw new DBWebException("Error changing context defaul schema/catalog", e);
+        }
     }
 
     @WebAction

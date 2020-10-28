@@ -97,7 +97,7 @@ public class WebSQLProcessor {
     }
 
     @NotNull
-    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema) {
+    public WebSQLContextInfo createContext(String defaultCatalog, String defaultSchema) throws DBCException {
         String contextId = String.valueOf(this.contextId.incrementAndGet());
         WebSQLContextInfo contextInfo = new WebSQLContextInfo(this, contextId, defaultCatalog, defaultSchema);
         synchronized (contexts) {

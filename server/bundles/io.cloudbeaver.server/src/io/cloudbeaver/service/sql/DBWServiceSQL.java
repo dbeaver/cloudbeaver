@@ -40,7 +40,7 @@ public interface DBWServiceSQL extends DBWService {
     WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException;
 
     @WebAction
-    WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema);
+    WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;
 
     @WebAction
     void destroyContext(@NotNull WebSQLContextInfo sqlContext);

@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
@@ -46,22 +47,22 @@ public class WebSQLContextInfo {
 
     private static final Log log = Log.getLog(WebSQLContextInfo.class);
 
-    private WebSQLProcessor processor;
-    private String id;
+    private final WebSQLProcessor processor;
+    private final String id;
     private DBSCatalog defaultCatalog;
     private String defaultSchema;
-    private Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
+    private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
 
-    private AtomicInteger resultId = new AtomicInteger();
+    private final AtomicInteger resultId = new AtomicInteger();
 
-    public WebSQLContextInfo(WebSQLProcessor processor, String id, String catalogName, String schemaName) {
+    public WebSQLContextInfo(WebSQLProcessor processor, String id, String catalogName, String schemaName) throws DBCException {
         this.processor = processor;
         this.id = id;
 
         setContextDefaults(catalogName, schemaName);
     }
 
-    private void setContextDefaults(String catalogName, String schemaName) {
+    private void setContextDefaults(String catalogName, String schemaName) throws DBCException {
         DBPDataSource dataSource = this.processor.getConnection().getDataSource();
 
         DBSObject defaultObject = null;
@@ -127,7 +128,7 @@ public class WebSQLContextInfo {
         return defaultCatalog == null ? null : defaultCatalog.getName();
     }
 
-    public void setDefaults(String catalogName, String schemaName) throws DBWebException {
+    public void setDefaults(String catalogName, String schemaName) throws DBWebException, DBCException {
         String oldCatalogName = defaultCatalog == null ? null : defaultCatalog.getName();
         setContextDefaults(catalogName, schemaName);
         try {
@@ -146,16 +147,18 @@ public class WebSQLContextInfo {
     @WebAction
     public String getDefaultSchema() {
         if (defaultSchema == null) {
-            DBCExecutionContext defaultContext = DBUtils.getOrOpenDefaultContext(
-                defaultCatalog != null ? defaultCatalog : processor.getConnection().getDataSource(), false);
-            if (defaultContext == null) {
+            try {
+                DBCExecutionContext defaultContext = DBUtils.getOrOpenDefaultContext(
+                    defaultCatalog != null ? defaultCatalog : processor.getConnection().getDataSource(), false);
+                DBSObject ao = DBUtils.getActiveInstanceObject(defaultContext);
+                if (ao instanceof DBSSchema) {
+                    defaultSchema = ao.getName();
+                } else {
+                    defaultSchema = "";
+                }
+            } catch (DBCException e) {
+                log.error(e);
                 return null;
-            }
-            DBSObject ao = DBUtils.getActiveInstanceObject(defaultContext);
-            if (ao instanceof DBSSchema) {
-                defaultSchema = ao.getName();
-            } else {
-                defaultSchema = "";
             }
         }
         return CommonUtils.isEmpty(defaultSchema) ? null : defaultSchema;
