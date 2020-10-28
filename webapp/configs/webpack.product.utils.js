@@ -1,6 +1,10 @@
 const fs = require('fs');
 const { resolve } = require('path');
 
+function withTimestamp(value) {
+  return `${value}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`
+}
+
 function getCloudbeaverDeps(package) {
   if (!package.dependencies) {
     return [];
@@ -27,7 +31,7 @@ function scanCloudbeaverDeps(package) {
   return Array.from(deps.keys())
 }
 
-module.exports = function getAssets(package, to) {
+function getAssets(package, to) {
   const patterns = scanCloudbeaverDeps(package)
     .map(dependency => ({ from: resolve('../../node_modules', dependency, 'public'), to, force: true }))
     .reverse();
@@ -36,3 +40,5 @@ module.exports = function getAssets(package, to) {
 
   return patterns.filter(pattern => fs.existsSync(pattern.from))
 }
+
+module.exports = { withTimestamp, getAssets }

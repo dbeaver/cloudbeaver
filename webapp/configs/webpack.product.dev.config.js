@@ -7,7 +7,7 @@ const commonConfig = require('./webpack.config.js')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
-const getAssets = require('./webpack.product.utils')
+const { getAssets } = require('./webpack.product.utils');
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -35,9 +35,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       patterns: getAssets(package, ''),
     }),
     new webpack.DefinePlugin({
-      'process.env.VERSION': JSON.stringify(package.version),
+      _VERSION_: JSON.stringify(package.version),
     }),
-    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs') }),
+    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), inject: 'html', version: package.version }),
     new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     // new BundleAnalyzerPlugin()
   ],

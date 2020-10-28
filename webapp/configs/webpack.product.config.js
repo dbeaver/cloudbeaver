@@ -5,11 +5,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const commonConfig = require('./webpack.config.js');
-const getAssets = require('./webpack.product.utils');
+const { withTimestamp, getAssets } = require('./webpack.product.utils');
 
-var main = resolve('src/index.ts');
-var outputDir = resolve('lib');
-var package = require(resolve('package.json'))
+const main = resolve('src/index.ts');
+const outputDir = resolve('lib');
+const package = require(resolve('package.json'))
+
+const timestampVersion = withTimestamp(package.version);
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   entry: main,
@@ -43,8 +45,8 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       patterns: getAssets(package, ''),
     }),
     new webpack.DefinePlugin({
-      'process.env.VERSION': JSON.stringify(`${package.version}.${new Date().toLocaleString('ru').split(/[.,-\s:]+/).join('').slice(0, -3)}`),
+      _VERSION_: JSON.stringify(timestampVersion),
     }),
-    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs') }),
+    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), inject: 'html', version: timestampVersion }),
   ],
 });
