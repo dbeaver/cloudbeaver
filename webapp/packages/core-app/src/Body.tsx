@@ -16,6 +16,8 @@ import { Notifications } from '@cloudbeaver/core-notifications';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useAppVersion } from './useAppVersion';
+
 const bodyStyles = css`
   theme {
     height: 100vh;
@@ -28,13 +30,17 @@ export const Body = observer(function Body() {
   const ref = useRef<HTMLDivElement>(null);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
-
+  const { backendVersion } = useAppVersion();
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {
     if (ref.current) {
       document.body.className = ref.current.className;
     }
   });
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.backendVersion = backendVersion;
+  }, [backendVersion]);
 
   return styled(useStyles(bodyStyles))(
     <theme ref={ref} as="div">
