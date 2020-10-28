@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.auth.impl;
 
-import io.cloudbeaver.DBWAuthProvider;
-import io.cloudbeaver.DBWAuthProviderExternal;
-import io.cloudbeaver.DBWSecurityController;
-import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
@@ -45,9 +42,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
-        if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
-            throw new DBWebException("Authentication was disabled for this server");
-        }
+        DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
+
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
@@ -55,7 +51,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
-        DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
 
@@ -77,6 +72,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
                 if (userId == null) {
                     throw new DBCException("Invalid user credentials");
+                }
+            }
+
+            // Check for auth enabled. Auth is always enabled for admins
+            if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
+                if (!serverController.getUserPermissions(userId).contains(DBWConstants.PERMISSION_ADMIN)) {
+                    throw new DBWebException("Authentication was disabled for this server");
                 }
             }
 

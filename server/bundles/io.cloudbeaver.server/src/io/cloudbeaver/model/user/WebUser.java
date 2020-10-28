@@ -64,6 +64,10 @@ public class WebUser implements WebAuthSubject {
         return Arrays.stream(roles).map(WebRole::getRoleId).toArray(String[]::new);
     }
 
+    public boolean hasRole(String roleId) {
+        return Arrays.stream(roles).anyMatch(r -> r.getRoleId().equals(roleId));
+    }
+
     public Map<String, Object> getMetaParameters() {
         return Collections.unmodifiableMap(metaParameters);
     }
