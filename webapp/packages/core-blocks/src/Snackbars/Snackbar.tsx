@@ -92,7 +92,7 @@ export function Snackbar({
           )}
         </notification-footer>
       </notification-body>
-      {!closeAfter && onClose && (
+      {onClose && (
         <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
       )}
     </notification>
