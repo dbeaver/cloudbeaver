@@ -21,13 +21,11 @@ import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils'
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
 const styles = css`    
-  TreeNodeControl {
-    &[use|disconnected] {
-      & TreeNodeIcon, & TreeNodeName {
-        opacity: 0.7;
-      }
+  TreeNodeControl[use|disconnected] {
+    & TreeNodeIcon, & TreeNodeName {
+      opacity: 0.7;
     }
-  }  
+  }
   TreeNodeControl:hover > portal, 
   TreeNodeControl:global([aria-selected=true]) > portal,
   portal:focus-within {
