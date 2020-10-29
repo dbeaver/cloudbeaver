@@ -59,7 +59,9 @@
         border-radius: 0;
         @include mdc-theme-prop(background-color, surface, false);
       }
-
+      .ag-header-cell {
+        @include mdc-theme-prop(background-color, surface, false);
+      }
       .ag-header-cell::after,
       .ag-header-group-cell::after {
         height: 100%;

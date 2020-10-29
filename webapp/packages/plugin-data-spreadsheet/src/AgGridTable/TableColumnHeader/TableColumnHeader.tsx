@@ -33,6 +33,12 @@ const headerStyles = css`
     align-content: center;
     width: 100%;
   }
+  shrink-container {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
   icon {
     height: 16px;
   }
@@ -52,6 +58,9 @@ const headerStyles = css`
     padding: 2px 4px;
     flex-direction: column;
     align-content: center;
+    align-items: center;
+    min-width: 20px;
+    box-sizing: border-box;
   }
   sort-icon > Icon {
     width: 8px;
@@ -119,10 +128,12 @@ export function TableColumnHeader(props: HeaderProps) {
 
   return styled(headerStyles)(
     <table-header as="div" onClick={handleClick}>
-      <icon as="div">
-        <StaticImage icon={props.icon} />
-      </icon>
-      <name as="div">{props.displayName}</name>
+      <shrink-container as='div'>
+        <icon as="div">
+          <StaticImage icon={props.icon} />
+        </icon>
+        <name as="div">{props.displayName}</name>
+      </shrink-container>
       {props.enableSorting && (
         <sort-icon as="div" onClick={handleSort}>
           <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'asc' })} />
