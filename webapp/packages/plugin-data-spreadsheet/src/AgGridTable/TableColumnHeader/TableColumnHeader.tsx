@@ -66,6 +66,12 @@ const headerStyles = css`
   sort-icon:hover > Icon {
     width: 9px;
   }
+  shrink-container {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
 `;
 
 export interface IAgColumnClickEvent extends AgEvent{
@@ -119,10 +125,12 @@ export function TableColumnHeader(props: HeaderProps) {
 
   return styled(headerStyles)(
     <table-header as="div" onClick={handleClick}>
-      <icon as="div">
-        <StaticImage icon={props.icon} />
-      </icon>
-      <name as="div">{props.displayName}</name>
+      <shrink-container as='div'>
+        <icon as="div">
+          <StaticImage icon={props.icon} />
+        </icon>
+        <name as="div">{props.displayName}</name>
+      </shrink-container>
       {props.enableSorting && (
         <sort-icon as="div" onClick={handleSort}>
           <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: sortMode === 'asc' })} />
