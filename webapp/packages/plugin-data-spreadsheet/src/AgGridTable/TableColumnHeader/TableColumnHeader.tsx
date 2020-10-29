@@ -33,6 +33,12 @@ const headerStyles = css`
     align-content: center;
     width: 100%;
   }
+  shrink-container {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
   icon {
     height: 16px;
   }
@@ -65,12 +71,6 @@ const headerStyles = css`
   }
   sort-icon:hover > Icon {
     width: 9px;
-  }
-  shrink-container {
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
-    overflow: hidden;
   }
 `;
 
