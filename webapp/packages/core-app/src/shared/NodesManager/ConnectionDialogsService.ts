@@ -50,7 +50,7 @@ export class ConnectionDialogsService {
           return !context.data.objectFeatures.includes(EObjectFeature.dataSource)
             || !connection?.connected;
         },
-        title: 'app_shared_connectionMenu_disconnect',
+        title: 'app_navigationTree_context_disconnect',
         onClick: (context: IMenuContext<NavNode>) => {
           const node = context.data;
           this.connectionsManagerService.closeConnectionAsync(
