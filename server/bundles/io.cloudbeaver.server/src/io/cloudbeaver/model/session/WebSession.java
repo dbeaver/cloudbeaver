@@ -97,6 +97,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
     private final Map<String, Function<Object,Object>> attributeDisposers = new HashMap<>();
+    private WebAuthInfo authInfo;
 
     private DBNModel navigatorModel;
     private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
@@ -182,13 +183,6 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             refreshSessionAuth();
         }
         return sessionPermissions;
-    }
-
-    public synchronized void setUser(WebUser user) {
-        if (CommonUtils.equalObjects(this.user, user)) {
-            return;
-        }
-        forceUserRefresh(user);
     }
 
     // Note: for admin use only
@@ -475,9 +469,15 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         } catch (Throwable e) {
             log.error(e);
         }
-        if (sessionProject != null) {
-            sessionProject.dispose();
-            sessionProject = null;
+        if (this.authInfo != null) {
+            this.authInfo.closeAuth();
+            this.authInfo = null;
+        }
+        this.user = null;
+
+        if (this.sessionProject != null) {
+            this.sessionProject.dispose();
+            this.sessionProject = null;
         }
     }
 
@@ -614,6 +614,23 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    public WebAuthInfo getAuthInfo() {
+        return authInfo;
+    }
+
+    public void setAuthInfo(@Nullable WebAuthInfo authInfo) {
+        WebUser newUser = authInfo == null ? null : authInfo.getUser();
+        if (CommonUtils.equalObjects(this.user, newUser)) {
+            return;
+        }
+        forceUserRefresh(newUser);
+
+        if (this.authInfo != null) {
+            this.authInfo.closeAuth();
+        }
+        this.authInfo = authInfo;
+    }
+
     public boolean hasContextCredentials() {
         return getAdapter(DBAAuthCredentialsProvider.class) != null;
     }
@@ -676,14 +693,9 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     // May be called to extract auth information from session
     @Override
     public <T> T getAdapter(Class<T> adapter) {
-        for (Object attrValue : attributes.values()) {
-            if (adapter.isInstance(attrValue)) {
-                return adapter.cast(attrValue);
-            } else if (attrValue instanceof IAdaptable) {
-                T result = ((IAdaptable) attrValue).getAdapter(adapter);
-                if (result != null) {
-                    return result;
-                }
+        if (authInfo != null && authInfo.getAuthSession() != null) {
+            if (adapter.isInstance(authInfo.getAuthSession())) {
+                return adapter.cast(authInfo.getAuthSession());
             }
         }
         return null;

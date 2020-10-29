@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.*;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
@@ -25,7 +26,6 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
-import io.cloudbeaver.service.auth.WebAuthInfo;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -87,7 +87,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             DBASession authSession = authProviderInstance.openSession(
                 webSession,
                 providerConfig,
-                userCredentials, authParameters);
+                userCredentials,
+                authParameters);
 
             if (user == null) {
                 user = new WebUser(userId);
@@ -96,15 +97,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 user.setDisplayName(authProviderExternal.getUserDisplayName(providerConfig, authParameters));
             }
 
-            webSession.setUser(user);
-
             WebAuthInfo authInfo = new WebAuthInfo(user);
             authInfo.setLoginTime(OffsetDateTime.now());
-            authInfo.setAuthProvider(authProvider.getId());
+            authInfo.setAuthProvider(authProvider);
             authInfo.setAuthSession(authSession);
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
-
-            webSession.setAttribute(ATTR_USER_AUTH, authInfo);
+            webSession.setAuthInfo(authInfo);
 
             return authInfo;
         } catch (DBException e) {
@@ -117,7 +115,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (webSession.getUser() == null) {
             throw new DBWebException("Not logged in");
         }
-        webSession.setUser(null);
+        webSession.setAuthInfo(null);
     }
 
     @Override
@@ -125,7 +123,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (webSession.getUser() == null) {
             return null;
         }
-        return webSession.getAttribute(ATTR_USER_AUTH);
+        return webSession.getAuthInfo();
     }
 
     @Override

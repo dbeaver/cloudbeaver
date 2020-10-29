@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.auth;
+package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.eclipse.core.runtime.IAdaptable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.time.OffsetDateTime;
@@ -28,14 +30,20 @@ import java.time.OffsetDateTime;
  */
 public class WebAuthInfo implements IAdaptable {
 
+    private static final Log log = Log.getLog(WebAuthInfo.class);
+
     private WebUser user;
-    private String authProvider;
+    private WebAuthProviderDescriptor authProvider;
     private DBASession authSession;
     private OffsetDateTime loginTime;
     private String message;
 
     public WebAuthInfo(WebUser user) {
         this.user = user;
+    }
+
+    public WebUser getUser() {
+        return user;
     }
 
     public String getUserId() {
@@ -46,11 +54,11 @@ public class WebAuthInfo implements IAdaptable {
         return user.getDisplayName();
     }
 
-    public String getAuthProvider() {
+    public WebAuthProviderDescriptor getAuthProvider() {
         return authProvider;
     }
 
-    public void setAuthProvider(String authProvider) {
+    public void setAuthProvider(WebAuthProviderDescriptor authProvider) {
         this.authProvider = authProvider;
     }
 
@@ -87,8 +95,16 @@ public class WebAuthInfo implements IAdaptable {
         return null;
     }
 
-    public static WebAuthInfo getFromSession(WebSession webSession) {
-        return webSession.getAttribute(DBWServiceAuth.ATTR_USER_AUTH);
+    void closeAuth() {
+        if (authProvider != null && authSession != null) {
+            try {
+                DBWAuthProvider authProviderInstance = this.authProvider.getInstance();
+                authProviderInstance.closeSession(authSession);
+            } catch (Exception e) {
+                log.error(e);
+            } finally {
+                authSession = null;
+            }
+        }
     }
-
 }

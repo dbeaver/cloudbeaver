@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 
@@ -28,8 +29,6 @@ import java.util.Map;
  * Web service API
  */
 public interface DBWServiceAuth extends DBWService {
-
-    String ATTR_USER_AUTH = "user-auth-info";
 
     @WebAction(requirePermissions = {} )
     WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> credentials) throws DBWebException;
