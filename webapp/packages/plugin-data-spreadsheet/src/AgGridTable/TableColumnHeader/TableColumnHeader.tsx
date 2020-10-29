@@ -58,6 +58,9 @@ const headerStyles = css`
     padding: 2px 4px;
     flex-direction: column;
     align-content: center;
+    align-items: center;
+    min-width: 20px;
+    box-sizing: border-box;
   }
   sort-icon > Icon {
     width: 8px;
