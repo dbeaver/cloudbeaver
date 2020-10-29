@@ -22,6 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -52,8 +53,8 @@ public class WebServiceUtils {
 
     private static final Gson gson = new GsonBuilder().create();
 
-    public static String makeIconId(DBPImage icon) {
-        return icon.getLocation();
+    public static String makeIconId(@Nullable DBPImage icon) {
+        return icon == null ? null : icon.getLocation();
     }
 
     public static String makeDriverFullId(DBPDriver driver) {

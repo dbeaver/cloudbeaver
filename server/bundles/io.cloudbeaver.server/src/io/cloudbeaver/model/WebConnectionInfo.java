@@ -226,6 +226,11 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public WebConnectionOriginInfo getOrigin() {
+        return new WebConnectionOriginInfo(dataSourceContainer.getOrigin());
+    }
+
+    @Property
     public boolean isAuthNeeded() {
         return !dataSourceContainer.isConnected() &&
             !dataSourceContainer.isSavePassword() &&

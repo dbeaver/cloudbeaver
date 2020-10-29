@@ -195,6 +195,8 @@ type ConnectionInfo {
     serverVersion: String
     clientVersion: String
 
+    origin: ConnectionOrigin!
+
     authNeeded: Boolean!
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
@@ -203,6 +205,13 @@ type ConnectionInfo {
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
+}
+
+type ConnectionOrigin {
+    id: ID!
+    displayName: String!
+    icon: String
+    configuration: Object
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
