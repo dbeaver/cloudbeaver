@@ -8,15 +8,24 @@
 
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
-const styles = css`      
+const styles = css`    
+  TreeNodeControl[use|disconnected] {
+    & TreeNodeIcon, & TreeNodeName {
+      opacity: 0.7;
+    }
+  }
   TreeNodeControl:hover > portal, 
   TreeNodeControl:global([aria-selected=true]) > portal,
   portal:focus-within {
@@ -38,8 +47,16 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   node,
 }) {
   const context = useContext(TreeNodeContext);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+
+  let disconnected = false;
+  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
+    const connectionInfo = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(node.id));
+    disconnected = !connectionInfo?.connected;
+  }
+
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl>
+    <TreeNodeControl {...use({ disconnected })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon} />
       <TreeNodeName>{node.name}</TreeNodeName>

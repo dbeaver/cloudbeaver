@@ -10,17 +10,13 @@ import { observer } from 'mobx-react';
 
 import { AppLogo } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-declare const _VERSION_: string; // declared in webpack DefinePlugin
+import { useAppVersion } from '../useAppVersion';
 
 export const Logo = observer(function Logo() {
-  const serverService = useService(ServerService);
   const screenService = useService(ScreenService);
-
-  const backendVersion = serverService.config.data?.version.slice(0, 5);
-  const frontendVersion = _VERSION_?.slice(0, 5) || '';
+  const { backendVersion, frontendVersion } = useAppVersion(true);
 
   const isSameVersion = backendVersion === frontendVersion;
 
