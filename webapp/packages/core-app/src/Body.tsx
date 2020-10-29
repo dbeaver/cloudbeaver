@@ -36,11 +36,8 @@ export const Body = observer(function Body() {
     if (ref.current) {
       document.body.className = ref.current.className;
     }
-  });
-
-  useLayoutEffect(() => {
     document.documentElement.dataset.backendVersion = backendVersion;
-  }, [backendVersion]);
+  });
 
   return styled(useStyles(bodyStyles))(
     <theme ref={ref} as="div">
