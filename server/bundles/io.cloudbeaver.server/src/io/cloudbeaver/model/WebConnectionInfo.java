@@ -227,7 +227,7 @@ public class WebConnectionInfo {
 
     @Property
     public WebConnectionOriginInfo getOrigin() {
-        return new WebConnectionOriginInfo(dataSourceContainer.getOrigin());
+        return new WebConnectionOriginInfo(session, dataSourceContainer, dataSourceContainer.getOrigin());
     }
 
     @Property

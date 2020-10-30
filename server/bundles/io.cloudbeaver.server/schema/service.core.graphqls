@@ -188,6 +188,7 @@ type ConnectionInfo {
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
+    useUrl: Boolean!
     saveCredentials: Boolean!
 
     connectTime: String
@@ -212,6 +213,7 @@ type ConnectionOrigin {
     displayName: String!
     icon: String
     configuration: Object
+    details: [ObjectPropertyInfo!]
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info

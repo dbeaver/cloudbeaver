@@ -16,11 +16,20 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceOrigin;
+import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
+import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -28,9 +37,13 @@ import java.util.Map;
  */
 public class WebConnectionOriginInfo {
 
+    private final WebSession session;
+    private final DBPDataSourceContainer dataSourceContainer;
     private final DBPDataSourceOrigin origin;
 
-    public WebConnectionOriginInfo(DBPDataSourceOrigin origin) {
+    public WebConnectionOriginInfo(WebSession session, DBPDataSourceContainer dataSourceContainer, DBPDataSourceOrigin origin) {
+        this.session = session;
+        this.dataSourceContainer = dataSourceContainer;
         this.origin = origin;
     }
 
@@ -52,6 +65,20 @@ public class WebConnectionOriginInfo {
     @NotNull
     public Map<String, Object> getConfiguration() {
         return origin.getConfiguration();
+    }
+
+    @Property
+    public WebPropertyInfo[] getDetails() throws DBWebException {
+        try {
+            DBPObject details = origin.getDataSourceDetails(session.getProgressMonitor(), dataSourceContainer);
+            PropertyCollector propertyCollector = new PropertyCollector(details, false);
+            propertyCollector.collectProperties();
+            return Arrays.stream(propertyCollector.getProperties())
+                .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
+                .map(p -> new WebPropertyInfo(session, p)).toArray(WebPropertyInfo[]::new);
+        } catch (DBException e) {
+            throw new DBWebException("Error reading origin details", e);
+        }
     }
 
 }

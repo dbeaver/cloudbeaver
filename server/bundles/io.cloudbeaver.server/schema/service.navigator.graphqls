@@ -10,10 +10,17 @@ type ObjectDescriptor {
 }
 
 input ObjectPropertyFilter {
-    ids: [String]
-    features: [String]
-    categories: [String]
-    dataTypes: [String]
+    ids: [String!]
+    features: [String!]
+    categories: [String!]
+    dataTypes: [String!]
+}
+
+type ObjectDetails {
+    id: Int
+    displayName: String
+    description: String
+    value: Object
 }
 
 type DatabaseObjectInfo {
