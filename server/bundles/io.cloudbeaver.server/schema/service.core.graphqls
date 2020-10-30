@@ -209,7 +209,8 @@ type ConnectionInfo {
 }
 
 type ConnectionOrigin {
-    id: ID!
+    type: ID!
+    subType: ID!
     displayName: String!
     icon: String
     configuration: Object

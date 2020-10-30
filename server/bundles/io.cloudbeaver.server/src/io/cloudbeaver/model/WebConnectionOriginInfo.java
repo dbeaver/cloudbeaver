@@ -48,8 +48,8 @@ public class WebConnectionOriginInfo {
     }
 
     @NotNull
-    public String getId() {
-        return origin.getId();
+    public String getType() {
+        return origin.getType();
     }
 
     @NotNull
