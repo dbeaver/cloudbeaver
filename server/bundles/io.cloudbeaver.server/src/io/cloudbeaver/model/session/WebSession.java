@@ -39,10 +39,13 @@ import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.DBAAuthCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.DBAAuthSpace;
+import org.jkiss.dbeaver.model.auth.DBASessionContext;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
+import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -102,12 +105,14 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private DBNModel navigatorModel;
     private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
+    private final SessionContextImpl sessionAuthContext;
 
     public WebSession(HttpSession httpSession) {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
+        this.sessionAuthContext = new SessionContextImpl(null);
 
         if (!httpSession.isNew()) {
             try {
@@ -119,6 +124,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
 
         initNavigatorModel();
+    }
+
+    @NotNull
+    @Override
+    public DBAAuthSpace getSessionSpace() {
+        return sessionProject;
     }
 
     @NotNull
@@ -136,6 +147,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     @Override
     public DBPProject getSingletonProject() {
         return sessionProject;
+    }
+
+    public DBASessionContext getSessionContext() {
+        return sessionProject.getSessionContext();
     }
 
     @Property
@@ -234,11 +249,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         this.sessionProject = new ProjectMetadata(
             platform.getWorkspace(),
             projectName,
-            projectPath);
+            projectPath,
+            sessionAuthContext);
         if (user == null) {
             sessionProject.setInMemory(true);
         }
-        this.navigatorModel = new DBNModel(platform, this);
+        this.navigatorModel = new DBNModel(platform, this.sessionProject);
         this.navigatorModel.initialize();
 
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
@@ -626,9 +642,19 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         forceUserRefresh(newUser);
 
         if (this.authInfo != null) {
+            DBASession oldAuthSession = this.authInfo.getAuthSession();
+            if (oldAuthSession != null) {
+                sessionProject.getSessionContext().removeSession(oldAuthSession);
+            }
             this.authInfo.closeAuth();
         }
         this.authInfo = authInfo;
+        if (authInfo != null) {
+            DBASession authSession = authInfo.getAuthSession();
+            if (authSession != null) {
+                this.sessionProject.getSessionContext().addSession(authSession);
+            }
+        }
     }
 
     public boolean hasContextCredentials() {

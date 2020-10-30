@@ -19,7 +19,6 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import org.eclipse.core.runtime.IAdaptable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 
@@ -28,7 +27,7 @@ import java.time.OffsetDateTime;
 /**
  * WebAuthInfo
  */
-public class WebAuthInfo implements IAdaptable {
+public class WebAuthInfo {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);
 
@@ -84,15 +83,6 @@ public class WebAuthInfo implements IAdaptable {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Override
-    public <T> T getAdapter(Class<T> adapter) {
-        // Needed to extract auth context from web session
-        if (adapter.isInstance(authSession)) {
-            return adapter.cast(authSession);
-        }
-        return null;
     }
 
     void closeAuth() {

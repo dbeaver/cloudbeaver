@@ -49,7 +49,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
         if (!storedPasswordHash.equals(clientPasswordHash)) {
             throw new DBException("Invalid user name or password");
         }
-        return new LocalAuthSession(mainSession.getSessionId(), userName);
+        return new LocalAuthSession(mainSession, userName);
     }
 
     @Override

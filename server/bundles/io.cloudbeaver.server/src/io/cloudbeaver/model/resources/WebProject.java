@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.resources;
 
 import io.cloudbeaver.server.CBWorkspace;
+import org.jkiss.dbeaver.model.auth.DBASessionContext;
 import org.jkiss.dbeaver.registry.ProjectMetadata;
 
 /**
@@ -24,7 +25,7 @@ import org.jkiss.dbeaver.registry.ProjectMetadata;
  */
 public class WebProject extends ProjectMetadata {
 
-    public WebProject(CBWorkspace workspace) {
-        super(workspace, workspace.getEclipseWorkspace().getRoot().getProject());
+    public WebProject(CBWorkspace workspace, DBASessionContext authContext) {
+        super(workspace, workspace.getEclipseWorkspace().getRoot().getProject(), authContext);
     }
 }

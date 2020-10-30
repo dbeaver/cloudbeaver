@@ -52,6 +52,11 @@ public class WebConnectionOriginInfo {
         return origin.getType();
     }
 
+    @Nullable
+    public String getSubType() {
+        return origin.getSubType();
+    }
+
     @NotNull
     public String getDisplayName() {
         return origin.getDisplayName();

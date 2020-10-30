@@ -210,7 +210,7 @@ type ConnectionInfo {
 
 type ConnectionOrigin {
     type: ID!
-    subType: ID!
+    subType: ID
     displayName: String!
     icon: String
     configuration: Object
