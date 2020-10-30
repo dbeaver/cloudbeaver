@@ -76,11 +76,14 @@ public class WebConnectionOriginInfo {
     public WebPropertyInfo[] getDetails() throws DBWebException {
         try {
             DBPObject details = origin.getDataSourceDetails(session.getProgressMonitor(), dataSourceContainer);
+            if (details == null) {
+                return new WebPropertyInfo[0];
+            }
             PropertyCollector propertyCollector = new PropertyCollector(details, false);
             propertyCollector.collectProperties();
             return Arrays.stream(propertyCollector.getProperties())
                 .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
-                .map(p -> new WebPropertyInfo(session, p)).toArray(WebPropertyInfo[]::new);
+                .map(p -> new WebPropertyInfo(session, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
             throw new DBWebException("Error reading origin details", e);
         }
