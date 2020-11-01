@@ -32,7 +32,7 @@ public class WebUser implements WebAuthSubject {
     private final String userId;
     private String displayName;
 
-    private Map<String, Object> metaParameters = new LinkedHashMap<>();
+    private Map<String, String> metaParameters = new LinkedHashMap<>();
     private Map<String, Object> configurationParameters = new LinkedHashMap<>();
 
     private WebRole[] roles = null;
@@ -68,8 +68,16 @@ public class WebUser implements WebAuthSubject {
         return Arrays.stream(roles).anyMatch(r -> r.getRoleId().equals(roleId));
     }
 
-    public Map<String, Object> getMetaParameters() {
+    public Map<String, String> getMetaParameters() {
         return Collections.unmodifiableMap(metaParameters);
+    }
+
+    public void setMetaParameter(String name, String value) {
+        metaParameters.put(name, value);
+    }
+
+    public void removeMetaParameter(String name) {
+        metaParameters.remove(name);
     }
 
     public Map<String, Object> getConfigurationParameters() {

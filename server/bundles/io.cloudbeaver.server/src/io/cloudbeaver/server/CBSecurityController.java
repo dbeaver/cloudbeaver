@@ -31,6 +31,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -79,12 +80,26 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException("User or role '" + user.getUserId() + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
-            createAuthSubject(dbCon, user.getUserId(), SUBJECT_USER);
-            try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
-                dbStat.setString(1, user.getUserId());
-                dbStat.setString(2, CHAR_BOOL_TRUE);
-                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                createAuthSubject(dbCon, user.getUserId(), SUBJECT_USER);
+                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
+                    dbStat.setString(1, user.getUserId());
+                    dbStat.setString(2, CHAR_BOOL_TRUE);
+                    dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                    dbStat.execute();
+                }
+                Map<String, String> metaParameters = user.getMetaParameters();
+                if (!CommonUtils.isEmpty(metaParameters)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
+                        dbStat.setString(1, user.getUserId());
+                        for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
+                            dbStat.setString(2, mp.getKey());
+                            dbStat.setString(3, mp.getValue());
+                            dbStat.execute();
+                        }
+                    }
+                }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user in database", e);
@@ -94,8 +109,11 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteUser(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            deleteAuthSubject(dbCon, userId);
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER WHERE USER_ID=?", userId);
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteAuthSubject(dbCon, userId);
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER WHERE USER_ID=?", userId);
+                txn.commit();
+            }
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
         }
@@ -104,17 +122,20 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_ROLE WHERE USER_ID=?", userId);
-            if (!ArrayUtils.isEmpty(roleIds)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_ROLE(USER_ID,ROLE_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
-                    for (String roleId : roleIds) {
-                        dbStat.setString(1, userId);
-                        dbStat.setString(2, roleId);
-                        dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(4, grantorId);
-                        dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_ROLE WHERE USER_ID=?", userId);
+                if (!ArrayUtils.isEmpty(roleIds)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_ROLE(USER_ID,ROLE_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                        for (String roleId : roleIds) {
+                            dbStat.setString(1, userId);
+                            dbStat.setString(2, roleId);
+                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                            dbStat.setString(4, grantorId);
+                            dbStat.execute();
+                        }
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user roles in database", e);
@@ -202,20 +223,23 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException(e.getMessage(), e);
         }
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?", userId, authProvider.getId());
-            if (!CommonUtils.isEmpty(credentials)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")) {
-                    for (String[] cred : transformedCredentials) {
-                        if (cred == null) {
-                            continue;
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?", userId, authProvider.getId());
+                if (!CommonUtils.isEmpty(credentials)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")) {
+                        for (String[] cred : transformedCredentials) {
+                            if (cred == null) {
+                                continue;
+                            }
+                            dbStat.setString(1, userId);
+                            dbStat.setString(2, authProvider.getId());
+                            dbStat.setString(3, cred[0]);
+                            dbStat.setString(4, cred[1]);
+                            dbStat.execute();
                         }
-                        dbStat.setString(1, userId);
-                        dbStat.setString(2, authProvider.getId());
-                        dbStat.setString(3, cred[0]);
-                        dbStat.setString(4, cred[1]);
-                        dbStat.execute();
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user credentials in database", e);
@@ -365,13 +389,16 @@ class CBSecurityController implements DBWSecurityController {
             throw new DBCException("User or role '" + role.getRoleId() + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
-            createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
-            try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
-                dbStat.setString(1, role.getRoleId());
-                dbStat.setString(2, CommonUtils.notEmpty(role.getName()));
-                dbStat.setString(3, CommonUtils.notEmpty(role.getDescription()));
-                dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-                dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
+                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
+                    dbStat.setString(1, role.getRoleId());
+                    dbStat.setString(2, CommonUtils.notEmpty(role.getName()));
+                    dbStat.setString(3, CommonUtils.notEmpty(role.getDescription()));
+                    dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+                    dbStat.execute();
+                }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving role in database", e);
@@ -381,8 +408,11 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void deleteRole(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            deleteAuthSubject(dbCon, roleId);
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE WHERE ROLE_ID=?", roleId);
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteAuthSubject(dbCon, roleId);
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_ROLE WHERE ROLE_ID=?", roleId);
+                txn.commit();
+            }
         } catch (SQLException e) {
             throw new DBCException("Error deleting role from database", e);
         }
@@ -394,17 +424,20 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void setSubjectPermissions(String subjectId, String[] permissionIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
-            if (!ArrayUtils.isEmpty(permissionIds)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
-                    for (String permission : permissionIds) {
-                        dbStat.setString(1, subjectId);
-                        dbStat.setString(2, permission);
-                        dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                        dbStat.setString(4, grantorId);
-                        dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
+                if (!ArrayUtils.isEmpty(permissionIds)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                        for (String permission : permissionIds) {
+                            dbStat.setString(1, subjectId);
+                            dbStat.setString(2, permission);
+                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                            dbStat.setString(4, grantorId);
+                            dbStat.execute();
+                        }
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving role permissions in database", e);
@@ -602,19 +635,22 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void setSubjectConnectionAccess(@NotNull String subjectId, @NotNull String[] connectionIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
-            if (!ArrayUtils.isEmpty(connectionIds)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
-                    dbStat.setString(1, subjectId);
-                    dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(3, grantorId);
-                    for (String connectionId : connectionIds) {
-                        dbStat.setString(4, connectionId);
-                        dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                JDBCUtils.executeStatement(dbCon,
+                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE SUBJECT_ID=?", subjectId);
+                if (!ArrayUtils.isEmpty(connectionIds)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        "INSERT INTO CB_DATASOURCE_ACCESS(SUBJECT_ID,GRANT_TIME,GRANTED_BY,DATASOURCE_ID) VALUES(?,?,?,?)")) {
+                        dbStat.setString(1, subjectId);
+                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                        dbStat.setString(3, grantorId);
+                        for (String connectionId : connectionIds) {
+                            dbStat.setString(4, connectionId);
+                            dbStat.execute();
+                        }
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error granting datasource access", e);
@@ -651,20 +687,23 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public void setConnectionSubjectAccess(@NotNull String connectionId, @Nullable String[] subjects, @Nullable String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            // Delete all permissions
-            JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM CB_DATASOURCE_ACCESS WHERE DATASOURCE_ID=?", connectionId);
-            if (!ArrayUtils.isEmpty(subjects)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_DATASOURCE_ACCESS(DATASOURCE_ID,GRANT_TIME,GRANTED_BY,SUBJECT_ID) VALUES(?,?,?,?)")) {
-                    dbStat.setString(1, connectionId);
-                    dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(3, grantorId);
-                    for (String subject : subjects) {
-                        dbStat.setString(4, subject);
-                        dbStat.execute();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                // Delete all permissions
+                JDBCUtils.executeStatement(dbCon,
+                    "DELETE FROM CB_DATASOURCE_ACCESS WHERE DATASOURCE_ID=?", connectionId);
+                if (!ArrayUtils.isEmpty(subjects)) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        "INSERT INTO CB_DATASOURCE_ACCESS(DATASOURCE_ID,GRANT_TIME,GRANTED_BY,SUBJECT_ID) VALUES(?,?,?,?)")) {
+                        dbStat.setString(1, connectionId);
+                        dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                        dbStat.setString(3, grantorId);
+                        for (String subject : subjects) {
+                            dbStat.setString(4, subject);
+                            dbStat.execute();
+                        }
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error granting datasource access", e);
@@ -684,24 +723,27 @@ class CBSecurityController implements DBWSecurityController {
 
     void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            Set<String> registeredProviders = new HashSet<>();
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT PROVIDER_ID FROM CB_AUTH_PROVIDER")) {
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        registeredProviders.add(dbResult.getString(1));
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                Set<String> registeredProviders = new HashSet<>();
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "SELECT PROVIDER_ID FROM CB_AUTH_PROVIDER")) {
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        while (dbResult.next()) {
+                            registeredProviders.add(dbResult.getString(1));
+                        }
                     }
                 }
-            }
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
-                for (WebAuthProviderDescriptor authProvider : WebServiceRegistry.getInstance().getAuthProviders()) {
-                    if (!registeredProviders.contains(authProvider.getId())) {
-                        dbStat.setString(1, authProvider.getId());
-                        dbStat.executeUpdate();
-                        log.debug("Auth provider '" + authProvider.getId() + "' registered");
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
+                    for (WebAuthProviderDescriptor authProvider : WebServiceRegistry.getInstance().getAuthProviders()) {
+                        if (!registeredProviders.contains(authProvider.getId())) {
+                            dbStat.setString(1, authProvider.getId());
+                            dbStat.executeUpdate();
+                            log.debug("Auth provider '" + authProvider.getId() + "' registered");
+                        }
                     }
                 }
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading session state", e);

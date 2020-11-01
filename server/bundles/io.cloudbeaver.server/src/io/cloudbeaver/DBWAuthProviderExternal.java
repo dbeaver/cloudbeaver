@@ -31,6 +31,9 @@ import java.util.Map;
  */
 public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extends DBWAuthProvider<AUTH_SESSION> {
 
+    String META_AUTH_PROVIDER = "$provider";
+    String META_AUTH_SPACE_ID = "$space";
+
     /**
      * Returns new identifying credentials which can be used to find/create user in database
      */
