@@ -58,7 +58,7 @@ class CBSecurityController implements DBWSecurityController {
         this.database = database;
     }
 
-    public boolean isSubjectExists(String subjectId) throws DBCException {
+    private boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT 1 FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
                 dbStat.setString(1, subjectId);
@@ -166,15 +166,29 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public WebUser getUserById(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            WebUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        return new WebUser(dbResult.getString(1));
+                        user = new WebUser(dbResult.getString(1));
+                    } else {
+                        return null;
                     }
-                    return null;
                 }
             }
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        user.setMetaParameter(
+                            dbResult.getString(1),
+                            dbResult.getString(2)
+                        );
+                    }
+                }
+            }
+            return user;
         } catch (SQLException e) {
             throw new DBCException("Error while searching credentials", e);
         }
@@ -184,21 +198,42 @@ class CBSecurityController implements DBWSecurityController {
     @Override
     public WebUser[] findUsers(String userNameMask) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            Map<String, WebUser> result = new LinkedHashMap<>();
+            // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER" +
+                (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?"))) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        result.put(userId, new WebUser(userId));
+                    }
+                }
+            }
+            // Read metas
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,META_ID,META_VALUE FROM CB_USER_META" +
                 (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
                 if (!CommonUtils.isEmpty(userNameMask)) {
                     dbStat.setString(1, userNameMask);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    List<WebUser> result = new ArrayList<>();
                     while (dbResult.next()) {
-                        result.add(new WebUser(dbResult.getString(1)));
+                        String userId = dbResult.getString(1);
+                        WebUser user = result.get(userId);
+                        if (user != null) {
+                            user.setMetaParameter(
+                                dbResult.getString(2),
+                                dbResult.getString(3)
+                            );
+                        }
                     }
-                    return result.toArray(new WebUser[0]);
                 }
             }
+            return result.values().toArray(new WebUser[0]);
         } catch (SQLException e) {
-            throw new DBCException("Error while searching credentials", e);
+            throw new DBCException("Error while loading users", e);
         }
     }
 

@@ -72,6 +72,10 @@ public class WebUser implements WebAuthSubject {
         return Collections.unmodifiableMap(metaParameters);
     }
 
+    public String getMetaParameter(String name) {
+        return metaParameters.get(name);
+    }
+
     public void setMetaParameter(String name, String value) {
         metaParameters.put(name, value);
     }

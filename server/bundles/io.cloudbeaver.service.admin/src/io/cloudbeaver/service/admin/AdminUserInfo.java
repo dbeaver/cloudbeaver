@@ -16,15 +16,20 @@
  */
 package io.cloudbeaver.service.admin;
 
+import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWConnectionGrant;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -38,9 +43,6 @@ public class AdminUserInfo {
     private final WebSession session;
     private final WebUser user;
 
-    private Map<String, Object> metaParameters;
-    private Map<String, Object> configurationParameters;
-
     public AdminUserInfo(WebSession session, WebUser user) {
         this.session = session;
         this.user = user;
@@ -52,13 +54,13 @@ public class AdminUserInfo {
     }
 
     @Property
-    public Map<String, Object> getMetaParameters() {
-        return metaParameters;
+    public Map<String, String> getMetaParameters() {
+        return user.getMetaParameters();
     }
 
     @Property
     public Map<String, Object> getConfigurationParameters() {
-        return configurationParameters;
+        return user.getConfigurationParameters();
     }
 
     @Property
@@ -76,7 +78,15 @@ public class AdminUserInfo {
     }
 
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, null);
+        String providerId = user.getMetaParameter(DBWAuthProviderExternal.META_AUTH_PROVIDER);
+        if (CommonUtils.isEmpty(providerId)) {
+            providerId = LocalAuthProvider.PROVIDER_ID;
+        }
+        WebAuthProviderDescriptor authProvieer = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        if (authProvieer == null) {
+            log.error("Auth provider '" + providerId + "' not found");
+        }
+        return new WebUserOriginInfo(session, user, authProvieer);
     }
 
 }
