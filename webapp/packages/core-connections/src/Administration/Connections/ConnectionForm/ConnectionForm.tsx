@@ -94,14 +94,15 @@ export const ConnectionForm = observer(function ConnectionForm({
   onBack = () => {},
   onCancel = () => {},
 }: Props) {
+  const style = [styles, BORDER_TAB_STYLES];
   const service = useService(ConnectionFormService);
   const controller = useController(Controller, model, onCancel);
   const translate = useTranslate();
 
-  return styled(useStyles(styles, BORDER_TAB_STYLES))(
+  return styled(useStyles(style))(
     <TabsState selectedId='options' container={service.tabsContainer} model={model} metadata={controller.metadata}>
       <box as='div'>
-        <TabList>
+        <TabList style={style}>
           <Tab tabId='options'>
             <TabTitle>{translate('customConnection_options')}</TabTitle>
           </Tab>
@@ -138,7 +139,7 @@ export const ConnectionForm = observer(function ConnectionForm({
           </Button>
         </TabList>
         <content-box as="div">
-          <TabPanelList>
+          <TabPanelList style={style}>
             {controller.isLoading
               ? <Loader />
               : (
