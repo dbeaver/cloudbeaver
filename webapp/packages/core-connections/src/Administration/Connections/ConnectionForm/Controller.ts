@@ -26,6 +26,8 @@ implements IInitializableController {
   @observable connectionType = EConnectionType.Parameters;
   @observable isLoading = false;
   @observable isSaving = false;
+  @observable
+  readonly metadata = new Map<string, any>();
 
   @computed get isDisabled() {
     return this.isLoading || this.isSaving;

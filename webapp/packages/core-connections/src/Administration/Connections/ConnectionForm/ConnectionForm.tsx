@@ -12,13 +12,14 @@ import styled, { css } from 'reshadow';
 import {
   TabsState, TabList, Tab,
   TabTitle, Loader, TabPanel,
-  Button, BORDER_TAB_STYLES
+  Button, BORDER_TAB_STYLES, TabPanelList
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
+import { ConnectionFormService } from './ConnectionFormService';
 import { Controller } from './Controller';
 import { DriverProperties } from './DriverProperties/DriverProperties';
 import { IConnectionFormModel } from './IConnectionFormModel';
@@ -93,11 +94,12 @@ export const ConnectionForm = observer(function ConnectionForm({
   onBack = () => {},
   onCancel = () => {},
 }: Props) {
+  const service = useService(ConnectionFormService);
   const controller = useController(Controller, model, onCancel);
   const translate = useTranslate();
 
   return styled(useStyles(styles, BORDER_TAB_STYLES))(
-    <TabsState selectedId='options'>
+    <TabsState selectedId='options' container={service.tabsContainer} model={model} metadata={controller.metadata}>
       <box as='div'>
         <TabList>
           <Tab tabId='options'>
@@ -136,49 +138,51 @@ export const ConnectionForm = observer(function ConnectionForm({
           </Button>
         </TabList>
         <content-box as="div">
-          {controller.isLoading
-            ? <Loader />
-            : (
-              <>
-                <TabPanel tabId='options'>
-                  <Options
-                    model={model}
-                    type={controller.connectionType}
-                    disabled={controller.isDisabled}
-                    onTypeChange={controller.setType}
-                    onSave={controller.save}
-                  />
-                </TabPanel>
-                {model.connection.driverId && (
-                  <TabPanel tabId='driver_properties'>
-                    {state => (
-                      <DriverProperties
-                        driverId={model.connection.driverId}
-                        state={model.connection.properties}
-                        loadProperties={state.selectedId === 'driver_properties'}
-                      />
-                    )}
+          <TabPanelList>
+            {controller.isLoading
+              ? <Loader />
+              : (
+                <>
+                  <TabPanel tabId='options'>
+                    <Options
+                      model={model}
+                      type={controller.connectionType}
+                      disabled={controller.isDisabled}
+                      onTypeChange={controller.setType}
+                      onSave={controller.save}
+                    />
                   </TabPanel>
-                )}
-                <TabPanel tabId='access'>
-                  {state => {
-                    if (state.selectedId === 'access') {
-                      controller.loadAccessSubjects();
-                    } else {
-                      return null;
-                    }
+                  {model.connection.driverId && (
+                    <TabPanel tabId='driver_properties'>
+                      {state => (
+                        <DriverProperties
+                          driverId={model.connection.driverId}
+                          state={model.connection.properties}
+                          loadProperties={state.selectedId === 'driver_properties'}
+                        />
+                      )}
+                    </TabPanel>
+                  )}
+                  <TabPanel tabId='access'>
+                    {state => {
+                      if (state.selectedId === 'access') {
+                        controller.loadAccessSubjects();
+                      } else {
+                        return null;
+                      }
 
-                    return (
-                      <ConnectionAccess
-                        model={model}
-                        disabled={controller.isDisabled}
-                        onChange={controller.handleAccessChange}
-                      />
-                    );
-                  }}
-                </TabPanel>
-              </>
-            )}
+                      return (
+                        <ConnectionAccess
+                          model={model}
+                          disabled={controller.isDisabled}
+                          onChange={controller.handleAccessChange}
+                        />
+                      );
+                    }}
+                  </TabPanel>
+                </>
+              )}
+          </TabPanelList>
         </content-box>
       </box>
     </TabsState>
