@@ -20,7 +20,9 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBASession;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.Map;
 
@@ -34,14 +36,28 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
      */
     @NotNull
     Map<String, Object> readExternalCredentials(
-        Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
-        Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException;
 
     @NotNull
-    WebUser registerNewUser(DBWSecurityController securityController, Map<String, Object> providerConfig, Map<String, Object> credentials) throws DBException;
+    WebUser registerNewUser(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBWSecurityController securityController,
+        @NotNull Map<String, Object> providerConfig,
+        @NotNull Map<String, Object> credentials) throws DBException;
 
     @Nullable
-    String getUserDisplayName(Map<String, Object> providerConfig, Map<String, Object> credentials);
+    String getUserDisplayName(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull Map<String, Object> providerConfig,
+        @NotNull Map<String, Object> credentials) throws DBException;
+
+    @Nullable
+    DBPObject getUserDetails(
+        @NotNull DBRProgressMonitor monitor,
+        AUTH_SESSION session,
+        @NotNull WebUser user) throws DBException;
 
 }

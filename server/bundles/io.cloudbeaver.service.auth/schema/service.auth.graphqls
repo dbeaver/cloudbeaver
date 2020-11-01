@@ -42,6 +42,8 @@ type UserAuthInfo {
 
     # Optional login message
     message: String
+
+    externalProperties: [ObjectPropertyInfo!]!
 }
 
 extend type Query {

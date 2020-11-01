@@ -17,9 +17,13 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.DBWAuthProviderExternal;
+import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.time.OffsetDateTime;
@@ -31,13 +35,15 @@ public class WebAuthInfo {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);
 
-    private WebUser user;
+    private final WebSession session;
+    private final WebUser user;
     private WebAuthProviderDescriptor authProvider;
     private DBASession authSession;
     private OffsetDateTime loginTime;
     private String message;
 
-    public WebAuthInfo(WebUser user) {
+    public WebAuthInfo(WebSession session, WebUser user) {
+        this.session = session;
         this.user = user;
     }
 
@@ -83,6 +89,25 @@ public class WebAuthInfo {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public WebPropertyInfo[] getExternalProperties() {
+        if (user == null) {
+            return new WebPropertyInfo[0];
+        }
+        try {
+            DBASession authSession = session.getAuthInfo().getAuthSession();
+            DBWAuthProvider<?> authProvider = this.authProvider.getInstance();
+            if (authSession != null && authProvider instanceof DBWAuthProviderExternal) {
+                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), authSession, user);
+                if (userDetails != null) {
+                    return WebServiceUtils.getObjectProperties(session, userDetails);
+                }
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return new WebPropertyInfo[0];
     }
 
     void closeAuth() {

@@ -58,7 +58,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             DBWAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBWAuthProviderExternal<?> ?
                 (DBWAuthProviderExternal<?>) authProviderInstance : null;
             if (authProviderExternal != null) {
-                authParameters = authProviderExternal.readExternalCredentials(providerConfig, authParameters);
+                authParameters = authProviderExternal.readExternalCredentials(webSession.getProgressMonitor(), providerConfig, authParameters);
             }
 
             WebUser user = null;
@@ -66,7 +66,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (userId == null) {
                 // User doesn't exist. We can create new user automatically if auth provider supports this
                 if (authProviderExternal != null) {
-                    user = authProviderExternal.registerNewUser(serverController, providerConfig, authParameters);
+                    user = authProviderExternal.registerNewUser(webSession.getProgressMonitor(), serverController, providerConfig, authParameters);
                     userId = user.getUserId();
                 }
 
@@ -94,10 +94,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 user = new WebUser(userId);
             }
             if (authProviderExternal != null) {
-                user.setDisplayName(authProviderExternal.getUserDisplayName(providerConfig, authParameters));
+                user.setDisplayName(authProviderExternal.getUserDisplayName(webSession.getProgressMonitor(), providerConfig, authParameters));
             }
 
-            WebAuthInfo authInfo = new WebAuthInfo(user);
+            WebAuthInfo authInfo = new WebAuthInfo(webSession, user);
             authInfo.setLoginTime(OffsetDateTime.now());
             authInfo.setAuthProvider(authProvider);
             authInfo.setAuthSession(authSession);
