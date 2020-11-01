@@ -246,6 +246,7 @@ public class WebServiceCore implements DBWServiceCore {
                     dataSourceContainer.getConnectionConfiguration().setAuthProperty(s, CommonUtils.toString(o)));
             }
             dataSourceContainer.setSavePassword(true);
+            dataSourceContainer.persistConfiguration();
         }
 
         return connectionInfo;
