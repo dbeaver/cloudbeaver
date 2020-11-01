@@ -6,25 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useCallback, PropsWithChildren } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled from 'reshadow';
 
-import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Icon } from '../../Icons';
-import { TabsContext } from '../TabsContext';
+import { TabProps } from './TabProps';
+import { useTab } from './useTab';
 
-export type TabProps = PropsWithChildren<{
-  tabId: string;
-  disabled?: boolean;
-  className?: string;
-  style?: DynamicStyle[] | DynamicStyle;
-  onOpen?: (tabId: string) => void;
-  onClose?: (tabId: string) => void;
-}>;
-
-export function Tab({
+export const Tab: React.FC<TabProps> = function Tab({
   tabId,
   disabled,
   className,
@@ -32,27 +23,8 @@ export function Tab({
   style,
   onOpen,
   onClose,
-}: TabProps) {
-  const state = useContext(TabsContext);
-  if (!state) {
-    throw new Error('TabsContext not provided');
-  }
-
-  const handleOpen = useCallback((e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    state.select(tabId);
-    if (onOpen) {
-      onOpen(tabId);
-    }
-  }, [state, onOpen, tabId]);
-
-  const handleClose = useCallback((e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    e.stopPropagation(); // it's here because close triggers handleOpen too
-    if (onClose) {
-      onClose(tabId);
-    }
-  }, [onClose, tabId]);
+}) {
+  const { state, handleClose, handleOpen } = useTab(tabId, onOpen, onClose);
 
   return styled(useStyles(style))(
     <tab-outer as='div'>
@@ -76,4 +48,4 @@ export function Tab({
       </tab-inner>
     </tab-outer>
   );
-}
+};

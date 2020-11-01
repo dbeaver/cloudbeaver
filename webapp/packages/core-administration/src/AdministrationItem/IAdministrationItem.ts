@@ -39,7 +39,7 @@ export type AdministrationItemSubContentProps = AdministrationItemContentProps &
 };
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
-export type AdministrationItemEvent = (configurationWizard: boolean, administration: boolean) => Promise<void> | void;
+export type AdministrationItemEvent = (configurationWizard: boolean, outside: boolean) => Promise<void> | void;
 export type AdministrationItemCanActivateEvent = (
   configurationWizard: boolean,
   administration: boolean
@@ -47,7 +47,7 @@ export type AdministrationItemCanActivateEvent = (
 export type AdministrationItemSubEvent = (
   param: string | null,
   configurationWizard: boolean,
-  administration: boolean
+  outside: boolean
 ) => Promise<void> | void;
 export type AdministrationItemSubCanActivateEvent = (
   param: string | null,

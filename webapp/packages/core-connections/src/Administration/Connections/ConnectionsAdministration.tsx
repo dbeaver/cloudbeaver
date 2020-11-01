@@ -11,13 +11,14 @@ import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
+import { CreateConnectionService } from './CreateConnectionService';
 
 const styles = composes(
   css`
@@ -70,6 +71,7 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
   param,
   configurationWizard,
 }) {
+  const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
@@ -82,17 +84,12 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
             </message-box>
           )}
           <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
+            <IconButton name="add" viewBox="0 0 28 28" onClick={service.create} />
             <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
             <IconButton name="refresh-outline" viewBox="0 0 16 16" onClick={controller.update} />
           </AdministrationTools>
           {sub && (
-            <CreateConnection
-              method={param || 'driver'}
-              configurationWizard={configurationWizard}
-              onChange={controller.setCreateMethod}
-              onCancel={controller.cancelCreate}
-            />
+            <CreateConnection method={param} configurationWizard={configurationWizard} />
           )}
           <ConnectionsTable
             connections={controller.connections}

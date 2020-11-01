@@ -9,11 +9,16 @@
 import { createContext } from 'react';
 import { TabStateReturn } from 'reakit/Tab';
 
-export interface ITabsContext {
+import { TabsContainer } from './TabsContainer';
+
+export interface ITabsContext<T = Record<string, any>> {
   state: TabStateReturn;
+  container?: TabsContainer<T>;
+  lazy: boolean;
   select: (tabId: string) => any;
+  props: T;
 }
 
-export const TabsContext = createContext<ITabsContext | undefined>(
+export const TabsContext = createContext<ITabsContext<any> | undefined>(
   undefined
 );

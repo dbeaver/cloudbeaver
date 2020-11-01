@@ -36,13 +36,14 @@ export class ConnectionsAdministrationService extends Bootstrap {
       type: AdministrationItemType.Default,
       order: 2,
       configurationWizardOptions: {
-        defaultRoute: { sub: 'create', param: 'search-database' },
+        defaultRoute: { sub: 'create' },
         description: 'connections_administration_configuration_wizard_step_description',
       },
       sub: [
         {
           name: 'create',
           onActivate: this.activateCreateMethod.bind(this),
+          onDeActivate: this.deactivateCreateMethod.bind(this),
         },
       ],
       getContentComponent: () => ConnectionsAdministration,
@@ -63,12 +64,19 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   private async activateCreateMethod(param: string | null) {
     if (!param) {
+      this.createConnectionService.setCreateMethod();
       return;
     }
 
-    const method = this.createConnectionService.methods.get(param);
+    const method = this.createConnectionService.tabsContainer.tabInfoMap.get(param);
     if (method) {
-      method.onOpen?.();
+      method.onOpen?.(method.key);
+    }
+  }
+
+  private async deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {
+    if (outside) {
+      this.createConnectionService.close();
     }
   }
 
