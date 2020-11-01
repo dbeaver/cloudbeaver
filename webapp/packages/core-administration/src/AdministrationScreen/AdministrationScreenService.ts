@@ -169,7 +169,7 @@ export class AdministrationScreenService {
       await this.administrationItemService.deActivate(
         screen,
         this.isConfigurationMode,
-        screen.item !== toScreen?.item
+        screen.sub !== toScreen?.sub
       );
     }
 
