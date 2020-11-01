@@ -20,6 +20,9 @@ export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends 
   tab?: () => React.FC<TabProps & TProps>;
   panel: () => React.FC<{ tabId: string } & TProps>;
 
+  isHidden?: (tabId: string, props?: TProps) => boolean;
+  isDisabled?: (tabId: string, props?: TProps) => boolean;
+
   onClose?: (tabId: string) => void;
   onOpen?: (tabId: string) => void;
 }
@@ -36,11 +39,16 @@ export class TabsContainer<TProps = Record<string, any>, TOptions extends Record
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
 
   @computed get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
-    return Array.from(this.tabInfoMap.values()).sort((a, b) => a.order - b.order);
+    return Array.from(this.tabInfoMap.values())
+      .sort((a, b) => a.order - b.order);
   }
 
   constructor() {
     this.tabInfoMap = new Map();
+  }
+
+  getDisplayed(props?: TProps): Array<ITabInfo<TProps, TOptions>> {
+    return this.tabInfoList.filter(tabInfo => !tabInfo.isHidden?.(tabInfo.key, props));
   }
 
   add(tabInfo: ITabInfoOptions<TProps, TOptions>): void {

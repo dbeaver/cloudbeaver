@@ -16,11 +16,13 @@ import { TabsContext } from './TabsContext';
 
 type Props = React.PropsWithChildren<Omit<TabListOptions, keyof TabStateReturn>> & {
   style?: DynamicStyle[] | DynamicStyle;
+  childrenFirst?: boolean;
 };
 
 export const TabList: React.FC<Props> = function TabList({
   style,
   children,
+  childrenFirst,
   ...props
 }) {
   const state = useContext(TabsContext);
@@ -30,9 +32,11 @@ export const TabList: React.FC<Props> = function TabList({
   }
 
   if (state.container) {
+    const displayed = state.container.getDisplayed(state.props);
     return (
       <BaseTabList {...props} {...state.state}>
-        {state.container.tabInfoList.map(tabInfo => (
+        {childrenFirst && children}
+        {displayed.map(tabInfo => (
           <TabDefault
             key={tabInfo.key}
             tabId={tabInfo.key}
@@ -41,11 +45,12 @@ export const TabList: React.FC<Props> = function TabList({
             component={tabInfo.tab?.()}
             {...state.props}
             style={style}
+            disabled={tabInfo.isDisabled?.(tabInfo.key, state.props)}
             onOpen={tabInfo.onOpen}
             onClose={tabInfo.onClose}
           />
         ))}
-        {children}
+        {!childrenFirst && children}
       </BaseTabList>
     );
   }

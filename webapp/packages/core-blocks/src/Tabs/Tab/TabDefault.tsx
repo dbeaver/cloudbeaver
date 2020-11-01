@@ -23,6 +23,7 @@ interface Props<T = Record<string, any>> {
   component?: React.FC<TabProps & T>;
   className?: string;
   style?: DynamicStyle[] | DynamicStyle;
+  disabled?: boolean;
   onOpen?: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }
@@ -34,6 +35,7 @@ export function TabDefault<T = Record<string, any>>({
   component,
   className,
   style,
+  disabled,
   onOpen,
   onClose,
   ...rest
@@ -48,6 +50,7 @@ export function TabDefault<T = Record<string, any>>({
         className={className}
         {...(rest as unknown as T)}
         style={style}
+        disabled={disabled}
         onOpen={onOpen}
         onClose={onClose}
       />
@@ -55,7 +58,7 @@ export function TabDefault<T = Record<string, any>>({
   }
 
   return styled(styles)(
-    <Tab tabId={tabId} className={className} style={style} onOpen={onOpen} onClose={onClose}>
+    <Tab tabId={tabId} className={className} style={style} disabled={disabled} onOpen={onOpen} onClose={onClose}>
       {icon && <TabIcon icon={icon} />}
       {name && <TabTitle><Translate token={name} /></TabTitle>}
     </Tab>

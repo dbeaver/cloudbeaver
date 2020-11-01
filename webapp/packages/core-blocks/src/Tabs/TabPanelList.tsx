@@ -39,9 +39,11 @@ export const TabPanelList: React.FC<Props> = function TabPanelList({
     return <Panel tabId={tabInfo.key} {...state?.props} />;
   }
 
+  const displayed = state.container.getDisplayed(state.props);
+
   return styled(styles)(
     <>
-      {state.container.tabInfoList.map(tabInfo => (
+      {displayed.map(tabInfo => (
         <TabPanel
           key={tabInfo.key}
           tabId={tabInfo.key}

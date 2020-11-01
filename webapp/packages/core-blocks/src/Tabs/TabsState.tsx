@@ -33,7 +33,7 @@ export function TabsState<T = Record<string, any>>({
   onChange,
   ...rest
 }: Props<T>): React.ReactElement | null {
-  if (!currentTabId && container && container.tabInfoList.length > 0) {
+  if (!selectedId && !currentTabId && container && container.tabInfoList.length > 0) {
     currentTabId = container.tabInfoList[0].key;
   }
 
