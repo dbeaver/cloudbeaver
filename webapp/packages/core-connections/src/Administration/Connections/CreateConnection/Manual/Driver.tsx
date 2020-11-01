@@ -14,7 +14,7 @@ import {
   ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
 } from '@cloudbeaver/core-blocks';
 
-import { DBDriver } from '../../../DBDriverResource';
+import { DBDriver } from '../../../../DBDriverResource';
 
 const styles = css`
   StaticImage {

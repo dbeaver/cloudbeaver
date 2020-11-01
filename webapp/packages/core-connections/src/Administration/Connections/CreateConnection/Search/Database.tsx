@@ -17,7 +17,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { DBDriverResource } from '../../../DBDriverResource';
+import { DBDriverResource } from '../../../../DBDriverResource';
 
 const styles = composes(
   css`

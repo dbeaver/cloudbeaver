@@ -8,28 +8,19 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { DBDriverResource } from '../../../DBDriverResource';
+import { DBDriverResource } from '../../../../DBDriverResource';
+import { ConnectionManualService } from './ConnectionManualService';
 import { DriverList } from './DriverList';
 
-interface Props {
-  className?: string;
-  onSelect: (driverId: string) => void;
-}
-
-export const CustomConnection = observer(function CustomConnection({
-  className,
-  onSelect,
-}: Props) {
+export const CustomConnection = observer(function CustomConnection() {
+  const service = useService(ConnectionManualService);
   const dbDriverResource = useService(DBDriverResource);
 
-  useEffect(() => {
-    dbDriverResource.loadAll();
-  }, []);
   const loading = dbDriverResource.isLoading();
   const drivers = useMemo(() => computed(() => (
     Array.from(dbDriverResource.data.values())
@@ -37,8 +28,8 @@ export const CustomConnection = observer(function CustomConnection({
   )), [dbDriverResource.data]);
 
   if (loading) {
-    return <Loader className={className} />;
+    return <Loader />;
   }
 
-  return <DriverList drivers={drivers.get()} className={className} onSelect={onSelect} />;
+  return <DriverList drivers={drivers.get()} onSelect={service.select} />;
 });

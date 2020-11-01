@@ -14,7 +14,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
-import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 @injectable()
 export class ConnectionsAdministrationController {
@@ -48,14 +47,8 @@ export class ConnectionsAdministrationController {
   constructor(
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
-    private commonDialogService: CommonDialogService,
-    private connectionsAdministrationNavService: ConnectionsAdministrationNavService
+    private commonDialogService: CommonDialogService
   ) { }
-
-  setCreateMethod = (method: string): void => this.connectionsAdministrationNavService.navToCreate(method);
-  cancelCreate = (): void => this.connectionsAdministrationNavService.navToRoot();
-
-  create = (): void => this.connectionsAdministrationNavService.navToCreate('driver');
 
   update = async (): Promise<void> => {
     try {

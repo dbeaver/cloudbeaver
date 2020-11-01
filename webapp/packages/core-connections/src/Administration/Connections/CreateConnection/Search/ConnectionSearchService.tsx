@@ -1,0 +1,96 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { observable } from 'mobx';
+
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
+
+import { AdminConnection, ConnectionsResource } from '../../../ConnectionsResource';
+import { CreateConnectionService } from '../../CreateConnectionService';
+
+@injectable()
+export class ConnectionSearchService {
+  @observable hosts = 'localhost';
+  @observable databases: AdminConnectionSearchInfo[];
+
+  get disabled(): boolean {
+    return this.createConnectionService.disabled;
+  }
+
+  set disabled(value: boolean) {
+    this.createConnectionService.disabled = value;
+  }
+
+  constructor(
+    private notificationService: NotificationService,
+    private connectionsResource: ConnectionsResource,
+    private createConnectionService: CreateConnectionService,
+    private administrationScreenService: AdministrationScreenService
+  ) {
+    this.databases = [];
+    this.search = this.search.bind(this);
+    this.change = this.change.bind(this);
+    this.select = this.select.bind(this);
+  }
+
+  close(): void {
+    this.hosts = 'localhost';
+    this.databases = [];
+  }
+
+  async load(): Promise<void> {
+    if (this.administrationScreenService.isConfigurationMode) {
+      await this.search();
+    }
+  }
+
+  async search(): Promise<void> {
+    if (this.disabled || !this.hosts || !this.hosts.trim()) {
+      return;
+    }
+
+    this.disabled = true;
+
+    try {
+      const hosts = this.hosts
+        .trim()
+        .replace(/[\s,|+-]+/gm, ' ')
+        .split(/[\s,|+-]/);
+
+      this.databases = await this.connectionsResource.searchDatabases(hosts);
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Databases search failed');
+    } finally {
+      this.disabled = false;
+    }
+  }
+
+  change(hosts: string): void {
+    this.hosts = hosts;
+  }
+
+  select(database: AdminConnectionSearchInfo): void {
+    this.createConnectionService.setConnectionTemplate(
+      {
+        id: uuid(),
+        driverId: database.defaultDriver,
+        template: false,
+        saveCredentials: false,
+        host: database.host,
+        port: `${database.port}`,
+        authProperties: [],
+        properties: {},
+      } as Partial<AdminConnection> as any,
+      database.possibleDrivers
+    );
+  }
+}

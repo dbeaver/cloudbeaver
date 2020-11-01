@@ -7,23 +7,18 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Tab, TabTitle, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES
+  TabsState, TabList, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES, TabPanelList
 } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
 import { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
 import { CreateConnectionService } from '../CreateConnectionService';
-import { CreateConnectionController } from './CreateConnectionController';
-import { CreateConnectionMethod } from './CreateConnectionMethod';
-import { CustomConnection } from './CustomConnection';
-import { SearchDatabase } from './SearchDatabase';
 
 const styles = composes(
   css`
@@ -64,7 +59,8 @@ const styles = composes(
       overflow: auto;
     }
 
-    CustomConnection, SearchDatabase {
+    TabPanel, CustomConnection, SearchDatabase {
+      flex-direction: column;
       height: 100%;
       overflow: auto;
     }
@@ -115,52 +111,33 @@ const styles = composes(
 );
 
 interface Props {
-  method: string;
+  method: string | null | undefined;
   configurationWizard: boolean;
-  onChange: (method: string) => void;
-  onCancel: () => void;
 }
 
 export const CreateConnection = observer(function CreateConnection({
   method,
   configurationWizard,
-  onChange,
-  onCancel,
 }: Props) {
   const style = useStyles(styles);
   const service = useService(CreateConnectionService);
-  const controller = useController(CreateConnectionController);
   const translate = useTranslate();
 
-  useEffect(() => {
-    if (configurationWizard) {
-      controller.search();
-    }
-  }, [configurationWizard, controller]);
-
-  const handleConnectionCancel = useCallback(() => {
-    if (method === 'driver') {
-      onCancel();
-    } else {
-      controller.back();
-    }
-  }, [controller, method, onCancel]);
-
-  if (controller.connection) {
+  if (service.connection) {
     return styled(style)(
       <connection-create as='div'>
         <title-bar as='div'>
-          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={controller.back} /></back-button>
-          {controller.driver?.icon && <StaticImage icon={controller.driver.icon} />}
-          {controller.driver?.name ?? translate('connections_administration_connection_create')}
+          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={service.clearConnectionTemplate} /></back-button>
+          {service.driver?.icon && <StaticImage icon={service.driver.icon} />}
+          {service.driver?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
-          <IconButton name="cross" viewBox="0 0 24 24" onClick={onCancel} />
+          <IconButton name="cross" viewBox="0 0 24 24" onClick={service.cancelCreate} />
         </title-bar>
         <connection-create-content as='div'>
           <ConnectionForm
-            model={controller as IConnectionFormModel}
-            onBack={controller.back}
-            onCancel={handleConnectionCancel}
+            model={service as IConnectionFormModel}
+            onBack={service.clearConnectionTemplate}
+            onCancel={service.clearConnectionTemplate}
           />
         </connection-create-content>
         <connection-create-footer as='div' />
@@ -170,42 +147,25 @@ export const CreateConnection = observer(function CreateConnection({
 
   return styled(style, BORDER_TAB_STYLES)(
     <connection-create as='div'>
-      <TabsState currentTabId={method} onChange={onChange}>
+      <TabsState
+        currentTabId={method}
+        container={service.tabsContainer}
+        manual
+        lazy
+        onChange={service.setCreateMethod}
+      >
         <title-bar as='div'>
           {translate('connections_administration_connection_create')}
           <fill as="div" />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={onCancel} />
+          <IconButton name="cross" viewBox="0 0 16 16" onClick={service.cancelCreate} />
         </title-bar>
-        <TabList>
-          <Tab tabId='driver'>
-            <TabTitle>{translate('connections_connection_create_custom')}</TabTitle>
-          </Tab>
-          <Tab tabId='search-database'>
-            <TabTitle>{translate('connections_connection_create_search_database')}</TabTitle>
-          </Tab>
-          {service.methodList.map(method => (
-            <Tab key={method.key} tabId={method.key}>
-              <TabTitle>{translate(method.title)}</TabTitle>
-            </Tab>
-          ))}
-        </TabList>
+        <TabList style={[style, BORDER_TAB_STYLES]} />
+        <connection-create-content as='div'>
+          <TabPanelList style={[style, BORDER_TAB_STYLES]} />
+          {service.disabled && <Loader overlay />}
+        </connection-create-content>
+        <connection-create-footer as='div' />
       </TabsState>
-      <connection-create-content as='div'>
-        {method === 'driver' && <CustomConnection onSelect={controller.onDriverSelect} />}
-        {method === 'search-database' && (
-          <SearchDatabase
-            databases={controller.databases}
-            hosts={controller.hosts}
-            disabled={controller.isProcessing}
-            onSelect={controller.onDatabaseSelect}
-            onSearch={controller.search}
-            onChange={controller.onSearchChange}
-          />
-        )}
-        <CreateConnectionMethod methodId={method} />
-        {controller.isProcessing && <Loader overlay />}
-      </connection-create-content>
-      <connection-create-footer as='div' />
     </connection-create>
   );
 });
