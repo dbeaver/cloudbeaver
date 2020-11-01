@@ -43,7 +43,7 @@ type UserAuthInfo {
     # Optional login message
     message: String
 
-    externalProperties: [ObjectPropertyInfo!]!
+    origin: ObjectOrigin!
 }
 
 extend type Query {

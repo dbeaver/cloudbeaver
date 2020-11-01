@@ -66,7 +66,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             List<AdminUserInfo> webUsers = new ArrayList<>();
             for (WebUser user : CBPlatform.getInstance().getApplication().getSecurityController().findUsers(userName)) {
-                webUsers.add(new AdminUserInfo(user));
+                webUsers.add(new AdminUserInfo(webSession, user));
             }
             return webUsers;
         } catch (Exception e) {
@@ -113,7 +113,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             WebUser newUser = new WebUser(userName);
             CBPlatform.getInstance().getApplication().getSecurityController().createUser(newUser);
-            return new AdminUserInfo(newUser);
+            return new AdminUserInfo(webSession, newUser);
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
         }

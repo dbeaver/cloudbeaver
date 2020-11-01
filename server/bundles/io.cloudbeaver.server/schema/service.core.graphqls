@@ -196,7 +196,7 @@ type ConnectionInfo {
     serverVersion: String
     clientVersion: String
 
-    origin: ConnectionOrigin!
+    origin: ObjectOrigin!
 
     authNeeded: Boolean!
     authModel: ID
@@ -208,7 +208,7 @@ type ConnectionInfo {
     supportedDataFormats: [ ResultDataFormat! ]!
 }
 
-type ConnectionOrigin {
+type ObjectOrigin {
     type: ID!
     subType: ID
     displayName: String!

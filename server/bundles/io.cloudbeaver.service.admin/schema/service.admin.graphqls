@@ -25,6 +25,8 @@ type AdminUserInfo {
     configurationParameters: Object!
     grantedRoles: [ID!]!
     grantedConnections: [AdminConnectionGrantInfo!]!
+
+    origin: ObjectOrigin!
 }
 
 type AdminRoleInfo {

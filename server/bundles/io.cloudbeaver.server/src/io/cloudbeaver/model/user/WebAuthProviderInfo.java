@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.user;
 
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderPropertyDescriptor;
 import io.cloudbeaver.server.CBPlatform;
@@ -45,7 +46,7 @@ public class WebAuthProviderInfo {
     }
 
     public String getIcon() {
-        return descriptor.getIcon();
+        return WebServiceUtils.makeIconId(descriptor.getIcon());
     }
 
     public String getDescription() {

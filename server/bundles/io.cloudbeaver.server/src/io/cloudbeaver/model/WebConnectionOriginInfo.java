@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Web connection origin info
  */
-public class WebConnectionOriginInfo {
+public class WebConnectionOriginInfo implements WebObjectOrigin {
 
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
@@ -45,31 +45,37 @@ public class WebConnectionOriginInfo {
     }
 
     @NotNull
+    @Override
     public String getType() {
         return origin.getType();
     }
 
     @Nullable
+    @Override
     public String getSubType() {
         return origin.getSubType();
     }
 
     @NotNull
+    @Override
     public String getDisplayName() {
         return origin.getDisplayName();
     }
 
     @Nullable
+    @Override
     public String getIcon() {
         return WebServiceUtils.makeIconId(origin.getIcon());
     }
 
     @NotNull
+    @Override
     public Map<String, Object> getConfiguration() {
         return origin.getConfiguration();
     }
 
     @Property
+    @Override
     public WebPropertyInfo[] getDetails() throws DBWebException {
         try {
             DBPObject details = origin.getDataSourceDetails(session.getProgressMonitor(), dataSourceContainer);

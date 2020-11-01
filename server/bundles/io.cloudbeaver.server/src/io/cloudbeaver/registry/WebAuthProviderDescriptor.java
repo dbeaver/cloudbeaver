@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWAuthProvider;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.utils.ArrayUtils;
@@ -39,6 +40,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     private ObjectType implType;
     private DBWAuthProvider instance;
+    private final DBPImage icon;
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
     private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
 
@@ -46,6 +48,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         super(cfg);
         this.cfg = cfg;
         this.implType = new ObjectType(cfg, "class");
+        this.icon = iconToImage(cfg.getAttribute("icon"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
@@ -82,8 +85,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return cfg.getAttribute("description");
     }
 
-    public String getIcon() {
-        return cfg.getAttribute("icon");
+    public DBPImage getIcon() {
+        return icon;
     }
 
     public List<PropertyDescriptor> getConfigurationParameters() {
