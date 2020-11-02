@@ -15,8 +15,10 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
-  GQLErrorCatcher, AdminUserInfo, AdminConnectionGrantInfo, AdminSubjectType
+  GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType
 } from '@cloudbeaver/core-sdk';
+
+import { CreatingUser } from '../UsersAdministrationController';
 
 @injectable()
 export class UserFormController implements IInitializableController, IDestructibleController {
@@ -39,7 +41,7 @@ export class UserFormController implements IInitializableController, IDestructib
     return Array.from(this.rolesManagerService.roles.data.values());
   }
 
-  user!: AdminUserInfo;
+  user!: CreatingUser;
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
@@ -57,7 +59,7 @@ export class UserFormController implements IInitializableController, IDestructib
     private dbDriverResource: DBDriverResource
   ) { }
 
-  init(user: AdminUserInfo, editing: boolean, collapse: () => void) {
+  init(user: CreatingUser, editing: boolean, collapse: () => void) {
     this.user = user;
     this.editing = editing;
     this.collapse = collapse;

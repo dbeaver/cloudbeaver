@@ -44,7 +44,7 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
       provider,
       credentials: processedCredentials,
     });
-    this.data = user;
+    this.data = user as UserAuthInfo;
 
     await this.updateSession();
     return this.data;
@@ -62,7 +62,7 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
     const { user } = await this.graphQLService.sdk.getSessionUser();
     this.loaded = true;
 
-    return user ?? null;
+    return (user as UserAuthInfo | null) ?? null;
   }
 
   private async updateSession() {

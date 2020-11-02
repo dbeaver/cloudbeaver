@@ -21,9 +21,9 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { CreatingUser } from '../UsersAdministrationController';
 import { GrantedConnections } from './GrantedConnections';
 import { UserFormController } from './UserFormController';
 
@@ -103,7 +103,7 @@ const styles = composes(
 );
 
 interface Props {
-  user: AdminUserInfo;
+  user: CreatingUser;
   editing?: boolean;
   onCancel: () => void;
 }

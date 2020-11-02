@@ -10,10 +10,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedMapResource,
-  AdminUserInfo,
   ResourceKey,
   isResourceKeyList,
-  AdminConnectionGrantInfo
+  AdminConnectionGrantInfo, AdminUserInfoFragment
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -22,7 +21,9 @@ import { AuthProviderService } from './AuthProviderService';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
-type AdminUserNew = AdminUserInfo & { [NEW_USER_SYMBOL]: boolean };
+export type AdminUser = AdminUserInfoFragment;
+
+type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
 
 interface UserCreateOptions {
   userId: string;
@@ -32,7 +33,7 @@ interface UserCreateOptions {
 }
 
 @injectable()
-export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
+export class UsersResource extends CachedMapResource<string, AdminUser> {
   private metadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
@@ -70,7 +71,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
 
   async create({
     userId, roles, credentials, grantedConnections,
-  }: UserCreateOptions): Promise<AdminUserInfo> {
+  }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({ userId });
 
     try {
@@ -152,7 +153,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     this.metadata.set('all', false);
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUserInfo>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUser>> {
     const userId = key === 'all' ? undefined : key as string;
 
     const { users } = await this.graphQLService.sdk.getUsersList({ userId });
@@ -163,7 +164,7 @@ export class UsersResource extends CachedMapResource<string, AdminUserInfo> {
     }
 
     for (const user of users) {
-      this.set(user.userId, user as AdminUserInfo);
+      this.set(user.userId, user as AdminUser);
     }
     this.markUpdated(key);
 

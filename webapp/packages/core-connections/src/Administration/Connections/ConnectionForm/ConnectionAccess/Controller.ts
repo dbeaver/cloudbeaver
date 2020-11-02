@@ -8,9 +8,9 @@
 
 import { computed, observable } from 'mobx';
 
-import { UsersResource, RolesResource } from '@cloudbeaver/core-authentication';
+import { UsersResource, RolesResource, AdminUser } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
-import { AdminRoleInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { AdminRoleInfo, AdminSubjectType } from '@cloudbeaver/core-sdk';
 
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
@@ -19,7 +19,7 @@ export class Controller
 implements IInitializableController {
   @observable selectedSubjects: Map<string, boolean> = new Map();
 
-  @computed get users(): AdminUserInfo[] {
+  @computed get users(): AdminUser[] {
     return Array.from(this.usersResource.data.values());
   }
 

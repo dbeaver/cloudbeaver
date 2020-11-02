@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
+import { AdminUser } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand
 } from '@cloudbeaver/core-blocks';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { UserEdit } from './UserEdit';
@@ -24,7 +24,7 @@ const styles = css`
 `;
 
 interface Props {
-  user: AdminUserInfo;
+  user: AdminUser;
 }
 
 export const User = observer(function User({ user }: Props) {

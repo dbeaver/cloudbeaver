@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react';
 import styled, { css, use } from 'reshadow';
 
+import { AdminUser } from '@cloudbeaver/core-authentication';
 import {
   Table, TableHeader, TableColumnHeader, TableBody
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { User } from './User';
@@ -28,7 +28,7 @@ const styles = css`
 `;
 
 interface Props {
-  users: AdminUserInfo[];
+  users: AdminUser[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
 }
