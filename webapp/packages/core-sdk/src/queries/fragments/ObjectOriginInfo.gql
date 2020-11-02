@@ -1,0 +1,6 @@
+fragment ObjectOriginInfo on ObjectOrigin {
+  type
+  subType
+  displayName
+  icon
+}

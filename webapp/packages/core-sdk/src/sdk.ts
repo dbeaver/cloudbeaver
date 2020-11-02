@@ -529,17 +529,28 @@ export interface ConnectionInfo {
   connected: Scalars['Boolean'];
   provided: Scalars['Boolean'];
   readOnly: Scalars['Boolean'];
+  useUrl: Scalars['Boolean'];
   saveCredentials: Scalars['Boolean'];
   connectTime?: Maybe<Scalars['String']>;
   connectionError?: Maybe<ServerError>;
   serverVersion?: Maybe<Scalars['String']>;
   clientVersion?: Maybe<Scalars['String']>;
+  origin: ObjectOrigin;
   authNeeded: Scalars['Boolean'];
   authModel?: Maybe<Scalars['ID']>;
   authProperties: ObjectPropertyInfo[];
   features: Array<Scalars['String']>;
   navigatorSettings: NavigatorSettings;
   supportedDataFormats: ResultDataFormat[];
+}
+
+export interface ObjectOrigin {
+  type: Scalars['ID'];
+  subType?: Maybe<Scalars['ID']>;
+  displayName: Scalars['String'];
+  icon?: Maybe<Scalars['String']>;
+  configuration?: Maybe<Scalars['Object']>;
+  details?: Maybe<ObjectPropertyInfo[]>;
 }
 
 export interface ConnectionConfig {
@@ -600,10 +611,17 @@ export interface ObjectDescriptor {
 }
 
 export interface ObjectPropertyFilter {
-  ids?: Maybe<Array<Maybe<Scalars['String']>>>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  categories?: Maybe<Array<Maybe<Scalars['String']>>>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
+  ids?: Maybe<Array<Scalars['String']>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  categories?: Maybe<Array<Scalars['String']>>;
+  dataTypes?: Maybe<Array<Scalars['String']>>;
+}
+
+export interface ObjectDetails {
+  id?: Maybe<Scalars['Int']>;
+  displayName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['Object']>;
 }
 
 export interface DatabaseObjectInfo {
@@ -765,6 +783,7 @@ export interface AdminUserInfo {
   configurationParameters: Scalars['Object'];
   grantedRoles: Array<Scalars['ID']>;
   grantedConnections: AdminConnectionGrantInfo[];
+  origin: ObjectOrigin;
 }
 
 export interface AdminRoleInfo {
@@ -822,6 +841,7 @@ export interface UserAuthInfo {
   authProvider: Scalars['String'];
   loginTime: Scalars['DateTime'];
   message?: Maybe<Scalars['String']>;
+  origin: ObjectOrigin;
 }
 
 export interface DataTransferProcessorInfo {
@@ -879,7 +899,7 @@ export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
 
-export interface CreateUserQuery { user: Pick<AdminUserInfo, 'userId' | 'grantedRoles'> }
+export interface CreateUserQuery { user: AdminUserInfoFragment }
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -909,7 +929,7 @@ export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetUsersListQuery { users: Array<Maybe<Pick<AdminUserInfo, 'userId' | 'grantedRoles'>>> }
+export interface GetUsersListQuery { users: Array<Maybe<AdminUserInfoFragment>> }
 
 export type GrantUserRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1133,7 +1153,12 @@ export interface NavGetStructContainersQuery { navGetStructContainers: { catalog
 
 export type AdminConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
-  & { authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
+  & { origin: ObjectOriginInfoFragment; authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
+);
+
+export type AdminUserInfoFragment = (
+  Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
+  & { origin: ObjectOriginInfoFragment }
 );
 
 export type NavNodeInfoFragment = (
@@ -1142,6 +1167,8 @@ export type NavNodeInfoFragment = (
 );
 
 export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>;
+
+export type ObjectOriginInfoFragment = Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>;
 
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
 
@@ -1404,6 +1431,14 @@ export type SqlResultCloseMutationVariables = Exact<{
 
 export interface SqlResultCloseMutation { result: Mutation['sqlResultClose'] }
 
+export const ObjectOriginInfoFragmentDoc = `
+    fragment ObjectOriginInfo on ObjectOrigin {
+  type
+  subType
+  displayName
+  icon
+}
+    `;
 export const AdminConnectionFragmentDoc = `
     fragment AdminConnection on ConnectionInfo {
   id
@@ -1420,6 +1455,9 @@ export const AdminConnectionFragmentDoc = `
   url
   properties
   features
+  origin {
+    ...ObjectOriginInfo
+  }
   authNeeded
   authModel
   authProperties {
@@ -1430,7 +1468,16 @@ export const AdminConnectionFragmentDoc = `
   features
   supportedDataFormats
 }
-    `;
+    ${ObjectOriginInfoFragmentDoc}`;
+export const AdminUserInfoFragmentDoc = `
+    fragment AdminUserInfo on AdminUserInfo {
+  userId
+  grantedRoles
+  origin {
+    ...ObjectOriginInfo
+  }
+}
+    ${ObjectOriginInfoFragmentDoc}`;
 export const NavNodeInfoFragmentDoc = `
     fragment NavNodeInfo on NavigatorNodeInfo {
   id
@@ -1548,11 +1595,10 @@ export const GetSessionUserDocument = `
 export const CreateUserDocument = `
     query createUser($userId: ID!) {
   user: createUser(userId: $userId) {
-    userId
-    grantedRoles
+    ...AdminUserInfo
   }
 }
-    `;
+    ${AdminUserInfoFragmentDoc}`;
 export const DeleteUserDocument = `
     query deleteUser($userId: ID!) {
   deleteUser(userId: $userId)
@@ -1589,11 +1635,10 @@ export const GetUserGrantedConnectionsDocument = `
 export const GetUsersListDocument = `
     query getUsersList($userId: ID) {
   users: listUsers(userId: $userId) {
-    userId
-    grantedRoles
+    ...AdminUserInfo
   }
 }
-    `;
+    ${AdminUserInfoFragmentDoc}`;
 export const GrantUserRoleDocument = `
     query grantUserRole($userId: ID!, $roleId: ID!) {
   grantUserRole(userId: $userId, roleId: $roleId)

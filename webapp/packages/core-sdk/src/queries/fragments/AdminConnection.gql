@@ -17,6 +17,10 @@ fragment AdminConnection on ConnectionInfo {
     
   features
 
+  origin {
+    ...ObjectOriginInfo
+  }
+
   authNeeded
   authModel
   authProperties {

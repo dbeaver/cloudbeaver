@@ -1,0 +1,8 @@
+fragment AdminUserInfo on AdminUserInfo {
+  userId
+  grantedRoles
+  
+  origin {
+    ...ObjectOriginInfo
+  }
+}
