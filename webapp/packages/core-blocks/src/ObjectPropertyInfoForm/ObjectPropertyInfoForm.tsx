@@ -20,9 +20,11 @@ import { formStyles } from './formStyles';
 interface Props {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
-  disabled?: boolean;
   autofillToken?: string;
   className?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  autoHide?: boolean;
   onFocus?: (name: string) => void;
 }
 
@@ -31,9 +33,11 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
-  disabled,
   autofillToken = '',
   className,
+  disabled,
+  readOnly,
+  autoHide,
   onFocus,
 }) {
   const style = useStyles(formStyles);
@@ -66,6 +70,8 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
             name={property.id!}
             state={credentials}
             disabled={disabled}
+            readOnly={readOnly}
+            autoHide={autoHide}
             autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
             mod='surface'
             onFocus={handleFocus}
