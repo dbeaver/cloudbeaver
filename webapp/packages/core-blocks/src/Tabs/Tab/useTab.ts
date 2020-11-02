@@ -6,35 +6,61 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
-import { TabsContext } from '../TabsContext';
+import { IExecutorHandler } from '@cloudbeaver/core-executor';
+
+import { ITabData, TabsContext } from '../TabsContext';
 
 export function useTab(
   tabId: string,
-  onOpen?: (tabId: string) => void,
-  onClose?: (tabId: string) => void
+  onOpen?: (tab: ITabData<any>) => void,
+  onClose?: (tab: ITabData<any>) => void
 ) {
   const state = useContext(TabsContext);
   if (!state) {
     throw new Error('TabsContext not provided');
   }
 
-  const handleOpen = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    // e.preventDefault();
-    state.select(tabId);
-    if (onOpen) {
-      onOpen(tabId);
-    }
-  }, [state, onOpen, tabId]);
+  const dynamic = useRef({
+    tabId,
+    open: onOpen,
+    close: onClose,
+  });
 
-  const handleClose = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    // e.preventDefault();
+  dynamic.current.tabId = tabId;
+  dynamic.current.open = onOpen;
+  dynamic.current.close = onClose;
+
+  useEffect(() => {
+    const openHandler: IExecutorHandler<ITabData<any>> = (_, data) => {
+      if (tabId !== data.tabId) {
+        return;
+      }
+      dynamic.current.open?.(data);
+    };
+    const closeHandler: IExecutorHandler<ITabData<any>> = (_, data) => {
+      if (tabId !== data.tabId) {
+        return;
+      }
+      dynamic.current.close?.(data);
+    };
+
+    state.openExecutor.addHandler(openHandler);
+    state.closeExecutor.addHandler(closeHandler);
+
+    return () => {
+      state.openExecutor.removeHandler(openHandler);
+      state.closeExecutor.removeHandler(closeHandler);
+    };
+  }, [state.openExecutor, state.closeExecutor]);
+
+  const handleOpen = () => state.open(tabId);
+
+  const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation(); // it's here because close triggers handleOpen too
-    if (onClose) {
-      onClose(tabId);
-    }
-  }, [onClose, tabId]);
+    state.close(tabId);
+  };
 
   return { state, handleOpen, handleClose };
 }

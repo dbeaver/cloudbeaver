@@ -8,12 +8,12 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { ITab as TabClass } from '@cloudbeaver/core-app';
 import {
-  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader
+  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader, ITabData
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -74,14 +74,8 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
     [tab]
   );
 
-  const handleOpen = useCallback(
-    (resultId: string) => navigatorService.openEditorResult(tab.id, resultId),
-    []
-  );
-  const handleClose = useCallback(
-    (resultId: string) => navigatorService.closeEditorResult(tab.id, resultId),
-    []
-  );
+  const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(tab.id, tabId);
+  const handleClose = ({ tabId }: ITabData<any>) => navigatorService.closeEditorResult(tab.id, tabId);
 
   if (!tab.handlerState.queryTabGroups.length) {
     return <TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>;

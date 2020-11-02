@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
+import { Executor, IExecutorHandler } from '@cloudbeaver/core-executor';
+
 import { TabsContainer } from './TabsContainer';
-import { TabsContext, ITabsContext } from './TabsContext';
+import { TabsContext, ITabsContext, ITabData } from './TabsContext';
 
 type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   selectedId?: string;
@@ -19,7 +21,8 @@ type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   container?: TabsContainer<T>;
   lazy?: boolean;
   manual?: boolean;
-  onChange?: (tabId: string) => any;
+  onChange?: (tab: ITabData<T>) => void;
+  onClose?: (tab: ITabData<T>) => void;
 }>;
 
 export function TabsState<T = Record<string, any>>({
@@ -30,7 +33,8 @@ export function TabsState<T = Record<string, any>>({
   children,
   lazy = false,
   manual,
-  onChange,
+  onChange: onOpen,
+  onClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
   if (!selectedId && !currentTabId && container && container.tabInfoList.length > 0) {
@@ -43,6 +47,21 @@ export function TabsState<T = Record<string, any>>({
     manual,
   });
 
+  const dynamic = useRef({
+    open: onOpen,
+    close: onClose,
+    props: rest as T,
+    selectedId: null as string | null | undefined,
+    state,
+  });
+  const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
+  const [openExecutor] = useState(() => new Executor<ITabData<T>>());
+
+  dynamic.current.open = onOpen;
+  dynamic.current.close = onClose;
+  dynamic.current.props = rest as T;
+  dynamic.current.state = state;
+
   if (currentTabId) {
     state.selectedId = currentTabId;
   }
@@ -54,15 +73,64 @@ export function TabsState<T = Record<string, any>>({
     state.select(currentTabId);
   }, [currentTabId]); // hack currentId and selectedId not works
 
-  const handleChange = useCallback((tabId: string) => onChange?.(tabId), [onChange]);
+  useEffect(() => {
+    const openHandler: IExecutorHandler<ITabData<T>> = (_, data) => {
+      if (dynamic.current.selectedId === data.tabId) {
+        return false;
+      }
+      dynamic.current.selectedId = data.tabId;
+      dynamic.current.state.select(data.tabId);
+      dynamic.current.open?.(data);
+      return undefined;
+    };
+    const closeHandler: IExecutorHandler<ITabData<T>> = (_, data) => dynamic.current.close?.(data);
+
+    openExecutor.addHandler(openHandler);
+    closeExecutor.addHandler(closeHandler);
+
+    return () => {
+      // probably not needed, executors destroyed with component
+      openExecutor.removeHandler(openHandler);
+      closeExecutor.removeHandler(closeHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    openExecutor.execute({
+      tabId: state.selectedId!,
+      props: rest as T,
+    });
+  }, [state.selectedId]);
+
+  const handleOpen = useCallback((tabId: string) => openExecutor.execute({
+    tabId,
+    props: dynamic.current.props,
+  }), [openExecutor]);
+
+  const handleClose = useCallback((tabId: string) => closeExecutor.execute({
+    tabId,
+    props: dynamic.current.props,
+  }), [closeExecutor]);
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
     container,
     lazy,
     props: rest as T,
-    select: handleChange,
-  }), [...Object.values(state), handleChange, ...Object.values(rest), lazy, container]);
+    openExecutor,
+    closeExecutor,
+    open: handleOpen,
+    close: handleClose,
+  }), [
+    ...Object.values(state),
+    ...Object.values(rest),
+    lazy,
+    container,
+    closeExecutor,
+    openExecutor,
+    handleClose,
+    handleOpen,
+  ]);
 
   return (
     <TabsContext.Provider value={value}>

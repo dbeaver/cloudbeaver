@@ -152,7 +152,7 @@ export const CreateConnection = observer(function CreateConnection({
         container={service.tabsContainer}
         manual
         lazy
-        onChange={service.setCreateMethod}
+        onChange={({ tabId }) => service.setCreateMethod(tabId)}
       >
         <title-bar as='div'>
           {translate('connections_administration_connection_create')}

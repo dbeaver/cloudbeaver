@@ -10,11 +10,13 @@ import { PropsWithChildren } from 'react';
 
 import { DynamicStyle } from '@cloudbeaver/core-theming';
 
+import { ITabData } from '../TabsContext';
+
 export type TabProps = PropsWithChildren<{
   tabId: string;
   disabled?: boolean;
   className?: string;
   style?: DynamicStyle[] | DynamicStyle;
-  onOpen?: (tabId: string) => void;
-  onClose?: (tabId: string) => void;
+  onOpen?: (tab: ITabData<any>) => void;
+  onClose?: (tab: ITabData<any>) => void;
 }>;

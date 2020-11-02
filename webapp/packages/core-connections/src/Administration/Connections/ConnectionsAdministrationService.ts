@@ -65,12 +65,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
   private async activateCreateMethod(param: string | null) {
     if (!param) {
       this.createConnectionService.setCreateMethod();
-      return;
-    }
-
-    const method = this.createConnectionService.tabsContainer.tabInfoMap.get(param);
-    if (method) {
-      method.onOpen?.(method.key);
     }
   }
 

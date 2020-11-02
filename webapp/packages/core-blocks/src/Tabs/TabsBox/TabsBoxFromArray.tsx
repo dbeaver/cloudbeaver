@@ -13,6 +13,7 @@ import { useStyles, Style } from '@cloudbeaver/core-theming';
 
 import { Tab } from '../Tab';
 import { TabPanel } from '../TabPanel';
+import { ITabData } from '../TabsContext';
 import { TabsBox } from './TabsBox';
 
 export interface TabElementProps {
@@ -25,8 +26,8 @@ interface TabsBoxControllerProps {
   tab: React.ElementType<TabElementProps>;
   panel: React.ElementType<TabElementProps>;
   hideTabs?: boolean;
-  onOpen: (tabId: string) => void;
-  onClose?: (tabId: string) => void;
+  onOpen: (tab: ITabData<any>) => void;
+  onClose?: (tab: ITabData<any>) => void;
   className?: string;
   style?: Style[];
 }

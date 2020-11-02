@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-blocks';
+import { ITabData, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -64,10 +64,11 @@ export const TableLeftBar = observer(function TableLeftBar({
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(supportedDataFormat);
   const Tab = PresentationTab; // alias for styles matching
+  const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
 
   return styled(useStyles(styles, verticalRotatedTabStyles))(
     <table-left-bar as="div" className={className}>
-      <TabsState currentTabId={presentationId} onChange={onPresentationChange}>
+      <TabsState currentTabId={presentationId} onChange={changePresentation}>
         <TabList>
           {presentations.map(presentation => (
             <Tab key={presentation.id} presentation={presentation} model={model} style={styles} />

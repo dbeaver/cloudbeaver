@@ -9,6 +9,7 @@
 import { computed, observable } from 'mobx';
 
 import { TabProps } from './Tab/TabProps';
+import { ITabData } from './TabsContext';
 
 export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
   key: string;
@@ -23,8 +24,8 @@ export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends 
   isHidden?: (tabId: string, props?: TProps) => boolean;
   isDisabled?: (tabId: string, props?: TProps) => boolean;
 
-  onClose?: (tabId: string) => void;
-  onOpen?: (tabId: string) => void;
+  onClose?: (tab: ITabData<TProps>) => void;
+  onOpen?: (tab: ITabData<TProps>) => void;
 }
 
 export interface ITabInfo<

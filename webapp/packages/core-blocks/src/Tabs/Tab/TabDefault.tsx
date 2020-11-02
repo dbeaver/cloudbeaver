@@ -11,6 +11,7 @@ import styled from 'reshadow';
 import { Translate } from '@cloudbeaver/core-localization';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
+import { ITabData } from '../TabsContext';
 import { Tab } from './Tab';
 import { TabIcon } from './TabIcon';
 import { TabProps } from './TabProps';
@@ -24,8 +25,8 @@ interface Props<T = Record<string, any>> {
   className?: string;
   style?: DynamicStyle[] | DynamicStyle;
   disabled?: boolean;
-  onOpen?: (tabId: string) => void;
-  onClose?: (tabId: string) => void;
+  onOpen?: (tab: ITabData<any>) => void;
+  onClose?: (tab: ITabData<any>) => void;
 }
 
 export function TabDefault<T = Record<string, any>>({
