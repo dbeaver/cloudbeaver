@@ -116,20 +116,18 @@ export class ConnectionsManagerService {
     this.disconnecting = true;
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
-    const closedConnections = [] as string[];
-    for (const connection of this.connectionInfo.data.values()) {
-      try {
+    try {
+      for (const connection of this.connectionInfo.data.values()) {
         await this._closeConnectionAsync(connection);
-        closedConnections.push(connection.name);
-      } catch (e) {
-        controller.reject(e);
-        this.disconnecting = false;
-        return;
       }
+    } catch (e) {
+      controller.reject(e);
+      return;
+    } finally {
+      this.disconnecting = false;
     }
 
     notification.close();
-    this.disconnecting = false;
   }
 
   async closeConnectionAsync(id: string): Promise<void> {

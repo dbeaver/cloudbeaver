@@ -7,9 +7,8 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
 
-import { NotificationComponentProps, INotificationProcessExtraProps } from '@cloudbeaver/core-events';
+import { NotificationComponentProps, INotificationProcessExtraProps, ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
@@ -33,23 +32,16 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
   state,
   onClose,
 }: IProcessSnackbarProps) {
-  const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
 
-  const { processing: pending, error, response, title, message, status } = state!;
+  const { error, title, message, status } = state!;
 
   useSnackbarTimeout({ closeAfter, onClose, type: status });
-  const { isDialogOpen, onShowDetailsError } = useErrorDetails({ error });
-  const { isShowContent } = useDelayToShowContent({
+  const { isDialogOpen, showErrorDetails } = useErrorDetails({ error });
+  const isShowContent = useDelayToShowContent({
     deletingDelay: !!notification.state.deletingDelay,
     showContentDelay,
   });
-
-  useEffect(() => {
-    if (isShowContent) {
-      setMounted(true);
-    }
-  }, [isShowContent]);
 
   if (!isShowContent) {
     return null;
@@ -57,18 +49,17 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
 
   return (
     <SnackbarWrapper
-      mounted={mounted}
       closing={!!notification.state.deletingDelay}
-      closeable={!pending && (!response || !error)}
+      closeable={status !== ENotificationType.Loading}
       onClose={() => onClose(false)}
     >
       <SnackbarStatus status={status} />
       <SnackbarContent>
-        <SnackbarBody title={translate(title)} message={translate(message)} />
+        <SnackbarBody title={translate(title)} message={message && translate(message)} />
         <SnackbarFooter
           disabled={isDialogOpen}
           timestamp={notification.timestamp}
-          onShowDetails={onShowDetailsError}
+          onShowDetails={showErrorDetails}
         />
       </SnackbarContent>
     </SnackbarWrapper>

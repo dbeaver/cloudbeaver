@@ -1,3 +1,11 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import styled, { css } from 'reshadow';
 
 const SNACKBAR_BODY_STYLES = css`
@@ -36,13 +44,11 @@ const SNACKBAR_BODY_STYLES = css`
 interface ISnackbarBodyProps {
   title: string;
   message?: string;
-  preMessage?: string;
-
+  className?: string;
 }
-export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody(
-  { title, message, preMessage, ...rest }) {
+export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({ title, message, className }) {
   return styled(SNACKBAR_BODY_STYLES)(
-    <notification-body {...rest} as="div">
+    <notification-body as="div" className={className}>
       <body-text-block as='div'>
         <text-block-title title={title} as='h2'>{title}</text-block-title>
         {message && <message as="div">{message}</message>}

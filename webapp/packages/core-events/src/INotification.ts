@@ -1,4 +1,3 @@
-
 /*
  * cloudbeaver - Cloud Database Manager
  * Copyright (C) 2020 DBeaver Corp and others
@@ -8,15 +7,13 @@
  */
 
 export interface IProcessNotificationState {
-  readonly processing: boolean;
-  readonly response: string;
   readonly error: Error | null;
   readonly title: string;
-  readonly message: string;
   readonly status: ENotificationType;
-  init: (title: string) => void;
+  readonly message?: string;
+  init: (title: string, message?: string) => void;
   resolve: (title: string, res: string) => void;
-  reject: (e: Error, title?: string, message?: string) => void;
+  reject: (error: Error, title?: string, message?: string) => void;
 }
 
 export enum ENotificationType {

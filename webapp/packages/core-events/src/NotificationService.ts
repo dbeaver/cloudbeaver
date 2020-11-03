@@ -101,7 +101,7 @@ export class NotificationService {
     TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
     props?: TProps,
-    options?: INotificationOptions<TProps> & { type?: ENotificationType}
+    options?: INotificationOptions<TProps>
   ): {controller: ProcessNotificationController; notification: INotification<TProps>} {
     const processController = props?.state || new ProcessNotificationController();
 
@@ -110,9 +110,9 @@ export class NotificationService {
       ...options,
       extraProps: { ...props, state: processController } as TProps,
       customComponent: component,
-    }, options?.type ?? ENotificationType.Custom);
+    }, ENotificationType.Custom);
 
-    processController.init(options?.title || '');
+    processController.init(notification.title, notification.message);
     return { controller: processController, notification };
   }
 
@@ -165,6 +165,6 @@ export class NotificationService {
   }
 }
 
-function hasDetails(error: Error): error is GQLError | ServerInternalError {
+export function hasDetails(error: Error): error is GQLError | ServerInternalError {
   return error instanceof GQLError || error instanceof ServerInternalError;
 }

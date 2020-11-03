@@ -1,3 +1,12 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -47,22 +56,28 @@ const SNACKBAR_WRAPPER_STYLES = composes(
 );
 
 interface ISnackbarWrapperProps {
-  mounted: boolean;
   closing: boolean;
   closeable: boolean;
   onClose?: () => void;
+  className?: string;
 }
 
-export const SnackbarWrapper: React.FC<ISnackbarWrapperProps>
-  = function SnackbarWrapper({ mounted, closing, closeable, onClose, children, ...rest }) {
-    const styles = useStyles(SNACKBAR_WRAPPER_STYLES);
+export const SnackbarWrapper: React.FC<ISnackbarWrapperProps> = function SnackbarWrapper({
+  closing, closeable, onClose, children, className,
+}) {
+  const styles = useStyles(SNACKBAR_WRAPPER_STYLES);
+  const [mounted, setMounted] = useState(false);
 
-    return styled(styles)(
-      <notification as="div" {...use({ mounted, closing })} {...rest}>
-        {children}
-        {closeable && onClose && (
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
-        )}
-      </notification>
-    );
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return styled(styles)(
+    <notification as="div" className={className} {...use({ mounted, closing })}>
+      {children}
+      {closeable && onClose && (
+        <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
+      )}
+    </notification>
+  );
+};

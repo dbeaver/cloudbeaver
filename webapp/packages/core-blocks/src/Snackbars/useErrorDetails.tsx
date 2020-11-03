@@ -1,3 +1,11 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -11,9 +19,9 @@ export function useErrorDetails({ error }: IUseErrorDetailsProps) {
   const commonDialogService = useService(CommonDialogService);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  let onShowDetailsError;
+  let showErrorDetails;
   if (error) {
-    onShowDetailsError = async () => {
+    showErrorDetails = async () => {
       if (!error) {
         return;
       }
@@ -26,5 +34,5 @@ export function useErrorDetails({ error }: IUseErrorDetailsProps) {
     };
   }
 
-  return { isDialogOpen, onShowDetailsError };
+  return { isDialogOpen, showErrorDetails };
 }
