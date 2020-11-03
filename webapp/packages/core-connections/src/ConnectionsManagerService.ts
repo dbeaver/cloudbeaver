@@ -8,6 +8,7 @@
 
 import { Subject } from 'rxjs';
 
+import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -21,6 +22,7 @@ import { EConnectionFeature } from './EConnectionFeature';
 export class ConnectionsManagerService {
   onOpenConnection = new Subject<Connection>();
   onCloseConnection = new Subject<string>();
+  private disconnecting: boolean;
 
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
@@ -29,6 +31,7 @@ export class ConnectionsManagerService {
     private connectionAuthService: ConnectionAuthService,
     private commonDialogService: CommonDialogService
   ) {
+    this.disconnecting = false;
   }
 
   async requireConnection(connectionId?: string) {
@@ -98,10 +101,35 @@ export class ConnectionsManagerService {
     return !!Array.from(this.connectionInfo.data.values()).length;
   }
 
-  async closeAllConnections(): Promise<void> {
-    for (const connection of this.connectionInfo.data.values()) {
-      await this.closeConnectionAsync(connection.id);
+  private async _closeConnectionAsync(connection: Connection) {
+    if (!connection.connected) {
+      return;
     }
+    await this.connectionInfo.close(connection.id);
+    await this.afterConnectionClose(connection.id);
+  }
+
+  async closeAllConnections(): Promise<void> {
+    if (this.disconnecting) {
+      return;
+    }
+    this.disconnecting = true;
+    const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
+
+    const closedConnections = [] as string[];
+    for (const connection of this.connectionInfo.data.values()) {
+      try {
+        await this._closeConnectionAsync(connection);
+        closedConnections.push(connection.name);
+      } catch (e) {
+        controller.reject(e);
+        this.disconnecting = false;
+        return;
+      }
+    }
+
+    notification.close();
+    this.disconnecting = false;
   }
 
   async closeConnectionAsync(id: string): Promise<void> {
@@ -109,13 +137,16 @@ export class ConnectionsManagerService {
     if (!connection || !connection.connected) {
       return;
     }
+    const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
-      await this.connectionInfo.close(id);
-      await this.afterConnectionClose(id);
+      await this._closeConnectionAsync(connection);
     } catch (exception) {
-      this.notificationService.logException(exception, "Can't close connection", `Can't close connection: ${connection.name}`);
+      controller.reject(exception);
+      return;
     }
+
+    notification.close();
   }
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {

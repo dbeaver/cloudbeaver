@@ -1,3 +1,4 @@
+
 /*
  * cloudbeaver - Cloud Database Manager
  * Copyright (C) 2020 DBeaver Corp and others
@@ -6,10 +7,23 @@
  * you may not use this file except in compliance with the License.
  */
 
+export interface IProcessNotificationState {
+  readonly processing: boolean;
+  readonly response: string;
+  readonly error: Error | null;
+  readonly title: string;
+  readonly message: string;
+  readonly status: ENotificationType;
+  init: (title: string) => void;
+  resolve: (title: string, res: string) => void;
+  reject: (e: Error, title?: string, message?: string) => void;
+}
+
 export enum ENotificationType {
   Info = 'Info',
   Error = 'Error',
   Success = 'Success',
+  Loading = 'Loading',
   Custom =' Custom'
 }
 
@@ -17,12 +31,15 @@ export interface INotificationExtraProps<T = never> {
   source?: T;
   [key: string]: any;
 }
+export interface INotificationProcessExtraProps<T = never> extends INotificationExtraProps<T> {
+  state?: IProcessNotificationState;
+}
 
 export type NotificationComponentProps<
   TProps extends INotificationExtraProps<any> = INotificationExtraProps
 > = TProps & {
   notification: INotification<TProps>;
-  onClose: () => void;
+  onClose: (deletingDelay?: boolean) => void;
 };
 
 export type NotificationComponent<
@@ -37,10 +54,11 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   timestamp: number;
   details?: string | Error;
   persistent?: boolean;
+  state: {deletingDelay: number};
   isSilent: boolean;
   extraProps: TProps;
   customComponent?: () => NotificationComponent<TProps>;
-  close: () => void;
+  close: (deletingDelay?: boolean) => void;
   showDetails: () => void;
 }
 
@@ -52,5 +70,6 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   persistent?: boolean;
   extraProps?: TProps;
   timestamp?: number;
+  onClose?: (deletingDelay?: boolean) => void;
   customComponent?: () => NotificationComponent<TProps>;
 }

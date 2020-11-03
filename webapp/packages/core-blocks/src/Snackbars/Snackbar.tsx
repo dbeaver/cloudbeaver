@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { observer } from 'mobx-react';
+import { useEffect, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Button, IconButton, SNACKBAR_COMMON_STYLES } from '@cloudbeaver/core-blocks';
@@ -15,6 +16,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NotificationMark } from './NotificationMark';
+import { useSnackbarTimeout } from './useSnackbarTimeout';
 
 interface SnackbarProps {
   type?: ENotificationType;
@@ -23,11 +25,12 @@ interface SnackbarProps {
   closeAfter?: number;
   disableShowDetails?: boolean;
   time?: number;
-  onClose?: () => void;
+  onClose?: (deletingDelay?: boolean) => void;
+  state?: {deletingDelay: number};
   onShowDetails?: () => void;
 }
 
-export function Snackbar({
+export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   type,
   message,
   title,
@@ -35,41 +38,22 @@ export function Snackbar({
   disableShowDetails,
   onClose,
   onShowDetails,
+  state,
   time,
-}: SnackbarProps) {
+}) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
-  const [closing, setClosing] = useState(false);
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
   const translatedTitle = translate(title);
+  useSnackbarTimeout({ closeAfter, onClose, type });
 
   useEffect(() => {
     setMounted(true);
-    let timeOutId: any;
-    let timeOutClosingId: any;
-
-    if (closeAfter) {
-      timeOutId = setTimeout(() => {
-        setClosing(true);
-
-        if (onClose) {
-          timeOutClosingId = setTimeout(onClose, 1000);
-        }
-      }, closeAfter);
-    }
-    return () => {
-      if (timeOutId) {
-        clearTimeout(timeOutId);
-      }
-      if (timeOutClosingId) {
-        clearTimeout(timeOutClosingId);
-      }
-    };
   }, []);
 
   return styled(styles)(
-    <notification as="div" {...use({ mounted, closing })}>
+    <notification as="div" {...use({ mounted, closing: !!state?.deletingDelay })}>
       {type && <NotificationMark type={type} />}
       <notification-body as="div">
         <body-text-block as='div'>
@@ -93,8 +77,8 @@ export function Snackbar({
         </notification-footer>
       </notification-body>
       {onClose && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
+        <IconButton name="cross" viewBox="0 0 16 16" onClick={() => onClose(false)} />
       )}
     </notification>
   );
-}
+});

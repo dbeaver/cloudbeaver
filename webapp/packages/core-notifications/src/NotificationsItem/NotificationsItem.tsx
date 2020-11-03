@@ -18,7 +18,7 @@ interface Props {
   notification: INotification<any>;
 }
 
-export const NotificationsItem = observer(function Notification({ notification }: Props) {
+export const NotificationsItem = function Notification({ notification }: Props) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {
@@ -32,10 +32,11 @@ export const NotificationsItem = observer(function Notification({ notification }
       message={notification.message}
       type={notification.type}
       time={notification.timestamp}
+      state={notification.state}
       disableShowDetails={controller.isDetailsDialogOpen}
       closeAfter={controller.closeAfter}
       onClose={controller.handleClose}
       onShowDetails={controller.handleShowDetails}
     />
   );
-});
+};
