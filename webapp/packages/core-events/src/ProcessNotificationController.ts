@@ -11,39 +11,39 @@ import { observable } from 'mobx';
 import { GQLError } from '@cloudbeaver/core-sdk';
 
 import { ENotificationType, IProcessNotificationState } from './INotification';
-import { hasDetails } from './NotificationService';
+import { getErrorDetails } from './NotificationService';
 
 export class ProcessNotificationController implements IProcessNotificationState {
   @observable error: Error | null;
   @observable title: string;
   @observable status: ENotificationType;
-  @observable message?: string;
+  @observable message: string | null;
 
   constructor() {
     this.error = null;
     this.title = '';
-    this.message = '';
+    this.message = null;
     this.status = ENotificationType.Info;
   }
 
-  init(title: string, message?: string) {
+  init(title: string, message: string | null = null) {
     this.status = ENotificationType.Loading;
     this.title = title;
     this.message = message;
   }
 
-  resolve(title: string, message?: string) {
+  resolve(title: string, message: string | null = null) {
     this.status = ENotificationType.Success;
     this.title = title;
     this.message = message;
   }
 
-  reject(e: Error | GQLError, title?: string, message?: string) {
-    const exceptionMessage = hasDetails(e) ? e.errorText : e.message || e.name;
+  reject(error: Error | GQLError, title?: string, message: string | null = null) {
+    const { errorName, errorMessage } = getErrorDetails(error);
 
     this.status = ENotificationType.Error;
-    this.title = title || e.name;
-    this.message = message || exceptionMessage;
-    this.error = e;
+    this.title = title || errorName;
+    this.message = message || errorMessage;
+    this.error = error;
   }
 }

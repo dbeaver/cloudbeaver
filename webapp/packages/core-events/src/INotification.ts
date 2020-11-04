@@ -10,9 +10,9 @@ export interface IProcessNotificationState {
   readonly error: Error | null;
   readonly title: string;
   readonly status: ENotificationType;
-  readonly message?: string;
+  readonly message: string | null;
   init: (title: string, message?: string) => void;
-  resolve: (title: string, res: string) => void;
+  resolve: (title: string, message?: string) => void;
   reject: (error: Error, title?: string, message?: string) => void;
 }
 
@@ -51,11 +51,11 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   timestamp: number;
   details?: string | Error;
   persistent?: boolean;
-  state: {deletingDelay: number};
+  state: {delayDeleting: number};
   isSilent: boolean;
   extraProps: TProps;
   customComponent?: () => NotificationComponent<TProps>;
-  close: (deletingDelay?: boolean) => void;
+  close: (delayDeleting?: boolean) => void;
   showDetails: () => void;
 }
 
@@ -67,6 +67,6 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   persistent?: boolean;
   extraProps?: TProps;
   timestamp?: number;
-  onClose?: (deletingDelay?: boolean) => void;
+  onClose?: (delayDeleting?: boolean) => void;
   customComponent?: () => NotificationComponent<TProps>;
 }

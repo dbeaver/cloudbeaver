@@ -43,7 +43,7 @@ const SNACKBAR_BODY_STYLES = css`
 
 interface ISnackbarBodyProps {
   title: string;
-  message?: string;
+  message: string | null;
   className?: string;
 }
 export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({ title, message, className }) {

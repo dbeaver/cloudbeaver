@@ -120,14 +120,12 @@ export class ConnectionsManagerService {
       for (const connection of this.connectionInfo.data.values()) {
         await this._closeConnectionAsync(connection);
       }
+      notification.close();
     } catch (e) {
       controller.reject(e);
-      return;
     } finally {
       this.disconnecting = false;
     }
-
-    notification.close();
   }
 
   async closeConnectionAsync(id: string): Promise<void> {
@@ -139,12 +137,10 @@ export class ConnectionsManagerService {
 
     try {
       await this._closeConnectionAsync(connection);
+      notification.close();
     } catch (exception) {
       controller.reject(exception);
-      return;
     }
-
-    notification.close();
   }
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {

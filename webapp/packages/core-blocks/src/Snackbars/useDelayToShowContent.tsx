@@ -8,24 +8,19 @@
 
 import { useEffect, useState } from 'react';
 
-interface IUseDelayToShowContent {
-  deletingDelay: boolean;
-  showContentDelay: number;
-}
-
-export function useDelayToShowContent({ deletingDelay, showContentDelay }: IUseDelayToShowContent) {
+export function useDelayToShowContent(animate: boolean, showContentDelay: number) {
   const [isShowContent, setIsShowContent] = useState(false);
 
   useEffect(() => {
+    if (animate) {
+      return;
+    }
     const timerId = setTimeout(() => {
-      if (deletingDelay) {
-        return;
-      }
       setIsShowContent(true);
     }, showContentDelay);
 
     return () => clearTimeout(timerId);
-  }, [deletingDelay, showContentDelay]);
+  }, [animate, showContentDelay]);
 
   return isShowContent;
 }

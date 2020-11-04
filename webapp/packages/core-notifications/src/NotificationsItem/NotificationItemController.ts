@@ -38,11 +38,11 @@ export class NotificationItemController implements IInitializableController {
 
   handleShowDetails?: () => void;
 
-  handleClose = (deletingDelay = true) => {
+  handleClose = (delayDeleting = true) => {
     if (!this.notification) {
       return;
     }
-    this.notification.close(deletingDelay);
+    this.notification.close(delayDeleting);
   };
 
   private async showDetails() {

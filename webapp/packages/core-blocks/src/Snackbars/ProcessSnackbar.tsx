@@ -11,6 +11,7 @@ import { observer } from 'mobx-react';
 import { NotificationComponentProps, INotificationProcessExtraProps, ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
+import { Button } from '../Button';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
 import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
@@ -36,12 +37,10 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
 
   const { error, title, message, status } = state!;
 
-  useSnackbarTimeout({ closeAfter, onClose, type: status });
-  const { isDialogOpen, showErrorDetails } = useErrorDetails({ error });
-  const isShowContent = useDelayToShowContent({
-    deletingDelay: !!notification.state.deletingDelay,
-    showContentDelay,
-  });
+  useSnackbarTimeout({ closeDelay: closeAfter, onClose, animate: status === ENotificationType.Success });
+  const { isDialogOpen, showErrorDetails } = useErrorDetails(error);
+  const isShowContent = useDelayToShowContent(!!notification.state.delayDeleting, showContentDelay,
+  );
 
   if (!isShowContent) {
     return null;
@@ -49,7 +48,7 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
 
   return (
     <SnackbarWrapper
-      closing={!!notification.state.deletingDelay}
+      closing={!!notification.state.delayDeleting}
       closeable={status !== ENotificationType.Loading}
       onClose={() => onClose(false)}
     >
@@ -57,10 +56,19 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
       <SnackbarContent>
         <SnackbarBody title={translate(title)} message={message && translate(message)} />
         <SnackbarFooter
-          disabled={isDialogOpen}
           timestamp={notification.timestamp}
-          onShowDetails={showErrorDetails}
-        />
+        >
+          {showErrorDetails && (
+            <Button
+              type="button"
+              mod={['outlined']}
+              disabled={isDialogOpen}
+              onClick={showErrorDetails}
+            >
+              {translate('ui_errors_details')}
+            </Button>
+          )}
+        </SnackbarFooter>
       </SnackbarContent>
     </SnackbarWrapper>
   );

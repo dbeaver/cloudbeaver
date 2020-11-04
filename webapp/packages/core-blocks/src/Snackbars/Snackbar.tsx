@@ -25,8 +25,8 @@ interface SnackbarProps {
   closeAfter?: number;
   disableShowDetails?: boolean;
   time?: number;
-  onClose?: (deletingDelay?: boolean) => void;
-  state?: {deletingDelay: number};
+  onClose?: (delayDeleting?: boolean) => void;
+  state?: {delayDeleting: number};
   onShowDetails?: () => void;
 }
 
@@ -46,14 +46,14 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
   const translatedTitle = translate(title);
-  useSnackbarTimeout({ closeAfter, onClose, type });
+  useSnackbarTimeout({ closeDelay: closeAfter, onClose });
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return styled(styles)(
-    <notification as="div" {...use({ mounted, closing: !!state?.deletingDelay })}>
+    <notification as="div" {...use({ mounted, closing: !!state?.delayDeleting })}>
       {type && <NotificationMark type={type} />}
       <notification-body as="div">
         <body-text-block as='div'>

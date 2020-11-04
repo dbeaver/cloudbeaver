@@ -8,29 +8,24 @@
 
 import { useEffect } from 'react';
 
-import { ENotificationType } from '@cloudbeaver/core-events';
-
 interface IUseSnackbarTimeoutProps {
-  closeAfter?: number;
+  closeDelay?: number;
   onClose?: (deletingDelay?: boolean) => void;
-  type?: ENotificationType;
+  animate?: boolean;
 }
 
-export function useSnackbarTimeout(
-  { closeAfter, onClose, type }: IUseSnackbarTimeoutProps) {
+export function useSnackbarTimeout({ closeDelay, onClose, animate = true }: IUseSnackbarTimeoutProps) {
   useEffect(() => {
-    if (type !== ENotificationType.Success || !closeAfter) {
+    if (!onClose || !animate || !closeDelay) {
       return;
     }
 
     const timeoutId = setTimeout(() => {
-      if (onClose) {
-        onClose();
-      }
-    }, closeAfter);
+      onClose();
+    }, closeDelay);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [closeAfter, onClose, type]);
+  }, [closeDelay, onClose, animate]);
 }

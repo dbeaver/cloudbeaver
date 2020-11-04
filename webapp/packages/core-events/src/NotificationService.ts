@@ -23,7 +23,7 @@ import {
 } from './INotification';
 import { ProcessNotificationController } from './ProcessNotificationController';
 
-export const DELETING_DELAY = 1000;
+export const DELAY_DELETING = 1000;
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
@@ -60,10 +60,10 @@ export class NotificationService {
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
       persistent: options.persistent,
-      state: observable({ deletingDelay: 0 }),
+      state: observable({ delayDeleting: 0 }),
       timestamp: options.timestamp || Date.now(),
       type,
-      close: deletingDelay => this.close(id, deletingDelay),
+      close: delayDeleting => this.close(id, delayDeleting),
       showDetails: this.showDetails.bind(this, id),
     };
 
@@ -129,12 +129,12 @@ export class NotificationService {
   }
 
   logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
-    const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
+    const { errorName, errorMessage } = getErrorDetails(exception);
 
     if (!silent) {
       this.logError({
-        title: title || exception.name,
-        message: message || exceptionMessage,
+        title: title || errorName,
+        message: message || errorMessage,
         details: hasDetails(exception) ? exception : undefined,
         isSilent: silent,
       });
@@ -143,17 +143,17 @@ export class NotificationService {
     console.error(exception);
   }
 
-  close(id: number, deletingDelay = true): void {
+  close(id: number, delayDeleting = true): void {
     // TODO: emit event or something
 
-    if (deletingDelay) {
+    if (delayDeleting) {
       const notification = this.notificationList.get(id);
 
       if (notification) {
-        notification.state.deletingDelay = DELETING_DELAY;
+        notification.state.delayDeleting = DELAY_DELETING;
         setTimeout(() => {
           this.notificationList.remove(id);
-        }, DELETING_DELAY);
+        }, DELAY_DELETING);
       }
       return;
     }
@@ -167,4 +167,9 @@ export class NotificationService {
 
 export function hasDetails(error: Error): error is GQLError | ServerInternalError {
   return error instanceof GQLError || error instanceof ServerInternalError;
+}
+
+export function getErrorDetails(error: Error | GQLError) {
+  const exceptionMessage = hasDetails(error) ? error.errorText : error.message || error.name;
+  return { errorName: error.name, errorMessage: exceptionMessage };
 }
