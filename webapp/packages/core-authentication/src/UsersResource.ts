@@ -12,7 +12,9 @@ import {
   CachedMapResource,
   ResourceKey,
   isResourceKeyList,
-  AdminConnectionGrantInfo, AdminUserInfoFragment
+  AdminConnectionGrantInfo,
+  AdminUserInfoFragment,
+  ObjectPropertyInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -57,6 +59,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
 
     return this.data.has(id);
+  }
+
+  async loadOrigin(userId: string): Promise<ObjectPropertyInfo[]> {
+    const { user } = await this.graphQLService.sdk.getUserOrigin({ userId });
+
+    return user[0].origin.details || [];
   }
 
   async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {

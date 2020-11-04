@@ -7,32 +7,32 @@
  */
 
 import { observer } from 'mobx-react';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Tab,
-  TabTitle, Loader, SubmittingForm, TabPanel,
+  TabsState, TabList,
+  Loader, SubmittingForm,
   ErrorMessage, Button,
-  InputField,
-  FieldCheckbox,
-  useFocus,
-  InputGroup, FormBox, FormBoxElement, FormGroup, BORDER_TAB_STYLES
+  useFocus, BORDER_TAB_STYLES, TabPanelList
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { CreatingUser } from '../UsersAdministrationController';
-import { GrantedConnections } from './GrantedConnections';
 import { UserFormController } from './UserFormController';
+import { UserFormService } from './UserFormService';
 
-const styles = composes(
+const tabStyles = composes(
   css`
     Tab {
       composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
     }
+  `
+);
 
+const styles = composes(
+  css`
     TabList {
       composes: theme-background-surface theme-text-on-surface from global;
     }
@@ -47,10 +47,6 @@ const styles = composes(
 
     content-box {
       composes: theme-background-secondary theme-border-color-background from global;
-    }
-
-    GrantedConnections {
-      composes: theme-background-surface from global;
     }
   `,
   css`
@@ -103,7 +99,7 @@ const styles = composes(
 );
 
 interface Props {
-  user: CreatingUser;
+  user: AdminUserInfo;
   editing?: boolean;
   onCancel: () => void;
 }
@@ -113,37 +109,16 @@ export const UserForm = observer(function UserForm({
   editing = false,
   onCancel,
 }: Props) {
+  const tabsStyles = [tabStyles, BORDER_TAB_STYLES];
   const translate = useTranslate();
+  const service = useService(UserFormService);
   const controller = useController(UserFormController, user, editing, onCancel);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const handleLoginChange = useCallback(
-    (value: string) => { controller.credentials.login = value; },
-    []
-  );
-  const handlePasswordChange = useCallback(
-    (value: string) => { controller.credentials.password = value; },
-    []
-  );
-  const handlePasswordRepeatChange = useCallback(
-    (value: string) => { controller.credentials.passwordRepeat = value; },
-    []
-  );
-  const handleRoleChange = useCallback(
-    (roleId: string, value: boolean) => { controller.credentials.roles.set(roleId, value); },
-    []
-  );
-
-  return styled(useStyles(styles, BORDER_TAB_STYLES))(
-    <TabsState selectedId='info'>
+  return styled(useStyles(styles, tabsStyles))(
+    <TabsState container={service.tabsContainer} user={user} controller={controller} editing={editing}>
       <box as='div'>
-        <TabList>
-          <Tab tabId='info'>
-            <TabTitle>{translate('authentication_administration_user_info')}</TabTitle>
-          </Tab>
-          <Tab tabId='connections_access' onOpen={controller.loadConnectionsAccess}>
-            <TabTitle>{translate('authentication_administration_user_connections_access')}</TabTitle>
-          </Tab>
+        <TabList style={tabsStyles}>
           <fill as="div" />
           <Button
             type="button"
@@ -164,83 +139,8 @@ export const UserForm = observer(function UserForm({
         </TabList>
         <content-box as='div'>
           <SubmittingForm ref={focusedRef} onSubmit={controller.save}>
-            <TabPanel tabId='info'>
-              <FormBox>
-                <FormBoxElement>
-                  <FormGroup>
-                    <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputField
-                      type='text'
-                      name='login'
-                      value={controller.credentials.login}
-                      disabled={editing || controller.isSaving}
-                      mod='surface'
-                      required
-                      onChange={handleLoginChange}
-                    >
-                      {translate('authentication_user_name')}
-                    </InputField>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputField
-                      type='password'
-                      name='password'
-                      autoComplete='new-password'
-                      value={controller.credentials.password}
-                      disabled={controller.isSaving}
-                      mod='surface'
-                      required
-                      onChange={handlePasswordChange}
-                    >
-                      {translate('authentication_user_password')}
-                    </InputField>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputField
-                      type='password'
-                      name='password_repeat'
-                      value={controller.credentials.passwordRepeat}
-                      disabled={controller.isSaving}
-                      mod='surface'
-                      required
-                      onChange={handlePasswordRepeatChange}
-                    >
-                      {translate('authentication_user_password_repeat')}
-                    </InputField>
-                  </FormGroup>
-                </FormBoxElement>
-                <FormBoxElement>
-                  <FormGroup>
-                    <InputGroup>{translate('authentication_user_role')}</InputGroup>
-                  </FormGroup>
-                  {controller.roles.map((role, i) => (
-                    <FormGroup key={role.roleId}>
-                      <FieldCheckbox
-                        value={role.roleId}
-                        name='role'
-                        checkboxLabel={role.roleName || role.roleId}
-                        checked={controller.credentials.roles.get(role.roleId)}
-                        disabled={controller.isSaving}
-                        mod='surface'
-                        onChange={checked => handleRoleChange(role.roleId, checked)}
-                      />
-                    </FormGroup>
-                  ))}
-                </FormBoxElement>
-              </FormBox>
-            </TabPanel>
+            <TabPanelList style={tabsStyles} />
             {controller.isLoading && <Loader overlay />}
-            <TabPanel tabId='connections_access'>
-              <GrantedConnections
-                grantedConnections={controller.grantedConnections}
-                connections={controller.connections}
-                selectedConnection={controller.selectedConnections}
-                disabled={controller.isLoading}
-                onChange={controller.handleConnectionsAccessChange}
-              />
-            </TabPanel>
           </SubmittingForm>
           {controller.error.responseMessage && (
             <ErrorMessage

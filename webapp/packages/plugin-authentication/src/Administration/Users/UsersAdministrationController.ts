@@ -17,8 +17,6 @@ import { GQLErrorCatcher, resourceKeyList, AdminUserInfo } from '@cloudbeaver/co
 
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 
-export type CreatingUser = Omit<AdminUserInfo, 'origin'>;
-
 @injectable()
 export class UsersAdministrationController {
   @observable isDeleting = false;
@@ -39,7 +37,7 @@ export class UsersAdministrationController {
       });
   }
 
-  @observable creatingUser: CreatingUser | null = null;
+  @observable creatingUser: AdminUserInfo | null = null;
 
   get isLoading() {
     return this.usersResource.isLoading() || this.isDeleting;
@@ -63,6 +61,10 @@ export class UsersAdministrationController {
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
+      origin: {
+        type: 'local',
+        displayName: 'Local',
+      },
     };
     this.usersAdministrationNavigationService.navToAdd();
   };

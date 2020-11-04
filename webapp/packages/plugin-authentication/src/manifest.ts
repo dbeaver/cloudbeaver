@@ -8,6 +8,8 @@
 
 import { PluginManifest } from '@cloudbeaver/core-di';
 
+import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
+import { UserFormService } from './Administration/Users/UserForm/UserFormService';
 import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
@@ -27,5 +29,7 @@ export const manifest: PluginManifest = {
     UsersAdministrationService,
     AuthenticationLocaleService,
     UsersAdministrationNavigationService,
+    UserFormService,
+    UserFormBaseBootstrap,
   ],
 };

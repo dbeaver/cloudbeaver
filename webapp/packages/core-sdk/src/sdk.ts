@@ -919,6 +919,12 @@ export type GetRolesListQueryVariables = Exact<{
 
 export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> }
 
+export type GetUserOriginQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+export interface GetUserOriginQuery { user: Array<Maybe<{ origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>>> } }>> }
+
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
@@ -1623,6 +1629,25 @@ export const GetRolesListDocument = `
   }
 }
     `;
+export const GetUserOriginDocument = `
+    query getUserOrigin($userId: ID!) {
+  user: listUsers(userId: $userId) {
+    origin {
+      details {
+        id
+        displayName
+        description
+        category
+        dataType
+        value
+        validValues
+        defaultValue
+        features
+      }
+    }
+  }
+}
+    `;
 export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
@@ -2297,6 +2322,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
+    },
+    getUserOrigin(variables: GetUserOriginQueryVariables): Promise<GetUserOriginQuery> {
+      return withWrapper(() => client.request<GetUserOriginQuery>(GetUserOriginDocument, variables));
     },
     getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables): Promise<GetUserGrantedConnectionsQuery> {
       return withWrapper(() => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables));

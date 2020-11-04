@@ -11,6 +11,9 @@ import { computed, observable } from 'mobx';
 import { TabProps } from './Tab/TabProps';
 import { ITabData } from './TabsContext';
 
+export type TabContainerTabComponent<TProps = Record<string, any>> = React.FC<TabProps & TProps>;
+export type TabContainerPanelComponent<TProps = Record<string, any>> = React.FC<{ tabId: string } & TProps>;
+
 export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
   key: string;
   name?: string;
@@ -18,8 +21,8 @@ export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends 
   order?: number;
   options?: TOptions;
 
-  tab?: () => React.FC<TabProps & TProps>;
-  panel: () => React.FC<{ tabId: string } & TProps>;
+  tab?: () => TabContainerTabComponent<TProps>;
+  panel: () => TabContainerPanelComponent<TProps>;
 
   isHidden?: (tabId: string, props?: TProps) => boolean;
   isDisabled?: (tabId: string, props?: TProps) => boolean;

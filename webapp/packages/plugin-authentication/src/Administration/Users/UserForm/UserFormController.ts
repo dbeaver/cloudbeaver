@@ -8,58 +8,79 @@
 
 import { observable, computed } from 'mobx';
 
-import { RolesManagerService, UsersResource } from '@cloudbeaver/core-authentication';
-import { ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
-  GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType
+  GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, AdminRoleInfo
 } from '@cloudbeaver/core-sdk';
 
-import { CreatingUser } from '../UsersAdministrationController';
+interface IUserCredentials {
+  login: string;
+  password: string;
+  passwordRepeat: string;
+  roles: Map<string, boolean>;
+}
 
 @injectable()
 export class UserFormController implements IInitializableController, IDestructibleController {
-  readonly selectedConnections = observable<string, boolean>(new Map());
-  @observable grantedConnections: AdminConnectionGrantInfo[] = [];
-  @observable isSaving = false;
-  @observable isLoading = true;
-  @observable credentials = {
-    login: '',
-    password: '',
-    passwordRepeat: '',
-    roles: new Map<string, boolean>(),
-  };
+  @observable
+  readonly selectedConnections: Map<string, boolean>;
 
-  @computed get connections() {
+  @observable grantedConnections: AdminConnectionGrantInfo[];
+  @observable isSaving: boolean;
+  @observable isLoading: boolean;
+  @observable credentials: IUserCredentials;
+
+  @computed get connections(): AdminConnection[] {
     return Array.from(this.connectionsResource.data.values());
   }
 
-  @computed get roles() {
-    return Array.from(this.rolesManagerService.roles.data.values());
+  @computed get roles(): AdminRoleInfo[] {
+    return Array.from(this.rolesResource.data.values());
   }
 
-  user!: CreatingUser;
+  user!: AdminUserInfo;
 
-  readonly error = new GQLErrorCatcher();
-  private isDistructed = false;
-  private connectionAccessChanged = false;
-  private connectionAccessLoaded = false;
+  readonly error: GQLErrorCatcher;
+  @observable
+  readonly metadata: Map<string, any>;
+
+  private isDistructed: boolean;
+  private connectionAccessChanged: boolean;
+  private connectionAccessLoaded: boolean;
   private collapse!: () => void;
   private editing!: boolean;
 
   constructor(
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
-    private rolesManagerService: RolesManagerService,
+    private rolesResource: RolesResource,
     private usersResource: UsersResource,
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource
-  ) { }
+  ) {
+    this.selectedConnections = new Map();
+    this.grantedConnections = [];
+    this.isSaving = false;
+    this.isLoading = true;
+    this.credentials = {
+      login: '',
+      password: '',
+      passwordRepeat: '',
+      roles: new Map(),
+    };
+    this.error = new GQLErrorCatcher();
+    this.metadata = new Map<string, any>();
+    this.isDistructed = false;
+    this.connectionAccessChanged = false;
+    this.connectionAccessLoaded = false;
+  }
 
-  init(user: CreatingUser, editing: boolean, collapse: () => void) {
+  init(user: AdminUserInfo, editing: boolean, collapse: () => void) {
     this.user = user;
     this.editing = editing;
     this.collapse = collapse;
@@ -151,7 +172,7 @@ export class UserFormController implements IInitializableController, IDestructib
         return;
       }
 
-      if (this.rolesManagerService.roles.has(this.credentials.login)) {
+      if (this.rolesResource.has(this.credentials.login)) {
         this.notificationService.logError({ title: 'authentication_user_login_cant_be_used' });
         return;
       }
@@ -229,7 +250,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadRoles() {
     try {
-      await this.rolesManagerService.roles.loadAll();
+      await this.rolesResource.loadAll();
       await this.loadUser();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load roles');

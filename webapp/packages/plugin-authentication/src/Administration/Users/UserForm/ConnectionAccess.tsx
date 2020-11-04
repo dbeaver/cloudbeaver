@@ -14,16 +14,23 @@ import {
   Table, TableHeader, TableColumnHeader, TableBody,
   TableItem, TableColumnValue, TableItemSelect, StaticImage, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
-import { AdminConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminSubjectType, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+
+import { IUserFormProps } from './UserFormService';
 
 const styles = composes(
   css`
     box {
       composes: theme-background-surface theme-text-on-surface from global;
+    }
+
+    Table {
+      composes: theme-background-surface from global;
     }
   `,
   css`
@@ -35,41 +42,31 @@ const styles = composes(
     }
     StaticImage {
       display: flex;
-      width: 16px;
+      width: 24px;
     }
   `
 );
 
-interface Props {
-  grantedConnections: AdminConnectionGrantInfo[];
-  connections: AdminConnection[];
-  selectedConnection: Map<string, boolean>;
-  disabled: boolean;
-  onChange?: () => void;
-  className?: string;
-}
-
-export const GrantedConnections = observer(function GrantedConnections({
-  grantedConnections,
-  connections,
-  selectedConnection,
-  disabled,
-  onChange,
-  className,
-}: Props) {
+export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = observer(function ConnectionAccess({
+  controller,
+  editing,
+}) {
   const style = useStyles(styles);
   const translate = useTranslate();
   const driversResource = useService(DBDriverResource);
-  const getConnectionPermission = useCallback((connectionId: string) => grantedConnections
-    ?.find(connectionPermission => connectionPermission.connectionId === connectionId), [grantedConnections]);
+  const getConnectionPermission = useCallback(
+    (connectionId: string) => controller.grantedConnections
+      ?.find(connectionPermission => connectionPermission.connectionId === connectionId),
+    [controller.grantedConnections]);
+  const disabled = controller.isLoading;
 
-  if (connections.length === 0) {
+  if (controller.connections.length === 0) {
     return <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>;
   }
 
   return styled(style)(
     <box as='div'>
-      <Table selectedItems={selectedConnection} className={className} onSelect={onChange}>
+      <Table selectedItems={controller.selectedConnections} onSelect={controller.handleConnectionsAccessChange}>
         <TableHeader>
           <TableColumnHeader min />
           <TableColumnHeader min />
@@ -78,7 +75,7 @@ export const GrantedConnections = observer(function GrantedConnections({
           <TableColumnHeader />
         </TableHeader>
         <TableBody>
-          {connections.map(connection => {
+          {controller.connections.map(connection => {
             const connectionPermission = getConnectionPermission(connection.id);
             const driver = driversResource.get(connection.driverId);
             const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
