@@ -94,15 +94,8 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             DBASession authSession = session.getAuthInfo().getAuthSession();
             DBWAuthProvider<?> authProvider = this.authProvider.getInstance();
             if (authSession != null && authProvider instanceof DBWAuthProviderExternal) {
-                Type provideerSuperClass = authProvider.getClass().getGenericSuperclass();
-                if (provideerSuperClass instanceof ParameterizedType) {
-                    Type[] typeArguments = ((ParameterizedType) provideerSuperClass).getActualTypeArguments();
-                    if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
-                        if (!((Class)typeArguments[0]).isInstance(authSession)) {
-                            // Wrong session type for this auth provider
-                            return new WebPropertyInfo[0];
-                        }
-                    }
+                if (!isValidSessionType(authSession, authProvider)) {
+                    return new WebPropertyInfo[0];
                 }
                 DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), authSession, user);
                 if (userDetails != null) {
@@ -113,6 +106,18 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             log.error(e);
         }
         return new WebPropertyInfo[0];
+    }
+
+    private static boolean isValidSessionType(DBASession authSession, DBWAuthProvider<?> authProvider) {
+        Type providerSuperClass = authProvider.getClass().getGenericSuperclass();
+        if (providerSuperClass instanceof ParameterizedType) {
+            Type[] typeArguments = ((ParameterizedType) providerSuperClass).getActualTypeArguments();
+            if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
+                // Wrong session type for this auth provider
+                return ((Class) typeArguments[0]).isInstance(authSession);
+            }
+        }
+        return true;
     }
 
 }
