@@ -37,7 +37,7 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
 
   const { error, title, message, status } = state!;
 
-  useSnackbarTimeout({ closeDelay: closeAfter, onClose, animate: status === ENotificationType.Success });
+  useSnackbarTimeout(onClose, closeAfter, status === ENotificationType.Success);
   const { isDialogOpen, showErrorDetails } = useErrorDetails(error);
   const isShowContent = useDelayToShowContent(!!notification.state.delayDeleting, showContentDelay);
 

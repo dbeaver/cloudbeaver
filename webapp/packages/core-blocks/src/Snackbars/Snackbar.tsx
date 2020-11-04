@@ -22,10 +22,10 @@ interface SnackbarProps {
   type?: ENotificationType;
   message?: string;
   title: string;
-  closeAfter?: number;
+  closeAfter: number;
   disableShowDetails?: boolean;
   time?: number;
-  onClose?: (delayDeleting?: boolean) => void;
+  onClose: (delayDeleting?: boolean) => void;
   state?: {delayDeleting: number};
   onShowDetails?: () => void;
 }
@@ -34,7 +34,7 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   type,
   message,
   title,
-  closeAfter,
+  closeAfter = 0,
   disableShowDetails,
   onClose,
   onShowDetails,
@@ -46,7 +46,7 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
   const translatedTitle = translate(title);
-  useSnackbarTimeout({ closeDelay: closeAfter, onClose });
+  useSnackbarTimeout(onClose, closeAfter, !!closeAfter);
 
   useEffect(() => {
     setMounted(true);

@@ -8,15 +8,9 @@
 
 import { useEffect } from 'react';
 
-interface IUseSnackbarTimeoutProps {
-  closeDelay?: number;
-  onClose?: (deletingDelay?: boolean) => void;
-  animate?: boolean;
-}
-
-export function useSnackbarTimeout({ closeDelay, onClose, animate = true }: IUseSnackbarTimeoutProps) {
+export function useSnackbarTimeout(onClose: () => void, closeDelay: number, animate = true) {
   useEffect(() => {
-    if (!onClose || !animate || !closeDelay) {
+    if (!animate) {
       return;
     }
 

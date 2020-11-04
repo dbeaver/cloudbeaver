@@ -19,7 +19,8 @@ import {
   INotificationExtraProps,
   INotificationOptions,
   NotificationComponent,
-  INotificationProcessExtraProps
+  INotificationProcessExtraProps,
+  IProcessNotificationContainer
 } from './INotification';
 import { ProcessNotificationController } from './ProcessNotificationController';
 
@@ -102,7 +103,7 @@ export class NotificationService {
     component: () => NotificationComponent<TProps>,
     props?: TProps,
     options?: INotificationOptions<TProps>
-  ): {controller: ProcessNotificationController; notification: INotification<TProps>} {
+  ): IProcessNotificationContainer<TProps> {
     const processController = props?.state || new ProcessNotificationController();
 
     const notification = this.notify({

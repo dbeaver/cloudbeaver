@@ -32,6 +32,11 @@ export interface INotificationProcessExtraProps<T = never> extends INotification
   state?: IProcessNotificationState;
 }
 
+export interface IProcessNotificationContainer<TProps> {
+  controller: IProcessNotificationState;
+  notification: INotification<TProps>;
+}
+
 export type NotificationComponentProps<
   TProps extends INotificationExtraProps<any> = INotificationExtraProps
 > = TProps & {
