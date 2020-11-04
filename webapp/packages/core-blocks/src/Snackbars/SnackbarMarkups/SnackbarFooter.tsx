@@ -28,8 +28,7 @@ const SNACKBAR_FOOTER_STYLES = css`
   }
 `;
 
-export const SnackbarFooter: React.FC<ISnackbarFooter> = function SnackbarFooter(
-  { timestamp, className, children }) {
+export const SnackbarFooter: React.FC<ISnackbarFooter> = function SnackbarFooter({ timestamp, className, children }) {
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();
 
   return styled(SNACKBAR_FOOTER_STYLES)(

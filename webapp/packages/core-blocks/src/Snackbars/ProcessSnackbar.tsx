@@ -39,8 +39,7 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
 
   useSnackbarTimeout({ closeDelay: closeAfter, onClose, animate: status === ENotificationType.Success });
   const { isDialogOpen, showErrorDetails } = useErrorDetails(error);
-  const isShowContent = useDelayToShowContent(!!notification.state.delayDeleting, showContentDelay,
-  );
+  const isShowContent = useDelayToShowContent(!!notification.state.delayDeleting, showContentDelay);
 
   if (!isShowContent) {
     return null;
@@ -55,9 +54,7 @@ export const ProcessSnackbar = observer(function ProcessSnackbar({
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)} message={message && translate(message)} />
-        <SnackbarFooter
-          timestamp={notification.timestamp}
-        >
+        <SnackbarFooter timestamp={notification.timestamp}>
           {showErrorDetails && (
             <Button
               type="button"

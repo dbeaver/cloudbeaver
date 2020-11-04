@@ -39,11 +39,11 @@ export class ProcessNotificationController implements IProcessNotificationState 
   }
 
   reject(error: Error | GQLError, title?: string, message: string | null = null) {
-    const { errorName, errorMessage } = getErrorDetails(error);
+    const errorDetails = getErrorDetails(error);
 
     this.status = ENotificationType.Error;
-    this.title = title || errorName;
-    this.message = message || errorMessage;
+    this.title = title || errorDetails.name;
+    this.message = message || errorDetails.message;
     this.error = error;
   }
 }

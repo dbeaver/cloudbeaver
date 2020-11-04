@@ -129,12 +129,12 @@ export class NotificationService {
   }
 
   logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
-    const { errorName, errorMessage } = getErrorDetails(exception);
+    const errorDetails = getErrorDetails(exception);
 
     if (!silent) {
       this.logError({
-        title: title || errorName,
-        message: message || errorMessage,
+        title: title || errorDetails.name,
+        message: message || errorDetails.message,
         details: hasDetails(exception) ? exception : undefined,
         isSilent: silent,
       });
@@ -171,5 +171,5 @@ export function hasDetails(error: Error): error is GQLError | ServerInternalErro
 
 export function getErrorDetails(error: Error | GQLError) {
   const exceptionMessage = hasDetails(error) ? error.errorText : error.message || error.name;
-  return { errorName: error.name, errorMessage: exceptionMessage };
+  return { name: error.name, message: exceptionMessage };
 }
