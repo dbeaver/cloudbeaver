@@ -6,17 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
-
-import { useTranslate } from '@cloudbeaver/core-localization';
-
-import { Button } from '../../Button';
 
 interface ISnackbarFooter {
   timestamp: number;
-  onShowDetails?: () => void;
-  disabled?: boolean;
   className?: string;
 }
 
@@ -30,28 +23,21 @@ const SNACKBAR_FOOTER_STYLES = css`
     composes: theme-typography--caption from global;
     opacity: 0.7;
   }
+  actions:empty {
+    display: none;
+  }
 `;
 
-export const SnackbarFooter: React.FC<ISnackbarFooter> = observer(function SnackbarFooter(
-  { timestamp, onShowDetails, disabled, className }) {
+export const SnackbarFooter: React.FC<ISnackbarFooter> = function SnackbarFooter(
+  { timestamp, className, children }) {
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();
-  const translate = useTranslate();
 
   return styled(SNACKBAR_FOOTER_STYLES)(
     <notification-footer as='div' className={className}>
       <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
-      {onShowDetails && (
-        <actions as="div">
-          <Button
-            type="button"
-            mod={['outlined']}
-            disabled={disabled}
-            onClick={onShowDetails}
-          >
-            {translate('ui_errors_details')}
-          </Button>
-        </actions>
-      )}
+      <actions as="div">
+        {children}
+      </actions>
     </notification-footer>
   );
-});
+};
