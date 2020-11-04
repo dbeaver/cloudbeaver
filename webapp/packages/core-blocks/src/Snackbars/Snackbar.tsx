@@ -76,9 +76,7 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
           )}
         </notification-footer>
       </notification-body>
-      {onClose && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={() => onClose(false)} />
-      )}
+      <IconButton name="cross" viewBox="0 0 16 16" onClick={() => onClose(false)} />
     </notification>
   );
 });
