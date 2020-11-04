@@ -32,6 +32,8 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
@@ -92,6 +94,16 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             DBASession authSession = session.getAuthInfo().getAuthSession();
             DBWAuthProvider<?> authProvider = this.authProvider.getInstance();
             if (authSession != null && authProvider instanceof DBWAuthProviderExternal) {
+                Type provideerSuperClass = authProvider.getClass().getGenericSuperclass();
+                if (provideerSuperClass instanceof ParameterizedType) {
+                    Type[] typeArguments = ((ParameterizedType) provideerSuperClass).getActualTypeArguments();
+                    if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
+                        if (!((Class)typeArguments[0]).isInstance(authSession)) {
+                            // Wrong session type for this auth provider
+                            return new WebPropertyInfo[0];
+                        }
+                    }
+                }
                 DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), authSession, user);
                 if (userDetails != null) {
                     return WebServiceUtils.getObjectProperties(session, userDetails);
