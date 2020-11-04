@@ -30,7 +30,7 @@ export class CreateConnectionService {
   @observable connection: AdminConnection | null;
   @observable availableDrivers: string[];
   @observable credentials: Record<string, string | number>;
-  @observable grantedSubjects: AdminConnectionGrantInfo[];
+  @observable grantedSubjects: AdminConnectionGrantInfo[] | null;
 
   @computed get driver(): DBDriver | undefined {
     if (!this.connection?.driverId) {
@@ -49,7 +49,7 @@ export class CreateConnectionService {
   ) {
     this.credentials = {};
     this.availableDrivers = [];
-    this.grantedSubjects = [];
+    this.grantedSubjects = null;
     this.connection = null;
     this.tabsContainer = new TabsContainer();
 
@@ -112,7 +112,7 @@ export class CreateConnectionService {
     this.connection = null;
     this.availableDrivers = [];
     this.credentials = {};
-    this.grantedSubjects = [];
+    this.grantedSubjects = null;
   }
 
   close(): void {

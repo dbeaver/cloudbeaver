@@ -10,20 +10,16 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Tab,
-  TabTitle, Loader, TabPanel,
+  TabsState, TabList, Loader,
   Button, BORDER_TAB_STYLES, TabPanelList
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
+import { ConnectionFormController } from './ConnectionFormController';
 import { ConnectionFormService } from './ConnectionFormService';
-import { Controller } from './Controller';
-import { DriverProperties } from './DriverProperties/DriverProperties';
 import { IConnectionFormModel } from './IConnectionFormModel';
-import { Options } from './Options/Options';
 
 const styles = composes(
   css`
@@ -96,22 +92,17 @@ export const ConnectionForm = observer(function ConnectionForm({
 }: Props) {
   const style = [styles, BORDER_TAB_STYLES];
   const service = useService(ConnectionFormService);
-  const controller = useController(Controller, model, onCancel);
+  const controller = useController(ConnectionFormController, model, onCancel);
   const translate = useTranslate();
 
   return styled(useStyles(style))(
-    <TabsState selectedId='options' container={service.tabsContainer} model={model} metadata={controller.metadata}>
+    <TabsState
+      container={service.tabsContainer}
+      model={model}
+      controller={controller}
+    >
       <box as='div'>
         <TabList style={style}>
-          <Tab tabId='options'>
-            <TabTitle>{translate('customConnection_options')}</TabTitle>
-          </Tab>
-          <Tab tabId='driver_properties' disabled={!controller.driver}>
-            <TabTitle>{translate('customConnection_properties')}</TabTitle>
-          </Tab>
-          <Tab tabId='access' disabled={!controller.driver || !controller.isTabAvailable('access')}>
-            <TabTitle>{translate('connections_connection_edit_access')}</TabTitle>
-          </Tab>
           <fill as="div" />
           <Button
             type="button"
@@ -139,51 +130,7 @@ export const ConnectionForm = observer(function ConnectionForm({
           </Button>
         </TabList>
         <content-box as="div">
-          <TabPanelList style={style}>
-            {controller.isLoading
-              ? <Loader />
-              : (
-                <>
-                  <TabPanel tabId='options'>
-                    <Options
-                      model={model}
-                      type={controller.connectionType}
-                      disabled={controller.isDisabled}
-                      onTypeChange={controller.setType}
-                      onSave={controller.save}
-                    />
-                  </TabPanel>
-                  {model.connection.driverId && (
-                    <TabPanel tabId='driver_properties'>
-                      {state => (
-                        <DriverProperties
-                          driverId={model.connection.driverId}
-                          state={model.connection.properties}
-                          loadProperties={state.selectedId === 'driver_properties'}
-                        />
-                      )}
-                    </TabPanel>
-                  )}
-                  <TabPanel tabId='access'>
-                    {state => {
-                      if (state.selectedId === 'access') {
-                        controller.loadAccessSubjects();
-                      } else {
-                        return null;
-                      }
-
-                      return (
-                        <ConnectionAccess
-                          model={model}
-                          disabled={controller.isDisabled}
-                          onChange={controller.handleAccessChange}
-                        />
-                      );
-                    }}
-                  </TabPanel>
-                </>
-              )}
-          </TabPanelList>
+          <TabPanelList style={style} />
         </content-box>
       </box>
     </TabsState>

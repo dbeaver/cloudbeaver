@@ -54,7 +54,7 @@ export class DriverPropertiesController implements IInitializableController {
     });
   };
 
-  async loadDriverProperties() {
+  loadDriverProperties = async () => {
     if (this.isLoading || this.loaded) {
       return;
     }
@@ -85,5 +85,5 @@ export class DriverPropertiesController implements IInitializableController {
     } finally {
       this.isLoading = false;
     }
-  }
+  };
 }

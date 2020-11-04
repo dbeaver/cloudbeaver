@@ -1,3 +1,4 @@
+export * from './Administration/Connections/ConnectionForm/ConnectionFormBaseBootstrap';
 export * from './Administration/Connections/ConnectionForm/ConnectionFormService';
 export * from './Administration/Connections/ConnectionsAdministration';
 export * from './Administration/Connections/ConnectionsAdministrationNavService';

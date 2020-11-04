@@ -20,11 +20,11 @@ export interface ITabData<T = Record<string, any>> {
 
 export interface ITabsContext<T = Record<string, any>> {
   state: TabStateReturn;
-  container?: TabsContainer<T>;
-  lazy: boolean;
   props: T;
+  container?: TabsContainer<T>;
   openExecutor: IExecutor<ITabData<T>>;
   closeExecutor: IExecutor<ITabData<T>>;
+  lazy: boolean;
   open: (tabId: string) => void;
   close: (tabId: string) => void;
 }

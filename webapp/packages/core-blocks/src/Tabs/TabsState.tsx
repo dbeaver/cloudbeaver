@@ -37,9 +37,17 @@ export function TabsState<T = Record<string, any>>({
   onClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
-  if (!selectedId && !currentTabId && container && container.tabInfoList.length > 0) {
-    currentTabId = container.tabInfoList[0].key;
+  if (
+    !selectedId
+    && !currentTabId
+    && container
+    && container.tabInfoList.length > 0
+  ) {
+    selectedId = container.tabInfoList[0].key;
   }
+
+  const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
+  const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
   const state = useTabState({
     selectedId: selectedId || currentTabId,
@@ -54,8 +62,6 @@ export function TabsState<T = Record<string, any>>({
     selectedId: null as string | null | undefined,
     state,
   });
-  const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
-  const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
   dynamic.current.open = onOpen;
   dynamic.current.close = onClose;
@@ -114,20 +120,20 @@ export function TabsState<T = Record<string, any>>({
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
-    container,
-    lazy,
     props: rest as T,
+    container,
     openExecutor,
     closeExecutor,
+    lazy,
     open: handleOpen,
     close: handleClose,
   }), [
     ...Object.values(state),
     ...Object.values(rest),
-    lazy,
     container,
     closeExecutor,
     openExecutor,
+    lazy,
     handleClose,
     handleOpen,
   ]);

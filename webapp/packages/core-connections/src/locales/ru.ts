@@ -3,6 +3,7 @@ export default [
   ['connections_administration_connection_create', 'Создание подключения'],
   ['connections_administration_search_database_tip', 'Укажите ваши хосты, например \'localhost host1.myhost.com 192.168.0.1\' и нажмите Enter'],
   ['connections_administration_new_connection', 'Создание подключения'],
+  ['connections_administration_connection_access_empty', 'Нет доступных пользователей и подключений'],
   ['connections_administration_configuration_wizard_step_title', 'Подключения к базам'],
   ['connections_administration_configuration_wizard_step_description', 'Подключения к базам'],
   ['connections_connection_create_custom', 'Настроить'],

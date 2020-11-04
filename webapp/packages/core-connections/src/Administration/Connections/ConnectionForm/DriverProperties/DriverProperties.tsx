@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react';
-import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, PropertiesTable } from '@cloudbeaver/core-blocks';
+import { Loader, PropertiesTable, useTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { ConnectionFormController } from '../ConnectionFormController';
+import { IConnectionFormModel } from '../IConnectionFormModel';
 import { DriverPropertiesController } from './DriverPropertiesController';
 
 const styles = css`
@@ -29,23 +30,17 @@ const styles = css`
 `;
 
 interface DriverPropertiesProps {
-  driverId: string;
-  state: Record<string, string>;
-  loadProperties: boolean;
+  tabId: string;
+  model: IConnectionFormModel;
+  controller: ConnectionFormController;
 }
 
 export const DriverProperties = observer(function DriverProperties({
-  driverId,
-  state,
-  loadProperties,
+  tabId,
+  model,
 }: DriverPropertiesProps) {
-  const controller = useController(DriverPropertiesController, driverId, state);
-
-  useMemo(() => {
-    if (loadProperties) {
-      controller.loadDriverProperties();
-    }
-  }, [loadProperties, controller]);
+  const controller = useController(DriverPropertiesController, model.connection.driverId, model.connection.properties);
+  useTab(tabId, controller.loadDriverProperties);
 
   return styled(useStyles(styles))(
     <properties as="div">
@@ -53,7 +48,7 @@ export const DriverProperties = observer(function DriverProperties({
       {!controller.isLoading && controller.loaded && (
         <PropertiesTable
           properties={controller.driverProperties}
-          propertiesState={state}
+          propertiesState={model.connection.properties}
           onAdd={controller.addProperty}
         />
       )}

@@ -12,12 +12,21 @@ import styled, { css } from 'reshadow';
 
 import {
   Table,
-  TableHeader, TableColumnHeader, TableBody, TableItem, TableColumnValue, TableItemSelect, TextPlaceholder, Loader
+  TableHeader,
+  TableColumnHeader,
+  TableBody,
+  TableItem,
+  TableColumnValue,
+  TableItemSelect,
+  TextPlaceholder,
+  Loader,
+  useTab
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { ConnectionFormController } from '../ConnectionFormController';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 import { Controller } from './Controller';
 
@@ -39,35 +48,36 @@ const styles = composes(
 );
 
 interface Props {
+  tabId: string;
   model: IConnectionFormModel;
-  disabled: boolean;
-  onChange?: () => void;
+  controller: ConnectionFormController;
   className?: string;
 }
 
 export const ConnectionAccess = observer(function ConnectionAccess({
+  tabId,
   model,
-  disabled,
-  onChange,
+  controller: formController,
   className,
 }: Props) {
   const style = useStyles(styles);
-  const controller = useController(Controller, model);
+  const controller = useController(Controller, model, formController);
+  const { selected } = useTab(tabId, controller.load);
   const translate = useTranslate();
+  const disabled = controller.isLoading;
 
   const handleSelect = useCallback((item: string, state: boolean) => {
-    controller.onSelect(item, state);
-    if (onChange) {
-      onChange();
-    }
-  }, [onChange, controller]);
+    controller.select(item, state);
+    controller.change();
+  }, [controller]);
 
-  if (!model.grantedSubjects) {
-    return null;
-  }
-
-  if (controller.users.length === 0 && controller.roles.length) {
-    return <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>;
+  if (!model.grantedSubjects || !selected || (controller.users.length === 0 && controller.roles.length)) {
+    return styled(style)(
+      <box as='div'>
+        <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
+        {controller.isLoading && <Loader overlay />}
+      </box>
+    );
   }
 
   return styled(style)(

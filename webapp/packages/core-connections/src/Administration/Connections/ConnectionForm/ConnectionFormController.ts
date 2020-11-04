@@ -8,50 +8,50 @@
 
 import { observable, computed } from 'mobx';
 
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import {
   injectable, IInitializableController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
-import { DBDriverResource } from '../../../DBDriverResource';
+import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource } from '../../ConnectionsResource';
 import { EConnectionType } from './EConnectionType';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
 @injectable()
-export class Controller
+export class ConnectionFormController
 implements IInitializableController {
-  @observable connectionType = EConnectionType.Parameters;
-  @observable isLoading = false;
-  @observable isSaving = false;
+  @observable connectionType: EConnectionType;
+  @observable isSaving: boolean;
   @observable
-  readonly metadata = new Map<string, any>();
+  readonly metadata: Map<string, any>;
 
-  @computed get isDisabled() {
-    return this.isLoading || this.isSaving;
+  readonly afterSave: IExecutor<string>;
+
+  @computed get isDisabled(): boolean {
+    return this.isSaving;
   }
 
   /** It will be loaded by options controller */
-  @computed get driver() {
+  @computed get driver(): DBDriver | null {
     return this.dbDriverResource.get(this.model.connection.driverId) || null;
   }
 
-  @computed private get accessLoaded() {
-    return !!this.model.grantedSubjects;
-  }
-
-  private accessChanged = false;
   private model!: IConnectionFormModel;
   private close!: () => void;
 
   constructor(
-    private administrationScreenService: AdministrationScreenService,
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
     private dbDriverResource: DBDriverResource
-  ) { }
+  ) {
+    this.connectionType = EConnectionType.Parameters;
+    this.isSaving = false;
+    this.metadata = new Map<string, any>();
+    this.afterSave = new Executor();
+  }
 
   init(
     model: IConnectionFormModel,
@@ -61,30 +61,21 @@ implements IInitializableController {
     this.close = close;
   }
 
-  isTabAvailable(tabId: string): boolean {
-    if (this.administrationScreenService.isConfigurationMode) {
-      if (tabId === 'access') {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  setType = (type: EConnectionType) => {
+  setType = (type: EConnectionType): void => {
     this.connectionType = type;
   };
 
-  save = async () => {
+  save = async (): Promise<void> => {
     this.isSaving = true;
     try {
       if (this.model.editing) {
         const connection = await this.connectionsResource.update(this.model.connection.id, this.getConnectionConfig());
-        await this.saveSubjectPermissions(connection.id);
+        await this.afterSave.execute(connection.id);
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} updated` });
       } else {
         const connection = await this.connectionsResource.create(this.getConnectionConfig());
-        await this.saveSubjectPermissions(connection.id);
+        await this.afterSave.execute(connection.id);
         this.close();
         this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
       }
@@ -95,7 +86,7 @@ implements IInitializableController {
     }
   };
 
-  test = async () => {
+  test = async (): Promise<void> => {
     this.isSaving = true;
     try {
       await this.connectionsResource.test(this.getConnectionConfig());
@@ -106,33 +97,6 @@ implements IInitializableController {
       this.isSaving = false;
     }
   };
-
-  handleAccessChange = () => { this.accessChanged = true; };
-
-  loadAccessSubjects = async () => {
-    if (this.accessLoaded || this.isLoading) {
-      return;
-    }
-
-    this.isLoading = true;
-    try {
-      this.model.grantedSubjects = await this.connectionsResource.loadAccessSubjects(this.model.connection.id);
-    } catch (exception) {
-      this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
-    }
-    this.isLoading = false;
-  };
-
-  private async saveSubjectPermissions(connectionId: string) {
-    if (!this.accessChanged || !this.model.grantedSubjects) {
-      return;
-    }
-    await this.connectionsResource.setAccessSubjects(
-      connectionId,
-      this.model.grantedSubjects.map(subject => subject.subjectId)
-    );
-    this.accessChanged = false;
-  }
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};

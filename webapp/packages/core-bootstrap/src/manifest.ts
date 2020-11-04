@@ -63,7 +63,8 @@ import {
   ConnectionManualService,
   ConnectionSearchService,
   CreateConnectionBaseBootstrap,
-  ConnectionFormService
+  ConnectionFormService,
+  ConnectionFormBaseBootstrap
 } from '@cloudbeaver/core-connections';
 import { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
@@ -125,6 +126,7 @@ export const coreManifest: PluginManifest = {
     SessionExpireService,
     SessionExpiredDialogService,
     ConnectionsLocaleService,
+    ConnectionFormBaseBootstrap,
     ConnectionFormService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,

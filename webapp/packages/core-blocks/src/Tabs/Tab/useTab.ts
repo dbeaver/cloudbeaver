@@ -34,13 +34,13 @@ export function useTab(
 
   useEffect(() => {
     const openHandler: IExecutorHandler<ITabData<any>> = (_, data) => {
-      if (tabId !== data.tabId) {
+      if (dynamic.current.tabId !== data.tabId) {
         return;
       }
       dynamic.current.open?.(data);
     };
     const closeHandler: IExecutorHandler<ITabData<any>> = (_, data) => {
-      if (tabId !== data.tabId) {
+      if (dynamic.current.tabId !== data.tabId) {
         return;
       }
       dynamic.current.close?.(data);
@@ -62,5 +62,10 @@ export function useTab(
     state.close(tabId);
   };
 
-  return { state, handleOpen, handleClose };
+  return {
+    state,
+    selected: state.state.selectedId === tabId,
+    handleOpen,
+    handleClose,
+  };
 }

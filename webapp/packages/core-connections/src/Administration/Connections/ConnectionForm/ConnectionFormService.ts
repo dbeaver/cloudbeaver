@@ -9,11 +9,12 @@
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
+import { ConnectionFormController } from './ConnectionFormController';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
 export interface IConnectionFormProps {
   model: IConnectionFormModel;
-  metadata: Map<string, any>;
+  controller: ConnectionFormController;
 }
 
 @injectable()

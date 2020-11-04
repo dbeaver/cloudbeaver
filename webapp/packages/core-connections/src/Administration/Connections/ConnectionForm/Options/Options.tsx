@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import {
   Radio,
   InputField,
-  useFocus,
   ObjectPropertyInfoForm,
   Textarea,
   InputGroup,
@@ -26,18 +25,16 @@ import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { ConnectionFormController } from '../ConnectionFormController';
 import { EConnectionType } from '../EConnectionType';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
 
 interface Props {
+  tabId: string;
   model: IConnectionFormModel;
-  type: EConnectionType;
-  saving?: boolean;
-  disabled?: boolean;
-  onTypeChange: (type: EConnectionType) => void;
-  onSave?: () => void;
+  controller: ConnectionFormController;
 }
 
 const styles = css`
@@ -61,17 +58,14 @@ const styles = css`
 
 export const Options = observer(function Options({
   model,
-  type,
-  disabled,
-  saving,
-  onTypeChange,
-  onSave,
+  controller: formController,
 }: Props) {
   const controller = useController(OptionsController, model);
   const translate = useTranslate();
+  const disabled = formController.isDisabled;
 
   return styled(useStyles(styles))(
-    <SubmittingForm onChange={controller.onFormChange} onSubmit={onSave}>
+    <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
       <FormBox>
         <FormBoxElement>
           <FormGroup>
@@ -124,7 +118,7 @@ export const Options = observer(function Options({
         </FormBoxElement>
         <FormBoxElement>
           <connection-type as="div">
-            <RadioGroup name='type' value={type} onChange={onTypeChange}>
+            <RadioGroup name='type' value={formController.connectionType} onChange={formController.setType}>
               <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
                 {translate('customConnection_connectionType_custom')}
               </Radio>
@@ -133,12 +127,12 @@ export const Options = observer(function Options({
               </Radio>
             </RadioGroup>
           </connection-type>
-          <TabsState currentTabId={type}>
+          <TabsState currentTabId={formController.connectionType}>
             <TabPanel tabId={EConnectionType.Parameters}>
               <ParametersForm
                 connection={model.connection}
                 embedded={controller.driver?.embedded}
-                disabled={disabled || saving}
+                disabled={disabled}
               />
             </TabPanel>
             <TabPanel tabId={EConnectionType.URL}>
