@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -54,7 +55,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getType() {
-        return authProvider.getId();
+        return authProvider == null ? LocalAuthProvider.PROVIDER_ID : authProvider.getId();
     }
 
     @Nullable

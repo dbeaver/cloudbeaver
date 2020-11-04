@@ -77,16 +77,17 @@ public class AdminUserInfo {
         return CBPlatform.getInstance().getApplication().getSecurityController().getSubjectConnectionAccess(new String[] { getUserId()} );
     }
 
+    @Property
     public WebUserOriginInfo getOrigin() {
         String providerId = user.getMetaParameter(DBWAuthProviderExternal.META_AUTH_PROVIDER);
         if (CommonUtils.isEmpty(providerId)) {
             providerId = LocalAuthProvider.PROVIDER_ID;
         }
-        WebAuthProviderDescriptor authProvieer = WebServiceRegistry.getInstance().getAuthProvider(providerId);
-        if (authProvieer == null) {
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
+        if (authProvider == null) {
             log.error("Auth provider '" + providerId + "' not found");
         }
-        return new WebUserOriginInfo(session, user, authProvieer);
+        return new WebUserOriginInfo(session, user, authProvider);
     }
 
 }
