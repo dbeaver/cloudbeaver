@@ -51,4 +51,5 @@ export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
 export * from './Snackbars/Snackbar';
 export * from './Snackbars/ActionSnackbar';
+export * from './Snackbars/ProcessSnackbar';
 export * from './Snackbars/SnackbarCommonStyles';

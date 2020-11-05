@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
-
 import { Snackbar } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { INotification } from '@cloudbeaver/core-events';
@@ -18,12 +16,12 @@ interface Props {
   notification: INotification<any>;
 }
 
-export const NotificationsItem = observer(function Notification({ notification }: Props) {
+export const NotificationsItem: React.FC<Props> = function Notification({ notification }) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {
     const Custom = notification.customComponent();
-    return <Custom notification={notification} onClose={controller.handleClose} {...notification.extraProps} />;
+    return <Custom notification={notification} {...notification.extraProps} />;
   }
 
   return (
@@ -32,10 +30,11 @@ export const NotificationsItem = observer(function Notification({ notification }
       message={notification.message}
       type={notification.type}
       time={notification.timestamp}
+      state={notification.state}
       disableShowDetails={controller.isDetailsDialogOpen}
-      closeAfter={controller.closeAfter}
-      onClose={controller.handleClose}
+      closeDelay={controller.closeAfter}
+      onClose={notification.close}
       onShowDetails={controller.handleShowDetails}
     />
   );
-});
+};
