@@ -10,6 +10,7 @@ import { createContext } from 'react';
 import { TabStateReturn } from 'reakit/Tab';
 
 import { IExecutor } from '@cloudbeaver/core-executor';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { TabsContainer } from './TabsContainer';
 
@@ -20,6 +21,7 @@ export interface ITabData<T = Record<string, any>> {
 
 export interface ITabsContext<T = Record<string, any>> {
   state: TabStateReturn;
+  tabsState: MetadataMap<string, any>;
   props: T;
   container?: TabsContainer<T>;
   openExecutor: IExecutor<ITabData<T>>;

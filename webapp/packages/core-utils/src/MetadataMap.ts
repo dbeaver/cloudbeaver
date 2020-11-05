@@ -8,6 +8,7 @@
 
 import { observable } from 'mobx';
 
+export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
 export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, TValue>) => TValue;
 
 export class MetadataMap<TKey, TValue> {

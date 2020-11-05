@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
+import { TabContext } from './TabContext';
 import { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 
@@ -24,21 +25,27 @@ export const TabPanel: React.FC<TabPanelProps> = function TabPanel({
     throw new Error('Tabs context was not provided');
   }
 
+  const tabContext = useMemo(() => ({ tabId }), [tabId]);
+
   if ((lazy || state.lazy) && state.state.selectedId !== tabId) {
     return null;
   }
 
   if (typeof children === 'function') {
     return (
-      <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-        {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-      </BaseTabPanel>
+      <TabContext.Provider value={tabContext}>
+        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+          {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
+        </BaseTabPanel>
+      </TabContext.Provider>
     );
   }
 
   return (
-    <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-      {children}
-    </BaseTabPanel>
+    <TabContext.Provider value={tabContext}>
+      <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+        {children}
+      </BaseTabPanel>
+    </TabContext.Provider>
   );
 };

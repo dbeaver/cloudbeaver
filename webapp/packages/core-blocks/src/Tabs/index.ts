@@ -1,4 +1,5 @@
-export * from './Tab';
+export * from './ITab';
+export * from './TabContext';
 export * from './TabList';
 export * from './TabPanel';
 export * from './TabPanelList';
@@ -6,9 +7,9 @@ export * from './TabPanelProps';
 export * from './TabsContainer';
 export * from './TabsContext';
 export * from './TabsState';
-export * from './TabList';
+export * from './useTabState';
 
-export * from './ITab';
+export * from './Tab';
 
 export * from './TabsBox/TabsBox';
 export * from './TabsBox/TabsBoxFromArray';
