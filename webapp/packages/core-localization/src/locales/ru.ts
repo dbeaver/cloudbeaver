@@ -18,6 +18,7 @@ export const defaultRULocale = [
   ['ui_data_saving_error', 'Ошибка при сохранении изменений'],
   ['ui_no_matches_placeholder', 'По вашему запросу ничего не найдено.'],
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],
+  ['ui_information', 'Информация'],
   ['root_permission_denied', 'Отказано в доступе'],
   ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],

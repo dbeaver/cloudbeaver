@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, InputGroup, Loader } from '@cloudbeaver/core-blocks';
 import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -51,7 +50,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   if (state.properties.length === 0) {
     return (
       <FormBox>
-        <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>
+        <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
         <Loader loading={state.loading} overlay />
       </FormBox>
     );
@@ -61,7 +60,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     <FormBox>
       <FormBoxElement>
         <FormGroup>
-          <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
+          <InputGroup>{translate('ui_information')}</InputGroup>
         </FormGroup>
         <ObjectPropertyInfoForm
           properties={state.properties}
