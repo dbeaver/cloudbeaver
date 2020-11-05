@@ -86,7 +86,6 @@ public class AdminUserInfo {
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             log.error("Auth provider '" + providerId + "' not found");
-            return null;
         }
         return new WebUserOriginInfo(session, user, authProvider);
     }
