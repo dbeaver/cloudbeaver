@@ -173,3 +173,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
 export function isLocalConnection(connection: AdminConnection): boolean {
   return connection.origin.type === 'local';
 }
+
+export function isCloudConnection(connection: AdminConnection): boolean {
+  return connection.origin.type === 'cloud';
+}

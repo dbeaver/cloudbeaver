@@ -84,8 +84,8 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
             </message-box>
           )}
           <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" onClick={service.create} />
-            <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
+            <IconButton name="add" viewBox="0 0 28 28" disabled={!!sub} onClick={service.create} />
+            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
             <IconButton name="refresh-outline" viewBox="0 0 16 16" onClick={controller.update} />
           </AdministrationTools>
           {sub && (
