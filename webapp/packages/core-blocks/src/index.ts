@@ -41,6 +41,7 @@ export * from './FormControls/SubmittingForm';
 export * from './FormControls/Switch';
 export * from './FormControls/Textarea';
 export * from './ErrorMessage';
+export * from './ExceptionMessage';
 export * from './IconButton';
 export * from './IconOrImage';
 export * from './StaticImage';

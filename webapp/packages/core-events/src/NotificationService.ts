@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { getErrorDetails, GQLError } from '@cloudbeaver/core-sdk';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
@@ -136,7 +136,7 @@ export class NotificationService {
       this.logError({
         title: title || errorDetails.name,
         message: message || errorDetails.message,
-        details: hasDetails(exception) ? exception : undefined,
+        details: errorDetails.hasDetails ? exception : undefined,
         isSilent: silent,
       });
     }
@@ -164,13 +164,4 @@ export class NotificationService {
   showDetails(id: number): void {
     // TODO: emit event or something
   }
-}
-
-export function hasDetails(error: Error): error is GQLError | ServerInternalError {
-  return error instanceof GQLError || error instanceof ServerInternalError;
-}
-
-export function getErrorDetails(error: Error | GQLError) {
-  const exceptionMessage = hasDetails(error) ? error.errorText : error.message || error.name;
-  return { name: error.name, message: exceptionMessage };
 }

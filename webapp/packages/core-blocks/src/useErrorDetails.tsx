@@ -11,13 +11,15 @@ import { useState } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { getErrorDetails, IErrorDetails } from '@cloudbeaver/core-sdk';
 
-interface IErrorDetails{
+interface IErrorDetailsHook {
+  details: IErrorDetails | null;
   isOpen: boolean;
   open: () => void;
 }
 
-export function useErrorDetails(error: Error | null): IErrorDetails {
+export function useErrorDetails(error: Error | null): IErrorDetailsHook {
   const service = useService(CommonDialogService);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -33,5 +35,9 @@ export function useErrorDetails(error: Error | null): IErrorDetails {
     }
   };
 
-  return { isOpen, open };
+  return {
+    details: error && getErrorDetails(error),
+    isOpen,
+    open,
+  };
 }
