@@ -13,9 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, resourceKeyList, AdminUserInfo } from '@cloudbeaver/core-sdk';
-
-import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
+import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UsersAdministrationController {
@@ -37,46 +35,19 @@ export class UsersAdministrationController {
       });
   }
 
-  @observable creatingUser: AdminUserInfo | null = null;
-
   get isLoading() {
     return this.usersResource.isLoading() || this.isDeleting;
+  }
+
+  @computed get itemsSelected(): boolean {
+    return Array.from(this.selectedItems.values()).some(v => v);
   }
 
   constructor(
     private notificationService: NotificationService,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
-    private usersAdministrationNavigationService: UsersAdministrationNavigationService
   ) { }
-
-  create = () => {
-    if (this.creatingUser) {
-      return;
-    }
-
-    this.creatingUser = {
-      userId: '',
-      grantedRoles: [],
-      grantedConnections: [],
-      configurationParameters: {},
-      metaParameters: {},
-      origin: {
-        type: 'local',
-        displayName: 'Local',
-      },
-    };
-    this.usersAdministrationNavigationService.navToAdd();
-  };
-
-  cancelCreate = () => {
-    if (!this.creatingUser) {
-      return;
-    }
-
-    this.creatingUser = null;
-    this.usersAdministrationNavigationService.navToRoot();
-  };
 
   update = async () => {
     try {

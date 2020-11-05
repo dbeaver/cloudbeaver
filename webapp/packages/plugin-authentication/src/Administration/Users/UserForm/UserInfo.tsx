@@ -48,7 +48,8 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
             type='text'
             name='login'
             value={controller.credentials.login}
-            disabled={editing || controller.isSaving}
+            disabled={controller.isSaving}
+            readOnly={editing}
             mod='surface'
             required
             onChange={handleLoginChange}
@@ -56,33 +57,37 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
             {translate('authentication_user_name')}
           </InputField>
         </FormGroup>
-        <FormGroup>
-          <InputField
-            type='password'
-            name='password'
-            autoComplete='new-password'
-            value={controller.credentials.password}
-            disabled={controller.isSaving}
-            mod='surface'
-            required
-            onChange={handlePasswordChange}
-          >
-            {translate('authentication_user_password')}
-          </InputField>
-        </FormGroup>
-        <FormGroup>
-          <InputField
-            type='password'
-            name='password_repeat'
-            value={controller.credentials.passwordRepeat}
-            disabled={controller.isSaving}
-            mod='surface'
-            required
-            onChange={handlePasswordRepeatChange}
-          >
-            {translate('authentication_user_password_repeat')}
-          </InputField>
-        </FormGroup>
+        {controller.local && (
+          <>
+            <FormGroup>
+              <InputField
+                type='password'
+                name='password'
+                autoComplete='new-password'
+                value={controller.credentials.password}
+                disabled={controller.isSaving}
+                mod='surface'
+                required
+                onChange={handlePasswordChange}
+              >
+                {translate('authentication_user_password')}
+              </InputField>
+            </FormGroup>
+            <FormGroup>
+              <InputField
+                type='password'
+                name='password_repeat'
+                value={controller.credentials.passwordRepeat}
+                disabled={controller.isSaving}
+                mod='surface'
+                required
+                onChange={handlePasswordRepeatChange}
+              >
+                {translate('authentication_user_password_repeat')}
+              </InputField>
+            </FormGroup>
+          </>
+        )}
       </FormBoxElement>
       <FormBoxElement>
         <FormGroup>

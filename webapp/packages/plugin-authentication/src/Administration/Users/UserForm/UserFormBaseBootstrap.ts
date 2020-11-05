@@ -30,18 +30,18 @@ export class UserFormBaseBootstrap extends Bootstrap {
       panel: () => UserInfo,
     });
     this.userFormService.tabsContainer.add({
-      key: 'connections_access',
-      name: 'authentication_administration_user_connections_access',
-      order: 2,
-      panel: () => ConnectionAccess,
-      onOpen: ({ props }) => props.controller.loadConnectionsAccess(),
-    });
-    this.userFormService.tabsContainer.add({
       key: 'origin',
-      order: 3,
+      order: 2,
       isHidden: (tabId, props) => props?.user.origin.type === 'local',
       panel: () => OriginInfo,
       tab: () => OriginInfoTab,
+    });
+    this.userFormService.tabsContainer.add({
+      key: 'connections_access',
+      name: 'authentication_administration_user_connections_access',
+      order: 3,
+      panel: () => ConnectionAccess,
+      onOpen: ({ props }) => props.controller.loadConnectionsAccess(),
     });
   }
 

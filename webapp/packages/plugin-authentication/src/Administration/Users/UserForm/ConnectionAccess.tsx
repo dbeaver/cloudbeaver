@@ -15,7 +15,7 @@ import {
   TableItem, TableColumnValue, TableItemSelect, StaticImage, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
 import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
@@ -66,7 +66,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
 
   return styled(style)(
     <box as='div'>
-      <Table selectedItems={controller.selectedConnections} onSelect={controller.handleConnectionsAccessChange}>
+      <Table selectedItems={controller.selectedConnections} size='big' onSelect={controller.handleConnectionsAccessChange}>
         <TableHeader>
           <TableColumnHeader min />
           <TableColumnHeader min />
@@ -79,18 +79,36 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
             const connectionPermission = getConnectionPermission(connection.id);
             const driver = driversResource.get(connection.driverId);
             const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
+            const cloud = isCloudConnection(connection);
+
+            let grantedBy = '';
+            if (isRoleProvided) {
+              grantedBy = `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission?.subjectId}`;
+            } else if (connectionPermission) {
+              grantedBy = translate('authentication_administration_user_connections_access_granted_directly');
+            } else if (cloud) {
+              grantedBy = translate('authentication_administration_user_connections_access_granted_unmanaged');
+            }
 
             return (
-              <TableItem key={connection.id} item={connection.id} selectDisabled={disabled || isRoleProvided}>
+              <TableItem
+                key={connection.id}
+                item={connection.id}
+                selectDisabled={disabled || isRoleProvided || cloud}
+                disabled={cloud}
+              >
                 <TableColumnValue centerContent flex>
-                  <TableItemSelect disabled={disabled || isRoleProvided} checked={disabled || isRoleProvided} />
+                  {!cloud && (
+                    <TableItemSelect
+                      disabled={disabled || isRoleProvided}
+                      checked={disabled || isRoleProvided}
+                    />
+                  )}
                 </TableColumnValue>
                 <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>
                 <TableColumnValue>{connection.name}</TableColumnValue>
                 <TableColumnValue>
-                  {connectionPermission && (isRoleProvided
-                    ? `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission?.subjectId}`
-                    : translate('authentication_administration_user_connections_access_granted_directly'))}
+                  {grantedBy}
                 </TableColumnValue>
                 <TableColumnValue />
               </TableItem>

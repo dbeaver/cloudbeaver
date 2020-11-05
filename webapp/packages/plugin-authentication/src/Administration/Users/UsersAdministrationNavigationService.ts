@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 @injectable()
 export class UsersAdministrationNavigationService {
   static ItemName = 'users';
-  static AddItemName = 'add';
+  static CreateItemName = 'create';
 
   constructor(
     private administrationScreenService: AdministrationScreenService
@@ -22,10 +22,10 @@ export class UsersAdministrationNavigationService {
     this.administrationScreenService.navigateToItem(UsersAdministrationNavigationService.ItemName);
   }
 
-  navToAdd() {
+  navToCreate() {
     this.administrationScreenService.navigateToItemSub(
       UsersAdministrationNavigationService.ItemName,
-      UsersAdministrationNavigationService.AddItemName
+      UsersAdministrationNavigationService.CreateItemName
     );
   }
 }
