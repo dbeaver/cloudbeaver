@@ -169,3 +169,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     this.set(id, connection);
   }
 }
+
+export function isLocalConnection(connection: AdminConnection): boolean {
+  return connection.origin.type === 'local';
+}
