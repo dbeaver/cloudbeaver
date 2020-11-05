@@ -167,6 +167,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant role in anonymous mode");
         }
+        if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
+            throw new DBWebException("You cannot edit your own permissions");
+        }
         try {
             WebRole[] userRoles = CBPlatform.getInstance().getApplication().getSecurityController().getUserRoles(user);
             List<String> roleIds = Arrays.stream(userRoles).map(WebRole::getRoleId).collect(Collectors.toList());
