@@ -44,6 +44,10 @@ export class ConnectionsAdministrationController {
     return this.connectionsResource.isLoading() || this.isProcessing;
   }
 
+  @computed get itemsSelected(): boolean {
+    return Array.from(this.selectedItems.values()).some(v => v);
+  }
+
   constructor(
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
