@@ -69,13 +69,13 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getDisplayName() {
-        return authProvider.getLabel();
+        return authProvider == null ? "N/A" : authProvider.getLabel();
     }
 
     @Nullable
     @Override
     public String getIcon() {
-        return WebServiceUtils.makeIconId(authProvider.getIcon());
+        return authProvider == null ? null : WebServiceUtils.makeIconId(authProvider.getIcon());
     }
 
     @NotNull
@@ -87,7 +87,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @Property
     @Override
     public WebPropertyInfo[] getDetails() throws DBWebException {
-        if (user == null) {
+        if (user == null || authProvider == null) {
             return new WebPropertyInfo[0];
         }
         try {
