@@ -14,7 +14,7 @@ import {
   isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminUserInfoFragment,
-  ObjectPropertyInfo
+  ObjectPropertyInfo, AdminUserInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -59,6 +59,20 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
 
     return this.data.has(id);
+  }
+
+  getEmptyUser(): AdminUserInfo {
+    return {
+      userId: '',
+      grantedRoles: [],
+      grantedConnections: [],
+      configurationParameters: {},
+      metaParameters: {},
+      origin: {
+        type: 'local',
+        displayName: 'Local',
+      },
+    };
   }
 
   async loadOrigin(userId: string): Promise<ObjectPropertyInfo[]> {
@@ -182,4 +196,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
   private isActiveUser(userId: string) {
     return this.authInfoService.userInfo?.userId === userId;
   }
+}
+
+export function isLocalUser(user: AdminUser): boolean {
+  return user.origin.type === 'local';
 }

@@ -19,7 +19,7 @@ import {
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
@@ -58,6 +58,20 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
       return false;
     }
     return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
+  }
+
+  getEmptyConnection(): AdminConnection {
+    return {
+      id: uuid(),
+      template: false,
+      saveCredentials: false,
+      authProperties: [],
+      properties: {},
+      origin: {
+        type: 'local',
+        displayName: 'Local',
+      },
+    } as Partial<AdminConnection> as any;
   }
 
   async loadAll(): Promise<Map<string, AdminConnection>> {

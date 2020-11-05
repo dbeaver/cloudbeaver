@@ -7,10 +7,9 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../../../DBDriverResource';
-import { AdminConnection } from '../../../ConnectionsResource';
+import { ConnectionsResource } from '../../../ConnectionsResource';
 import { CreateConnectionService } from '../../CreateConnectionService';
 
 @injectable()
@@ -25,6 +24,7 @@ export class ConnectionManualService {
 
   constructor(
     private dbDriverResource: DBDriverResource,
+    private connectionsResource: ConnectionsResource,
     private createConnectionService: CreateConnectionService
   ) {
     this.select = this.select.bind(this);
@@ -34,13 +34,9 @@ export class ConnectionManualService {
   select(driverId: string): void {
     this.createConnectionService.setConnectionTemplate(
       {
-        id: uuid(),
+        ...this.connectionsResource.getEmptyConnection(),
         driverId,
-        template: false,
-        saveCredentials: false,
-        authProperties: [],
-        properties: {},
-      } as Partial<AdminConnection> as any,
+      },
       [driverId]
     );
   }

@@ -81,15 +81,11 @@ export class ConnectionSearchService {
   select(database: AdminConnectionSearchInfo): void {
     this.createConnectionService.setConnectionTemplate(
       {
-        id: uuid(),
+        ...this.connectionsResource.getEmptyConnection(),
         driverId: database.defaultDriver,
-        template: false,
-        saveCredentials: false,
         host: database.host,
         port: `${database.port}`,
-        authProperties: [],
-        properties: {},
-      } as Partial<AdminConnection> as any,
+      },
       database.possibleDrivers
     );
   }
