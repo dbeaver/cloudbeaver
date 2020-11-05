@@ -14,7 +14,7 @@ export class MetadataMap<TKey, TValue> {
   private data: Map<TKey, TValue>;
   private length: number;
 
-  constructor(private defaultValueGetter: DefaultValueGetter<TKey, TValue>) {
+  constructor(private defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
     this.data = observable(new Map());
     this.length = 0;
   }
@@ -43,28 +43,35 @@ export class MetadataMap<TKey, TValue> {
     return this.data.has(key);
   }
 
-  set(key: TKey, value: TValue) {
+  set(key: TKey, value: TValue): void {
     this.data.set(key, value);
   }
 
-  get(key: TKey): TValue {
+  get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
     if (this.data.has(key)) {
       return this.data.get(key)!;
     }
-    const value = this.defaultValueGetter(key, this);
+
+    const provider = defaultValue || this.defaultValueGetter;
+
+    if (!provider) {
+      throw new Error('MetadataMap: defaultValue should be provided if defaultValueGetter not set');
+    }
+
+    const value = provider(key, this);
     this.data.set(key, value);
     this.length++;
     return this.data.get(key)!;
   }
 
-  delete(key: TKey) {
+  delete(key: TKey): void {
     if (this.data.has(key)) {
       this.data.delete(key);
       this.length--;
     }
   }
 
-  clear() {
+  clear(): void {
     this.data.clear();
     this.length = 0;
   }
