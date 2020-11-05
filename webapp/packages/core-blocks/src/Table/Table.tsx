@@ -18,12 +18,13 @@ import { TableContext, ITableContext } from './TableContext';
 type Props = React.PropsWithChildren<{
   selectedItems?: Map<any, boolean>;
   expandedItems?: Map<any, boolean>;
-  onSelect?: (item: any, state: boolean) => void;
+  size?: 'big';
   className?: string;
+  onSelect?: (item: any, state: boolean) => void;
 }>;
 
 export const Table = observer(function Table({
-  selectedItems, expandedItems, onSelect, children, className,
+  selectedItems, expandedItems, className, size, children, onSelect,
 }: Props) {
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
   const [expanded] = useState<Map<any, boolean>>(() => expandedItems || observable(new Map()));
@@ -49,7 +50,7 @@ export const Table = observer(function Table({
 
   return styled(useStyles())(
     <TableContext.Provider value={context}>
-      <table className={className} {...use({ expanded: isExpanded.get() })}>
+      <table className={className} {...use({ expanded: isExpanded.get(), size })}>
         {children}
       </table>
     </TableContext.Provider>

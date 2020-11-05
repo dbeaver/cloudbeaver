@@ -55,6 +55,10 @@
     &:not([use|noHover])[use|expanded] {
       @include stripes-background($mdc-theme-secondary);
     }
+
+    &[|disabled] {
+      opacity: .85;
+    }
   }
 
   th {
