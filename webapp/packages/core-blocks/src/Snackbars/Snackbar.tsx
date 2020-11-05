@@ -15,18 +15,18 @@ import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useStateDelay } from '../useStateDelay';
 import { NotificationMark } from './NotificationMark';
-import { useSnackbarTimeout } from './useSnackbarTimeout';
 
 interface SnackbarProps {
   type?: ENotificationType;
   message?: string;
   title: string;
-  closeAfter: number;
+  closeDelay: number;
   disableShowDetails?: boolean;
   time?: number;
   onClose: (delayDeleting?: boolean) => void;
-  state?: {delayDeleting: number};
+  state?: { deleteDelay: number };
   onShowDetails?: () => void;
 }
 
@@ -34,7 +34,7 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   type,
   message,
   title,
-  closeAfter = 0,
+  closeDelay = 0,
   disableShowDetails,
   onClose,
   onShowDetails,
@@ -46,14 +46,14 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   const translate = useTranslate();
   const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
   const translatedTitle = translate(title);
-  useSnackbarTimeout(onClose, closeAfter, !!closeAfter);
+  useStateDelay(closeDelay > 0, closeDelay, onClose);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return styled(styles)(
-    <notification as="div" {...use({ mounted, closing: !!state?.delayDeleting })}>
+    <notification as="div" {...use({ mounted, closing: !!state?.deleteDelay })}>
       {type && <NotificationMark type={type} />}
       <notification-body as="div">
         <body-text-block as='div'>

@@ -8,59 +8,57 @@
 
 import { observer } from 'mobx-react';
 
-import { NotificationComponentProps, INotificationProcessExtraProps, ENotificationType } from '@cloudbeaver/core-events';
+import { INotificationProcessExtraProps, ENotificationType, NotificationComponent } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Button } from '../Button';
+import { useErrorDetails } from '../useErrorDetails';
+import { useStateDelay } from '../useStateDelay';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
 import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
-import { useDelayToShowContent } from './useDelayToShowContent';
-import { useErrorDetails } from './useErrorDetails';
-import { useSnackbarTimeout } from './useSnackbarTimeout';
 
-type IProcessSnackbarProps = NotificationComponentProps<INotificationProcessExtraProps & {
-  closeAfter?: number;
-  showContentDelay?: number;
-}>;
+interface Props extends INotificationProcessExtraProps {
+  closeDelay?: number;
+  displayDelay?: number;
+}
 
-export const ProcessSnackbar = observer(function ProcessSnackbar({
-  closeAfter = 5000,
-  showContentDelay = 750,
+export const ProcessSnackbar: NotificationComponent<Props> = observer(function ProcessSnackbar({
+  closeDelay = 3000,
+  displayDelay = 750,
   notification,
   state,
-  onClose,
-}: IProcessSnackbarProps) {
-  const translate = useTranslate();
-
+}) {
   const { error, title, message, status } = state!;
 
-  useSnackbarTimeout(onClose, closeAfter, status === ENotificationType.Success);
-  const { isDialogOpen, showErrorDetails } = useErrorDetails(error);
-  const isShowContent = useDelayToShowContent(!!notification.state.delayDeleting, showContentDelay);
+  const translate = useTranslate();
+  const details = useErrorDetails(error);
+  const displayed = useStateDelay(notification.state.deleteDelay === 0, displayDelay);
 
-  if (!isShowContent) {
+  useStateDelay(status === ENotificationType.Success, closeDelay, notification.close);
+
+  if (!displayed) {
     return null;
   }
 
   return (
     <SnackbarWrapper
-      closing={!!notification.state.delayDeleting}
+      closing={!!notification.state.deleteDelay}
       closeable={status !== ENotificationType.Loading}
-      onClose={() => onClose(false)}
+      onClose={() => notification.close(false)}
     >
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)} message={message && translate(message)} />
         <SnackbarFooter timestamp={notification.timestamp}>
-          {showErrorDetails && (
+          {error && (
             <Button
               type="button"
               mod={['outlined']}
-              disabled={isDialogOpen}
-              onClick={showErrorDetails}
+              disabled={details.isOpen}
+              onClick={details.open}
             >
               {translate('ui_errors_details')}
             </Button>

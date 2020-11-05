@@ -61,7 +61,7 @@ export class NotificationService {
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
       persistent: options.persistent,
-      state: observable({ delayDeleting: 0 }),
+      state: observable({ deleteDelay: 0 }),
       timestamp: options.timestamp || Date.now(),
       type,
       close: delayDeleting => this.close(id, delayDeleting),
@@ -87,7 +87,7 @@ export class NotificationService {
     TProps extends INotificationExtraProps<any> = INotificationExtraProps
   >(
     component: () => NotificationComponent<TProps>,
-    props?: TProps,
+    props?: TProps extends any ? TProps : never, // some magic
     options?: INotificationOptions<TProps> & { type?: ENotificationType }
   ): void {
     this.notify({
@@ -101,7 +101,7 @@ export class NotificationService {
   processNotification<
     TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
-    props?: TProps,
+    props?: TProps extends any ? TProps : never, // some magic,
     options?: INotificationOptions<TProps>
   ): IProcessNotificationContainer<TProps> {
     const processController = props?.state || new ProcessNotificationController();
@@ -151,7 +151,7 @@ export class NotificationService {
       const notification = this.notificationList.get(id);
 
       if (notification) {
-        notification.state.delayDeleting = DELAY_DELETING;
+        notification.state.deleteDelay = DELAY_DELETING;
         setTimeout(() => {
           this.notificationList.remove(id);
         }, DELAY_DELETING);

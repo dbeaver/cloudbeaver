@@ -11,20 +11,20 @@ import { useEffect, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Button, IconButton } from '@cloudbeaver/core-blocks';
-import { NotificationComponentProps } from '@cloudbeaver/core-events';
+import { INotificationExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NotificationMark } from './NotificationMark';
 import { SNACKBAR_COMMON_STYLES } from './SnackbarCommonStyles';
 
-type Props = NotificationComponentProps<{
+interface Props extends INotificationExtraProps {
   onAction: () => void;
   actionText: string;
-}>;
+}
 
-export const ActionSnackbar: React.FC<Props> = observer(function ActionSnackbar({
-  notification, onAction, actionText, onClose,
+export const ActionSnackbar: NotificationComponent<Props> = observer(function ActionSnackbar({
+  notification, onAction, actionText,
 }) {
   const styles = useStyles(SNACKBAR_COMMON_STYLES);
   const [mounted, setMounted] = useState(false);
@@ -54,9 +54,8 @@ export const ActionSnackbar: React.FC<Props> = observer(function ActionSnackbar(
         </notification-footer>
       </notification-body>
       {!notification.persistent && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={() => onClose(false)} />
+        <IconButton name="cross" viewBox="0 0 16 16" onClick={() => notification.close(false)} />
       )}
     </notification>
-
   );
 });

@@ -26,7 +26,6 @@ export enum ENotificationType {
 
 export interface INotificationExtraProps<T = never> {
   source?: T;
-  [key: string]: any;
 }
 export interface INotificationProcessExtraProps<T = never> extends INotificationExtraProps<T> {
   state?: IProcessNotificationState;
@@ -41,7 +40,6 @@ export type NotificationComponentProps<
   TProps extends INotificationExtraProps<any> = INotificationExtraProps
 > = TProps & {
   notification: INotification<TProps>;
-  onClose: (deletingDelay?: boolean) => void;
 };
 
 export type NotificationComponent<
@@ -56,7 +54,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   timestamp: number;
   details?: string | Error;
   persistent?: boolean;
-  state: {delayDeleting: number};
+  state: { deleteDelay: number };
   isSilent: boolean;
   extraProps: TProps;
   customComponent?: () => NotificationComponent<TProps>;

@@ -8,11 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-interface ISnackbarFooter {
-  timestamp: number;
-  className?: string;
-}
-
 const SNACKBAR_FOOTER_STYLES = css`
   notification-footer {
     display: flex;
@@ -27,6 +22,11 @@ const SNACKBAR_FOOTER_STYLES = css`
     display: none;
   }
 `;
+
+interface ISnackbarFooter {
+  timestamp: number;
+  className?: string;
+}
 
 export const SnackbarFooter: React.FC<ISnackbarFooter> = function SnackbarFooter({ timestamp, className, children }) {
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();

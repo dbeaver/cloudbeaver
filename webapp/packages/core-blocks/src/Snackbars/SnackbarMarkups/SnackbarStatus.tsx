@@ -13,11 +13,6 @@ import { ENotificationType } from '@cloudbeaver/core-events';
 import { Loader } from '../../Loader/Loader';
 import { NotificationMark } from '../NotificationMark';
 
-interface SnackbarStatusProps {
-  status: ENotificationType;
-  className?: string;
-}
-
 const SNACKBAR_STATUS_STYLES = css`
   NotificationMark {
     padding-right: 12px; 
@@ -30,6 +25,11 @@ const SNACKBAR_STATUS_STYLES = css`
     }
   }
 `;
+
+interface SnackbarStatusProps {
+  status: ENotificationType;
+  className?: string;
+}
 
 export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarStatus({ status, className }) {
   return styled(SNACKBAR_STATUS_STYLES)(
