@@ -14,6 +14,7 @@ interface Props {
   label?: string;
   long?: boolean;
   short?: boolean;
+  raw?: boolean;
   className?: string;
 }
 
@@ -21,11 +22,12 @@ export const FormFieldDescription: React.FC<Props> = function FormFieldDescripti
   label,
   long,
   short,
+  raw,
   children,
   className,
 }) {
   return styled(baseFormControlStyles)(
-    <field as='div' className={className} {...use({ long, short })}>
+    <field as='div' className={className} {...use({ long, short, raw })}>
       {label && <field-label as='label'>{label}</field-label>}
       <field-description as='div'>
         {children}

@@ -63,21 +63,24 @@ export const Options = observer(function Options({
   const controller = useController(OptionsController, model);
   const translate = useTranslate();
   const disabled = formController.isDisabled;
+  const isOriginLocal = formController.local;
 
   return styled(useStyles(styles))(
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
       <FormBox>
         <FormBoxElement>
-          <FormGroup>
-            <FieldCheckbox
-              name="template"
-              value={model.connection.id}
-              state={model.connection}
-              checkboxLabel={translate('connections_connection_template')}
-              disabled={model.editing || disabled}
-              mod='surface'
-            />
-          </FormGroup>
+          {isOriginLocal && (
+            <FormGroup>
+              <FieldCheckbox
+                name="template"
+                value={model.connection.id}
+                state={model.connection}
+                checkboxLabel={translate('connections_connection_template')}
+                disabled={model.editing || disabled}
+                mod='surface'
+              />
+            </FormGroup>
+          )}
           <FormGroup>
             <Combobox
               name='driverId'
@@ -117,22 +120,25 @@ export const Options = observer(function Options({
           </FormGroup>
         </FormBoxElement>
         <FormBoxElement>
-          <connection-type as="div">
-            <RadioGroup name='type' value={formController.connectionType} onChange={formController.setType}>
-              <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
-                {translate('customConnection_connectionType_custom')}
-              </Radio>
-              <Radio value={EConnectionType.URL} disabled={disabled} mod={['primary']}>
-                {translate('customConnection_connectionType_url')}
-              </Radio>
-            </RadioGroup>
-          </connection-type>
+          {isOriginLocal && (
+            <connection-type as="div">
+              <RadioGroup name='type' value={formController.connectionType} onChange={formController.setType}>
+                <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
+                  {translate('customConnection_connectionType_custom')}
+                </Radio>
+                <Radio value={EConnectionType.URL} disabled={disabled} mod={['primary']}>
+                  {translate('customConnection_connectionType_url')}
+                </Radio>
+              </RadioGroup>
+            </connection-type>
+          )}
           <TabsState currentTabId={formController.connectionType}>
             <TabPanel tabId={EConnectionType.Parameters}>
               <ParametersForm
                 connection={model.connection}
                 embedded={controller.driver?.embedded}
                 disabled={disabled}
+                readOnly={!isOriginLocal}
               />
             </TabPanel>
             <TabPanel tabId={EConnectionType.URL}>

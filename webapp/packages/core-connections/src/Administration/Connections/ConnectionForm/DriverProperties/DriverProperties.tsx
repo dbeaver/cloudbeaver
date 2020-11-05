@@ -38,8 +38,10 @@ interface DriverPropertiesProps {
 export const DriverProperties = observer(function DriverProperties({
   tabId,
   model,
+  controller: formController,
 }: DriverPropertiesProps) {
   const controller = useController(DriverPropertiesController, model.connection.driverId, model.connection.properties);
+  const isOriginLocal = formController.local;
   useTab(tabId, controller.loadDriverProperties);
 
   return styled(useStyles(styles))(
@@ -49,6 +51,7 @@ export const DriverProperties = observer(function DriverProperties({
         <PropertiesTable
           properties={controller.driverProperties}
           propertiesState={model.connection.properties}
+          readOnly={!isOriginLocal}
           onAdd={controller.addProperty}
         />
       )}

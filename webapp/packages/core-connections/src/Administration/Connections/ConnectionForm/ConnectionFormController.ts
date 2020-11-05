@@ -25,8 +25,7 @@ export class ConnectionFormController
 implements IInitializableController {
   @observable connectionType: EConnectionType;
   @observable isSaving: boolean;
-  @observable
-  readonly metadata: Map<string, any>;
+  @observable readonly metadata: Map<string, any>;
 
   readonly afterSave: IExecutor<string>;
 
@@ -51,6 +50,10 @@ implements IInitializableController {
     this.isSaving = false;
     this.metadata = new Map<string, any>();
     this.afterSave = new Executor();
+  }
+
+  get local(): boolean {
+    return this.model.connection.origin.type === 'local';
   }
 
   init(

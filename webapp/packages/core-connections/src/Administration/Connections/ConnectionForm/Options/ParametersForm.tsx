@@ -19,6 +19,7 @@ interface ParametersFormProps {
   connection: AdminConnection;
   disabled?: boolean;
   embedded?: boolean;
+  readOnly?: boolean;
 }
 
 const parametersFormStyles = css`
@@ -31,6 +32,7 @@ export const ParametersForm = observer(function ParametersForm({
   connection,
   embedded,
   disabled,
+  readOnly,
 }: ParametersFormProps) {
   const translate = useTranslate();
 
@@ -44,6 +46,7 @@ export const ParametersForm = observer(function ParametersForm({
               name="host"
               state={connection}
               disabled={disabled}
+              readOnly={readOnly}
               mod='surface'
             >
               {translate('customConnection_custom_host')}
@@ -56,6 +59,7 @@ export const ParametersForm = observer(function ParametersForm({
               name="port"
               state={connection}
               disabled={disabled}
+              readOnly={readOnly}
               mod='surface'
               short
             >
@@ -70,6 +74,7 @@ export const ParametersForm = observer(function ParametersForm({
           name="databaseName"
           state={connection}
           disabled={disabled}
+          readOnly={readOnly}
           mod='surface'
         >
           {translate('customConnection_custom_database')}

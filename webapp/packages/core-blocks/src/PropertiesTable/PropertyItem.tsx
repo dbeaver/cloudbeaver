@@ -114,6 +114,7 @@ interface Props {
   onValueChange: (staticId: string, value: string) => void;
   onRemove: (staticId: string) => void;
   error?: boolean;
+  readOnly?: boolean;
 }
 
 export const PropertyItem = observer(function PropertyItem({
@@ -123,6 +124,7 @@ export const PropertyItem = observer(function PropertyItem({
   onValueChange,
   onRemove,
   error,
+  readOnly,
 }: Props) {
   const isKeyEditable = !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
@@ -162,6 +164,7 @@ export const PropertyItem = observer(function PropertyItem({
           name={`${property.id}_value`}
           placeholder={property.valuePlaceholder}
           autoComplete='none'
+          readOnly={readOnly}
           onChange={handleValueChange}
           {...use({ focus, edited })}
         >
@@ -172,6 +175,7 @@ export const PropertyItem = observer(function PropertyItem({
             <PropertyValueSelector
               propertyName={property.id}
               values={property.validValues}
+              disabled={readOnly}
               onSelect={handleValueChange}
               onSwitch={setFocus}
             >

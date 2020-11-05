@@ -13,6 +13,8 @@ import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
 import { ConnectionFormService } from './ConnectionFormService';
 import { DriverProperties } from './DriverProperties/DriverProperties';
 import { Options } from './Options/Options';
+import { OriginInfo } from './OriginInfo/OriginInfo';
+import { OriginInfoTab } from './OriginInfo/OriginInfoTab';
 
 @injectable()
 export class ConnectionFormBaseBootstrap extends Bootstrap {
@@ -38,9 +40,16 @@ export class ConnectionFormBaseBootstrap extends Bootstrap {
       isDisabled: (tabId, props) => !props?.controller.driver,
     });
     this.connectionFormService.tabsContainer.add({
+      key: 'origin',
+      order: 3,
+      panel: () => OriginInfo,
+      tab: () => OriginInfoTab,
+      isHidden: (tabId, props) => props?.model.connection.origin.type === 'local',
+    });
+    this.connectionFormService.tabsContainer.add({
       key: 'access',
       name: 'connections_connection_edit_access',
-      order: 3,
+      order: 4,
       isDisabled: (tabId, props) => !props?.controller.driver || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
     });

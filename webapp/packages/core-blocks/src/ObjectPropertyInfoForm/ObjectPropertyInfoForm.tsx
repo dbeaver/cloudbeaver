@@ -14,6 +14,8 @@ import { InputField } from '@cloudbeaver/core-blocks';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { Button } from '../Button';
+import { FormFieldDescription } from '../FormControls/FormFieldDescription';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
 
@@ -64,20 +66,26 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
   return styled(style)(
     <form-body as='div' className={className}>
       {properties.map(property => (
-        <group key={property.id} as="div">
-          <InputField
-            type={property.features.includes('password') ? 'password' : 'text'}
-            name={property.id!}
-            state={credentials}
-            disabled={disabled}
-            readOnly={readOnly}
-            autoHide={autoHide}
-            autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-            mod='surface'
-            onFocus={handleFocus}
-          >
-            {property.displayName}
-          </InputField>
+        <group key={property.id} as='div'>
+          {property.features.includes('href') ? (
+            <FormFieldDescription label={property.displayName} raw>
+              <Button href={property.value} target='_blank' rel='noopener noreferrer' tag='a'>{property.description}</Button>
+            </FormFieldDescription>
+          ) : (
+            <InputField
+              type={property.features.includes('password') ? 'password' : 'text'}
+              name={property.id!}
+              state={credentials}
+              disabled={disabled}
+              readOnly={readOnly}
+              autoHide={autoHide}
+              autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
+              mod='surface'
+              onFocus={handleFocus}
+            >
+              {property.displayName}
+            </InputField>
+          )}
         </group>
       ))}
     </form-body>

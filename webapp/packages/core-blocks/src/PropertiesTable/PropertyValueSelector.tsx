@@ -62,6 +62,7 @@ type Props = React.PropsWithChildren<{
   values: string[];
   onSelect: (value: string) => void;
   onSwitch: (state: boolean) => void;
+  disabled?: boolean;
 }>;
 
 export const PropertyValueSelector = observer(function PropertyValueSelector({
@@ -70,6 +71,7 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
   children,
   onSelect,
   onSwitch,
+  disabled,
 }: Props) {
   const menu = useMenuState();
   const handleMenuSelect = useCallback(
@@ -83,8 +85,8 @@ export const PropertyValueSelector = observer(function PropertyValueSelector({
 
   return styled(useStyles(styles))(
     <>
-      <MenuButton {...menu}>{children}</MenuButton>
-      <Menu {...menu} aria-label={propertyName}>
+      <MenuButton {...menu} disabled={disabled}>{children}</MenuButton>
+      <Menu {...menu} aria-label={propertyName} disabled={disabled}>
         {values.map(value => (
           <MenuItem key={value} type='button' {...menu} onClick={() => handleMenuSelect(value)}>
             {value}

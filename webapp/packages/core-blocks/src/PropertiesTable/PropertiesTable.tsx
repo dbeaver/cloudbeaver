@@ -24,6 +24,7 @@ type PropertiesState = Record<string, string>;
 interface PropertiesTableProps {
   properties: IProperty[];
   propertiesState?: PropertiesState;
+  readOnly?: boolean;
   onKeyChange?: (id: string, name: string) => void;
   onChange?: (state: PropertiesState) => void;
   onAdd?: () => void;
@@ -32,8 +33,9 @@ interface PropertiesTableProps {
 }
 
 export const PropertiesTable = observer(function PropertiesTable({
-  propertiesState,
   properties,
+  propertiesState,
+  readOnly,
   onKeyChange,
   onChange,
   onAdd,
@@ -113,7 +115,7 @@ export const PropertiesTable = observer(function PropertiesTable({
           {translate('block_properties_table_value')}
         </properties-header-value>
         <properties-header-right as="div">
-          {onAdd && <Button type='button' mod={['outlined']} onClick={() => onAdd()}>{translate('block_properties_table_add')}</Button>}
+          {onAdd && !readOnly && <Button type='button' mod={['outlined']} onClick={() => onAdd()}>{translate('block_properties_table_add')}</Button>}
         </properties-header-right>
       </properties-header>
       <properties-list as="div">
@@ -123,6 +125,7 @@ export const PropertiesTable = observer(function PropertiesTable({
             property={property}
             value={state[property.key]}
             error={!isKeyUnique(property.key)}
+            readOnly={readOnly}
             onNameChange={changeName}
             onValueChange={changeValue}
             onRemove={removeProperty}

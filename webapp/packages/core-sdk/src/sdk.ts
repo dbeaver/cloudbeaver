@@ -1032,6 +1032,12 @@ export type ConnectionInfoQueryVariables = Exact<{
 
 export interface ConnectionInfoQuery { connection: UserConnectionFragment }
 
+export type ConnectionOriginDetailsQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+}>;
+
+export interface ConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features'>>> } } }
+
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
@@ -1765,6 +1771,25 @@ export const ConnectionInfoDocument = `
   }
 }
     ${UserConnectionFragmentDoc}`;
+export const ConnectionOriginDetailsDocument = `
+    query connectionOriginDetails($connectionId: ID!) {
+  connection: connectionInfo(id: $connectionId) {
+    origin {
+      details {
+        id
+        displayName
+        description
+        category
+        dataType
+        defaultValue
+        validValues
+        value
+        features
+      }
+    }
+  }
+}
+    `;
 export const CreateConnectionDocument = `
     mutation createConnection($config: ConnectionConfig!) {
   connection: createConnection(config: $config) {
@@ -2376,6 +2401,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     connectionInfo(variables: ConnectionInfoQueryVariables): Promise<ConnectionInfoQuery> {
       return withWrapper(() => client.request<ConnectionInfoQuery>(ConnectionInfoDocument, variables));
+    },
+    connectionOriginDetails(variables: ConnectionOriginDetailsQueryVariables): Promise<ConnectionOriginDetailsQuery> {
+      return withWrapper(() => client.request<ConnectionOriginDetailsQuery>(ConnectionOriginDetailsDocument, variables));
     },
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
