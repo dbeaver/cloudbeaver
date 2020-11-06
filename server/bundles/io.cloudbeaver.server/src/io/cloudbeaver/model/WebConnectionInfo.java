@@ -138,6 +138,11 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isUseUrl() {
+        return CommonUtils.isEmpty(dataSourceContainer.getDriver().getSampleURL());
+    }
+
+    @Property
     public boolean isSaveCredentials() {
         return dataSourceContainer.isSavePassword();
     }
