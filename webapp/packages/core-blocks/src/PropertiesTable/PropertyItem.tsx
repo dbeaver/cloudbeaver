@@ -126,7 +126,7 @@ export const PropertyItem = observer(function PropertyItem({
   error,
   readOnly,
 }: Props) {
-  const isDeletable = !property.displayName && !readOnly;
+  const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
@@ -170,7 +170,7 @@ export const PropertyItem = observer(function PropertyItem({
         >
           {value !== undefined ? value : property.defaultValue}
         </ShadowInput>
-        {(property.validValues && property.validValues.length > 0 && !readOnly) && (
+        {(!readOnly && property.validValues && property.validValues.length > 0) && (
           <property-select as="div">
             <PropertyValueSelector
               propertyName={property.id}

@@ -9,7 +9,7 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import { isLocalConnection } from '../../..';
+import { isLocalConnection } from '../../ConnectionsResource';
 import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
 import { ConnectionFormService } from './ConnectionFormService';
 import { DriverProperties } from './DriverProperties/DriverProperties';
