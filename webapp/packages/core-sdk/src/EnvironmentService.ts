@@ -10,6 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()
 export class EnvironmentService {
-  readonly gqlEndpoint = '/dbeaver/gql';
-  readonly staticEndpoint = '/dbeaver';
+  readonly gqlEndpoint = '/api/gql';
+  readonly staticEndpoint = '/api';
 }
