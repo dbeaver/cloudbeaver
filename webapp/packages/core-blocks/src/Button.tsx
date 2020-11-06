@@ -64,6 +64,7 @@ type ButtonProps = (
   mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
   download?: boolean;
 };
 

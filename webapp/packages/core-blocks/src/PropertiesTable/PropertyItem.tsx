@@ -114,6 +114,7 @@ interface Props {
   onValueChange: (staticId: string, value: string) => void;
   onRemove: (staticId: string) => void;
   error?: boolean;
+  readOnly?: boolean;
 }
 
 export const PropertyItem = observer(function PropertyItem({
@@ -123,8 +124,9 @@ export const PropertyItem = observer(function PropertyItem({
   onValueChange,
   onRemove,
   error,
+  readOnly,
 }: Props) {
-  const isKeyEditable = !property.displayName;
+  const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
@@ -136,7 +138,7 @@ export const PropertyItem = observer(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useLayoutEffect(() => {
-    if (keyInputRef.current && isKeyEditable && property.new) {
+    if (keyInputRef.current && isDeletable && property.new) {
       keyInputRef.current.focus();
     }
   }, [property]);
@@ -149,7 +151,7 @@ export const PropertyItem = observer(function PropertyItem({
           type='text'
           name={property.id}
           placeholder={property.keyPlaceholder}
-          readOnly={!isKeyEditable}
+          readOnly={!isDeletable}
           autoComplete='none'
           onChange={handleKeyChange}
         >
@@ -162,12 +164,13 @@ export const PropertyItem = observer(function PropertyItem({
           name={`${property.id}_value`}
           placeholder={property.valuePlaceholder}
           autoComplete='none'
+          readOnly={readOnly}
           onChange={handleValueChange}
           {...use({ focus, edited })}
         >
           {value !== undefined ? value : property.defaultValue}
         </ShadowInput>
-        {(property.validValues && property.validValues.length > 0) && (
+        {(!readOnly && property.validValues && property.validValues.length > 0) && (
           <property-select as="div">
             <PropertyValueSelector
               propertyName={property.id}
@@ -180,7 +183,7 @@ export const PropertyItem = observer(function PropertyItem({
           </property-select>
         )}
       </property-value>
-      {isKeyEditable && (
+      {isDeletable && (
         <property-remove as="div">
           <button type="button" onClick={handleRemove}><Icon name="reject" viewBox="0 0 11 11" /></button>
         </property-remove>

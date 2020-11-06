@@ -15,11 +15,4 @@ export const formStyles = css`
     display: flex;
     flex-direction: column;
   }
-  group {
-    box-sizing: border-box;
-    display: flex;
-  }
-  center {
-    margin: auto;
-  }
 `;

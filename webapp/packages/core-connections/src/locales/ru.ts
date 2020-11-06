@@ -6,6 +6,7 @@ export default [
   ['connections_administration_connection_access_empty', 'Нет доступных пользователей и подключений'],
   ['connections_administration_configuration_wizard_step_title', 'Подключения к базам'],
   ['connections_administration_configuration_wizard_step_description', 'Подключения к базам'],
+  ['connections_administration_connection_no_information', 'Нет доступной информации'],
   ['connections_connection_create_custom', 'Настроить'],
   ['connections_connection_create_search_database', 'Найти'],
   ['connections_connection_edit_save_credentials', ' Запомнить данные'],

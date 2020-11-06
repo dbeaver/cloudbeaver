@@ -20,6 +20,7 @@ export const defaultENLocale = [
   ['ui_data_saving_error', 'Save error'],
   ['ui_data_delete_confirmation', 'Delete confirmation'],
   ['ui_no_matches_placeholder', 'Your search returned no matches.'],
+  ['ui_information', 'Information'],
   ['root_permission_denied', 'You have no permissions'],
   ['app_root_session_expired_title', 'Session expired'],
   ['app_root_session_expired_message', 'Session has been expired. Do you want to reload?'],

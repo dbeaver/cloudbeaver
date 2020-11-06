@@ -17,7 +17,8 @@ import {
   ResourceKey,
   isResourceKeyList,
   AdminConnectionGrantInfo,
-  AdminConnectionSearchInfo
+  AdminConnectionSearchInfo,
+  ObjectPropertyInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
@@ -135,6 +136,11 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     const { subjects } = await this.graphQLService.sdk.getConnectionAccess({ connectionId });
 
     return subjects;
+  }
+
+  async loadOrigin(connectionId: string): Promise<ObjectPropertyInfo[]> {
+    const { connection } = await this.graphQLService.sdk.getConnectionOriginDetails({ connectionId });
+    return connection.origin.details || [];
   }
 
   async setAccessSubjects(connectionId: string, subjects: string[]): Promise<void> {

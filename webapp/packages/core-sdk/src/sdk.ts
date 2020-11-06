@@ -1080,6 +1080,12 @@ export interface GetAuthModelsQuery {
   )>;
 }
 
+export type GetConnectionOriginDetailsQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+}>;
+
+export interface GetConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features'>>> } } }
+
 export type GetDriverByIdQueryVariables = Exact<{
   driverId: Scalars['ID'];
 }>;
@@ -1846,6 +1852,25 @@ export const GetAuthModelsDocument = `
   }
 }
     `;
+export const GetConnectionOriginDetailsDocument = `
+    query getConnectionOriginDetails($connectionId: ID!) {
+  connection: connectionInfo(id: $connectionId) {
+    origin {
+      details {
+        id
+        displayName
+        description
+        category
+        dataType
+        defaultValue
+        validValues
+        value
+        features
+      }
+    }
+  }
+}
+    `;
 export const GetDriverByIdDocument = `
     query getDriverById($driverId: ID!) {
   driverList(id: $driverId) {
@@ -2397,6 +2422,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
       return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
+    },
+    getConnectionOriginDetails(variables: GetConnectionOriginDetailsQueryVariables): Promise<GetConnectionOriginDetailsQuery> {
+      return withWrapper(() => client.request<GetConnectionOriginDetailsQuery>(GetConnectionOriginDetailsDocument, variables));
     },
     getDriverById(variables: GetDriverByIdQueryVariables): Promise<GetDriverByIdQuery> {
       return withWrapper(() => client.request<GetDriverByIdQuery>(GetDriverByIdDocument, variables));
