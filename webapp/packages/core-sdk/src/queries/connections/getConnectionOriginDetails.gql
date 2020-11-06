@@ -1,4 +1,4 @@
-query connectionOriginDetails($connectionId: ID!) {
+query getConnectionOriginDetails($connectionId: ID!) {
   connection: connectionInfo(id: $connectionId) {
     origin {
       details {

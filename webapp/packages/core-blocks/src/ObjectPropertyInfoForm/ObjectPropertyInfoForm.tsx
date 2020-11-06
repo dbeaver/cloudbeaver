@@ -15,6 +15,7 @@ import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';
+import { FormGroup } from '../FormControls/FormGroup';
 import { Link } from '../Link';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
@@ -66,7 +67,7 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
   return styled(style)(
     <form-body as='div' className={className}>
       {properties.map(property => (
-        <group key={property.id} as='div'>
+        <FormGroup key={property.id}>
           {property.features.includes('href') ? (
             <FormFieldDescription label={property.displayName} raw>
               <Link href={property.value} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
@@ -86,7 +87,7 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
               {property.displayName}
             </InputField>
           )}
-        </group>
+        </FormGroup>
       ))}
     </form-body>
   );

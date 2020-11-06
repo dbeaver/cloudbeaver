@@ -14,16 +14,5 @@ export const formStyles = css`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    & Link {
-      padding: 0 4px;
-    }
-  }
-  group {
-    box-sizing: border-box;
-    display: flex;
-  }
- 
-  center {
-    margin: auto;
   }
 `;

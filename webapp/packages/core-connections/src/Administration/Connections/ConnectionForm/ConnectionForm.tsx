@@ -52,6 +52,7 @@ const styles = composes(
       overflow: auto;
     }
     content-box {
+      position: relative;
       display: flex;
       flex: 1;
       flex-direction: column;
