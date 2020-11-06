@@ -81,10 +81,6 @@ ResourceKey<TKey>
     return this.has(key);
   }
 
-  isDataLoading(key: ResourceKey<TKey>): boolean {
-    return this.tasks.some(task => this.includes(key, task.param));
-  }
-
   get(key: TKey): TValue | undefined;
   get(key: ResourceKeyList<TKey>): Array<TValue | undefined>;
   get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined;

@@ -10,11 +10,7 @@ import { observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
-
-interface IResourceTask<TParam> {
-  readonly param: TParam;
-  readonly task: Promise<any>;
-}
+import { TaskScheduler } from '@cloudbeaver/core-executor';
 
 @injectable()
 export abstract class CachedResource<
@@ -36,10 +32,10 @@ export abstract class CachedResource<
   protected outdatedSubject: Subject<TParam>;
   protected dataSubject: Subject<TData>;
 
-  @observable.shallow
-  protected tasks: Array<IResourceTask<TParam>> = [];
+  protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
+    this.scheduler = new TaskScheduler(this.includes.bind(this));
     this.data = defaultValue;
     this.outdatedSubject = new Subject();
     this.dataSubject = new Subject();
@@ -56,6 +52,10 @@ export abstract class CachedResource<
 
   isLoading(): boolean {
     return this.loading;
+  }
+
+  isDataLoading(key: TParam): boolean {
+    return this.scheduler.activeList.some(active => this.includes(key, active));
   }
 
   markOutdated(param: TParam): void {
@@ -102,7 +102,7 @@ export abstract class CachedResource<
       return;
     }
 
-    return this.task(param, async () => {
+    return this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (exitCheck?.()) {
         return;
@@ -117,7 +117,7 @@ export abstract class CachedResource<
       return;
     }
 
-    await this.task(param, async () => {
+    await this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
         return;
@@ -143,31 +143,5 @@ export abstract class CachedResource<
     } finally {
       this.loading = prevState;
     }
-  }
-
-  protected async task<T>(param: TParam, action: (param: TParam) => Promise<T>): Promise<T> {
-    const task: IResourceTask<TParam> = {
-      param,
-      task: this.wrappedTask(param, action),
-    };
-    this.tasks.push(task);
-
-    try {
-      return await task.task;
-    } finally {
-      this.tasks.splice(this.tasks.indexOf(task), 1);
-    }
-  }
-
-  private async wrappedTask<T>(param: TParam, task: (param: TParam) => Promise<T>): Promise<T> {
-    const queue = this.tasks.filter(task => this.includes(param, task.param));
-
-    for (const task of queue) {
-      try {
-        await task.task;
-      } catch {}
-    }
-
-    return await task(param);
   }
 }
