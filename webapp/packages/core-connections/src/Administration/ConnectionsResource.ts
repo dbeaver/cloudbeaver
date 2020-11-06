@@ -66,6 +66,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
       id: uuid(),
       template: false,
       saveCredentials: false,
+      useUrl: false,
       authProperties: [],
       properties: {},
       origin: {
