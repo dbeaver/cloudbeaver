@@ -6,18 +6,29 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
-import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { getErrorDetails, GQLError } from '@cloudbeaver/core-sdk';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
 import {
-  ENotificationType, INotification, INotificationExtraProps, INotificationOptions, NotificationComponent
+  ENotificationType,
+  INotification,
+  INotificationExtraProps,
+  INotificationOptions,
+  NotificationComponent,
+  INotificationProcessExtraProps,
+  IProcessNotificationContainer
 } from './INotification';
+import { ProcessNotificationController } from './ProcessNotificationController';
 
+export const DELAY_DELETING = 1000;
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
+
   readonly notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
   private notificationNextId = 0;
 
@@ -31,7 +42,7 @@ export class NotificationService {
 
   notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
     options: INotificationOptions<TProps>, type: ENotificationType
-  ): void {
+  ): INotification<TProps> {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
       if (persistentNotifications.length >= this.settings.settings.getValue('maxPersistentAllow')) {
@@ -50,9 +61,10 @@ export class NotificationService {
       customComponent: options.customComponent,
       extraProps: options.extraProps || {} as TProps,
       persistent: options.persistent,
+      state: observable({ deleteDelay: 0 }),
       timestamp: options.timestamp || Date.now(),
       type,
-      close: this.close.bind(this, id),
+      close: delayDeleting => this.close(id, delayDeleting),
       showDetails: this.showDetails.bind(this, id),
     };
 
@@ -67,13 +79,15 @@ export class NotificationService {
       }
       this.notificationList.remove(this.notificationList.keys[i]);
     }
+
+    return notification;
   }
 
   customNotification<
     TProps extends INotificationExtraProps<any> = INotificationExtraProps
   >(
     component: () => NotificationComponent<TProps>,
-    props?: TProps,
+    props?: TProps extends any ? TProps : never, // some magic
     options?: INotificationOptions<TProps> & { type?: ENotificationType }
   ): void {
     this.notify({
@@ -82,6 +96,25 @@ export class NotificationService {
       customComponent: component,
       extraProps: props || {} as TProps,
     }, options?.type ?? ENotificationType.Custom);
+  }
+
+  processNotification<
+    TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
+    component: () => NotificationComponent<TProps>,
+    props?: TProps extends any ? TProps : never, // some magic,
+    options?: INotificationOptions<TProps>
+  ): IProcessNotificationContainer<TProps> {
+    const processController = props?.state || new ProcessNotificationController();
+
+    const notification = this.notify({
+      title: '',
+      ...options,
+      extraProps: { ...props, state: processController } as TProps,
+      customComponent: component,
+    }, ENotificationType.Custom);
+
+    processController.init(notification.title, notification.message);
+    return { controller: processController, notification };
   }
 
   logInfo<T>(notification: INotificationOptions<T>): void {
@@ -97,13 +130,13 @@ export class NotificationService {
   }
 
   logException(exception: Error | GQLError, title?: string, message?: string, silent?: boolean): void {
-    const exceptionMessage = hasDetails(exception) ? exception.errorText : exception.message || exception.name;
+    const errorDetails = getErrorDetails(exception);
 
     if (!silent) {
       this.logError({
-        title: title || exception.name,
-        message: message || exceptionMessage,
-        details: hasDetails(exception) ? exception : undefined,
+        title: title || errorDetails.name,
+        message: message || errorDetails.message,
+        details: errorDetails.hasDetails ? exception : undefined,
         isSilent: silent,
       });
     }
@@ -111,17 +144,24 @@ export class NotificationService {
     console.error(exception);
   }
 
-  close(id: number): void {
+  close(id: number, delayDeleting = true): void {
     // TODO: emit event or something
 
+    if (delayDeleting) {
+      const notification = this.notificationList.get(id);
+
+      if (notification) {
+        notification.state.deleteDelay = DELAY_DELETING;
+        setTimeout(() => {
+          this.notificationList.remove(id);
+        }, DELAY_DELETING);
+      }
+      return;
+    }
     this.notificationList.remove(id);
   }
 
   showDetails(id: number): void {
     // TODO: emit event or something
   }
-}
-
-function hasDetails(error: Error): error is GQLError | ServerInternalError {
-  return error instanceof GQLError || error instanceof ServerInternalError;
 }

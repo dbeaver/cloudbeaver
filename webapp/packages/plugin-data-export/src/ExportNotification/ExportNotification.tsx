@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import {

@@ -25,6 +25,7 @@ type Props = React.PropsWithChildren<{
   item: any;
   expandElement?: React.FunctionComponent<ExpandProps>;
   selectDisabled?: boolean;
+  disabled?: boolean;
   className?: string;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -34,6 +35,7 @@ export const TableItem = observer(function TableItem({
   item,
   expandElement,
   selectDisabled = false,
+  disabled,
   children,
   className,
   onClick,
@@ -82,7 +84,7 @@ export const TableItem = observer(function TableItem({
         className={className}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        {...use({ selected: isSelected, expanded: isExpanded })}
+        {...use({ selected: isSelected, expanded: isExpanded, disabled })}
       >
         {children}
       </tr>

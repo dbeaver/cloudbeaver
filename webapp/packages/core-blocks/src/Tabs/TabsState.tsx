@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
 import { Executor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { TabsContainer } from './TabsContainer';
 import { TabsContext, ITabsContext, ITabData } from './TabsContext';
@@ -19,6 +20,7 @@ type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
   container?: TabsContainer<T>;
+  localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
   onChange?: (tab: ITabData<T>) => void;
@@ -30,6 +32,7 @@ export function TabsState<T = Record<string, any>>({
   orientation,
   currentTabId,
   container,
+  localState,
   children,
   lazy = false,
   manual,
@@ -46,6 +49,7 @@ export function TabsState<T = Record<string, any>>({
     selectedId = container.tabInfoList[0].key;
   }
 
+  const tabsState = useMemo(() => localState || new MetadataMap<string, any>(), [localState]);
   const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
@@ -120,6 +124,7 @@ export function TabsState<T = Record<string, any>>({
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
+    tabsState,
     props: rest as T,
     container,
     openExecutor,
@@ -129,6 +134,7 @@ export function TabsState<T = Record<string, any>>({
     close: handleClose,
   }), [
     ...Object.values(state),
+    tabsState,
     ...Object.values(rest),
     container,
     closeExecutor,

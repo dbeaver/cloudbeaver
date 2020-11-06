@@ -22,7 +22,6 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
-import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 
 import java.util.Arrays;
 
@@ -61,9 +60,11 @@ public class WebDatabaseAuthModel {
 
     @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
+        boolean hasContextCredentials = webSession.hasContextCredentials();
+
         DBPPropertySource credentialsSource = model.createCredentialsSource(null, null);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
+            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, hasContextCredentials))
             .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 

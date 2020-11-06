@@ -4,6 +4,7 @@ export * from './CachedResource';
 export * from './CustomGraphQLClient';
 export * from './EnvironmentService';
 export * from './EServerErrorCode';
+export * from './getErrorDetails';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';

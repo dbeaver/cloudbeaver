@@ -24,7 +24,7 @@ export class NotificationItemController implements IInitializableController {
 
   constructor(private commonDialogService: CommonDialogService) {}
 
-  init(notification: INotification<any>) {
+  init(notification: INotification<any>): void {
     this.notification = notification;
 
     if (this.notification.details) {
@@ -37,13 +37,6 @@ export class NotificationItemController implements IInitializableController {
   }
 
   handleShowDetails?: () => void;
-
-  handleClose = () => {
-    if (!this.notification) {
-      return;
-    }
-    this.notification.close();
-  };
 
   private async showDetails() {
     this.isDetailsDialogOpen = true;

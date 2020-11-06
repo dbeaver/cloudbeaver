@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { isLocalUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { AdminConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -43,11 +43,13 @@ export class UserFormController implements IInitializableController, IDestructib
     return Array.from(this.rolesResource.data.values());
   }
 
+  get local(): boolean {
+    return isLocalUser(this.user);
+  }
+
   user!: AdminUserInfo;
 
   readonly error: GQLErrorCatcher;
-  @observable
-  readonly metadata: Map<string, any>;
 
   private isDistructed: boolean;
   private connectionAccessChanged: boolean;
@@ -74,7 +76,6 @@ export class UserFormController implements IInitializableController, IDestructib
       roles: new Map(),
     };
     this.error = new GQLErrorCatcher();
-    this.metadata = new Map<string, any>();
     this.isDistructed = false;
     this.connectionAccessChanged = false;
     this.connectionAccessLoaded = false;

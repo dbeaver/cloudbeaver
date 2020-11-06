@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useMemo } from 'react';
 import styled from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
+import { TabContext } from '../TabContext';
 import { ITabData } from '../TabsContext';
 import { Tab } from './Tab';
 import { TabIcon } from './TabIcon';
@@ -42,19 +44,22 @@ export function TabDefault<T = Record<string, any>>({
   ...rest
 }: Props<T> & T): React.ReactElement | null {
   const styles = useStyles(style);
+  const tabContext = useMemo(() => ({ tabId }), [tabId]);
 
   if (component) {
     const TabComponent = component;
     return (
-      <TabComponent
-        tabId={tabId}
-        className={className}
-        {...(rest as unknown as T)}
-        style={style}
-        disabled={disabled}
-        onOpen={onOpen}
-        onClose={onClose}
-      />
+      <TabContext.Provider value={tabContext}>
+        <TabComponent
+          tabId={tabId}
+          className={className}
+          {...(rest as unknown as T)}
+          style={style}
+          disabled={disabled}
+          onOpen={onOpen}
+          onClose={onClose}
+        />
+      </TabContext.Provider>
     );
   }
 

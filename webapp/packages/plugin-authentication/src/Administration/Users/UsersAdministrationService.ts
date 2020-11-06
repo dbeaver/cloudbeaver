@@ -11,6 +11,7 @@ import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { CreateUserService } from './CreateUserService';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
@@ -20,7 +21,8 @@ export class UsersAdministrationService extends Bootstrap {
   constructor(
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
-    private usersResource: UsersResource
+    private usersResource: UsersResource,
+    private createUserService: CreateUserService
   ) {
     super();
   }
@@ -31,7 +33,8 @@ export class UsersAdministrationService extends Bootstrap {
       order: 3,
       sub: [
         {
-          name: UsersAdministrationNavigationService.AddItemName,
+          name: UsersAdministrationNavigationService.CreateItemName,
+          onDeActivate: this.cancelCreate.bind(this),
         },
       ],
       getContentComponent: () => UsersAdministration,
@@ -41,6 +44,10 @@ export class UsersAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
+
+  private async cancelCreate() {
+    this.createUserService.close();
+  }
 
   private async loadUsers() {
     try {

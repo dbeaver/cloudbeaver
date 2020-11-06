@@ -11,10 +11,11 @@ import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, IconButton } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { CreateUser } from './CreateUser';
+import { CreateUserService } from './CreateUserService';
 import { UsersAdministrationController } from './UsersAdministrationController';
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersTable } from './UsersTable/UsersTable';
@@ -52,10 +53,11 @@ const styles = composes(
 export const UsersAdministration = observer(function UsersAdministration({
   sub,
 }: AdministrationItemContentProps) {
+  const service = useService(CreateUserService);
   const controller = useController(UsersAdministrationController);
 
-  if (sub?.name === UsersAdministrationNavigationService.AddItemName) {
-    controller.create();
+  if (sub?.name === UsersAdministrationNavigationService.CreateItemName) {
+    service.create();
   }
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
@@ -63,12 +65,12 @@ export const UsersAdministration = observer(function UsersAdministration({
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
           <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" onClick={controller.create} />
-            <IconButton name="trash" viewBox="0 0 28 28" onClick={controller.delete} />
+            <IconButton name="add" viewBox="0 0 28 28" disabled={sub && !!service.user} onClick={service.create} />
+            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
             <IconButton name="refresh-outline" viewBox="0 0 28 28" onClick={controller.update} />
           </AdministrationTools>
-          {sub && controller.creatingUser && (
-            <CreateUser user={controller.creatingUser} onCancel={controller.cancelCreate} />
+          {sub && service.user && (
+            <CreateUser user={service.user} onCancel={service.cancelCreate} />
           )}
           <UsersTable
             users={controller.users}
