@@ -36,19 +36,11 @@ export class ConnectionsManagerService {
 
   async requireConnection(connectionId?: string) {
     if (!connectionId) {
-      if (!this.hasAnyConnection()) {
-        return null;
-      }
       connectionId = Array.from(this.connectionInfo.data.values())[0].id;
     }
 
     try {
       const connection = await this.connectionAuthService.auth(connectionId);
-
-      if (!connection.connected) {
-        return null;
-      }
-
       return connection;
     } catch (exception) {
       this.notificationService.logException(exception);

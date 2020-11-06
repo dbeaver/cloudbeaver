@@ -76,29 +76,42 @@ export class SqlEditorTabService {
     catalogId?: string,
     schemaId?: string
   ): Promise<ITabOptions<ISqlEditorTabState> | null> {
-    const order = this.getFreeEditorId();
+    if (!this.connectionsManagerService.hasAnyConnection()) {
+      return null;
+    }
+    let newEditor;
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
-    if (!connection) {
+    if (!connection.connected) {
       return null;
     }
 
-    await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
+    try {
+      const order = this.getFreeEditorId();
 
-    const context = await this.createSqlContext(connection.id, catalogId, schemaId);
+      await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
 
-    return {
-      handlerId: sqlEditorTabHandlerKey,
-      handlerState: {
-        query: '',
-        order,
-        contextId: context.contextId,
-        connectionId: connection.id,
-        objectCatalogId: context.objectCatalogId,
-        objectSchemaId: context.objectSchemaId,
-        queryTabGroups: [],
-        resultTabs: [],
-      },
-    };
+      const context = await this.createSqlContext(connection.id, catalogId, schemaId);
+
+      newEditor = {
+        handlerId: sqlEditorTabHandlerKey,
+        handlerState: {
+          query: '',
+          order,
+          contextId: context.contextId,
+          connectionId: connection.id,
+          objectCatalogId: context.objectCatalogId,
+          objectSchemaId: context.objectSchemaId,
+          queryTabGroups: [],
+          resultTabs: [],
+        },
+      };
+    } catch (error) {
+      newEditor = null;
+      this.notificationService.logError({
+        title: `Failed to create editor for ${connection.name || connection.id} connection`,
+      });
+    }
+    return newEditor;
   }
 
   private getFreeEditorId() {
@@ -149,10 +162,13 @@ export class SqlEditorTabService {
   }
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
+    if (!this.connectionsManagerService.hasAnyConnection()) {
+      return false;
+    }
     try {
       const connection = await this.connectionsManagerService.requireConnection(connectionId);
 
-      if (!connection) {
+      if (!connection.connected) {
         return false;
       }
       // try to create new context first
@@ -205,6 +221,7 @@ export class SqlEditorTabService {
 
   private async handleTabClose(tab: ITab<ISqlEditorTabState>) {
     this.tabExecutionState.delete(tab.id);
+
     await this.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
   }
 

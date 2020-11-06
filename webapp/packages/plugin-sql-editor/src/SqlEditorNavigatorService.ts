@@ -109,17 +109,12 @@ export class SqlEditorNavigatorService {
           data.catalogId,
           data.schemaId
         );
-        const connectionInfo = this.connectionInfoResource.get(data.connectionId || '');
 
         if (tabOptions) {
           const tab = tabInfo.openNewTab(tabOptions);
 
           // FIXME: should be in SqlEditorTabService
           this.sqlEditorTabService.tabExecutionState.set(tab.id, new SqlExecutionState());
-        } else {
-          this.notificationService.logError({
-            title: `Failed to create editor for ${connectionInfo?.name || data.connectionId} connection`,
-          });
         }
         return;
       }
