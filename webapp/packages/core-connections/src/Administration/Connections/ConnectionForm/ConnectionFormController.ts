@@ -23,13 +23,16 @@ import { IConnectionFormModel } from './IConnectionFormModel';
 @injectable()
 export class ConnectionFormController
 implements IInitializableController {
-  @observable connectionType: EConnectionType;
   @observable isSaving: boolean;
   @observable readonly metadata: Map<string, any>;
 
   readonly afterSave: IExecutor<string>;
 
-  @computed get isDisabled(): boolean {
+  get connectionType(): EConnectionType {
+    return this.model.connection.useUrl ? EConnectionType.URL : EConnectionType.Parameters;
+  }
+
+  get isDisabled(): boolean {
     return this.isSaving;
   }
 
@@ -46,7 +49,6 @@ implements IInitializableController {
     private notificationService: NotificationService,
     private dbDriverResource: DBDriverResource
   ) {
-    this.connectionType = EConnectionType.Parameters;
     this.isSaving = false;
     this.metadata = new Map<string, any>();
     this.afterSave = new Executor();
@@ -65,7 +67,7 @@ implements IInitializableController {
   }
 
   setType = (type: EConnectionType): void => {
-    this.connectionType = type;
+    this.model.connection.useUrl = type === EConnectionType.URL;
   };
 
   save = async (): Promise<void> => {

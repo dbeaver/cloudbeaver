@@ -1164,7 +1164,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
   & { origin: ObjectOriginInfoFragment; authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
 );
 
@@ -1459,6 +1459,7 @@ export const AdminConnectionFragmentDoc = `
   driverId
   template
   connected
+  useUrl
   readOnly
   saveCredentials
   host
