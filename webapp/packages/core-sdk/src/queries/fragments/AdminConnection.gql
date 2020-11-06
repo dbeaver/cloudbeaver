@@ -6,6 +6,7 @@ fragment AdminConnection on ConnectionInfo {
 
   template
   connected
+  useUrl
   readOnly
   saveCredentials
 
