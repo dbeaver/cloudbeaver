@@ -56,8 +56,8 @@ input SQLDataFilterConstraint {
 }
 
 input SQLDataFilter {
-
-    offset: Int
+    # Row offset. We use Float because offset may be bigger than 32 bit.
+    offset: Float
     limit: Int
 
     constraints: [ SQLDataFilterConstraint ]
@@ -75,7 +75,8 @@ type SQLResultColumn {
     dataKind: String
     typeName: String
     fullTypeName: String
-    maxLength: Int
+    # Column value max length. We use Float because it may be bigger than 32 bit.
+    maxLength: Float
     scale: Int
     precision: Int
 
@@ -100,7 +101,7 @@ type SQLResultSet {
 
 type SQLQueryResults {
     title: String
-    updateRowCount: Int
+    updateRowCount: Float
     sourceQuery: String
 
     # Actual data format of this result
