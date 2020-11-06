@@ -21,7 +21,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   devServer: {
     hot: true,
     proxy: {
-      '/dbeaver': {
+      '/api': {
         target: argv.server,
       },
     },
