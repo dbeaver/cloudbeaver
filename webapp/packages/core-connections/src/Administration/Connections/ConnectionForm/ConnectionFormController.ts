@@ -16,7 +16,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
-import { ConnectionsResource } from '../../ConnectionsResource';
+import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
 import { EConnectionType } from './EConnectionType';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
@@ -53,7 +53,7 @@ implements IInitializableController {
   }
 
   get local(): boolean {
-    return this.model.connection.origin.type === 'local';
+    return isLocalConnection(this.model.connection);
   }
 
   init(

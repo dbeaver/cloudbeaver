@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, InputGroup, Loader } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, InputGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
 import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -21,31 +21,56 @@ interface IState {
   properties: ObjectPropertyInfo[];
   state: Record<string, any>;
   loading: boolean;
+  loaded: boolean;
+  exception: Error | null;
 }
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
   tabId,
   model,
-  controller,
 }) {
   const translate = useTranslate();
   const connectionsResource = useService(ConnectionsResource);
+  const state = useTabState<IState>(() => ({
+    properties: [],
+    state: {},
+    loading: false,
+    loaded: false,
+    exception: null,
+  }));
 
-  useTab(tabId, async () => {
-    if (controller.metadata.has(tabId)) {
+  const load = async () => {
+    if (state.loaded) {
       return;
     }
-    controller.metadata.set(tabId, { properties: [], state: {}, loading: true });
+    state.loading = true;
+    state.exception = null;
 
-    const properties = await connectionsResource.loadOrigin(model.connection.id);
-    const propertiesState = {} as Record<string, any>;
-    for (const property of properties) {
-      propertiesState[property.id!] = property.value;
+    try {
+      const properties = await connectionsResource.loadOrigin(model.connection.id);
+      const propertiesState = {} as Record<string, any>;
+      for (const property of properties) {
+        propertiesState[property.id!] = property.value;
+      }
+      state.properties = properties;
+      state.state = propertiesState;
+      state.loaded = true;
+    } catch (error) {
+      state.exception = error;
+    } finally {
+      state.loading = false;
     }
-    controller.metadata.set(tabId, { properties, state: propertiesState, loading: false });
-  });
+  };
 
-  const state: IState = controller.metadata.get(tabId) || { properties: [], state: {}, loading: false };
+  useTab(tabId, load);
+
+  if (state.exception) {
+    return (
+      <FormBox>
+        <ExceptionMessage exception={state.exception} onRetry={load} />
+      </FormBox>
+    );
+  }
 
   if (state.properties.length === 0) {
     return (

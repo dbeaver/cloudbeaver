@@ -14,9 +14,8 @@ export const formStyles = css`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    & Button {
-      padding: 0 4px 0 4px;
-      min-width: unset;
+    & Link {
+      padding: 0 4px;
     }
   }
   group {

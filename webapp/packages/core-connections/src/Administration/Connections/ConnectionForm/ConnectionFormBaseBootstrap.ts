@@ -9,6 +9,7 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
+import { isLocalConnection } from '../../..';
 import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
 import { ConnectionFormService } from './ConnectionFormService';
 import { DriverProperties } from './DriverProperties/DriverProperties';
@@ -44,7 +45,7 @@ export class ConnectionFormBaseBootstrap extends Bootstrap {
       order: 3,
       panel: () => OriginInfo,
       tab: () => OriginInfoTab,
-      isHidden: (tabId, props) => props?.model.connection.origin.type === 'local',
+      isHidden: (tabId, props) => props ? isLocalConnection(props.model.connection) : true,
     });
     this.connectionFormService.tabsContainer.add({
       key: 'access',

@@ -126,7 +126,7 @@ export const PropertyItem = observer(function PropertyItem({
   error,
   readOnly,
 }: Props) {
-  const isKeyEditable = !property.displayName;
+  const isDeletable = !property.displayName && !readOnly;
   const edited = value !== undefined && value !== property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +138,7 @@ export const PropertyItem = observer(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useLayoutEffect(() => {
-    if (keyInputRef.current && isKeyEditable && property.new) {
+    if (keyInputRef.current && isDeletable && property.new) {
       keyInputRef.current.focus();
     }
   }, [property]);
@@ -151,7 +151,7 @@ export const PropertyItem = observer(function PropertyItem({
           type='text'
           name={property.id}
           placeholder={property.keyPlaceholder}
-          readOnly={!isKeyEditable}
+          readOnly={!isDeletable}
           autoComplete='none'
           onChange={handleKeyChange}
         >
@@ -170,12 +170,11 @@ export const PropertyItem = observer(function PropertyItem({
         >
           {value !== undefined ? value : property.defaultValue}
         </ShadowInput>
-        {(property.validValues && property.validValues.length > 0) && (
+        {(property.validValues && property.validValues.length > 0 && !readOnly) && (
           <property-select as="div">
             <PropertyValueSelector
               propertyName={property.id}
               values={property.validValues}
-              disabled={readOnly}
               onSelect={handleValueChange}
               onSwitch={setFocus}
             >
@@ -184,7 +183,7 @@ export const PropertyItem = observer(function PropertyItem({
           </property-select>
         )}
       </property-value>
-      {isKeyEditable && (
+      {isDeletable && (
         <property-remove as="div">
           <button type="button" onClick={handleRemove}><Icon name="reject" viewBox="0 0 11 11" /></button>
         </property-remove>
