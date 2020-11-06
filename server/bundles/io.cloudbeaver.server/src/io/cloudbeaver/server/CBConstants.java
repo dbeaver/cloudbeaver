@@ -51,7 +51,7 @@ public class CBConstants {
     //public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";
     public static final String DEFAULT_CONTENT_ROOT = "/var/www/cloudbeaver";
     public static final String DEFAULT_ROOT_URI = "/";
-    public static final String DEFAULT_SERVICES_URI = "/dbeaver/";
+    public static final String DEFAULT_SERVICES_URI = "/api/";
 
     public static final String DEFAULT_DEPLOY_LOCATION = "/opt/cloudbeaver";
     public static final String DEFAULT_DRIVERS_LOCATION = DEFAULT_DEPLOY_LOCATION + "/drivers";
