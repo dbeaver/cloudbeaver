@@ -14,7 +14,7 @@ import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 import { SessionResource } from './SessionResource';
 
 @injectable()
-export class PermissionsResource extends CachedDataResource<Set<string>, null> {
+export class PermissionsResource extends CachedDataResource<Set<string>, void> {
   @observable private loaded: boolean;
 
   constructor(
@@ -24,7 +24,7 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
     super(new Set());
     this.loaded = false;
     this.sessionResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
-    this.sessionResource.onDataUpdate.subscribe(() => this.load(null));
+    this.sessionResource.onDataUpdate.subscribe(() => this.load());
   }
 
   isLoaded(): boolean {
@@ -35,8 +35,8 @@ export class PermissionsResource extends CachedDataResource<Set<string>, null> {
     return this.data.has(id);
   }
 
-  protected async loader(key: null): Promise<Set<string>> {
-    await this.sessionResource.load(null);
+  protected async loader(): Promise<Set<string>> {
+    await this.sessionResource.load();
 
     const { permissions } = await this.graphQLService.sdk.sessionPermissions();
 

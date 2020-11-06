@@ -20,7 +20,7 @@ export class SessionService {
   ) {
   }
 
-  async update() {
-    await this.session.refresh(null);
+  async update(): Promise<void> {
+    await this.session.refresh();
   }
 }

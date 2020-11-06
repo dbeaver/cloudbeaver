@@ -421,7 +421,7 @@ export class NavNodeManagerService extends Bootstrap {
     }
 
     // TODO: IT'S IS REALLY BAD PLACE FOR THAT
-    const config = await this.serverService.config.load(null);
+    const config = await this.serverService.config.load();
     if (config?.configurationMode) {
       return false;
     }

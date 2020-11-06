@@ -26,7 +26,7 @@ export enum DataExportStep {
 @injectable()
 export class DataExportController implements IInitializableController, IDestructibleController {
   @observable step = DataExportStep.DataTransferProcessor;
-  get isLoading() {
+  get isLoading(): boolean {
     return this.dataExportService.processors.isLoading();
   }
 
@@ -56,7 +56,7 @@ export class DataExportController implements IInitializableController, IDestruct
     private commonDialogService: CommonDialogService
   ) { }
 
-  init(context: IExportContext, close: () => void) {
+  init(context: IExportContext, close: () => void): void {
     this.context = context;
     this.close = close;
     this.loadProcessors();
@@ -125,7 +125,7 @@ export class DataExportController implements IInitializableController, IDestruct
 
   private async loadProcessors() {
     try {
-      await this.dataExportService.processors.load(null);
+      await this.dataExportService.processors.load();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load data export processors');
     }

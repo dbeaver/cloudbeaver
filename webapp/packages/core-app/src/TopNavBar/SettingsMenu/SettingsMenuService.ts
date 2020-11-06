@@ -8,7 +8,7 @@
 
 import { EAdminPermission, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { IComputedMenuItemOptions, StaticMenu } from '@cloudbeaver/core-dialogs';
+import { IComputedMenuItemOptions, IMenuPanel, StaticMenu } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ServerConfigResource, PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
@@ -43,11 +43,11 @@ export class SettingsMenuService extends Bootstrap {
     await this.addLocales();
   }
 
-  getMenu() {
+  getMenu(): IMenuPanel {
     return this.menu.getMenu(SettingsMenuService.settingsMenuToken);
   }
 
-  addMenuItem(panelId: string, options: IComputedMenuItemOptions) {
+  addMenuItem(panelId: string, options: IComputedMenuItemOptions): void {
     this.menu.addMenuItem(panelId, options);
   }
 
@@ -100,7 +100,7 @@ export class SettingsMenuService extends Bootstrap {
   }
 
   private async addLocales() {
-    const config = await this.serverConfigResource.load(null);
+    const config = await this.serverConfigResource.load();
 
     if (!config) {
       return;

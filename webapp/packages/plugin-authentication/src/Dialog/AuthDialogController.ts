@@ -21,7 +21,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
   @observable isAuthenticating = false;
   @observable credentials = {};
 
-  get isLoading() {
+  get isLoading(): boolean {
     return this.authProvidersResource.isLoading();
   }
 
@@ -87,7 +87,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   private async loadProviders() {
     try {
-      await this.authProvidersResource.load(null);
+      await this.authProvidersResource.load();
       if (this.providers.length > 0) {
         this.provider = this.providers[0];
       }

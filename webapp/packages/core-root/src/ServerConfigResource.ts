@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, ServerConfig } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class ServerConfigResource extends CachedDataResource<ServerConfig | null, null> {
+export class ServerConfigResource extends CachedDataResource<ServerConfig | null, void> {
   @observable private loaded: boolean;
   constructor(
     private graphQLService: GraphQLService
@@ -26,10 +26,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   async update(): Promise<void> {
-    await this.refresh(null);
+    await this.refresh();
   }
 
-  protected async loader(key: null): Promise<ServerConfig> {
+  protected async loader(): Promise<ServerConfig> {
     const { serverConfig } = await this.graphQLService.sdk.serverConfig();
 
     this.loaded = true;

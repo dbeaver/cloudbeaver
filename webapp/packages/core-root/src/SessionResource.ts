@@ -20,7 +20,7 @@ import { ServerConfigResource } from './ServerConfigResource';
 export type SessionState = SessionStateFragment;
 
 @injectable()
-export class SessionResource extends CachedDataResource<SessionState | null, null> {
+export class SessionResource extends CachedDataResource<SessionState | null, void> {
   @observable
   private loaded: boolean;
 
@@ -30,7 +30,7 @@ export class SessionResource extends CachedDataResource<SessionState | null, nul
   ) {
     super(null);
     this.serverConfiguration.onDataOutdated.subscribe(this.markOutdated.bind(this));
-    this.serverConfiguration.onDataUpdate.subscribe(() => this.load(null));
+    this.serverConfiguration.onDataUpdate.subscribe(() => this.load());
     this.loaded = false;
   }
 
@@ -39,11 +39,11 @@ export class SessionResource extends CachedDataResource<SessionState | null, nul
   }
 
   async update(): Promise<void> {
-    await this.refresh(null);
+    await this.refresh();
   }
 
-  protected async loader(key: null): Promise<SessionState> {
-    await this.serverConfiguration.load(null);
+  protected async loader(): Promise<SessionState> {
+    await this.serverConfiguration.load();
 
     const { session } = await this.graphQLService.sdk.openSession();
 

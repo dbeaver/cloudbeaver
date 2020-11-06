@@ -19,7 +19,7 @@ import {
 export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>;
 
 @injectable()
-export class AuthProvidersResource extends CachedDataResource<AuthProvider[], null> {
+export class AuthProvidersResource extends CachedDataResource<AuthProvider[], void> {
   @observable private loaded;
 
   constructor(
@@ -28,14 +28,14 @@ export class AuthProvidersResource extends CachedDataResource<AuthProvider[], nu
   ) {
     super([]);
     this.loaded = false;
-    this.permissionsService.onUpdate.subscribe(() => this.markOutdated(null));
+    this.permissionsService.onUpdate.subscribe(() => this.markOutdated());
   }
 
   isLoaded(): boolean {
     return this.loaded;
   }
 
-  protected async loader(key: null): Promise<AuthProvider[]> {
+  protected async loader(): Promise<AuthProvider[]> {
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
     this.loaded = true;
     return providers;

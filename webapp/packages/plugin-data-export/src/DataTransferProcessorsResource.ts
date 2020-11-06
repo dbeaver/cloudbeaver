@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>, null> {
+export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>, void> {
   @observable private loaded = false;
 
   constructor(
@@ -21,11 +21,11 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
     super(new Map());
   }
 
-  isLoaded() {
+  isLoaded(): boolean {
     return this.loaded;
   }
 
-  protected async loader(key: null) {
+  protected async loader(): Promise<Map<string, DataTransferProcessorInfo>> {
     const { processors } = await this.graphQLService.sdk.getDataTransferProcessors();
 
     this.data.clear();
@@ -34,7 +34,6 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
       this.data.set(processor.id, processor);
     }
     this.loaded = true;
-    this.markUpdated(key);
 
     return this.data;
   }

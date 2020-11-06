@@ -85,7 +85,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    await this.serverConfigResource.load(null);
+    await this.serverConfigResource.load();
 
     if (this.administrationScreenService.isConfigurationMode
       && !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenService.setupName)) {

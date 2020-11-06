@@ -14,7 +14,7 @@ import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class TemplateConnectionsResource extends CachedDataResource<Connection[], null> {
+export class TemplateConnectionsResource extends CachedDataResource<Connection[], void> {
   @observable loaded: boolean;
   constructor(
     private graphQLService: GraphQLService,
@@ -22,24 +22,14 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   ) {
     super([]);
     this.loaded = false;
-    this.permissionsService.onUpdate.subscribe(() => this.markOutdated(null));
+    this.permissionsService.onUpdate.subscribe(() => this.markOutdated());
   }
 
-  isLoaded() {
+  isLoaded(): boolean {
     return this.loaded;
   }
 
-  async loadAll() {
-    await this.load(null);
-    return this.data;
-  }
-
-  async refreshAll() {
-    await this.refresh(null);
-    return this.data;
-  }
-
-  protected async loader(key: null): Promise<Connection[]> {
+  protected async loader(): Promise<Connection[]> {
     if (!await this.permissionsService.hasAsync(EPermission.public)) {
       this.loaded = true;
       return [];

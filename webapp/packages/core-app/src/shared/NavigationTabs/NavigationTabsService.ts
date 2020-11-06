@@ -79,7 +79,7 @@ export class NavigationTabsService {
     this.autoSaveService.withAutoSave(this.state, NAVIGATION_TABS_BASE_KEY);
   }
 
-  @action openTab(tab: ITab, isSelected?: boolean) {
+  @action openTab(tab: ITab, isSelected?: boolean): void {
     this.tabsMap.set(tab.id, tab);
     this.state.tabs.push(tab.id);
 
@@ -88,7 +88,7 @@ export class NavigationTabsService {
     }
   }
 
-  @action async selectTab(tabId: string, skipHandlers?: boolean) {
+  @action async selectTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     if (tabId === '') {
       this.state.currentId = '';
     }
@@ -110,7 +110,7 @@ export class NavigationTabsService {
     this.tabSelectSubject.next(tab);
   }
 
-  @action async closeTab(tabId: string, skipHandlers?: boolean) {
+  @action async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     const tab = this.tabsMap.get(tabId);
     if (tab && !skipHandlers) {
       await this.callHandlerCallback(tab, handler => handler.onClose);
@@ -134,7 +134,7 @@ export class NavigationTabsService {
     return tabHandler;
   }
 
-  @action updateHandlerState<T>(tabId: string, state: T) {
+  @action updateHandlerState<T>(tabId: string, state: T): void {
     const tab = this.tabsMap.get(tabId);
     if (tab) {
       tab.handlerState = state;
@@ -200,9 +200,9 @@ export class NavigationTabsService {
   }
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
-  async restoreTabs() {
+  async restoreTabs(): Promise<void> {
     const removedTabs: string[] = [];
-    const session = await this.sessionService.session.load(null);
+    const session = await this.sessionService.session.load();
 
     for (const tabId of this.state.tabs) {
       if (session?.cacheExpired) {

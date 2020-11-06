@@ -66,6 +66,6 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
   }
 
   private async updateSession() {
-    await this.sessionResource.refresh(null);
+    await this.sessionResource.refresh();
   }
 }

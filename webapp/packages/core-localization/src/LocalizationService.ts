@@ -46,7 +46,7 @@ export class LocalizationService extends Bootstrap {
     super();
   }
 
-  addProvider(provider: ILocaleProvider) {
+  addProvider(provider: ILocaleProvider): void {
     this.localeProviders.push(provider);
   }
 
@@ -72,7 +72,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    const session = await this.sessionService.session.load(null);
+    const session = await this.sessionService.session.load();
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
 
     if (!session) {
@@ -89,7 +89,7 @@ export class LocalizationService extends Bootstrap {
     return this.settings.language;
   }
 
-  async changeLocaleAsync(key: string) {
+  async changeLocaleAsync(key: string): Promise<void> {
     if (key === this.settings.language) {
       return;
     }
@@ -115,7 +115,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   private async setLocale(key: string) {
-    const config = await this.serverService.config.load(null);
+    const config = await this.serverService.config.load();
 
     if (!config) {
       throw new Error('Cant\'t get server settings');

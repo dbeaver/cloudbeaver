@@ -26,7 +26,7 @@ export class ContainerResource extends CachedDataResource<Map<string, ObjectCont
     super(new Map());
   }
 
-  isLoaded({ connectionId }: ObjectContainerParams) {
+  isLoaded({ connectionId }: ObjectContainerParams): boolean {
     return this.data.has(connectionId);
   }
 

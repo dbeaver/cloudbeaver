@@ -32,11 +32,11 @@ export class PermissionsService {
   }
 
   async hasAsync(id: string): Promise<boolean> {
-    await this.permissions.load(null);
+    await this.permissions.load();
     return this.has(id);
   }
 
   async update(): Promise<void> {
-    await this.permissions.refresh(null);
+    await this.permissions.refresh();
   }
 }

@@ -18,8 +18,8 @@ export class AuthProviderService {
     private providers: AuthProvidersResource
   ) { }
 
-  async processCredentials(providerId: string, credentials: Record<string, any>) {
-    const providers = await this.providers.load(null);
+  async processCredentials(providerId: string, credentials: Record<string, any>): Promise<Record<string, any>> {
+    const providers = await this.providers.load();
     const provider = providers.find(provider => provider.id === providerId);
 
     if (!provider) {

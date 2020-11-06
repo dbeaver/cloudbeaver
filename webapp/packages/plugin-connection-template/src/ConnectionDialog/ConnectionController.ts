@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource
+  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver
 } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -47,15 +47,15 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private onClose!: () => void;
   private isDistructed = false;
 
-  get templateConnections() {
+  get templateConnections(): Connection[] {
     return this.templateConnectionsResource.data;
   }
 
-  get dbDrivers() {
+  get dbDrivers(): Map<string, DBDriver> {
     return this.dbDriverResource.data;
   }
 
-  get dbDriver() {
+  get dbDriver(): DBDriver | undefined {
     if (!this.template) {
       return undefined;
     }
@@ -71,7 +71,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private dbAuthModelsResource: DatabaseAuthModelsResource
   ) { }
 
-  init(onClose: () => void) {
+  init(onClose: () => void): void {
     this.onClose = onClose;
     this.loadTemplateConnections();
   }
@@ -152,7 +152,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   private async loadTemplateConnections() {
     try {
-      await this.templateConnectionsResource.loadAll();
+      await this.templateConnectionsResource.load();
       await this.dbDriverResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load database sources');

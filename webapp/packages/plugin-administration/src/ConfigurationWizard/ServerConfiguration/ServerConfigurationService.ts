@@ -44,7 +44,7 @@ export class ServerConfigurationService {
   async loadConfig(): Promise<void> {
     this.loading = true;
     try {
-      const config = await this.serverConfigResource.load(null);
+      const config = await this.serverConfigResource.load();
 
       this.state = this.administrationScreenService
         .getItemState(

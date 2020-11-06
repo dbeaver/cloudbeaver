@@ -71,7 +71,7 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async requireAuthentication() {
-    const config = await this.serverService.config.load(null);
+    const config = await this.serverService.config.load();
     if (!config) {
       throw new Error('Can\'t configure Authentication');
     }
@@ -83,11 +83,11 @@ export class AuthenticationService extends Bootstrap {
     await this.auth(true);
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.sessionService.session.onDataUpdate.subscribe(() => this.requireAuthentication());
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => await this.auth(false));
   }
 
-  load() { }
+  load(): void { }
 }
