@@ -316,16 +316,10 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
-        DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
-        DBPDataSourceContainer dataSource = null;
-        if (!CommonUtils.isEmpty(connectionConfig.getConnectionId())) {
-            dataSource = sessionRegistry.getDataSource(connectionConfig.getConnectionId());
-            if (dataSource == null) {
-                // If called for new connection in admin mode then this connection may absent in session registry yet
-                dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionConfig.getConnectionId());
-            }
-        }
+        String connectionId = connectionConfig.getConnectionId();
+        DBPDataSourceContainer dataSource = WebServiceUtils.getLocalOrGlobalDataSource(webSession, connectionId);
 
+        DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer testDataSource;
         if (dataSource != null) {
             testDataSource = dataSource.createCopy(dataSource.getRegistry());

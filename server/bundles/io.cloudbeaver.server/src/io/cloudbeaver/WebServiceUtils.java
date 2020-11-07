@@ -230,4 +230,17 @@ public class WebServiceUtils {
         }
         return true;
     }
+
+    @Nullable
+    public static DBPDataSourceContainer getLocalOrGlobalDataSource(WebSession webSession, String connectionId) throws DBWebException {
+        DBPDataSourceContainer dataSource = null;
+        if (!CommonUtils.isEmpty(connectionId)) {
+            dataSource = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(connectionId);
+            if (dataSource == null) {
+                // If called for new connection in admin mode then this connection may absent in session registry yet
+                dataSource = getDataSourceRegistry().getDataSource(connectionId);
+            }
+        }
+        return dataSource;
+    }
 }

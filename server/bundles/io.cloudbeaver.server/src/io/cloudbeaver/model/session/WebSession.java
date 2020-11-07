@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConnectionGrant;
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWSecurityController;
-import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -436,17 +433,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(String connectionID) throws DBWebException {
-        return getWebConnectionInfo(sessionProject.getDataSourceRegistry(), connectionID);
-    }
-
-    @NotNull
-    public WebConnectionInfo getWebConnectionInfo(DBPDataSourceRegistry registry, String connectionID) throws DBWebException {
         WebConnectionInfo connectionInfo;
         synchronized (connections) {
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = registry.getDataSource(connectionID);
+            DBPDataSourceContainer dataSource = WebServiceUtils.getLocalOrGlobalDataSource(this, connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {

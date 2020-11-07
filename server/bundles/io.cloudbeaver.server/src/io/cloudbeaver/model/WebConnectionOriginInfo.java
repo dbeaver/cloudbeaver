@@ -78,7 +78,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
     @Override
     public WebPropertyInfo[] getDetails() throws DBWebException {
         try {
-            DBPObject details = origin.getDataSourceDetails(session.getProgressMonitor(), dataSourceContainer);
+            DBPObject details = origin.getDataSourceDetails(session.getProgressMonitor(), session.getSessionContext(), dataSourceContainer);
             if (details == null) {
                 return new WebPropertyInfo[0];
             }
