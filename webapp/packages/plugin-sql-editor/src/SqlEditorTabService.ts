@@ -79,11 +79,12 @@ export class SqlEditorTabService {
     if (!this.connectionsManagerService.hasAnyConnection()) {
       return null;
     }
-    let newEditor;
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
     if (!connection.connected) {
       return null;
     }
+
+    let newEditor;
 
     try {
       const order = this.getFreeEditorId();

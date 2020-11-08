@@ -44,7 +44,7 @@ export class NavigationTreeService {
 
   async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
-      if (this.isNodeConnection(id) && !await this.tryEnsureConnectionInit(id)) {
+      if (this.isNodeConnection(id) && !await this.tryConnectionInit(id)) {
         return false;
       }
       await this.navNodeManagerService.loadTree(id);
@@ -94,7 +94,7 @@ export class NavigationTreeService {
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
-  private async tryEnsureConnectionInit(navNodeId: string): Promise<boolean> {
+  private async tryConnectionInit(navNodeId: string): Promise<boolean> {
     const connection = await this.connectionAuthService.auth(
       NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
     );
