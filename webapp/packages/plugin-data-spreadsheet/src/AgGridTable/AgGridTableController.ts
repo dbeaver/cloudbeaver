@@ -63,6 +63,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     headerHeight: 28,
     rowModelType: 'infinite',
     infiniteInitialRowCount: 0,
+    maxConcurrentDatasourceRequests: 1,
     cacheBlockSize: undefined, // to be set during init phase
 
     datasource: this.datasource,
@@ -216,7 +217,19 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private handleSortChanged(event: SortChangedEvent) {
     const sortModel = event.api.getSortModel() as SortModel;
-    this.gridModel.onSortChanged(sortModel);
+    const newModel = this.gridModel.onSortChanged(sortModel);
+
+    if (sortModel.length !== newModel.length) {
+      event.api.setSortModel(newModel);
+    } else {
+      for (let i = 0; i < sortModel.length; i++) {
+        if (sortModel[i].colId !== newModel[i].colId
+          || sortModel[i].sort !== newModel[i].sort) {
+          event.api.setSortModel(newModel);
+          return;
+        }
+      }
+    }
   }
 
   /* Actions */
