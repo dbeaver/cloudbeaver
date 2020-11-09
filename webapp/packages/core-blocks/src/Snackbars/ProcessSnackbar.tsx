@@ -19,7 +19,6 @@ import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
-
 interface Props extends INotificationProcessExtraProps {
   closeDelay?: number;
   displayDelay?: number;

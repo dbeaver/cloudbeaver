@@ -47,12 +47,15 @@ interface ISnackbarBodyProps {
   className?: string;
 }
 
-export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({ title, message, className }) {
+export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({
+  title, message, className, children,
+}) {
   return styled(SNACKBAR_BODY_STYLES)(
     <notification-body as="div" className={className}>
       <body-text-block as='div'>
         <text-block-title title={title} as='h2'>{title}</text-block-title>
         {message && <message as="div">{message}</message>}
+        {children}
       </body-text-block>
     </notification-body>
   );

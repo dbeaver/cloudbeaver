@@ -87,12 +87,12 @@ export class ExportNotificationController implements IInitializableController {
 
   delete = (): void => {
     this.dataExportProcessService.delete(this.notification.extraProps.source);
-    this.notification.close();
+    this.notification.close(false);
   };
 
   download = (): void => {
     this.dataExportProcessService.download(this.notification.extraProps.source);
-    this.notification.close();
+    this.notification.close(false);
   };
 
   cancel = (): void => {

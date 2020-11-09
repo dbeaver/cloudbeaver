@@ -21,6 +21,11 @@ const SNACKBAR_FOOTER_STYLES = css`
   actions:empty {
     display: none;
   }
+  actions:not(:empty) {
+    & > *:not(:first-child) {
+      margin-left: 16px;
+    }
+  }
 `;
 
 interface ISnackbarFooter {

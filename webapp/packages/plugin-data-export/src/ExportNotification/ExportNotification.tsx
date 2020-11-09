@@ -7,11 +7,10 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import {
-  Button, Loader, IconButton, SNACKBAR_COMMON_STYLES, NotificationMark
+  Button, SnackbarWrapper, SnackbarStatus, SnackbarContent, SnackbarBody, SnackbarFooter
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
@@ -22,9 +21,6 @@ import { EDeferredState } from '@cloudbeaver/core-utils';
 import { ExportNotificationController } from './ExportNotificationController';
 
 const styles = css`
-  Loader {
-    margin-right: 16px;
-  }
   source-name {
     composes: theme-typography--body2 from global;
     padding-top: 16px;
@@ -33,12 +29,6 @@ const styles = css`
 
     & pre {
       margin: 0;
-    }
-  }
-  loader-container {
-    & Loader {
-      width: 40px;
-      height: 40px;
     }
   }
 `;
@@ -52,84 +42,63 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
 }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
-  const [mounted, setMounted] = useState(false);
-  const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
   const exportNotificationType = controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
-  const translatedStatus = translate(controller.status);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return styled(useStyles(SNACKBAR_COMMON_STYLES, styles))(
-    <notification as="div" {...use({ mounted })}>
-      {!controller.isPending && <NotificationMark type={exportNotificationType} />}
-      {controller.isPending && (
-        <loader-container as='div'>
-          <Loader fullSize hideMessage />
-        </loader-container>
-      )}
-      <notification-body as="div">
-        <body-text-block as='div'>
-          <text-block-title title={translatedStatus} as="h2">{translatedStatus}</text-block-title>
-          <message as="div">
-            {controller.sourceName}
-            {controller.task?.context.sourceName && (
-              <pre title={controller.task?.context.sourceName}>
-                {controller.task?.context.sourceName}
-              </pre>
-            )}
-          </message>
-        </body-text-block>
-        <notification-footer as='div'>
-          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
-          <actions as="div">
-            {controller.isSuccess && (
-              <>
-                <Button
-                  type="button"
-                  mod={['outlined']}
-                  onClick={controller.delete}
-                >
-                  {translate('data_transfer_notification_delete')}
-                </Button>
-                <Button
-                  tag='a'
-                  href={controller.downloadUrl}
-                  mod={['unelevated']}
-                  download
-                  onClick={controller.download}
-                >
-                  {translate('data_transfer_notification_download')}
-                </Button>
-              </>
-            )}
-            {controller.hasDetails && (
+  return styled(useStyles(styles))(
+    <SnackbarWrapper closing={false} closeable={!controller.isPending} onClose={() => notification.close(false)}>
+      <SnackbarStatus status={controller.isPending ? ENotificationType.Loading : exportNotificationType} />
+      <SnackbarContent>
+        <SnackbarBody title={translate(controller.status)} message={controller.sourceName}>
+          {controller.task?.context.sourceName && (
+            <pre title={controller.task?.context.sourceName}>
+              {controller.task?.context.sourceName}
+            </pre>
+          )}
+        </SnackbarBody>
+        <SnackbarFooter timestamp={notification.timestamp}>
+          {controller.isSuccess && (
+            <>
               <Button
                 type="button"
                 mod={['outlined']}
-                disabled={controller.isDetailsDialogOpen}
-                onClick={controller.showDetails}
+                onClick={controller.delete}
               >
-                {translate('ui_errors_details')}
+                {translate('data_transfer_notification_delete')}
               </Button>
-            )}
-            {controller.isPending && (
               <Button
-                type="button"
-                mod={['outlined']}
-                disabled={controller.process?.getState() === EDeferredState.CANCELLING}
-                onClick={controller.cancel}
+                tag='a'
+                href={controller.downloadUrl}
+                mod={['unelevated']}
+                download
+                onClick={controller.download}
               >
-                {translate('ui_processing_cancel')}
+                {translate('data_transfer_notification_download')}
               </Button>
-            )}
-          </actions>
-        </notification-footer>
-      </notification-body>
-      {!controller.isPending && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={controller.delete} />
-      )}
-    </notification>
+            </>
+          )}
+          {controller.hasDetails && (
+            <Button
+              type="button"
+              mod={['outlined']}
+              disabled={controller.isDetailsDialogOpen}
+              onClick={controller.showDetails}
+            >
+              {translate('ui_errors_details')}
+            </Button>
+          )}
+          {controller.isPending && (
+            <Button
+              type="button"
+              mod={['outlined']}
+              disabled={controller.process?.getState() === EDeferredState.CANCELLING}
+              onClick={controller.cancel}
+            >
+              {translate('ui_processing_cancel')}
+            </Button>
+          )}
+        </SnackbarFooter>
+      </SnackbarContent>
+    </SnackbarWrapper>
+
   );
 });
