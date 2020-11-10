@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -38,6 +38,21 @@ export const Body = observer(function Body() {
     }
     document.documentElement.dataset.backendVersion = backendVersion;
   });
+
+  useEffect(() => {
+    const appLoadingScreen = document.getElementById('loading-screen');
+    let onTransitionEnd: () => void;
+
+    if (appLoadingScreen) {
+      onTransitionEnd = () => {
+        appLoadingScreen.style.display = 'none';
+      };
+      appLoadingScreen.addEventListener('transitionend', onTransitionEnd);
+      appLoadingScreen.classList.add('loading-screen--fade-out');
+    }
+
+    return () => appLoadingScreen?.removeEventListener('transitionend', onTransitionEnd);
+  }, []);
 
   return styled(useStyles(bodyStyles))(
     <theme ref={ref} as="div">
