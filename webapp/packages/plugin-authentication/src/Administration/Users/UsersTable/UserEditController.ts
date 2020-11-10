@@ -7,13 +7,14 @@
  */
 
 import { observable, computed } from 'mobx';
+import { Subscription } from 'rxjs';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminUserInfo, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UserEditController
@@ -22,34 +23,47 @@ implements IInitializableController, IDestructibleController {
   @observable user: AdminUserInfo | null = null;
 
   @computed get isDisabled() {
-    return this.isLoading;
+    return this.usersResource.isDataLoading(this.userId);
   }
 
   userId!: string;
 
   readonly error = new GQLErrorCatcher();
 
+  private subscription!: Subscription;
+
   constructor(
     private notificationService: NotificationService,
     private usersResource: UsersResource
   ) { }
 
-  init(id: string) {
+  async init(id: string): Promise<void> {
     this.userId = id;
-    this.loadUser();
+
+    await this.loadUser();
+    this.subscription = this.usersResource.onItemAdd.subscribe(key => {
+      if ((isResourceKeyList(key) && !key.includes(id)) || (key !== id)) {
+        return;
+      }
+      this.updateUser();
+    });
   }
 
-  destruct(): void { }
+  destruct(): void {
+    this.subscription.unsubscribe();
+  }
 
   private async loadUser() {
-    this.isLoading = true;
     try {
       // we create a copy to protect the current value from mutation
-      this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId)));
+      await this.usersResource.load(this.userId);
+      this.updateUser();
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load user ${this.userId}`);
-    } finally {
-      this.isLoading = false;
     }
+  }
+
+  private async updateUser() {
+    this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId)));
   }
 }

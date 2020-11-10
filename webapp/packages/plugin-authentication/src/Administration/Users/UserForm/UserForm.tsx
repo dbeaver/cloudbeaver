@@ -112,8 +112,10 @@ export const UserForm = observer(function UserForm({
   const tabsStyles = [tabStyles, BORDER_TAB_STYLES];
   const translate = useTranslate();
   const service = useService(UserFormService);
-  const controller = useController(UserFormController, user, editing, onCancel);
+  const controller = useController(UserFormController);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+
+  controller.update(user, editing, onCancel);
 
   return styled(useStyles(styles, tabsStyles))(
     <TabsState container={service.tabsContainer} user={user} controller={controller} editing={editing}>
