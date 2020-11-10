@@ -31,7 +31,7 @@ export class Executor<T> implements IExecutor<T> {
 
       try {
         for (const handler of this.handlers) {
-          const result = await handler(context, data);
+          const result = await handler(data, context);
 
           if (result === false) {
             return context;
@@ -39,7 +39,7 @@ export class Executor<T> implements IExecutor<T> {
         }
       } finally {
         for (const handler of this.postHandlers) {
-          await handler(context, data);
+          await handler(data, context);
         }
       }
       return context;

@@ -308,9 +308,9 @@ export class ObjectViewerTabService {
     await this.dbObjectPageService.closePages(tab);
   }
 
-  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
+  private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const { tab, tabInfo, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
+      const { tab, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
 
       if (tab) {
         if (!tab.handlerState.folderId || (nodeInfo.folderId && tab.handlerState.folderId !== nodeInfo.folderId)) {

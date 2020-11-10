@@ -36,14 +36,14 @@ interface UserCreateOptions {
 
 @injectable()
 export class UsersResource extends CachedMapResource<string, AdminUser> {
-  private metadata: MetadataMap<string, boolean>;
+  private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
     super(new Map());
-    this.metadata = new MetadataMap(() => false);
+    this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
   isNew(id: string): boolean {
@@ -53,9 +53,9 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return NEW_USER_SYMBOL in this.get(id)!;
   }
 
-  has(id: string) {
-    if (this.metadata.has(id)) {
-      return this.metadata.get(id);
+  has(id: string): boolean {
+    if (this.loadedKeyMetadata.has(id)) {
+      return this.loadedKeyMetadata.get(id);
     }
 
     return this.data.has(id);
@@ -172,7 +172,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
 
   refreshAllLazy() {
     this.markOutdated('all');
-    this.metadata.set('all', false);
+    this.loadedKeyMetadata.set('all', false);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUser>> {
@@ -182,7 +182,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
 
     if (key === 'all') {
       this.data.clear();
-      this.metadata.set('all', true);
+      this.loadedKeyMetadata.set('all', true);
     }
 
     for (const user of users) {

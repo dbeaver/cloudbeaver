@@ -33,7 +33,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
-    this.onDataOutdated.subscribe(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
+    this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }
 
   deleteInNode(key: string, value: string[]): void;

@@ -92,7 +92,7 @@ implements IInitializableController {
 
   change = (): void => { this.accessChanged = true; };
 
-  private async saveSubjectPermissions(context: IExecutionContextProvider<string>, connectionId: string) {
+  private async saveSubjectPermissions(connectionId: string) {
     if (!this.accessChanged || !this.model.grantedSubjects) {
       return;
     }

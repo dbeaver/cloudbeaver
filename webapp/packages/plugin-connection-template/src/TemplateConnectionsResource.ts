@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 
 import { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
+import { EPermission, PermissionsResource, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -18,11 +18,12 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   @observable loaded: boolean;
   constructor(
     private graphQLService: GraphQLService,
+    private permissionsResource: PermissionsResource,
     private permissionsService: PermissionsService
   ) {
     super([]);
     this.loaded = false;
-    this.permissionsService.onUpdate.subscribe(() => this.markOutdated());
+    this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
   }
 
   isLoaded(): boolean {

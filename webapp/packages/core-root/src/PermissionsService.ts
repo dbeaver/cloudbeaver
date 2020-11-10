@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Observable } from 'rxjs';
-
 import { injectable } from '@cloudbeaver/core-di';
 
 import { PermissionsResource } from './PermissionsResource';
@@ -18,10 +16,6 @@ export enum EPermission {
 
 @injectable()
 export class PermissionsService {
-  get onUpdate(): Observable<Set<string>> {
-    return this.permissions.onDataUpdate;
-  }
-
   constructor(
     private permissions: PermissionsResource
   ) {

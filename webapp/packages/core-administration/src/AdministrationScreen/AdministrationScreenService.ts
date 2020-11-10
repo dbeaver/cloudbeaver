@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
-import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
@@ -53,6 +53,7 @@ export class AdministrationScreenService {
   readonly activationEvent: IExecutor<boolean>;
 
   constructor(
+    private permissionsResource: PermissionsResource,
     private permissionsService: PermissionsService,
     private screenService: ScreenService,
     private administrationItemService: AdministrationItemService,
@@ -68,7 +69,9 @@ export class AdministrationScreenService {
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
-    this.permissionsService.onUpdate.subscribe(() => this.checkPermissions(this.screenService.routerService.state));
+    this.permissionsResource.onDataUpdate.addHandler(() => {
+      this.checkPermissions(this.screenService.routerService.state);
+    });
   }
 
   getScreen(state?: RouterState): IAdministrationItemRoute | null {

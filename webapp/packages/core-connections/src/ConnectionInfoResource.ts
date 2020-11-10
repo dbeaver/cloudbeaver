@@ -30,7 +30,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   ) {
     super(new Map());
     this.onConnectionCreate = new Executor();
-    sessionResource.onDataUpdate.subscribe(() => this.refreshSession(true));
+    sessionResource.onDataUpdate.addHandler(() => this.refreshSession(true));
   }
 
   @action async refreshSession(sessionUpdate?: boolean): Promise<void> {

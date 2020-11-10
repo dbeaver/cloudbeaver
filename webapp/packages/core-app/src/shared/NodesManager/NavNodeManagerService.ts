@@ -111,7 +111,7 @@ export class NavNodeManagerService extends Bootstrap {
       }
     )
       .addHandler(this.navigateHandler.bind(this))
-      .addPostHandler((_, { nodeId }) => {
+      .addPostHandler(({ nodeId }) => {
         this.activeNavigationNodes = this.activeNavigationNodes.filter(id => id !== nodeId);
       });
   }
@@ -120,7 +120,7 @@ export class NavNodeManagerService extends Bootstrap {
     this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
-    this.sessionResource.onDataUpdate.subscribe(this.refreshRoot.bind(this));
+    this.sessionResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
   }
 
   load(): void {}
@@ -332,7 +332,7 @@ export class NavNodeManagerService extends Bootstrap {
     }
   }
 
-  private async connectionCreateHandler(context: IExecutionContextProvider<Connection>, connection: Connection) {
+  private async connectionCreateHandler(connection: Connection) {
     if (!await this.isNavTreeEnabled()) {
       return;
     }
@@ -386,8 +386,8 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async navigateHandler(
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    data: INodeNavigationData
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void | false> {
     if (this.activeNavigationNodes.includes(data.nodeId)) {

@@ -10,7 +10,7 @@ import { action, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
+import { PermissionsService, EPermission, PermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -35,8 +35,9 @@ export class LogViewerService {
     private coreSettingsService: CoreSettingsService,
     private notificationService: NotificationService,
     private permissionsService: PermissionsService,
+    private permissionsResource: PermissionsResource,
   ) {
-    this.permissionsService.onUpdate.subscribe(this.stopIfHasNoPermission.bind(this));
+    this.permissionsResource.onDataUpdate.addHandler(this.stopIfHasNoPermission.bind(this));
   }
 
   toggle(): void {

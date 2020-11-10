@@ -22,7 +22,7 @@ export class ServerService {
     readonly config: ServerConfigResource,
     private sessionService: SessionService
   ) {
-    this.config.onDataUpdate.subscribe(this.refreshConfigAsync.bind(this));
+    this.config.onDataUpdate.addHandler(this.refreshConfigAsync.bind(this));
   }
 
   private refreshConfigAsync() {

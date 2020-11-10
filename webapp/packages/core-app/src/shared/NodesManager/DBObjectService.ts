@@ -21,8 +21,8 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
-    this.navNodeInfoResource.onDataOutdated.subscribe(key => this.markOutdated(key));
-    this.navNodeInfoResource.onItemDelete.subscribe(key => this.delete(key));
+    this.navNodeInfoResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.navNodeInfoResource.onItemDelete.subscribe(this.delete.bind(this));
   }
 
   async loadChildren(parentId: string, key: ResourceKey<string>): Promise<Map<string, DBObject>> {
