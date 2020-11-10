@@ -140,7 +140,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     });
   }
 
-  async delete(key: ResourceKey<string>) {
+  async delete(key: ResourceKey<string>): Promise<void> {
     if (isResourceKeyList(key)) {
       for (let i = 0; i < key.list.length; i++) {
         if (this.isActiveUser(key.list[i])) {
@@ -157,7 +157,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
       this.data.delete(key);
     }
     this.markUpdated(key);
-    this.itemDeleteSubject.next(key);
+    await this.onItemDelete.execute(key);
   }
 
   async loadAll() {

@@ -24,30 +24,43 @@ export type Connection = UserConnectionFragment & { authProperties?: UserConnect
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
   readonly onConnectionCreate: IExecutor<Connection>;
+  private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
     sessionResource: SessionResource
   ) {
     super(new Map());
     this.onConnectionCreate = new Executor();
+    this.sessionUpdate = false;
+
+    // in case when session was refreshed all data depended on connection info
+    // should be refreshed by session update executor
+    // it's prevents double nav tree refresh
+    this.onItemAdd.addHandler(() => !this.sessionUpdate);
+    this.onItemDelete.addHandler(() => !this.sessionUpdate);
     sessionResource.onDataUpdate.addHandler(() => this.refreshSession(true));
   }
 
   @action async refreshSession(sessionUpdate?: boolean): Promise<void> {
-    const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
+    this.sessionUpdate = true;
+    try {
+      const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
 
-    const restoredConnections = new Set<string>();
-    for (const connection of connections) {
-      await this.add(connection, sessionUpdate);
-      restoredConnections.add(connection.id);
-    }
+      const restoredConnections = new Set<string>();
+      for (const connection of connections) {
+        await this.add(connection, sessionUpdate);
+        restoredConnections.add(connection.id);
+      }
 
-    const unrestoredConnectionIdList = Array.from(this.data.values())
-      .map(connection => connection.id)
-      .filter(connectionId => !restoredConnections.has(connectionId));
+      const unrestoredConnectionIdList = Array.from(this.data.values())
+        .map(connection => connection.id)
+        .filter(connectionId => !restoredConnections.has(connectionId));
 
-    for (const connectionId of unrestoredConnectionIdList) {
-      this.delete(connectionId);
+      for (const connectionId of unrestoredConnectionIdList) {
+        this.delete(connectionId);
+      }
+    } finally {
+      this.sessionUpdate = false;
     }
   }
 

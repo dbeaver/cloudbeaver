@@ -145,6 +145,7 @@ export abstract class CachedResource<
 
   private async loadingTask(param: TParam) {
     this.data = await this.loader(param);
+    this.onDataUpdate.execute(this.data);
   }
 
   private async taskWrapper<T>(param: TParam, promise: (param: TParam) => Promise<T>) {
@@ -154,7 +155,6 @@ export abstract class CachedResource<
     try {
       const value = await promise(param);
       this.markUpdated(param);
-      this.onDataUpdate.execute(this.data);
       return value;
     } finally {
       this.loading = prevState;

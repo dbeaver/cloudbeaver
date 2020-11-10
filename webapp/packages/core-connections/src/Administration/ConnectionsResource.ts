@@ -171,7 +171,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     } else {
       await this.deleteConnection(key);
     }
-    this.itemDeleteSubject.next(key);
+    await this.onItemDelete.execute(key);
   }
 
   private async deleteConnection(connectionId: string) {

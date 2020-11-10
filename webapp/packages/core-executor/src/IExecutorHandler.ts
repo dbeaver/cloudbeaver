@@ -12,4 +12,4 @@ export type IExecutorHandler<T> = (
   data: T,
   contexts: IExecutionContextProvider<T>
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-) => void | false | Promise<void | false>;
+) => void | boolean | Promise<void | boolean>;

@@ -117,10 +117,10 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   register(): void {
-    this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
-    this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
-    this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
     this.sessionResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
+    this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
+    this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
+    this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
   }
 
   load(): void {}

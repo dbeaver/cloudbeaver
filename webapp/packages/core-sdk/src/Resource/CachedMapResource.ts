@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject, Observable } from 'rxjs';
-
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { CachedResource } from './CachedResource';
 import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
@@ -18,18 +17,13 @@ export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
 Map<TKey, TValue>,
 ResourceKey<TKey>
 > {
-  readonly onItemAdd: Observable<ResourceKey<TKey>>;
-  readonly onItemDelete: Observable<ResourceKey<TKey>>;
-
-  protected itemAddSubject: Subject<ResourceKey<TKey>>;
-  protected itemDeleteSubject: Subject<ResourceKey<TKey>>;
+  readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
+  readonly onItemDelete: IExecutor<ResourceKey<TKey>>;
 
   constructor(defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
-    this.itemAddSubject = new Subject();
-    this.onItemAdd = this.itemAddSubject.asObservable();
-    this.itemDeleteSubject = new Subject();
-    this.onItemDelete = this.itemDeleteSubject.asObservable();
+    this.onItemAdd = new Executor(null, this.includes);
+    this.onItemDelete = new Executor(null, this.includes);
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
@@ -103,7 +97,7 @@ ResourceKey<TKey>
       }
     });
     this.markUpdated(key);
-    this.itemAddSubject.next(key);
+    this.onItemAdd.execute(key);
   }
 
   delete(key: TKey): void;
@@ -112,7 +106,7 @@ ResourceKey<TKey>
   delete(key: ResourceKey<TKey>): void {
     ResourceKeyUtils.forEach(key, key => this.data.delete(key));
     this.markUpdated(key);
-    this.itemDeleteSubject.next(key);
+    this.onItemDelete.execute(key);
   }
 
   async refresh(key: TKey): Promise<TValue>;
