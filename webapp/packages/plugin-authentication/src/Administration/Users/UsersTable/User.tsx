@@ -25,14 +25,17 @@ const styles = css`
 
 interface Props {
   user: AdminUser;
+  selectable?: boolean;
 }
 
-export const User = observer(function User({ user }: Props) {
+export const User: React.FC<Props> = observer(function User({ user, selectable }) {
   return styled(useStyles(styles))(
-    <TableItem item={user.userId} expandElement={UserEdit}>
-      <TableColumnValue centerContent flex>
-        <TableItemSelect />
-      </TableColumnValue>
+    <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
+      {selectable && (
+        <TableColumnValue centerContent flex>
+          <TableItemSelect />
+        </TableColumnValue>
+      )}
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>

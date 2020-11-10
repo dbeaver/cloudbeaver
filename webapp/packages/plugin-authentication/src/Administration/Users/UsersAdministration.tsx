@@ -17,7 +17,6 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { CreateUser } from './CreateUser';
 import { CreateUserService } from './CreateUserService';
 import { UsersAdministrationController } from './UsersAdministrationController';
-import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersTable } from './UsersTable/UsersTable';
 
 const styles = composes(
@@ -47,6 +46,10 @@ const styles = composes(
     AdministrationTools {
       border: none;
     }
+
+    Loader {
+      height: 100%;
+    }
   `
 );
 
@@ -56,28 +59,35 @@ export const UsersAdministration = observer(function UsersAdministration({
   const service = useService(CreateUserService);
   const controller = useController(UsersAdministrationController);
 
-  if (sub?.name === UsersAdministrationNavigationService.CreateItemName) {
-    service.create();
-  }
-
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
         <layout-grid-cell as='div' {...use({ span: 12 })}>
-          <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" disabled={sub && !!service.user} onClick={service.create} />
-            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
-            <IconButton name="refresh-outline" viewBox="0 0 28 28" onClick={controller.update} />
-          </AdministrationTools>
-          {sub && service.user && (
-            <CreateUser user={service.user} onCancel={service.cancelCreate} />
-          )}
-          <UsersTable
-            users={controller.users}
-            selectedItems={controller.selectedItems}
-            expandedItems={controller.expandedItems}
-          />
-          {controller.isLoading && <Loader overlay />}
+          {controller.isProvidersLoading
+            ? <Loader />
+            : (
+              <>
+                <AdministrationTools>
+                  {controller.isLocalProviderAvailable && (
+                    <>
+                      <IconButton name="add" viewBox="0 0 28 28" disabled={sub && !!service.user} onClick={service.create} />
+                      <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
+                    </>
+                  )}
+                  <IconButton name="refresh-outline" viewBox="0 0 28 28" onClick={controller.update} />
+                </AdministrationTools>
+                {sub && service.user && (
+                  <CreateUser user={service.user} onCancel={service.cancelCreate} />
+                )}
+                <UsersTable
+                  users={controller.users}
+                  selectedItems={controller.selectedItems}
+                  expandedItems={controller.expandedItems}
+                  selectable={controller.isLocalProviderAvailable}
+                />
+                {controller.isLoading && <Loader overlay />}
+              </>
+            )}
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>
