@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useAppLoadingSreen } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -27,10 +28,12 @@ const bodyStyles = css`
 `;
 
 export const Body = observer(function Body() {
+  useAppLoadingSreen();
   const ref = useRef<HTMLDivElement>(null);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
+
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {
     if (ref.current) {

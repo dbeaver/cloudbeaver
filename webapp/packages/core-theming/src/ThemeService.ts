@@ -9,6 +9,7 @@
 import { action, computed, observable } from 'mobx';
 
 import './styles/main/normalize.css';
+import './styles/main/app-loading-screen.css';
 import './styles/main/elevation.scss';
 import './styles/main/typography.scss';
 import './styles/main/color.scss';
