@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { useRef, useLayoutEffect, useEffect } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAppLoadingSreen } from '@cloudbeaver/core-blocks';
