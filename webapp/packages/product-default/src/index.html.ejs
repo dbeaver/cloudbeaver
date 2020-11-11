@@ -7,8 +7,8 @@
 </head>
 
 <body class="theme-typography">
-      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/loader.html.ejs') %>
       <div id="root"></div>
+      <%= require('html-loader!@cloudbeaver/core-blocks/src/HTMLTemplates/app-loading-screen.html.ejs') %>
 
       <!-- Dependencies -->
       <% if (webpackConfig.mode == 'production') { %>

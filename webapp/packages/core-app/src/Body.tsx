@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { useRef, useLayoutEffect, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useAppLoadingSreen } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -27,10 +28,12 @@ const bodyStyles = css`
 `;
 
 export const Body = observer(function Body() {
+  useAppLoadingSreen();
   const ref = useRef<HTMLDivElement>(null);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
+
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {
     if (ref.current) {
@@ -38,21 +41,6 @@ export const Body = observer(function Body() {
     }
     document.documentElement.dataset.backendVersion = backendVersion;
   });
-
-  useEffect(() => {
-    const appLoadingScreen = document.getElementById('loading-screen');
-    let onTransitionEnd: () => void;
-
-    if (appLoadingScreen) {
-      onTransitionEnd = () => {
-        appLoadingScreen.style.display = 'none';
-      };
-      appLoadingScreen.addEventListener('transitionend', onTransitionEnd);
-      appLoadingScreen.classList.add('loading-screen--fade-out');
-    }
-
-    return () => appLoadingScreen?.removeEventListener('transitionend', onTransitionEnd);
-  }, []);
 
   return styled(useStyles(bodyStyles))(
     <theme ref={ref} as="div">
