@@ -97,8 +97,8 @@ export class SqlEditorNavigatorService {
   }
 
   private async navigateHandler(
-    contexts: IExecutionContextProvider<SQLCreateAction | SQLEditorAction>,
-    data: SQLCreateAction | SQLEditorAction
+    data: SQLCreateAction | SQLEditorAction,
+    contexts: IExecutionContextProvider<SQLCreateAction | SQLEditorAction>
   ) {
     try {
       const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);

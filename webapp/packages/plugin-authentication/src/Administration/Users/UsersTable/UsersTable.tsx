@@ -31,21 +31,22 @@ interface Props {
   users: AdminUser[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
+  selectable?: boolean;
 }
 
-export const UsersTable = observer(function UsersTable({ users, selectedItems, expandedItems }: Props) {
+export const UsersTable = observer(function UsersTable({ users, selectedItems, expandedItems, selectable }: Props) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <Table selectedItems={selectedItems} expandedItems={expandedItems} {...use({ size: 'big' })}>
       <TableHeader>
-        <TableColumnHeader min />
+        {selectable && <TableColumnHeader min />}
         <TableColumnHeader min />
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
-        {users.map(user => <User key={user.userId} user={user} />)}
+        {users.map(user => <User key={user.userId} user={user} selectable={selectable} />)}
       </TableBody>
     </Table>
   );

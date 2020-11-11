@@ -7,40 +7,38 @@
  */
 
 import { observable } from 'mobx';
-import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { TaskScheduler } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 
 @injectable()
-export abstract class CachedResource<
+export abstract class LocalResource<
   TData,
   TParam,
 > {
   @observable
   data: TData;
 
-  readonly onDataUpdate: Observable<TData>;
-  readonly onDataOutdated: Observable<TParam>;
+  readonly onDataOutdated: IExecutor<TParam>;
+  readonly onDataUpdate: IExecutor<TData>;
 
   @observable
   protected outdated = new Set<TParam>();
 
   @observable
-  protected loading = false;
+  protected dataLoading = new Set<TParam>();
 
-  protected outdatedSubject: Subject<TParam>;
-  protected dataSubject: Subject<TData>;
+  @observable
+  protected loading = false;
 
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
-    this.scheduler = new TaskScheduler(this.includes.bind(this));
+    this.includes = this.includes.bind(this);
+    this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
-    this.outdatedSubject = new Subject();
-    this.dataSubject = new Subject();
-    this.onDataOutdated = this.outdatedSubject.asObservable();
-    this.onDataUpdate = this.dataSubject.asObservable();
+    this.onDataOutdated = new Executor(null, this.includes);
+    this.onDataUpdate = new Executor();
     this.loadingTask = this.loadingTask.bind(this);
   }
 
@@ -55,12 +53,20 @@ export abstract class CachedResource<
   }
 
   isDataLoading(key: TParam): boolean {
-    return this.scheduler.activeList.some(active => this.includes(key, active));
+    return this.dataLoading.has(key);
+  }
+
+  markDataLoading(key: TParam): void {
+    this.dataLoading.add(key);
+  }
+
+  markDataLoaded(key: TParam): void {
+    this.dataLoading.delete(key);
   }
 
   markOutdated(param: TParam): void {
     this.outdated.add(param);
-    this.outdatedSubject.next(param);
+    this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: TParam): void {
@@ -138,7 +144,7 @@ export abstract class CachedResource<
     try {
       const value = await promise(param);
       this.markUpdated(param);
-      this.dataSubject.next(this.data);
+      this.onDataUpdate.execute(this.data);
       return value;
     } finally {
       this.loading = prevState;

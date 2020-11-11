@@ -23,8 +23,8 @@ export class PermissionsResource extends CachedDataResource<Set<string>, void> {
   ) {
     super(new Set());
     this.loaded = false;
-    this.sessionResource.onDataOutdated.subscribe(this.markOutdated.bind(this));
-    this.sessionResource.onDataUpdate.subscribe(() => this.load());
+    this.sessionResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.sessionResource.onDataUpdate.addHandler(() => { this.load(); });
   }
 
   isLoaded(): boolean {

@@ -47,7 +47,7 @@ export class DdlViewerTabService {
     return ddlTab;
   }
 
-  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
+  private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
       const tabContext = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 

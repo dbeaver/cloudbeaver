@@ -6,39 +6,46 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject, Observable } from 'rxjs';
-
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { CachedResource } from './CachedResource';
-import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
-
-export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
+import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
 @injectable()
 export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
 Map<TKey, TValue>,
 ResourceKey<TKey>
 > {
-  readonly onItemAdd: Observable<ResourceKey<TKey>>;
-  readonly onItemDelete: Observable<ResourceKey<TKey>>;
-
-  protected itemAddSubject: Subject<ResourceKey<TKey>>;
-  protected itemDeleteSubject: Subject<ResourceKey<TKey>>;
+  readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
+  readonly onItemDelete: IExecutor<ResourceKey<TKey>>;
 
   constructor(defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
-    this.itemAddSubject = new Subject();
-    this.onItemAdd = this.itemAddSubject.asObservable();
-    this.itemDeleteSubject = new Subject();
-    this.onItemDelete = this.itemDeleteSubject.asObservable();
+    this.onItemAdd = new Executor(null, this.includes);
+    this.onItemDelete = new Executor(null, this.includes);
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
-    if (isResourceKeyList(key)) {
-      return key.list.some(key => this.outdated.has(key));
-    }
-    return this.outdated.has(key);
+    return ResourceKeyUtils.some(key, key => this.metadata.get(key).outdated);
+  }
+
+  isDataLoading(key: ResourceKey<TKey>): boolean {
+    return ResourceKeyUtils.some(key, key => this.metadata.get(key).loading);
+  }
+
+  markDataLoading(key: ResourceKey<TKey>): void {
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
+      metadata.loading = true;
+    });
+  }
+
+  markDataLoaded(key: ResourceKey<TKey>): void {
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
+      metadata.loading = false;
+    });
   }
 
   markOutdated(): void
@@ -48,14 +55,11 @@ ResourceKey<TKey>
       key = resourceKeyList(Array.from(this.data.keys()));
     }
 
-    if (isResourceKeyList(key)) {
-      for (const itemKey of key.list) {
-        this.outdated.add(itemKey);
-      }
-    } else {
-      this.outdated.add(key);
-    }
-    this.outdatedSubject.next(key);
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
+      metadata.outdated = true;
+    });
+    this.onDataOutdated.execute(key);
   }
 
   markUpdated(): void
@@ -65,59 +69,44 @@ ResourceKey<TKey>
       key = resourceKeyList(Array.from(this.data.keys()));
     }
 
-    if (isResourceKeyList(key)) {
-      for (const itemKey of key.list) {
-        this.outdated.delete(itemKey);
-      }
-    } else {
-      this.outdated.delete(key);
-    }
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
+      metadata.outdated = false;
+    });
   }
 
   isLoaded(key: ResourceKey<TKey>): boolean {
-    if (isResourceKeyList(key)) {
-      return key.list.every(key => this.has(key));
-    }
-    return this.has(key);
+    return ResourceKeyUtils.every(key, key => this.has(key));
   }
 
   get(key: TKey): TValue | undefined;
   get(key: ResourceKeyList<TKey>): Array<TValue | undefined>;
   get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined;
   get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined {
-    if (isResourceKeyList(key)) {
-      return key.list.map(key => this.data.get(key));
-    }
-    return this.data.get(key);
+    return ResourceKeyUtils.map(key, key => this.data.get(key));
   }
 
   set(key: TKey, value: TValue): void;
   set(key: ResourceKeyList<TKey>, value: TValue[]): void;
   set(key: ResourceKey<TKey>, value: TValue | TValue[]): void {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        this.data.set(key.list[i], (value as TValue[])[i]);
+    ResourceKeyUtils.forEach(key, (key, i) => {
+      if (i === -1) {
+        this.data.set(key, value as TValue);
+      } else {
+        this.data.set(key, (value as TValue[])[i]);
       }
-    } else {
-      this.data.set(key, value as TValue);
-    }
+    });
     this.markUpdated(key);
-    this.itemAddSubject.next(key);
+    this.onItemAdd.execute(key);
   }
 
   delete(key: TKey): void;
   delete(key: ResourceKeyList<TKey>): void;
   delete(key: ResourceKey<TKey>): void;
   delete(key: ResourceKey<TKey>): void {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        this.data.delete(key.list[i]);
-      }
-    } else {
-      this.data.delete(key);
-    }
+    ResourceKeyUtils.forEach(key, key => this.data.delete(key));
     this.markUpdated(key);
-    this.itemDeleteSubject.next(key);
+    this.onItemDelete.execute(key);
   }
 
   async refresh(key: TKey): Promise<TValue>;
@@ -141,14 +130,6 @@ ResourceKey<TKey>
   }
 
   protected includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
-    if (isResourceKeyList(param)) {
-      return param.includes(key);
-    }
-
-    if (isResourceKeyList(key)) {
-      return key.includes(param);
-    }
-
-    return param === key;
+    return ResourceKeyUtils.includes(param, key);
   }
 }

@@ -33,7 +33,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
-    this.onDataOutdated.subscribe(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
+    this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }
 
   deleteInNode(key: string, value: string[]): void;
@@ -60,7 +60,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     this.markUpdated(keyObject);
-    this.itemAddSubject.next(keyObject);
+    this.onItemAdd.execute(keyObject);
   }
 
   unshiftToNode(key: string, value: string[]): void;
@@ -83,7 +83,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     this.markUpdated(keyObject);
-    this.itemAddSubject.next(keyObject);
+    this.onItemAdd.execute(keyObject);
   }
 
   pushToNode(key: string, value: string[]): void;
@@ -106,7 +106,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
 
     this.markUpdated(keyObject);
-    this.itemAddSubject.next(keyObject);
+    this.onItemAdd.execute(keyObject);
   }
 
   set(key: string, value: string[]): void;
@@ -128,7 +128,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       ));
     }
     this.markUpdated(keyObject);
-    this.itemAddSubject.next(keyObject);
+    this.onItemAdd.execute(keyObject);
   }
 
   delete(key: string): void;
@@ -145,7 +145,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     }
     const allKeys = resourceKeyList(items);
     this.markUpdated(allKeys);
-    this.itemDeleteSubject.next(allKeys);
+    this.onItemDelete.execute(allKeys);
     this.navNodeInfoResource.delete(resourceKeyList(items.filter(navNodeId => navNodeId !== key)));
   }
 

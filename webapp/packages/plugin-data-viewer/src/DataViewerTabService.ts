@@ -51,7 +51,7 @@ export class DataViewerTabService {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
-  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
+  private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
       const {
         nodeInfo,

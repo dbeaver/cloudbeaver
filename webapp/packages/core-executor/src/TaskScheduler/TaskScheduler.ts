@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 
 import { ITask } from './ITask';
 
-type BlockedExecution<T> = (active: T, current: T) => boolean;
+export type BlockedExecution<T> = (active: T, current: T) => boolean;
 
 export class TaskScheduler<TIdentifier> {
   @computed get activeList(): TIdentifier[] {
@@ -27,7 +27,11 @@ export class TaskScheduler<TIdentifier> {
     this.isBlocked = isBlocked;
   }
 
-  async schedule<T>(id: TIdentifier, promise: () => Promise<T>): Promise<T> {
+  async schedule<T>(
+    id: TIdentifier,
+    promise: () => Promise<T>,
+    after?: () => Promise<void> | void,
+  ): Promise<T> {
     const task: ITask<TIdentifier> = {
       id,
       task: this.scheduler(id, promise),
@@ -39,6 +43,7 @@ export class TaskScheduler<TIdentifier> {
       return await task.task;
     } finally {
       this.queue.splice(this.queue.indexOf(task), 1);
+      await after?.();
     }
   }
 

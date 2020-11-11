@@ -29,8 +29,8 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     private serverConfiguration: ServerConfigResource
   ) {
     super(null);
-    this.serverConfiguration.onDataOutdated.subscribe(this.markOutdated.bind(this));
-    this.serverConfiguration.onDataUpdate.subscribe(() => this.load());
+    this.serverConfiguration.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.serverConfiguration.onDataUpdate.addHandler(() => { this.load(); });
     this.loaded = false;
   }
 

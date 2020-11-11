@@ -48,7 +48,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   const dbObjectPagesService = useService(DBObjectPageService);
   const pages = dbObjectPagesService.orderedPages;
 
-  if (!isLoaded || (!isOutdated && isLoading)) {
+  if (!isLoaded() || (!isOutdated() && isLoading())) {
     return <Loader />;
   }
 

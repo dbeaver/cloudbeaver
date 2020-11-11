@@ -84,7 +84,7 @@ export function TabsState<T = Record<string, any>>({
   }, [currentTabId]); // hack currentId and selectedId not works
 
   useEffect(() => {
-    const openHandler: IExecutorHandler<ITabData<T>> = (_, data) => {
+    const openHandler: IExecutorHandler<ITabData<T>> = data => {
       if (dynamic.current.selectedId === data.tabId) {
         return false;
       }
@@ -93,7 +93,7 @@ export function TabsState<T = Record<string, any>>({
       dynamic.current.open?.(data);
       return undefined;
     };
-    const closeHandler: IExecutorHandler<ITabData<T>> = (_, data) => dynamic.current.close?.(data);
+    const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.current.close?.(data);
 
     openExecutor.addHandler(openHandler);
     closeExecutor.addHandler(closeHandler);
