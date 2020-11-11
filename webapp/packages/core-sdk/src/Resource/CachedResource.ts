@@ -145,6 +145,8 @@ export abstract class CachedResource<
 
   private async loadingTask(param: TParam) {
     this.data = await this.loader(param);
+
+    // TODO: seems should be moved to scheduler `after` callback
     this.onDataUpdate.execute(this.data);
   }
 

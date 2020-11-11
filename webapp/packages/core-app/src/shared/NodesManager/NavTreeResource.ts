@@ -14,7 +14,7 @@ import {
   isResourceKeyList,
   ResourceKeyList,
   resourceKeyList,
-  NavNodeChildrenQuery as fake
+  NavNodeChildrenQuery as fake, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource';
@@ -39,25 +39,15 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   deleteInNode(key: string, value: string[]): void;
   deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
   deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
-    if (isResourceKeyList(keyObject)) {
-      for (let i = 0; i < keyObject.list.length; i++) {
-        const key = keyObject.list[i];
-        const values = (valueObject as string[][])[i];
-        const currentValue = this.data.get(key);
-
-        if (currentValue) {
-          this.data.set(key, currentValue.filter(value => !values.includes(value)));
-          this.delete(resourceKeyList(values));
-        }
-      }
-    } else {
-      const currentValue = this.data.get(keyObject);
+    ResourceKeyUtils.forEach(keyObject, (key, i) => {
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const currentValue = this.data.get(key);
 
       if (currentValue) {
-        this.data.set(keyObject, currentValue.filter(value => !(valueObject as string[]).includes(value)));
-        this.delete(resourceKeyList(valueObject as string[]));
+        this.data.set(key, currentValue.filter(value => !values.includes(value)));
+        this.delete(resourceKeyList(values));
       }
-    }
+    });
 
     this.markUpdated(keyObject);
     this.onItemAdd.execute(keyObject);
@@ -66,21 +56,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   unshiftToNode(key: string, value: string[]): void;
   unshiftToNode(key: ResourceKeyList<string>, value: string[][]): void;
   unshiftToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
-    if (isResourceKeyList(keyObject)) {
-      for (let i = 0; i < keyObject.list.length; i++) {
-        const key = keyObject.list[i];
-        const values = (valueObject as string[][])[i];
-        const currentValue = this.data.get(key) || [];
+    ResourceKeyUtils.forEach(keyObject, (key, i) => {
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const currentValue = this.data.get(key) || [];
 
-        currentValue.unshift(...values);
-        this.data.set(key, currentValue);
-      }
-    } else {
-      const currentValue = this.data.get(keyObject) || [];
-
-      currentValue.unshift(...valueObject as string[]);
-      this.data.set(keyObject, currentValue);
-    }
+      currentValue.unshift(...values);
+      this.data.set(key, currentValue);
+    });
 
     this.markUpdated(keyObject);
     this.onItemAdd.execute(keyObject);
@@ -89,21 +71,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   pushToNode(key: string, value: string[]): void;
   pushToNode(key: ResourceKeyList<string>, value: string[][]): void;
   pushToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
-    if (isResourceKeyList(keyObject)) {
-      for (let i = 0; i < keyObject.list.length; i++) {
-        const key = keyObject.list[i];
-        const values = (valueObject as string[][])[i];
-        const currentValue = this.data.get(key) || [];
+    ResourceKeyUtils.forEach(keyObject, (key, i) => {
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const currentValue = this.data.get(key) || [];
 
-        currentValue.push(...values);
-        this.data.set(key, currentValue);
-      }
-    } else {
-      const currentValue = this.data.get(keyObject) || [];
-
-      currentValue.push(...valueObject as string[]);
-      this.data.set(keyObject, currentValue);
-    }
+      currentValue.push(...values);
+      this.data.set(key, currentValue);
+    });
 
     this.markUpdated(keyObject);
     this.onItemAdd.execute(keyObject);
@@ -112,21 +86,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   set(key: string, value: string[]): void;
   set(key: ResourceKeyList<string>, value: string[][]): void;
   set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
-    if (isResourceKeyList(keyObject)) {
-      for (let i = 0; i < keyObject.list.length; i++) {
-        const key = keyObject.list[i];
-        const value = (valueObject as string[][])[i];
-        const childrenToRemove = this.data.get(key)?.concat() || [];
-        this.data.set(key, value);
-        this.delete(resourceKeyList(childrenToRemove.filter(navNodeId => !value.includes(navNodeId))));
-      }
-    } else {
-      const childrenToRemove = this.data.get(keyObject)?.concat() || [];
-      this.data.set(keyObject, valueObject as string[]);
-      this.delete(resourceKeyList(
-        childrenToRemove.filter(navNodeId => !(valueObject as string[]).includes(navNodeId))
-      ));
-    }
+    ResourceKeyUtils.forEach(keyObject, (key, i) => {
+      const value = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const childrenToRemove = this.data.get(key)?.concat() || [];
+      this.data.set(key, value);
+      this.delete(resourceKeyList(childrenToRemove.filter(navNodeId => !value.includes(navNodeId))));
+    });
+
     this.markUpdated(keyObject);
     this.onItemAdd.execute(keyObject);
   }

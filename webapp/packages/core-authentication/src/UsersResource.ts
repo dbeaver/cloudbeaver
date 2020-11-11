@@ -11,10 +11,10 @@ import {
   GraphQLService,
   CachedMapResource,
   ResourceKey,
-  isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminUserInfoFragment,
-  ObjectPropertyInfo, AdminUserInfo
+  ObjectPropertyInfo, AdminUserInfo,
+  ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -87,7 +87,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return grantedConnections;
   }
 
-  async setConnections(userId: string, connections: string[]) {
+  async setConnections(userId: string, connections: string[]): Promise<void> {
     await this.graphQLService.sdk.setConnections({ userId, connections });
   }
 
@@ -113,7 +113,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return this.get(user.userId)!;
   }
 
-  async grantRole(userId: string, roleId: string, skipUpdate?: boolean) {
+  async grantRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.grantUserRole({ userId, roleId });
 
     if (!skipUpdate) {
@@ -121,7 +121,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
   }
 
-  async revokeRole(userId: string, roleId: string, skipUpdate?: boolean) {
+  async revokeRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.revokeUserRole({ userId, roleId });
 
     if (!skipUpdate) {
@@ -129,7 +129,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
   }
 
-  async updateCredentials(userId: string, credentials: Record<string, any>) {
+  async updateCredentials(userId: string, credentials: Record<string, any>): Promise<void> {
     const provider = 'local';
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
@@ -141,36 +141,28 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
   }
 
   async delete(key: ResourceKey<string>): Promise<void> {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        if (this.isActiveUser(key.list[i])) {
-          throw new Error('You can\'t delete current logged user');
-        }
-        await this.graphQLService.sdk.deleteUser({ userId: key.list[i] });
-        this.data.delete(key.list[i]);
-      }
-    } else {
+    await ResourceKeyUtils.forEach(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error('You can\'t delete current logged user');
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
       this.data.delete(key);
-    }
+    });
     this.markUpdated(key);
     await this.onItemDelete.execute(key);
   }
 
-  async loadAll() {
+  async loadAll(): Promise<Map<string, AdminUser>> {
     await this.load('all');
     return this.data;
   }
 
-  async refreshAll() {
+  async refreshAll(): Promise<Map<string, AdminUser>> {
     await this.refresh('all');
     return this.data;
   }
 
-  refreshAllLazy() {
+  refreshAllLazy(): void {
     this.markOutdated('all');
     this.loadedKeyMetadata.set('all', false);
   }

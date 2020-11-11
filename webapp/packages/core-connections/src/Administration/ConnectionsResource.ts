@@ -15,10 +15,10 @@ import {
   ConnectionConfig,
   CachedMapResource,
   ResourceKey,
-  isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  ObjectPropertyInfo
+  ObjectPropertyInfo,
+  ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
@@ -164,13 +164,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        await this.deleteConnection(key.list[i]);
-      }
-    } else {
-      await this.deleteConnection(key);
-    }
+    await ResourceKeyUtils.forEach(key, key => this.deleteConnection(key));
     await this.onItemDelete.execute(key);
   }
 

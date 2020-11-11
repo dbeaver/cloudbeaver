@@ -7,6 +7,9 @@
  */
 
 export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
+export type SingleResourceKey<T> = Exclude<T, Exclude<T, ResourceKeyList<any>>> extends ResourceKeyList<infer TKey>
+  ? TKey
+  : T;
 
 export class ResourceKeyList<TKey> {
   readonly list: TKey[];
@@ -23,13 +26,21 @@ export class ResourceKeyList<TKey> {
   }
 }
 
+interface ForeachFnc {
+  <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => any): any;
+  <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => Promise<any>): Promise<any>;
+}
+
 interface MapFnc {
-  <TKey, TValue>(key: TKey, selector: (key: TKey, index: number) => TValue): TValue;
   <TKey, TValue>(key: ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue[];
+  <TKey, TValue>(
+    key: ResourceKey<TKey>,
+    selector: (key: TKey, index: number) => TValue
+  ): TKey extends ResourceKeyList<any> ? TValue[] : TValue;
 }
 
 export interface ResourceKeyUtils {
-  forEach: <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => void) => void;
+  forEach: ForeachFnc;
   some: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   every: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   map: MapFnc;
@@ -37,14 +48,17 @@ export interface ResourceKeyUtils {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ResourceKeyUtils = {
-  forEach<TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => void): void {
+export const ResourceKeyUtils: ResourceKeyUtils = {
+  async forEach<TKey>(
+    key: ResourceKey<TKey>,
+    action: (key: TKey, index: number) => any | Promise<any>
+  ): Promise<void> {
     if (isResourceKeyList(key)) {
       for (let i = 0; i < key.list.length; i++) {
-        action(key.list[i], i);
+        await action(key.list[i], i);
       }
     } else {
-      action(key, -1);
+      await action(key, -1);
     }
   },
 

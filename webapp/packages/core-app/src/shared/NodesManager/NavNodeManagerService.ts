@@ -16,7 +16,7 @@ import {
   PermissionsService, EPermission, SessionResource, ServerService
 } from '@cloudbeaver/core-root';
 import {
-  GraphQLService, resourceKeyList, isResourceKeyList, ResourceKey
+  GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 
 import { ENodeFeature } from './ENodeFeature';
@@ -352,37 +352,33 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
-    const keys = isResourceKeyList(key) ? key.list : [key];
-
     await this.navTree.load(ROOT_NODE_PATH);
-    for (const id of keys) {
-      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+    ResourceKeyUtils.forEach(key, key => {
+      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
       this.markTreeOutdated(nodeId);
 
       // addOpenedConnection
-      const connectionInfo = this.connectionInfo.get(id);
+      const connectionInfo = this.connectionInfo.get(key);
 
       if (!connectionInfo?.connected) {
         this.removeTree(nodeId);
       }
 
       this.navNodeInfoResource.markOutdated(nodeId);
-    }
+    });
   }
 
   private async connectionRemoveHandler(key: ResourceKey<string>) {
-    const keys = isResourceKeyList(key) ? key.list : [key];
-
-    for (const id of keys) {
+    ResourceKeyUtils.forEach(key, key => {
     // deleteConnection
-      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
 
       const node = this.getNode(navNodeId);
       if (!node) {
         return;
       }
       this.navTree.deleteInNode(node.parentId, [navNodeId]);
-    }
+    });
   }
 
   private async navigateHandler(
