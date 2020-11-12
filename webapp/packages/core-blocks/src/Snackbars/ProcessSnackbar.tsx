@@ -45,12 +45,14 @@ export const ProcessSnackbar: NotificationComponent<Props> = observer(function P
   return (
     <SnackbarWrapper
       closing={!!notification.state.deleteDelay}
-      closeable={status !== ENotificationType.Loading}
+      unclosable={status === ENotificationType.Loading}
       onClose={() => notification.close(false)}
     >
       <SnackbarStatus status={status} />
       <SnackbarContent>
-        <SnackbarBody title={translate(title)} message={message && translate(message)} />
+        <SnackbarBody title={translate(title)}>
+          {message && translate(message)}
+        </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {error && (
             <Button

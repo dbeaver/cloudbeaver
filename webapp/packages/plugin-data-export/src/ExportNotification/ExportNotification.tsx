@@ -42,13 +42,20 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
 }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
-  const exportNotificationType = controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
+  const getExportNotificationType = () => {
+    if (controller.isPending) {
+      return ENotificationType.Loading;
+    } else {
+      return controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
+    }
+  };
 
   return styled(useStyles(styles))(
-    <SnackbarWrapper closing={false} closeable={!controller.isPending} onClose={() => notification.close(false)}>
-      <SnackbarStatus status={controller.isPending ? ENotificationType.Loading : exportNotificationType} />
+    <SnackbarWrapper unclosable={controller.isPending} onClose={controller.delete}>
+      <SnackbarStatus status={getExportNotificationType()} />
       <SnackbarContent>
-        <SnackbarBody title={translate(controller.status)} message={controller.sourceName}>
+        <SnackbarBody title={translate(controller.status)}>
+          {controller.sourceName}
           {controller.task?.context.sourceName && (
             <pre title={controller.task?.context.sourceName}>
               {controller.task?.context.sourceName}
@@ -56,7 +63,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
           )}
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          {controller.isSuccess && (
+          {getExportNotificationType() === ENotificationType.Info && (
             <>
               <Button
                 type="button"
@@ -76,7 +83,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
               </Button>
             </>
           )}
-          {controller.hasDetails && (
+          {getExportNotificationType() === ENotificationType.Error && (
             <Button
               type="button"
               mod={['outlined']}
@@ -86,7 +93,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
               {translate('ui_errors_details')}
             </Button>
           )}
-          {controller.isPending && (
+          {getExportNotificationType() === ENotificationType.Loading && (
             <Button
               type="button"
               mod={['outlined']}

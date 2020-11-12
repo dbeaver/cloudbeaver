@@ -29,13 +29,12 @@ export const ActionSnackbar: NotificationComponent<Props> = observer(function Ac
   const translate = useTranslate();
 
   return (
-    <SnackbarWrapper closing={false} closeable={!notification.persistent} onClose={() => notification.close(false)}>
+    <SnackbarWrapper unclosable={notification.persistent} onClose={() => notification.close(false)}>
       <SnackbarStatus status={notification.type} />
       <SnackbarContent>
-        <SnackbarBody
-          title={translate(notification.title)}
-          message={notification.message ? translate(notification.message) : null}
-        />
+        <SnackbarBody title={translate(notification.title)}>
+          {notification.message && translate(notification.message)}
+        </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           <Button type="button" mod={['outlined']} onClick={onAction}>
             {translate(actionText)}

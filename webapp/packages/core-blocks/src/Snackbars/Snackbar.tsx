@@ -46,10 +46,12 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   useStateDelay(closeDelay > 0, closeDelay, onClose);
 
   return (
-    <SnackbarWrapper closing={!!state?.deleteDelay} closeable onClose={() => onClose(false)}>
+    <SnackbarWrapper closing={!!state?.deleteDelay} onClose={() => onClose(false)}>
       <SnackbarStatus status={type} />
       <SnackbarContent>
-        <SnackbarBody message={message ? translate(message) : null} title={translate(title)} />
+        <SnackbarBody title={translate(title)}>
+          {message && translate(message)}
+        </SnackbarBody>
         <SnackbarFooter timestamp={time}>
           {onShowDetails && (
             <Button

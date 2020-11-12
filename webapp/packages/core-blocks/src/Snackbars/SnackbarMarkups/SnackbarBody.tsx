@@ -43,19 +43,19 @@ const SNACKBAR_BODY_STYLES = css`
 
 interface ISnackbarBodyProps {
   title: string;
-  message: string | null;
   className?: string;
 }
 
 export const SnackbarBody: React.FC<ISnackbarBodyProps> = function SnackbarBody({
-  title, message, className, children,
+  title, className, children,
 }) {
   return styled(SNACKBAR_BODY_STYLES)(
     <notification-body as="div" className={className}>
       <body-text-block as='div'>
         <text-block-title title={title} as='h2'>{title}</text-block-title>
-        {message && <message as="div">{message}</message>}
-        {children}
+        <message as="div">
+          {children}
+        </message>
       </body-text-block>
     </notification-body>
   );
