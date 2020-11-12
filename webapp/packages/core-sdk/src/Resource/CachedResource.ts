@@ -117,6 +117,7 @@ export abstract class CachedResource<
     }
 
     this.markDataLoading(param);
+    this.loading = true;
     return this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (exitCheck?.()) {
@@ -124,7 +125,10 @@ export abstract class CachedResource<
       }
 
       return await this.taskWrapper(param, update);
-    }, () => this.markDataLoaded(param));
+    }, () => {
+      this.markDataLoaded(param);
+      this.loading = false;
+    });
   }
 
   protected async loadData(param: TParam, refresh?: boolean): Promise<void> {
@@ -133,6 +137,7 @@ export abstract class CachedResource<
     }
 
     this.markDataLoading(param);
+    this.loading = true;
     await this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
@@ -140,7 +145,10 @@ export abstract class CachedResource<
       }
 
       await this.taskWrapper(param, this.loadingTask);
-    }, () => this.markDataLoaded(param));
+    }, () => {
+      this.markDataLoaded(param);
+      this.loading = false;
+    });
   }
 
   private async loadingTask(param: TParam) {
@@ -151,15 +159,9 @@ export abstract class CachedResource<
   }
 
   private async taskWrapper<T>(param: TParam, promise: (param: TParam) => Promise<T>) {
-    const prevState = this.loading;
-    this.loading = true;
     this.markOutdated(param);
-    try {
-      const value = await promise(param);
-      this.markUpdated(param);
-      return value;
-    } finally {
-      this.loading = prevState;
-    }
+    const value = await promise(param);
+    this.markUpdated(param);
+    return value;
   }
 }

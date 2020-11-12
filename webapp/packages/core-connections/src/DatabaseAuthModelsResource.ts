@@ -24,7 +24,6 @@ export class DatabaseAuthModelsResource extends CachedMapResource<string, Databa
     const { models } = await this.graphQLService.sdk.getAuthModels();
 
     this.set(resourceKeyList(models.map(model => model.id)), models);
-    this.markUpdated(key);
 
     return this.data;
   }

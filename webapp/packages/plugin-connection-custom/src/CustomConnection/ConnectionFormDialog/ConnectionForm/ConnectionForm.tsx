@@ -10,7 +10,17 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  Radio, InputField, useFocus, ObjectPropertyInfoForm, InputGroup, FieldCheckbox, SubmittingForm, FormBox, FormBoxElement, FormGroup, RadioGroup
+  Radio,
+  InputField,
+  useFocus,
+  ObjectPropertyInfoForm,
+  InputGroup,
+  FieldCheckbox,
+  SubmittingForm,
+  FormBox,
+  FormBoxElement,
+  FormGroup,
+  RadioGroup
 } from '@cloudbeaver/core-blocks';
 import { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';

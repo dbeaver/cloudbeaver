@@ -164,7 +164,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEach(key, key => this.deleteConnection(key));
+    await ResourceKeyUtils.forEachAsync(key, key => this.deleteConnection(key));
     await this.onItemDelete.execute(key);
   }
 
