@@ -105,7 +105,7 @@ export function TableColumnHeader(props: HeaderProps) {
     return function cleanup() {
       props.column.removeEventListener('sortChanged', onSortChanged);
     };
-  });
+  }, [props.column]);
 
   const handleSort = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {

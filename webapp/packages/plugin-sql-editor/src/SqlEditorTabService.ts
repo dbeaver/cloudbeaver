@@ -120,7 +120,7 @@ export class SqlEditorTabService {
       return false;
     }
 
-    // the connection for this editor was closed
+    // // the connection for this editor was closed
     if (!this.connectionInfoResource.get(tab.handlerState.connectionId)) {
       return false;
     }
@@ -131,6 +131,7 @@ export class SqlEditorTabService {
 
     this.tabExecutionState.set(tab.id, new SqlExecutionState());
 
+    // todo seems to be changed
     await this.sqlDialectInfoService.loadSqlDialectInfo(tab.handlerState.connectionId);
 
     return true;

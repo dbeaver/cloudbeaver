@@ -9,7 +9,7 @@
 import { IExecutionContextProvider } from './ExecutionContext';
 
 export type IExecutorHandler<T> = (
-  contexts: IExecutionContextProvider<T>,
-  data: T
+  data: T,
+  contexts: IExecutionContextProvider<T>
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-) => void | false | Promise<void | false>;
+) => void | boolean | Promise<void | boolean>;

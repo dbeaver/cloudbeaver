@@ -50,7 +50,7 @@ export class ObjectPropertiesPageService {
     // await this.nodesManagerService.loadNodeInfo(tab.handlerState.objectId);
   }
 
-  private async navigationHandler(contexts: IExecutionContextProvider<INodeNavigationData>) {
+  private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     if (!this.page) { // TODO: it will be never true, because navHandler registers after page creation
       return;
     }

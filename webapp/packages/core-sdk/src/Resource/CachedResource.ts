@@ -7,10 +7,15 @@
  */
 
 import { observable } from 'mobx';
-import { Subject, Observable } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { TaskScheduler } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
+import { MetadataMap } from '@cloudbeaver/core-utils';
+
+export interface ICachedResourceMetadata {
+  outdated: boolean;
+  loading: boolean;
+}
 
 @injectable()
 export abstract class CachedResource<
@@ -20,51 +25,60 @@ export abstract class CachedResource<
   @observable
   data: TData;
 
-  readonly onDataUpdate: Observable<TData>;
-  readonly onDataOutdated: Observable<TParam>;
+  readonly onDataOutdated: IExecutor<TParam>;
+  readonly onDataUpdate: IExecutor<TData>;
 
-  @observable
-  protected outdated = new Set<TParam>();
+  protected metadata: MetadataMap<TParam, ICachedResourceMetadata>;
 
   @observable
   protected loading = false;
 
-  protected outdatedSubject: Subject<TParam>;
-  protected dataSubject: Subject<TData>;
-
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
-    this.scheduler = new TaskScheduler(this.includes.bind(this));
-    this.data = defaultValue;
-    this.outdatedSubject = new Subject();
-    this.dataSubject = new Subject();
-    this.onDataOutdated = this.outdatedSubject.asObservable();
-    this.onDataUpdate = this.dataSubject.asObservable();
+    this.includes = this.includes.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
+
+    this.metadata = new MetadataMap(() => ({ outdated: true, loading: false }));
+    this.scheduler = new TaskScheduler(this.includes);
+    this.data = defaultValue;
+    this.onDataOutdated = new Executor(null, this.includes);
+    this.onDataUpdate = new Executor();
   }
 
   abstract isLoaded(param: TParam): boolean;
 
   isOutdated(param: TParam): boolean {
-    return this.outdated.has(param);
+    return this.metadata.get(param).outdated;
   }
 
   isLoading(): boolean {
     return this.loading;
   }
 
-  isDataLoading(key: TParam): boolean {
-    return this.scheduler.activeList.some(active => this.includes(key, active));
+  isDataLoading(param: TParam): boolean {
+    return this.metadata.get(param).loading;
+  }
+
+  markDataLoading(param: TParam): void {
+    const metadata = this.metadata.get(param);
+    metadata.loading = true;
+  }
+
+  markDataLoaded(param: TParam): void {
+    const metadata = this.metadata.get(param);
+    metadata.loading = false;
   }
 
   markOutdated(param: TParam): void {
-    this.outdated.add(param);
-    this.outdatedSubject.next(param);
+    const metadata = this.metadata.get(param);
+    metadata.outdated = true;
+    this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: TParam): void {
-    this.outdated.delete(param);
+    const metadata = this.metadata.get(param);
+    metadata.outdated = false;
   }
 
   async refresh(param: TParam): Promise<any> {
@@ -102,6 +116,7 @@ export abstract class CachedResource<
       return;
     }
 
+    this.markDataLoading(param);
     return this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (exitCheck?.()) {
@@ -109,7 +124,7 @@ export abstract class CachedResource<
       }
 
       return await this.taskWrapper(param, update);
-    });
+    }, () => this.markDataLoaded(param));
   }
 
   protected async loadData(param: TParam, refresh?: boolean): Promise<void> {
@@ -117,6 +132,7 @@ export abstract class CachedResource<
       return;
     }
 
+    this.markDataLoading(param);
     await this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
       if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
@@ -124,11 +140,14 @@ export abstract class CachedResource<
       }
 
       await this.taskWrapper(param, this.loadingTask);
-    });
+    }, () => this.markDataLoaded(param));
   }
 
   private async loadingTask(param: TParam) {
     this.data = await this.loader(param);
+
+    // TODO: seems should be moved to scheduler `after` callback
+    this.onDataUpdate.execute(this.data);
   }
 
   private async taskWrapper<T>(param: TParam, promise: (param: TParam) => Promise<T>) {
@@ -138,7 +157,6 @@ export abstract class CachedResource<
     try {
       const value = await promise(param);
       this.markUpdated(param);
-      this.dataSubject.next(this.data);
       return value;
     } finally {
       this.loading = prevState;

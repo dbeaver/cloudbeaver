@@ -11,10 +11,10 @@ import {
   GraphQLService,
   CachedMapResource,
   ResourceKey,
-  isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminUserInfoFragment,
-  ObjectPropertyInfo, AdminUserInfo
+  ObjectPropertyInfo, AdminUserInfo,
+  ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -36,14 +36,14 @@ interface UserCreateOptions {
 
 @injectable()
 export class UsersResource extends CachedMapResource<string, AdminUser> {
-  private metadata: MetadataMap<string, boolean>;
+  private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
     super(new Map());
-    this.metadata = new MetadataMap(() => false);
+    this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
   isNew(id: string): boolean {
@@ -53,9 +53,9 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return NEW_USER_SYMBOL in this.get(id)!;
   }
 
-  has(id: string) {
-    if (this.metadata.has(id)) {
-      return this.metadata.get(id);
+  has(id: string): boolean {
+    if (this.loadedKeyMetadata.has(id)) {
+      return this.loadedKeyMetadata.get(id);
     }
 
     return this.data.has(id);
@@ -87,7 +87,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return grantedConnections;
   }
 
-  async setConnections(userId: string, connections: string[]) {
+  async setConnections(userId: string, connections: string[]): Promise<void> {
     await this.graphQLService.sdk.setConnections({ userId, connections });
   }
 
@@ -113,7 +113,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     return this.get(user.userId)!;
   }
 
-  async grantRole(userId: string, roleId: string, skipUpdate?: boolean) {
+  async grantRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.grantUserRole({ userId, roleId });
 
     if (!skipUpdate) {
@@ -121,7 +121,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
   }
 
-  async revokeRole(userId: string, roleId: string, skipUpdate?: boolean) {
+  async revokeRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.revokeUserRole({ userId, roleId });
 
     if (!skipUpdate) {
@@ -129,7 +129,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     }
   }
 
-  async updateCredentials(userId: string, credentials: Record<string, any>) {
+  async updateCredentials(userId: string, credentials: Record<string, any>): Promise<void> {
     const provider = 'local';
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
@@ -140,39 +140,31 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     });
   }
 
-  async delete(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        if (this.isActiveUser(key.list[i])) {
-          throw new Error('You can\'t delete current logged user');
-        }
-        await this.graphQLService.sdk.deleteUser({ userId: key.list[i] });
-        this.data.delete(key.list[i]);
-      }
-    } else {
+  async delete(key: ResourceKey<string>): Promise<void> {
+    await ResourceKeyUtils.forEach(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error('You can\'t delete current logged user');
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
       this.data.delete(key);
-    }
+    });
     this.markUpdated(key);
-    this.itemDeleteSubject.next(key);
+    await this.onItemDelete.execute(key);
   }
 
-  async loadAll() {
+  async loadAll(): Promise<Map<string, AdminUser>> {
     await this.load('all');
     return this.data;
   }
 
-  async refreshAll() {
+  async refreshAll(): Promise<Map<string, AdminUser>> {
     await this.refresh('all');
     return this.data;
   }
 
-  refreshAllLazy() {
+  refreshAllLazy(): void {
     this.markOutdated('all');
-    this.metadata.set('all', false);
+    this.loadedKeyMetadata.set('all', false);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUser>> {
@@ -182,7 +174,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
 
     if (key === 'all') {
       this.data.clear();
-      this.metadata.set('all', true);
+      this.loadedKeyMetadata.set('all', true);
     }
 
     for (const user of users) {

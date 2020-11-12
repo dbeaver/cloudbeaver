@@ -17,15 +17,15 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class RolesResource extends CachedMapResource<string, AdminRoleInfo> {
-  private metadata: MetadataMap<string, boolean>;
+  private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(private graphQLService: GraphQLService) {
     super(new Map());
-    this.metadata = new MetadataMap(() => false);
+    this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
-  has(id: string) {
-    if (this.metadata.has(id)) {
-      return this.metadata.get(id);
+  has(id: string): boolean {
+    if (this.loadedKeyMetadata.has(id)) {
+      return this.loadedKeyMetadata.get(id);
     }
 
     return this.data.has(id);
@@ -48,13 +48,12 @@ export class RolesResource extends CachedMapResource<string, AdminRoleInfo> {
 
     if (key === 'all') {
       this.data.clear();
-      this.metadata.set('all', true);
+      this.loadedKeyMetadata.set('all', true);
     }
 
     for (const role of roles) {
       this.set(role.roleId, role as AdminRoleInfo);
     }
-    this.markUpdated(key);
 
     return this.data;
   }

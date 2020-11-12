@@ -22,6 +22,7 @@ export function useFocus<T extends HTMLElement>({
   onBlur,
 }: FocusOptions): [React.RefObject<T>, boolean] {
   const handlersRef = useRef({ onFocus, onBlur });
+  // TODO: seems can be inconsistent when element changes
   const [focus, setFocus] = useState(false);
   const reference = useRef<T>(null);
   handlersRef.current = { onFocus, onBlur };
@@ -35,7 +36,7 @@ export function useFocus<T extends HTMLElement>({
         firstFocusable.focus();
       }
     }
-  }, [focusFirstChild, reference.current]);
+  }, [focusFirstChild]);
 
   useEffect(() => {
     if (!reference.current) {
@@ -67,7 +68,7 @@ export function useFocus<T extends HTMLElement>({
       element.removeEventListener('focusin', focusHandler);
       element.removeEventListener('focusout', blurHandler);
     };
-  }, [reference.current]);
+  });
 
   return [reference, focus];
 }

@@ -84,7 +84,7 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionService.session.onDataUpdate.subscribe(() => this.requireAuthentication());
+    this.sessionService.session.onDataUpdate.addHandler(() => this.requireAuthentication());
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => await this.auth(false));
   }

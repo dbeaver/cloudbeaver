@@ -8,21 +8,21 @@
 
 import { observable, computed } from 'mobx';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { AdminUser, AuthProvidersResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class UsersAdministrationController {
+export class UsersAdministrationController implements IInitializableController {
   @observable isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   readonly error = new GQLErrorCatcher();
 
-  @computed get users() {
+  @computed get users(): AdminUser[] {
     return Array.from(this.usersResource.data.values())
       .sort((a, b) => {
         if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
@@ -35,7 +35,15 @@ export class UsersAdministrationController {
       });
   }
 
-  get isLoading() {
+  get isProvidersLoading(): boolean {
+    return this.authProvidersResource.isLoading();
+  }
+
+  get isLocalProviderAvailable(): boolean {
+    return this.authProvidersResource.data.some(({ id }) => id === 'local');
+  }
+
+  get isLoading(): boolean {
     return this.usersResource.isLoading() || this.isDeleting;
   }
 
@@ -45,9 +53,14 @@ export class UsersAdministrationController {
 
   constructor(
     private notificationService: NotificationService,
+    private authProvidersResource: AuthProvidersResource,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
   ) { }
+
+  init(): void{
+    this.authProvidersResource.load();
+  }
 
   update = async () => {
     try {

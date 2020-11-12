@@ -16,7 +16,7 @@ import {
   PermissionsService, EPermission, SessionResource, ServerService
 } from '@cloudbeaver/core-root';
 import {
-  GraphQLService, resourceKeyList, isResourceKeyList, ResourceKey
+  GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 
 import { ENodeFeature } from './ENodeFeature';
@@ -111,16 +111,16 @@ export class NavNodeManagerService extends Bootstrap {
       }
     )
       .addHandler(this.navigateHandler.bind(this))
-      .addPostHandler((_, { nodeId }) => {
+      .addPostHandler(({ nodeId }) => {
         this.activeNavigationNodes = this.activeNavigationNodes.filter(id => id !== nodeId);
       });
   }
 
   register(): void {
-    this.connectionInfo.onItemAdd.subscribe(this.connectionUpdateHandler.bind(this));
-    this.connectionInfo.onItemDelete.subscribe(this.connectionRemoveHandler.bind(this));
+    this.sessionResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
+    this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
+    this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
-    this.sessionResource.onDataUpdate.subscribe(this.refreshRoot.bind(this));
   }
 
   load(): void {}
@@ -332,7 +332,7 @@ export class NavNodeManagerService extends Bootstrap {
     }
   }
 
-  private async connectionCreateHandler(context: IExecutionContextProvider<Connection>, connection: Connection) {
+  private async connectionCreateHandler(connection: Connection) {
     if (!await this.isNavTreeEnabled()) {
       return;
     }
@@ -352,42 +352,38 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
-    const keys = isResourceKeyList(key) ? key.list : [key];
-
     await this.navTree.load(ROOT_NODE_PATH);
-    for (const id of keys) {
-      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+    ResourceKeyUtils.forEach(key, key => {
+      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
       this.markTreeOutdated(nodeId);
 
       // addOpenedConnection
-      const connectionInfo = this.connectionInfo.get(id);
+      const connectionInfo = this.connectionInfo.get(key);
 
       if (!connectionInfo?.connected) {
         this.removeTree(nodeId);
       }
 
       this.navNodeInfoResource.markOutdated(nodeId);
-    }
+    });
   }
 
   private async connectionRemoveHandler(key: ResourceKey<string>) {
-    const keys = isResourceKeyList(key) ? key.list : [key];
-
-    for (const id of keys) {
+    ResourceKeyUtils.forEach(key, key => {
     // deleteConnection
-      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(id);
+      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
 
       const node = this.getNode(navNodeId);
       if (!node) {
         return;
       }
       this.navTree.deleteInNode(node.parentId, [navNodeId]);
-    }
+    });
   }
 
   private async navigateHandler(
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    data: INodeNavigationData
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void | false> {
     if (this.activeNavigationNodes.includes(data.nodeId)) {

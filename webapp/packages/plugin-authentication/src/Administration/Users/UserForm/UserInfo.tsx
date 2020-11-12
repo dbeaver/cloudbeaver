@@ -99,7 +99,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               value={role.roleId}
               name='role'
               checkboxLabel={role.roleName || role.roleId}
-              checked={controller.credentials.roles.get(role.roleId)}
+              checked={!!controller.credentials.roles.get(role.roleId)}
               disabled={controller.isSaving}
               mod='surface'
               onChange={checked => handleRoleChange(role.roleId, checked)}

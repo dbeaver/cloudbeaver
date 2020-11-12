@@ -133,6 +133,8 @@ export class TableViewerModel {
 
   private resetSubject: Subject<never>;
   private chunkChangeSubject: Subject<never>;
+  private updating = false;
+  private loading = false;
 
   @observable private _hasMoreRows = true;
   @observable private _isLoaderVisible = false;
@@ -166,10 +168,18 @@ export class TableViewerModel {
 
   cancelFetch = (): void => { };
 
-  refresh = async (): Promise<void> => {
+  refresh = async (skipResetUpdate = false): Promise<void> => {
+    if (!skipResetUpdate && this.isUpdateLocked()) {
+      return;
+    }
+
     this.resetData();
-    await this.onRequestData(0, this.getChunkSize());
-    this.resetSubject.next();
+    // if (skipDataLoad) {
+    //   await this.onRequestData(0, this.getChunkSize());
+    // }
+    if (!skipResetUpdate) {
+      this.resetSubject.next();
+    }
   };
 
   onShowDetails = (): void => {
@@ -294,6 +304,7 @@ export class TableViewerModel {
     }
 
     this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
+    this.loading = true;
 
     try {
       const response = await this.requestDataAsync(this, rowOffset, count);
@@ -314,6 +325,7 @@ export class TableViewerModel {
       this.showError(e);
       throw e;
     } finally {
+      this.loading = false;
       this._isLoaderVisible = false;
     }
   }
@@ -326,12 +338,34 @@ export class TableViewerModel {
     this.tableEditor.editCellValue(rowNumber, column, value, editing);
   }
 
-  onSortChanged(sorting: SortModel): void {
+  onSortChanged(sorting: SortModel): SortModel {
+    if (this.isUpdateLocked()) {
+      return this.getSortModel();
+    }
+
     this.sortedColumns.clear();
     for (const sort of sorting) {
       this.setColumnSorting(sort.colId, sort.sort === 'asc', true);
     }
-    this.refresh();
+    this.refresh(true);
+    return sorting;
+  }
+
+  getSortModel(): SortModel {
+    return Array.from(this.sortedColumns.values()).map(v => ({
+      colId: v.attribute,
+      sort: v.orderAsc ? 'asc' : 'desc',
+    }));
+  }
+
+  private isUpdateLocked(): boolean {
+    if (this.updating || this.loading) {
+      return true;
+    }
+
+    this.updating = true;
+    setTimeout(() => { this.updating = false; }, 1000);
+    return false;
   }
 
   @action

@@ -13,7 +13,7 @@ import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminUserInfo, ResourceKeyUtils, ResourceKey } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UserEditController
@@ -22,7 +22,7 @@ implements IInitializableController, IDestructibleController {
   @observable user: AdminUserInfo | null = null;
 
   @computed get isDisabled() {
-    return this.isLoading;
+    return this.usersResource.isDataLoading(this.userId);
   }
 
   userId!: string;
@@ -32,24 +32,35 @@ implements IInitializableController, IDestructibleController {
   constructor(
     private notificationService: NotificationService,
     private usersResource: UsersResource
-  ) { }
-
-  init(id: string) {
-    this.userId = id;
-    this.loadUser();
+  ) {
+    this.updateUser = this.updateUser.bind(this);
   }
 
-  destruct(): void { }
+  async init(id: string): Promise<void> {
+    this.userId = id;
+
+    await this.loadUser();
+    this.usersResource.onItemAdd.addHandler(this.updateUser);
+  }
+
+  destruct(): void {
+    this.usersResource.onItemAdd.removeHandler(this.updateUser);
+  }
 
   private async loadUser() {
-    this.isLoading = true;
     try {
       // we create a copy to protect the current value from mutation
-      this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId)));
+      await this.usersResource.load(this.userId);
+      this.updateUser('');
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load user ${this.userId}`);
-    } finally {
-      this.isLoading = false;
     }
+  }
+
+  private async updateUser(key: ResourceKey<string>) {
+    if (ResourceKeyUtils.includes(key, this.userId)) {
+      return;
+    }
+    this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId)));
   }
 }

@@ -15,10 +15,10 @@ import {
   ConnectionConfig,
   CachedMapResource,
   ResourceKey,
-  isResourceKeyList,
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  ObjectPropertyInfo
+  ObjectPropertyInfo,
+  ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
@@ -32,7 +32,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   readonly onConnectionCreate: Observable<AdminConnection>;
 
   private changed: boolean;
-  private metadata: MetadataMap<string, boolean>;
+  private loadedKeyMetadata: MetadataMap<string, boolean>;
   private connectionCreateSubject: Subject<AdminConnection>;
 
   constructor(
@@ -42,12 +42,12 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     this.changed = false;
     this.connectionCreateSubject = new Subject<AdminConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
-    this.metadata = new MetadataMap(() => false);
+    this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
   has(id: string): boolean {
-    if (this.metadata.has(id)) {
-      return this.metadata.get(id);
+    if (this.loadedKeyMetadata.has(id)) {
+      return this.loadedKeyMetadata.get(id);
     }
 
     return this.data.has(id);
@@ -155,24 +155,17 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     for (const connection of connections) {
       this.set(connection.id, connection);
     }
-    this.markUpdated(key);
 
     // TODO: getConnections must accept connectionId, so we can update some connection or all connections,
     //       here we should check is it's was a full update
-    this.metadata.set('all', true);
+    this.loadedKeyMetadata.set('all', true);
 
     return this.data;
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {
-    if (isResourceKeyList(key)) {
-      for (let i = 0; i < key.list.length; i++) {
-        await this.deleteConnection(key.list[i]);
-      }
-    } else {
-      await this.deleteConnection(key);
-    }
-    this.itemDeleteSubject.next(key);
+    await ResourceKeyUtils.forEach(key, key => this.deleteConnection(key));
+    await this.onItemDelete.execute(key);
   }
 
   private async deleteConnection(connectionId: string) {

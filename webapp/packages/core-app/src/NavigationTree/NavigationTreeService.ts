@@ -44,7 +44,9 @@ export class NavigationTreeService {
 
   async loadNestedNodes(id = ROOT_NODE_PATH) {
     try {
-      await this.ensureConnectionInit(id);
+      if (this.isConnectionNode(id) && !await this.tryInitConnection(id)) {
+        return false;
+      }
       await this.navNodeManagerService.loadTree(id);
       return true;
     } catch (exception) {
@@ -86,16 +88,15 @@ export class NavigationTreeService {
     };
   }
 
-  private async ensureConnectionInit(navNodeId: string) {
+  private isConnectionNode(navNodeId: string) {
     const node = this.navNodeManagerService.getNode(navNodeId);
+    return node?.objectFeatures.includes(EObjectFeature.dataSource);
+  }
 
-    if (node?.objectFeatures.includes(EObjectFeature.dataSource)) {
-      const connection = await this.connectionAuthService.auth(
-        NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
-      );
-      if (!connection.connected) {
-        throw new Error('Connection not established');
-      }
-    }
+  private async tryInitConnection(navNodeId: string) {
+    const connection = await this.connectionAuthService.auth(
+      NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId));
+
+    return connection.connected;
   }
 }

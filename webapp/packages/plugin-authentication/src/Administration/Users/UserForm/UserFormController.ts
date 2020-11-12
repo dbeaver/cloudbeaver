@@ -81,11 +81,16 @@ export class UserFormController implements IInitializableController, IDestructib
     this.connectionAccessLoaded = false;
   }
 
-  init(user: AdminUserInfo, editing: boolean, collapse: () => void) {
+  init(): void { }
+
+  update(user: AdminUserInfo, editing: boolean, collapse: () => void): void {
+    const prevUser = this.user;
     this.user = user;
     this.editing = editing;
     this.collapse = collapse;
-    this.loadRoles();
+    if (prevUser !== this.user) {
+      this.loadRoles();
+    }
   }
 
   destruct(): void {

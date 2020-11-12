@@ -1,6 +1,7 @@
-export * from './CachedDataResource';
-export * from './CachedMapResource';
-export * from './CachedResource';
+export * from './Resource/CachedDataResource';
+export * from './Resource/CachedMapResource';
+export * from './Resource/CachedResource';
+export * from './Resource/ResourceKeyList';
 export * from './CustomGraphQLClient';
 export * from './EnvironmentService';
 export * from './EServerErrorCode';
@@ -8,6 +9,5 @@ export * from './getErrorDetails';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';
-export * from './ResourceKeyList';
 export * from './sdk';
 export * from './ServerInternalError';
