@@ -8,14 +8,14 @@
 
 import { observer } from 'mobx-react';
 import { ButtonHTMLAttributes } from 'react';
-import { Button } from 'reakit/Button';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { composes, useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, Style } from '@cloudbeaver/core-theming';
 
+import { TopMenuButton } from './TopMenuButton';
 import { topMenuStyles } from './topMenuStyles';
 
 type TopMenuItemProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
@@ -23,47 +23,19 @@ type TopMenuItemProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
   style?: Style[];
 };
 
-const buttonStyle = composes(
-  css`
-    Button {
-      composes: theme-ripple from global;
-    }  
-  `,
-  css`
-    Button {
-      height: 100%;
-      padding: 0 16px !important;
-      text-transform: uppercase;
-      font-weight: 700;
-      
-      background: none;
-      border: none;
-      outline: none !important;
-      color: inherit;
-      cursor: pointer;
- 
-      & div {
-        display: flex;
-        align-items: center;
-      }
-    }
-  `
-);
-
 export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [], ...props }: TopMenuItemProps) {
   const translate = useTranslate();
-  const styles = useStyles(!menuItem.panel ? buttonStyle : [...style, topMenuStyles]);
+  const styles = useStyles(!menuItem.panel ? [] : [...style, topMenuStyles]);
 
   if (!menuItem.panel) {
-    return styled(styles)(
-      <Button
-        as="button"
+    return (
+      <TopMenuButton
         {...props}
         disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
       >
-        <div>{translate(menuItem.title)}</div>
-      </Button>
+        {translate(menuItem.title)}
+      </TopMenuButton>
     );
   }
 
