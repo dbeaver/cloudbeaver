@@ -18,7 +18,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExtension } from '@cloudbeaver/core-extensions';
+import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
 
 import { ITab } from '../../shared/NavigationTabs/ITab';
 import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
@@ -122,10 +122,9 @@ export class ConnectionSchemaManagerService {
     private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService
   ) {
-
   }
 
-  registerCallbacks() {
+  registerCallbacks(): void {
     this.navigationTabsService.onTabSelect
       .subscribe(this.onTabSelect.bind(this));
 
@@ -136,36 +135,36 @@ export class ConnectionSchemaManagerService {
   /**
    * Trigger when user select connection in dropdown
    */
-  async selectConnection(connectionId: string) {
+  async selectConnection(connectionId: string): Promise<void> {
     if (!this.activeItem?.changeConnectionId) {
       return;
     }
-    this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
-    this.updateContainer(connectionId);
+    await this.activeItem.changeConnectionId(connectionId, this.activeItem.context);
+    await this.updateContainer(connectionId);
   }
 
   /**
    * Trigger when user select catalog in dropdown
    */
-  selectCatalog(catalogId: string) {
+  async selectCatalog(catalogId: string): Promise<void> {
     if (!this.activeItem?.changeCatalogId) {
       throw new Error('The try to change catalog without connection');
     }
-    this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
-    this.updateContainer(this.currentConnectionId, catalogId);
+    await this.activeItem.changeCatalogId(catalogId, this.activeItem.context);
+    await this.updateContainer(this.currentConnectionId, catalogId);
   }
 
   /**
    * Trigger when user select schema in dropdown
    */
-  selectSchema(schemaId: string) {
+  async selectSchema(schemaId: string): Promise<void> {
     if (!this.activeItem?.changeSchemaId) {
       throw new Error('The try to change schema without connection');
     }
-    this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
+    await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
   }
 
-  async updateContainer(connectionId?: string, catalogId?: string) {
+  private async updateContainer(connectionId?: string, catalogId?: string): Promise<void> {
     if (!connectionId) {
       connectionId = this.currentConnectionId;
     }
@@ -219,27 +218,14 @@ export class ConnectionSchemaManagerService {
   }
 
   private setExtensions<T>(item: IActiveItem<T>, extensions: Array<IExtension<T>>) {
-    for (const extension of extensions) {
-      if (isConnectionProvider(extension)) {
-        item.getCurrentConnectionId = extension;
-      }
-      if (isObjectCatalogProvider(extension)) {
-        item.getCurrentCatalogId = extension;
-      }
-      if (isObjectSchemaProvider(extension)) {
-        item.getCurrentSchemaId = extension;
-      }
+    ExtensionUtils.from(extensions)
+      .on(isConnectionProvider, extension => { item.getCurrentConnectionId = extension; })
+      .on(isObjectCatalogProvider, extension => { item.getCurrentCatalogId = extension; })
+      .on(isObjectSchemaProvider, extension => { item.getCurrentSchemaId = extension; })
 
-      if (isConnectionSetter(extension)) {
-        item.changeConnectionId = extension;
-      }
-      if (isObjectCatalogSetter(extension)) {
-        item.changeCatalogId = extension;
-      }
-      if (isObjectSchemaSetter(extension)) {
-        item.changeSchemaId = extension;
-      }
-    }
+      .on(isConnectionSetter, extension => { item.changeConnectionId = extension; })
+      .on(isObjectCatalogSetter, extension => { item.changeCatalogId = extension; })
+      .on(isObjectSchemaSetter, extension => { item.changeSchemaId = extension; });
   }
 
   private removeActiveItem(id: string) {

@@ -69,8 +69,6 @@ export class SqlEditorTabService {
     });
   }
 
-  registerTabHandler() { }
-
   async createNewEditor(
     connectionId?: string,
     catalogId?: string,

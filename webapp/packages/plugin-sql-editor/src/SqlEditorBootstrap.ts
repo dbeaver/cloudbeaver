@@ -17,10 +17,10 @@ import {
 import { ConnectionsManagerService, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ActiveViewService } from '@cloudbeaver/core-view';
 
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
-import { SqlEditorTabService } from './SqlEditorTabService';
 
 @injectable()
 export class SqlEditorBootstrap {
@@ -28,15 +28,12 @@ export class SqlEditorBootstrap {
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
     private connectionsManagerService: ConnectionsManagerService,
-    private sqlEditorTabService: SqlEditorTabService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
     private activeViewService: ActiveViewService
   ) {}
 
   async bootstrap() {
-    this.sqlEditorTabService.registerTabHandler();
-
     this.mainMenuService.registerRootItem(
       {
         id: 'sql-editor',
@@ -65,37 +62,23 @@ export class SqlEditorBootstrap {
   }
 
   private openSQLEditor() {
+    let connectionId: string | undefined;
+    let catalogId: string | undefined;
+    let schemaId: string | undefined;
+
     const activeView = this.activeViewService.view;
 
     if (activeView) {
-      let connectionId: string | undefined;
-      let catalogId: string | undefined;
-      let schemaId: string | undefined;
-
-      for (const extension of activeView.extensions) {
-        if (isConnectionProvider(extension)) {
-          connectionId = extension(activeView.context);
-        } else if (isObjectCatalogProvider(extension)) {
-          catalogId = extension(activeView.context);
-        } else if (isObjectSchemaProvider(extension)) {
-          schemaId = extension(activeView.context);
-        }
-      }
-
-      if (connectionId) {
-        this.sqlEditorNavigatorService.openNewEditor(
-          connectionId,
-          catalogId,
-          schemaId
-        );
-        return;
-      }
+      ExtensionUtils.from(activeView.extensions)
+        .on(isConnectionProvider, extension => { connectionId = extension(activeView.context); })
+        .on(isObjectCatalogProvider, extension => { catalogId = extension(activeView.context); })
+        .on(isObjectSchemaProvider, extension => { schemaId = extension(activeView.context); });
+    } else {
+      connectionId = this.connectionSchemaManagerService.currentConnectionId;
+      catalogId = this.connectionSchemaManagerService.currentObjectCatalogId;
+      schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
 
-    this.sqlEditorNavigatorService.openNewEditor(
-      this.connectionSchemaManagerService.currentConnectionId,
-      this.connectionSchemaManagerService.currentObjectCatalogId,
-      this.connectionSchemaManagerService.currentObjectSchemaId
-    );
+    this.sqlEditorNavigatorService.openNewEditor(connectionId, catalogId, schemaId);
   }
 }

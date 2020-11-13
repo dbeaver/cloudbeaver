@@ -1,2 +1,3 @@
-export * from './IExtension';
 export * from './createExtension';
+export * from './ExtensionUtils';
+export * from './IExtension';

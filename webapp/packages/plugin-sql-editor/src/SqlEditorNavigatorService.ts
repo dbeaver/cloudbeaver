@@ -59,8 +59,6 @@ export class SqlEditorNavigatorService {
     this.connectionsManagerService.onCloseConnection.subscribe(this.handleConnectionClose.bind(this));
   }
 
-  registerTabHandler() { }
-
   openNewEditor(connectionId?: string, catalogId?: string, schemaId?: string) {
     this.navigator.execute({
       type: SQLEditorNavigationAction.create,
