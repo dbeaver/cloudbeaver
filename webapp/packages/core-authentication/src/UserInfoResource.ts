@@ -26,7 +26,9 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
     super(null);
     this.loaded = false;
     this.sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.sessionResource.onDataUpdate.addHandler(() => { this.load(); });
+
+  getId(): string {
+    return this.data?.userId || 'anonymous';
   }
 
   isLoaded(): boolean {

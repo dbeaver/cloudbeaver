@@ -8,6 +8,7 @@
 
 import { observable } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { ITab, ITabOptions } from './ITab';
@@ -22,15 +23,15 @@ export interface ITabNavigationContext {
 }
 
 export class TabNavigationContext implements ITabNavigationContext {
-  get isNewlyCreated() {
+  get isNewlyCreated(): boolean {
     return this._isNewlyCreated;
   }
 
-  get handlerPriority() {
+  get handlerPriority(): number {
     return this._handlerPriority;
   }
 
-  get tab() {
+  get tab(): ITab<any> | null {
     return this._tab;
   }
 
@@ -38,11 +39,15 @@ export class TabNavigationContext implements ITabNavigationContext {
   private _handlerPriority = 0;
   private _tab: ITab | null = null;
 
-  constructor(private navigationTabsService: NavigationTabsService) { }
+  constructor(
+    private navigationTabsService: NavigationTabsService,
+    private userInfoResource: UserInfoResource
+  ) { }
 
   openNewTab<T = any>(options: ITabOptions<T>): ITab<T> {
     this._tab = observable({
       id: uuid(),
+      userId: this.userInfoResource.getId(),
       restored: true,
       ...options,
     });
@@ -51,7 +56,7 @@ export class TabNavigationContext implements ITabNavigationContext {
     return this._tab;
   }
 
-  registerTab(tab: ITab) {
+  registerTab(tab: ITab): void {
     this._tab = tab;
   }
 }
