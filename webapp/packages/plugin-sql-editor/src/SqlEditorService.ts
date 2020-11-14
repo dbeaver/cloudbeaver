@@ -138,8 +138,7 @@ export class SqlEditorService {
     defaultSchema?: string
   ): Promise<void> {
     if (!contextId) {
-      console.error('updateSqlContext contextId not provided');
-      return;
+      throw new Error('updateSqlContext contextId not provided');
     }
     await this.gql.sdk.sqlContextSetDefaults({
       connectionId,
