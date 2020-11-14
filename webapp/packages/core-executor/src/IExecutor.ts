@@ -9,7 +9,7 @@
 import { IExecutionContextProvider } from './ExecutionContext';
 import { IExecutorHandler } from './IExecutorHandler';
 
-export interface IExecutor<T> {
+export interface IExecutor<T = unknown> {
   execute: (data: T) => Promise<IExecutionContextProvider<T>>;
   addHandler: (handler: IExecutorHandler<T>) => this;
   removeHandler: (handler: IExecutorHandler<T>) => void;

@@ -11,7 +11,7 @@ import { IExecutor } from './IExecutor';
 import { IExecutorHandler } from './IExecutorHandler';
 import { BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler';
 
-export class Executor<T> implements IExecutor<T> {
+export class Executor<T = unknown> implements IExecutor<T> {
   private handlers: Array<IExecutorHandler<any>> = [];
   private postHandlers: Array<IExecutorHandler<any>> = [];
   private scheduler: TaskScheduler<T>;

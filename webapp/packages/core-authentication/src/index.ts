@@ -1,3 +1,4 @@
+export * from './AppAuthService';
 export * from './AuthInfoService';
 export * from './AuthProviderService';
 export * from './AuthProvidersResource';

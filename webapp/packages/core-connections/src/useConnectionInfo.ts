@@ -11,8 +11,10 @@ import { useCallback } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ConnectionInfoResource } from './ConnectionInfoResource';
+import { ConnectionsManagerService } from './ConnectionsManagerService';
 
 export function useConnectionInfo(connectionId: string) {
+  const manager = useService(ConnectionsManagerService);
   const service = useService(ConnectionInfoResource);
 
   const connectionInfo = service.get(connectionId);
@@ -20,6 +22,7 @@ export function useConnectionInfo(connectionId: string) {
   const refresh = useCallback(() => service.refresh(connectionId), [service, connectionId]);
   const isLoading = useCallback(() => service.isDataLoading(connectionId), [service, connectionId]);
   const isLoaded = useCallback(() => service.isLoaded(connectionId), [service, connectionId]);
+  const connect = useCallback(() => manager.requireConnection(connectionId), [manager, connectionId]);
 
   return {
     connectionInfo,
@@ -27,5 +30,6 @@ export function useConnectionInfo(connectionId: string) {
     isLoaded,
     load,
     refresh,
+    connect,
   };
 }

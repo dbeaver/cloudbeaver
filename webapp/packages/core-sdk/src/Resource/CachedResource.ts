@@ -21,6 +21,7 @@ export interface ICachedResourceMetadata {
 export abstract class CachedResource<
   TData,
   TParam,
+  TKey = TParam
 > {
   @observable
   data: TData;
@@ -28,7 +29,7 @@ export abstract class CachedResource<
   readonly onDataOutdated: IExecutor<TParam>;
   readonly onDataUpdate: IExecutor<TData>;
 
-  protected metadata: MetadataMap<TParam, ICachedResourceMetadata>;
+  protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
 
   @observable
   protected loading = false;
@@ -48,36 +49,36 @@ export abstract class CachedResource<
 
   abstract isLoaded(param: TParam): boolean;
 
-  isOutdated(param: TParam): boolean {
-    return this.metadata.get(param).outdated;
-  }
-
   isLoading(): boolean {
     return this.loading;
   }
 
+  isOutdated(param: TParam): boolean {
+    return this.metadata.get(param as unknown as TKey).outdated;
+  }
+
   isDataLoading(param: TParam): boolean {
-    return this.metadata.get(param).loading;
+    return this.metadata.get(param as unknown as TKey).loading;
   }
 
   markDataLoading(param: TParam): void {
-    const metadata = this.metadata.get(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = true;
   }
 
   markDataLoaded(param: TParam): void {
-    const metadata = this.metadata.get(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = false;
   }
 
   markOutdated(param: TParam): void {
-    const metadata = this.metadata.get(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = true;
     this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: TParam): void {
-    const metadata = this.metadata.get(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = false;
   }
 

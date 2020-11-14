@@ -43,7 +43,8 @@ export class ObjectViewerTabService {
     private dbObjectService: DBObjectService,
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService,
-    private navigationTabsService: NavigationTabsService
+    private navigationTabsService: NavigationTabsService,
+    private connectionInfo: ConnectionInfoResource
   ) {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -140,7 +141,7 @@ export class ObjectViewerTabService {
   };
 
   private async updateConnectionInfoTabs(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
       const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
       const connected = this.connectionInfoResource.get(key)?.connected;
 
@@ -157,7 +158,7 @@ export class ObjectViewerTabService {
   }
 
   private async updateTabs(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
       const tab = this.navigationTabsService.findTab(
         isObjectViewerTab(tab => tab.handlerState.objectId === key)
       );
@@ -169,7 +170,7 @@ export class ObjectViewerTabService {
   }
 
   private async removeTabs(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
       const tab = this.navigationTabsService.findTab(
         isObjectViewerTab(tab => tab.handlerState.objectId === key)
       );
@@ -213,16 +214,31 @@ export class ObjectViewerTabService {
 
   private async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
     try {
+      const connectionId = NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId);
+      const connection = await this.connectionInfo.load(connectionId);
+
+      if (!connection.connected) {
+        return;
+      }
+
+      for (const nodeId of tab.handlerState.parents) {
+        await this.navNodeManagerService.loadTree(nodeId);
+      }
+
+      // TODO: must be loaded by info folder?
+      const node = await this.navNodeManagerService.loadNode({
+        nodeId: tab.handlerState.objectId,
+        parentId: tab.handlerState.parentId,
+      });
+
       const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
       if (currentPage) {
         await this.dbObjectPageService.selectPage(tab, currentPage);
       }
-
-      // TODO: must be loaded by info folder?
-      await this.navNodeManagerService.loadNode({
-        nodeId: tab.handlerState.objectId,
-        parentId: tab.handlerState.parentId,
-      });
+      if (node) {
+        tab.handlerState.tabIcon = node.icon;
+        tab.handlerState.tabTitle = node.name;
+      }
       await this.dbObjectService.load(tab.handlerState.objectId);
       const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
 
@@ -250,21 +266,14 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
+      const connectionId = NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId);
+      const connection = this.connectionInfo.get(connectionId);
 
-      for (const nodeId of tab.handlerState.parents) {
-        await this.navNodeManagerService.loadTree(nodeId);
+      if (!connection) {
+        return false;
       }
 
-      const node = await this.navNodeManagerService.loadNode({
-        nodeId: tab.handlerState.objectId,
-        parentId: tab.handlerState.parentId,
-      });
-      if (node) {
-        tab.handlerState.tabIcon = node.icon;
-        tab.handlerState.tabTitle = node.name;
-
-        return this.dbObjectPageService.restorePages(tab);
-      }
+      return this.dbObjectPageService.restorePages(tab);
     }
     return false;
   }
@@ -275,6 +284,13 @@ export class ObjectViewerTabService {
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
+      const connectionId = NodeManagerUtils.nodeIdToConnectionId(data.nodeId);
+      const connection = await this.connectionInfo.load(connectionId);
+
+      if (!connection.connected) {
+        return;
+      }
+
       const { tab, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
 
       if (tab) {

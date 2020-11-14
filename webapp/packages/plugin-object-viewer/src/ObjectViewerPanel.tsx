@@ -7,12 +7,14 @@
  */
 
 import { observer } from 'mobx-react';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useChildren, TabHandlerPanelProps } from '@cloudbeaver/core-app';
+import { useChildren, TabHandlerPanelProps, NodeManagerUtils, NavigationTabsService } from '@cloudbeaver/core-app';
 import {
-  Loader, TabsBox, TabPanel, TextPlaceholder
+  Loader, TabsBox, TabPanel, TextPlaceholder, Button
 } from '@cloudbeaver/core-blocks';
+import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -39,14 +41,34 @@ const styles = composes(
 const stylesArray = [styles];
 
 export const ObjectViewerPanel = observer(function ObjectViewerPanel({
-  tab, handler,
+  tab,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
+  const {
+    connectionInfo,
+    connect,
+  } = useConnectionInfo(NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId));
+  const navigation = useService(NavigationTabsService);
   const style = useStyles(styles);
   const {
     children, isOutdated, isLoading, isLoaded,
   } = useChildren(tab.handlerState.objectId);
   const dbObjectPagesService = useService(DBObjectPageService);
   const pages = dbObjectPagesService.orderedPages;
+
+  const handleConnect = useCallback(async () => {
+    await connect();
+    navigation.selectTab(tab.id);
+  }, [navigation, connect, tab]);
+
+  if (!connectionInfo?.connected) {
+    return (
+      <TextPlaceholder>
+        Connection required
+        <br />
+        <Button type="button" mod={['unelevated']} onClick={handleConnect}>Connect</Button>
+      </TextPlaceholder>
+    );
+  }
 
   if (!isLoaded() || (!isOutdated() && isLoading())) {
     return <Loader />;

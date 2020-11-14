@@ -12,7 +12,7 @@ import {
 } from 'mobx';
 import { Subject } from 'rxjs';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionService } from '@cloudbeaver/core-root';
@@ -62,7 +62,7 @@ export class NavigationTabsService {
   }
 
   private tabSelectSubject = new Subject<ITab>();
-  private tabCloseSubject = new Subject<ITab>();
+  private tabCloseSubject = new Subject<ITab | undefined>();
   readonly onTabSelect = this.tabSelectSubject.asObservable();
   readonly onTabClose = this.tabCloseSubject.asObservable();
 
@@ -71,6 +71,7 @@ export class NavigationTabsService {
     private autoSaveService: LocalStorageSaveService,
     private sessionService: SessionService,
     private userInfoResource: UserInfoResource,
+    appAuthService: AppAuthService
   ) {
     this.autoSaveService.withAutoSave(
       this.tabsMap,
@@ -100,7 +101,7 @@ export class NavigationTabsService {
           if (
             typeof value.currentId === 'string'
             && Array.isArray(value.history)
-            && Array.isArray(typeof value.tabs)
+            && Array.isArray(value.tabs)
           ) {
             map[key] = value;
           }
@@ -109,12 +110,13 @@ export class NavigationTabsService {
       }
     );
 
-    appAuthService.auth.addHandler(state => {
-      this.unloadTabs();
-      if (state || appAuthService.authenticated) {
-        this.restoreTabs();
-      }
-    });
+    appAuthService.auth
+      .addHandler(() => this.unloadTabs())
+      .addPostHandler(async state => {
+        if (state || appAuthService.authenticated) {
+          await this.restoreTabs();
+        }
+      });
   }
 
   @action openTab(tab: ITab, isSelected?: boolean): void {
@@ -129,6 +131,9 @@ export class NavigationTabsService {
   @action async selectTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     if (tabId === '') {
       this.userTabsState.currentId = '';
+    }
+    if (!this.userTabsState.tabs.includes(tabId)) {
+      return;
     }
     const tab = this.tabsMap.get(tabId);
     if (!tab) {
@@ -149,6 +154,10 @@ export class NavigationTabsService {
   }
 
   @action async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {
+    if (!this.userTabsState.tabs.includes(tabId)) {
+      return;
+    }
+
     const tab = this.tabsMap.get(tabId);
     if (tab && !skipHandlers) {
       await this.callHandlerCallback(tab, handler => handler.onClose);
@@ -220,7 +229,7 @@ export class NavigationTabsService {
   findTab(predicate: (tab: ITab) => boolean): ITab | null;
   findTab(predicate: (tab: ITab) => boolean): ITab | null {
     for (const tab of this.tabsMap.values()) {
-      if (tab.userId === this.userInfoResource.getId() && predicate(tab)) {
+      if (tab.restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         return tab;
       }
     }
@@ -231,22 +240,25 @@ export class NavigationTabsService {
   findTabs<S>(predicate: (tab: ITab) => tab is ITab<S>): Generator<ITab<S>>;
   * findTabs(predicate: (tab: ITab) => boolean): Generator<ITab> {
     for (const tab of this.tabsMap.values()) {
-      if (tab.userId === this.userInfoResource.getId() && predicate(tab)) {
+      if (tab.restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         yield tab;
       }
     }
   }
 
-  @action private unloadTabs() {
+  @action private async unloadTabs() {
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
-        tab.restored = false;
+        if (tab.restored) {
+          await this.callHandlerCallback(tab, handler => handler.onClose);
+          tab.restored = false;
+        }
       }
     }
   }
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
-  async restoreTabs(): Promise<void> {
+  private async restoreTabs(): Promise<void> {
     const removedTabs: string[] = [];
     const session = await this.sessionService.session.load();
     // TODO: will be removed, tabs will restored after user identification

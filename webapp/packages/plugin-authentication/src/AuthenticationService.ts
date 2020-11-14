@@ -8,10 +8,9 @@
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ServerService, SessionService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
@@ -22,8 +21,7 @@ export class AuthenticationService extends Bootstrap {
   constructor(
     private screenService: ScreenService,
     private appScreenService: AppScreenService,
-    private serverService: ServerService,
-    private sessionService: SessionService,
+    private appAuthService: AppAuthService,
     private authDialogService: AuthDialogService,
     private userInfoResource: UserInfoResource,
     private notificationService: NotificationService,
@@ -71,12 +69,7 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async requireAuthentication() {
-    const config = await this.serverService.config.load();
-    if (!config) {
-      throw new Error('Can\'t configure Authentication');
-    }
-
-    if (config.anonymousAccessEnabled || !config.authenticationEnabled || config.configurationMode) {
+    if (!await this.appAuthService.isAuthNeeded()) {
       return;
     }
 
@@ -84,7 +77,11 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionService.session.onDataUpdate.addHandler(() => this.requireAuthentication());
+    this.appAuthService.auth.addHandler(async state => {
+      if (!state) {
+        await this.requireAuthentication();
+      }
+    });
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => await this.auth(false));
   }

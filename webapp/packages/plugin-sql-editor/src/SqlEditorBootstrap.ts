@@ -16,7 +16,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { ConnectionsManagerService, isConnectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ActiveViewService } from '@cloudbeaver/core-view';
 
@@ -43,8 +43,7 @@ export class SqlEditorBootstrap {
         isDisabled: () => !this.connectionsManagerService.hasAnyConnection(),
       }
     );
-
-    const openSqlEditor: IContextMenuItem<NavNode> = {
+    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
       id: 'open-sql-editor',
       isPresent(context) {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType
@@ -57,8 +56,7 @@ export class SqlEditorBootstrap {
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
         this.sqlEditorNavigatorService.openNewEditor(connectionId);
       },
-    };
-    this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), openSqlEditor);
+    });
   }
 
   private openSQLEditor() {

@@ -12,6 +12,7 @@ import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 
 import { ConnectionAuthService } from './ConnectionAuthService';
 import { ConnectionInfoResource, Connection } from './ConnectionInfoResource';
@@ -23,6 +24,7 @@ export class ConnectionsManagerService {
   onOpenConnection = new Subject<Connection>();
   onCloseConnection = new Subject<string>();
   private disconnecting: boolean;
+  private connectionExecutor: IExecutor<string | null>;
 
   constructor(
     readonly connectionInfo: ConnectionInfoResource,
@@ -32,28 +34,14 @@ export class ConnectionsManagerService {
     private commonDialogService: CommonDialogService
   ) {
     this.disconnecting = false;
+    this.connectionExecutor = new Executor<string | null>(null, (active, current) => active === current);
+    this.connectionExecutor.addHandler(this.connectionDialog.bind(this));
   }
 
-  async requireConnection(connectionId?: string) {
-    if (!connectionId) {
-      if (!this.hasAnyConnection()) {
-        return null;
-      }
-      connectionId = Array.from(this.connectionInfo.data.values())[0].id;
-    }
+  async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
+    const context = await this.connectionExecutor.execute(connectionId);
 
-    try {
-      const connection = await this.connectionAuthService.auth(connectionId);
-
-      if (!connection.connected) {
-        return null;
-      }
-
-      return connection;
-    } catch (exception) {
-      this.notificationService.logException(exception);
-      throw exception;
-    }
+    return (await context.getContext(this.connectionContext)).connection;
   }
 
   async addOpenedConnection(connection: Connection) {
@@ -65,7 +53,7 @@ export class ConnectionsManagerService {
     objectCatalogId: string,
     objectSchemaId?: string
   ): ObjectContainer | undefined {
-    const objectContainers = this.connectionObjectContainers.data.get(connectionId);
+    const objectContainers = this.connectionObjectContainers.get({ connectionId, catalogId: objectCatalogId });
     if (!objectContainers) {
       return;
     }
@@ -99,6 +87,34 @@ export class ConnectionsManagerService {
       return Array.from(this.connectionInfo.data.values()).some(connection => connection.connected);
     }
     return !!Array.from(this.connectionInfo.data.values()).length;
+  }
+
+  private connectionContext() {
+    return {
+      connection: null as (Connection | null),
+    };
+  }
+
+  private async connectionDialog(connectionId: string | null, context: IExecutionContextProvider<string | null>) {
+    const connection = await context.getContext(this.connectionContext);
+    if (!connectionId) {
+      if (!this.hasAnyConnection()) {
+        return;
+      }
+      connectionId = Array.from(this.connectionInfo.data.values())[0].id;
+    }
+
+    try {
+      const tempConnection = await this.connectionAuthService.auth(connectionId);
+
+      if (!tempConnection) {
+        return;
+      }
+      connection.connection = tempConnection;
+    } catch (exception) {
+      this.notificationService.logException(exception);
+      throw exception;
+    }
   }
 
   private async _closeConnectionAsync(connection: Connection) {
@@ -145,7 +161,7 @@ export class ConnectionsManagerService {
 
   async loadObjectContainer(connectionId: string, catalogId?: string): Promise<ObjectContainer[]> {
     await this.connectionObjectContainers.load({ connectionId, catalogId });
-    return this.connectionObjectContainers.data.get(connectionId)!;
+    return this.connectionObjectContainers.get({ connectionId, catalogId })!;
   }
 
   private async afterConnectionClose(id: string) {

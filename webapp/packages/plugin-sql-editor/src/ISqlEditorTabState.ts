@@ -34,7 +34,7 @@ export interface IQueryTabGroup {
   sqlQueryParams: ISqlQueryParams;
 }
 
-export interface ISqlEditorTabState extends IExecutionContext {
+export interface ISqlEditorTabState extends Partial<IExecutionContext> {
   order: number;
   query: string;
   currentResultTabId?: string;
