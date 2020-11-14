@@ -72,6 +72,10 @@ type NavigatorNodeInfo {
     # Supported features: item, container, leaf
     features: [ String ]
 
+    # Object detailed info.
+    # If is different than properties. It doesn't perform any expensive operation and doesn't require authentication.
+    nodeDetails: [ ObjectPropertyInfo ]
+
     folder: Boolean
     inline: Boolean
     navigable: Boolean

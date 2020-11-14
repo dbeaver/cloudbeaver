@@ -16,7 +16,13 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.DBPObjectWithDetails;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
@@ -31,11 +37,11 @@ import java.util.List;
  * Web connection info
  */
 public class WebNavigatorNodeInfo {
-    private final WebSession sesion;
+    private final WebSession session;
     private final DBNNode node;
 
-    public WebNavigatorNodeInfo(WebSession sesion, DBNNode node) {
-        this.sesion = sesion;
+    public WebNavigatorNodeInfo(WebSession session, DBNNode node) {
+        this.session = session;
         this.node = node;
     }
 
@@ -54,7 +60,7 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getName() {
-        return node.getLocalizedName(sesion.getLocale());
+        return node.getLocalizedName(session.getLocale());
     }
 
     @Property
@@ -116,13 +122,32 @@ public class WebNavigatorNodeInfo {
     }
 
     ///////////////////////////////////
+    // Details
+    ///////////////////////////////////
+
+    @Property
+    public WebPropertyInfo[] getNodeDetails() throws DBWebException {
+        if (node instanceof DBPObjectWithDetails) {
+            try {
+                DBPObject objectDetails = ((DBPObjectWithDetails) node).getObjectDetails(session.getProgressMonitor(), session.getSessionContext(), node);
+                if (objectDetails != null) {
+                    return WebServiceUtils.getObjectProperties(session, objectDetails);
+                }
+            } catch (DBException e) {
+                throw new DBWebException("Error extracting node details", e);
+            }
+        }
+        return null;
+    }
+
+    ///////////////////////////////////
     // Objects
     ///////////////////////////////////
 
     @Property
     public WebDatabaseObjectInfo getObject() {
         if (node instanceof DBNDatabaseNode) {
-            return new WebDatabaseObjectInfo(sesion, ((DBNDatabaseNode) node).getObject());
+            return new WebDatabaseObjectInfo(session, ((DBNDatabaseNode) node).getObject());
         }
         return null;
     }
