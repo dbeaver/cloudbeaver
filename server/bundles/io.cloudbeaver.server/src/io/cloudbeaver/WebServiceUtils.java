@@ -194,7 +194,7 @@ public class WebServiceUtils {
         setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
-        if (config.isSaveCredentials()) {
+        if (config.getCredentials() != null) {
             saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials());
         }
         dataSource.setSavePassword(config.isSaveCredentials());
