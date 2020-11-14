@@ -107,7 +107,7 @@ export class ConnectionsManagerService {
     try {
       const tempConnection = await this.connectionAuthService.auth(connectionId);
 
-      if (!tempConnection) {
+      if (!tempConnection.connected) {
         return;
       }
       connection.connection = tempConnection;
