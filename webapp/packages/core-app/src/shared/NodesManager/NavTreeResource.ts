@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -14,8 +16,9 @@ import {
   isResourceKeyList,
   ResourceKeyList,
   resourceKeyList,
-  NavNodeChildrenQuery as fake, ResourceKeyUtils
+  NavNodeChildrenQuery as fake, ResourceKeyUtils, ICachedResourceMetadata
 } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 
@@ -26,14 +29,41 @@ export interface NodePath {
 
 type NavNodeChildrenQuery = fake & NodePath;
 
+interface INodeMetadata extends ICachedResourceMetadata {
+  withDetails: boolean;
+}
+
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
+  protected metadata: MetadataMap<string, INodeMetadata>;
+
   constructor(
     private graphQLService: GraphQLService,
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
+    this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
+      outdated: true,
+      loading: false,
+      withDetails: false,
+    }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
+  }
+
+  @action setDetails(keyObject: ResourceKey<string>, state: boolean): void {
+    ResourceKeyUtils.forEach(keyObject, key => {
+      const children = resourceKeyList(this.getNestedChildren(key));
+      this.navNodeInfoResource.setDetails(children, state);
+
+      ResourceKeyUtils.forEach(children, key => {
+        const metadata = this.metadata.get(key);
+
+        if (!metadata.withDetails) {
+          metadata.outdated = true;
+        }
+        metadata.withDetails = state;
+      });
+    });
   }
 
   deleteInNode(key: string, value: string[]): void;
@@ -151,6 +181,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
     if (Array.isArray(data)) {
+      for (const node of data) {
+        const metadata = this.metadata.get(node.parentPath);
+
+        this.setDetails(node.navNodeInfo.id, metadata.withDetails);
+        this.setDetails(resourceKeyList(node.navNodeChildren.map(node => node.id)), metadata.withDetails);
+      }
+
       this.navNodeInfoResource.set(
         resourceKeyList(data.map(data => data.parentPath)),
         data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat()
@@ -170,6 +207,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         data.map(data => data.navNodeChildren.map(node => node.id))
       );
     } else {
+      const metadata = this.metadata.get(data.parentPath);
+
+      this.setDetails(data.navNodeInfo.id, metadata.withDetails);
+      this.setDetails(resourceKeyList(data.navNodeChildren.map(node => node.id)), metadata.withDetails);
+
       this.navNodeInfoResource.set(
         data.parentPath,
         this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)
@@ -185,8 +227,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   private async loadNodeChildren(parentPath: string) {
+    const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
+      withDetails: metadata.withDetails,
     });
 
     return { navNodeChildren, navNodeInfo, parentPath };

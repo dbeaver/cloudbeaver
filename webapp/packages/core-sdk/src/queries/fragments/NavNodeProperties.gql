@@ -6,4 +6,5 @@ fragment NavNodeProperties on ObjectPropertyInfo {
   displayName
   features
   value
+  order
 }

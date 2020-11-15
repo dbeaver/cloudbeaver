@@ -15,7 +15,8 @@ import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from 
 @injectable()
 export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
 Map<TKey, TValue>,
-ResourceKey<TKey>
+ResourceKey<TKey>,
+TKey
 > {
   readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
   readonly onItemDelete: IExecutor<ResourceKey<TKey>>;

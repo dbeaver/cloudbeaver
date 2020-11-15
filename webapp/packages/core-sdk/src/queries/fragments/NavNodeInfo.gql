@@ -11,4 +11,7 @@ fragment NavNodeInfo on NavigatorNodeInfo {
   object {
     features
   }
+  nodeDetails @include(if: $withDetails) {
+    ...NavNodeProperties
+  }
 }

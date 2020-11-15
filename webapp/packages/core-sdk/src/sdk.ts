@@ -404,6 +404,7 @@ export interface ObjectPropertyInfo {
   validValues?: Maybe<Array<Maybe<Scalars['Object']>>>;
   defaultValue?: Maybe<Scalars['Object']>;
   features: Array<Scalars['String']>;
+  order: Scalars['Int'];
 }
 
 export interface AsyncTaskInfo {
@@ -651,6 +652,7 @@ export interface NavigatorNodeInfo {
   hasChildren?: Maybe<Scalars['Boolean']>;
   object?: Maybe<DatabaseObjectInfo>;
   features?: Maybe<Array<Maybe<Scalars['String']>>>;
+  nodeDetails?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
   folder?: Maybe<Scalars['Boolean']>;
   inline?: Maybe<Scalars['Boolean']>;
   navigable?: Maybe<Scalars['Boolean']>;
@@ -702,7 +704,7 @@ export interface SqlDataFilterConstraint {
 }
 
 export interface SqlDataFilter {
-  offset?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Float']>;
   limit?: Maybe<Scalars['Int']>;
   constraints?: Maybe<Array<Maybe<SqlDataFilterConstraint>>>;
   where?: Maybe<Scalars['String']>;
@@ -718,7 +720,7 @@ export interface SqlResultColumn {
   dataKind?: Maybe<Scalars['String']>;
   typeName?: Maybe<Scalars['String']>;
   fullTypeName?: Maybe<Scalars['String']>;
-  maxLength?: Maybe<Scalars['Int']>;
+  maxLength?: Maybe<Scalars['Float']>;
   scale?: Maybe<Scalars['Int']>;
   precision?: Maybe<Scalars['Int']>;
   readOnly: Scalars['Boolean'];
@@ -741,7 +743,7 @@ export interface SqlResultSet {
 
 export interface SqlQueryResults {
   title?: Maybe<Scalars['String']>;
-  updateRowCount?: Maybe<Scalars['Int']>;
+  updateRowCount?: Maybe<Scalars['Float']>;
   sourceQuery?: Maybe<Scalars['String']>;
   dataFormat?: Maybe<ResultDataFormat>;
   resultSet?: Maybe<SqlResultSet>;
@@ -1175,10 +1177,10 @@ export type AdminUserInfoFragment = (
 
 export type NavNodeInfoFragment = (
   Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>> }
+  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
 );
 
-export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value'>;
+export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>;
 
 export type ObjectOriginInfoFragment = Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>;
 
@@ -1325,12 +1327,14 @@ export interface GetDbObjectInfoQuery {
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
+  withDetails: Scalars['Boolean'];
 }>;
 
 export interface NavNodeChildrenQuery { navNodeChildren: NavNodeInfoFragment[]; navNodeInfo: NavNodeInfoFragment }
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
+  withDetails: Scalars['Boolean'];
 }>;
 
 export interface NavNodeInfoQuery { navNodeInfo: NavNodeInfoFragment }
@@ -1491,6 +1495,18 @@ export const AdminUserInfoFragmentDoc = `
   }
 }
     ${ObjectOriginInfoFragmentDoc}`;
+export const NavNodePropertiesFragmentDoc = `
+    fragment NavNodeProperties on ObjectPropertyInfo {
+  id
+  category
+  dataType
+  description
+  displayName
+  features
+  value
+  order
+}
+    `;
 export const NavNodeInfoFragmentDoc = `
     fragment NavNodeInfo on NavigatorNodeInfo {
   id
@@ -1505,19 +1521,11 @@ export const NavNodeInfoFragmentDoc = `
   object {
     features
   }
+  nodeDetails @include(if: $withDetails) {
+    ...NavNodeProperties
+  }
 }
-    `;
-export const NavNodePropertiesFragmentDoc = `
-    fragment NavNodeProperties on ObjectPropertyInfo {
-  id
-  category
-  dataType
-  description
-  displayName
-  features
-  value
-}
-    `;
+    ${NavNodePropertiesFragmentDoc}`;
 export const SessionStateFragmentDoc = `
     fragment SessionState on SessionInfo {
   createTime
@@ -2150,7 +2158,7 @@ export const GetDbObjectInfoDocument = `
 }
     ${NavNodePropertiesFragmentDoc}`;
 export const NavNodeChildrenDocument = `
-    query navNodeChildren($parentPath: ID!) {
+    query navNodeChildren($parentPath: ID!, $withDetails: Boolean!) {
   navNodeChildren(parentPath: $parentPath) {
     ...NavNodeInfo
   }
@@ -2160,7 +2168,7 @@ export const NavNodeChildrenDocument = `
 }
     ${NavNodeInfoFragmentDoc}`;
 export const NavNodeInfoDocument = `
-    query navNodeInfo($nodePath: ID!) {
+    query navNodeInfo($nodePath: ID!, $withDetails: Boolean!) {
   navNodeInfo(nodePath: $nodePath) {
     ...NavNodeInfo
   }

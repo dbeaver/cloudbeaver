@@ -1,4 +1,7 @@
-query navNodeInfo($nodePath: ID!) {
+query navNodeInfo(
+  $nodePath: ID!
+  $withDetails: Boolean!
+) {
   navNodeInfo(nodePath: $nodePath) {
     ...NavNodeInfo
   }

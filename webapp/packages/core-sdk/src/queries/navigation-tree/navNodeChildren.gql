@@ -1,4 +1,7 @@
-query navNodeChildren($parentPath: ID!) {
+query navNodeChildren(
+  $parentPath: ID!
+  $withDetails: Boolean!
+) {
   navNodeChildren(parentPath: $parentPath) {
     ...NavNodeInfo
   }
