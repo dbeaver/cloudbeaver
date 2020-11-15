@@ -77,7 +77,7 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.appAuthService.auth.addHandler(async state => {
+    this.appAuthService.auth.addPostHandler(async state => {
       if (!state) {
         await this.requireAuthentication();
       }
