@@ -46,25 +46,25 @@ export class SqlResultTabsService {
       return;
     }
 
-    const state = await this.sqlEditorService.initEditorConnection(editorState);
+    const context = await this.sqlEditorService.initEditorConnection(editorState);
 
-    if (!state) {
+    if (!context) {
       console.error('executeEditorQuery connection not established');
       return;
     }
 
-    if (!state.contextId) {
+    if (!context.contextId) {
       console.error('executeEditorQuery contextId is not provided');
       return;
     }
 
-    if (!state.connectionId) {
+    if (!context.connectionId) {
       console.error('executeEditorQuery connectionId is not provided');
       return;
     }
 
-    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(state.connectionId);
-    const currentTab = state.resultTabs.find(tab => tab.resultTabId === state.currentResultTabId);
+    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(context.connectionId);
+    const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
 
     if (dialectInfo?.scriptDelimiter && query.endsWith(dialectInfo?.scriptDelimiter)) {
       query = query.slice(0, query.length - dialectInfo.scriptDelimiter.length);
@@ -73,10 +73,10 @@ export class SqlResultTabsService {
     let tabGroup: IQueryTabGroup;
 
     const sqlQueryParams: ISqlQueryParams = {
-      connectionId: state.connectionId,
-      objectCatalogId: state.objectCatalogId,
-      objectSchemaId: state.objectSchemaId,
-      contextId: state.contextId,
+      connectionId: context.connectionId,
+      objectCatalogId: context.objectCatalogId,
+      objectSchemaId: context.objectSchemaId,
+      contextId: context.contextId,
       query,
     };
 

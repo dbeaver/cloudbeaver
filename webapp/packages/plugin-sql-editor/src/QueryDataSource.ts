@@ -114,4 +114,12 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
 
     return results;
   }
+
+  async dispose(): Promise<void> {
+    if (!this.options) {
+      return;
+    }
+
+    await this.metadata.dispose(this.options.group.sqlQueryParams);
+  }
 }

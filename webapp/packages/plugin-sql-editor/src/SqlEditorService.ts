@@ -42,27 +42,19 @@ export class SqlEditorService {
     return result.sqlCompletionProposals;
   }
 
-  async initEditorConnection(state: ISqlEditorTabState): Promise<ISqlEditorTabState | undefined> {
+  async initEditorConnection(state: ISqlEditorTabState): Promise<IExecutionContext | undefined> {
     if (!state.connectionId) {
       console.error('executeEditorQuery connectionId is not provided');
       return;
     }
 
-    try {
-      await this.updateSqlContext(state.connectionId, state.contextId, state.objectCatalogId, state.objectSchemaId);
-    } catch {
-      const context = await this.initContext(state.connectionId);
+    const context = await this.initContext(state.connectionId, state.objectCatalogId, state.objectSchemaId);
 
-      if (!context) {
-        return;
-      }
-
-      state.connectionId = context.connectionId;
-      state.contextId = context.contextId;
-      state.objectCatalogId = context.objectCatalogId;
-      state.objectSchemaId = context.objectSchemaId;
+    if (!context) {
+      return;
     }
-    return state;
+
+    return context;
   }
 
   async initContext(

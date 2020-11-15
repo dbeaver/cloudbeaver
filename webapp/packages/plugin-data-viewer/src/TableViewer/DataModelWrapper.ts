@@ -125,6 +125,10 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
     }
   };
 
+  async dispose(): Promise<void> {
+    await this.source.dispose();
+  }
+
   private showError(exception: any) {
     this.exception = null;
     this.hasDetails = false;

@@ -34,6 +34,7 @@ export class SqlEditorGroupMetadataService {
     const serviceContext = this;
 
     return {
+      resultDataProcess: new SQLQueryExecutionProcess(this.graphQLService, this.notificationService),
       async start(context, sqlQueryParams, filter, dataFormat) {
         this.resultDataProcess = new SQLQueryExecutionProcess(
           serviceContext.graphQLService,
@@ -44,7 +45,9 @@ export class SqlEditorGroupMetadataService {
 
         return this.resultDataProcess;
       },
-      resultDataProcess: new SQLQueryExecutionProcess(this.graphQLService, this.notificationService),
+      async dispose(params) {
+        // TODO: will be implemented
+      },
     };
   }
 }

@@ -99,6 +99,15 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     throw new Error('Not implemented');
   }
 
+  async dispose(): Promise<void> {
+    if (this.executionContext) {
+      await this.graphQLService.sdk.sqlContextDestroy({
+        connectionId: this.executionContext.connectionId,
+        contextId: this.executionContext.contextId,
+      });
+    }
+  }
+
   private async ensureContextCreated(): Promise<IExecutionContext> {
     if (!this.executionContext) {
       if (!this.options) {
