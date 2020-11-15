@@ -44,7 +44,7 @@ export class ConnectionSelectorController {
   }
 
   get isConnectionSelectorVisible() {
-    return !!this.currentConnection;
+    return this.connectionSelectorService.currentConnectionId !== null;
   }
 
   get isObjectContainerSelectorVisible() {
@@ -56,6 +56,13 @@ export class ConnectionSelectorController {
   @computed get objectContainerSelectionDisabled(): boolean {
     return !this.connectionSelectorService.isConnectionChangeable
       || this.getObjectContainerItems().length === 0;
+  }
+
+  private get currentConnectionTitle(): string | undefined {
+    if (this.currentConnection) {
+      return this.currentConnection.name;
+    }
+    return 'app_topnavbar_connection_schema_manager_not_selected';
   }
 
   private get currentObjectContainerTitle(): string | undefined {
@@ -90,7 +97,7 @@ export class ConnectionSelectorController {
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
       isDisabled: () => !this.connectionSelectorService.isConnectionChangeable,
-      titleGetter: () => this.currentConnection?.name,
+      titleGetter: () => this.currentConnectionTitle,
       iconGetter: () => this.currentConnectionIcon,
       panel: new ComputedMenuPanelModel({
         id: 'connectionsDropdownPanel',

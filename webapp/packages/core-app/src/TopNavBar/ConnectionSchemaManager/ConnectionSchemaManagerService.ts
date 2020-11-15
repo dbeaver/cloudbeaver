@@ -46,9 +46,9 @@ interface IActiveItem<T> {
 
 @injectable()
 export class ConnectionSchemaManagerService {
-  get currentConnectionId(): string | undefined {
+  get currentConnectionId(): string | null | undefined {
     if (!this.activeItem?.getCurrentConnectionId) {
-      return;
+      return null;
     }
     return this.activeItem.getCurrentConnectionId(this.activeItem.context);
   }
@@ -176,7 +176,7 @@ export class ConnectionSchemaManagerService {
     this.activeItemHistory = [];
   }
 
-  private async updateContainer(connectionId?: string, catalogId?: string): Promise<void> {
+  private async updateContainer(connectionId?: string | null, catalogId?: string): Promise<void> {
     if (!connectionId) {
       connectionId = this.currentConnectionId;
     }
