@@ -10,7 +10,15 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, Loader, useFocus, ObjectPropertyInfoForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup
+  SubmittingForm,
+  ErrorMessage,
+  Loader,
+  useFocus,
+  ObjectPropertyInfoForm,
+  FieldCheckbox,
+  FormBox,
+  FormBoxElement,
+  FormGroup
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';

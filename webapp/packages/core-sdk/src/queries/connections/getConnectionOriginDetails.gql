@@ -11,6 +11,7 @@ query getConnectionOriginDetails($connectionId: ID!) {
         validValues
         value
         features
+        order
       }
     } 
   }

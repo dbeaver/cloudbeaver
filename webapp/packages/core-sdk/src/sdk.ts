@@ -635,8 +635,8 @@ export interface DatabaseObjectInfo {
   overloadedName?: Maybe<Scalars['String']>;
   uniqueName?: Maybe<Scalars['String']>;
   state?: Maybe<Scalars['String']>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  editors?: Maybe<Array<Maybe<Scalars['String']>>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  editors?: Maybe<Array<Scalars['String']>>;
 }
 
 export interface DatabaseObjectInfoPropertiesArgs {
@@ -651,8 +651,8 @@ export interface NavigatorNodeInfo {
   nodeType?: Maybe<Scalars['String']>;
   hasChildren?: Maybe<Scalars['Boolean']>;
   object?: Maybe<DatabaseObjectInfo>;
-  features?: Maybe<Array<Maybe<Scalars['String']>>>;
-  nodeDetails?: Maybe<Array<Maybe<ObjectPropertyInfo>>>;
+  features?: Maybe<Array<Scalars['String']>>;
+  nodeDetails?: Maybe<ObjectPropertyInfo[]>;
   folder?: Maybe<Scalars['Boolean']>;
   inline?: Maybe<Scalars['Boolean']>;
   navigable?: Maybe<Scalars['Boolean']>;
@@ -925,7 +925,7 @@ export type GetUserOriginQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
 
-export interface GetUserOriginQuery { user: Array<Maybe<{ origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>>> } }>> }
+export interface GetUserOriginQuery { user: Array<Maybe<{ origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'order' | 'value' | 'validValues' | 'defaultValue' | 'features'>>> } }>> }
 
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
@@ -1078,7 +1078,7 @@ export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthModelsQuery {
   models: Array<(
     Pick<DatabaseAuthModel, 'id' | 'displayName' | 'description' | 'icon'>
-    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'features'>> }
+    & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'features' | 'order'>> }
   )>;
 }
 
@@ -1086,7 +1086,7 @@ export type GetConnectionOriginDetailsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
 }>;
 
-export interface GetConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features'>>> } } }
+export interface GetConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> } } }
 
 export type GetDriverByIdQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -1148,7 +1148,7 @@ export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: nev
 export interface GetDataTransferProcessorsQuery {
   processors: Array<(
     Pick<DataTransferProcessorInfo, 'id' | 'name' | 'description' | 'fileExtension' | 'appFileExtension' | 'appName' | 'order' | 'icon' | 'isBinary' | 'isHTML'>
-    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features'>>>> }
+    & { properties?: Maybe<Array<Maybe<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>>> }
   )>;
 }
 
@@ -1177,7 +1177,7 @@ export type AdminUserInfoFragment = (
 
 export type NavNodeInfoFragment = (
   Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
-  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<Array<Maybe<NavNodePropertiesFragment>>> }
+  & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<NavNodePropertiesFragment[]> }
 );
 
 export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>;
@@ -1188,7 +1188,7 @@ export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessT
 
 export type UserConnectionFragment = Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>;
 
-export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features'>;
+export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
 
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
@@ -1559,6 +1559,7 @@ export const UserConnectionAuthPropertiesFragmentDoc = `
   validValues
   defaultValue
   features
+  order
 }
     `;
 export const AsyncTaskCancelDocument = `
@@ -1654,6 +1655,7 @@ export const GetUserOriginDocument = `
         description
         category
         dataType
+        order
         value
         validValues
         defaultValue
@@ -1857,6 +1859,7 @@ export const GetAuthModelsDocument = `
       validValues
       defaultValue
       features
+      order
     }
   }
 }
@@ -1875,6 +1878,7 @@ export const GetConnectionOriginDetailsDocument = `
         validValues
         value
         features
+        order
       }
     }
   }
@@ -1972,6 +1976,7 @@ export const GetDataTransferProcessorsDocument = `
       defaultValue
       validValues
       features
+      order
     }
     isBinary
     isHTML

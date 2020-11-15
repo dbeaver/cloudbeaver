@@ -17,6 +17,7 @@ query getDataTransferProcessors {
       defaultValue
       validValues
       features
+      order
     }
     isBinary
     isHTML
