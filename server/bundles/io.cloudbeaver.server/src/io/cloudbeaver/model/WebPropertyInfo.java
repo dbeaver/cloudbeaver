@@ -57,7 +57,8 @@ public class WebPropertyInfo {
     public void setShowProtected(boolean showProtected) {
         this.showProtected = showProtected;
     }
-///////////////////////////////////
+
+    ///////////////////////////////////
     // General properties
     ///////////////////////////////////
 
@@ -82,6 +83,11 @@ public class WebPropertyInfo {
         } else {
             return property.getDescription();
         }
+    }
+
+    @Property
+    public int getOrder() {
+        return property instanceof ObjectPropertyDescriptor ? ((ObjectPropertyDescriptor) property).getOrderNumber() : -1;
     }
 
     @Property

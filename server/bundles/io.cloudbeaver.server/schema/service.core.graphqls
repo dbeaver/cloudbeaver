@@ -26,6 +26,8 @@ type ObjectPropertyInfo {
     defaultValue: Object
     # Supported features (system, hidden, inherited, foreign, expensive, etc)
     features: [ String! ]!
+    # Order position
+    order: Int!
 }
 
 # Async types
