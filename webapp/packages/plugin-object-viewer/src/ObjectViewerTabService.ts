@@ -94,6 +94,7 @@ export class ObjectViewerTabService {
       tabInfo.openNewTab<IObjectViewerTabState>({
         handlerId: objectViewerTabHandlerKey,
         handlerState: {
+          connectionId: nodeInfo.connection?.id,
           objectId: nodeInfo.nodeId,
           parentId: nodeInfo.parentId,
           parents: await nodeInfo.getParents(),
@@ -182,14 +183,7 @@ export class ObjectViewerTabService {
   }
 
   private getConnection(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
-
-    if (!nodeInfo.connectionId) {
-      return;
-    }
-    // connection node id differs from connection id
-    return NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
+    return context.handlerState.connectionId;
   }
 
   private getDBObjectCatalog(context: ITab<IObjectViewerTabState>) {
@@ -214,11 +208,12 @@ export class ObjectViewerTabService {
 
   private async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
     try {
-      const connectionId = NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId);
-      const connection = await this.connectionInfo.load(connectionId);
+      if (tab.handlerState.connectionId) {
+        const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
 
-      if (!connection.connected) {
-        return;
+        if (!connection.connected) {
+          return;
+        }
       }
 
       for (const nodeId of tab.handlerState.parents) {
@@ -259,6 +254,7 @@ export class ObjectViewerTabService {
     if (
       typeof tab.handlerState?.folderId === 'string'
       && typeof tab.handlerState.parentId === 'string'
+      && ['string', 'undefined'].includes(typeof tab.handlerState.connectionId)
       && Array.isArray(tab.handlerState.parents)
       && typeof tab.handlerState.objectId === 'string'
       && typeof tab.handlerState.pagesState === 'object'
@@ -266,11 +262,12 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
-      const connectionId = NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId);
-      const connection = this.connectionInfo.get(connectionId);
+      if (tab.handlerState.connectionId) {
+        const connection = this.connectionInfo.get(tab.handlerState.connectionId);
 
-      if (!connection) {
-        return false;
+        if (!connection) {
+          return false;
+        }
       }
 
       return this.dbObjectPageService.restorePages(tab);
@@ -284,13 +281,6 @@ export class ObjectViewerTabService {
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const connectionId = NodeManagerUtils.nodeIdToConnectionId(data.nodeId);
-      const connection = await this.connectionInfo.load(connectionId);
-
-      if (!connection.connected) {
-        return;
-      }
-
       const { tab, nodeInfo } = await contexts.getContext(this.objectViewerTabContext);
 
       if (tab) {

@@ -46,7 +46,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   const {
     connectionInfo,
     connect,
-  } = useConnectionInfo(NodeManagerUtils.nodeIdToConnectionId(tab.handlerState.objectId));
+  } = useConnectionInfo(tab.handlerState.connectionId || '');
   const navigation = useService(NavigationTabsService);
   const style = useStyles(styles);
   const {
@@ -60,7 +60,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
     navigation.selectTab(tab.id);
   }, [navigation, connect, tab]);
 
-  if (!connectionInfo?.connected) {
+  if (connectionInfo && !connectionInfo.connected) {
     return (
       <TextPlaceholder>
         Connection required

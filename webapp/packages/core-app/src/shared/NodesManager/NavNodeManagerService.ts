@@ -70,6 +70,7 @@ export interface INavNodeId {
 
 export interface INodeNavigationContext {
   type: NavigationType;
+  connection: Connection | undefined;
   nodeId: string;
   parentId: string;
   folderId: string;
@@ -89,7 +90,6 @@ export interface INodeNavigationData {
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
-  private activeNavigationNodes: string[];
 
   constructor(
     private graphQLService: GraphQLService,
@@ -103,18 +103,15 @@ export class NavNodeManagerService extends Bootstrap {
     private appAuthService: AppAuthService
   ) {
     super();
-    this.activeNavigationNodes = [];
     this.navigator = new Executor(
       {
         type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
-      }
+      },
+      (active, current) => active.nodeId === current.nodeId
     )
-      .addHandler(this.navigateHandler.bind(this))
-      .addPostHandler(({ nodeId }) => {
-        this.activeNavigationNodes = this.activeNavigationNodes.filter(id => id !== nodeId);
-      });
+      .addHandler(this.navigateHandler.bind(this));
   }
 
   register(): void {
@@ -262,8 +259,17 @@ export class NavNodeManagerService extends Bootstrap {
     let folderId = '';
     let name: string | undefined;
     let icon: string | undefined;
+    let connection: Connection | undefined;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
+    const nodeInfo = this.getNodeContainerInfo(nodeId);
+
+    if (nodeInfo.connectionId) {
+      // connection node id differs from connection id
+      const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId);
+      connection = this.connectionInfo.get(connectionId);
+    }
+
+    if (NodeManagerUtils.isDatabaseObject(nodeId) && connection?.connected) {
       const node = await this.loadNode({ nodeId, parentId });
 
       name = node.name;
@@ -310,6 +316,7 @@ export class NavNodeManagerService extends Bootstrap {
 
     return {
       type: data.type,
+      connection,
       nodeId,
       parentId,
       folderId,
@@ -387,20 +394,12 @@ export class NavNodeManagerService extends Bootstrap {
     contexts: IExecutionContextProvider<INodeNavigationData>
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   ): Promise<void | false> {
-    if (this.activeNavigationNodes.includes(data.nodeId)) {
-      return false;
-    }
-
-    this.activeNavigationNodes.push(data.nodeId);
-
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
-    if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId)) {
+    if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
       let connection: Connection | undefined;
       try {
-        connection = await this.connectionAuthService.auth(
-          NodeManagerUtils.nodeIdToConnectionId(nodeInfo.nodeId)
-        );
+        connection = await this.connectionAuthService.auth(nodeInfo.connection.id);
       } catch (exception) {
         this.notificationService.logException(exception);
         throw exception;
