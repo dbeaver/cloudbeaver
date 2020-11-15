@@ -12,9 +12,9 @@ import {
 } from 'mobx';
 import { Subject } from 'rxjs';
 
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionService } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { IActiveView } from '@cloudbeaver/core-view';
 
@@ -34,29 +34,42 @@ const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 export class NavigationTabsService {
   @observable handlers = new Map<string, TabHandler>();
   @observable tabsMap = new Map<string, ITab>();
-  @observable state: TabsState = {
-    tabs: [],
-    history: [],
-    currentId: '',
-  };
+  @observable state = new Map<string, TabsState>();
 
   @computed get currentTabId(): string {
-    return this.state.currentId;
+    return this.userTabsState.currentId;
   }
 
   @computed get tabIdList(): string[] {
-    return this.state.tabs;
+    return Array.from(this.tabsMap.values())
+      .filter(tab => tab.restored && tab.userId === this.userInfoResource.getId())
+      .map(tab => tab.id);
+  }
+
+  get userTabsState(): TabsState {
+    const userId = this.userInfoResource.getId();
+
+    if (!this.state.has(userId)) {
+      this.state.set(userId, {
+        tabs: [],
+        history: [],
+        currentId: '',
+      });
+    }
+
+    return this.state.get(userId)!;
   }
 
   private tabSelectSubject = new Subject<ITab>();
-  private tabCloseSubject = new Subject<ITab>();
+  private tabCloseSubject = new Subject<ITab | undefined>();
   readonly onTabSelect = this.tabSelectSubject.asObservable();
   readonly onTabClose = this.tabCloseSubject.asObservable();
 
   constructor(
     private notificationService: NotificationService,
     private autoSaveService: LocalStorageSaveService,
-    private sessionService: SessionService
+    private userInfoResource: UserInfoResource,
+    appAuthService: AppAuthService
   ) {
     this.autoSaveService.withAutoSave(
       this.tabsMap,
@@ -67,6 +80,7 @@ export class NavigationTabsService {
           if (
             typeof value.id === 'string'
             && typeof value.handlerId === 'string'
+            && typeof value.userId === 'string'
           ) {
             value.restored = false;
             map[key] = value;
@@ -76,12 +90,36 @@ export class NavigationTabsService {
       }
     );
 
-    this.autoSaveService.withAutoSave(this.state, NAVIGATION_TABS_BASE_KEY);
+    this.autoSaveService.withAutoSave(
+      this.state,
+      NAVIGATION_TABS_BASE_KEY,
+      (json): IKeyValueMap<TabsState> => {
+        const map: IKeyValueMap<TabsState> = {};
+        for (const [key, value] of Object.entries(json as IKeyValueMap<TabsState>)) {
+          if (
+            typeof value.currentId === 'string'
+            && Array.isArray(value.history)
+            && Array.isArray(value.tabs)
+          ) {
+            map[key] = value;
+          }
+        }
+        return map;
+      }
+    );
+
+    appAuthService.auth
+      .addHandler(() => this.unloadTabs())
+      .addPostHandler(async state => {
+        if (state || appAuthService.authenticated) {
+          await this.restoreTabs();
+        }
+      });
   }
 
   @action openTab(tab: ITab, isSelected?: boolean): void {
     this.tabsMap.set(tab.id, tab);
-    this.state.tabs.push(tab.id);
+    this.userTabsState.tabs.push(tab.id);
 
     if (isSelected) {
       this.selectTab(tab.id);
@@ -90,17 +128,20 @@ export class NavigationTabsService {
 
   @action async selectTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     if (tabId === '') {
-      this.state.currentId = '';
+      this.userTabsState.currentId = '';
+    }
+    if (!this.userTabsState.tabs.includes(tabId)) {
+      return;
     }
     const tab = this.tabsMap.get(tabId);
     if (!tab) {
       return;
     }
 
-    if (this.state.currentId !== tabId) {
-      this.state.history = this.state.history.filter(id => id !== tabId);
-      this.state.history.unshift(tabId);
-      this.state.currentId = tabId;
+    if (this.userTabsState.currentId !== tabId) {
+      this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
+      this.userTabsState.history.unshift(tabId);
+      this.userTabsState.currentId = tabId;
     }
 
     if (!skipHandlers) {
@@ -111,18 +152,22 @@ export class NavigationTabsService {
   }
 
   @action async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {
+    if (!this.userTabsState.tabs.includes(tabId)) {
+      return;
+    }
+
     const tab = this.tabsMap.get(tabId);
     if (tab && !skipHandlers) {
       await this.callHandlerCallback(tab, handler => handler.onClose);
     }
 
     this.tabCloseSubject.next(tab);
-    this.state.history = this.state.history.filter(id => id !== tabId);
+    this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
     this.tabsMap.delete(tabId);
-    this.state.tabs = this.state.tabs.filter(id => id !== tabId);
+    this.userTabsState.tabs = this.userTabsState.tabs.filter(id => id !== tabId);
 
-    if (this.state.currentId === tabId) {
-      this.selectTab(this.state.history.shift() ?? '', skipHandlers);
+    if (this.userTabsState.currentId === tabId) {
+      this.selectTab(this.userTabsState.history.shift() ?? '', skipHandlers);
     }
   }
 
@@ -182,7 +227,7 @@ export class NavigationTabsService {
   findTab(predicate: (tab: ITab) => boolean): ITab | null;
   findTab(predicate: (tab: ITab) => boolean): ITab | null {
     for (const tab of this.tabsMap.values()) {
-      if (predicate(tab)) {
+      if (tab.restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         return tab;
       }
     }
@@ -193,23 +238,28 @@ export class NavigationTabsService {
   findTabs<S>(predicate: (tab: ITab) => tab is ITab<S>): Generator<ITab<S>>;
   * findTabs(predicate: (tab: ITab) => boolean): Generator<ITab> {
     for (const tab of this.tabsMap.values()) {
-      if (predicate(tab)) {
+      if (tab.restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         yield tab;
       }
     }
   }
 
-  // must be executed with low priority, because this call runs many requests to backend and blocks others
-  async restoreTabs(): Promise<void> {
-    const removedTabs: string[] = [];
-    const session = await this.sessionService.session.load();
-
-    for (const tabId of this.state.tabs) {
-      if (session?.cacheExpired) {
-        removedTabs.push(tabId);
-        continue;
+  @action private async unloadTabs() {
+    for (const tab of this.tabsMap.values()) {
+      if (tab.userId !== this.userInfoResource.getId()) {
+        if (tab.restored) {
+          await this.callHandlerCallback(tab, handler => handler.onClose);
+          tab.restored = false;
+        }
       }
+    }
+  }
 
+  // must be executed with low priority, because this call runs many requests to backend and blocks others
+  private async restoreTabs(): Promise<void> {
+    const removedTabs: string[] = [];
+
+    for (const tabId of this.userTabsState.tabs) {
       const tab = this.tabsMap.get(tabId);
       if (!tab) {
         removedTabs.push(tabId);
@@ -227,12 +277,12 @@ export class NavigationTabsService {
       this.closeTab(tabId, true);
     }
 
-    if (this.tabsMap.has(this.state.currentId)) {
-      this.selectTab(this.state.currentId);
+    if (this.tabsMap.has(this.userTabsState.currentId)) {
+      this.selectTab(this.userTabsState.currentId);
     }
   }
 
-  navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this);
+  navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
     const handler = this.handlers.get(tab.handlerId);

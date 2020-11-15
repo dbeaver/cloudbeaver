@@ -8,6 +8,7 @@
 
 import { computed, observable } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import {
   ConnectionInfoResource,
   ConnectionsManagerService,
@@ -94,7 +95,10 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionsManagerService.connectionObjectContainers.data.get(this.currentConnectionId);
+    return this.connectionsManagerService.connectionObjectContainers.get({
+      connectionId: this.currentConnectionId,
+      catalogId: this.currentObjectCatalogId,
+    });
   }
 
   get isConnectionChangeable(): boolean {
@@ -120,7 +124,8 @@ export class ConnectionSchemaManagerService {
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private appAuthService: AppAuthService
   ) {
   }
 
@@ -130,6 +135,8 @@ export class ConnectionSchemaManagerService {
 
     this.navigationTabsService.onTabClose
       .subscribe(this.onTabClose.bind(this));
+
+    this.appAuthService.auth.addHandler(() => this.reset());
   }
 
   /**
@@ -162,6 +169,11 @@ export class ConnectionSchemaManagerService {
       throw new Error('The try to change schema without connection');
     }
     await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
+  }
+
+  private reset() {
+    this.activeItem = null;
+    this.activeItemHistory = [];
   }
 
   private async updateContainer(connectionId?: string, catalogId?: string): Promise<void> {
@@ -213,7 +225,10 @@ export class ConnectionSchemaManagerService {
     this.setActiveItem(item);
   }
 
-  private onTabClose(tab: ITab) {
+  private onTabClose(tab: ITab | undefined) {
+    if (!tab) {
+      return;
+    }
     this.removeActiveItem(tab.id);
   }
 

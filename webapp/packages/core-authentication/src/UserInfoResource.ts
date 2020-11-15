@@ -26,7 +26,11 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
     super(null);
     this.loaded = false;
     this.sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.sessionResource.onDataUpdate.addHandler(() => { this.load(); });
+    this.sessionResource.onDataUpdate.addHandler(async () => { await this.load(); });
+  }
+
+  getId(): string {
+    return this.data?.userId || 'anonymous';
   }
 
   isLoaded(): boolean {
@@ -59,6 +63,7 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
   }
 
   protected async loader(): Promise<UserAuthInfo | null> {
+    await this.sessionResource.load();
     const { user } = await this.graphQLService.sdk.getSessionUser();
     this.loaded = true;
 

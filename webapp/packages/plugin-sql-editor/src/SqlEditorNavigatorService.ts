@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
+import { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlExecutionState } from './SqlExecutionState';
 
@@ -86,10 +87,10 @@ export class SqlEditorNavigatorService {
 
   private async handleConnectionClose(connectionId: string) {
     try {
-      for (const tab of this.navigationTabsService.findTabs(
-        isSQLEditorTab(tab => tab.handlerState.connectionId.includes(connectionId))
+      for (const tab of this.navigationTabsService.findTabs<ISqlEditorTabState>(
+        isSQLEditorTab(tab => !!tab.handlerState.connectionId?.includes(connectionId))
       )) {
-        await this.navigationTabsService.closeTab(tab.id);
+        tab.handlerState.contextId = undefined;
       }
       return;
     } catch (exception) {
@@ -110,17 +111,12 @@ export class SqlEditorNavigatorService {
           data.catalogId,
           data.schemaId
         );
-        const connectionInfo = this.connectionInfoResource.get(data.connectionId || '');
 
         if (tabOptions) {
           const tab = tabInfo.openNewTab(tabOptions);
 
           // FIXME: should be in SqlEditorTabService
           this.sqlEditorTabService.tabExecutionState.set(tab.id, new SqlExecutionState());
-        } else {
-          this.notificationService.logError({
-            title: `Failed to create editor for ${connectionInfo?.name || data.connectionId} connection`,
-          });
         }
         return;
       }
@@ -131,30 +127,9 @@ export class SqlEditorNavigatorService {
       }
 
       if (data.type === SQLEditorNavigationAction.select) {
-        tab.handlerState.currentResultTabId = data.resultId;
+        this.sqlEditorTabService.selectResultTab(tab, data.resultId);
       } else if (data.type === SQLEditorNavigationAction.close) {
-        const resultTabGroupId = tab.handlerState.resultTabs
-          .find(resultTab => resultTab.resultTabId === data.resultId)?.groupId;
-
-        tab.handlerState.resultTabs.splice(
-          tab.handlerState.resultTabs.findIndex(result => result.resultTabId === data.resultId),
-          1
-        );
-
-        const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
-
-        if (isGroupEmpty) {
-          tab.handlerState.queryTabGroups.splice(
-            tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId), 1);
-        }
-
-        if (tab.handlerState.currentResultTabId === data.resultId) {
-          if (tab.handlerState.resultTabs.length > 0) {
-            tab.handlerState.currentResultTabId = tab.handlerState.resultTabs[0].resultTabId;
-          } else {
-            tab.handlerState.currentResultTabId = '';
-          }
-        }
+        await this.sqlEditorTabService.closeResultTab(tab, data.resultId);
       }
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception) {

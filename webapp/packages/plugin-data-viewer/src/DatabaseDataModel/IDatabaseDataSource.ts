@@ -49,4 +49,5 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
     data: DataUpdate
   ) => Promise<TResult[]> | TResult[];
   cancel: () => Promise<boolean>;
+  dispose: () => Promise<void>;
 }

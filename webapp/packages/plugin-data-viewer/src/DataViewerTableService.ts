@@ -28,7 +28,20 @@ export class DataViewerTableService {
     return this.tableViewerStorageService.has(tableId);
   }
 
-  removeTableModel(tableId: string): void {
+  async removeTableModel(tableId: string): Promise<void> {
+    const model = this.tableViewerStorageService.get(tableId);
+    if (model) {
+      await model.dispose();
+
+      if (model.deprecatedModel.executionContext) {
+        try {
+          await this.graphQLService.sdk.sqlContextDestroy({
+            connectionId: model.deprecatedModel.executionContext.connectionId,
+            contextId: model.deprecatedModel.executionContext.contextId,
+          });
+        } catch {}
+      }
+    }
     this.tableViewerStorageService.remove(tableId);
   }
 

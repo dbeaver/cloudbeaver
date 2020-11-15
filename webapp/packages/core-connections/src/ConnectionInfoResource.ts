@@ -8,6 +8,7 @@
 
 import { action } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
@@ -27,6 +28,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
+    appAuthService: AppAuthService,
     sessionResource: SessionResource
   ) {
     super(new Map());
@@ -38,7 +40,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // it's prevents double nav tree refresh
     this.onItemAdd.addHandler(() => !this.sessionUpdate);
     this.onItemDelete.addHandler(() => !this.sessionUpdate);
-    sessionResource.onDataUpdate.addHandler(() => this.refreshSession(true));
+    sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
+    appAuthService.auth.addHandler(() => this.refreshSession(true));
   }
 
   @action async refreshSession(sessionUpdate?: boolean): Promise<void> {

@@ -38,6 +38,7 @@ import {
   SessionExpiredDialogService
 } from '@cloudbeaver/core-app';
 import {
+  AppAuthService,
   AuthInfoService,
   AuthProviderService,
   AuthProvidersResource,
@@ -80,7 +81,8 @@ import {
   ServerSettingsService,
   ServerConfigResource,
   PermissionsResource,
-  SessionResource, SessionExpireService
+  SessionResource,
+  SessionExpireService
 } from '@cloudbeaver/core-root';
 import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -108,6 +110,7 @@ export const coreManifest: PluginManifest = {
     ProductSettingsService,
     ProductManagerService,
     PluginManagerService,
+    AppAuthService,
     AuthInfoService,
     AuthProviderService,
     AuthProvidersResource,

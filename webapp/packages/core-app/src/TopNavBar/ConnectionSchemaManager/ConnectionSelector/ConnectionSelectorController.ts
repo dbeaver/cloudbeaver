@@ -48,7 +48,9 @@ export class ConnectionSelectorController {
   }
 
   get isObjectContainerSelectorVisible() {
-    return this.getObjectContainerItems().length !== 0 && !this.objectContainerSelectionDisabled;
+    return this.currentConnection?.connected
+      && this.getObjectContainerItems().length !== 0
+      && !this.objectContainerSelectionDisabled;
   }
 
   @computed get objectContainerSelectionDisabled(): boolean {

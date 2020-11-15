@@ -18,11 +18,14 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { ISqlEditorTabState } from './ISqlEditorTabState';
 
 export const SqlEditorTab = observer(function SqlEditorTab({
-  tab, handler, onSelect, onClose, style,
+  tab, onSelect, onClose, style,
 }: TabHandlerTabProps<ISqlEditorTabState>) {
   const connectionInfo = useService(ConnectionInfoResource);
-  const connection = connectionInfo.get(tab.handlerState.connectionId);
-  const name = `sql-${tab.handlerState.order}${connection ? ` (${connection.name})` : ''}`;
+  let name = `sql-${tab.handlerState.order}`;
+  if (tab.handlerState.connectionId) {
+    const connection = connectionInfo.get(tab.handlerState.connectionId);
+    name = `sql-${tab.handlerState.order}${connection ? ` (${connection.name})` : ''}`;
+  }
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;

@@ -19,36 +19,30 @@ import {
   ITabOptions
 } from '@cloudbeaver/core-app';
 import {
-  ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
-  ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 import { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDialectInfoService } from './SqlDialectInfoService';
 import { SqlEditorPanel } from './SqlEditorPanel';
+import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
 import { SqlExecutionState } from './SqlExecutionState';
 
 @injectable()
-export class SqlEditorTabService {
+export class SqlEditorTabService extends Bootstrap {
   @observable readonly tabExecutionState: Map<string, SqlExecutionState>;
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
   constructor(
     private navigationTabsService: NavigationTabsService,
-    private connectionInfoResource: ConnectionInfoResource,
     private notificationService: NotificationService,
-    private gql: GraphQLService,
-    private sqlDialectInfoService: SqlDialectInfoService,
-    private connectionsManagerService: ConnectionsManagerService
+    private sqlEditorService: SqlEditorService,
   ) {
+    super();
     this.tabExecutionState = new Map();
 
     this.tabHandler = this.navigationTabsService
@@ -69,20 +63,21 @@ export class SqlEditorTabService {
     });
   }
 
+  register(): void {}
+  load(): void {}
+
   async createNewEditor(
     connectionId?: string,
     catalogId?: string,
     schemaId?: string
   ): Promise<ITabOptions<ISqlEditorTabState> | null> {
-    const order = this.getFreeEditorId();
-    const connection = await this.connectionsManagerService.requireConnection(connectionId);
-    if (!connection) {
+    const context = await this.sqlEditorService.initContext(connectionId, catalogId, schemaId);
+
+    if (!context) {
       return null;
     }
 
-    await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
-
-    const context = await this.createSqlContext(connection.id, catalogId, schemaId);
+    const order = this.getFreeEditorId();
 
     return {
       handlerId: sqlEditorTabHandlerKey,
@@ -90,13 +85,46 @@ export class SqlEditorTabService {
         query: '',
         order,
         contextId: context.contextId,
-        connectionId: connection.id,
+        connectionId: context.connectionId,
         objectCatalogId: context.objectCatalogId,
         objectSchemaId: context.objectSchemaId,
         queryTabGroups: [],
         resultTabs: [],
       },
     };
+  }
+
+  selectResultTab(tab: ITab<ISqlEditorTabState>, resultId: string): void {
+    tab.handlerState.currentResultTabId = resultId;
+  }
+
+  async closeResultTab(tab: ITab<ISqlEditorTabState>, resultId: string): Promise<void> {
+    const resultTabGroupId = tab.handlerState.resultTabs
+      .find(resultTab => resultTab.resultTabId === resultId)?.groupId;
+
+    tab.handlerState.resultTabs.splice(
+      tab.handlerState.resultTabs.findIndex(result => result.resultTabId === resultId),
+      1
+    );
+
+    const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
+
+    if (isGroupEmpty) {
+      const group = tab.handlerState.queryTabGroups.splice(
+        tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId),
+        1
+      )[0];
+
+      await this.sqlEditorService.destroySqlContext(group.sqlQueryParams.connectionId, group.sqlQueryParams.contextId);
+    }
+
+    if (tab.handlerState.currentResultTabId === resultId) {
+      if (tab.handlerState.resultTabs.length > 0) {
+        tab.handlerState.currentResultTabId = tab.handlerState.resultTabs[0].resultTabId;
+      } else {
+        tab.handlerState.currentResultTabId = '';
+      }
+    }
   }
 
   private getFreeEditorId() {
@@ -107,19 +135,14 @@ export class SqlEditorTabService {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
     if (typeof tab.handlerState.query !== 'string'
-        || typeof tab.handlerState.connectionId !== 'string'
-        || typeof tab.handlerState.contextId !== 'string'
-        || typeof tab.handlerState.objectCatalogId !== 'string'
         || typeof tab.handlerState.order !== 'number'
+        || !['string', 'undefined'].includes(typeof tab.handlerState.connectionId)
+        || !['string', 'undefined'].includes(typeof tab.handlerState.contextId)
+        || !['string', 'undefined'].includes(typeof tab.handlerState.objectCatalogId)
         || !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId)
         || !Array.isArray(tab.handlerState.queryTabGroups)
         || !Array.isArray(tab.handlerState.resultTabs)
     ) {
-      return false;
-    }
-
-    // // the connection for this editor was closed
-    if (!this.connectionInfoResource.get(tab.handlerState.connectionId)) {
       return false;
     }
 
@@ -128,9 +151,6 @@ export class SqlEditorTabService {
     tab.handlerState.resultTabs = []; // clean old results
 
     this.tabExecutionState.set(tab.id, new SqlExecutionState());
-
-    // todo seems to be changed
-    await this.sqlDialectInfoService.loadSqlDialectInfo(tab.handlerState.connectionId);
 
     return true;
   }
@@ -149,21 +169,19 @@ export class SqlEditorTabService {
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
     try {
-      const connection = await this.connectionsManagerService.requireConnection(connectionId);
+      const context = await this.sqlEditorService.initContext(connectionId);
 
-      if (!connection) {
+      if (!context) {
         return false;
       }
-      // try to create new context first
-      const context = await this.createSqlContext(connectionId);
+
       // when new context created - destroy old one silently
-      await this.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
+      await this.sqlEditorService.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
 
       tab.handlerState.connectionId = context.connectionId;
       tab.handlerState.contextId = context.contextId;
       tab.handlerState.objectCatalogId = context.objectCatalogId;
       tab.handlerState.objectSchemaId = context.objectSchemaId;
-      await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
       return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
@@ -172,8 +190,11 @@ export class SqlEditorTabService {
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {
+    if (!tab.handlerState.connectionId) {
+      return false;
+    }
     try {
-      await this.updateSqlContext(
+      await this.sqlEditorService.updateSqlContext(
         tab.handlerState.connectionId,
         tab.handlerState.contextId,
         containerId
@@ -187,8 +208,11 @@ export class SqlEditorTabService {
   }
 
   private async setObjectSchemaId(containerId: string, tab: ITab<ISqlEditorTabState>) {
+    if (!tab.handlerState.connectionId) {
+      return false;
+    }
     try {
-      await this.updateSqlContext(
+      await this.sqlEditorService.updateSqlContext(
         tab.handlerState.connectionId,
         tab.handlerState.contextId,
         tab.handlerState.objectCatalogId,
@@ -204,61 +228,10 @@ export class SqlEditorTabService {
 
   private async handleTabClose(tab: ITab<ISqlEditorTabState>) {
     this.tabExecutionState.delete(tab.id);
-    await this.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
-  }
-
-  private async destroySqlContext(connectionId: string, contextId: string) {
-    const connection = this.connectionInfoResource.get(connectionId);
-    if (!connection) {
-      // connection was closed before, nothing to destroy
-      return;
+    await this.sqlEditorService.destroySqlContext(tab.handlerState.connectionId, tab.handlerState.contextId);
+    for (const resultTab of tab.handlerState.resultTabs) {
+      await this.closeResultTab(tab, resultTab.resultTabId);
     }
-    try {
-      await this.gql.sdk.sqlContextDestroy({ connectionId, contextId });
-    } catch (exception) {
-      this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`, '', true);
-    }
-  }
-
-  /**
-   * Returns context id, context catalog and schema
-   * When try create context without catalog or schema the context is created with default catalog and schema
-   * and response contains its ids.
-   * If in the response there are no catalog or schema it means that database has no catalogs or schemas at all.
-   */
-  private async createSqlContext(
-    connectionId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IExecutionContext> {
-    const response = await this.gql.sdk.sqlContextCreate({
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    });
-    return {
-      contextId: response.context.id,
-      connectionId,
-      objectCatalogId: response.context.defaultCatalog,
-      objectSchemaId: response.context.defaultSchema,
-    };
-  }
-
-  /**
-   * Update catalog and schema for the exiting sql context in the certain connection
-   */
-  private async updateSqlContext(
-    connectionId: string,
-    contextId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ) {
-    await this.gql.sdk.sqlContextSetDefaults({
-      connectionId,
-      contextId,
-      defaultCatalog,
-      defaultSchema,
-    });
   }
 }
 

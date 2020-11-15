@@ -18,8 +18,8 @@ import { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
+import { SqlEditorService } from '../SqlEditorService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
-import { SqlEditorService } from './SqlEditorService';
 
 // allows to bypass rollup-commonjs error " 'showHint' is not exported by codemirror.js "
 const showHint = CodeMirror.showHint;
@@ -27,6 +27,10 @@ const showHint = CodeMirror.showHint;
 @injectable()
 export class SqlEditorController implements IInitializableController {
   @computed get dialect(): SqlDialectInfo | undefined {
+    if (!this.tab.handlerState.connectionId) {
+      return undefined;
+    }
+
     return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.connectionId);
   }
 
@@ -125,6 +129,14 @@ export class SqlEditorController implements IInitializableController {
 
   private getHandleAutocomplete(): AsyncHintFunction {
     const handleAutocomplete: AsyncHintFunction = (editor, callback) => {
+      if (!this.tab.handlerState.connectionId) {
+        console.error('getHandleAutocomplete connectionId is not provided');
+        return;
+      }
+      if (!this.tab.handlerState.contextId) {
+        console.error('getHandleAutocomplete contextId is not provided');
+        return;
+      }
       const cursor = editor.getCursor('from');
       const cursorPosition = getAbsolutePosition(editor, cursor);
       const [from, to] = getWordRange(editor, cursor);

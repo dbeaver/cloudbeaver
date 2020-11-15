@@ -118,4 +118,6 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[], data: DataUpdate): Promise<TResult[]> | TResult[];
+
+  abstract dispose(): Promise<void>;
 }

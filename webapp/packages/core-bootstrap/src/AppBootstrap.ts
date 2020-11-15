@@ -52,6 +52,6 @@ export class AppBootstrap {
 
   async doAfterPluginsInit() {
     // todo this should be moved to the NavigationTabs component creation phase but now it leads to bugs
-    await this.navigationTabsService.restoreTabs();
+    // await this.navigationTabsService.restoreTabs();
   }
 }

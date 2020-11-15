@@ -10,10 +10,10 @@ import { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
-import { SqlEditorService } from './SqlEditor/SqlEditorService';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap';
 import { SqlEditorGroupMetadataService } from './SqlEditorGroupMetadataService';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
+import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTabService } from './SqlEditorTabService';
 import { SqlResultService } from './SqlResultTabs/SqlResultService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';

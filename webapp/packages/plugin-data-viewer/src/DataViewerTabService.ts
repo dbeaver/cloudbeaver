@@ -105,18 +105,10 @@ export class DataViewerTabService {
   }
 
   private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
-    // if (!this.nodesManagerService.isNodeHasData(tab.handlerState.objectId)) {
-    //   return;
-    // }
-    await this.navNodeManagerService.loadNode({
-      nodeId: tab.handlerState.objectId,
-      parentId: tab.handlerState.parentId,
-    });
-    // await this.dbObjectService.load(tab.handlerState.objectId);
     return true;
   }
 
   private handleTabClose(tab: ITab<IObjectViewerTabState>) {
-    this.dataViewerTableService.removeTableModel(tab.handlerState.objectId);
+    this.dataViewerTableService.removeTableModel(tab.id);
   }
 }
