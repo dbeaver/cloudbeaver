@@ -72,7 +72,7 @@ export class SqlEditorBootstrap {
         .on(isObjectCatalogProvider, extension => { catalogId = extension(activeView.context); })
         .on(isObjectSchemaProvider, extension => { schemaId = extension(activeView.context); });
     } else {
-      connectionId = this.connectionSchemaManagerService.currentConnectionId;
+      connectionId = this.connectionSchemaManagerService.currentConnectionId || undefined;
       catalogId = this.connectionSchemaManagerService.currentObjectCatalogId;
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
     }
