@@ -205,7 +205,9 @@ export class ConnectionSchemaManagerService {
       } catch (exception) {
         this.notificationService.logException(
           exception,
-          `Can't load objectContainers for ${connectionId}@${catalogId}`
+          `Can't load objectContainers for ${connectionId}@${catalogId}`,
+          '',
+          true
         );
       }
     }
