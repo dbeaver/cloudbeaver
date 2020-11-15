@@ -15,7 +15,6 @@ import { Subject } from 'rxjs';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionService } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { IActiveView } from '@cloudbeaver/core-view';
 
@@ -69,7 +68,6 @@ export class NavigationTabsService {
   constructor(
     private notificationService: NotificationService,
     private autoSaveService: LocalStorageSaveService,
-    private sessionService: SessionService,
     private userInfoResource: UserInfoResource,
     appAuthService: AppAuthService
   ) {
@@ -260,16 +258,8 @@ export class NavigationTabsService {
   // must be executed with low priority, because this call runs many requests to backend and blocks others
   private async restoreTabs(): Promise<void> {
     const removedTabs: string[] = [];
-    const session = await this.sessionService.session.load();
-    // TODO: will be removed, tabs will restored after user identification
-    await this.userInfoResource.load();
 
     for (const tabId of this.userTabsState.tabs) {
-      if (session?.cacheExpired) {
-        removedTabs.push(tabId);
-        continue;
-      }
-
       const tab = this.tabsMap.get(tabId);
       if (!tab) {
         removedTabs.push(tabId);
