@@ -77,9 +77,9 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.appAuthService.auth.addPostHandler(async state => {
+    this.appAuthService.auth.addPostHandler(state => {
       if (!state) {
-        await this.requireAuthentication();
+        this.requireAuthentication();
       }
     });
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
