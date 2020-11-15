@@ -46,10 +46,10 @@ type DatabaseObjectInfo {
     state: String
 
     # Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog
-    features: [ String ]
+    features: [ String! ]
 
     # Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition
-    editors: [ String ]
+    editors: [ String! ]
 }
 
 type NavigatorNodeInfo {
@@ -70,11 +70,11 @@ type NavigatorNodeInfo {
     object: DatabaseObjectInfo
 
     # Supported features: item, container, leaf
-    features: [ String ]
+    features: [ String! ]
 
     # Object detailed info.
     # If is different than properties. It doesn't perform any expensive operation and doesn't require authentication.
-    nodeDetails: [ ObjectPropertyInfo ]
+    nodeDetails: [ ObjectPropertyInfo! ]
 
     folder: Boolean
     inline: Boolean
