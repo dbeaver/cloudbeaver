@@ -94,8 +94,17 @@ export const TREE_NODE_STYLES = composes(
     }
 
     node TreeNodeControl[big] {
-      height: 44px;
+      height: 46px;
+      padding: 0;
 
+      & TreeNodeSelect {
+        margin: 3px;
+      }
+      & TreeNodeName {
+        margin: 0;
+        padding-right: 16px;
+        padding-left: 16px;
+      }
       & TreeNodeIcon,
       & TreeNodeExpand {
         width: 24px;
@@ -111,13 +120,13 @@ export const TREE_NODE_STYLES = composes(
       }
 
       & > * {
-        margin-right: 10px;
-        margin-left: 10px;
+        margin-right: 11px;
+        margin-left: 11px;
       }
     }
 
     node TreeNodeControl[big] + TreeNodeNested {
-      padding-left: 36px;
+      padding-left: 46px;
     }
   `
 );

@@ -59,7 +59,6 @@ export const Connection = observer(function Connection({ connection }: Props) {
       <TableColumnValue expand>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
       <TableColumnValue><Checkbox checked={connection.template} disabled /></TableColumnValue>
-      <TableColumnValue />
     </TableItem>
   );
 });

@@ -59,7 +59,6 @@ export const ConnectionsTable = observer(function ConnectionsTable({
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_template')}</TableColumnHeader>
-        <TableColumnHeader />
       </TableHeader>
       <TableBody>
         {connections.map(connection => <Connection key={connection.id} connection={connection} />)}
