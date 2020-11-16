@@ -22,8 +22,7 @@ const SNACKBAR_FOOTER_STYLES = css`
     display: none;
   }
   actions > *:not(:first-child) {
-      margin-left: 16px;
-    }
+    margin-left: 16px;
   }
 `;
 
