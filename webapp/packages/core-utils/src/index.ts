@@ -3,6 +3,7 @@ export * from './MetadataMap';
 export * from './OrderedMap';
 export * from './parseJSONFlat';
 export * from './uuid_';
+export * from './generateFileName';
 
 export * from './Promises/CancellablePromise';
 export * from './Promises/Deferred';
