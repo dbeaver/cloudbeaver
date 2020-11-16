@@ -66,7 +66,7 @@ export class ExportNotificationController implements IInitializableController {
       case EDeferredState.CANCELLING:
         return { title: 'ui_processing_canceling', status: ENotificationType.Loading };
       case EDeferredState.RESOLVED:
-        return { title: 'data_transfer_notification_ready', status: ENotificationType.Success };
+        return { title: 'data_transfer_notification_ready', status: ENotificationType.Info };
       default:
         return { title: 'data_transfer_notification_error', status: ENotificationType.Error };
     }
