@@ -187,10 +187,11 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    try {
-      await this.connectionInfo.load(connectionId);
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load connection info', '', true);
+    const connection = this.connectionInfo.get(connectionId);
+
+    if (!connection) {
+      console.warn(`Connection Schema Manager: connection (${connectionId}) not exists`);
+      return;
     }
 
     try {

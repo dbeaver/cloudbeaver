@@ -44,7 +44,9 @@ export class ConnectionSelectorController {
   }
 
   get isConnectionSelectorVisible() {
-    return this.connectionSelectorService.currentConnectionId !== null;
+    return this.connectionSelectorService.currentConnectionId !== null
+     || (this.connectionSelectorService.currentConnectionId === null
+        && this.connectionSelectorService.isConnectionChangeable);
   }
 
   get isObjectContainerSelectorVisible() {
