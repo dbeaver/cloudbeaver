@@ -8,6 +8,7 @@ export default [
   ['connections_administration_configuration_wizard_step_description', 'Database connections'],
   ['connections_administration_configuration_wizard_message', 'Here you can create database connections manually or using a database server search.\nYou can skip this step and configure the connections later.'],
   ['connections_administration_connection_no_information', 'No information available'],
+  ['connections_connection_connect', 'Connect'],
   ['connections_connection_create_custom', 'Custom'],
   ['connections_connection_create_search_database', 'Search'],
   ['connections_connection_edit_save_credentials', 'Save credentials'],

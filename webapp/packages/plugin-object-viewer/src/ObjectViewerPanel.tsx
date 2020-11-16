@@ -10,12 +10,13 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useChildren, TabHandlerPanelProps, NodeManagerUtils, NavigationTabsService } from '@cloudbeaver/core-app';
+import { useChildren, TabHandlerPanelProps, NavigationTabsService } from '@cloudbeaver/core-app';
 import {
   Loader, TabsBox, TabPanel, TextPlaceholder, Button
 } from '@cloudbeaver/core-blocks';
 import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -43,6 +44,7 @@ const stylesArray = [styles];
 export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
+  const translate = useTranslate();
   const {
     connectionInfo,
     connect,
@@ -63,9 +65,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   if (connectionInfo && !connectionInfo.connected) {
     return (
       <TextPlaceholder>
-        Connection required
-        <br />
-        <Button type="button" mod={['unelevated']} onClick={handleConnect}>Connect</Button>
+        <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
       </TextPlaceholder>
     );
   }
@@ -75,7 +75,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   }
 
   if (!children) {
-    return <TextPlaceholder>Nothing to show</TextPlaceholder>;
+    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
   return styled(style)(

@@ -7,7 +7,6 @@ export default [
   ['basicConnection_connectionDialog_password', 'Database User Password:'],
   ['basicConnection_connectionDialog_passwordPlaceholder', 'password'],
   ['basicConnection_connectionDialog_connecting', 'Connecting...'],
-  ['basicConnection_connectionDialog_connect', 'Connect'],
   ['basicConnection_connectionDialog_connecting_message', 'Connecting to database...'],
   ['basicConnection_main_menu_item', 'From Template'],
 ];

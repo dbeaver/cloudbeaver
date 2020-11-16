@@ -62,7 +62,7 @@ export const ConnectionDialogFooter = observer(
         >
           {isConnecting
             ? translate('basicConnection_connectionDialog_connecting')
-            : translate('basicConnection_connectionDialog_connect')}
+            : translate('connections_connection_connect')}
         </Button>
       </controls>
     );
