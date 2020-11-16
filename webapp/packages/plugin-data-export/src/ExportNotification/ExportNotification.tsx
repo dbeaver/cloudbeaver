@@ -42,19 +42,13 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
 }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
-  const getExportNotificationType = () => {
-    if (controller.isPending) {
-      return ENotificationType.Loading;
-    } else {
-      return controller.isSuccess ? ENotificationType.Info : ENotificationType.Error;
-    }
-  };
+  const { title, status } = controller.status;
 
   return styled(useStyles(styles))(
     <SnackbarWrapper unclosable={controller.isPending} onClose={controller.delete}>
-      <SnackbarStatus status={getExportNotificationType()} />
+      <SnackbarStatus status={status} />
       <SnackbarContent>
-        <SnackbarBody title={translate(controller.status)}>
+        <SnackbarBody title={translate(title)}>
           {controller.sourceName}
           {controller.task?.context.sourceName && (
             <pre title={controller.task?.context.sourceName}>
@@ -63,7 +57,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
           )}
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          {getExportNotificationType() === ENotificationType.Info && (
+          {status === ENotificationType.Info && (
             <>
               <Button
                 type="button"
@@ -83,7 +77,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
               </Button>
             </>
           )}
-          {getExportNotificationType() === ENotificationType.Error && (
+          {status === ENotificationType.Error && (
             <Button
               type="button"
               mod={['outlined']}
@@ -93,7 +87,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
               {translate('ui_errors_details')}
             </Button>
           )}
-          {getExportNotificationType() === ENotificationType.Loading && (
+          {status === ENotificationType.Loading && (
             <Button
               type="button"
               mod={['outlined']}

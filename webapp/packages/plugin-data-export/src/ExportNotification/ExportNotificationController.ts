@@ -11,13 +11,17 @@ import { observable, computed } from 'mobx';
 import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { INotification } from '@cloudbeaver/core-events';
+import { ENotificationType, INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DataExportProcessService, ExportProcess } from '../DataExportProcessService';
 
+interface ExportNotificationStatus {
+  title: string;
+  status: ENotificationType;
+}
 @injectable()
 export class ExportNotificationController implements IInitializableController {
   @observable isDetailsDialogOpen = false;
@@ -55,16 +59,16 @@ export class ExportNotificationController implements IInitializableController {
     return this.localization.translate('data_transfer_exporting_sql');
   }
 
-  get status(): string {
+  get status(): ExportNotificationStatus {
     switch (this.process?.getState()) {
       case EDeferredState.PENDING:
-        return 'data_transfer_notification_preparation';
+        return { title: 'data_transfer_notification_preparation', status: ENotificationType.Loading };
       case EDeferredState.CANCELLING:
-        return 'ui_processing_canceling';
+        return { title: 'ui_processing_canceling', status: ENotificationType.Loading };
       case EDeferredState.RESOLVED:
-        return 'data_transfer_notification_ready';
+        return { title: 'data_transfer_notification_ready', status: ENotificationType.Success };
       default:
-        return 'data_transfer_notification_error';
+        return { title: 'data_transfer_notification_error', status: ENotificationType.Error };
     }
   }
 
