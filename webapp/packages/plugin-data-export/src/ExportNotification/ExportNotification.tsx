@@ -45,7 +45,7 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
   const { title, status } = controller.status;
 
   return styled(useStyles(styles))(
-    <SnackbarWrapper unclosable={controller.isPending} onClose={controller.delete}>
+    <SnackbarWrapper unclosable={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
