@@ -48,6 +48,7 @@ export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './useClipboard';
 export * from './useFocus';
+export * from './useErrorDetails';
 export * from './useAppLoadingScreen';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';

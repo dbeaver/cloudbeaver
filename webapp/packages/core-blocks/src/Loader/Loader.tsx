@@ -20,6 +20,7 @@ interface Props {
   loading?: boolean;
   /** disable cancel button */
   cancelDisabled?: boolean;
+  message?: string;
   /** hides message */
   hideMessage?: boolean;
   /** render loader as overlay with white spinner */
@@ -41,6 +42,7 @@ const spinnerType = {
 export const Loader: React.FC<Props> = function Loader({
   cancelDisabled,
   overlay,
+  message,
   hideMessage,
   secondary,
   small,
@@ -72,7 +74,7 @@ export const Loader: React.FC<Props> = function Loader({
   return styled(style)(
     <loader as="div" className={className} {...use({ small, fullSize })}>
       <icon as="div"><img src={spinnerURL} /></icon>
-      {!hideMessage && <message as="div"><Translate token='ui_processing_loading' /></message>}
+      {!hideMessage && <message as="div"><Translate token={message || 'ui_processing_loading'} /></message>}
       {onCancel && (
         <actions as='div'>
           <Button
