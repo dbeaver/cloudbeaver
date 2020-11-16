@@ -69,32 +69,3 @@ declare module 'reshadow' {
 
   export default styled
 }
-
-declare module 'save-svg-as-png' {
-  export type SourceElement = HTMLElement | SVGElement | Element;
-
-  export type BackgroundStyle = string | CanvasGradient | CanvasPattern;
-
-  export type SelectorRemap = (text: string) => string;
-
-  export interface SaveSVGOptions {
-    scale?: number;
-    responsive?: boolean;
-    width?: number;
-    height?: number;
-    left?: number;
-    top?: number;
-    selectorRemap?: SelectorRemap;
-    backgroundColor?: BackgroundStyle;
-  }
-
-  export type UriCallback = (uri: string) => void;
-
-  export function svgAsDataUri(el: SourceElement, options: SaveSVGOptions, cb: UriCallback): void;
-
-  export function svgAsPngUri(el: SourceElement, options: SaveSVGOptions, cb: UriCallback): void;
-
-  export function saveSvg(el: SourceElement, fileName: string, options?: SaveSVGOptions): Promise<void>;
-
-  export function saveSvgAsPng(el: SourceElement, fileName: string, options?: SaveSVGOptions): Promise<void>;
-}
