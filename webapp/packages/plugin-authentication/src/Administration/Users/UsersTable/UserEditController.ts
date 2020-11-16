@@ -51,14 +51,14 @@ implements IInitializableController, IDestructibleController {
     try {
       // we create a copy to protect the current value from mutation
       await this.usersResource.load(this.userId);
-      this.updateUser('');
+      this.updateUser(this.userId);
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load user ${this.userId}`);
     }
   }
 
   private async updateUser(key: ResourceKey<string>) {
-    if (ResourceKeyUtils.includes(key, this.userId)) {
+    if (!ResourceKeyUtils.includes(key, this.userId)) {
       return;
     }
     this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId)));
