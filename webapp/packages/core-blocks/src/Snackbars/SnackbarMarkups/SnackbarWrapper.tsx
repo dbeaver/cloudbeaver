@@ -56,14 +56,14 @@ const SNACKBAR_WRAPPER_STYLES = composes(
 );
 
 interface ISnackbarWrapperProps {
-  closing: boolean;
-  closeable: boolean;
+  closing?: boolean;
+  unclosable?: boolean;
   onClose?: () => void;
   className?: string;
 }
 
 export const SnackbarWrapper: React.FC<ISnackbarWrapperProps> = function SnackbarWrapper({
-  closing, closeable, onClose, children, className,
+  closing = false, unclosable, onClose, children, className,
 }) {
   const styles = useStyles(SNACKBAR_WRAPPER_STYLES);
   const [mounted, setMounted] = useState(false);
@@ -75,7 +75,7 @@ export const SnackbarWrapper: React.FC<ISnackbarWrapperProps> = function Snackba
   return styled(styles)(
     <notification as="div" className={className} {...use({ mounted, closing })}>
       {children}
-      {closeable && onClose && (
+      {!unclosable && onClose && (
         <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
       )}
     </notification>

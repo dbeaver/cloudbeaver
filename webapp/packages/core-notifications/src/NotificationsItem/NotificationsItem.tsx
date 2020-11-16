@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
+
 import { Snackbar } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { INotification } from '@cloudbeaver/core-events';
@@ -16,7 +18,7 @@ interface Props {
   notification: INotification<any>;
 }
 
-export const NotificationsItem: React.FC<Props> = function Notification({ notification }) {
+export const NotificationsItem: React.FC<Props> = observer(function Notification({ notification }) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {
@@ -37,4 +39,4 @@ export const NotificationsItem: React.FC<Props> = function Notification({ notifi
       onShowDetails={controller.handleShowDetails}
     />
   );
-};
+});

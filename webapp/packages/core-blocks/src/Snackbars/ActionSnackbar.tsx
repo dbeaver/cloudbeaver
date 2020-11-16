@@ -7,16 +7,16 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
-import styled, { use } from 'reshadow';
 
-import { Button, IconButton } from '@cloudbeaver/core-blocks';
+import { Button } from '@cloudbeaver/core-blocks';
 import { INotificationExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
-import { NotificationMark } from './NotificationMark';
-import { SNACKBAR_COMMON_STYLES } from './SnackbarCommonStyles';
+import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
+import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
+import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
+import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
+import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 
 interface Props extends INotificationExtraProps {
   onAction: () => void;
@@ -26,36 +26,21 @@ interface Props extends INotificationExtraProps {
 export const ActionSnackbar: NotificationComponent<Props> = observer(function ActionSnackbar({
   notification, onAction, actionText,
 }) {
-  const styles = useStyles(SNACKBAR_COMMON_STYLES);
-  const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
-  const timeStringFromTimestamp = notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString() : '';
-  const translatedTitle = translate(notification.title);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return styled(styles)(
-    <notification as="div" {...use({ mounted })}>
-      <NotificationMark type={notification.type} />
-      <notification-body as="div">
-        <body-text-block as='div'>
-          <text-block-title title={translatedTitle} as='h2'>{translatedTitle}</text-block-title>
-          {notification.message && <message as="div">{translate(notification.message)}</message>}
-        </body-text-block>
-        <notification-footer as='div'>
-          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
-          <actions as="div">
-            <Button type="button" mod={['outlined']} onClick={onAction}>
-              {translate(actionText)}
-            </Button>
-          </actions>
-        </notification-footer>
-      </notification-body>
-      {!notification.persistent && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={() => notification.close(false)} />
-      )}
-    </notification>
+  return (
+    <SnackbarWrapper unclosable={notification.persistent} onClose={() => notification.close(false)}>
+      <SnackbarStatus status={notification.type} />
+      <SnackbarContent>
+        <SnackbarBody title={translate(notification.title)}>
+          {notification.message && translate(notification.message)}
+        </SnackbarBody>
+        <SnackbarFooter timestamp={notification.timestamp}>
+          <Button type="button" mod={['outlined']} onClick={onAction}>
+            {translate(actionText)}
+          </Button>
+        </SnackbarFooter>
+      </SnackbarContent>
+    </SnackbarWrapper>
   );
 });

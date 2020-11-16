@@ -19,7 +19,6 @@ import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
-
 interface Props extends INotificationProcessExtraProps {
   closeDelay?: number;
   displayDelay?: number;
@@ -46,12 +45,14 @@ export const ProcessSnackbar: NotificationComponent<Props> = observer(function P
   return (
     <SnackbarWrapper
       closing={!!notification.state.deleteDelay}
-      closeable={status !== ENotificationType.Loading}
+      unclosable={status === ENotificationType.Loading}
       onClose={() => notification.close(false)}
     >
       <SnackbarStatus status={status} />
       <SnackbarContent>
-        <SnackbarBody title={translate(title)} message={message && translate(message)} />
+        <SnackbarBody title={translate(title)}>
+          {message && translate(message)}
+        </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {error && (
             <Button

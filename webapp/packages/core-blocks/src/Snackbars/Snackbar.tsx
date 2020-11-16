@@ -7,24 +7,25 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
-import styled, { use } from 'reshadow';
 
-import { Button, IconButton, SNACKBAR_COMMON_STYLES } from '@cloudbeaver/core-blocks';
+import { Button } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useStateDelay } from '../useStateDelay';
-import { NotificationMark } from './NotificationMark';
+import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
+import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
+import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
+import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
+import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 
 interface SnackbarProps {
-  type?: ENotificationType;
+  type: ENotificationType;
   message?: string;
   title: string;
   closeDelay: number;
   disableShowDetails?: boolean;
-  time?: number;
+  time: number;
   onClose: (delayDeleting?: boolean) => void;
   state?: { deleteDelay: number };
   onShowDetails?: () => void;
@@ -41,42 +42,29 @@ export const Snackbar: React.FC<SnackbarProps> = observer(function Snackbar({
   state,
   time,
 }) {
-  const styles = useStyles(SNACKBAR_COMMON_STYLES);
-  const [mounted, setMounted] = useState(false);
   const translate = useTranslate();
-  const timeStringFromTimestamp = time ? new Date(time).toLocaleTimeString() : '';
-  const translatedTitle = translate(title);
   useStateDelay(closeDelay > 0, closeDelay, onClose);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return styled(styles)(
-    <notification as="div" {...use({ mounted, closing: !!state?.deleteDelay })}>
-      {type && <NotificationMark type={type} />}
-      <notification-body as="div">
-        <body-text-block as='div'>
-          <text-block-title title={translatedTitle} as='h2'>{translatedTitle}</text-block-title>
-          {message && <message as="div">{translate(message)}</message>}
-        </body-text-block>
-        <notification-footer as='div'>
-          <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
+  return (
+    <SnackbarWrapper closing={!!state?.deleteDelay} onClose={() => onClose(false)}>
+      <SnackbarStatus status={type} />
+      <SnackbarContent>
+        <SnackbarBody title={translate(title)}>
+          {message && translate(message)}
+        </SnackbarBody>
+        <SnackbarFooter timestamp={time}>
           {onShowDetails && (
-            <actions as="div">
-              <Button
-                type="button"
-                mod={['outlined']}
-                disabled={disableShowDetails}
-                onClick={onShowDetails}
-              >
-                {translate('ui_errors_details')}
-              </Button>
-            </actions>
+            <Button
+              type="button"
+              mod={['outlined']}
+              disabled={disableShowDetails}
+              onClick={onShowDetails}
+            >
+              {translate('ui_errors_details')}
+            </Button>
           )}
-        </notification-footer>
-      </notification-body>
-      <IconButton name="cross" viewBox="0 0 16 16" onClick={() => onClose(false)} />
-    </notification>
+        </SnackbarFooter>
+      </SnackbarContent>
+    </SnackbarWrapper>
   );
 });
