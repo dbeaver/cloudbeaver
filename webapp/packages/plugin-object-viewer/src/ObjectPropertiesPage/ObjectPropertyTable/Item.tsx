@@ -77,7 +77,7 @@ export const Item = observer(function Item({
     );
   }
 
-  if (!dbObject?.properties) {
+  if (!dbObject?.properties || dbObject.properties.length === 0) {
     return styled(styles)(
       <TableItem item={objectId}>
         <TableColumnValue centerContent><TableItemSelect /></TableColumnValue>
