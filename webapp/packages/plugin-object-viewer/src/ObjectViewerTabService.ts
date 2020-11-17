@@ -161,7 +161,6 @@ export class ObjectViewerTabService {
       );
 
       if (tab && this.navigationTabsService.currentTabId === tab.id) {
-        console.log('update key: ', key);
         await this.navigationTabsService.selectTab(tab.id);
       }
     });
@@ -174,7 +173,6 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
-        console.log('remove key: ', key);
         await this.navigationTabsService.closeTab(tab.id, true);
       }
     });
