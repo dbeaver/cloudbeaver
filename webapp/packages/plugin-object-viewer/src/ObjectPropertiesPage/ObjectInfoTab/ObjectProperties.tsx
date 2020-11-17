@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
 import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ObjectProperty } from './ObjectProperty';
@@ -36,6 +37,7 @@ type ObjectPropertiesProps = PropsWithChildren<{
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,
 }: ObjectPropertiesProps) {
+  const translate = useTranslate();
   const style = useStyles(tabStyles);
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
 
@@ -43,8 +45,8 @@ export const ObjectProperties = observer(function ObjectProperties({
     return <Loader />;
   }
 
-  if (!dbObject?.properties) {
-    return <TextPlaceholder>There are no items to show</TextPlaceholder>;
+  if (!dbObject?.properties || dbObject.properties.length === 0) {
+    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
   return styled(style)(

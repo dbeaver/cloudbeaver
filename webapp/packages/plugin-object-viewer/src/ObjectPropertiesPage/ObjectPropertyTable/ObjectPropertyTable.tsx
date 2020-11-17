@@ -7,20 +7,13 @@
  */
 
 import { observer } from 'mobx-react';
-import styled, { css } from 'reshadow';
 
 import { useChildren } from '@cloudbeaver/core-app';
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { useObjectFolder } from '../../useObjectFolder';
 import { ObjectChildrenPropertyTable } from './ObjectChildrenPropertyTable';
-
-const styles = css`
-  center {
-    margin: auto;
-  }
-`;
 
 interface ObjectPropertyTableProps {
   objectId: string;
@@ -40,9 +33,7 @@ export const ObjectPropertyTable = observer(function ObjectPropertyTable({
   }
 
   if (!children?.children || !children.children.length) {
-    return styled(styles)(
-      <center as="div">{translate('plugin_object_viewer_table_no_items')}</center>
-    );
+    return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
   return <ObjectChildrenPropertyTable nodeIds={children.children} />;
