@@ -25,6 +25,7 @@ export type Connection = UserConnectionFragment & { authProperties?: UserConnect
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
   readonly onConnectionCreate: IExecutor<Connection>;
+  readonly onConnectionClose: IExecutor<Connection>;
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
@@ -33,6 +34,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   ) {
     super(new Map());
     this.onConnectionCreate = new Executor();
+    this.onConnectionClose = new Executor();
     this.sessionUpdate = false;
 
     // in case when session was refreshed all data depended on connection info
@@ -114,7 +116,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       this.set(connectionId, connection);
     });
 
-    return this.get(connectionId)!;
+    const connection = this.get(connectionId)!;
+    await this.onConnectionClose.execute(connection);
+    return connection;
   }
 
   async deleteConnection(connectionId: string): Promise<void> {

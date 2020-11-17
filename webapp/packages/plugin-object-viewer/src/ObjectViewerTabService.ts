@@ -19,7 +19,7 @@ import {
   NavNodeManagerService,
   DBObjectService
 } from '@cloudbeaver/core-app';
-import { connectionProvider, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -64,7 +64,7 @@ export class ObjectViewerTabService {
 
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
-    this.connectionInfo.onItemAdd.addHandler(this.updateConnectionInfoTabs.bind(this));
+    this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
@@ -140,21 +140,18 @@ export class ObjectViewerTabService {
     };
   };
 
-  private async updateConnectionInfoTabs(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      const connection = this.connectionInfo.get(key);
+  private async closeConnectionInfoTabs(connection: Connection) {
+    const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
 
-      if (!connection?.connected) {
-        const tab = this.navigationTabsService.findTab(
-          isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
-        );
+    if (!connection.connected) {
+      const tab = this.navigationTabsService.findTab(
+        isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
+      );
 
-        if (tab) {
-          await this.navigationTabsService.closeTab(tab.id, true);
-        }
+      if (tab) {
+        await this.navigationTabsService.closeTab(tab.id, true);
       }
-    });
+    }
   }
 
   private async updateTabs(key: ResourceKey<string>) {
@@ -163,7 +160,8 @@ export class ObjectViewerTabService {
         isObjectViewerTab(tab => tab.handlerState.objectId === key)
       );
 
-      if (tab?.restored && this.navigationTabsService.currentTabId === tab.id) {
+      if (tab && this.navigationTabsService.currentTabId === tab.id) {
+        console.log('update key: ', key);
         await this.navigationTabsService.selectTab(tab.id);
       }
     });
@@ -176,6 +174,7 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
+        console.log('remove key: ', key);
         await this.navigationTabsService.closeTab(tab.id, true);
       }
     });
