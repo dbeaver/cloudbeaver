@@ -105,6 +105,10 @@ export class ConnectionsManagerService {
     }
 
     try {
+      if (!this.connectionInfo.has(connectionId)) {
+        return;
+      }
+
       const tempConnection = await this.connectionAuthService.auth(connectionId);
 
       if (!tempConnection.connected) {

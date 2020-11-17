@@ -19,11 +19,13 @@ import {
   ITabOptions
 } from '@cloudbeaver/core-app';
 import {
+  ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -41,6 +43,7 @@ export class SqlEditorTabService extends Bootstrap {
     private navigationTabsService: NavigationTabsService,
     private notificationService: NotificationService,
     private sqlEditorService: SqlEditorService,
+    private connectionInfo: ConnectionInfoResource,
   ) {
     super();
     this.tabExecutionState = new Map();
@@ -63,7 +66,11 @@ export class SqlEditorTabService extends Bootstrap {
     });
   }
 
-  register(): void {}
+  register(): void {
+    this.connectionInfo.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
+    this.connectionInfo.onItemAdd.addHandler(this.handleConnectionUpdate.bind(this));
+  }
+
   load(): void {}
 
   async createNewEditor(
@@ -127,8 +134,35 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
+  private async handleConnectionUpdate(key: ResourceKey<string>) {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
+        isSQLEditorTab(tab => tab.handlerState.connectionId === key)
+      );
+      const connection = this.connectionInfo.get(key);
+
+      if (!connection?.connected) {
+        for (const tab of tabs) {
+          this.resetConnectionInfo(tab.handlerState);
+        }
+      }
+    });
+  }
+
+  private async handleConnectionDelete(key: ResourceKey<string>) {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
+        isSQLEditorTab(tab => tab.handlerState.connectionId === key)
+      );
+
+      for (const tab of tabs) {
+        this.resetConnectionInfo(tab.handlerState);
+      }
+    });
+  }
+
   private getFreeEditorId() {
-    const editorTabs = this.navigationTabsService.findTabs(isSQLEditorTab);
+    const editorTabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab);
     const ordered = Array.from(editorTabs).map(tab => tab.handlerState.order);
     return findMinimalFree(ordered, 1);
   }
@@ -144,6 +178,14 @@ export class SqlEditorTabService extends Bootstrap {
         || !Array.isArray(tab.handlerState.resultTabs)
     ) {
       return false;
+    }
+
+    if (tab.handlerState.connectionId) {
+      const connection = this.connectionInfo.get(tab.handlerState.connectionId);
+
+      if (!connection?.connected) {
+        this.resetConnectionInfo(tab.handlerState);
+      }
     }
 
     tab.handlerState.currentResultTabId = '';
@@ -165,6 +207,13 @@ export class SqlEditorTabService extends Bootstrap {
 
   private getObjectSchemaId(tab: ITab<ISqlEditorTabState>) {
     return tab.handlerState.objectSchemaId;
+  }
+
+  private resetConnectionInfo(state: ISqlEditorTabState) {
+    state.connectionId = undefined;
+    state.contextId = undefined;
+    state.objectCatalogId = undefined;
+    state.currentResultTabId = undefined;
   }
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {

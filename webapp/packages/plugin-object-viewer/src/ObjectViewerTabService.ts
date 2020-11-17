@@ -38,7 +38,6 @@ export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
 
   constructor(
-    private connectionInfoResource: ConnectionInfoResource,
     private navNodeManagerService: NavNodeManagerService,
     private dbObjectService: DBObjectService,
     private dbObjectPageService: DBObjectPageService,
@@ -65,7 +64,7 @@ export class ObjectViewerTabService {
 
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
-    this.connectionInfoResource.onItemAdd.addHandler(this.updateConnectionInfoTabs.bind(this));
+    this.connectionInfo.onItemAdd.addHandler(this.updateConnectionInfoTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
@@ -144,9 +143,9 @@ export class ObjectViewerTabService {
   private async updateConnectionInfoTabs(key: ResourceKey<string>) {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      const connected = this.connectionInfoResource.get(key)?.connected;
+      const connection = this.connectionInfo.get(key);
 
-      if (!connected) {
+      if (!connection?.connected) {
         const tab = this.navigationTabsService.findTab(
           isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
         );
@@ -263,9 +262,7 @@ export class ObjectViewerTabService {
     ) {
       tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
       if (tab.handlerState.connectionId) {
-        const connection = this.connectionInfo.get(tab.handlerState.connectionId);
-
-        if (!connection) {
+        if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
           return false;
         }
       }

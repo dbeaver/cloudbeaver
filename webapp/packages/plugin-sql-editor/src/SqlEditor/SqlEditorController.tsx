@@ -130,11 +130,11 @@ export class SqlEditorController implements IInitializableController {
   private getHandleAutocomplete(): AsyncHintFunction {
     const handleAutocomplete: AsyncHintFunction = (editor, callback) => {
       if (!this.tab.handlerState.connectionId) {
-        console.error('getHandleAutocomplete connectionId is not provided');
+        console.warn('getHandleAutocomplete connectionId is not provided');
         return;
       }
       if (!this.tab.handlerState.contextId) {
-        console.error('getHandleAutocomplete contextId is not provided');
+        console.warn('getHandleAutocomplete contextId is not provided');
         return;
       }
       const cursor = editor.getCursor('from');

@@ -11,7 +11,7 @@ import { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTab } from '@cloudbeaver/core-app';
-import { StaticImage } from '@cloudbeaver/core-blocks';
+import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
 import { CodeEditor } from './CodeEditor/CodeEditor';
@@ -57,7 +57,12 @@ const styles = css`
 
 export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
   const tab = useTab(tabId);
+  const baseTab = useBaseTab(tabId);
   const controller = useController(SqlEditorController, tab);
+
+  if (!baseTab.selected) {
+    return null;
+  }
 
   return styled(styles)(
     <sql-editor as="div" className={className}>
