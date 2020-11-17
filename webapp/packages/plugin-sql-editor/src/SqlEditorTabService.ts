@@ -170,10 +170,10 @@ export class SqlEditorTabService extends Bootstrap {
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
     if (typeof tab.handlerState.query !== 'string'
         || typeof tab.handlerState.order !== 'number'
-        || !['string', 'undefined'].includes(typeof tab.handlerState.connectionId)
-        || !['string', 'undefined'].includes(typeof tab.handlerState.contextId)
-        || !['string', 'undefined'].includes(typeof tab.handlerState.objectCatalogId)
-        || !['string', 'undefined'].includes(typeof tab.handlerState.currentResultTabId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.connectionId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.contextId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.objectCatalogId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentResultTabId)
         || !Array.isArray(tab.handlerState.queryTabGroups)
         || !Array.isArray(tab.handlerState.resultTabs)
     ) {
