@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { Button, SanitizedHTML } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -40,6 +41,7 @@ const styles = css`
 
 export interface ErrorDialogPayload {
   message: string;
+  title: string;
   onShowDetails?: () => void;
 }
 
@@ -51,7 +53,8 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={translate('ui_data_saving_error')}
+      type={ENotificationType.Error}
+      title={translate(payload.title)}
       footer={(
         <controls as="div">
           {payload.onShowDetails && (

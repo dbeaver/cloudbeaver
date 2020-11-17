@@ -50,6 +50,11 @@ export const commonDialogStyle = composes(
     padding-right: 0;
     margin-right: -8px;
   }
+  NotificationMark {
+    padding: 18px 24px;
+    padding-right: 0;
+    margin-right: -8px;
+  }
   dialog-body {
     box-sizing: border-box;
     display: flex;

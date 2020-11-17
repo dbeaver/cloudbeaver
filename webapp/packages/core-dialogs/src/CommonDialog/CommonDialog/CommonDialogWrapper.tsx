@@ -8,13 +8,15 @@
 
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, NotificationMark } from '@cloudbeaver/core-blocks';
+import { ENotificationType } from '@cloudbeaver/core-events';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { commonDialogStyle } from './styles';
 
 export interface CommonDialogWrapperProps {
   title?: string;
+  type?: ENotificationType;
   icon?: string;
   viewBox?: string;
   onReject?: () => void;
@@ -27,6 +29,7 @@ export interface CommonDialogWrapperProps {
 
 export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function CommonDialogWrapper({
   title,
+  type,
   icon,
   viewBox,
   header,
@@ -40,6 +43,7 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
     <dialog className={className}>
       <header>
         <header-title as="div">
+          {type && !icon && <NotificationMark type={type} />}
           {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
           <h1>{title}</h1>
           {onReject && (
