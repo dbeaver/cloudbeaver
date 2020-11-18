@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { Button, SanitizedHTML } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -53,7 +52,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      type={ENotificationType.Error}
+      icon="/icons/error_icon.svg"
       title={translate(payload.title)}
       footer={(
         <controls as="div">
@@ -67,6 +66,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
           <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
         </controls>
       )}
+      stretchIcon
       onReject={rejectDialog}
     >
       <message as="div"><SanitizedHTML html={payload.message} /></message>
