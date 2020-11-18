@@ -10,12 +10,10 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  Radio,
   InputField,
   ObjectPropertyInfoForm,
   Textarea,
   InputGroup,
-  RadioGroup,
   TabsState,
   TabPanel,
   Combobox,
@@ -48,12 +46,6 @@ const styles = css`
     flex-direction: column;
     max-width: 630px;
   }
-  connection-type {
-    margin-left: 180px;
-  }
-  Radio {
-    composes: theme-typography--body2 from global;
-  }
 `;
 
 export const Options = observer(function Options({
@@ -64,6 +56,7 @@ export const Options = observer(function Options({
   const translate = useTranslate();
   const disabled = formController.isDisabled;
   const isOriginLocal = formController.local;
+  const connectionType = formController.isUrlConnection ? EConnectionType.URL : EConnectionType.Parameters;
 
   return styled(useStyles(styles))(
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
@@ -120,7 +113,7 @@ export const Options = observer(function Options({
           </FormGroup>
         </FormBoxElement>
         <FormBoxElement>
-          <TabsState currentTabId={formController.connectionType}>
+          <TabsState currentTabId={connectionType}>
             <TabPanel tabId={EConnectionType.Parameters}>
               <ParametersForm
                 connection={model.connection}

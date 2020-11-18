@@ -17,7 +17,6 @@ import { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
-import { EConnectionType } from './EConnectionType';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
 @injectable()
@@ -28,8 +27,11 @@ implements IInitializableController {
 
   readonly afterSave: IExecutor<string>;
 
-  get connectionType(): EConnectionType {
-    return this.model.connection.useUrl ? EConnectionType.URL : EConnectionType.Parameters;
+  get isUrlConnection(): boolean {
+    if (this.model.editing) {
+      return this.model.connection.useUrl;
+    }
+    return !this.driver?.sampleURL;
   }
 
   get isDisabled(): boolean {
@@ -65,10 +67,6 @@ implements IInitializableController {
     this.model = model;
     this.close = close;
   }
-
-  setType = (type: EConnectionType): void => {
-    this.model.connection.useUrl = type === EConnectionType.URL;
-  };
 
   save = async (): Promise<void> => {
     this.isSaving = true;
@@ -115,7 +113,7 @@ implements IInitializableController {
     config.template = this.model.connection.template;
     config.driverId = this.model.connection.driverId;
 
-    if (this.connectionType === EConnectionType.Parameters) {
+    if (!this.isUrlConnection) {
       if (!this.driver?.embedded) {
         config.host = this.model.connection.host;
         config.port = this.model.connection.port;
