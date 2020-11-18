@@ -10,7 +10,6 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  Radio,
   InputField,
   useFocus,
   ObjectPropertyInfoForm,
@@ -20,13 +19,11 @@ import {
   FormBox,
   FormBoxElement,
   FormGroup,
-  RadioGroup
 } from '@cloudbeaver/core-blocks';
 import { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionType } from '../ConnectionFormDialogController';
 import { IFormController } from './IFormController';
 import { ParametersForm } from './ParametersForm';
 
@@ -43,16 +40,7 @@ const connectionFormStyles = css`
     flex: 1;
   }
   FormBox {
-    padding: 4px 24px 18px;
-  }
-  connection-type {
-    padding: 12px;
-    margin-left: 160px;
-  }
-  Radio {
-    composes: theme-typography--body2 from global;
-    font-weight: 500;
-    padding: 0 12px;
+    padding: 24px 4px 24px;
   }
 `;
 
@@ -67,29 +55,7 @@ export const ConnectionForm = observer(function ConnectionForm({
     <SubmittingForm ref={focusedRef}>
       <FormBox>
         <FormBoxElement>
-          <FormGroup>
-            <connection-type as="div">
-              <RadioGroup name='type' value={controller.connectionType} onChange={controller.onChangeType}>
-                <Radio
-                  value={ConnectionType.Attributes}
-                  disabled={controller.isConnecting}
-                  mod={['primary']}
-                >
-                  {translate('customConnection_connectionType_custom')}
-                </Radio>
-                <Radio
-                  value={ConnectionType.URL}
-                  disabled={controller.isConnecting}
-                  mod={['primary']}
-                >
-                  {translate('customConnection_connectionType_url')}
-                </Radio>
-              </RadioGroup>
-            </connection-type>
-          </FormGroup>
-          {controller.connectionType === ConnectionType.Attributes ? (
-            <ParametersForm controller={controller} embedded={driver?.embedded} />
-          ) : (
+          {controller.isUrlConnection ? (
             <FormGroup>
               <InputField
                 type="text"
@@ -102,6 +68,8 @@ export const ConnectionForm = observer(function ConnectionForm({
                 {translate('customConnection_url_JDBC')}
               </InputField>
             </FormGroup>
+          ) : (
+            <ParametersForm controller={controller} embedded={driver?.embedded} />
           )}
           {controller.authModel && (
             <>

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, Loader,
+  TabsState, TabList,
   Button, BORDER_TAB_STYLES, TabPanelList
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';

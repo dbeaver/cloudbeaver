@@ -10,14 +10,10 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  Radio,
   InputField,
   ObjectPropertyInfoForm,
   Textarea,
   InputGroup,
-  RadioGroup,
-  TabsState,
-  TabPanel,
   Combobox,
   SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup
 } from '@cloudbeaver/core-blocks';
@@ -26,7 +22,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionFormController } from '../ConnectionFormController';
-import { EConnectionType } from '../EConnectionType';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
@@ -44,15 +39,8 @@ const styles = css`
     flex: 1;
     padding-top: 16px;
   }
-  TabPanel {
-    flex-direction: column;
+  parameters-type-container {
     max-width: 630px;
-  }
-  connection-type {
-    margin-left: 180px;
-  }
-  Radio {
-    composes: theme-typography--body2 from global;
   }
 `;
 
@@ -69,18 +57,6 @@ export const Options = observer(function Options({
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
       <FormBox>
         <FormBoxElement>
-          {isOriginLocal && (
-            <FormGroup>
-              <FieldCheckbox
-                name="template"
-                value={model.connection.id}
-                state={model.connection}
-                checkboxLabel={translate('connections_connection_template')}
-                disabled={model.editing || disabled}
-                mod='surface'
-              />
-            </FormGroup>
-          )}
           <FormGroup>
             <Combobox
               name='driverId'
@@ -118,30 +94,22 @@ export const Options = observer(function Options({
               {translate('connections_connection_description')}
             </Textarea>
           </FormGroup>
+          {isOriginLocal && (
+            <FormGroup>
+              <FieldCheckbox
+                name="template"
+                value={model.connection.id}
+                state={model.connection}
+                checkboxLabel={translate('connections_connection_template')}
+                disabled={model.editing || disabled}
+                mod='surface'
+              />
+            </FormGroup>
+          )}
         </FormBoxElement>
         <FormBoxElement>
-          {isOriginLocal && (
-            <connection-type as="div">
-              <RadioGroup name='type' value={formController.connectionType} onChange={formController.setType}>
-                <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
-                  {translate('customConnection_connectionType_custom')}
-                </Radio>
-                <Radio value={EConnectionType.URL} disabled={disabled} mod={['primary']}>
-                  {translate('customConnection_connectionType_url')}
-                </Radio>
-              </RadioGroup>
-            </connection-type>
-          )}
-          <TabsState currentTabId={formController.connectionType}>
-            <TabPanel tabId={EConnectionType.Parameters}>
-              <ParametersForm
-                connection={model.connection}
-                embedded={controller.driver?.embedded}
-                disabled={disabled}
-                readOnly={!isOriginLocal}
-              />
-            </TabPanel>
-            <TabPanel tabId={EConnectionType.URL}>
+          <parameters-type-container as='div'>
+            {formController.isUrlConnection ? (
               <FormGroup>
                 <InputField
                   type="text"
@@ -154,8 +122,16 @@ export const Options = observer(function Options({
                   {translate('customConnection_url_JDBC')}
                 </InputField>
               </FormGroup>
-            </TabPanel>
-          </TabsState>
+            ) : (
+              <ParametersForm
+                connection={model.connection}
+                embedded={controller.driver?.embedded}
+                disabled={disabled}
+                readOnly={!isOriginLocal}
+              />
+            )}
+          </parameters-type-container>
+
           {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
               <FormGroup>

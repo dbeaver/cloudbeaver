@@ -8,13 +8,10 @@
 
 import { ConnectionConfig, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
-import { ConnectionType } from '../ConnectionFormDialogController';
-
 export interface IFormController {
   authModel?: DatabaseAuthModel;
   config: ConnectionConfig;
-  connectionType: ConnectionType;
+  isUrlConnection: boolean;
   isConnecting: boolean;
-  onChangeType: (type: ConnectionType) => void;
   onChange: <T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]) => void;
 }
