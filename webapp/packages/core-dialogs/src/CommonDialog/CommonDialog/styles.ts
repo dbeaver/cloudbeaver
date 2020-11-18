@@ -49,6 +49,10 @@ export const commonDialogStyle = composes(
     padding: 18px 24px;
     padding-right: 0;
     margin-right: -8px;
+    &[|error] {
+      width: 40px;
+      height: 40px;
+    }
   }
   dialog-body {
     box-sizing: border-box;

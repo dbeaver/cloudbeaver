@@ -63,6 +63,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
             )}
           </controls>
         )}
+        error
         onReject={props.rejectDialog}
       >
         {error.reason && <property as="div">{error.reason}</property>}

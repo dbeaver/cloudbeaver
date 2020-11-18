@@ -40,6 +40,7 @@ const styles = css`
 
 export interface ErrorDialogPayload {
   message: string;
+  title: string;
   onShowDetails?: () => void;
 }
 
@@ -51,7 +52,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={translate('ui_data_saving_error')}
+      title={translate(payload.title)}
       footer={(
         <controls as="div">
           {payload.onShowDetails && (
@@ -64,6 +65,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
           <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
         </controls>
       )}
+      error
       onReject={rejectDialog}
     >
       <message as="div"><SanitizedHTML html={payload.message} /></message>

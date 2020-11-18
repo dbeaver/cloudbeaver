@@ -279,6 +279,7 @@ export class TableViewerModel {
           ErrorDialog,
           {
             message,
+            title: 'ui_data_saving_error',
             onShowDetails: hasDetails
               ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
               : undefined,
