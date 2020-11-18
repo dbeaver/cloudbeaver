@@ -52,7 +52,6 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      icon="/icons/error_icon.svg"
       title={translate(payload.title)}
       footer={(
         <controls as="div">
@@ -66,7 +65,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
           <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
         </controls>
       )}
-      stretchIcon
+      isError
       onReject={rejectDialog}
     >
       <message as="div"><SanitizedHTML html={payload.message} /></message>
