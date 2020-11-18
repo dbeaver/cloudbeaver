@@ -65,7 +65,7 @@ export const ErrorDialog: DialogComponent<ErrorDialogPayload> = observer(functio
           <Button type="button" mod={['unelevated']} onClick={handleRetry}>{translate('ui_processing_retry')}</Button>
         </controls>
       )}
-      isError
+      error
       onReject={rejectDialog}
     >
       <message as="div"><SanitizedHTML html={payload.message} /></message>

@@ -17,7 +17,7 @@ export interface CommonDialogWrapperProps {
   title?: string;
   icon?: string;
   viewBox?: string;
-  isError?: boolean;
+  error?: boolean;
   onReject?: () => void;
   className?: string;
   noBodyPadding?: boolean;
@@ -30,7 +30,7 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   title,
   icon,
   viewBox,
-  isError,
+  error,
   header,
   footer,
   noBodyPadding,
@@ -38,14 +38,14 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   onReject,
   children,
 }) {
-  if (!icon && isError) {
+  if (!icon && error) {
     icon = '/icons/error_icon.svg';
   }
   return styled(useStyles(commonDialogStyle))(
     <dialog className={className}>
       <header>
         <header-title as="div">
-          {icon && <IconOrImage {...use({ isError })} icon={icon} viewBox={viewBox} />}
+          {icon && <IconOrImage {...use({ error })} icon={icon} viewBox={viewBox} />}
           <h1>{title}</h1>
           {onReject && (
             <reject as="div">
