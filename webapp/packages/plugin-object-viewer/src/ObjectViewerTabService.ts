@@ -65,6 +65,7 @@ export class ObjectViewerTabService {
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
+    this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
@@ -140,6 +141,21 @@ export class ObjectViewerTabService {
     };
   };
 
+  private async updateConnectionTabs(key: ResourceKey<string>) {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const tab = this.navigationTabsService.findTab(
+        isObjectViewerTab(tab =>
+          tab.id === this.navigationTabsService.currentTabId
+          && tab.handlerState.connectionId === key
+        )
+      );
+
+      if (tab) {
+        await this.navigationTabsService.selectTab(tab.id);
+      }
+    });
+  }
+
   private async closeConnectionInfoTabs(connection: Connection) {
     const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
 
@@ -157,10 +173,13 @@ export class ObjectViewerTabService {
   private async updateTabs(key: ResourceKey<string>) {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab => tab.handlerState.objectId === key)
+        isObjectViewerTab(tab =>
+          tab.id === this.navigationTabsService.currentTabId
+          && tab.handlerState.objectId === key
+        )
       );
 
-      if (tab && this.navigationTabsService.currentTabId === tab.id) {
+      if (tab) {
         await this.navigationTabsService.selectTab(tab.id);
       }
     });
