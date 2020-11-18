@@ -120,18 +120,6 @@ export const Options = observer(function Options({
           </FormGroup>
         </FormBoxElement>
         <FormBoxElement>
-          {isOriginLocal && (
-            <connection-type as="div">
-              <RadioGroup name='type' value={formController.connectionType} onChange={formController.setType}>
-                <Radio value={EConnectionType.Parameters} disabled={disabled} mod={['primary']}>
-                  {translate('customConnection_connectionType_custom')}
-                </Radio>
-                <Radio value={EConnectionType.URL} disabled={disabled} mod={['primary']}>
-                  {translate('customConnection_connectionType_url')}
-                </Radio>
-              </RadioGroup>
-            </connection-type>
-          )}
           <TabsState currentTabId={formController.connectionType}>
             <TabPanel tabId={EConnectionType.Parameters}>
               <ParametersForm
