@@ -16,16 +16,9 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';
-
-export enum ConnectionType {
-  Attributes,
-  URL
-}
-
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
-  @observable connectionType = ConnectionType.Attributes;
   @observable isLoading = true;
   @observable isConnecting = false;
   @observable driver!: DBDriver;
@@ -41,6 +34,10 @@ implements IInitializableController, IDestructibleController {
     credentials: {},
     saveCredentials: false,
   };
+
+  get isUrlConnection() {
+    return !this.driver.sampleURL;
+  }
 
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
@@ -63,10 +60,6 @@ implements IInitializableController, IDestructibleController {
   destruct(): void {
     this.isDistructed = true;
   }
-
-  onChangeType = (type: ConnectionType) => {
-    this.connectionType = type;
-  };
 
   onChange = (property: keyof ConnectionConfig, value: any) => {
     this.config[property] = value;
@@ -112,7 +105,7 @@ implements IInitializableController, IDestructibleController {
     config.name = this.config.name;
     config.driverId = this.config.driverId;
 
-    if (this.connectionType === ConnectionType.Attributes) {
+    if (!this.isUrlConnection) {
       config.name = this.config.databaseName;
       if (!this.driver?.embedded) {
         config.host = this.config.host;

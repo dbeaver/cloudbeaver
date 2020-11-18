@@ -57,18 +57,6 @@ export const Options = observer(function Options({
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
       <FormBox>
         <FormBoxElement>
-          {isOriginLocal && (
-            <FormGroup>
-              <FieldCheckbox
-                name="template"
-                value={model.connection.id}
-                state={model.connection}
-                checkboxLabel={translate('connections_connection_template')}
-                disabled={model.editing || disabled}
-                mod='surface'
-              />
-            </FormGroup>
-          )}
           <FormGroup>
             <Combobox
               name='driverId'
@@ -106,31 +94,41 @@ export const Options = observer(function Options({
               {translate('connections_connection_description')}
             </Textarea>
           </FormGroup>
+          {isOriginLocal && (
+            <FormGroup>
+              <FieldCheckbox
+                name="template"
+                value={model.connection.id}
+                state={model.connection}
+                checkboxLabel={translate('connections_connection_template')}
+                disabled={model.editing || disabled}
+                mod='surface'
+              />
+            </FormGroup>
+          )}
         </FormBoxElement>
         <FormBoxElement>
-          {formController.isUrlConnection
-            ? (
-              <FormGroup>
-                <InputField
-                  type="text"
-                  name="url"
-                  state={model.connection}
-                  disabled={disabled}
-                  autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
-                  mod='surface'
-                >
-                  {translate('customConnection_url_JDBC')}
-                </InputField>
-              </FormGroup>
-            )
-            : (
-              <ParametersForm
-                connection={model.connection}
-                embedded={controller.driver?.embedded}
+          {formController.isUrlConnection ? (
+            <FormGroup>
+              <InputField
+                type="text"
+                name="url"
+                state={model.connection}
                 disabled={disabled}
-                readOnly={!isOriginLocal}
-              />
-            )}
+                autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
+                mod='surface'
+              >
+                {translate('customConnection_url_JDBC')}
+              </InputField>
+            </FormGroup>
+          ) : (
+            <ParametersForm
+              connection={model.connection}
+              embedded={controller.driver?.embedded}
+              disabled={disabled}
+              readOnly={!isOriginLocal}
+            />
+          )}
 
           {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
