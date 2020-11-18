@@ -14,8 +14,6 @@ import {
   ObjectPropertyInfoForm,
   Textarea,
   InputGroup,
-  TabsState,
-  TabPanel,
   Combobox,
   SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup
 } from '@cloudbeaver/core-blocks';
@@ -24,7 +22,6 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionFormController } from '../ConnectionFormController';
-import { EConnectionType } from '../EConnectionType';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
@@ -42,8 +39,7 @@ const styles = css`
     flex: 1;
     padding-top: 16px;
   }
-  TabPanel {
-    flex-direction: column;
+  FormBoxElement + FormBoxElement {
     max-width: 630px;
   }
 `;
@@ -56,7 +52,6 @@ export const Options = observer(function Options({
   const translate = useTranslate();
   const disabled = formController.isDisabled;
   const isOriginLocal = formController.local;
-  const connectionType = formController.isUrlConnection ? EConnectionType.URL : EConnectionType.Parameters;
 
   return styled(useStyles(styles))(
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
@@ -113,16 +108,8 @@ export const Options = observer(function Options({
           </FormGroup>
         </FormBoxElement>
         <FormBoxElement>
-          <TabsState currentTabId={connectionType}>
-            <TabPanel tabId={EConnectionType.Parameters}>
-              <ParametersForm
-                connection={model.connection}
-                embedded={controller.driver?.embedded}
-                disabled={disabled}
-                readOnly={!isOriginLocal}
-              />
-            </TabPanel>
-            <TabPanel tabId={EConnectionType.URL}>
+          {formController.isUrlConnection
+            ? (
               <FormGroup>
                 <InputField
                   type="text"
@@ -135,8 +122,16 @@ export const Options = observer(function Options({
                   {translate('customConnection_url_JDBC')}
                 </InputField>
               </FormGroup>
-            </TabPanel>
-          </TabsState>
+            )
+            : (
+              <ParametersForm
+                connection={model.connection}
+                embedded={controller.driver?.embedded}
+                disabled={disabled}
+                readOnly={!isOriginLocal}
+              />
+            )}
+
           {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
               <FormGroup>
