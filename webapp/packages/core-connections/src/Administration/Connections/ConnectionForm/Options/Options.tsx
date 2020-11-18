@@ -39,7 +39,7 @@ const styles = css`
     flex: 1;
     padding-top: 16px;
   }
-  FormBoxElement + FormBoxElement {
+  parameters-type-container {
     max-width: 630px;
   }
 `;
@@ -108,27 +108,29 @@ export const Options = observer(function Options({
           )}
         </FormBoxElement>
         <FormBoxElement>
-          {formController.isUrlConnection ? (
-            <FormGroup>
-              <InputField
-                type="text"
-                name="url"
-                state={model.connection}
+          <parameters-type-container as='div'>
+            {formController.isUrlConnection ? (
+              <FormGroup>
+                <InputField
+                  type="text"
+                  name="url"
+                  state={model.connection}
+                  disabled={disabled}
+                  autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
+                  mod='surface'
+                >
+                  {translate('customConnection_url_JDBC')}
+                </InputField>
+              </FormGroup>
+            ) : (
+              <ParametersForm
+                connection={model.connection}
+                embedded={controller.driver?.embedded}
                 disabled={disabled}
-                autoComplete={`section-${controller.driver?.id || 'driver'} section-jdbc`}
-                mod='surface'
-              >
-                {translate('customConnection_url_JDBC')}
-              </InputField>
-            </FormGroup>
-          ) : (
-            <ParametersForm
-              connection={model.connection}
-              embedded={controller.driver?.embedded}
-              disabled={disabled}
-              readOnly={!isOriginLocal}
-            />
-          )}
+                readOnly={!isOriginLocal}
+              />
+            )}
+          </parameters-type-container>
 
           {(controller.authModel && !controller.driver?.anonymousAccess) && (
             <>
