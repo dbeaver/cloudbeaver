@@ -290,7 +290,7 @@ public class GraphQLEndpoint extends HttpServlet {
 
                 DataFetcherExceptionHandlerResult.Builder handlerResult = DataFetcherExceptionHandlerResult.newResult();
                 if (!(exception instanceof GraphQLError)) {
-                    exception = new DBWebException("Unexpected GraphQL error", exception);
+                    exception = new DBWebException(exception.getMessage(), exception);
                 }
                 if (exception instanceof DBWebException) {
                     ((DBWebException) exception).setPath(path.toList());
