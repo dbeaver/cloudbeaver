@@ -113,10 +113,10 @@ public class DBWebException extends DBException implements GraphQLError {
         }
         if (divPos != -1) {
             stString = stString.substring(0, divPos);
-            divPos = stString.lastIndexOf(")");
-            if (divPos != -1) {
-                stString = stString.substring(0, divPos + 1);
-            }
+//            divPos = stString.lastIndexOf(")");
+//            if (divPos != -1) {
+//                stString = stString.substring(0, divPos + 1);
+//            }
         }
         divPos = stString.indexOf(':');
         if (divPos != -1) {
