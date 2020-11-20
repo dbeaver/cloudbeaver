@@ -85,7 +85,7 @@ export const UsersAdministration = observer(function UsersAdministration({
                   expandedItems={controller.expandedItems}
                   selectable={controller.isLocalProviderAvailable}
                 />
-                {controller.isLoading && <Loader overlay />}
+                <Loader loading={controller.isLoading} overlay />
               </>
             )}
         </layout-grid-cell>

@@ -40,10 +40,15 @@ export const DriverProperties = observer(function DriverProperties({
   model,
   controller: formController,
 }: DriverPropertiesProps) {
+  const style = useStyles(styles);
   const controller = useController(DriverPropertiesController, model.connection.driverId, model.connection.properties);
-  useTab(tabId, controller.loadDriverProperties);
+  const { selected } = useTab(tabId, controller.loadDriverProperties);
 
-  return styled(useStyles(styles))(
+  if (!selected) {
+    return null;
+  }
+
+  return styled(style)(
     <properties as="div">
       {controller.isLoading && <Loader />}
       {!controller.isLoading && controller.loaded && (

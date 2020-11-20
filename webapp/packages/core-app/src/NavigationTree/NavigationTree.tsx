@@ -23,7 +23,7 @@ const navigationTreeStyles = css`
   inside-box {
     flex: 1;
     position: relative;
-    min-width: 240px;
+    min-width: 100%;
     overflow: auto;
     outline: none;
   }

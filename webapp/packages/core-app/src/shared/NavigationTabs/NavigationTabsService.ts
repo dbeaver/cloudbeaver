@@ -12,6 +12,7 @@ import {
 } from 'mobx';
 import { Subject } from 'rxjs';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -69,6 +70,7 @@ export class NavigationTabsService {
     private notificationService: NotificationService,
     private autoSaveService: LocalStorageSaveService,
     private userInfoResource: UserInfoResource,
+    private administrationScreenService: AdministrationScreenService,
     appAuthService: AppAuthService
   ) {
     this.autoSaveService.withAutoSave(
@@ -245,6 +247,9 @@ export class NavigationTabsService {
   }
 
   @action private async unloadTabs() {
+    if (this.administrationScreenService.isConfigurationMode) {
+      return;
+    }
     for (const tab of this.tabsMap.values()) {
       if (tab.userId !== this.userInfoResource.getId()) {
         if (tab.restored) {
@@ -257,6 +262,10 @@ export class NavigationTabsService {
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
   private async restoreTabs(): Promise<void> {
+    if (this.administrationScreenService.isConfigurationMode) {
+      return;
+    }
+
     const removedTabs: string[] = [];
 
     for (const tabId of this.userTabsState.tabs) {
