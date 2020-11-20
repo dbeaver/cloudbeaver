@@ -96,7 +96,7 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
           />
-          {controller.isLoading && <Loader overlay />}
+          <Loader loading={controller.isLoading} overlay />
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>

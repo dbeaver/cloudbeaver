@@ -32,13 +32,17 @@ import { Controller } from './Controller';
 
 const styles = composes(
   css`
-    box {
+    Table {
       composes: theme-background-surface theme-text-on-surface from global;
     }
   `,
   css`
     box {
       position: relative;
+      display: flex;
+      flex: 1;
+    }
+    Table {
       flex: 1;
     }
     TableColumnHeader {
@@ -71,11 +75,22 @@ export const ConnectionAccess = observer(function ConnectionAccess({
     controller.change();
   }, [controller]);
 
-  if (!model.grantedSubjects || !selected || (controller.users.length === 0 && controller.roles.length)) {
+  if (!selected) {
+    return null;
+  }
+
+  if (controller.isLoading) {
+    return styled(style)(
+      <box as='div'>
+        <Loader />
+      </box>
+    );
+  }
+
+  if (!model.grantedSubjects || (controller.users.length === 0 && controller.roles.length)) {
     return styled(style)(
       <box as='div'>
         <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
-        {controller.isLoading && <Loader overlay />}
       </box>
     );
   }

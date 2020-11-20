@@ -64,6 +64,14 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   useTab(tabId, load);
 
+  if (state.loading) {
+    return (
+      <FormBox>
+        <Loader />
+      </FormBox>
+    );
+  }
+
   if (state.exception) {
     return (
       <FormBox>
@@ -76,7 +84,6 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     return (
       <FormBox>
         <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
-        <Loader loading={state.loading} overlay />
       </FormBox>
     );
   }

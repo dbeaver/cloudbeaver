@@ -62,7 +62,19 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     }
   };
 
-  useTab(tabId, load);
+  const { selected } = useTab(tabId, load);
+
+  if (!selected) {
+    return null;
+  }
+
+  if (state.loading) {
+    return (
+      <FormBox>
+        <Loader />
+      </FormBox>
+    );
+  }
 
   if (state.exception) {
     return (
@@ -76,7 +88,6 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     return (
       <FormBox>
         <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
-        <Loader loading={state.loading} overlay />
       </FormBox>
     );
   }
