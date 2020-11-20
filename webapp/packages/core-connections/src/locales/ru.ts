@@ -1,5 +1,5 @@
 export default [
-  ['connections_administration_item', 'Управление подключениями'],
+  ['connections_administration_item', 'Подключения'],
   ['connections_administration_connection_create', 'Создание подключения'],
   ['connections_administration_search_database_tip', 'Укажите ваши хосты, например \'localhost host1.myhost.com 192.168.0.1\' и нажмите Enter'],
   ['connections_administration_new_connection', 'Создание подключения'],
@@ -25,7 +25,7 @@ export default [
   ['connections_connection_host', 'Хост'],
   ['connections_connection_port', 'Порт'],
   ['connections_connection_template', 'Шаблон'],
-  ['connections_connection_test', 'Проверить подключение'],
+  ['connections_connection_test', 'Подключиться'],
   ['connections_connection_test_fail', 'Не удалось выполнить подключение'],
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
