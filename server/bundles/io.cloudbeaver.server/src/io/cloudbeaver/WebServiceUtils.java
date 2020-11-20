@@ -141,8 +141,7 @@ public class WebServiceUtils {
         navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
-        saveAuthProperties(newDataSource, newDataSource.getConnectionConfiguration(), config.getCredentials());
-        newDataSource.setSavePassword(config.isSaveCredentials());
+        saveAuthProperties(newDataSource, newDataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 
         return newDataSource;
     }
@@ -169,8 +168,18 @@ public class WebServiceUtils {
         dsConfig.setAuthModelId(config.getAuthModelId());
     }
 
-    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties) {
-        if (!CommonUtils.isEmpty(authProperties)) {
+    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties, boolean saveCredentials) {
+        dataSourceContainer.setSavePassword(saveCredentials);
+        if (!saveCredentials) {
+            // Reset credentials
+            authProperties = new LinkedHashMap<>();
+        } else {
+            if (authProperties == null) {
+                // No changes
+                return;
+            }
+        }
+        {
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
@@ -194,10 +203,7 @@ public class WebServiceUtils {
         setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         dataSource.setName(config.getName());
         dataSource.setDescription(config.getDescription());
-        if (config.getCredentials() != null) {
-            saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials());
-        }
-        dataSource.setSavePassword(config.isSaveCredentials());
+        saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
     }
 
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
