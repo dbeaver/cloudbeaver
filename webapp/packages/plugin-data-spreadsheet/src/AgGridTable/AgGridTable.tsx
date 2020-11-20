@@ -7,9 +7,10 @@
  */
 
 import { observer, Observer } from 'mobx-react';
-import { PropsWithChildren, useMemo, useRef } from 'react';
+import { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
 import styled from 'reshadow';
 
+import { ModelUpdatedEvent } from '@ag-grid-community/core';
 import { AgGridReactProps } from '@ag-grid-community/react';
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
@@ -54,6 +55,10 @@ export const AgGridTable = observer(function AgGridTable({
   useMemo(() => refreshRef.current === controller.refreshId && controller.refresh(), [tableModel]);
   refreshRef.current = controller.refreshId;
 
+  const onModelUpdatedHandler = useCallback((event: ModelUpdatedEvent) => {
+    controller.autoSizeDisplayedVirtualColumns();
+  }, [controller]);
+
   return (
     <ComplexLoader
       loader={loader}
@@ -70,6 +75,7 @@ export const AgGridTable = observer(function AgGridTable({
                 modules={AllCommunityModules}
                 frameworkComponents={agGridComponents}
                 loadingCellRenderer="loadingCellRenderer"
+                onModelUpdated={onModelUpdatedHandler}
                 {...controller.dynamicOptions}
                 {...rest}
               />

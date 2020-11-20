@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { AgEvent, GridApi, Column } from '@ag-grid-community/core';
+import { AgEvent, GridApi, Column, FirstDataRenderedEvent } from '@ag-grid-community/core';
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
 import { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
@@ -82,7 +82,12 @@ export interface IAgColumnClickEvent extends AgEvent{
   isMultiple: boolean;
 }
 
+export interface IAgColumnHeaderMount extends AgEvent {
+  columnId: string;
+}
+
 export const COLUMN_CLICK_EVENT_TYPE = 'column-click';
+export const COLUMN_HEADER_MOUNT_EVENT_TYPE = 'column-header-mount';
 
 export function TableColumnHeader(props: HeaderProps) {
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -90,6 +95,15 @@ export function TableColumnHeader(props: HeaderProps) {
       type: COLUMN_CLICK_EVENT_TYPE,
       columnId: props.column.getColId(),
       isMultiple: e.ctrlKey,
+    });
+
+    props.api.dispatchEvent(event);
+  }, []);
+
+  const handleColumnMount = useCallback(() => {
+    const event: IAgColumnHeaderMount = Object.freeze({
+      type: COLUMN_HEADER_MOUNT_EVENT_TYPE,
+      columnId: props.column.getColId(),
     });
 
     props.api.dispatchEvent(event);
@@ -125,6 +139,10 @@ export function TableColumnHeader(props: HeaderProps) {
     },
     []
   );
+
+  useEffect(() => {
+    handleColumnMount();
+  }, []);
 
   return styled(headerStyles)(
     <table-header as="div" onClick={handleClick}>

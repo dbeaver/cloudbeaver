@@ -20,7 +20,7 @@ import {
   GridOptions,
   CellClassParams,
   SortChangedEvent,
-  RowNode
+  RowNode,
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
@@ -28,11 +28,13 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridContext } from './AgGridContext';
+import { COLUMN_HEADER_MOUNT_EVENT_TYPE, IAgColumnHeaderMount } from './TableColumnHeader/TableColumnHeader';
 import { TableSelection } from './TableSelection/TableSelection';
 
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
   @observable refreshId = 0;
+  private autoSizedColumnsIds = new Set();
 
   private readonly datasource: IDatasource = {
     getRows: this.getRows.bind(this),
@@ -210,9 +212,38 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
+  autoSizeDisplayedVirtualColumns(skipHeader = false) {
+    if (!this.columnApi || !this.autoSizedColumnsIds.size) {
+      return;
+    }
+
+    const displayedVirtualColumnsIds: string[] = [];
+    this.columnApi.getAllDisplayedVirtualColumns()
+      .forEach(column => {
+        displayedVirtualColumnsIds.push(column.getColId());
+      });
+
+    this.columnApi.autoSizeColumns(displayedVirtualColumnsIds, skipHeader);
+  }
+
+  private onColumnHeaderMount = (event: IAgColumnHeaderMount) => {
+    if (this.autoSizedColumnsIds.has(event.columnId) || !this.api || !this.columnApi) {
+      return;
+    }
+
+    this.columnApi.autoSizeColumn(event.columnId);
+    this.autoSizedColumnsIds.add(event.columnId);
+
+    if (this.columnApi.getAllColumns().length === this.autoSizedColumnsIds.size) {
+      this.api.removeEventListener(COLUMN_HEADER_MOUNT_EVENT_TYPE, this.onColumnHeaderMount);
+    }
+  };
+
   private handleGridReady(params: GridReadyEvent) {
     this.api = params.api;
     this.columnApi = params.columnApi;
+
+    this.api.addEventListener(COLUMN_HEADER_MOUNT_EVENT_TYPE, this.onColumnHeaderMount);
   }
 
   private handleSortChanged(event: SortChangedEvent) {
