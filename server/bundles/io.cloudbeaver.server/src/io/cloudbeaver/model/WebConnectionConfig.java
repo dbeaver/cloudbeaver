@@ -74,12 +74,12 @@ public class WebConnectionConfig {
         name = JSONUtils.getString(params, "name");
         description = JSONUtils.getString(params, "description");
 
-        properties = JSONUtils.getObject(params, "properties");
+        properties = JSONUtils.getObjectOrNull(params, "properties");
         userName = JSONUtils.getString(params, "userName");
         userPassword = JSONUtils.getString(params, "userPassword");
 
         authModelId = JSONUtils.getString(params, "authModelId");
-        credentials = JSONUtils.getObject(params, "credentials");
+        credentials = JSONUtils.getObjectOrNull(params, "credentials");
         saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
     }
 

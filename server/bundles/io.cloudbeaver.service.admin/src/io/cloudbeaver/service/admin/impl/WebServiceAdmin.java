@@ -249,7 +249,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException {
         // Get all connections from global configuration
         List<WebConnectionInfo> result = new ArrayList<>();
-        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+        for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
             if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
@@ -267,7 +267,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public WebConnectionInfo createConnectionConfiguration(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
-        DBPDataSourceRegistry registry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceRegistry registry = WebServiceUtils.getGlobalDataSourceRegistry();
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
         registry.addDataSource(dataSource);
         registry.flushConfig();
@@ -279,7 +279,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException {
         try {
             DBNModel globalNavigatorModel = webSession.getNavigatorModel();
-            DBPDataSourceRegistry globalDataSourceRegistry = WebServiceUtils.getDataSourceRegistry();
+            DBPDataSourceRegistry globalDataSourceRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
 
             DBNNode srcNode = globalNavigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (srcNode == null) {
@@ -303,23 +303,30 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public WebConnectionInfo updateConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id, @NotNull WebConnectionConfig config) throws DBWebException {
-        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        DBPDataSourceContainer dataSource = WebServiceUtils.getGlobalDataSourceRegistry().getDataSource(id);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
         WebServiceUtils.updateConnectionFromConfig(dataSource, config);
         dataSource.persistConfiguration();
+        // Update local datasource as well. We use it for connection tests
+        // It may be null if this connection was just created
+        DBPDataSourceContainer localDS = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(id);
+        if (localDS != null) {
+            WebServiceUtils.updateConnectionFromConfig(localDS, config);
+            // We don't need to save it in local registry (because in fact it is stored in the global registry)
+        }
         return new WebConnectionInfo(webSession, dataSource);
     }
 
     @Override
     public boolean deleteConnectionConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
-        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(id);
+        DBPDataSourceContainer dataSource = WebServiceUtils.getGlobalDataSourceRegistry().getDataSource(id);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
-        WebServiceUtils.getDataSourceRegistry().removeDataSource(dataSource);
-        WebServiceUtils.getDataSourceRegistry().flushConfig();
+        WebServiceUtils.getGlobalDataSourceRegistry().removeDataSource(dataSource);
+        WebServiceUtils.getGlobalDataSourceRegistry().flushConfig();
 
         try {
             CBApplication.getInstance().getSecurityController().setConnectionSubjectAccess(id, null, null);
@@ -389,7 +396,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean setConnectionSubjectAccess(@NotNull WebSession webSession, @NotNull String connectionId, @NotNull List<String> subjects) throws DBWebException {
-        DBPDataSourceContainer dataSource = WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId);
+        DBPDataSourceContainer dataSource = WebServiceUtils.getGlobalDataSourceRegistry().getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");
         }
@@ -417,7 +424,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull List<String> connections) throws DBWebException {
         for (String connectionId : connections) {
-            if (WebServiceUtils.getDataSourceRegistry().getDataSource(connectionId) == null) {
+            if (WebServiceUtils.getGlobalDataSourceRegistry().getDataSource(connectionId) == null) {
                 throw new DBWebException("Connection '" + connectionId + "' not found");
             }
         }

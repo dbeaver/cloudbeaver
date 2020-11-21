@@ -89,7 +89,7 @@ public class WebServiceUtils {
     }
 
     @NotNull
-    public static DBPDataSourceRegistry getDataSourceRegistry() throws DBWebException {
+    public static DBPDataSourceRegistry getGlobalDataSourceRegistry() throws DBWebException {
         DBPDataSourceRegistry registry = DBWorkbench.getPlatform().getWorkspace().getDefaultDataSourceRegistry();
         if (registry == null) {
             throw new DBWebException("No activate data source registry");
@@ -163,9 +163,15 @@ public class WebServiceUtils {
             }
             dsConfig.setProperties(newProps);
         }
-        dsConfig.setUserName(config.getUserName());
-        dsConfig.setUserPassword(config.getUserPassword());
-        dsConfig.setAuthModelId(config.getAuthModelId());
+        if (config.getUserName() != null) {
+            dsConfig.setUserName(config.getUserName());
+        }
+        if (config.getUserPassword() != null) {
+            dsConfig.setUserPassword(config.getUserPassword());
+        }
+        if (config.getAuthModelId() != null) {
+            dsConfig.setAuthModelId(config.getAuthModelId());
+        }
     }
 
     public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties, boolean saveCredentials) {
@@ -244,7 +250,7 @@ public class WebServiceUtils {
             dataSource = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(connectionId);
             if (dataSource == null) {
                 // If called for new connection in admin mode then this connection may absent in session registry yet
-                dataSource = getDataSourceRegistry().getDataSource(connectionId);
+                dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);
             }
         }
         return dataSource;

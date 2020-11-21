@@ -531,7 +531,7 @@ public class CBApplication extends BaseApplicationImpl {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
             DBWSecurityController securityController = getSecurityController();
-            for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+            for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
                 DBWConnectionGrant[] grants = securityController.getConnectionSubjectAccess(ds.getId());
                 if (ArrayUtils.isEmpty(grants)) {
                     securityController.setConnectionSubjectAccess(

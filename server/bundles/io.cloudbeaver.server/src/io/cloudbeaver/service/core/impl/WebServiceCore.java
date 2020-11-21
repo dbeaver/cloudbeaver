@@ -84,7 +84,7 @@ public class WebServiceCore implements DBWServiceCore {
     public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
 
         List<WebDataSourceConfig> result = new ArrayList<>();
-        DBPDataSourceRegistry dsRegistry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceRegistry dsRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
 
         for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
             if (ds.isTemplate()) {
@@ -102,7 +102,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
-        for (DBPDataSourceContainer ds : WebServiceUtils.getDataSourceRegistry().getDataSources()) {
+        for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
             if (ds.isTemplate() &&
                 CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver()))
             {
@@ -180,7 +180,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (CommonUtils.isEmpty(templateId)) {
             throw new DBWebException("Only preconfigured data sources are supported yet");
         }
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
             throw new DBWebException("Datasource '" + templateId + "' not found");
@@ -270,7 +270,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException {
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getDataSourceRegistry();
+        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
             throw new DBWebException("Template data source '" + templateId + "' not found");
@@ -324,7 +324,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (dataSource != null) {
             testDataSource = dataSource.createCopy(dataSource.getRegistry());
             WebServiceUtils.setConnectionConfiguration(testDataSource.getDriver(), testDataSource.getConnectionConfiguration(), connectionConfig);
-            WebServiceUtils.saveAuthProperties(testDataSource, testDataSource.getConnectionConfiguration(), connectionConfig.getCredentials(), connectionConfig.isSaveCredentials());
+            WebServiceUtils.saveAuthProperties(testDataSource, testDataSource.getConnectionConfiguration(), connectionConfig.getCredentials(), true);
         } else {
             testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         }
