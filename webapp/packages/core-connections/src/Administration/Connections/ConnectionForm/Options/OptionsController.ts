@@ -39,11 +39,11 @@ implements IInitializableController {
     return this.dbAuthModelsResource.isLoading();
   }
 
-  @computed get properties(): ObjectPropertyInfo[] {
-    if (this.model.connection.authProperties) {
+  @computed get properties(): ObjectPropertyInfo[] | undefined {
+    if (this.model.connection.authProperties.length) {
       return this.model.connection.authProperties;
     }
-    return this.authModel?.properties || [];
+    return this.authModel?.properties;
   }
 
   private model!: IConnectionFormModel;
