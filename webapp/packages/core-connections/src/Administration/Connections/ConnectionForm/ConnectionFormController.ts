@@ -23,7 +23,6 @@ import { IConnectionFormModel } from './IConnectionFormModel';
 export class ConnectionFormController
 implements IInitializableController {
   @observable isSaving: boolean;
-  @observable readonly metadata: Map<string, any>;
 
   readonly afterSave: IExecutor<string>;
 
@@ -52,7 +51,6 @@ implements IInitializableController {
     private dbDriverResource: DBDriverResource
   ) {
     this.isSaving = false;
-    this.metadata = new Map<string, any>();
     this.afterSave = new Executor();
   }
 
@@ -141,7 +139,13 @@ implements IInitializableController {
       return true;
     }
     for (const property of this.model.connection.authProperties) {
-      if (property.value !== null && this.model.credentials[property.id!] !== property.value) {
+      const value = this.model.credentials[property.id!];
+
+      if (property.features.includes('password')) {
+        if (value) {
+          return true;
+        }
+      } else if (value !== property.value) {
         return true;
       }
     }

@@ -1167,7 +1167,7 @@ export interface NavGetStructContainersQuery { navGetStructContainers: { catalog
 
 export type AdminConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
-  & { origin: ObjectOriginInfoFragment; authProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'value' | 'features'>> }
+  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[] }
 );
 
 export type AdminUserInfoFragment = (
@@ -1455,6 +1455,20 @@ export const ObjectOriginInfoFragmentDoc = `
   icon
 }
     `;
+export const UserConnectionAuthPropertiesFragmentDoc = `
+    fragment UserConnectionAuthProperties on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  features
+  order
+}
+    `;
 export const AdminConnectionFragmentDoc = `
     fragment AdminConnection on ConnectionInfo {
   id
@@ -1478,14 +1492,13 @@ export const AdminConnectionFragmentDoc = `
   authNeeded
   authModel
   authProperties {
-    id
-    value
-    features
+    ...UserConnectionAuthProperties
   }
   features
   supportedDataFormats
 }
-    ${ObjectOriginInfoFragmentDoc}`;
+    ${ObjectOriginInfoFragmentDoc}
+${UserConnectionAuthPropertiesFragmentDoc}`;
 export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
@@ -1546,20 +1559,6 @@ export const UserConnectionFragmentDoc = `
   authModel
   features
   supportedDataFormats
-}
-    `;
-export const UserConnectionAuthPropertiesFragmentDoc = `
-    fragment UserConnectionAuthProperties on ObjectPropertyInfo {
-  id
-  displayName
-  description
-  category
-  dataType
-  value
-  validValues
-  defaultValue
-  features
-  order
 }
     `;
 export const AsyncTaskCancelDocument = `

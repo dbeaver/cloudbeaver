@@ -12,8 +12,9 @@ import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, ResourceKeyUtils, ResourceKey } from '@cloudbeaver/core-sdk';
 
+import { DatabaseAuthModelsResource } from '../../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../../DBDriverResource';
 import { AdminConnection, ConnectionsResource } from '../../ConnectionsResource';
 
@@ -51,26 +52,68 @@ implements IInitializableController, IDestructibleController {
   constructor(
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
-    private dbDriverResource: DBDriverResource
-  ) { }
+    private dbDriverResource: DBDriverResource,
+    private dbAuthModelsResource: DatabaseAuthModelsResource
+  ) {
+    this.updateConnectionInfo = this.updateConnectionInfo.bind(this);
+  }
 
-  init(id: string) {
+  async init(id: string): Promise<void> {
     this.connectionId = id;
-    this.loadConnectionInfo();
+    await this.loadConnectionInfo();
+    this.connectionsResource.onItemAdd.addHandler(this.updateConnectionInfo);
   }
 
   destruct(): void {
+    this.connectionsResource.onItemAdd.removeHandler(this.updateConnectionInfo);
   }
 
   private async loadConnectionInfo() {
     this.isLoading = true;
     try {
       // we create a copy to protect the current value from mutation
-      this.connection = JSON.parse(JSON.stringify(await this.connectionsResource.load(this.connectionId)));
+      await this.connectionsResource.load(this.connectionId);
+      await this.updateConnectionInfo(this.connectionId);
     } catch (exception) {
       this.notificationService.logException(exception, "Can't load ConnectionInfo", `Can't load ConnectionInfo ${this.connectionId}`);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  private async updateConnectionInfo(key: ResourceKey<string>) {
+    if (!ResourceKeyUtils.includes(key, this.connectionId)) {
+      return;
+    }
+    this.connection = JSON.parse(JSON.stringify(await this.connectionsResource.load(this.connectionId)));
+    await this.updateCredentials();
+  }
+
+  private cleanCredentials() {
+    for (const property of Object.keys(this.credentials)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete this.credentials[property];
+    }
+  }
+
+  private async updateCredentials() {
+    this.cleanCredentials();
+    if (!this.driver || this.driver.anonymousAccess || !this.connection) {
+      return;
+    }
+
+    try {
+      await this.dbAuthModelsResource.load(
+        this.connection.authModel || this.driver.defaultAuthModel
+      );
+
+      for (const property of this.connection.authProperties) {
+        if (!property.features.includes('password')) {
+          this.credentials[property.id!] = property.value;
+        }
+      }
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Can\'t load driver auth model');
     }
   }
 }

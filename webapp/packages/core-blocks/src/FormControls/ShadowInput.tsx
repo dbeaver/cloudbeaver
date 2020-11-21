@@ -22,7 +22,7 @@ export const ShadowInput = React.forwardRef(function ShadowInput({
   return (
     <input
       ref={ref}
-      value={children}
+      value={children ?? ''}
       onChange={e => onChange?.(e.target.value)}
       {...rest}
     />

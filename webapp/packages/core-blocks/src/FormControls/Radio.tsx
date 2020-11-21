@@ -139,7 +139,7 @@ export const Radio: RadioType = observer(function Radio({
           type="radio"
           id={id}
           name={name}
-          value={value}
+          value={value ?? ''}
           checked={checked}
           onChange={handleChange}
         />

@@ -40,7 +40,7 @@ export const baseFormControlStyles = css`
     flex-basis: 100%;
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 150px;
+    padding-left: 180px;
   }
   
   field[|raw] {

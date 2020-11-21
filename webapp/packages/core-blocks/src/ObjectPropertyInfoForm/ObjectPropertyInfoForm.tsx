@@ -20,7 +20,62 @@ import { Link } from '../Link';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
 
-interface Props {
+const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
+
+interface RenderFieldProps {
+  property: ObjectPropertyInfo;
+  state: Record<string, any>;
+  autofillToken?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  autoHide?: boolean;
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+}
+
+const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
+  property,
+  state,
+  autofillToken = '',
+  disabled,
+  readOnly,
+  autoHide,
+  onFocus,
+}) {
+  const href = property.features.includes('href');
+  const password = property.features.includes('password');
+  let description: string | undefined;
+
+  if (href) {
+    return (
+      <FormFieldDescription label={property.displayName} raw>
+        <Link href={property.value} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+      </FormFieldDescription>
+    );
+  }
+
+  if (password && property.value) {
+    description = 'Password saved';
+  }
+
+  return (
+    <InputField
+      type={password ? 'password' : 'text'}
+      name={property.id!}
+      state={state}
+      description={description}
+      disabled={disabled}
+      readOnly={readOnly}
+      autoHide={autoHide}
+      autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
+      mod='surface'
+      onFocus={onFocus}
+    >
+      {property.displayName}
+    </InputField>
+  );
+});
+
+interface ObjectPropertyFormProps {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
   autofillToken?: string;
@@ -31,9 +86,7 @@ interface Props {
   onFocus?: (name: string) => void;
 }
 
-const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
-
-export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectPropertyInfoForm({
+export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
   autofillToken = '',
@@ -49,16 +102,7 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
     if (onFocus) {
       onFocus(e.target.name);
     }
-    if (e.target.type !== 'password') {
-      return;
-    }
-
-    const property = properties?.find(property => property.id === e.target.name);
-
-    if (property?.value === e.target.value) {
-      credentials[e.target.name] = '';
-    }
-  }, [properties, credentials, onFocus]);
+  }, [onFocus]);
 
   if (!properties || properties.length === 0) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
@@ -68,25 +112,15 @@ export const ObjectPropertyInfoForm: React.FC<Props> = observer(function ObjectP
     <form-body as='div' className={className}>
       {properties.map(property => (
         <FormGroup key={property.id}>
-          {property.features.includes('href') ? (
-            <FormFieldDescription label={property.displayName} raw>
-              <Link href={property.value} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
-            </FormFieldDescription>
-          ) : (
-            <InputField
-              type={property.features.includes('password') ? 'password' : 'text'}
-              name={property.id!}
-              state={credentials}
-              disabled={disabled}
-              readOnly={readOnly}
-              autoHide={autoHide}
-              autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-              mod='surface'
-              onFocus={handleFocus}
-            >
-              {property.displayName}
-            </InputField>
-          )}
+          <RenderField
+            property={property}
+            state={credentials}
+            autofillToken={autofillToken}
+            disabled={disabled}
+            readOnly={readOnly}
+            autoHide={autoHide}
+            onFocus={handleFocus}
+          />
         </FormGroup>
       ))}
     </form-body>

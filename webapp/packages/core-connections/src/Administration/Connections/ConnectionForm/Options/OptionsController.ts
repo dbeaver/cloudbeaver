@@ -10,7 +10,7 @@ import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
+import { DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
@@ -39,6 +39,13 @@ implements IInitializableController {
     return this.dbAuthModelsResource.isLoading();
   }
 
+  @computed get properties(): ObjectPropertyInfo[] {
+    if (this.model.connection.authProperties) {
+      return this.model.connection.authProperties;
+    }
+    return this.authModel?.properties || [];
+  }
+
   private model!: IConnectionFormModel;
   private nameTemplate = /^.*?\s(|\(.*?\)\s)connection$/;
 
@@ -61,39 +68,14 @@ implements IInitializableController {
 
   onFormChange = (value?: unknown, name?: string): void => {
     this.updateName(name);
-    this.resetPassword(name || '');
   };
 
   @action
   private setDefaults(prevDriverId: string | null) {
     this.setDefaultParameters(prevDriverId);
+    this.cleanCredentials();
     this.model.connection.properties = {};
     this.model.connection.authModel = this.driver?.defaultAuthModel;
-    this.cleanCredentials();
-  }
-
-  resetPassword = (name: string): void => {
-    const passwordProperty = this.model.connection.authProperties.find(property => property.features.includes('password'));
-
-    if (passwordProperty && (this.isCredentialsChanged() || passwordProperty.id === name)) {
-      if (this.model.credentials[passwordProperty.id!] === passwordProperty.value) {
-        this.model.credentials[passwordProperty.id!] = '';
-        this.model.connection.saveCredentials = false;
-      }
-    }
-  };
-
-  private isCredentialsChanged() {
-    if (!Object.keys(this.model.credentials).length) {
-      return false;
-    }
-    for (const property of this.model.connection.authProperties) {
-      // commented because of case when name changed, password should be reset
-      if (/* property.value !== null && */this.model.credentials[property.id!] !== property.value) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private cleanCredentials() {
@@ -160,25 +142,10 @@ implements IInitializableController {
   private async loadDrivers() {
     try {
       await this.dbDriverResource.loadAll();
+      await this.dbAuthModelsResource.load(
+        this.model.connection.authModel || this.driver!.defaultAuthModel
+      );
       this.setDefaultParameters();
-
-      if (!this.driver || this.driver.anonymousAccess) {
-        return;
-      }
-
-      try {
-        await this.dbAuthModelsResource.load(
-          this.model.connection?.authModel || this.driver.defaultAuthModel
-        );
-
-        if (this.authModel) {
-          for (const property of this.model.connection.authProperties) {
-            this.model.credentials[property.id!] = property.value;
-          }
-        }
-      } catch (exception) {
-        this.notificationService.logException(exception, 'Can\'t load driver auth model');
-      }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load drivers');
     }
@@ -187,33 +154,17 @@ implements IInitializableController {
   private async loadDriver(driverId: string | null, prev: string | null) {
     if (!driverId) {
       this.model.connection.authModel = undefined;
-      this.cleanCredentials();
       return;
     }
 
     try {
       await this.dbDriverResource.load(driverId);
+      await this.dbAuthModelsResource.load(
+        this.model.connection.authModel || this.driver!.defaultAuthModel
+      );
       this.setDefaults(prev);
     } catch (exception) {
       this.notificationService.logException(exception, `Can't load driver ${driverId}`);
-    }
-
-    if (!this.driver || this.driver.anonymousAccess) {
-      return;
-    }
-
-    try {
-      await this.dbAuthModelsResource.load(
-        this.model.connection?.authModel || this.driver.defaultAuthModel
-      );
-
-      if (this.authModel) {
-        for (const property of this.model.connection.authProperties) {
-          this.model.credentials[property.id!] = property.value;
-        }
-      }
-    } catch (exception) {
-      this.notificationService.logException(exception, 'Can\'t load driver auth model');
     }
   }
 }

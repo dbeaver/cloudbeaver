@@ -139,10 +139,9 @@ export const Options = observer(function Options({
               </FormGroup>
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
-                properties={controller.authModel.properties}
+                properties={controller.properties}
                 credentials={model.credentials}
                 disabled={disabled}
-                onFocus={controller.resetPassword}
               />
               <FormGroup>
                 <FieldCheckbox

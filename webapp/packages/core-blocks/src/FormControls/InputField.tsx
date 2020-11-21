@@ -17,6 +17,7 @@ import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
+  description?: string;
   mod?: 'surface';
   long?: boolean;
   short?: boolean;
@@ -52,6 +53,7 @@ export const InputField: InputFieldType = observer(function InputField({
   state,
   children,
   className,
+  description,
   mod,
   long,
   short,
@@ -86,11 +88,16 @@ export const InputField: InputFieldType = observer(function InputField({
       <input
         {...rest}
         name={name}
-        value={value}
+        value={value ?? ''}
         onChange={handleChange}
         {...use({ mod })}
         required={required}
       />
+      {description && (
+        <field-description as='div'>
+          {description}
+        </field-description>
+      )}
     </field>
   );
 });

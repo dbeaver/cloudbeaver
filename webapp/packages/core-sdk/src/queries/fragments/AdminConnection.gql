@@ -25,9 +25,7 @@ fragment AdminConnection on ConnectionInfo {
   authNeeded
   authModel
   authProperties {
-    id
-    value
-    features
+    ...UserConnectionAuthProperties
   }
 
   features

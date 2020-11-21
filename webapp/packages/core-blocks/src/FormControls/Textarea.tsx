@@ -79,7 +79,7 @@ export const Textarea: TextareaType = observer(function Textarea({
       <field-label as='label'>{children}</field-label>
       <textarea
         {...rest}
-        value={value}
+        value={value ?? ''}
         name={name}
         onChange={handleChange}
         {...use({ mod })}
