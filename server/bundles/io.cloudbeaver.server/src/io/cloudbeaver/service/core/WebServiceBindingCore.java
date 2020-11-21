@@ -22,12 +22,15 @@ import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionManager;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
+
+import java.util.Collections;
 
 /**
  * Web service implementation
@@ -56,10 +59,17 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("connectionState", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
             .dataFetcher("connectionInfo", env -> getService(env).getConnectionState(getWebSession(env), env.getArgument("id")))
 
-            .dataFetcher("readSessionLog", env -> getService(env).readSessionLog(
-                getWebSession(env),
-                env.getArgument("maxEntries"),
-                env.getArgument("clearEntries")))
+            .dataFetcher("readSessionLog", env -> {
+                // CB-90. Log read mustn't extend session lifetime and mustn't fail if there is no session.
+                WebSession session = findWebSession(env);
+                if (session == null) {
+                    return Collections.emptyList();
+                }
+                return getService(env).readSessionLog(
+                    getWebSession(env),
+                    env.getArgument("maxEntries"),
+                    env.getArgument("clearEntries"));
+            })
         ;
 
         model.getMutationType()
