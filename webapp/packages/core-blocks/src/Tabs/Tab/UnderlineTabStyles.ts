@@ -11,7 +11,7 @@ import { css } from 'reshadow';
 export const UNDERLINE_TAB_STYLES = css`
   TabList {
     display: flex;
-    & Tab {
+    & tab-outer:not(:last-child) {
       margin-right: 15px;
     }
   }
@@ -27,7 +27,7 @@ export const UNDERLINE_TAB_STYLES = css`
       cursor: pointer;
       opacity: 1;
     }
-    &[|selected] {
+    &:global([aria-selected="true"]) {
       opacity: 1;
       &:after {
         content: '';
