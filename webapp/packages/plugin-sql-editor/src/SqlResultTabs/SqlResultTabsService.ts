@@ -140,6 +140,13 @@ export class SqlResultTabsService {
           const data = await editorMetadata.resultDataProcess.promise;
 
           length = data.results?.length || 1;
+
+          if (length === 1) {
+            resultTab.name = this.getTabNameForOrder(tabGroup.order);
+          } else {
+            resultTab.name = this.getTabNameForOrder(tabGroup.order, resultTab.order);
+          }
+
           editorState.resultTabs = editorState.resultTabs
             .filter(
               resultTab => resultTab.groupId !== tabGroup.groupId
@@ -172,13 +179,13 @@ export class SqlResultTabsService {
       resultTabId: uuid(),
       groupId,
       order,
-      name: this.getTabNameForOrder(order, groupOrder),
+      name: this.getTabNameForOrder(groupOrder, order),
       indexInResultSet,
     };
   }
 
-  private getTabNameForOrder(order: number, groupOrder: number) {
-    return `Result - ${groupOrder} (${order})`;
+  private getTabNameForOrder(groupOrder: number, order?: number) {
+    return `Result - ${groupOrder}` + (order !== undefined ? ` (${order})` : '');
   }
 }
 
