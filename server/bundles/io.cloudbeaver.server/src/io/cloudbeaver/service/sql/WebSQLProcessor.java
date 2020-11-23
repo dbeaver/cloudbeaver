@@ -246,13 +246,9 @@ public class WebSQLProcessor {
         WebSession webSession = contextInfo.getProcessor().getWebSession();
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        if (rowIdentifier == null) {
-            throw new DBWebException("Can't detect row identifier for results '" + resultsId + "'");
-        }
+        checkRowIdentifier(resultsInfo, rowIdentifier);
         DBSEntity dataContainer = rowIdentifier.getEntity();
-        if (!(dataContainer instanceof DBSDataManipulator)) {
-            throw new DBWebException("Data container '" + dataContainer.getName() + "' is not editable");
-        }
+        checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
 
         DBRProgressMonitor monitor = this.webSession.getProgressMonitor();
@@ -329,13 +325,9 @@ public class WebSQLProcessor {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        if (rowIdentifier == null || !rowIdentifier.isValidIdentifier()) {
-            throw new DBWebException("Can't detect row identifier for data container '" + resultsInfo.getDataContainer().getName() + "'. It must have at least one unique key.");
-        }
+        checkRowIdentifier(resultsInfo, rowIdentifier);
         DBSEntity dataContainer = rowIdentifier.getEntity();
-        if (!(dataContainer instanceof DBSDataManipulator)) {
-            throw new DBWebException("Data container '" + dataContainer.getName() + "' is not editable");
-        }
+        checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
 
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
@@ -423,6 +415,18 @@ public class WebSQLProcessor {
         }
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
         return result;
+    }
+
+    private void checkRowIdentifier(WebSQLResultsInfo resultsInfo, DBDRowIdentifier rowIdentifier) throws DBWebException {
+        if (rowIdentifier == null || !rowIdentifier.isValidIdentifier()) {
+            throw new DBWebException("Can't detect row identifier for data container '" + resultsInfo.getDataContainer().getName() + "'. It must have at least one unique key.");
+        }
+    }
+
+    private void checkDataEditAllowed(DBSEntity dataContainer) throws DBWebException {
+        if (!(dataContainer instanceof DBSDataManipulator)) {
+            throw new DBWebException("Data container '" + dataContainer.getName() + "' is not editable");
+        }
     }
 
     @NotNull
