@@ -35,6 +35,7 @@ export const Tab: React.FC<TabProps> = function Tab({
         <tab-inner as='div'>
           <BaseTab
             {...state.state}
+            type="button"
             id={tabId}
             className={className}
             disabled={disabled}

@@ -6,3 +6,4 @@ export * from './TabProps';
 export * from './TabTitle';
 export * from './useTab';
 export * from './verticalRotatedTabStyles';
+export * from './UnderlineTabStyles';
