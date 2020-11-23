@@ -329,8 +329,8 @@ public class WebSQLProcessor {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        if (rowIdentifier == null) {
-            throw new DBWebException("Can't detect row identifier for results '" + resultsId + "'");
+        if (rowIdentifier == null || !rowIdentifier.isValidIdentifier()) {
+            throw new DBWebException("Can't detect row identifier for data container '" + resultsInfo.getDataContainer().getName() + "'. It must have at least one unique key.");
         }
         DBSEntity dataContainer = rowIdentifier.getEntity();
         if (!(dataContainer instanceof DBSDataManipulator)) {
