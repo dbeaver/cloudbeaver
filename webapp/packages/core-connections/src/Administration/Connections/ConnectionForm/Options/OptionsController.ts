@@ -47,7 +47,7 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^.*?\s(|\(.*?\)\s)connection$/;
+  private nameTemplate = /^(.*?)\s(|\(.*?\)\s)connection$/;
 
   constructor(
     private notificationService: NotificationService,
@@ -115,10 +115,10 @@ implements IInitializableController {
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
       .filter(Boolean);
 
+    const matches = this.nameTemplate.exec(this.model.connection.name);
+
     if (this.model.connection.name === undefined
-        || (this.nameTemplate.test(this.model.connection.name)
-            && databaseNames.some(driver => this.model.connection.name.startsWith(driver)))
-    ) {
+        || (matches?.length && databaseNames.includes(matches[1]))) {
       this.model.connection.name = this.getNameTemplate();
     }
   }
