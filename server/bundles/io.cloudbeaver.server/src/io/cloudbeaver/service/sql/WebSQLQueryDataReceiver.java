@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDAttributeBindingMeta;
+import org.jkiss.dbeaver.model.data.DBDAttributeBindingType;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
@@ -99,6 +100,17 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         if (dataFormat != WebDataFormat.document) {
             convertComplexValuesToRelationalView(session);
+        }
+
+        // Set proper order position
+        for (int i = 0; i < bindings.length; i++) {
+            DBDAttributeBinding binding = bindings[i];
+            if (binding instanceof DBDAttributeBindingType) {
+                // Type bindings are produced by dynamic map resolve
+                // Their positions are valid only within parent value
+                // In web we make plain list of attributes so we must reorder leaf attributes
+                ((DBDAttributeBindingType) binding).setOrdinalPosition(i);
+            }
         }
 
         // Convert row values

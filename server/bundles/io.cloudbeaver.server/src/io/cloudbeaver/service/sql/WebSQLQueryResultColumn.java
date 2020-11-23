@@ -109,4 +109,8 @@ public class WebSQLQueryResultColumn {
         return DBExecUtils.getAttributeReadOnlyStatus(attrMeta);
     }
 
+    @Override
+    public String toString() {
+        return attrMeta.getName();
+    }
 }
