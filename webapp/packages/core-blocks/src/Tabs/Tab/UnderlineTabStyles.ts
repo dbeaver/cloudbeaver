@@ -30,7 +30,6 @@ export const UNDERLINE_TAB_STYLES = composes(
       border: none;
       border-bottom: 2px solid;
       outline: none;
-      box-sizing: border-box;
       opacity: 1;
       height: 30px !important;
       padding: 0 5px !important;
