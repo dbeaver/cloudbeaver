@@ -25,7 +25,6 @@ export const UNDERLINE_TAB_STYLES = composes(
     }
     Tab {
       composes: theme-typography--body2 from global;
-      position: relative;
       background: none;
       color: inherit;
       border: none;
