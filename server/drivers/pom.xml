@@ -19,6 +19,7 @@
         <module>derby</module>
         <module>h2</module>
         <module>sqlite</module>
+        <module>sqlserver</module>
     </modules>
 
     <build>

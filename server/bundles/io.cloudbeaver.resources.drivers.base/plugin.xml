@@ -10,6 +10,7 @@
         <resource name="drivers/jaybird"/>
         <resource name="drivers/h2"/>
         <resource name="drivers/sqlite/xerial"/>
+        <resource name="drivers/mssql/new"/>
     </extension>
 
     <!-- Bundles  -->
@@ -22,6 +23,7 @@
         <bundle id="drivers.firebird" label="Firebird drivers"/>
         <bundle id="drivers.h2" label="H2 drivers"/>
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
+        <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
     </extension>
 
     <!-- Enabled drivers -->
@@ -34,6 +36,7 @@
         <driver id="generic:derby_server"/>
         <driver id="generic:h2_embedded"/>
         <driver id="generic:sqlite_jdbc"/>
+        <driver id="sqlserver:microsoft"/>
     </extension>
 
 
