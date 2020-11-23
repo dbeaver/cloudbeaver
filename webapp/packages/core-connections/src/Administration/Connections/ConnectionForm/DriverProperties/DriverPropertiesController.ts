@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import { IProperty } from '@cloudbeaver/core-blocks';
-import { injectable, IInitializableController } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -23,7 +23,7 @@ interface StaticId {
 export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId;
 
 @injectable()
-export class DriverPropertiesController implements IInitializableController {
+export class DriverPropertiesController {
   @observable isLoading = false;
   @observable hasDetails = false;
   @observable responseMessage: string | null = null;
@@ -39,7 +39,7 @@ export class DriverPropertiesController implements IInitializableController {
     private notificationService: NotificationService
   ) { }
 
-  init(driverId: string, state: Record<string, string>) {
+  update(driverId: string, state: Record<string, string>): void {
     this.driverId = driverId;
     this.state = state;
   }

@@ -41,7 +41,8 @@ export const DriverProperties = observer(function DriverProperties({
   controller: formController,
 }: DriverPropertiesProps) {
   const style = useStyles(styles);
-  const controller = useController(DriverPropertiesController, model.connection.driverId, model.connection.properties);
+  const controller = useController(DriverPropertiesController);
+  controller.update(model.connection.driverId, model.connection.properties);
   const { selected } = useTab(tabId, controller.loadDriverProperties);
 
   if (!selected) {
