@@ -38,12 +38,22 @@ export class SqlEditorController implements IInitializableController {
     return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isSqlExecuting;
   }
 
-  handleExecute = () => {
-    this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), false);
+  handleExecute = async () => {
+    this.sqlResultTabsService.executeEditorQuery(
+      this.tab.id,
+      this.tab.handlerState,
+      await this.getExecutingQuery(),
+      false
+    );
   };
 
-  handleExecuteNewTab = () => {
-    this.sqlResultTabsService.executeEditorQuery(this.tab.id, this.tab.handlerState, this.getExecutingQuery(), true);
+  handleExecuteNewTab = async () => {
+    this.sqlResultTabsService.executeEditorQuery(
+      this.tab.id,
+      this.tab.handlerState,
+      await this.getExecutingQuery(),
+      true
+    );
   };
 
   readonly options: EditorConfiguration = {
@@ -62,10 +72,10 @@ export class SqlEditorController implements IInitializableController {
     },
     extraKeys: {
       // Execute sql script
-      'Ctrl-Enter': this.handleExecute,
+      'Ctrl-Enter': () => { this.handleExecute(); },
       // Execute sql script in new tab
-      'Ctrl-\\': this.handleExecuteNewTab,
-      'Shift-Ctrl-Enter': this.handleExecuteNewTab,
+      'Ctrl-\\': () => { this.handleExecuteNewTab(); },
+      'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
 
       // Autocomplete
       'Ctrl-Space': showHint, // classic for windows, linux
@@ -95,9 +105,18 @@ export class SqlEditorController implements IInitializableController {
 
   init(tab: ITab<ISqlEditorTabState>) {
     this.tab = tab;
+    this.loadDialect();
   }
 
-  private getExecutingQuery(): string {
+  private async loadDialect(): Promise<SqlDialectInfo | undefined> {
+    if (!this.tab.handlerState.connectionId) {
+      return undefined;
+    }
+
+    return await this.sqlDialectInfoService.loadSqlDialectInfo(this.tab.handlerState.connectionId);
+  }
+
+  private async getExecutingQuery(): Promise<string> {
     if (!this.editor) {
       return this.tab.handlerState.query;
     }
@@ -107,8 +126,9 @@ export class SqlEditorController implements IInitializableController {
     }
 
     const delimiters = [];
-    if (this.dialect?.scriptDelimiter) {
-      delimiters.push(this.dialect.scriptDelimiter);
+    const dialect = await this.loadDialect();
+    if (dialect?.scriptDelimiter) {
+      delimiters.push(dialect.scriptDelimiter);
     }
 
     const cursor = this.editor.getCursor();

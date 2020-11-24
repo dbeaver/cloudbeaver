@@ -117,7 +117,9 @@ export class SqlResultTabsService {
           1
         );
         resultTab = this.createResultTab(order, tabGroup.groupId, tabGroup.order, i);
-        editorState.resultTabs.push(resultTab);
+
+        // we get mobx observed value here, so we can mutate name late
+        resultTab = editorState.resultTabs[editorState.resultTabs.push(resultTab) - 1];
       }
 
       if (i === 0) {
@@ -179,7 +181,7 @@ export class SqlResultTabsService {
       resultTabId: uuid(),
       groupId,
       order,
-      name: this.getTabNameForOrder(groupOrder, order),
+      name: this.getTabNameForOrder(groupOrder, indexInResultSet === 0 ? undefined : order),
       indexInResultSet,
     };
   }
