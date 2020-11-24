@@ -50,8 +50,6 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
       getValue: () => value.current,
     }), []);
 
-    useEffect(() => inputRef.current?.focus(), []);
-
     const context: AgGridContext = props.context;
 
     const handleSave = useCallback(() => props.stopEditing(), [props.stopEditing]);
@@ -73,6 +71,14 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
       value.current = newValue;
       context.editCellValue(props.rowIndex, props.column.getColId(), newValue, true);
       forceUpdate(value.current);
+    }, []);
+
+    useEffect(() => {
+      inputRef.current?.focus();
+
+      if (initValue !== props.value) {
+        handleChange(initValue);
+      }
     }, []);
 
     const isLastColumn = props.columnApi?.getAllGridColumns().slice(-1)[0] === props.column;

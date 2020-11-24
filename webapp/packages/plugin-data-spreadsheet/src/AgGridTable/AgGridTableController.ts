@@ -20,7 +20,8 @@ import {
   GridOptions,
   CellClassParams,
   SortChangedEvent,
-  RowNode
+  RowNode,
+  CellEditingStoppedEvent
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
@@ -75,6 +76,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onBodyScroll: this.handleBodyScroll.bind(this),
 
     onSortChanged: this.handleSortChanged.bind(this),
+    onCellEditingStopped: this.handleCellEditingStopped.bind(this),
   };
 
   @observable columns: ColDef[] = [];
@@ -129,7 +131,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
       startRow,
       endRow,
       successCallback,
-      sortModel,
       failCallback,
     } = params;
 
@@ -230,6 +231,10 @@ export class AgGridTableController implements IInitializableController, IDestruc
         }
       }
     }
+  }
+
+  private handleCellEditingStopped(event: CellEditingStoppedEvent) {
+    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getId(), event.value, false);
   }
 
   /* Actions */

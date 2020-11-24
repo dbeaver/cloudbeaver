@@ -43,6 +43,13 @@ export class TableEditor {
       return;
     }
 
+    const row = this.dataModel.getRowByNumber(rowId);
+
+    if (row[column.position] === value) {
+      this.revertCellValue(rowId, columnKey);
+      return;
+    }
+
     const newValue = this.getOrCreateEditedRow(rowId)
       .setValue(column.position, value);
 
