@@ -148,7 +148,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       const requestedData = await this.gridModel.onRequestData(startRow, length);
       // update columns only once after first data fetching
       if (isColumnsChanged(this.columns, requestedData.columns)) {
-        this.columns = this.mapDataToColumns(requestedData.rows, this.gridContainer, requestedData.columns);
+        this.columns = this.mapDataToColumns(requestedData.rows, requestedData.columns);
       }
       successCallback(
         this.cloneRows(requestedData.rows),
@@ -304,7 +304,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     return this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100;
   }
 
-  private mapDataToColumns(rows: AgGridRow[], gridContainer: HTMLElement | null, columns?: IAgGridCol[]): ColDef[] {
+  private mapDataToColumns(rows: AgGridRow[], columns?: IAgGridCol[]): ColDef[] {
     if (!columns || !columns.length) {
       return [];
     }
