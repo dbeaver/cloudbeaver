@@ -21,7 +21,6 @@ import {
   CellClassParams,
   SortChangedEvent,
   RowNode,
-  CellEditingStoppedEvent
 } from '@ag-grid-community/core';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import {
@@ -31,9 +30,18 @@ import {
 import { AgGridContext } from './AgGridContext';
 import { TableSelection } from './TableSelection/TableSelection';
 
+/** title margin + type icon width + sort icon width + title margin right + box padding  */
+const COLUMN_TITLE_BOX_WIDTH = 8 + 16 + 24 + 20 + 24;
+/** row padding + sort шcon width + right column title padding  */
+const ROW_VALUE_BOX_WIDTH = 22 + 20 + 12;
+/** how many rows we want to include to get column width  */
+const ROWS_INCLUDE_IN_MEASUREMENTS = 100;
+const MAX_WIDTH_COLUMN_PERCENT = 33;
+const MAX_WIDTH_COLUMN_DEFALUT_VALUE = 300;
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
   @observable refreshId = 0;
+  gridContainer: HTMLElement | null = null;
 
   private readonly datasource: IDatasource = {
     getRows: this.getRows.bind(this),
@@ -76,7 +84,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onBodyScroll: this.handleBodyScroll.bind(this),
 
     onSortChanged: this.handleSortChanged.bind(this),
-    onCellEditingStopped: this.handleCellEditingStopped.bind(this),
   };
 
   @observable columns: ColDef[] = [];
@@ -131,6 +138,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       startRow,
       endRow,
       successCallback,
+      sortModel,
       failCallback,
     } = params;
 
@@ -139,7 +147,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       const requestedData = await this.gridModel.onRequestData(startRow, length);
       // update columns only once after first data fetching
       if (isColumnsChanged(this.columns, requestedData.columns)) {
-        this.columns = mapDataToColumns(requestedData.columns);
+        this.columns = mapDataToColumns(requestedData.rows, this.gridContainer, requestedData.columns);
       }
       successCallback(
         this.cloneRows(requestedData.rows),
@@ -233,10 +241,6 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getId(), event.value, false);
-  }
-
   /* Actions */
 
   private resetData(): void {
@@ -264,8 +268,8 @@ export const INDEX_COLUMN_DEF: ColDef = {
   headerName: '#',
   colId: `${Number.MAX_SAFE_INTEGER}`,
   field: `${Number.MAX_SAFE_INTEGER}`,
-  width: 70,
   pinned: 'left',
+  width: 70,
   suppressNavigable: true,
   suppressMenu: true,
   editable: false,
@@ -274,59 +278,101 @@ export const INDEX_COLUMN_DEF: ColDef = {
   cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
 };
 
-function mapDataToColumns(columns?: IAgGridCol[]): ColDef[] {
+function getMaxColumnWidth(gridContainer: HTMLElement | null) {
+  if (!gridContainer) {
+    console.info('Can"t get grid container width, default value will be used');
+    return MAX_WIDTH_COLUMN_DEFALUT_VALUE;
+  }
+
+  return gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100;
+}
+
+function measureText(text: string, title = false) {
+  const font = '400 12px Roboto';
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d')!;
+  context.font = font;
+
+  return context.measureText(text.toUpperCase()).width + (title ? COLUMN_TITLE_BOX_WIDTH : ROW_VALUE_BOX_WIDTH);
+}
+
+function getColumnWidth(column: IAgGridCol, columnIdx: number, rows: AgGridRow) {
+  const columnTitleWidth = measureText(column.name || '', true);
+  const rowsToIncludeInMeasurements = Math.min(rows.length, ROWS_INCLUDE_IN_MEASUREMENTS);
+  let longestRowValue = '';
+
+  for (let i = 0; i < rowsToIncludeInMeasurements; i++) {
+    // we need String to process NULL value
+    const rowValue = String(rows[i][columnIdx]);
+    if (rowValue.length > longestRowValue.length) {
+      longestRowValue = rowValue;
+    }
+  }
+
+  return Math.max(columnTitleWidth, measureText(longestRowValue));
+}
+
+function mapDataToColumns(rows: AgGridRow[], gridContainer: HTMLElement | null, columns?: IAgGridCol[]): ColDef[] {
   if (!columns || !columns.length) {
     return [];
   }
+
   return [
     INDEX_COLUMN_DEF,
-    ...columns.map((v, i) => ({
-      colId: v.name,
-      headerName: v.label,
-      field: `${i}`,
-      // type: v.dataKind,
-      editable: (params: any) => {
-        const context: AgGridContext = params.context;
-        return !(context.isReadonly() || v.readOnly);
-      },
-      valueGetter: (params: ValueGetterParams) => {
-        if (!params.data) {
-          return '';
-        }
-        const value = params.data[params.colDef.field || 'node.id'];
+    ...columns.map((v, columnIdx) => {
+      const columnWidth = getColumnWidth(v, columnIdx, rows);
+      const columnMaxWidth = getMaxColumnWidth(gridContainer);
 
-        if (value !== null && typeof value === 'object') {
-          return JSON.stringify(value);
-        }
+      return ({
+        colId: v.name,
+        headerName: v.label,
+        field: `${columnIdx}`,
+        width: columnWidth,
+        maxWidth: columnMaxWidth,
+        // type: v.dataKind,
+        editable: (params: any) => {
+          const context: AgGridContext = params.context;
+          return !(context.isReadonly() || v.readOnly);
+        },
+        valueGetter: (params: ValueGetterParams) => {
+          if (!params.data) {
+            return '';
+          }
+          const value = params.data[params.colDef.field || 'node.id'];
 
-        return value;
-      },
-      headerComponentParams: {
-        icon: v.icon,
-      },
-      cellRenderer: (params: CellClassParams) => {
-        if (typeof params.value === 'string' && params.value.length > 1000) {
-          return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
-        }
+          if (typeof value === 'object') {
+            return JSON.stringify(value);
+          }
 
-        if (params.value === null) {
-          return '[null]';
-        }
+          return value;
+        },
+        headerComponentParams: {
+          icon: v.icon,
+        },
+        cellRenderer: (params: CellClassParams) => {
+          if (typeof params.value === 'string' && params.value.length > 1000) {
+            return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
+          }
 
-        return params.value;
-      },
-      cellClass: (params: any) => {
-        const classes: string[] = [];
-        const context: AgGridContext = params.context;
-        if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
-          classes.push('cell-edited');
-        }
-        if (params.value === null) {
-          classes.push('cell-null');
-        }
-        return classes.join(' ');
-      },
-    })),
+          if (params.value === 'null') {
+            return '[null]';
+          }
+
+          return params.value;
+        },
+        cellClass: (params: any) => {
+          const classes: string[] = [];
+          const context: AgGridContext = params.context;
+          if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
+            classes.push('cell-edited');
+          }
+          if (params.value === 'null') {
+            classes.push('cell-null');
+          }
+          return classes.join(' ');
+        },
+      });
+    }),
   ];
 }
 

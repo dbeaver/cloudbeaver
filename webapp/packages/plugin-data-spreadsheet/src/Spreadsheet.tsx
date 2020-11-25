@@ -8,7 +8,7 @@
 
 import { DataModelWrapper, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import { AgGridTable } from './AgGridTable/AgGridTable';
+import { AgGridTableLoader } from './AgGridTable/AgGridTableLoader';
 
 interface Props {
   model: IDatabaseDataModel<any, any>;
@@ -21,5 +21,5 @@ export function Spreadsheet({
 }: Props) {
   const deprecated = (model as DataModelWrapper).deprecatedModel;
 
-  return <AgGridTable tableModel={deprecated} className={className} />;
+  return <AgGridTableLoader tableModel={deprecated} className={className} />;
 }
