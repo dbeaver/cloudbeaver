@@ -7,27 +7,21 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
 
-import { AgGridReactProps } from '@ag-grid-community/react';
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
-export type AgGridTableProps = PropsWithChildren<
-AgGridReactProps & {
+interface Props {
   tableModel: TableViewerModel;
   className?: string;
-}>;
+}
 
 async function loader() {
   const { AgGridTable } = await import('./AgGridTable');
   return { AgGridTable };
 }
 
-export const AgGridTableLoader: React.FC<AgGridTableProps> = observer(function AgGridTableLoader({
-  tableModel,
-  className,
-}) {
+export const AgGridTableLoader: React.FC<Props> = observer(function AgGridTableLoader({ tableModel, className }) {
   return (
     <ComplexLoader
       loader={loader}

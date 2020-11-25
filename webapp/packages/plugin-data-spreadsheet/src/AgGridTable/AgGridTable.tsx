@@ -16,7 +16,7 @@ import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
-import styles from '../styles/base.scss';
+import '../styles/base.scss';
 import { agGridStyles } from '../styles/styles';
 import { AgGridTableController } from './AgGridTableController';
 import { IndexCellRenderer } from './IndexCellRenderer';
@@ -37,7 +37,7 @@ interface IAgGridTableProps {
 }
 
 export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGridTable({ tableModel, className }) {
-  const agGridTableStyles = useStyles(agGridStyles, styles);
+  const styles = useStyles(agGridStyles);
   const refreshRef = useRef(0);
   const agGridContainerRef = useRef(null);
   const controller = useController(AgGridTableController, tableModel);
@@ -50,7 +50,7 @@ export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGrid
     }
   }, [controller]);
 
-  return styled(agGridTableStyles)(
+  return styled(styles)(
     <ag-grid-theme ref={agGridContainerRef} as="div" className={`cb-ag-grid-theme ${className}`}>
       <AgGridReact
         key={controller.refreshId}
