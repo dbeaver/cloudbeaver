@@ -24,8 +24,12 @@ interface Props {
 export const TreeNodeIcon: React.FC<Props> = function TreeNodeIcon({
   icon,
   className,
+  children,
 }) {
   return styled(styles)(
-    <icon as="div" className={className}><StaticImage icon={icon} /></icon>
+    <icon as="div" className={className}>
+      <StaticImage icon={icon} />
+      {children}
+    </icon>
   );
 };
