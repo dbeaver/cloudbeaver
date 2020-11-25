@@ -21,15 +21,13 @@ AgGridReactProps & {
 
 async function loader() {
   const { AgGridTable } = await import('./AgGridTable');
-
   return { AgGridTable };
 }
 
-export const AgGridTableLoader = observer(function AgGridTableLoader({
+export const AgGridTableLoader: React.FC<AgGridTableProps> = observer(function AgGridTableLoader({
   tableModel,
   className,
-  ...rest
-}: AgGridTableProps) {
+}) {
   return (
     <ComplexLoader
       loader={loader}
@@ -39,7 +37,6 @@ export const AgGridTableLoader = observer(function AgGridTableLoader({
         <AgGridTable
           tableModel={tableModel}
           className={className}
-          {...rest}
         />
       )}
     </ComplexLoader>

@@ -301,14 +301,14 @@ export class AgGridTableController implements IInitializableController, IDestruc
       return MAX_WIDTH_COLUMN_DEFALUT_VALUE;
     }
 
-    return this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100;
+    return Math.round(this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100);
   }
 
   private mapDataToColumns(rows: AgGridRow[], columns?: IAgGridCol[]): ColDef[] {
     if (!columns || !columns.length) {
       return [];
     }
-
+    const columnMaxWidth = this.getMaxColumnWidth();
     return [
       INDEX_COLUMN_DEF,
       ...columns.map((v, i) => ({
@@ -316,7 +316,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
         headerName: v.label,
         field: `${i}`,
         width: this.getColumnWidth(v, i, rows),
-        maxWidth: this.getMaxColumnWidth(),
+        maxWidth: columnMaxWidth,
         // type: v.dataKind,
         editable: (params: any) => {
           const context: AgGridContext = params.context;

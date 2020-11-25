@@ -29,18 +29,15 @@ const agGridComponents = {
   plainTextEditor: PlainTextEditor,
   indexCellRenderer: IndexCellRenderer,
 };
+
+const allCommunityModules = [InfiniteRowModelModule, RangeSelectionModule];
 interface IAgGridTableProps {
   tableModel: TableViewerModel;
   className?: string;
 }
 
-export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGridTable({
-  tableModel,
-  className,
-  ...rest
-}) {
+export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGridTable({ tableModel, className }) {
   const agGridTableStyles = useStyles(agGridStyles, styles);
-  const allCommunityModules = [InfiniteRowModelModule, RangeSelectionModule];
   const refreshRef = useRef(0);
   const agGridContainerRef = useRef(null);
   const controller = useController(AgGridTableController, tableModel);
@@ -63,7 +60,6 @@ export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGrid
         frameworkComponents={agGridComponents}
         loadingCellRenderer="loadingCellRenderer"
         {...controller.dynamicOptions}
-        {...rest}
       />
     </ag-grid-theme>
   );
