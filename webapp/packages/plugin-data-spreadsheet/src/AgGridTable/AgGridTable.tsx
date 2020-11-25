@@ -27,15 +27,15 @@ const agGridComponents = {
   plainTextEditor: PlainTextEditor,
   indexCellRenderer: IndexCellRenderer,
 };
-interface IAgGridMarkupProps {
+interface IAgGridTableProps {
   agGridReact: React.FC<AgGridReactProps>;
   tableModel: TableViewerModel;
   className?: string;
   allCommunityModules: Module[];
 }
 
-export const AgGridTable: React.FC<IAgGridMarkupProps> = observer(
-  function AgGridMarkup({
+export const AgGridTable: React.FC<IAgGridTableProps> = observer(
+  function AgGridTable({
     agGridReact: AgGridReact,
     tableModel,
     className,
