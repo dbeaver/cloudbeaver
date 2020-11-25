@@ -317,6 +317,9 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
         String connectionId = connectionConfig.getConnectionId();
+
+        connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
+
         DBPDataSourceContainer dataSource = WebServiceUtils.getLocalOrGlobalDataSource(webSession, connectionId);
 
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();

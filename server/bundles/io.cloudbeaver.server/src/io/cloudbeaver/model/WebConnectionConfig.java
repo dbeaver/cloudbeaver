@@ -172,4 +172,9 @@ public class WebConnectionConfig {
     public boolean isSaveCredentials() {
         return saveCredentials;
     }
+
+    public void setSaveCredentials(boolean saveCredentials) {
+        this.saveCredentials = saveCredentials;
+    }
+
 }
