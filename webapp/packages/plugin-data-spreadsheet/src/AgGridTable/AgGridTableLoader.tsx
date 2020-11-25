@@ -13,8 +13,6 @@ import { AgGridReactProps } from '@ag-grid-community/react';
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
-import { AgGridTable } from './AgGridTable';
-
 export type AgGridTableProps = PropsWithChildren<
 AgGridReactProps & {
   tableModel: TableViewerModel;
@@ -22,12 +20,9 @@ AgGridReactProps & {
 }>;
 
 async function loader() {
-  const styles = await import('../styles/base.scss');
-  const { AgGridReact } = await import('@ag-grid-community/react');
-  const { InfiniteRowModelModule } = await import('@ag-grid-community/infinite-row-model');
-  const { RangeSelectionModule } = await import('./modules/RangeSelection/rangeSelectionModule');
+  const { AgGridTable } = await import('./AgGridTable');
 
-  return { AgGridReact, AllCommunityModules: [InfiniteRowModelModule, RangeSelectionModule] };
+  return { AgGridTable };
 }
 
 export const AgGridTableLoader = observer(function AgGridTableLoader({
@@ -40,15 +35,12 @@ export const AgGridTableLoader = observer(function AgGridTableLoader({
       loader={loader}
       placeholder={<Loader />}
     >
-      {({ AgGridReact, AllCommunityModules }) => (
+      {({ AgGridTable }) => (
         <AgGridTable
-          agGridReact={AgGridReact as any}
-          allCommunityModules={AllCommunityModules}
           tableModel={tableModel}
           className={className}
           {...rest}
         />
-
       )}
     </ComplexLoader>
   );

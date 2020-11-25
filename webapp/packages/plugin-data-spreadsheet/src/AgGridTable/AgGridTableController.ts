@@ -148,7 +148,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       const requestedData = await this.gridModel.onRequestData(startRow, length);
       // update columns only once after first data fetching
       if (isColumnsChanged(this.columns, requestedData.columns)) {
-        this.columns = mapDataToColumns(requestedData.rows, this.gridContainer, requestedData.columns);
+        this.columns = this.mapDataToColumns(requestedData.rows, this.gridContainer, requestedData.columns);
       }
       successCallback(
         this.cloneRows(requestedData.rows),
@@ -159,14 +159,14 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  private handleCellEditingStopped(event: CellEditingStoppedEvent) {
-    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getId(), event.value, false);
-  }
-
   private changeChunkSize(): void {
     this.gridOptions.cacheBlockSize = this.gridModel.getChunkSize();
     // ag-grid is not able to change ca
     this.refresh();
+  }
+
+  private handleCellEditingStopped(event: CellEditingStoppedEvent) {
+    this.gridModel.onCellEditingStopped(event.rowIndex, event.column.getId(), event.value, false);
   }
 
   private revertCellValue(rowIndex: number, colId: string) {
@@ -259,81 +259,64 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private cloneRows(rows: AgGridRow[]): AgGridRow[] {
     return rows.map(row => [...row]);
   }
-}
 
-const defaultColumnDef: ColDef = {
-  sortable: true,
-  filter: true,
-  resizable: true,
-  editable: true,
-  cellEditor: 'plainTextEditor',
-};
+  private measureText(text: string, title = false) {
+    let font = '400 12px Roboto';
 
-export const INDEX_COLUMN_DEF: ColDef = {
-  headerName: '#',
-  colId: `${Number.MAX_SAFE_INTEGER}`,
-  field: `${Number.MAX_SAFE_INTEGER}`,
-  width: 70,
-  pinned: 'left',
-  suppressNavigable: true,
-  suppressMenu: true,
-  editable: false,
-  sortable: false,
-  valueGetter: props => props.node.rowIndex + 1,
-  cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
-};
-
-function getMaxColumnWidth(gridContainer: HTMLElement | null) {
-  if (!gridContainer) {
-    console.info('Can"t get grid container width, default value will be used');
-    return MAX_WIDTH_COLUMN_DEFALUT_VALUE;
-  }
-
-  return gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100;
-}
-
-function measureText(text: string, title = false) {
-  const font = '400 12px Roboto';
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d')!;
-  context.font = font;
-
-  return context.measureText(text.toUpperCase()).width + (title ? COLUMN_TITLE_BOX_WIDTH : ROW_VALUE_BOX_WIDTH);
-}
-
-function getColumnWidth(column: IAgGridCol, columnIdx: number, rows: AgGridRow) {
-  const columnTitleWidth = measureText(column.name || '', true);
-  const rowsToIncludeInMeasurements = Math.min(rows.length, ROWS_INCLUDE_IN_MEASUREMENTS);
-  let longestRowValue = '';
-
-  for (let i = 0; i < rowsToIncludeInMeasurements; i++) {
-    // we need String to process NULL value
-    const rowValue = String(rows[i][columnIdx]);
-    if (rowValue.length > longestRowValue.length) {
-      longestRowValue = rowValue;
+    if (this.gridContainer) {
+      const fontTags = ['font-weight', 'font-size', 'font-family'];
+      const styleDeclaration = window.getComputedStyle(this.gridContainer);
+      const fontValues = fontTags.map(fontValue => fontValue === 'font-family' ? styleDeclaration.getPropertyValue(fontValue).split(',')[0] : styleDeclaration.getPropertyValue(fontValue));
+      if (fontValues.filter(v => v !== '').length === fontTags.length) {
+        font = fontValues.join(' ');
+      }
     }
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d')!;
+    context.font = font;
+
+    return context.measureText(text.toUpperCase()).width + (title ? COLUMN_TITLE_BOX_WIDTH : ROW_VALUE_BOX_WIDTH);
   }
 
-  return Math.max(columnTitleWidth, measureText(longestRowValue));
-}
+  private getColumnWidth(column: IAgGridCol, columnIdx: number, rows: AgGridRow) {
+    const columnTitleWidth = this.measureText(column.name || '', true);
+    const rowsToIncludeInMeasurements = Math.min(rows.length, ROWS_INCLUDE_IN_MEASUREMENTS);
+    let longestRowValue = '';
 
-function mapDataToColumns(rows: AgGridRow[], gridContainer: HTMLElement | null, columns?: IAgGridCol[]): ColDef[] {
-  if (!columns || !columns.length) {
-    return [];
+    for (let i = 0; i < rowsToIncludeInMeasurements; i++) {
+      // we need String to process NULL value
+      const rowValue = String(rows[i][columnIdx]);
+      if (rowValue.length > longestRowValue.length) {
+        longestRowValue = rowValue;
+      }
+    }
+
+    return Math.max(columnTitleWidth, this.measureText(longestRowValue));
   }
 
-  return [
-    INDEX_COLUMN_DEF,
-    ...columns.map((v, columnIdx) => {
-      const columnWidth = getColumnWidth(v, columnIdx, rows);
-      const columnMaxWidth = getMaxColumnWidth(gridContainer);
+  private getMaxColumnWidth() {
+    if (!this.gridContainer) {
+      console.info('Can"t get grid container width, default value will be used');
+      return MAX_WIDTH_COLUMN_DEFALUT_VALUE;
+    }
 
-      return ({
+    return this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100;
+  }
+
+  private mapDataToColumns(rows: AgGridRow[], gridContainer: HTMLElement | null, columns?: IAgGridCol[]): ColDef[] {
+    if (!columns || !columns.length) {
+      return [];
+    }
+
+    return [
+      INDEX_COLUMN_DEF,
+      ...columns.map((v, i) => ({
         colId: v.name,
         headerName: v.label,
-        field: `${columnIdx}`,
-        width: columnWidth,
-        maxWidth: columnMaxWidth,
+        field: `${i}`,
+        width: this.getColumnWidth(v, i, rows),
+        maxWidth: this.getMaxColumnWidth(),
         // type: v.dataKind,
         editable: (params: any) => {
           const context: AgGridContext = params.context;
@@ -376,10 +359,33 @@ function mapDataToColumns(rows: AgGridRow[], gridContainer: HTMLElement | null, 
           }
           return classes.join(' ');
         },
-      });
-    }),
-  ];
+      })
+      ),
+    ];
+  }
 }
+
+const defaultColumnDef: ColDef = {
+  sortable: true,
+  filter: true,
+  resizable: true,
+  editable: true,
+  cellEditor: 'plainTextEditor',
+};
+
+export const INDEX_COLUMN_DEF: ColDef = {
+  headerName: '#',
+  colId: `${Number.MAX_SAFE_INTEGER}`,
+  field: `${Number.MAX_SAFE_INTEGER}`,
+  width: 70,
+  pinned: 'left',
+  suppressNavigable: true,
+  suppressMenu: true,
+  editable: false,
+  sortable: false,
+  valueGetter: props => props.node.rowIndex + 1,
+  cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
+};
 
 function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {
   const [indexColumn, ...withoutIndexColumn] = oldColumns;
