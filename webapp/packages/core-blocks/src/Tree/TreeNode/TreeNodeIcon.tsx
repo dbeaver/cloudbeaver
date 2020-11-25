@@ -11,9 +11,6 @@ import styled, { css } from 'reshadow';
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
 const styles = css`
-  icon {
-    position: relative;
-  }
   StaticImage {
     height: 100%;
   }

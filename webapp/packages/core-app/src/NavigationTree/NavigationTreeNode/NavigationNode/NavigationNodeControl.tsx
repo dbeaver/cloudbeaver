@@ -27,6 +27,14 @@ const styles = composes(
     }
   `,
   css`
+    TreeNodeControl:hover > portal, 
+    TreeNodeControl:global([aria-selected=true]) > portal,
+    portal:focus-within {
+      visibility: visible;
+    }
+    TreeNodeIcon {
+      position: relative;
+    }
     status {
       position: absolute;
       bottom: 0;
@@ -37,11 +45,6 @@ const styles = composes(
       border-radius: 50%;      
       border: 1px solid;
     }    
-    TreeNodeControl:hover > portal, 
-    TreeNodeControl:global([aria-selected=true]) > portal,
-    portal:focus-within {
-      visibility: visible;
-    }
     portal {
       box-sizing: border-box;
       margin-left: auto !important;
