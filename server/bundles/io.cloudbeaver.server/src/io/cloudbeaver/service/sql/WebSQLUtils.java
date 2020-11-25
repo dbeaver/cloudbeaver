@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -97,7 +98,7 @@ public class WebSQLUtils {
         }
 
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", document.getDocumentId());
+        map.put("id", CommonUtils.toString(document.getDocumentId()));
         map.put("contentType", document.getDocumentContentType());
         map.put("properties", Collections.emptyMap());
         map.put("data", documentData);
