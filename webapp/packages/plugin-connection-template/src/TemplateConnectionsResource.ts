@@ -8,9 +8,10 @@
 
 import { observable } from 'mobx';
 
-import { Connection } from '@cloudbeaver/core-connections';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { Connection, ConnectionsResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, PermissionsResource, PermissionsService } from '@cloudbeaver/core-root';
+import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -18,12 +19,14 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   @observable loaded: boolean;
   constructor(
     private graphQLService: GraphQLService,
-    private permissionsResource: PermissionsResource,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    connectionsResource: ConnectionsResource,
+    appAuthService: AppAuthService,
   ) {
     super([]);
     this.loaded = false;
-    this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
+    connectionsResource.onDataUpdate.addHandler(() => this.markOutdated());
+    appAuthService.auth.addHandler(() => this.markOutdated());
   }
 
   isLoaded(): boolean {
