@@ -59,7 +59,7 @@
   }
 
   // CSS rules for using primary and secondary (plus light/dark variants) as background colors.
-  @each $style in ("primary", "secondary") {
+  @each $style in ("primary", "secondary", "positive") {
     .theme-background-#{$style} {
       @include mdc-feature-targets($feat-color) {
         @include mdc-theme-prop(background-color, $style, true);

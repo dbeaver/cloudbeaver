@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -21,11 +21,6 @@ import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils'
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
 const styles = css`    
-  TreeNodeControl[use|disconnected] {
-    & TreeNodeIcon, & TreeNodeName {
-      opacity: 0.7;
-    }
-  }
   TreeNodeControl:hover > portal, 
   TreeNodeControl:global([aria-selected=true]) > portal,
   portal:focus-within {
@@ -49,16 +44,18 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   const context = useContext(TreeNodeContext);
   const connectionInfoResource = useService(ConnectionInfoResource);
 
-  let disconnected = false;
+  let connected = false;
+
   if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
     const connectionInfo = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(node.id));
-    disconnected = !connectionInfo?.connected;
+
+    connected = !!connectionInfo?.connected;
   }
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl {...use({ disconnected })}>
+    <TreeNodeControl>
       <TreeNodeExpand />
-      <TreeNodeIcon icon={node.icon} />
+      <TreeNodeIcon icon={node.icon} connected={connected} />
       <TreeNodeName>{node.name}</TreeNodeName>
       <portal as="div">
         <TreeNodeMenu node={node} selected={context?.selected} />
