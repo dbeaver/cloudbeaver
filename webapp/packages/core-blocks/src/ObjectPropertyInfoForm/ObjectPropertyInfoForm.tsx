@@ -29,6 +29,7 @@ interface RenderFieldProps {
   editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   autoHide?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
@@ -39,6 +40,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   editable = true,
   autofillToken = '',
   disabled,
+  readOnly,
   autoHide,
   onFocus,
 }) {
@@ -54,10 +56,6 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     );
   }
 
-  if (password && property.value) {
-    description = 'Password saved';
-  }
-
   if (!editable) {
     if (autoHide && !isControlPresented(property.id!, state)) {
       return null;
@@ -69,6 +67,10 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     );
   }
 
+  if (password && property.value) {
+    description = 'Password saved';
+  }
+
   return (
     <InputField
       type={password ? 'password' : 'text'}
@@ -76,6 +78,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       state={state}
       description={description}
       disabled={disabled}
+      readOnly={readOnly}
       autoHide={autoHide}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
@@ -93,6 +96,7 @@ interface ObjectPropertyFormProps {
   autofillToken?: string;
   className?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   autoHide?: boolean;
   onFocus?: (name: string) => void;
 }
@@ -104,6 +108,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
   autofillToken = '',
   className,
   disabled,
+  readOnly,
   autoHide,
   onFocus,
 }) {
@@ -129,6 +134,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
             editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}
+            readOnly={readOnly}
             autoHide={autoHide}
             onFocus={handleFocus}
           />
