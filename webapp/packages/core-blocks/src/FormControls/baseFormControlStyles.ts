@@ -44,7 +44,7 @@ export const baseFormControlStyles = css`
   }
   
   field[|raw] {
-    min-height: unset;
+    min-height: 40px;
     & field-description {
       padding: 0;
     }
