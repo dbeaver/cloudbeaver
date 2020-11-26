@@ -27,6 +27,7 @@ const styles = css`
     display: flex;
     height: 100%;
     width: 100%;
+    min-width: 240px;
   }
 `;
 
@@ -61,7 +62,11 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
     if (nodeChildren.isLoading()) {
-      return styled(styles)(<center as="div"><Loader /></center>);
+      return styled(styles)(
+        <center as="div">
+          <Loader />
+        </center>
+      );
     }
 
     return <Placeholder />;
