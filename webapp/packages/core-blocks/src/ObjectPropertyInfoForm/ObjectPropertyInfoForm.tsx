@@ -25,6 +25,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state: Record<string, any>;
+  editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -35,6 +36,7 @@ interface RenderFieldProps {
 const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   property,
   state,
+  editable = true,
   autofillToken = '',
   disabled,
   readOnly,
@@ -55,6 +57,14 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 
   if (password && property.value) {
     description = 'Password saved';
+  }
+
+  if (!editable && property.value) {
+    return (
+      <FormFieldDescription label={property.displayName} raw>
+        {property.value}
+      </FormFieldDescription>
+    );
   }
 
   return (
@@ -78,6 +88,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 interface ObjectPropertyFormProps {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
+  editable?: boolean;
   autofillToken?: string;
   className?: string;
   disabled?: boolean;
@@ -89,6 +100,7 @@ interface ObjectPropertyFormProps {
 export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
+  editable = true,
   autofillToken = '',
   className,
   disabled,
@@ -115,6 +127,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
           <RenderField
             property={property}
             state={credentials}
+            editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}
             readOnly={readOnly}

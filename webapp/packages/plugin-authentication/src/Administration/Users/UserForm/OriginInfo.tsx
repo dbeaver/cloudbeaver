@@ -99,6 +99,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
         <ObjectPropertyInfoForm
           properties={state.properties}
           credentials={state.state}
+          editable={false}
           readOnly
           autoHide
         />
