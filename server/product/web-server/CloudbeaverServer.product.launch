@@ -166,6 +166,7 @@
         <setEntry value="com.dbeaver.db.couchdb@default:default"/>
         <setEntry value="com.dbeaver.db.dynamodb@default:default"/>
         <setEntry value="com.dbeaver.db.influxdb@default:default"/>
+        <setEntry value="com.dbeaver.db.informix@default:default"/>
         <setEntry value="com.dbeaver.db.mongodb@default:default"/>
         <setEntry value="com.dbeaver.db.netezza@default:default"/>
         <setEntry value="com.dbeaver.db.postgresql.krb5@default:default"/>
