@@ -45,10 +45,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
   const translate = useTranslate();
-  const {
-    connectionInfo,
-    connect,
-  } = useConnectionInfo(tab.handlerState.connectionId || '');
+  const connection = useConnectionInfo(tab.handlerState.connectionId || '');
   const navigation = useService(NavigationTabsService);
   const style = useStyles(styles);
   const {
@@ -58,11 +55,11 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   const pages = dbObjectPagesService.orderedPages;
 
   const handleConnect = useCallback(async () => {
-    await connect();
+    await connection.connect();
     navigation.selectTab(tab.id);
-  }, [navigation, connect, tab]);
+  }, [navigation, connection, tab]);
 
-  if (connectionInfo && !connectionInfo.connected) {
+  if (connection.connectionInfo && !connection.connectionInfo.connected && !connection.isLoading()) {
     return (
       <TextPlaceholder>
         <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>

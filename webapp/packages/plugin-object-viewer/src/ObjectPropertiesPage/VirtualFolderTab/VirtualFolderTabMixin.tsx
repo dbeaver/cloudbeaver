@@ -8,7 +8,6 @@
 
 import { observable } from 'mobx';
 
-import { DBObjectService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { VirtualFolderTabData } from './VirtualFolderTabData';
@@ -19,7 +18,6 @@ export class VirtualFolderTabMixin {
 
   constructor(
     private virtualFolderTabData: VirtualFolderTabData,
-    private dbObjectService: DBObjectService
   ) {}
 
   getChildrenId() {
@@ -36,9 +34,9 @@ export class VirtualFolderTabMixin {
     }
 
     try {
-      for (const nodeId of this.getChildrenId()) {
-        await this.dbObjectService.load(nodeId);
-      }
+      // for (const nodeId of this.getChildrenId()) {
+      //   await this.dbObjectService.load(nodeId);
+      // }
     } finally {
       this.isActivated = true;
     }

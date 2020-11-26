@@ -242,13 +242,16 @@ export class ObjectViewerTabService {
       });
 
       const currentPage = this.dbObjectPageService.getPage(tab.handlerState.pageId);
+
       if (currentPage) {
         await this.dbObjectPageService.selectPage(tab, currentPage);
       }
+
       if (node) {
         tab.handlerState.tabIcon = node.icon;
         tab.handlerState.tabTitle = node.name;
       }
+
       await this.dbObjectService.load(tab.handlerState.objectId);
       const children = await this.navNodeManagerService.loadTree(tab.handlerState.objectId);
 
