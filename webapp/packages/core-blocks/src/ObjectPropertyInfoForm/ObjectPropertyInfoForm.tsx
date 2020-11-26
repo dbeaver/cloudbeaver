@@ -48,10 +48,6 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   const password = property.features.includes('password');
   let description: string | undefined;
 
-  if (autoHide && !isControlPresented(property.id!, state)) {
-    return null;
-  }
-
   if (href) {
     return (
       <FormFieldDescription label={property.displayName} raw>
