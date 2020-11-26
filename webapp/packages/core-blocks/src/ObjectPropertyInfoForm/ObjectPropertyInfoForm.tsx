@@ -16,6 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';
 import { FormGroup } from '../FormControls/FormGroup';
+import { isControlPresented } from '../FormControls/isControlPresented';
 import { Link } from '../Link';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
@@ -59,8 +60,8 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     description = 'Password saved';
   }
 
-  if (!editable && property.value) {
-    return (
+  if (!editable) {
+    return autoHide && !isControlPresented(property.id!, state) ? null : (
       <FormFieldDescription label={property.displayName} raw>
         {property.value}
       </FormFieldDescription>
