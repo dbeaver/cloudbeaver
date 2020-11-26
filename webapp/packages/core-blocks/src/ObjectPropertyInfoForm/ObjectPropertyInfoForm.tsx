@@ -29,7 +29,6 @@ interface RenderFieldProps {
   editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
-  readOnly?: boolean;
   autoHide?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
@@ -40,7 +39,6 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   editable = true,
   autofillToken = '',
   disabled,
-  readOnly,
   autoHide,
   onFocus,
 }) {
@@ -51,7 +49,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   if (href) {
     return (
       <FormFieldDescription label={property.displayName} raw>
-        <Link href={property.value} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+        <Link href={state[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
       </FormFieldDescription>
     );
   }
@@ -66,7 +64,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     }
     return (
       <FormFieldDescription label={property.displayName} raw>
-        {property.value}
+        {state[property.id!]}
       </FormFieldDescription>
     );
   }
@@ -78,7 +76,6 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       state={state}
       description={description}
       disabled={disabled}
-      readOnly={readOnly}
       autoHide={autoHide}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
@@ -96,7 +93,6 @@ interface ObjectPropertyFormProps {
   autofillToken?: string;
   className?: string;
   disabled?: boolean;
-  readOnly?: boolean;
   autoHide?: boolean;
   onFocus?: (name: string) => void;
 }
@@ -108,7 +104,6 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
   autofillToken = '',
   className,
   disabled,
-  readOnly,
   autoHide,
   onFocus,
 }) {
@@ -134,7 +129,6 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
             editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}
-            readOnly={readOnly}
             autoHide={autoHide}
             onFocus={handleFocus}
           />
