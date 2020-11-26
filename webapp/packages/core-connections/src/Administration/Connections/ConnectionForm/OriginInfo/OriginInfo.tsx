@@ -97,7 +97,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
         <ObjectPropertyInfoForm
           properties={state.properties}
           credentials={state.state}
-          readOnly
+          editable={false}
           autoHide
         />
       </FormBoxElement>

@@ -16,6 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';
 import { FormGroup } from '../FormControls/FormGroup';
+import { isControlPresented } from '../FormControls/isControlPresented';
 import { Link } from '../Link';
 import { TextPlaceholder } from '../TextPlaceholder';
 import { formStyles } from './formStyles';
@@ -25,6 +26,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state: Record<string, any>;
+  editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -35,6 +37,7 @@ interface RenderFieldProps {
 const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   property,
   state,
+  editable = true,
   autofillToken = '',
   disabled,
   readOnly,
@@ -48,7 +51,18 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   if (href) {
     return (
       <FormFieldDescription label={property.displayName} raw>
-        <Link href={property.value} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+        <Link href={state[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+      </FormFieldDescription>
+    );
+  }
+
+  if (!editable) {
+    if (autoHide && !isControlPresented(property.id!, state)) {
+      return null;
+    }
+    return (
+      <FormFieldDescription label={property.displayName} raw>
+        {state[property.id!]}
       </FormFieldDescription>
     );
   }
@@ -78,6 +92,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 interface ObjectPropertyFormProps {
   properties: ObjectPropertyInfo[] | undefined;
   credentials: Record<string, string | number>;
+  editable?: boolean;
   autofillToken?: string;
   className?: string;
   disabled?: boolean;
@@ -89,6 +104,7 @@ interface ObjectPropertyFormProps {
 export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoForm({
   properties,
   credentials,
+  editable = true,
   autofillToken = '',
   className,
   disabled,
@@ -115,6 +131,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
           <RenderField
             property={property}
             state={credentials}
+            editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}
             readOnly={readOnly}
