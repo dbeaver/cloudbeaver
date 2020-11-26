@@ -33,12 +33,13 @@ import { TableSelection } from './TableSelection/TableSelection';
 
 /** title margin + type icon width + sort icon width + title margin right + box padding  */
 const COLUMN_TITLE_BOX_WIDTH = 8 + 16 + 24 + 20 + 24;
-/** row padding + sort шcon width + right column title padding  */
+/** row padding + sort icon width + right column title padding  */
 const ROW_VALUE_BOX_WIDTH = 22 + 20 + 12;
 /** how many rows we want to include to get column width  */
 const ROWS_INCLUDE_IN_MEASUREMENTS = 100;
 const MAX_WIDTH_COLUMN_PERCENT = 33;
-const MAX_WIDTH_COLUMN_DEFALUT_VALUE = 300;
+const MAX_WIDTH_COLUMN_DEFAULT_VALUE = 300;
+
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
   @observable refreshId = 0;
@@ -105,7 +106,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private resizeTask?: any;
   private subscriptions: Subscription[] = [];
 
-  init(gridModel: TableViewerModel) {
+  init(gridModel: TableViewerModel): void {
     this.gridModel = gridModel;
     this.gridOptions.cacheBlockSize = gridModel.getChunkSize();
 
@@ -122,11 +123,11 @@ export class AgGridTableController implements IInitializableController, IDestruc
     }
   }
 
-  getGridOptions() {
+  getGridOptions(): GridOptions {
     return this.gridOptions;
   }
 
-  refresh() {
+  refresh(): void {
     this.refreshId++;
   }
 
@@ -251,8 +252,8 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private resetData(): void {
     this.selection.clear();
     if (this.api) {
-      this.api.setInfiniteRowCount(0, false);
       this.api.purgeInfiniteCache(); // it will reset internal state
+      this.api.setInfiniteRowCount(0, false);
     }
   }
 
@@ -267,6 +268,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
       const fontTags = ['font-weight', 'font-size', 'font-family'];
       const styleDeclaration = window.getComputedStyle(this.gridContainer);
       const fontValues = fontTags.map(fontValue => fontValue === 'font-family' ? styleDeclaration.getPropertyValue(fontValue).split(',')[0] : styleDeclaration.getPropertyValue(fontValue));
+
       if (fontValues.filter(v => v !== '').length === fontTags.length) {
         font = fontValues.join(' ');
       }
@@ -298,10 +300,13 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private getMaxColumnWidth() {
     if (!this.gridContainer) {
       console.info('Can"t get grid container width, default value will be used');
-      return MAX_WIDTH_COLUMN_DEFALUT_VALUE;
+      return MAX_WIDTH_COLUMN_DEFAULT_VALUE;
     }
 
-    return Math.round(this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100);
+    return Math.max(
+      Math.round(this.gridContainer.getBoundingClientRect().width * MAX_WIDTH_COLUMN_PERCENT / 100),
+      MAX_WIDTH_COLUMN_DEFAULT_VALUE
+    );
   }
 
   private mapDataToColumns(rows: AgGridRow[], columns?: IAgGridCol[]): ColDef[] {
@@ -388,9 +393,12 @@ export const INDEX_COLUMN_DEF: ColDef = {
 };
 
 function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {
-  const [indexColumn, ...withoutIndexColumn] = oldColumns;
+  // maybe better to filter based on INDEX_COLUMN_DEF
+  const withoutIndexColumn = oldColumns.slice(1);
+
   if (withoutIndexColumn.length !== newColumns.length) {
     return true;
   }
+
   return withoutIndexColumn.some((col, ind) => col.colId !== newColumns[ind].name);
 }
