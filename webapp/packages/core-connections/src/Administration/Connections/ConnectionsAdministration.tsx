@@ -61,7 +61,7 @@ const styles = composes(
     
     p {
       line-height: 2;
-      white-space: pre;
+      white-space: pre-wrap;
     }
   `
 );
@@ -80,6 +80,7 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
         <layout-grid-cell as='div' {...use({ span: 12 })}>
           {configurationWizard && (
             <message-box as='div'>
+              <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
               <p><Translate token='connections_administration_configuration_wizard_message' /></p>
             </message-box>
           )}
