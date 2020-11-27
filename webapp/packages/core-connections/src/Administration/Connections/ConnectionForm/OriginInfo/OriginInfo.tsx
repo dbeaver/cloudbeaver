@@ -91,9 +91,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <FormBox>
       <FormBoxElement>
-        <FormGroup>
-          <InputGroup>{translate('ui_information')}</InputGroup>
-        </FormGroup>
+        <FormGroup><br /></FormGroup>
         <ObjectPropertyInfoForm
           properties={state.properties}
           credentials={state.state}
