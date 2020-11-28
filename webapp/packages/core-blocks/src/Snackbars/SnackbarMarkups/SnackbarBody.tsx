@@ -23,6 +23,7 @@ const SNACKBAR_BODY_STYLES = css`
         max-height: 200px;
         margin-bottom: 8px;
         word-break: break-word;
+        white-space: pre-line;
       }
     }
   }
