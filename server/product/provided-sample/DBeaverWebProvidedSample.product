@@ -14,6 +14,7 @@
 
    <configurations>
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
+      <plugin id="org.apache.felix.scr" autoStart="true" startLevel="1"/>
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
    </configurations>
 

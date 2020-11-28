@@ -17,13 +17,14 @@
     <stringAttribute key="featurePluginResolution" value="workspace"/>
     <booleanAttribute key="includeOptional" value="true"/>
     <stringAttribute key="location" value="${workspace_loc}/../runtime-DBeaverWebServer.product"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -web-config conf/cloudbeaver.conf"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dosgi.requiredJavaVersion=1.6 -Xms40m -Xmx512m"/>
     <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="C:\devel\my\cloudbeaver\deploy\cloudbeaver\"/>
     <stringAttribute key="pde.version" value="3.3"/>
-    <stringAttribute key="product" value="io.cloudbeaver.product.ee.product"/>
+    <stringAttribute key="product" value="io.cloudbeaver.product.ce.product"/>
     <stringAttribute key="productFile" value="\web-server\DBeaverWebServer.product"/>
     <setAttribute key="selected_features">
         <setEntry value="io.cloudbeaver.ce.drivers.feature:default"/>
@@ -39,46 +40,21 @@
     <setAttribute key="selected_target_bundles">
         <setEntry value="com.github.jsqlparser@default:default"/>
         <setEntry value="com.google.gson@default:default"/>
-        <setEntry value="com.google.guava@default:default"/>
         <setEntry value="com.ibm.icu.base@default:default"/>
         <setEntry value="com.jcraft.jsch@default:default"/>
-        <setEntry value="com.jcraft.jzlib@default:default"/>
         <setEntry value="com.sun.jna.platform@default:default"/>
         <setEntry value="com.sun.jna@default:default"/>
-        <setEntry value="javax.annotation@default:default"/>
-        <setEntry value="javax.inject@default:default"/>
         <setEntry value="javax.servlet@default:default"/>
-        <setEntry value="javax.xml@default:default"/>
         <setEntry value="net.sf.opencsv@default:default"/>
-        <setEntry value="org.apache.batik.constants@default:default"/>
-        <setEntry value="org.apache.batik.css*1.11.0.v20190515-0436@default:default"/>
-        <setEntry value="org.apache.batik.i18n@default:default"/>
-        <setEntry value="org.apache.batik.util*1.11.0.v20190515-0436@default:default"/>
-        <setEntry value="org.apache.commons.codec@default:default"/>
-        <setEntry value="org.apache.commons.io@default:default"/>
         <setEntry value="org.apache.commons.jexl@default:default"/>
-        <setEntry value="org.apache.commons.jxpath@default:default"/>
         <setEntry value="org.apache.commons.logging@default:default"/>
-        <setEntry value="org.apache.felix.gogo.runtime@default:default"/>
         <setEntry value="org.apache.felix.scr@1:true"/>
-        <setEntry value="org.apache.httpcomponents.httpclient.win@default:default"/>
-        <setEntry value="org.apache.httpcomponents.httpclient@default:default"/>
-        <setEntry value="org.apache.httpcomponents.httpcore@default:default"/>
-        <setEntry value="org.apache.log4j@default:default"/>
-        <setEntry value="org.apache.xerces@default:default"/>
-        <setEntry value="org.apache.xml.resolver@default:default"/>
-        <setEntry value="org.apache.xml.serializer@default:default"/>
-        <setEntry value="org.apache.xmlgraphics@default:default"/>
         <setEntry value="org.bouncycastle.bcpkix@default:default"/>
         <setEntry value="org.bouncycastle.bcprov@default:default"/>
-        <setEntry value="org.eclipse.ant.core@default:default"/>
-        <setEntry value="org.eclipse.compare.core@default:default"/>
-        <setEntry value="org.eclipse.core.commands@default:default"/>
         <setEntry value="org.eclipse.core.contenttype@default:default"/>
         <setEntry value="org.eclipse.core.databinding.observable@default:default"/>
         <setEntry value="org.eclipse.core.databinding.property@default:default"/>
         <setEntry value="org.eclipse.core.databinding@default:default"/>
-        <setEntry value="org.eclipse.core.expressions@default:default"/>
         <setEntry value="org.eclipse.core.filebuffers@default:default"/>
         <setEntry value="org.eclipse.core.filesystem.win32.x86_64@default:false"/>
         <setEntry value="org.eclipse.core.filesystem@default:default"/>
@@ -88,36 +64,15 @@
         <setEntry value="org.eclipse.core.resources.win32.x86_64@default:false"/>
         <setEntry value="org.eclipse.core.resources@default:default"/>
         <setEntry value="org.eclipse.core.runtime@default:true"/>
-        <setEntry value="org.eclipse.core.variables@default:default"/>
-        <setEntry value="org.eclipse.e4.core.commands@default:default"/>
-        <setEntry value="org.eclipse.e4.core.contexts@default:default"/>
-        <setEntry value="org.eclipse.e4.core.di.annotations@default:default"/>
-        <setEntry value="org.eclipse.e4.core.di.extensions.supplier@default:default"/>
-        <setEntry value="org.eclipse.e4.core.di.extensions@default:default"/>
-        <setEntry value="org.eclipse.e4.core.di@default:default"/>
-        <setEntry value="org.eclipse.e4.core.services@default:default"/>
-        <setEntry value="org.eclipse.e4.emf.xpath@default:default"/>
         <setEntry value="org.eclipse.emf.common@default:default"/>
-        <setEntry value="org.eclipse.emf.ecore.change@default:default"/>
-        <setEntry value="org.eclipse.emf.ecore.edit@default:default"/>
-        <setEntry value="org.eclipse.emf.ecore.xmi@default:default"/>
-        <setEntry value="org.eclipse.emf.ecore@default:default"/>
-        <setEntry value="org.eclipse.emf.edit@default:default"/>
         <setEntry value="org.eclipse.equinox.app@default:default"/>
-        <setEntry value="org.eclipse.equinox.bidi@default:default"/>
         <setEntry value="org.eclipse.equinox.common@2:true"/>
         <setEntry value="org.eclipse.equinox.event@default:default"/>
-        <setEntry value="org.eclipse.equinox.http.jetty@default:default"/>
-        <setEntry value="org.eclipse.equinox.http.servlet@default:default"/>
-        <setEntry value="org.eclipse.equinox.p2.core@default:default"/>
-        <setEntry value="org.eclipse.equinox.p2.engine@default:default"/>
-        <setEntry value="org.eclipse.equinox.p2.metadata.repository@default:default"/>
-        <setEntry value="org.eclipse.equinox.p2.metadata@default:default"/>
-        <setEntry value="org.eclipse.equinox.p2.repository@default:default"/>
         <setEntry value="org.eclipse.equinox.preferences@default:default"/>
         <setEntry value="org.eclipse.equinox.registry@default:default"/>
         <setEntry value="org.eclipse.equinox.security.win32.x86_64@default:false"/>
         <setEntry value="org.eclipse.equinox.security@default:default"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator@1:true"/>
         <setEntry value="org.eclipse.jetty.http@default:default"/>
         <setEntry value="org.eclipse.jetty.io@default:default"/>
         <setEntry value="org.eclipse.jetty.security@default:default"/>
@@ -128,12 +83,10 @@
         <setEntry value="org.eclipse.osgi.services@default:default"/>
         <setEntry value="org.eclipse.osgi.util@default:default"/>
         <setEntry value="org.eclipse.osgi@-1:true"/>
-        <setEntry value="org.eclipse.team.core@default:default"/>
         <setEntry value="org.eclipse.text@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.dbcp@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.kerby@default:default"/>
         <setEntry value="org.jkiss.bundle.apache.poi@default:default"/>
-        <setEntry value="org.jkiss.bundle.aws@default:default"/>
         <setEntry value="org.jkiss.bundle.bouncycastle@default:default"/>
         <setEntry value="org.jkiss.bundle.cassandra@default:default"/>
         <setEntry value="org.jkiss.bundle.couchbase@default:default"/>
@@ -146,55 +99,17 @@
         <setEntry value="org.jkiss.bundle.lightcouch@default:default"/>
         <setEntry value="org.jkiss.bundle.liquibase@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
-        <setEntry value="org.mongodb.mongo-java-driver@default:default"/>
-        <setEntry value="org.objectweb.asm@default:default"/>
-        <setEntry value="org.slf4j.api*1.7.2.v20121108-1250@default:default"/>
-        <setEntry value="org.tukaani.xz@default:default"/>
-        <setEntry value="org.w3c.css.sac@default:default"/>
-        <setEntry value="org.w3c.dom.events@default:default"/>
-        <setEntry value="org.w3c.dom.smil@default:default"/>
-        <setEntry value="org.w3c.dom.svg@default:default"/>
-        <setEntry value="stax.api@default:default"/>
+        <setEntry value="org.objectweb.asm*9.0.0.v20201001-1419@default:default"/>
+        <setEntry value="org.slf4j.api@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="com.dbeaver.cloud.aws@default:default"/>
-        <setEntry value="com.dbeaver.cloud.model@default:default"/>
-        <setEntry value="com.dbeaver.data.office@default:default"/>
-        <setEntry value="com.dbeaver.db.bigtable@default:default"/>
-        <setEntry value="com.dbeaver.db.cassandra@default:default"/>
-        <setEntry value="com.dbeaver.db.couchbase@default:default"/>
-        <setEntry value="com.dbeaver.db.couchdb@default:default"/>
-        <setEntry value="com.dbeaver.db.dynamodb@default:default"/>
-        <setEntry value="com.dbeaver.db.influxdb@default:default"/>
-        <setEntry value="com.dbeaver.db.informix@default:default"/>
-        <setEntry value="com.dbeaver.db.mongodb@default:default"/>
-        <setEntry value="com.dbeaver.db.netezza@default:default"/>
-        <setEntry value="com.dbeaver.db.postgresql.krb5@default:default"/>
-        <setEntry value="com.dbeaver.db.prestodb.krb5@default:default"/>
-        <setEntry value="com.dbeaver.db.redis@default:default"/>
-        <setEntry value="com.dbeaver.db.sqlite.crypt@default:default"/>
-        <setEntry value="com.dbeaver.ee.runtime.net@default:default"/>
-        <setEntry value="com.dbeaver.ee.runtime@default:default"/>
-        <setEntry value="com.dbeaver.ee.sched.system@default:default"/>
-        <setEntry value="com.dbeaver.ee.scmp.core@default:default"/>
-        <setEntry value="com.dbeaver.ee.tasks@default:default"/>
-        <setEntry value="com.dbeaver.lm.core@default:default"/>
-        <setEntry value="com.dbeaver.net.auth.iam@default:default"/>
-        <setEntry value="com.dbeaver.net.auth.krb5@default:default"/>
-        <setEntry value="com.dbeaver.net.auth.profile@default:default"/>
-        <setEntry value="com.dbeaver.resources.clients.mysql.win32@default:default"/>
-        <setEntry value="com.dbeaver.resources.clients.postgresql.win32@default:default"/>
-        <setEntry value="com.dbeaver.resources.drivers.jdbc@default:default"/>
         <setEntry value="io.cloudbeaver.connect.provider.sample@default:default"/>
-        <setEntry value="io.cloudbeaver.product.ee@default:default"/>
-        <setEntry value="io.cloudbeaver.resources.drivers.ee@default:default"/>
+        <setEntry value="io.cloudbeaver.product.ce@default:default"/>
+        <setEntry value="io.cloudbeaver.resources.drivers.base@default:default"/>
         <setEntry value="io.cloudbeaver.server@default:default"/>
         <setEntry value="io.cloudbeaver.service.admin@default:default"/>
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
-        <setEntry value="io.cloudbeaver.service.aws.auth@default:default"/>
-        <setEntry value="io.cloudbeaver.service.aws.common@default:default"/>
         <setEntry value="io.cloudbeaver.service.data.transfer@default:default"/>
-        <setEntry value="io.cloudbeaver.service.erd@default:default"/>
         <setEntry value="io.cloudbeaver.service.metadata@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.gis@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.office@default:default"/>
@@ -239,9 +154,7 @@
         <setEntry value="org.jkiss.dbeaver.registry@default:default"/>
         <setEntry value="org.jkiss.dbeaver.slf4j@default:false"/>
         <setEntry value="org.jkiss.dbeaver.tasks.native@default:default"/>
-        <setEntry value="org.jkiss.lm@default:default"/>
         <setEntry value="org.jkiss.utils@default:default"/>
-        <setEntry value="org.jkiss.wmi@default:default"/>
     </setAttribute>
     <booleanAttribute key="show_selected_only" value="false"/>
     <booleanAttribute key="tracing" value="false"/>

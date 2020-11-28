@@ -9,9 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.expressions,
  org.apache.commons.logging,
- org.eclipse.core.commands,
  org.eclipse.core.resources,
  io.cloudbeaver.server,
  com.google.gson,

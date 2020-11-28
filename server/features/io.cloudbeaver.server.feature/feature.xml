@@ -15,13 +15,17 @@
     </copyright>
 
     <requires>
+        <import plugin="org.eclipse.core.resources" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>
-        <import plugin="org.eclipse.core.expressions" version="0.0.0" match="greaterOrEqual"/>
+        <!-- Equinox -->
         <import plugin="org.eclipse.equinox.launcher" version="0.0.0" match="greaterOrEqual"/>
-        <import plugin="org.eclipse.equinox.simpleconfigurator" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.equinox.common" version="0.0.0" match="greaterOrEqual"/>
-        <import plugin="org.eclipse.equinox.ds" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.equinox.event" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.preferences" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.equinox.registry" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.eclipse.osgi.compatibility.state" version="0.0.0" match="greaterOrEqual"/>
+        <!-- Main Equinox service provider -->
+        <import plugin="org.apache.felix.scr" version="0.0.0" match="greaterOrEqual"/>
     </requires>
 
     <includes id="org.jkiss.dbeaver.runtime.feature" version="0.0.0"/>
