@@ -56,7 +56,7 @@ public class CBImageServlet extends HttpServlet {
             }
 
             response.setContentType("image/" + iconExt);
-            setExpireTime(response, 60 * 60 * 24 * 3); // 3 days
+            setExpireTime(response); // 3 days
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             try (InputStream is = new BufferedInputStream(iconURL.openStream())) {
                 IOUtils.copyStream(is, buffer);
@@ -70,11 +70,11 @@ public class CBImageServlet extends HttpServlet {
         }
     }
 
-    private void setExpireTime(HttpServletResponse response, long expiresSeconds) {
+    private void setExpireTime(HttpServletResponse response) {
         // Http 1.0 header, set a fix expires date.
-        response.setDateHeader("Expires", System.currentTimeMillis() + expiresSeconds * 1000);
+        response.setDateHeader("Expires", System.currentTimeMillis() + CBStaticServlet.STATIC_CACHE_SECONDS * 1000);
         // Http 1.1 header, set a time after now.
-        response.setHeader("Cache-Control", "public, max-age=" + expiresSeconds);
+        response.setHeader("Cache-Control", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
     }
 
 
