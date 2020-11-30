@@ -332,7 +332,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
           }
           const value = params.data[params.colDef.field || 'node.id'];
 
-          if (typeof value === 'object') {
+          if (value !== null && typeof value === 'object') {
             return JSON.stringify(value);
           }
 
@@ -346,7 +346,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
             return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
           }
 
-          if (params.value === 'null') {
+          if (params.value === null) {
             return '[null]';
           }
 
@@ -358,7 +358,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
           if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
             classes.push('cell-edited');
           }
-          if (params.value === 'null') {
+          if (params.value === null) {
             classes.push('cell-null');
           }
           return classes.join(' ');
