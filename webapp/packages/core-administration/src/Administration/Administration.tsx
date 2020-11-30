@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-blocks';
@@ -75,8 +76,13 @@ type Props = React.PropsWithChildren<{
 export const Administration: React.FC<Props> = observer(function Administration({
   configurationWizard, activeScreen, onItemSelect, children,
 }) {
+  const contentRef = useRef<HTMLDivElement>(null);
   const controller = useController(AdministrationController);
   const items = controller.getItems(configurationWizard);
+
+  useLayoutEffect(() => {
+    contentRef.current?.scrollTo({ top: 0, left: 0 });
+  }, [activeScreen?.item]);
 
   return styled(useStyles(verticalTabStyles, administrationStyles, tabsStyles))(
     <container as='div'>
@@ -94,7 +100,7 @@ export const Administration: React.FC<Props> = observer(function Administration(
             ))}
           </TabList>
         </drawer>
-        <content as='div'>
+        <content ref={contentRef} as='div'>
           {children}
           <ItemContent
             activeScreen={activeScreen}
