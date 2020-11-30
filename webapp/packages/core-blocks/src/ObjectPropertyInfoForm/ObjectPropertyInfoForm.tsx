@@ -31,6 +31,7 @@ interface RenderFieldProps {
   disabled?: boolean;
   readOnly?: boolean;
   autoHide?: boolean;
+  showRememberTip?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -42,6 +43,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   disabled,
   readOnly,
   autoHide,
+  showRememberTip,
   onFocus,
 }) {
   const href = property.features.includes('href');
@@ -67,7 +69,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     );
   }
 
-  if (password && property.value) {
+  if (showRememberTip && password && property.value) {
     description = 'Password saved';
   }
 
@@ -98,6 +100,7 @@ interface ObjectPropertyFormProps {
   disabled?: boolean;
   readOnly?: boolean;
   autoHide?: boolean;
+  showRememberTip?: boolean;
   onFocus?: (name: string) => void;
 }
 
@@ -110,6 +113,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
   disabled,
   readOnly,
   autoHide,
+  showRememberTip,
   onFocus,
 }) {
   const style = useStyles(formStyles);
@@ -136,6 +140,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
             disabled={disabled}
             readOnly={readOnly}
             autoHide={autoHide}
+            showRememberTip={showRememberTip}
             onFocus={handleFocus}
           />
         </FormGroup>

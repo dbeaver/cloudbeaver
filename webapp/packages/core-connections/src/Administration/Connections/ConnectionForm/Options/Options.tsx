@@ -142,6 +142,7 @@ export const Options = observer(function Options({
                 properties={controller.properties}
                 credentials={model.credentials}
                 disabled={disabled}
+                showRememberTip
               />
               <FormGroup>
                 <FieldCheckbox
