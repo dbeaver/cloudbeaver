@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action } from 'mobx';
 import { Observable, Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -93,8 +94,11 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return this.add(connection, true);
   }
 
-  async add(connection: AdminConnection, isNew = false): Promise<AdminConnection> {
+  @action add(connection: AdminConnection, isNew = false): AdminConnection {
     this.changed = true;
+
+    this.cleanNewFlags();
+
     const newConnection: ConnectionNew = {
       ...connection,
       [NEW_CONNECTION_SYMBOL]: isNew,
@@ -161,6 +165,12 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     this.loadedKeyMetadata.set('all', true);
 
     return this.data;
+  }
+
+  private cleanNewFlags() {
+    for (const connection of this.data.values()) {
+      (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL] = false;
+    }
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {

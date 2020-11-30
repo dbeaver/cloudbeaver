@@ -28,14 +28,18 @@ export class ConnectionsAdministrationController {
         const isBNew = this.connectionsResource.isNew(b.id);
 
         if (isANew === isBNew) {
-          return 0;
+          return a.name.localeCompare(b.name);
         }
 
         if (isBNew) {
           return 1;
         }
 
-        return -1;
+        if (isANew) {
+          return -1;
+        }
+
+        return a.name.localeCompare(b.name);
       });
   }
 
