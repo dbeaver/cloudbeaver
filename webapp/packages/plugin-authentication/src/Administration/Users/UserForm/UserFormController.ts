@@ -68,7 +68,7 @@ export class UserFormController implements IInitializableController, IDestructib
     this.selectedConnections = new Map();
     this.grantedConnections = [];
     this.isSaving = false;
-    this.isLoading = true;
+    this.isLoading = false;
     this.credentials = {
       login: '',
       password: '',

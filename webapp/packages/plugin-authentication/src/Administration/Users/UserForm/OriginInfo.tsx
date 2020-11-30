@@ -71,7 +71,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   if (state.loading) {
     return (
       <FormBox>
-        <Loader />
+        <Loader key="static" />
       </FormBox>
     );
   }
@@ -103,7 +103,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
           autoHide
         />
       </FormBoxElement>
-      <Loader loading={state.loading} overlay />
+      <Loader key="overlay" loading={state.loading} overlay />
     </FormBox>
   );
 });

@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react';
-import { useContext, useCallback } from 'react';
+import { useContext, useCallback, useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TableContext } from '@cloudbeaver/core-blocks';
+import { Loader, TableContext } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -28,7 +28,7 @@ const styles = composes(
     box {
       box-sizing: border-box;
       padding: 24px;
-      min-height: 320px;
+      min-height: 440px;
       max-height: 500px;
       display: flex;
       flex-direction: column;
@@ -43,19 +43,27 @@ interface Props {
 export const ConnectionEdit = observer(function ConnectionEdit({
   item,
 }: Props) {
+  const boxRef = useRef<HTMLDivElement>(null);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
   const controller = useController(ConnectionEditController, item);
 
+  useEffect(() => {
+    boxRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }, []);
+
   return styled(useStyles(styles))(
-    <box as='div'>
-      {controller.connection && (
+    <box ref={boxRef} as='div'>
+      {controller.connection ? (
         <ConnectionForm
           model={controller as IConnectionFormModel}
           onBack={collapse}
           onCancel={collapse}
         />
-      )}
+      ) : <Loader />}
     </box>
   );
 });

@@ -38,10 +38,6 @@ const styles = composes(
     content-box {
       composes: theme-background-secondary theme-border-color-background from global;
     }
-
-    GrantedSubjects {
-      composes: theme-background-surface from global;
-    }
   `,
   css`
     box {
@@ -59,19 +55,8 @@ const styles = composes(
       overflow: auto;
     }
 
-    SubmittingForm {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
     fill {
       flex: 1;
-    }
-
-    SubmittingForm, Loader {
-      min-height: 320px;
-      max-height: 500px;
     }
 
     Button:not(:first-child) {

@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react';
-import { useContext, useCallback } from 'react';
+import { useContext, useCallback, useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
+  Loader,
   TableContext
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
@@ -29,7 +30,7 @@ const styles = composes(
     box {
       box-sizing: border-box;
       padding: 24px;
-      min-height: 320px;
+      min-height: 420px;
       max-height: 500px;
       display: flex;
       flex-direction: column;
@@ -44,15 +45,23 @@ interface Props {
 export const UserEdit = observer(function UserEdit({
   item,
 }: Props) {
+  const boxRef = useRef<HTMLDivElement>(null);
   const controller = useController(UserEditController, item);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
+  useEffect(() => {
+    boxRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }, []);
+
   return styled(useStyles(styles))(
-    <box as='div'>
-      {controller.user && (
+    <box ref={boxRef} as='div'>
+      {controller.user ? (
         <UserForm user={controller.user} editing onCancel={collapse} />
-      )}
+      ) : <Loader />}
     </box>
   );
 });

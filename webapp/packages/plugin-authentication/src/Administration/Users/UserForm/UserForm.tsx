@@ -142,7 +142,7 @@ export const UserForm = observer(function UserForm({
         <content-box as='div'>
           <SubmittingForm ref={focusedRef} onSubmit={controller.save}>
             <TabPanelList style={tabsStyles} />
-            {controller.isLoading && <Loader overlay />}
+            <Loader loading={controller.isLoading} overlay />
           </SubmittingForm>
           {controller.error.responseMessage && (
             <ErrorMessage

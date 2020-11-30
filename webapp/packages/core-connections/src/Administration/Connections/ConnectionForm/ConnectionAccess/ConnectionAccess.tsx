@@ -82,7 +82,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
   if (controller.isLoading) {
     return styled(style)(
       <box as='div'>
-        <Loader />
+        <Loader key="static" />
       </box>
     );
   }
@@ -124,7 +124,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
           ))}
         </TableBody>
       </Table>
-      <Loader loading={controller.isLoading} overlay />
+      <Loader key="overlay" loading={controller.isLoading} overlay />
     </box>
   );
 });

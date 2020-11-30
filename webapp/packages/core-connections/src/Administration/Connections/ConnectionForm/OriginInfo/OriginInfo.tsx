@@ -67,7 +67,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   if (state.loading) {
     return (
       <FormBox>
-        <Loader />
+        <Loader key="static" />
       </FormBox>
     );
   }
@@ -99,7 +99,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
           autoHide
         />
       </FormBoxElement>
-      <Loader loading={state.loading} overlay />
+      <Loader key="overlay" loading={state.loading} overlay />
     </FormBox>
   );
 });
