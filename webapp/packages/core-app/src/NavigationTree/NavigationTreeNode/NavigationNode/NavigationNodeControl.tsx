@@ -22,6 +22,9 @@ import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
 const styles = composes(
   css`
+    status-container {
+      composes: theme-background-surface from global;
+    }
     status {
       composes: theme-background-positive theme-border-color-surface from global;
     }
@@ -35,10 +38,20 @@ const styles = composes(
     TreeNodeIcon {
       position: relative;
     }
+    status-container {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border-bottom-right-radius: 0;
+    }
     status {
       position: absolute;
-      bottom: -1px;
-      right: -1px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       box-sizing: border-box;
       width: 8px;
       height: 8px;
@@ -75,7 +88,11 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
     <TreeNodeControl>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
-        {connected && <status as='div' />}
+        {connected && (
+          <status-container as='div'>
+            <status as='div' />
+          </status-container>
+        )}
       </TreeNodeIcon>
       <TreeNodeName>{node.name}</TreeNodeName>
       <portal as="div">
