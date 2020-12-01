@@ -37,8 +37,8 @@ const styles = composes(
     }
     status {
       position: absolute;
-      bottom: 0;
-      right: 0;
+      bottom: -1px;
+      right: -1px;
       box-sizing: border-box;
       width: 8px;
       height: 8px;
