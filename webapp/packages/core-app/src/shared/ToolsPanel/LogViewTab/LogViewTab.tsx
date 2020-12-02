@@ -40,10 +40,6 @@ const styles = css`
   .timestamp {
     width: 180px;
   }
-  .message {
-    width: calc(100% - 260px);
-  }
-  
 `;
 
 export const LogViewTab = observer(function LogViewTab() {
