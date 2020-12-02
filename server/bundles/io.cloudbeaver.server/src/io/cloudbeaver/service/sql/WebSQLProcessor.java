@@ -24,9 +24,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
+import org.jkiss.dbeaver.model.data.DBDDocument;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
@@ -35,10 +37,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
-import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -377,8 +376,23 @@ public class WebSQLProcessor {
                                 }
                                 for (int i = 0; i < keyAttributes.length; i++) {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];
-                                    Object cellValueRaw = finalRow[keyAttribute.getOrdinalPosition()];
-                                    rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
+                                    if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
+                                        // Document reference
+                                        Map<String, Object> keyMap = new LinkedHashMap<>();
+                                        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+                                        for (int j = 0; j < attributes.length; j++) {
+                                            DBDAttributeBinding attr = attributes[j];
+                                            keyMap.put(attr.getName(), row.getData().get(j));
+                                        }
+                                        DBDDocument document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
+                                        if (document == null) {
+                                            throw new DBCException("Error finding document by key " + keyMap);
+                                        }
+                                        rowValues[updateAttributes.length + i] = document;
+                                    } else {
+                                        Object cellValueRaw = finalRow[keyAttribute.getOrdinalPosition()];
+                                        rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
+                                    }
                                 }
 
                                 DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(session, updateAttributes, keyAttributes, null, executionSource);
