@@ -376,21 +376,19 @@ public class WebSQLProcessor {
                                 }
                                 for (int i = 0; i < keyAttributes.length; i++) {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];
-                                    if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT) {
+                                    if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
                                         // Document reference
-                                        if (dataContainer instanceof DBSDocumentLocator) {
-                                            Map<String, Object> keyMap = new LinkedHashMap<>();
-                                            DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
-                                            for (int j = 0; j < attributes.length; j++) {
-                                                DBDAttributeBinding attr = attributes[j];
-                                                keyMap.put(attr.getName(), row.getData().get(j));
-                                            }
-                                            DBDDocument document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
-                                            if (document == null) {
-                                                throw new DBCException("Error finding document by key " + keyMap);
-                                            }
-                                            rowValues[updateAttributes.length + i] = document;
+                                        Map<String, Object> keyMap = new LinkedHashMap<>();
+                                        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+                                        for (int j = 0; j < attributes.length; j++) {
+                                            DBDAttributeBinding attr = attributes[j];
+                                            keyMap.put(attr.getName(), row.getData().get(j));
                                         }
+                                        DBDDocument document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
+                                        if (document == null) {
+                                            throw new DBCException("Error finding document by key " + keyMap);
+                                        }
+                                        rowValues[updateAttributes.length + i] = document;
                                     } else {
                                         Object cellValueRaw = finalRow[keyAttribute.getOrdinalPosition()];
                                         rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
