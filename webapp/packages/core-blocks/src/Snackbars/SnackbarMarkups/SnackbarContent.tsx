@@ -13,6 +13,7 @@ const SNACKBAR_CONTENT_STYLES = css`
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow: hidden;
   }
 `;
 

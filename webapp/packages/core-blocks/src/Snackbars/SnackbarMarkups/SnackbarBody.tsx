@@ -30,7 +30,6 @@ const SNACKBAR_BODY_STYLES = css`
 
   text-block-title {
     composes: theme-typography--headline6 from global;
-    max-width: 392px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

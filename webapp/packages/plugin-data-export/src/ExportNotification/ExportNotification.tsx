@@ -29,6 +29,8 @@ const styles = css`
 
     & pre {
       margin: 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 `;
@@ -49,12 +51,14 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
-          {controller.sourceName}
-          {controller.task?.context.sourceName && (
-            <pre title={controller.task?.context.sourceName}>
-              {controller.task?.context.sourceName}
-            </pre>
-          )}
+          <source-name as="div">
+            {controller.sourceName}
+            {controller.task?.context.sourceName && (
+              <pre title={controller.task?.context.sourceName}>
+                {controller.task?.context.sourceName}
+              </pre>
+            )}
+          </source-name>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {status === ENotificationType.Info && (
