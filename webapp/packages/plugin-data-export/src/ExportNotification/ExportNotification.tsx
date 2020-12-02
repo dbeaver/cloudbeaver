@@ -25,9 +25,9 @@ const styles = css`
     composes: theme-typography--body2 from global;
     padding-top: 16px;
     max-height: 50px;
-    overflow: hidden;
-
+    overflow: auto;
     & pre {
+      white-space: pre-wrap;
       margin: 0;
     }
   }
@@ -49,12 +49,14 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
-          {controller.sourceName}
-          {controller.task?.context.sourceName && (
-            <pre title={controller.task?.context.sourceName}>
-              {controller.task?.context.sourceName}
-            </pre>
-          )}
+          <source-name as='div'>
+            {controller.sourceName}
+            {controller.task?.context.sourceName && (
+              <pre title={controller.task.context.sourceName}>
+                {controller.task.context.sourceName}
+              </pre>
+            )}
+          </source-name>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {status === ENotificationType.Info && (
@@ -100,6 +102,5 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
         </SnackbarFooter>
       </SnackbarContent>
     </SnackbarWrapper>
-
   );
 });
