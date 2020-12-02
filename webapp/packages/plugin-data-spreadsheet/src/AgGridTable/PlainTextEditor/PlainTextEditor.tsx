@@ -38,7 +38,7 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
         return '';
       }
       if (props.charPress) {
-        return props.charPress;
+        return typeof props.value === 'number' ? parseInt(props.charPress) : props.charPress;
       }
 
       return props.value;
@@ -67,7 +67,10 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
       );
     }, [props.api?.stopEditing]);
 
-    const handleChange = useCallback((newValue: string) => {
+    const handleChange = useCallback((newValue: string | number) => {
+      if (typeof value.current === 'number') {
+        newValue = parseInt(newValue + '');
+      }
       value.current = newValue;
       context.editCellValue(props.rowIndex, props.column.getColId(), newValue, true);
       forceUpdate(value.current);
@@ -92,7 +95,7 @@ export const PlainTextEditor = forwardRef<Partial<ICellEditorComp>, ICellEditorP
     return styled(styles)(
       <editor as="div">
         <InlineEditor
-          type={props.colDef.type === 'NUMERIC' ? 'number' : 'text'}
+          type={typeof value.current === 'number' ? 'number' : 'text'}
           value={value.current}
           controlsPosition={controlsPosition}
           edited
