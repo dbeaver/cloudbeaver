@@ -35,6 +35,8 @@ const styles = css`
 
     & pre {
       margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;

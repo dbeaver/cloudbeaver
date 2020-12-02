@@ -54,8 +54,8 @@ export const ExportNotification: React.FC<Props> = observer(function ExportNotif
           <source-name as="div">
             {controller.sourceName}
             {controller.task?.context.sourceName && (
-              <pre title={controller.task?.context.sourceName}>
-                {controller.task?.context.sourceName}
+              <pre title={controller.task.context.sourceName}>
+                {controller.task.context.sourceName}
               </pre>
             )}
           </source-name>
