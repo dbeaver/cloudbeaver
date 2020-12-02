@@ -40,6 +40,9 @@ const styles = composes(
     }
   `,
   css`
+    TabList {
+      flex-shrink: 0;
+    }
     box {
       display: flex;
       flex-direction: column;

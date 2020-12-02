@@ -22,7 +22,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
   css`
     properties {
       display: flex;
-      flex: 1;
+      flex: 1 0 auto;
       flex-direction: column;
     }
     properties-header {
