@@ -12,7 +12,7 @@ const SNACKBAR_BODY_STYLES = css`
   notification-body {
     display: flex;
     flex-direction: column;
-    flex: 1 0 0;
+    flex: 1;
     & body-text-block {
       margin-top: 8px;
       padding-right: 24px;
