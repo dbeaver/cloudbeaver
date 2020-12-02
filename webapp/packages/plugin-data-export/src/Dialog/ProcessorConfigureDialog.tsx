@@ -32,7 +32,7 @@ const styles = composes(
       min-height: 500px;
     }
     PropertiesTable {
-      flex: 1;
+      flex: 1 0 auto;
     }
     message {
       margin: auto;
