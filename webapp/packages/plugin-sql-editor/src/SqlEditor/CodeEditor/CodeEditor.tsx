@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
+import { forwardRef, useState } from 'react';
 import { Controlled as CodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';
 
@@ -31,16 +32,16 @@ export interface CodeEditorProps {
   className?: string;
 }
 
-export const CodeEditor = observer(function CodeEditor(props: CodeEditorProps) {
+export const CodeEditor = observer(forwardRef<HTMLDivElement, CodeEditorProps>(function CodeEditor(props, ref) {
   const controller = useController(CodeEditorController, props.bindings);
   controller.setDialect(props.dialect);
 
   return styled(useStyles(SqlEditorStyles))(
-    <code-editor as="div" {...use({ readonly: props.readonly })} className={props.className}>
+    <code-editor ref={ref} as="div" {...use({ readonly: props.readonly })} className={props.className}>
       <CodeMirror
         {...controller.bindings}
         value={props.value || ''}
       />
     </code-editor>
   );
-});
+}));

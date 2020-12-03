@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTab } from '@cloudbeaver/core-app';
@@ -55,10 +55,17 @@ const styles = css`
   }
 `;
 
-export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
+export const SqlEditor: React.FC<SqlEditorProps> = observer(function SqlEditor({ tabId, className }) {
+  const codeEditorRef = useRef<HTMLDivElement | null>(null);
   const tab = useTab(tabId);
   const baseTab = useBaseTab(tabId);
   const controller = useController(SqlEditorController, tab);
+
+  useLayoutEffect(() => {
+    if (codeEditorRef.current) {
+      controller.codeEditorRef = codeEditorRef.current;
+    }
+  });
 
   if (!baseTab.selected) {
     return null;
@@ -87,6 +94,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
         </button>
       </actions>
       <CodeEditor
+        ref={codeEditorRef}
         bindings={controller.bindings}
         dialect={controller.dialect}
         value={controller.value}

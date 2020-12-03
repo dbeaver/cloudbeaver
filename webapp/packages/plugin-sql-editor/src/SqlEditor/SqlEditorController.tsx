@@ -26,6 +26,8 @@ const showHint = CodeMirror.showHint;
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
+  codeEditorRef: HTMLDivElement | null = null;
+
   @computed get dialect(): SqlDialectInfo | undefined {
     if (!this.tab.handlerState.connectionId) {
       return undefined;
@@ -38,6 +40,16 @@ export class SqlEditorController implements IInitializableController {
     return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isSqlExecuting;
   }
 
+  private returnFocusToCodeEditor() {
+    const codeEditorTextArea = this.codeEditorRef?.querySelector('textarea');
+    setTimeout(() => {
+      if (!codeEditorTextArea) {
+        return;
+      }
+      codeEditorTextArea.focus();
+    }, 500);
+  }
+
   handleExecute = async () => {
     this.sqlResultTabsService.executeEditorQuery(
       this.tab.id,
@@ -45,6 +57,7 @@ export class SqlEditorController implements IInitializableController {
       await this.getExecutingQuery(),
       false
     );
+    this.returnFocusToCodeEditor();
   };
 
   handleExecuteNewTab = async () => {
@@ -54,6 +67,7 @@ export class SqlEditorController implements IInitializableController {
       await this.getExecutingQuery(),
       true
     );
+    this.returnFocusToCodeEditor();
   };
 
   readonly options: EditorConfiguration = {
