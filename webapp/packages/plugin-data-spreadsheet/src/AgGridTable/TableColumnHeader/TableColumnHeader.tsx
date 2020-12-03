@@ -89,7 +89,7 @@ export function TableColumnHeader(props: HeaderProps) {
     const event: IAgColumnClickEvent = Object.freeze({
       type: COLUMN_CLICK_EVENT_TYPE,
       columnId: props.column.getColId(),
-      isMultiple: e.ctrlKey,
+      isMultiple: e.ctrlKey || e.metaKey,
     });
 
     props.api.dispatchEvent(event);
@@ -121,7 +121,7 @@ export function TableColumnHeader(props: HeaderProps) {
         default:
           nextSort = 'asc';
       }
-      props.setSort(nextSort, e.ctrlKey);
+      props.setSort(nextSort, e.ctrlKey || e.metaKey);
     },
     []
   );

@@ -103,7 +103,8 @@ export class RangeController implements IRangeController {
   }
 
   private handleDocumentCopy(event: KeyboardEvent) {
-    if (event.code === EVENT_KEY_CODE.C && (event.ctrlKey || event.metaKey)) {
+    if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
+      event.preventDefault();
       this.copySelectedData();
     }
   }
