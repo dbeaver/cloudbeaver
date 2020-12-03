@@ -57,47 +57,54 @@ string
     );
   }
 
-  get({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): ObjectContainer[] | undefined {
-    return this.data.get(connectionId)[catalogId];
+  get({ connectionId, catalogId }: ObjectContainerParams): ObjectContainer[] | undefined {
+    return this.data.get(connectionId)[catalogId ?? defaultCatalog];
   }
 
-  isLoaded({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): boolean {
-    return catalogId in this.data.get(connectionId);
+  isLoaded({ connectionId, catalogId }: ObjectContainerParams): boolean {
+    return (catalogId ?? defaultCatalog) in this.data.get(connectionId);
   }
 
-  isOutdated({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): boolean {
-    const metadata = this.metadata.get(connectionId);
+  isOutdated(param: ObjectContainerParams): boolean {
+    const metadata = this.metadata.get(param.connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.outdatedData.includes(catalogId);
   }
 
-  isDataLoading({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): boolean {
-    const metadata = this.metadata.get(connectionId);
+  isDataLoading(param: ObjectContainerParams): boolean {
+    const metadata = this.metadata.get(param.connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.loadingData.includes(catalogId);
   }
 
-  markDataLoading({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): void {
-    const metadata = this.metadata.get(connectionId);
+  markDataLoading(param: ObjectContainerParams): void {
+    const metadata = this.metadata.get(param.connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
+
     if (!metadata.loadingData.includes(catalogId)) {
       metadata.loadingData.push(catalogId);
     }
   }
 
-  markDataLoaded({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): void {
-    const metadata = this.metadata.get(connectionId);
+  markDataLoaded(param: ObjectContainerParams): void {
+    const metadata = this.metadata.get(param.connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
 
   markOutdated(param: ObjectContainerParams): void {
-    const { connectionId, catalogId = defaultCatalog } = param;
-    const metadata = this.metadata.get(connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
+
+    const metadata = this.metadata.get(param.connectionId);
     if (!metadata.outdatedData.includes(catalogId)) {
       metadata.outdatedData.push(catalogId);
     }
     this.onDataOutdated.execute(param);
   }
 
-  markUpdated({ connectionId, catalogId = defaultCatalog }: ObjectContainerParams): void {
-    const metadata = this.metadata.get(connectionId);
+  markUpdated(param: ObjectContainerParams): void {
+    const metadata = this.metadata.get(param.connectionId);
+    const catalogId = param.catalogId ?? defaultCatalog;
     metadata.outdatedData = metadata.outdatedData.filter(id => id !== catalogId);
   }
 
@@ -107,7 +114,7 @@ string
       catalogId,
     });
     const value = this.data.get(connectionId);
-    value[catalogId || defaultCatalog] = [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList];
+    value[catalogId ?? defaultCatalog] = [...navGetStructContainers.schemaList, ...navGetStructContainers.catalogList];
 
     return this.data;
   }
