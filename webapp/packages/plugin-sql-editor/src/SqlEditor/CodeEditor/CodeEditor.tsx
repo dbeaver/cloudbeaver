@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import { Controlled as CodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';
 
