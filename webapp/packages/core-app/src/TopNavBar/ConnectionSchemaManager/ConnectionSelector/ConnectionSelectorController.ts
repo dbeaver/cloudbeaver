@@ -51,7 +51,7 @@ export class ConnectionSelectorController {
 
   get isObjectContainerSelectorVisible(): boolean {
     return !!this.currentConnection?.connected
-      && !this.objectContainerSelectionDisabled;
+      && this.connectionSelectorService.currentObjectSchemaId !== undefined;
   }
 
   @computed get objectContainerSelectionDisabled(): boolean {
