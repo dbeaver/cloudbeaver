@@ -200,17 +200,15 @@ export class ConnectionSchemaManagerService {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }
 
-    if (this.activeItem?.changeCatalogId || this.activeItem?.changeSchemaId) {
-      try {
-        await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
-      } catch (exception) {
-        this.notificationService.logException(
-          exception,
-          `Can't load objectContainers for ${connectionId}@${catalogId}`,
-          '',
-          true
-        );
-      }
+    try {
+      await this.connectionsManagerService.loadObjectContainer(connectionId, catalogId);
+    } catch (exception) {
+      this.notificationService.logException(
+        exception,
+        `Can't load objectContainers for ${connectionId}@${catalogId}`,
+        '',
+        true
+      );
     }
   }
 

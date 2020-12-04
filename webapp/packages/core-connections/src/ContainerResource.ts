@@ -118,4 +118,8 @@ string
 
     return this.data;
   }
+
+  protected includes(param: ObjectContainerParams, second: ObjectContainerParams): boolean {
+    return param.connectionId === second.connectionId && param.catalogId === second.catalogId;
+  }
 }
