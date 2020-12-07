@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTab } from '@cloudbeaver/core-app';
@@ -15,6 +15,7 @@ import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
 import { CodeEditor } from './CodeEditor/CodeEditor';
+import { CodeEditorController } from './CodeEditor/CodeEditorController';
 import { SqlEditorController } from './SqlEditorController';
 
 type SqlEditorProps = PropsWithChildren<{
@@ -57,11 +58,24 @@ const styles = css`
 
 export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
   const tab = useTab(tabId);
+  const editor = useRef<CodeEditorController>(null);
   const baseTab = useBaseTab(tabId);
   const controller = useController(SqlEditorController, tab);
 
+  useEffect(() => {
+    if (!baseTab.selected) {
+      return;
+    }
+
+    editor.current?.focus();
+  }, [baseTab.selected]);
+
   if (!baseTab.selected) {
     return null;
+  }
+
+  function preventFocus(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.preventDefault();
   }
 
   return styled(styles)(
@@ -69,6 +83,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
       <actions as="div">
         <button
           disabled={controller.isActionsDisabled}
+          onMouseDown={preventFocus}
           onClick={controller.handleExecute}
         >
           <StaticImage
@@ -78,6 +93,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
         </button>
         <button
           disabled={controller.isActionsDisabled}
+          onMouseDown={preventFocus}
           onClick={controller.handleExecuteNewTab}
         >
           <StaticImage
@@ -87,6 +103,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
         </button>
       </actions>
       <CodeEditor
+        ref={editor}
         bindings={controller.bindings}
         dialect={controller.dialect}
         value={controller.value}

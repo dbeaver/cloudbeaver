@@ -83,7 +83,7 @@ export function TabsState<T = Record<string, any>>({
         return false;
       }
       dynamic.current.selectedId = data.tabId;
-      dynamic.current.state.select(data.tabId);
+      dynamic.current.state.setSelectedId(data.tabId);
       return undefined;
     };
     const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.current.close?.(data);

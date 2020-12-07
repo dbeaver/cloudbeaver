@@ -53,6 +53,10 @@ export class CodeEditorController {
     this.dialect = dialect;
   }
 
+  focus() {
+    this.editor?.focus();
+  }
+
   private handleConfigure(editor: Editor) {
     this.editor = editor;
     this.editor.addOverlay({
