@@ -157,14 +157,12 @@ export class ObjectViewerTabService {
   }
 
   private async closeConnectionInfoTabs(connection: Connection) {
-    const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-
     if (!connection.connected) {
-      const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab => tab.handlerState.objectId === navNodeId)
+      const tabs = this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => tab.handlerState.connectionId === connection.id)
       );
 
-      if (tab) {
+      for (const tab of tabs) {
         await this.navigationTabsService.closeTab(tab.id, true);
       }
     }
@@ -192,6 +190,13 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
+        if (tab.handlerState.connectionId) {
+          const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
+
+          if (!connection.connected) {
+            return;
+          }
+        }
         await this.navigationTabsService.closeTab(tab.id, true);
       }
     });
