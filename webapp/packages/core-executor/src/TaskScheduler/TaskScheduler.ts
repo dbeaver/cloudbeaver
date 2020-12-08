@@ -47,6 +47,16 @@ export class TaskScheduler<TIdentifier> {
     }
   }
 
+  async wait(): Promise<void> {
+    const queueList = this.queue.slice();
+
+    for (const task of queueList) {
+      try {
+        await task.task;
+      } catch {}
+    }
+  }
+
   private async scheduler<T>(id: TIdentifier, promise: () => Promise<T>) {
     if (!this.isBlocked) {
       return promise();

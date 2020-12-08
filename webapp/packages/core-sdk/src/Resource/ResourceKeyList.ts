@@ -26,11 +26,6 @@ export class ResourceKeyList<TKey> {
   }
 }
 
-interface ForeachFnc {
-  <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => any): any;
-  <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => Promise<any>): Promise<any>;
-}
-
 interface MapFnc {
   <TKey, TValue>(key: ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue[];
   <TKey, TValue>(

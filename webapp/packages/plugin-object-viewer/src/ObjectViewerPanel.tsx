@@ -59,12 +59,18 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
     navigation.selectTab(tab.id);
   }, [navigation, connection, tab]);
 
-  if (connection.connectionInfo && !connection.connectionInfo.connected && !connection.isLoading()) {
-    return (
-      <TextPlaceholder>
-        <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
-      </TextPlaceholder>
-    );
+  if (connection.connectionInfo) {
+    if (connection.isLoading()) {
+      return <Loader />;
+    }
+
+    if (!connection.connectionInfo.connected) {
+      return (
+        <TextPlaceholder>
+          <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
+        </TextPlaceholder>
+      );
+    }
   }
 
   if (!isLoaded() || (!isOutdated() && isLoading())) {

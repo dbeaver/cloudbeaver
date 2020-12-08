@@ -17,8 +17,11 @@ import {
   GraphQLService,
   CachedMapResource,
   ConnectionConfig,
-  UserConnectionAuthPropertiesFragment
+  UserConnectionAuthPropertiesFragment,
+  resourceKeyList
 } from '@cloudbeaver/core-sdk';
+
+import { ConnectionsResource } from './Administration/ConnectionsResource';
 
 export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 
@@ -29,6 +32,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
+    private connectionsResource: ConnectionsResource,
     appAuthService: AppAuthService,
     sessionResource: SessionResource
   ) {
@@ -42,28 +46,39 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // it's prevents double nav tree refresh
     this.onItemAdd.addHandler(() => !this.sessionUpdate);
     this.onItemDelete.addHandler(() => !this.sessionUpdate);
+    this.onConnectionCreate.addHandler(() => !this.sessionUpdate);
     sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
     appAuthService.auth.addHandler(() => this.refreshSession(true));
   }
 
   @action async refreshSession(sessionUpdate?: boolean): Promise<void> {
-    this.sessionUpdate = true;
+    this.sessionUpdate = sessionUpdate === true;
     try {
-      const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
+      const connectionsList = resourceKeyList(Array.from(this.data.keys()));
+      await this.performUpdate(connectionsList, async () => {
+        if (!sessionUpdate) {
+          const updated = await this.connectionsResource.updateSessionConnections();
 
-      const restoredConnections = new Set<string>();
-      for (const connection of connections) {
-        await this.add(connection, sessionUpdate);
-        restoredConnections.add(connection.id);
-      }
+          if (!updated) {
+            return;
+          }
+        }
 
-      const unrestoredConnectionIdList = Array.from(this.data.values())
-        .map(connection => connection.id)
-        .filter(connectionId => !restoredConnections.has(connectionId));
+        const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
 
-      for (const connectionId of unrestoredConnectionIdList) {
-        this.delete(connectionId);
-      }
+        const restoredConnections = new Set<string>();
+
+        for (const connection of connections) {
+          await this.add(connection);
+          restoredConnections.add(connection.id);
+        }
+
+        const unrestoredConnectionIdList = Array.from(this.data.values())
+          .map(connection => connection.id)
+          .filter(connectionId => !restoredConnections.has(connectionId));
+
+        this.delete(resourceKeyList(unrestoredConnectionIdList));
+      });
     } finally {
       this.sessionUpdate = false;
     }
@@ -87,13 +102,13 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  @action async add(connection: Connection, update?: boolean): Promise<Connection> {
+  @action async add(connection: Connection): Promise<Connection> {
     const exists = this.data.has(connection.id);
     this.set(connection.id, connection);
 
     const observedConnection = this.get(connection.id)!;
 
-    if (!update && !exists) {
+    if (!exists) {
       await this.onConnectionCreate.execute(observedConnection);
     }
 
@@ -104,7 +119,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     await this.performUpdate(id, async () => {
       const connection = await this.initConnection(id, credentials, saveCredentials);
       this.set(id, connection);
-      return connection;
     });
 
     return this.get(id)!;

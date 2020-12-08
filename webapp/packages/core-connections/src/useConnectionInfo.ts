@@ -22,12 +22,14 @@ export function useConnectionInfo(connectionId: string) {
   const refresh = useCallback(() => service.refresh(connectionId), [service, connectionId]);
   const isLoading = useCallback(() => service.isDataLoading(connectionId), [service, connectionId]);
   const isLoaded = useCallback(() => service.isLoaded(connectionId), [service, connectionId]);
+  const isOutdated = useCallback(() => service.isOutdated(connectionId), [service, connectionId]);
   const connect = useCallback(() => manager.requireConnection(connectionId), [manager, connectionId]);
 
   return {
     connectionInfo,
     isLoading,
     isLoaded,
+    isOutdated,
     load,
     refresh,
     connect,

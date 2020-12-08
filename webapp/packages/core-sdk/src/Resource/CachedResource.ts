@@ -49,6 +49,10 @@ export abstract class CachedResource<
 
   abstract isLoaded(param: TParam): boolean;
 
+  waitLoad(): Promise<void> {
+    return this.scheduler.wait();
+  }
+
   isLoading(): boolean {
     return this.loading;
   }

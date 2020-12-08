@@ -51,10 +51,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
       onActivate: this.loadConnections.bind(this),
       onDeActivate: async (configuration: boolean, outside: boolean) => {
         if (outside) {
-          const updated = await this.connectionsResource.updateSessionConnections();
-          if (updated) {
-            await this.connectionInfoResource.refreshSession();
-          }
+          await this.connectionInfoResource.refreshSession();
         }
       },
     });

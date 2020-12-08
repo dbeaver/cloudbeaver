@@ -190,7 +190,7 @@ export class ObjectViewerTabService {
       );
 
       if (tab) {
-        if (tab.handlerState.connectionId) {
+        if (tab.handlerState.connectionId && this.connectionInfo.has(tab.handlerState.connectionId)) {
           const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
 
           if (!connection.connected) {
@@ -229,6 +229,13 @@ export class ObjectViewerTabService {
   private async selectObjectTab(tab: ITab<IObjectViewerTabState>) {
     try {
       if (tab.handlerState.connectionId) {
+        // here we wait when connections info will be updated and then check is connections is steel available
+        await this.connectionInfo.waitLoad();
+
+        if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
+          return;
+        }
+
         const connection = await this.connectionInfo.load(tab.handlerState.connectionId);
 
         if (!connection.connected) {
