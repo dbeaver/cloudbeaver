@@ -14,6 +14,7 @@ const defaultSettings = {
   'app.logViewer.maxLogRecords': 1000,
   'app.logViewer.logBatchSize': 2000,
   'app.logViewer.maxFailedRequests': 3,
+  'app.navigationTree.childrenLimit': 100,
 };
 
 export type CoreSettings = typeof defaultSettings;

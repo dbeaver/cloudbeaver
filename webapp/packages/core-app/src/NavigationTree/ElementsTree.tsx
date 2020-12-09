@@ -6,12 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
+import { CoreSettingsService } from '../CoreSettingsService';
 import { NavNode } from '../shared/NodesManager/EntityTypes';
 import { useChildren } from '../shared/useChildren';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
@@ -52,8 +55,10 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   onSelect,
   isSelected,
 }) {
+  const config = useService(CoreSettingsService);
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
+  const limit = useMemo(() => computed(() => config.settings.getValue('app.navigationTree.childrenLimit')), [config]);
 
   const context = useMemo<ITreeContext>(
     () => ({ control, onOpen, onSelect, isSelected }),
@@ -75,7 +80,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   return styled(styles)(
     <TreeContext.Provider value={context}>
       <tree as="div" className={className}>
-        {nodeChildren.children.map(id => (
+        {nodeChildren.children.slice(0, limit.get()).map(id => (
           <NavigationNodeElement key={id} nodeId={id} />
         ))}
         <Loader loading={nodeChildren.isLoading()} overlay />

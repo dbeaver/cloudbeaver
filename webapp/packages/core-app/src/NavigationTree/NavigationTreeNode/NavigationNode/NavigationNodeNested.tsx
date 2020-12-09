@@ -6,13 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { TreeNodeContext, TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { CoreSettingsService } from '../../../CoreSettingsService';
 import { useChildren } from '../../../shared/useChildren';
 
 interface Props {
@@ -26,9 +29,11 @@ export const NavigationNodeNested: React.FC<Props> = observer(function Navigatio
   nodeId,
   component,
 }) {
+  const config = useService(CoreSettingsService);
   const styles = useStyles(TREE_NODE_STYLES);
   const context = useContext(TreeNodeContext);
   const children = useChildren(nodeId);
+  const limit = useMemo(() => computed(() => config.settings.getValue('app.navigationTree.childrenLimit')), [config]);
 
   if (!children.children || !context?.expanded) {
     return null;
@@ -38,7 +43,7 @@ export const NavigationNodeNested: React.FC<Props> = observer(function Navigatio
 
   return styled(styles)(
     <TreeNodeNested>
-      {children.children.map(child => <NavigationNode key={child} nodeId={child} />)}
+      {children.children.slice(0, limit.get()).map(child => <NavigationNode key={child} nodeId={child} />)}
     </TreeNodeNested>
   );
 });
