@@ -278,7 +278,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
     const context = canvas.getContext('2d')!;
     context.font = font;
 
-    return context.measureText(text.toUpperCase()).width + (title ? COLUMN_TITLE_BOX_WIDTH : ROW_VALUE_BOX_WIDTH);
+    return context.measureText(text).width + (title ? COLUMN_TITLE_BOX_WIDTH : ROW_VALUE_BOX_WIDTH);
   }
 
   private getColumnWidth(column: IAgGridCol, columnIdx: number, rows: AgGridRow) {

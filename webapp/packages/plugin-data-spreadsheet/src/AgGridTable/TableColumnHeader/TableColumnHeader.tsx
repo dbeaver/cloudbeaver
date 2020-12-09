@@ -47,7 +47,7 @@ const headerStyles = css`
   }
   name {
     margin-left: 8px;
-    text-transform: uppercase;
+    text-transform: capitalize;
     font-weight: 400;
     flex-grow: 1;
   }
