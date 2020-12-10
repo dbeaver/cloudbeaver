@@ -59,6 +59,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
     this.isAuthenticating = true;
     try {
+      await this.authInfoService.logout();
       await this.authInfoService.login(this.provider.id, this.credentials);
       this.close();
     } catch (exception) {

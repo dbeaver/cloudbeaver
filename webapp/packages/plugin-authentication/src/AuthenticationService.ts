@@ -51,21 +51,12 @@ export class AuthenticationService extends Bootstrap {
     if (this.authPromise) {
       return this.authPromise;
     }
-    this.authPromise = this.wrap(persistent, provider);
+    this.authPromise = this.authDialogService.showLoginForm(persistent, provider);
     try {
       await this.authPromise;
     } finally {
       this.authPromise = null;
     }
-  }
-
-  private async wrap(persistent: boolean, provider: string | null = null) {
-    const userInfo = await this.userInfoResource.load();
-    if (userInfo) {
-      return;
-    }
-
-    await this.authDialogService.showLoginForm(persistent, provider);
   }
 
   private async requireAuthentication() {
@@ -83,7 +74,14 @@ export class AuthenticationService extends Bootstrap {
       }
     });
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
-    this.administrationScreenService.ensurePermissions.addHandler(async () => await this.auth(false));
+    this.administrationScreenService.ensurePermissions.addHandler(async () => {
+      const userInfo = await this.userInfoResource.load();
+      if (userInfo) {
+        return;
+      }
+
+      await this.auth(false);
+    });
   }
 
   load(): void { }
