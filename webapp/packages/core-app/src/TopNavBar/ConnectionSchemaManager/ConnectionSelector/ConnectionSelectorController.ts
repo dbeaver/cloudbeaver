@@ -11,7 +11,8 @@ import { computed } from 'mobx';
 import {
   ConnectionInfoResource,
   DBDriverResource,
-  Connection
+  Connection,
+  ConnectionsManagerService
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
@@ -96,11 +97,13 @@ export class ConnectionSelectorController {
   constructor(
     private connectionSelectorService: ConnectionSchemaManagerService,
     private dbDriverResource: DBDriverResource,
-    private connectionInfo: ConnectionInfoResource
+    private connectionInfo: ConnectionInfoResource,
+    private connectionsManagerService: ConnectionsManagerService,
   ) {
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
-      isDisabled: () => !this.connectionSelectorService.isConnectionChangeable,
+      isDisabled: () => !this.connectionSelectorService.isConnectionChangeable
+        || !this.connectionsManagerService.hasAnyConnection(),
       titleGetter: () => this.currentConnectionTitle,
       iconGetter: () => this.currentConnectionIcon,
       panel: new ComputedMenuPanelModel({
