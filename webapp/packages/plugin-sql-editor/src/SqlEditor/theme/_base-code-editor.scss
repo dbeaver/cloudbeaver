@@ -146,8 +146,7 @@
     }
 
     .cm-s-material .cm-comment {
-      @include mdc-theme-prop(color, text-primary-on-light, false);
-      // color: #546E7A;
+      color: $comment;
     }
 
     .cm-s-material .cm-variable {
