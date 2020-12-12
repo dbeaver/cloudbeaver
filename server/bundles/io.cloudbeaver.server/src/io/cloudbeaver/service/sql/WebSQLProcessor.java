@@ -390,7 +390,7 @@ public class WebSQLProcessor {
                                         }
                                         rowValues[updateAttributes.length + i] = document;
                                     } else {
-                                        Object cellValueRaw = finalRow[keyAttribute.getOrdinalPosition()];
+                                        Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
                                         rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
                                     }
                                 }
