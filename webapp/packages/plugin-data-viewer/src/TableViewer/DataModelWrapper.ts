@@ -18,7 +18,7 @@ import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import { ITableViewerModelOptions, TableViewerModel } from './TableViewerModel';
 
 const fetchingSettings = {
-  fetchMin: 1,
+  fetchMin: 100,
   fetchMax: 5000,
   fetchDefault: 200,
 };

@@ -24,7 +24,7 @@ import { TableEditor } from './TableDataModel/TableEditor';
 import { TableRow } from './TableDataModel/TableRow';
 
 export const fetchingSettings = {
-  fetchMin: 1,
+  fetchMin: 100,
   fetchMax: 5000,
   fetchDefault: 200,
 };
