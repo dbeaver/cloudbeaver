@@ -385,8 +385,10 @@ export const INDEX_COLUMN_DEF: ColDef = {
   pinned: 'left',
   suppressNavigable: true,
   suppressMenu: true,
+  suppressMovable: true,
   editable: false,
   sortable: false,
+  lockPosition: true,
   valueGetter: props => props.node.rowIndex + 1,
   cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
 };
