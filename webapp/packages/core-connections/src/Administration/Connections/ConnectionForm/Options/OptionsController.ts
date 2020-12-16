@@ -125,15 +125,11 @@ implements IInitializableController {
 
   private getNameTemplate() {
     if (this.driver) {
-      let address = [this.model.connection.host, this.model.connection.host && this.model.connection.port]
+      const address = [this.model.connection.host, this.model.connection.host && this.model.connection.port]
         .filter(Boolean)
         .join(':');
 
-      if (address) {
-        address = ` (${address})`;
-      }
-
-      return `${this.driver.name}${address} connection`;
+      return `${this.driver.name}@${address || ''}`;
     }
 
     return 'New connection';

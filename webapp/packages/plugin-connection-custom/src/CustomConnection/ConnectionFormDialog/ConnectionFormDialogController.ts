@@ -8,7 +8,7 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriver, DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
+import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -47,7 +47,8 @@ implements IInitializableController, IDestructibleController {
     private customConnectionService: CustomConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
-    private dbAuthModelsResource: DatabaseAuthModelsResource
+    private dbAuthModelsResource: DatabaseAuthModelsResource,
+    private connectionInfoResource: ConnectionInfoResource,
   ) { }
 
   init(driver: DBDriver, onClose: () => void) {
@@ -80,6 +81,12 @@ implements IInitializableController, IDestructibleController {
   };
 
   onCreateConnection = async () => {
+    const validationStatus = this.validate();
+    if (!validationStatus.passed) {
+      this.showError(new Error(validationStatus.errorMsg), 'customConnection_create_error');
+      return;
+    }
+
     this.isConnecting = true;
     this.error.clear();
     try {
@@ -100,21 +107,39 @@ implements IInitializableController, IDestructibleController {
     }
   };
 
+  private getNotDuplicatedConnectionName(name: string) {
+    let index = 0;
+    let nameToCheck = name.trim();
+
+    const connectionsNames = new Set();
+    for (const connection of this.connectionInfoResource.data.values()) {
+      connectionsNames.add(connection.name);
+    }
+
+    while (true) {
+      if (connectionsNames.has(nameToCheck)) {
+        index += 1;
+        nameToCheck = `${name} (${index})`;
+        continue;
+      }
+      break;
+    }
+
+    return nameToCheck;
+  }
+
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
-    config.name = this.config.name;
+    config.name = this.getNotDuplicatedConnectionName(this.config.name!);
     config.driverId = this.config.driverId;
 
     if (!this.isUrlConnection) {
-      config.name = this.config.databaseName;
       if (!this.driver?.embedded) {
         config.host = this.config.host;
         config.port = this.config.port;
-        config.name += `@${this.config.host}`;
       }
       config.databaseName = this.config.databaseName;
     } else {
-      config.name = this.urlToConnectionName(this.config.name, this.config.url);
       config.url = this.config.url;
     }
     if (this.authModel) {
@@ -129,9 +154,18 @@ implements IInitializableController, IDestructibleController {
     return config;
   }
 
+  private validate() {
+    const status = { passed: true, errorMsg: '' };
+    if (!this.config.name?.trim().length) {
+      status.errorMsg = 'Field "Name" can"t be empty';
+    }
+    status.passed = !status.errorMsg;
+    return status;
+  }
+
   @action
   private setDriverDefaults() {
-    this.config.name = `${this.driver.name} (custom)`;
+    this.config.name = `${this.driver.name}@${this.driver.defaultServer || 'localhost'}:${this.driver.defaultPort || ''}`;
     this.config.driverId = this.driver.id;
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
@@ -142,33 +176,9 @@ implements IInitializableController, IDestructibleController {
     this.config.credentials = {};
   }
 
-  /**
-   * Creates connection name based on connection url
-   * @param defaultName default connection name if url parsing failed
-   * @param url connection url
-   */
-  private urlToConnectionName(defaultName?: string, url?: string) {
-    let name = defaultName;
-    if (!url) {
-      return name;
-    }
-
-    const matches = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/.exec(url);
-    if (!matches) {
-      return name;
-    }
-
-    name = matches[1];
-    if (matches[4]) {
-      name += `@${matches[4]}`;
-    }
-
-    return name;
-  }
-
-  private showError(exception: Error, message: string) {
+  private showError(exception: Error, title: string) {
     if (!this.error.catch(exception) || this.isDistructed) {
-      this.notificationService.logException(exception, message);
+      this.notificationService.logException(exception, title);
     }
   }
 

@@ -67,6 +67,12 @@ implements IInitializableController {
   }
 
   save = async (): Promise<void> => {
+    const validationStatus = this.valdiate();
+    if (!validationStatus.passed) {
+      this.notificationService.logException(new Error(validationStatus.errorMsg), 'connections_administration_connection_create_error');
+      return;
+    }
+
     this.isSaving = true;
     try {
       if (this.model.editing) {
@@ -99,14 +105,61 @@ implements IInitializableController {
     }
   };
 
+  private isConnectionNameAlreadyExists(name: string) {
+    for (const connection of this.connectionsResource.data.values()) {
+      if (connection.id !== this.model.connection.id && connection.name === name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private valdiate() {
+    const status = { passed: true, errorMsg: '' };
+    const connectionName = this.model.connection.name?.trim();
+    if (!connectionName.length) {
+      status.errorMsg = "Field 'Name' can't be empty";
+    } else if (this.model.editing && this.isConnectionNameAlreadyExists(connectionName)) {
+      status.errorMsg = 'Connection with this name already exists';
+    }
+
+    status.passed = !status.errorMsg;
+    return status;
+  }
+
+  private getNotDuplicatedConnectionName(name: string) {
+    let index = 0;
+    let nameToCheck = name.trim();
+
+    const connectionsNames = new Set();
+    for (const connection of this.connectionsResource.data.values()) {
+      if (connection.id !== this.model.connection.id) {
+        connectionsNames.add(connection.name);
+      }
+    }
+
+    while (true) {
+      if (connectionsNames.has(nameToCheck)) {
+        index += 1;
+        nameToCheck = `${name} (${index})`;
+        continue;
+      }
+      break;
+    }
+
+    return nameToCheck;
+  }
+
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
 
     if (this.model.editing) {
       config.connectionId = this.model.connection.id;
+      config.name = this.model.connection.name;
+    } else {
+      config.name = this.getNotDuplicatedConnectionName(this.model.connection.name!);
     }
 
-    config.name = this.model.connection.name;
     config.description = this.model.connection.description;
     config.template = this.model.connection.template;
     config.driverId = this.model.connection.driverId;

@@ -3,6 +3,7 @@ export default [
   ['connections_administration_connection_create', 'Add Database'],
   ['connections_administration_search_database_tip', 'Type your hosts here, e.g. \'localhost host1.myhost.com 192.168.0.1\' and press Enter'],
   ['connections_administration_new_connection', 'New connection'],
+  ['connections_administration_connection_create_error', 'Form error'],
   ['connections_administration_connection_access_empty', 'No available users and roles'],
   ['connections_administration_configuration_wizard_step_title', 'Database connections'],
   ['connections_administration_configuration_wizard_step_description', 'Add database connections'],

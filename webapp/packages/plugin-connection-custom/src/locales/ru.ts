@@ -3,6 +3,7 @@ export default [
   ['customConnection_connectionType_url', 'URL'],
   ['customConnection_options', 'Подключение'],
   ['customConnection_properties', 'Параметры драйвера'],
+  ['customConnection_custom_name', 'Имя'],
   ['customConnection_custom_host', 'Хост'],
   ['customConnection_custom_obligatory', '(обязательное)'],
   ['customConnection_custom_port', 'Порт'],
@@ -13,4 +14,5 @@ export default [
   ['customConnection_Password', 'Пароль'],
   ['customConnection_test', 'Проверить'],
   ['customConnection_create', 'Создать'],
+  ['customConnection_create_error', 'Ошибка формы'],
 ];

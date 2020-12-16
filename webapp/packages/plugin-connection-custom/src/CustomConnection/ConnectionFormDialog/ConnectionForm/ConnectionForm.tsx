@@ -55,6 +55,18 @@ export const ConnectionForm = observer(function ConnectionForm({
     <SubmittingForm ref={focusedRef}>
       <FormBox>
         <FormBoxElement>
+          <FormGroup>
+            <InputField
+              type="text"
+              name="name"
+              value={controller.config.name}
+              disabled={controller.isConnecting}
+              mod='surface'
+              onChange={value => controller.onChange('name', value)}
+            >
+              {translate('customConnection_custom_name')}
+            </InputField>
+          </FormGroup>
           {controller.isUrlConnection ? (
             <FormGroup>
               <InputField
