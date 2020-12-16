@@ -42,6 +42,7 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
+  private nameTemplate = /(\w+)@([^\s]+[\d])$/;
 
   constructor(
     private customConnectionService: CustomConnectionService,
@@ -64,6 +65,7 @@ implements IInitializableController, IDestructibleController {
 
   onChange = (property: keyof ConnectionConfig, value: any) => {
     this.config[property] = value;
+    this.updateName(property);
   };
 
   onTestConnection = async () => {
@@ -106,6 +108,30 @@ implements IInitializableController, IDestructibleController {
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   };
+
+  private updateName(name?: keyof ConnectionConfig) {
+    if (name === 'name') {
+      return;
+    }
+
+    const matches = this.nameTemplate.exec(this.config.name!);
+
+    if (this.config.name === undefined || (matches?.length && this.driver.name === matches[1])) {
+      this.config.name = this.getNameTemplate();
+    }
+  }
+
+  private getNameTemplate() {
+    if (this.driver) {
+      const address = [this.config.host, this.config.host && this.config.port]
+        .filter(Boolean)
+        .join(':');
+
+      return `${this.driver.name}@${address || ''}`;
+    }
+
+    return 'New connection';
+  }
 
   private getNotDuplicatedConnectionName(name: string) {
     let index = 0;

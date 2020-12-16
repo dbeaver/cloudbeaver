@@ -47,7 +47,7 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^(.*?)\s(|\(.*?\)\s)connection$/;
+  private nameTemplate = /(\w+)@([^\s]+[\d])$/;
 
   constructor(
     private notificationService: NotificationService,
