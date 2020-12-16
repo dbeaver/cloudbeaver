@@ -19,6 +19,10 @@ import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
+interface IValidationStatus {
+  status: boolean;
+  errorMessage: string;
+}
 @injectable()
 export class ConnectionFormController
 implements IInitializableController {
@@ -67,21 +71,23 @@ implements IInitializableController {
   }
 
   save = async (): Promise<void> => {
-    const validationStatus = this.valdiate();
-    if (!validationStatus.passed) {
-      this.notificationService.logException(new Error(validationStatus.errorMsg), 'connections_administration_connection_create_error');
+    const connectionConfig = this.getConnectionConfig();
+    const validationStatus = this.valdiate(connectionConfig);
+    if (!validationStatus.status) {
+      this.notificationService.logError({ title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error', message: validationStatus.errorMessage });
       return;
     }
 
     this.isSaving = true;
     try {
       if (this.model.editing) {
-        const connection = await this.connectionsResource.update(this.model.connection.id, this.getConnectionConfig());
+        const connection = await this.connectionsResource.update(this.model.connection.id, connectionConfig);
         await this.afterSave.execute(connection.id);
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} updated` });
       } else {
-        const connection = await this.connectionsResource.create(this.getConnectionConfig());
+        connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+        const connection = await this.connectionsResource.create(connectionConfig);
         await this.afterSave.execute(connection.id);
         this.close();
         this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
@@ -114,22 +120,30 @@ implements IInitializableController {
     return false;
   }
 
-  private valdiate() {
-    const status = { passed: true, errorMsg: '' };
-    const connectionName = this.model.connection.name?.trim();
-    if (!connectionName.length) {
-      status.errorMsg = "Field 'Name' can't be empty";
-    } else if (this.model.editing && this.isConnectionNameAlreadyExists(connectionName)) {
-      status.errorMsg = 'Connection with this name already exists';
+  private valdiate(config: ConnectionConfig) {
+    const validateByLength: Array<keyof ConnectionConfig> = ['name'];
+    const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
+
+    for (const key of validateByLength) {
+      if (!config[key]?.length) {
+        validationStatus.errorMessage = `Field '${key}' can't be empty`;
+        break;
+      }
     }
 
-    status.passed = !status.errorMsg;
-    return status;
+    if (!validationStatus.errorMessage) {
+      if (this.model.editing && this.isConnectionNameAlreadyExists(config.name!)) {
+        validationStatus.errorMessage = 'Connection with this name already exists';
+      }
+    }
+
+    validationStatus.status = !validationStatus.errorMessage;
+    return validationStatus;
   }
 
-  private getNotDuplicatedConnectionName(name: string) {
+  private getUniqueName(name: string) {
     let index = 0;
-    let nameToCheck = name.trim();
+    let nameToCheck = name;
 
     const connectionsNames = new Set();
     for (const connection of this.connectionsResource.data.values()) {
@@ -139,12 +153,11 @@ implements IInitializableController {
     }
 
     while (true) {
-      if (connectionsNames.has(nameToCheck)) {
-        index += 1;
-        nameToCheck = `${name} (${index})`;
-        continue;
+      if (!connectionsNames.has(nameToCheck)) {
+        break;
       }
-      break;
+      index += 1;
+      nameToCheck = `${name} (${index})`;
     }
 
     return nameToCheck;
@@ -155,11 +168,9 @@ implements IInitializableController {
 
     if (this.model.editing) {
       config.connectionId = this.model.connection.id;
-      config.name = this.model.connection.name;
-    } else {
-      config.name = this.getNotDuplicatedConnectionName(this.model.connection.name!);
     }
 
+    config.name = this.model.connection.name;
     config.description = this.model.connection.description;
     config.template = this.model.connection.template;
     config.driverId = this.model.connection.driverId;
@@ -183,6 +194,13 @@ implements IInitializableController {
     if (Object.keys(this.model.connection.properties).length > 0) {
       config.properties = this.model.connection.properties;
     }
+
+    (Object.keys(config) as Array<keyof ConnectionConfig>).forEach(key => {
+      const value = config[key];
+      if (value && typeof value === 'string' && value.length) {
+        config[key] = value?.trim();
+      }
+    });
 
     return config;
   }

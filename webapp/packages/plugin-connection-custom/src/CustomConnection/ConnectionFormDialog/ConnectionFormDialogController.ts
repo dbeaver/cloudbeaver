@@ -16,6 +16,11 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';
+
+interface IValidationStatus {
+  status: boolean;
+  errorMessage: string;
+}
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
@@ -83,16 +88,18 @@ implements IInitializableController, IDestructibleController {
   };
 
   onCreateConnection = async () => {
-    const validationStatus = this.validate();
-    if (!validationStatus.passed) {
-      this.showError(new Error(validationStatus.errorMsg), 'customConnection_create_error');
+    const connectionConfig = this.getConnectionConfig();
+    const validationStatus = this.validate(connectionConfig);
+    if (!validationStatus.status) {
+      this.notificationService.logError({ title: 'customConnection_create_error', message: validationStatus.errorMessage });
       return;
     }
 
     this.isConnecting = true;
     this.error.clear();
     try {
-      const connection = await this.customConnectionService.createConnectionAsync(this.getConnectionConfig());
+      connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+      const connection = await this.customConnectionService.createConnectionAsync(connectionConfig);
 
       this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
       this.onClose();
@@ -133,7 +140,7 @@ implements IInitializableController, IDestructibleController {
     return 'New connection';
   }
 
-  private getNotDuplicatedConnectionName(name: string) {
+  private getUniqueName(name: string) {
     let index = 0;
     let nameToCheck = name.trim();
 
@@ -143,12 +150,11 @@ implements IInitializableController, IDestructibleController {
     }
 
     while (true) {
-      if (connectionsNames.has(nameToCheck)) {
-        index += 1;
-        nameToCheck = `${name} (${index})`;
-        continue;
+      if (!connectionsNames.has(nameToCheck)) {
+        break;
       }
-      break;
+      index += 1;
+      nameToCheck = `${name} (${index})`;
     }
 
     return nameToCheck;
@@ -156,7 +162,7 @@ implements IInitializableController, IDestructibleController {
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
-    config.name = this.getNotDuplicatedConnectionName(this.config.name!);
+    config.name = this.config.name;
     config.driverId = this.config.driverId;
 
     if (!this.isUrlConnection) {
@@ -177,16 +183,29 @@ implements IInitializableController, IDestructibleController {
       config.properties = this.config.properties;
     }
 
+    (Object.keys(config) as Array<keyof ConnectionConfig>).forEach(key => {
+      const value = config[key];
+      if (value && typeof value === 'string' && value.length) {
+        config[key] = value?.trim();
+      }
+    });
+
     return config;
   }
 
-  private validate() {
-    const status = { passed: true, errorMsg: '' };
-    if (!this.config.name?.trim().length) {
-      status.errorMsg = 'Field "Name" can"t be empty';
+  private validate(config: ConnectionConfig) {
+    const validateByLength: Array<keyof ConnectionConfig> = ['name'];
+    const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
+
+    for (const key of validateByLength) {
+      if (!config[key]?.length) {
+        validationStatus.errorMessage = `Field '${key}' can't be empty`;
+        break;
+      }
     }
-    status.passed = !status.errorMsg;
-    return status;
+
+    validationStatus.status = !validationStatus.errorMessage;
+    return validationStatus;
   }
 
   @action

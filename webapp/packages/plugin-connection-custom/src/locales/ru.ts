@@ -14,5 +14,5 @@ export default [
   ['customConnection_Password', 'Пароль'],
   ['customConnection_test', 'Проверить'],
   ['customConnection_create', 'Создать'],
-  ['customConnection_create_error', 'Ошибка формы'],
+  ['customConnection_create_error', 'Ошибка при создании подключения'],
 ];
