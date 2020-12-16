@@ -89,9 +89,9 @@ implements IInitializableController, IDestructibleController {
 
   onCreateConnection = async () => {
     const connectionConfig = this.getConnectionConfig();
-    const validationStatus = this.validate(connectionConfig);
-    if (!validationStatus.status) {
-      this.notificationService.logError({ title: 'customConnection_create_error', message: validationStatus.errorMessage });
+    const validation = this.validate(connectionConfig);
+    if (!validation.status) {
+      this.notificationService.logError({ title: 'customConnection_create_error', message: validation.errorMessage });
       return;
     }
 
@@ -140,9 +140,9 @@ implements IInitializableController, IDestructibleController {
     return 'New connection';
   }
 
-  private getUniqueName(name: string) {
-    let index = 0;
-    let nameToCheck = name.trim();
+  private getUniqueName(baseName: string) {
+    let index = 1;
+    let name = baseName;
 
     const connectionsNames = new Set();
     for (const connection of this.connectionInfoResource.data.values()) {
@@ -150,14 +150,14 @@ implements IInitializableController, IDestructibleController {
     }
 
     while (true) {
-      if (!connectionsNames.has(nameToCheck)) {
+      if (!connectionsNames.has(name)) {
         break;
       }
-      index += 1;
-      nameToCheck = `${name} (${index})`;
+      name = `${baseName} (${index})`;
+      index++;
     }
 
-    return nameToCheck;
+    return name;
   }
 
   private getConnectionConfig(): ConnectionConfig {
@@ -183,25 +183,16 @@ implements IInitializableController, IDestructibleController {
       config.properties = this.config.properties;
     }
 
-    (Object.keys(config) as Array<keyof ConnectionConfig>).forEach(key => {
-      const value = config[key];
-      if (value && typeof value === 'string' && value.length) {
-        config[key] = value?.trim();
-      }
-    });
+    config.name = config.name?.trim();
 
     return config;
   }
 
   private validate(config: ConnectionConfig) {
-    const validateByLength: Array<keyof ConnectionConfig> = ['name'];
     const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
 
-    for (const key of validateByLength) {
-      if (!config[key]?.length) {
-        validationStatus.errorMessage = `Field '${key}' can't be empty`;
-        break;
-      }
+    if (!config.name?.length) {
+      validationStatus.errorMessage = "Field 'name' can't be empty";
     }
 
     validationStatus.status = !validationStatus.errorMessage;

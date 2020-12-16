@@ -72,9 +72,9 @@ implements IInitializableController {
 
   save = async (): Promise<void> => {
     const connectionConfig = this.getConnectionConfig();
-    const validationStatus = this.valdiate(connectionConfig);
-    if (!validationStatus.status) {
-      this.notificationService.logError({ title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error', message: validationStatus.errorMessage });
+    const validation = this.validate(connectionConfig);
+    if (!validation.status) {
+      this.notificationService.logError({ title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error', message: validation.errorMessage });
       return;
     }
 
@@ -120,30 +120,22 @@ implements IInitializableController {
     return false;
   }
 
-  private valdiate(config: ConnectionConfig) {
-    const validateByLength: Array<keyof ConnectionConfig> = ['name'];
+  private validate(config: ConnectionConfig) {
     const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
 
-    for (const key of validateByLength) {
-      if (!config[key]?.length) {
-        validationStatus.errorMessage = `Field '${key}' can't be empty`;
-        break;
-      }
-    }
-
-    if (!validationStatus.errorMessage) {
-      if (this.model.editing && this.isConnectionNameAlreadyExists(config.name!)) {
-        validationStatus.errorMessage = 'Connection with this name already exists';
-      }
+    if (!config.name?.length) {
+      validationStatus.errorMessage = "Field 'name' can't be empty";
+    } else if (this.model.editing && this.isConnectionNameAlreadyExists(config.name)) {
+      validationStatus.errorMessage = 'Connection with this name already exists';
     }
 
     validationStatus.status = !validationStatus.errorMessage;
     return validationStatus;
   }
 
-  private getUniqueName(name: string) {
-    let index = 0;
-    let nameToCheck = name;
+  private getUniqueName(baseName: string) {
+    let index = 1;
+    let name = baseName;
 
     const connectionsNames = new Set();
     for (const connection of this.connectionsResource.data.values()) {
@@ -153,14 +145,14 @@ implements IInitializableController {
     }
 
     while (true) {
-      if (!connectionsNames.has(nameToCheck)) {
+      if (!connectionsNames.has(name)) {
         break;
       }
-      index += 1;
-      nameToCheck = `${name} (${index})`;
+      name = `${baseName} (${index})`;
+      index++;
     }
 
-    return nameToCheck;
+    return name;
   }
 
   private getConnectionConfig(): ConnectionConfig {
@@ -195,12 +187,7 @@ implements IInitializableController {
       config.properties = this.model.connection.properties;
     }
 
-    (Object.keys(config) as Array<keyof ConnectionConfig>).forEach(key => {
-      const value = config[key];
-      if (value && typeof value === 'string' && value.length) {
-        config[key] = value?.trim();
-      }
-    });
+    config.name = config.name.trim();
 
     return config;
   }
