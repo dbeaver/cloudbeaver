@@ -16,16 +16,13 @@ import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResour
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
+interface IParsedUrlParameters {
+  host?: string;
+  port?: string;
+}
 @injectable()
 export class OptionsController
 implements IInitializableController {
-  get isUrlConnection(): boolean {
-    if (this.model.editing) {
-      return this.model.connection.useUrl;
-    }
-    return !this.driver?.sampleURL;
-  }
-
   @computed get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
@@ -54,7 +51,7 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /(\w+)@([^\s]+)$/;
+  private nameTemplate = /^(\w+)@([\w:]+)?$/;
 
   constructor(
     private notificationService: NotificationService,
@@ -114,14 +111,36 @@ implements IInitializableController {
     this.updateName();
   }
 
+  private getParametersFromUrl(url: string) {
+    const parameters: IParsedUrlParameters = {};
+    const isParameterValidRegex = /[\[,\],{,}]+/;
+    const urlTemplateRegex = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/;
+
+    const parsedParameters = urlTemplateRegex.exec(url);
+    if (!parsedParameters) {
+      return null;
+    }
+
+    const isValidParameter = (parameter: string) => !isParameterValidRegex.test(parameter);
+
+    parameters.host = isValidParameter(parsedParameters[1]) ? parsedParameters[1] : undefined;
+    parameters.port = isValidParameter(parsedParameters[2]) ? parsedParameters[2] : undefined;
+
+    return parameters;
+  }
+
   private updateName(name?: string) {
     if (name === 'name') {
       return;
     }
 
-    if (this.isUrlConnection) {
-      this.model.connection.name = this.model.connection.url || '';
-      return;
+    let host = this.model.connection.host;
+    let port = this.model.connection.port;
+
+    if (this.model.connection.url && !host && !port) {
+      const urlParameters = this.getParametersFromUrl(this.model.connection.url || '');
+      host = urlParameters?.host;
+      port = urlParameters?.port?.slice(1);
     }
 
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
@@ -131,13 +150,13 @@ implements IInitializableController {
 
     if (this.model.connection.name === undefined
         || (matches?.length && databaseNames.includes(matches[1]))) {
-      this.model.connection.name = this.getNameTemplate();
+      this.model.connection.name = this.getNameTemplate(host, port);
     }
   }
 
-  private getNameTemplate() {
+  private getNameTemplate(host?: string, port?: string) {
     if (this.driver) {
-      const address = [this.model.connection.host, this.model.connection.host && this.model.connection.port]
+      const address = [host, host && port]
         .filter(Boolean)
         .join(':');
 

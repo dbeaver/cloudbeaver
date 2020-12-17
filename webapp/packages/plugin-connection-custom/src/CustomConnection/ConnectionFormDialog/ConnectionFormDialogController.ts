@@ -21,6 +21,11 @@ interface IValidationStatus {
   status: boolean;
   errorMessage: string;
 }
+
+interface IParsedUrlParameters {
+  host?: string;
+  port?: string;
+}
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
@@ -47,7 +52,7 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
-  private nameTemplate = /(\w+)@([^\s]+)$/;
+  private nameTemplate = /^(\w+)@([\w:]+)?$/;
 
   constructor(
     private customConnectionService: CustomConnectionService,
@@ -121,21 +126,25 @@ implements IInitializableController, IDestructibleController {
       return;
     }
 
+    let host = this.config.host;
+    let port = this.config.port;
+
     if (this.isUrlConnection) {
-      this.config.name = this.config.url;
-      return;
+      const urlParameters = this.getParametersFromUrl(this.config.url || '');
+      host = urlParameters?.host;
+      port = urlParameters?.port?.slice(1);
     }
 
     const matches = this.nameTemplate.exec(this.config.name!);
 
     if (this.config.name === undefined || (matches?.length && this.driver.name === matches[1])) {
-      this.config.name = this.getNameTemplate();
+      this.config.name = this.getNameTemplate(host, port);
     }
   }
 
-  private getNameTemplate() {
+  private getNameTemplate(host?: string, port?: string) {
     if (this.driver) {
-      const address = [this.config.host, this.config.host && this.config.port]
+      const address = [host, host && port]
         .filter(Boolean)
         .join(':');
 
@@ -143,6 +152,24 @@ implements IInitializableController, IDestructibleController {
     }
 
     return 'New connection';
+  }
+
+  private getParametersFromUrl(url: string) {
+    const parameters: IParsedUrlParameters = {};
+    const isParameterValidRegex = /[\[,\],{,}]+/;
+    const urlTemplateRegex = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/;
+
+    const parsedParameters = urlTemplateRegex.exec(url);
+    if (!parsedParameters) {
+      return null;
+    }
+
+    const isValidParameter = (parameter: string) => !isParameterValidRegex.test(parameter);
+
+    parameters.host = isValidParameter(parsedParameters[1]) ? parsedParameters[1] : undefined;
+    parameters.port = isValidParameter(parsedParameters[2]) ? parsedParameters[2] : undefined;
+
+    return parameters;
   }
 
   private getUniqueName(baseName: string) {
@@ -207,7 +234,7 @@ implements IInitializableController, IDestructibleController {
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
     this.config.url = this.driver.sampleURL || '';
-    this.config.name = this.isUrlConnection ? this.config.url : `${this.driver.name}@${this.config.host}${this.config.port ? ':' + this.config.port : ''}`;
+    this.config.name = this.isUrlConnection ? `${this.driver.name}@` : `${this.driver.name}@${this.config.host}${this.config.port ? ':' + this.config.port : ''}`;
     this.config.driverId = this.driver.id;
     this.config.databaseName = this.driver.defaultDatabase;
     this.config.properties = {};
