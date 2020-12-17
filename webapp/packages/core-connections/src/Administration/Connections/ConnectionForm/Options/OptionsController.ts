@@ -19,6 +19,13 @@ import { IConnectionFormModel } from '../IConnectionFormModel';
 @injectable()
 export class OptionsController
 implements IInitializableController {
+  get isUrlConnection(): boolean {
+    if (this.model.editing) {
+      return this.model.connection.useUrl;
+    }
+    return !this.driver?.sampleURL;
+  }
+
   @computed get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
@@ -47,12 +54,12 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /(\w+)@([^\s]+[\d])$/;
+  private nameTemplate = /(\w+)@([^\s]+)$/;
 
   constructor(
     private notificationService: NotificationService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
-    private dbDriverResource: DBDriverResource
+    private dbDriverResource: DBDriverResource,
   ) { }
 
   init(model: IConnectionFormModel): void {
@@ -109,6 +116,11 @@ implements IInitializableController {
 
   private updateName(name?: string) {
     if (name === 'name') {
+      return;
+    }
+
+    if (this.isUrlConnection) {
+      this.model.connection.name = this.model.connection.url || '';
       return;
     }
 

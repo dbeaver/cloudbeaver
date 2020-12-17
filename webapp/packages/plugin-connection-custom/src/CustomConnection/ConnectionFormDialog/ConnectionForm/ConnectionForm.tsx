@@ -72,9 +72,10 @@ export const ConnectionForm = observer(function ConnectionForm({
               <InputField
                 type="text"
                 name="url"
-                state={controller.config}
+                value={controller.config.url}
                 disabled={controller.isConnecting}
                 mod='surface'
+                onChange={value => controller.onChange('url', value)}
               >
                 {translate('customConnection_url_JDBC')}
               </InputField>

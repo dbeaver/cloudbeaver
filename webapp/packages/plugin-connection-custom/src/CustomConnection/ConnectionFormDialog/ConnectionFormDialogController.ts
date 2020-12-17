@@ -47,7 +47,7 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
-  private nameTemplate = /(\w+)@([^\s]+[\d])$/;
+  private nameTemplate = /(\w+)@([^\s]+)$/;
 
   constructor(
     private customConnectionService: CustomConnectionService,
@@ -121,6 +121,11 @@ implements IInitializableController, IDestructibleController {
       return;
     }
 
+    if (this.isUrlConnection) {
+      this.config.name = this.config.url;
+      return;
+    }
+
     const matches = this.nameTemplate.exec(this.config.name!);
 
     if (this.config.name === undefined || (matches?.length && this.driver.name === matches[1])) {
@@ -162,7 +167,7 @@ implements IInitializableController, IDestructibleController {
 
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
-    config.name = this.config.name;
+    config.name = this.config.name?.trim();
     config.driverId = this.config.driverId;
 
     if (!this.isUrlConnection) {
@@ -183,8 +188,6 @@ implements IInitializableController, IDestructibleController {
       config.properties = this.config.properties;
     }
 
-    config.name = config.name?.trim();
-
     return config;
   }
 
@@ -201,12 +204,12 @@ implements IInitializableController, IDestructibleController {
 
   @action
   private setDriverDefaults() {
-    this.config.name = `${this.driver.name}@${this.driver.defaultServer || 'localhost'}:${this.driver.defaultPort || ''}`;
-    this.config.driverId = this.driver.id;
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
-    this.config.databaseName = this.driver.defaultDatabase;
     this.config.url = this.driver.sampleURL || '';
+    this.config.name = this.isUrlConnection ? this.config.url : `${this.driver.name}@${this.config.host}${this.config.port ? ':' + this.config.port : ''}`;
+    this.config.driverId = this.driver.id;
+    this.config.databaseName = this.driver.defaultDatabase;
     this.config.properties = {};
     this.config.authModelId = this.driver.defaultAuthModel;
     this.config.credentials = {};

@@ -139,9 +139,7 @@ implements IInitializableController {
 
     const connectionsNames = new Set();
     for (const connection of this.connectionsResource.data.values()) {
-      if (connection.id !== this.model.connection.id) {
-        connectionsNames.add(connection.name);
-      }
+      connectionsNames.add(connection.name);
     }
 
     while (true) {
@@ -162,7 +160,7 @@ implements IInitializableController {
       config.connectionId = this.model.connection.id;
     }
 
-    config.name = this.model.connection.name;
+    config.name = this.model.connection.name.trim();
     config.description = this.model.connection.description;
     config.template = this.model.connection.template;
     config.driverId = this.model.connection.driverId;
@@ -186,8 +184,6 @@ implements IInitializableController {
     if (Object.keys(this.model.connection.properties).length > 0) {
       config.properties = this.model.connection.properties;
     }
-
-    config.name = config.name.trim();
 
     return config;
   }
