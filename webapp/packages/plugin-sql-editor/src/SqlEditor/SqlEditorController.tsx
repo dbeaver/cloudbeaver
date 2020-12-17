@@ -175,7 +175,7 @@ export class SqlEditorController implements IInitializableController {
           callback({
             from,
             to,
-            list: proposals.map(({ displayString }) => displayString || ''),
+            list: proposals.map(({ replacementString }) => replacementString || ''),
           });
         });
     };
