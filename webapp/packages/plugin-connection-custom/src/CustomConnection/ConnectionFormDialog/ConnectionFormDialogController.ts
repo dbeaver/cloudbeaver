@@ -73,9 +73,8 @@ implements IInitializableController, IDestructibleController {
     this.isDistructed = true;
   }
 
-  onChange = (property: keyof ConnectionConfig, value: any) => {
-    this.config[property] = value;
-    this.updateName(property);
+  onChange = (value?: unknown, name?: string): void => {
+    this.updateName(name);
   };
 
   onTestConnection = async () => {
@@ -121,7 +120,7 @@ implements IInitializableController, IDestructibleController {
     }
   };
 
-  private updateName(name?: keyof ConnectionConfig) {
+  private updateName(name?: string) {
     if (name === 'name') {
       return;
     }

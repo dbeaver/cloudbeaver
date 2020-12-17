@@ -52,7 +52,7 @@ export const ConnectionForm = observer(function ConnectionForm({
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   return styled(useStyles(connectionFormStyles))(
-    <SubmittingForm ref={focusedRef}>
+    <SubmittingForm ref={focusedRef} onChange={controller.onChange}>
       <FormBox>
         <FormBoxElement>
           <FormGroup>
@@ -72,10 +72,9 @@ export const ConnectionForm = observer(function ConnectionForm({
               <InputField
                 type="text"
                 name="url"
-                value={controller.config.url}
+                state={controller.config}
                 disabled={controller.isConnecting}
                 mod='surface'
-                onChange={value => controller.onChange('url', value)}
               >
                 {translate('customConnection_url_JDBC')}
               </InputField>
