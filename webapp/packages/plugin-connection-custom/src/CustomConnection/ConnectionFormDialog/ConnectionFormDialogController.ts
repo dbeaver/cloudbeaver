@@ -22,10 +22,13 @@ interface IValidationStatus {
   errorMessage: string;
 }
 
-interface IParsedUrlParameters {
+/** we want to save prev config parameters to detect if user changed "name" field to turn off autofill */
+interface IPrevConfigParameters {
   host?: string;
   port?: string;
+  url?: string;
 }
+
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
@@ -52,7 +55,8 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
-  private nameTemplate = /^(\w+)@([\w:.]+)?$/;
+  private prevConfigParameters: IPrevConfigParameters = {};
+  private maxHostLength = 20;
 
   constructor(
     private customConnectionService: CustomConnectionService,
@@ -125,50 +129,32 @@ implements IInitializableController, IDestructibleController {
       return;
     }
 
-    let host = this.config.host;
-    let port = this.config.port;
-
-    if (this.isUrlConnection && this.config.url) {
-      const urlParameters = this.getParametersFromUrl(this.config.url);
-      host = urlParameters?.host;
-      port = urlParameters?.port;
+    if (this.isUrlConnection && this.config.name === this.prevConfigParameters.url) {
+      this.config.name = this.config.url;
+      this.prevConfigParameters.url = this.config.url;
+      return;
     }
 
-    const matches = this.nameTemplate.exec(this.config.name!);
-
-    if (this.config.name === undefined || (matches?.length && this.driver.name === matches[1])) {
-      this.config.name = this.getNameTemplate(host, port);
+    if (this.config.name === this.getNameTemplate(this.prevConfigParameters.host, this.prevConfigParameters.port)) {
+      this.config.name = this.getNameTemplate(this.config.host, this.config.port);
+      this.prevConfigParameters.host = this.config.host;
+      this.prevConfigParameters.port = this.config.port;
     }
   }
 
   private getNameTemplate(host?: string, port?: string) {
     if (this.driver) {
-      const address = [host, host && port]
-        .filter(Boolean)
-        .join(':');
+      let address = '';
+      if (host) {
+        address += host.length > this.maxHostLength ? host.slice(0, this.maxHostLength) : host;
+        if (port && port !== this.driver.defaultPort) {
+          address += `:${port}`;
+        }
+      }
 
-      return `${this.driver.name}@${address || ''}`;
+      return `${this.driver.name}${address ? '@' + address : ''}`;
     }
-
     return 'New connection';
-  }
-
-  private getParametersFromUrl(url: string) {
-    const parameters: IParsedUrlParameters = {};
-    const isParameterValidRegex = /[\[\]{}]+/;
-    const urlTemplateRegex = /^.*:\/\/(.*?):(.*?|)(\/(.*)?|)$/;
-
-    const parsedParameters = urlTemplateRegex.exec(url);
-    if (!parsedParameters) {
-      return null;
-    }
-
-    const isValidParameter = (parameter: string) => !isParameterValidRegex.test(parameter);
-
-    parameters.host = isValidParameter(parsedParameters[1]) ? parsedParameters[1] : undefined;
-    parameters.port = isValidParameter(parsedParameters[2]) ? parsedParameters[2] : undefined;
-
-    return parameters;
   }
 
   private getUniqueName(baseName: string) {
@@ -233,12 +219,16 @@ implements IInitializableController, IDestructibleController {
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
     this.config.url = this.driver.sampleURL || '';
-    this.config.name = this.isUrlConnection ? `${this.driver.name}@` : `${this.driver.name}@${this.config.host}${this.config.port ? ':' + this.config.port : ''}`;
+    this.config.name = this.isUrlConnection ? this.config.url : `${this.driver.name}@${this.config.host}`;
     this.config.driverId = this.driver.id;
     this.config.databaseName = this.driver.defaultDatabase;
     this.config.properties = {};
     this.config.authModelId = this.driver.defaultAuthModel;
     this.config.credentials = {};
+
+    this.prevConfigParameters.host = this.config.host;
+    this.prevConfigParameters.port = this.config.port;
+    this.prevConfigParameters.url = this.config.url;
   }
 
   private showError(exception: Error, title: string) {

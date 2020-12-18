@@ -16,9 +16,11 @@ import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResour
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
-interface IParsedUrlParameters {
+/** we want to save prev connection parameters to detect if user changed "name" field to turn off autofill */
+interface IPrevConnectionParameters {
   host?: string;
   port?: string;
+  url?: string;
 }
 @injectable()
 export class OptionsController
@@ -51,7 +53,8 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^(\w+)@([\w:.]+)?$/;
+  private prevConnectionParameters: IPrevConnectionParameters = {};
+  private maxHostLength = 20;
 
   constructor(
     private notificationService: NotificationService,
@@ -108,25 +111,17 @@ implements IInitializableController {
       this.model.connection.url = this.driver?.sampleURL;
     }
 
-    this.updateName();
-  }
+    this.prevConnectionParameters.host = this.model.connection.host;
+    this.prevConnectionParameters.port = this.model.connection.port;
+    this.prevConnectionParameters.url = this.model.connection.url;
 
-  private getParametersFromUrl(url: string) {
-    const parameters: IParsedUrlParameters = {};
-    const isParameterValidRegex = /[\[\]{}]+/;
-    const urlTemplateRegex = /^.*:\/\/(.*?):(.*?|)(\/(.*)?|)$/;
-
-    const parsedParameters = urlTemplateRegex.exec(url);
-    if (!parsedParameters) {
-      return null;
+    if (!this.model.editing) {
+      if (this.model.connection.url && !this.model.connection.host && !this.model.connection.port) {
+        this.model.connection.name = this.model.connection.url;
+      } else {
+        this.model.connection.name = this.getNameTemplate(this.model.connection.host, this.model.connection.port);
+      }
     }
-
-    const isValidParameter = (parameter: string) => !isParameterValidRegex.test(parameter);
-
-    parameters.host = isValidParameter(parsedParameters[1]) ? parsedParameters[1] : undefined;
-    parameters.port = isValidParameter(parsedParameters[2]) ? parsedParameters[2] : undefined;
-
-    return parameters;
   }
 
   private updateName(name?: string) {
@@ -134,33 +129,37 @@ implements IInitializableController {
       return;
     }
 
-    let host = this.model.connection.host;
-    let port = this.model.connection.port;
+    const host = this.model.connection.host;
+    const port = this.model.connection.port;
+    const url = this.model.connection.url || '';
+    const prevHost = this.prevConnectionParameters.host;
+    const prevPort = this.prevConnectionParameters.port;
+    const prevUrl = this.prevConnectionParameters.url;
 
-    if (this.model.connection.url && !host && !port) {
-      const urlParameters = this.getParametersFromUrl(this.model.connection.url);
-      host = urlParameters?.host;
-      port = urlParameters?.port;
+    if (url && !host && !port && this.model.connection.name === prevUrl) {
+      this.model.connection.name = url;
+      this.prevConnectionParameters.url = url;
+      return;
     }
 
-    const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
-      .filter(Boolean);
-
-    const matches = this.nameTemplate.exec(this.model.connection.name);
-
-    if (this.model.connection.name === undefined
-        || (matches?.length && databaseNames.includes(matches[1]))) {
+    if (this.model.connection.name === this.getNameTemplate(prevHost, prevPort)) {
       this.model.connection.name = this.getNameTemplate(host, port);
+      this.prevConnectionParameters.host = host;
+      this.prevConnectionParameters.port = port;
     }
   }
 
   private getNameTemplate(host?: string, port?: string) {
     if (this.driver) {
-      const address = [host, host && port]
-        .filter(Boolean)
-        .join(':');
+      let address = '';
+      if (host) {
+        address += host.length > this.maxHostLength ? host.slice(0, this.maxHostLength) : host;
+        if (port && port !== this.driver.defaultPort) {
+          address += `:${port}`;
+        }
+      }
 
-      return `${this.driver.name}@${address || ''}`;
+      return `${this.driver.name}${address ? '@' + address : ''}`;
     }
 
     return 'New connection';
