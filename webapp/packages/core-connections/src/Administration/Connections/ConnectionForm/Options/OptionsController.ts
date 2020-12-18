@@ -51,7 +51,7 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^(\w+)@([\w:]+)?$/;
+  private nameTemplate = /^(\w+)@([\w:.]+)?$/;
 
   constructor(
     private notificationService: NotificationService,
@@ -113,8 +113,8 @@ implements IInitializableController {
 
   private getParametersFromUrl(url: string) {
     const parameters: IParsedUrlParameters = {};
-    const isParameterValidRegex = /[\[,\],{,}]+/;
-    const urlTemplateRegex = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/;
+    const isParameterValidRegex = /[\[\]{}]+/;
+    const urlTemplateRegex = /^.*:\/\/(.*?):(.*?|)(\/(.*)?|)$/;
 
     const parsedParameters = urlTemplateRegex.exec(url);
     if (!parsedParameters) {
@@ -138,9 +138,9 @@ implements IInitializableController {
     let port = this.model.connection.port;
 
     if (this.model.connection.url && !host && !port) {
-      const urlParameters = this.getParametersFromUrl(this.model.connection.url || '');
+      const urlParameters = this.getParametersFromUrl(this.model.connection.url);
       host = urlParameters?.host;
-      port = urlParameters?.port?.slice(1);
+      port = urlParameters?.port;
     }
 
     const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]

@@ -52,7 +52,7 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
-  private nameTemplate = /^(\w+)@([\w:]+)?$/;
+  private nameTemplate = /^(\w+)@([\w:.]+)?$/;
 
   constructor(
     private customConnectionService: CustomConnectionService,
@@ -128,10 +128,10 @@ implements IInitializableController, IDestructibleController {
     let host = this.config.host;
     let port = this.config.port;
 
-    if (this.isUrlConnection) {
-      const urlParameters = this.getParametersFromUrl(this.config.url || '');
+    if (this.isUrlConnection && this.config.url) {
+      const urlParameters = this.getParametersFromUrl(this.config.url);
       host = urlParameters?.host;
-      port = urlParameters?.port?.slice(1);
+      port = urlParameters?.port;
     }
 
     const matches = this.nameTemplate.exec(this.config.name!);
@@ -155,8 +155,8 @@ implements IInitializableController, IDestructibleController {
 
   private getParametersFromUrl(url: string) {
     const parameters: IParsedUrlParameters = {};
-    const isParameterValidRegex = /[\[,\],{,}]+/;
-    const urlTemplateRegex = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/;
+    const isParameterValidRegex = /[\[\]{}]+/;
+    const urlTemplateRegex = /^.*:\/\/(.*?):(.*?|)(\/(.*)?|)$/;
 
     const parsedParameters = urlTemplateRegex.exec(url);
     if (!parsedParameters) {
