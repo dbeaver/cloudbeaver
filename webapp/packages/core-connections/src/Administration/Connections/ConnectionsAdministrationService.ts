@@ -16,7 +16,6 @@ import { DBDriverResource } from '../../DBDriverResource';
 import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
-import { ConnectionDetailsInfo } from './ConnectionsTable/ConnectionDetailsInfo';
 import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
 import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
