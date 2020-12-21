@@ -22,13 +22,6 @@ interface IValidationStatus {
   errorMessage: string;
 }
 
-/** we want to save prev config parameters to detect if user changed "name" field to turn off autofill */
-interface IPrevConfigParameters {
-  host?: string;
-  port?: string;
-  url?: string;
-}
-
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
@@ -55,7 +48,8 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
-  private prevConfigParameters: IPrevConfigParameters = {};
+  /** we want to save prev generated config name to detect if user changed "name" field to turn off autofill */
+  private prevGeneratedName: string | null = null;
   private maxHostLength = 20;
 
   constructor(
@@ -78,7 +72,10 @@ implements IInitializableController, IDestructibleController {
   }
 
   onChange = (value?: unknown, name?: string): void => {
-    this.updateName(name);
+    if (name === 'name') {
+      return;
+    }
+    this.updateNameTemplate(this.config);
   };
 
   onTestConnection = async () => {
@@ -124,37 +121,33 @@ implements IInitializableController, IDestructibleController {
     }
   };
 
-  private updateName(name?: string) {
-    if (name === 'name') {
+  private updateNameTemplate(config: ConnectionConfig) {
+    const isAutoFill = config.name === this.prevGeneratedName || this.prevGeneratedName === null;
+
+    if (!isAutoFill) {
       return;
     }
 
-    if (this.isUrlConnection && this.config.name === this.prevConfigParameters.url) {
-      this.config.name = this.config.url;
-      this.prevConfigParameters.url = this.config.url;
+    if (this.isUrlConnection) {
+      this.prevGeneratedName = config.url || '';
+      config.name = config.url || '';
       return;
     }
 
-    if (this.config.name === this.getNameTemplate(this.prevConfigParameters.host, this.prevConfigParameters.port)) {
-      this.config.name = this.getNameTemplate(this.config.host, this.config.port);
-      this.prevConfigParameters.host = this.config.host;
-      this.prevConfigParameters.port = this.config.port;
+    if (!this.driver) {
+      config.name = 'New connection';
+      return;
     }
-  }
 
-  private getNameTemplate(host?: string, port?: string) {
-    if (this.driver) {
-      let address = '';
-      if (host) {
-        address += host.length > this.maxHostLength ? host.slice(0, this.maxHostLength) : host;
-        if (port && port !== this.driver.defaultPort) {
-          address += `:${port}`;
-        }
+    let name = this.driver.name || '';
+    if (config.host) {
+      name += '@' + config.host.slice(0, this.maxHostLength);
+      if (config.port && config.port !== this.driver.defaultPort) {
+        name += ':' + config.port;
       }
-
-      return `${this.driver.name}${address ? '@' + address : ''}`;
     }
-    return 'New connection';
+    this.prevGeneratedName = name;
+    config.name = name;
   }
 
   private getUniqueName(baseName: string) {
@@ -226,9 +219,7 @@ implements IInitializableController, IDestructibleController {
     this.config.authModelId = this.driver.defaultAuthModel;
     this.config.credentials = {};
 
-    this.prevConfigParameters.host = this.config.host;
-    this.prevConfigParameters.port = this.config.port;
-    this.prevConfigParameters.url = this.config.url;
+    this.updateNameTemplate(this.config);
   }
 
   private showError(exception: Error, title: string) {

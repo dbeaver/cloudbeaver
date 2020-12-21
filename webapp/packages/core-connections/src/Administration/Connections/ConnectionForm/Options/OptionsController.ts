@@ -10,18 +10,12 @@ import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { AdminConnectionFragment, DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
 import { IConnectionFormModel } from '../IConnectionFormModel';
 
-/** we want to save prev connection parameters to detect if user changed "name" field to turn off autofill */
-interface IPrevConnectionParameters {
-  host?: string;
-  port?: string;
-  url?: string;
-}
 @injectable()
 export class OptionsController
 implements IInitializableController {
@@ -53,7 +47,8 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private prevConnectionParameters: IPrevConnectionParameters = {};
+  /** we want to save prev generated connection name to detect if user changed "name" field to turn off autofill */
+  private prevGeneratedName: string | null = null;
   private maxHostLength = 20;
 
   constructor(
@@ -74,7 +69,10 @@ implements IInitializableController {
   ): Promise<void> => this.loadDriver(driverId, prevValue);
 
   onFormChange = (value?: unknown, name?: string): void => {
-    this.updateName(name);
+    if (name === 'name') {
+      return;
+    }
+    this.updateNameTemplate(this.model.connection);
   };
 
   @action
@@ -111,58 +109,37 @@ implements IInitializableController {
       this.model.connection.url = this.driver?.sampleURL;
     }
 
-    this.prevConnectionParameters.host = this.model.connection.host;
-    this.prevConnectionParameters.port = this.model.connection.port;
-    this.prevConnectionParameters.url = this.model.connection.url;
-
-    if (!this.model.editing) {
-      if (this.model.connection.url && !this.model.connection.host && !this.model.connection.port) {
-        this.model.connection.name = this.model.connection.url;
-      } else {
-        this.model.connection.name = this.getNameTemplate(this.model.connection.host, this.model.connection.port);
-      }
-    }
+    this.updateNameTemplate(this.model.connection);
   }
 
-  private updateName(name?: string) {
-    if (name === 'name') {
+  private updateNameTemplate(connection: AdminConnectionFragment) {
+    const isAutoFill = connection.name === this.prevGeneratedName || this.prevGeneratedName === null;
+
+    if (this.model.editing || !isAutoFill) {
       return;
     }
 
-    const host = this.model.connection.host;
-    const port = this.model.connection.port;
-    const url = this.model.connection.url || '';
-    const prevHost = this.prevConnectionParameters.host;
-    const prevPort = this.prevConnectionParameters.port;
-    const prevUrl = this.prevConnectionParameters.url;
-
-    if (url && !host && !port && this.model.connection.name === prevUrl) {
-      this.model.connection.name = url;
-      this.prevConnectionParameters.url = url;
+    const isUrlConnection = !this.driver?.sampleURL;
+    if (isUrlConnection) {
+      this.prevGeneratedName = connection.url || '';
+      connection.name = connection.url || '';
       return;
     }
 
-    if (this.model.connection.name === this.getNameTemplate(prevHost, prevPort)) {
-      this.model.connection.name = this.getNameTemplate(host, port);
-      this.prevConnectionParameters.host = host;
-      this.prevConnectionParameters.port = port;
+    if (!this.driver) {
+      connection.name = 'New connection';
+      return;
     }
-  }
 
-  private getNameTemplate(host?: string, port?: string) {
-    if (this.driver) {
-      let address = '';
-      if (host) {
-        address += host.length > this.maxHostLength ? host.slice(0, this.maxHostLength) : host;
-        if (port && port !== this.driver.defaultPort) {
-          address += `:${port}`;
-        }
+    let name = this.driver.name || '';
+    if (connection.host) {
+      name += '@' + connection.host.slice(0, this.maxHostLength);
+      if (connection.port && connection.port !== this.driver.defaultPort) {
+        name += ':' + connection.port;
       }
-
-      return `${this.driver.name}${address ? '@' + address : ''}`;
     }
-
-    return 'New connection';
+    this.prevGeneratedName = name;
+    connection.name = name;
   }
 
   private async loadDrivers() {
