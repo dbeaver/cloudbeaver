@@ -59,7 +59,20 @@ public class WebSQLContextInfo {
         this.processor = processor;
         this.id = id;
 
-        setContextDefaults(catalogName, schemaName);
+        if (!CommonUtils.isEmpty(catalogName) || !CommonUtils.isEmpty(schemaName)) {
+            try {
+                DBExecUtils.setExecutionContextDefaults(
+                    processor.getWebSession().getProgressMonitor(),
+                    processor.getConnection().getDataSource(),
+                    processor.getExecutionContext(),
+                    catalogName,
+                    null,
+                    schemaName);
+                setContextDefaults(catalogName, schemaName);
+            } catch (DBException e) {
+                log.error("Error settings ");
+            }
+        }
     }
 
     private void setContextDefaults(String catalogName, String schemaName) throws DBCException {
