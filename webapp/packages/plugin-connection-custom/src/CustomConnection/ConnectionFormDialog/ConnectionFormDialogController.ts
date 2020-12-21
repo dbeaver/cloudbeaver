@@ -8,7 +8,7 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriver, DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
+import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,6 +16,12 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ConnectionConfig, GQLErrorCatcher, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import { CustomConnectionService } from '../../CustomConnectionService';
+
+interface IValidationStatus {
+  status: boolean;
+  errorMessage: string;
+}
+
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
@@ -42,12 +48,16 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
   private onClose!: () => void;
   private isDistructed = false;
+  /** we want to save prev generated config name to detect if user changed "name" field to turn off autofill */
+  private prevGeneratedName: string | null = null;
+  private maxHostLength = 20;
 
   constructor(
     private customConnectionService: CustomConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
-    private dbAuthModelsResource: DatabaseAuthModelsResource
+    private dbAuthModelsResource: DatabaseAuthModelsResource,
+    private connectionInfoResource: ConnectionInfoResource,
   ) { }
 
   init(driver: DBDriver, onClose: () => void) {
@@ -61,8 +71,10 @@ implements IInitializableController, IDestructibleController {
     this.isDistructed = true;
   }
 
-  onChange = (property: keyof ConnectionConfig, value: any) => {
-    this.config[property] = value;
+  onChange = (value?: unknown, name?: string): void => {
+    if (name !== 'name') {
+      this.updateNameTemplate(this.config);
+    }
   };
 
   onTestConnection = async () => {
@@ -80,10 +92,18 @@ implements IInitializableController, IDestructibleController {
   };
 
   onCreateConnection = async () => {
+    const connectionConfig = this.getConnectionConfig();
+    const validation = this.validate(connectionConfig);
+    if (!validation.status) {
+      this.notificationService.logError({ title: 'customConnection_create_error', message: validation.errorMessage });
+      return;
+    }
+
     this.isConnecting = true;
     this.error.clear();
     try {
-      const connection = await this.customConnectionService.createConnectionAsync(this.getConnectionConfig());
+      connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+      const connection = await this.customConnectionService.createConnectionAsync(connectionConfig);
 
       this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
       this.onClose();
@@ -100,21 +120,67 @@ implements IInitializableController, IDestructibleController {
     }
   };
 
+  private updateNameTemplate(config: ConnectionConfig) {
+    const isAutoFill = config.name === this.prevGeneratedName || this.prevGeneratedName === null;
+
+    if (!isAutoFill) {
+      return;
+    }
+
+    if (this.isUrlConnection) {
+      this.prevGeneratedName = config.url || '';
+      config.name = config.url || '';
+      return;
+    }
+
+    if (!this.driver) {
+      config.name = 'New connection';
+      return;
+    }
+
+    let name = this.driver.name || '';
+    if (config.host) {
+      name += '@' + config.host.slice(0, this.maxHostLength);
+      if (config.port && config.port !== this.driver.defaultPort) {
+        name += ':' + config.port;
+      }
+    }
+    this.prevGeneratedName = name;
+    config.name = name;
+  }
+
+  private getUniqueName(baseName: string) {
+    let index = 1;
+    let name = baseName;
+
+    const connectionsNames = new Set();
+    for (const connection of this.connectionInfoResource.data.values()) {
+      connectionsNames.add(connection.name);
+    }
+
+    while (true) {
+      if (!connectionsNames.has(name)) {
+        break;
+      }
+      name = `${baseName} (${index})`;
+      index++;
+    }
+
+    return name;
+  }
+
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
-    config.name = this.config.name;
+    config.name = this.config.name?.trim();
     config.driverId = this.config.driverId;
 
     if (!this.isUrlConnection) {
-      config.name = this.config.databaseName;
       if (!this.driver?.embedded) {
         config.host = this.config.host;
         config.port = this.config.port;
-        config.name += `@${this.config.host}`;
       }
       config.databaseName = this.config.databaseName;
     } else {
-      config.name = this.urlToConnectionName(this.config.name, this.config.url);
       config.url = this.config.url;
     }
     if (this.authModel) {
@@ -129,46 +195,34 @@ implements IInitializableController, IDestructibleController {
     return config;
   }
 
+  private validate(config: ConnectionConfig) {
+    const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
+
+    if (!config.name?.length) {
+      validationStatus.errorMessage = "Field 'name' can't be empty";
+    }
+
+    validationStatus.status = !validationStatus.errorMessage;
+    return validationStatus;
+  }
+
   @action
   private setDriverDefaults() {
-    this.config.name = `${this.driver.name} (custom)`;
-    this.config.driverId = this.driver.id;
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
-    this.config.databaseName = this.driver.defaultDatabase;
     this.config.url = this.driver.sampleURL || '';
+    this.config.driverId = this.driver.id;
+    this.config.databaseName = this.driver.defaultDatabase;
     this.config.properties = {};
     this.config.authModelId = this.driver.defaultAuthModel;
     this.config.credentials = {};
+
+    this.updateNameTemplate(this.config);
   }
 
-  /**
-   * Creates connection name based on connection url
-   * @param defaultName default connection name if url parsing failed
-   * @param url connection url
-   */
-  private urlToConnectionName(defaultName?: string, url?: string) {
-    let name = defaultName;
-    if (!url) {
-      return name;
-    }
-
-    const matches = /^.*:\/\/(.*?)(:.*?|)(\/(.*)?|)$/.exec(url);
-    if (!matches) {
-      return name;
-    }
-
-    name = matches[1];
-    if (matches[4]) {
-      name += `@${matches[4]}`;
-    }
-
-    return name;
-  }
-
-  private showError(exception: Error, message: string) {
+  private showError(exception: Error, title: string) {
     if (!this.error.catch(exception) || this.isDistructed) {
-      this.notificationService.logException(exception, message);
+      this.notificationService.logException(exception, title);
     }
   }
 

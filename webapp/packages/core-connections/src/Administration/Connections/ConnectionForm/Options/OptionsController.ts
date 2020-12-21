@@ -10,7 +10,7 @@ import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { AdminConnectionFragment, DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
@@ -47,12 +47,14 @@ implements IInitializableController {
   }
 
   private model!: IConnectionFormModel;
-  private nameTemplate = /^(.*?)\s(|\(.*?\)\s)connection$/;
+  /** we want to save prev generated connection name to detect if user changed "name" field to turn off autofill */
+  private prevGeneratedName: string | null = null;
+  private maxHostLength = 20;
 
   constructor(
     private notificationService: NotificationService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
-    private dbDriverResource: DBDriverResource
+    private dbDriverResource: DBDriverResource,
   ) { }
 
   init(model: IConnectionFormModel): void {
@@ -67,7 +69,9 @@ implements IInitializableController {
   ): Promise<void> => this.loadDriver(driverId, prevValue);
 
   onFormChange = (value?: unknown, name?: string): void => {
-    this.updateName(name);
+    if (name !== 'name') {
+      this.updateNameTemplate(this.model.connection);
+    }
   };
 
   @action
@@ -104,39 +108,37 @@ implements IInitializableController {
       this.model.connection.url = this.driver?.sampleURL;
     }
 
-    this.updateName();
+    this.updateNameTemplate(this.model.connection);
   }
 
-  private updateName(name?: string) {
-    if (name === 'name') {
+  private updateNameTemplate(connection: AdminConnectionFragment) {
+    const isAutoFill = connection.name === this.prevGeneratedName || this.prevGeneratedName === null;
+
+    if (this.model.editing || !isAutoFill) {
       return;
     }
 
-    const databaseNames = ['New', ...this.drivers.map(driver => driver.name!)]
-      .filter(Boolean);
-
-    const matches = this.nameTemplate.exec(this.model.connection.name);
-
-    if (this.model.connection.name === undefined
-        || (matches?.length && databaseNames.includes(matches[1]))) {
-      this.model.connection.name = this.getNameTemplate();
+    const isUrlConnection = !this.driver?.sampleURL;
+    if (isUrlConnection) {
+      this.prevGeneratedName = connection.url || '';
+      connection.name = connection.url || '';
+      return;
     }
-  }
 
-  private getNameTemplate() {
-    if (this.driver) {
-      let address = [this.model.connection.host, this.model.connection.host && this.model.connection.port]
-        .filter(Boolean)
-        .join(':');
+    if (!this.driver) {
+      connection.name = 'New connection';
+      return;
+    }
 
-      if (address) {
-        address = ` (${address})`;
+    let name = this.driver.name || '';
+    if (connection.host) {
+      name += '@' + connection.host.slice(0, this.maxHostLength);
+      if (connection.port && connection.port !== this.driver.defaultPort) {
+        name += ':' + connection.port;
       }
-
-      return `${this.driver.name}${address} connection`;
     }
-
-    return 'New connection';
+    this.prevGeneratedName = name;
+    connection.name = name;
   }
 
   private async loadDrivers() {

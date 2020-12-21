@@ -19,6 +19,10 @@ import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
 import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
+interface IValidationStatus {
+  status: boolean;
+  errorMessage: string;
+}
 @injectable()
 export class ConnectionFormController
 implements IInitializableController {
@@ -67,15 +71,23 @@ implements IInitializableController {
   }
 
   save = async (): Promise<void> => {
+    const connectionConfig = this.getConnectionConfig();
+    const validation = this.validate(connectionConfig);
+    if (!validation.status) {
+      this.notificationService.logError({ title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error', message: validation.errorMessage });
+      return;
+    }
+
     this.isSaving = true;
     try {
       if (this.model.editing) {
-        const connection = await this.connectionsResource.update(this.model.connection.id, this.getConnectionConfig());
+        const connection = await this.connectionsResource.update(this.model.connection.id, connectionConfig);
         await this.afterSave.execute(connection.id);
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} updated` });
       } else {
-        const connection = await this.connectionsResource.create(this.getConnectionConfig());
+        connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+        const connection = await this.connectionsResource.create(connectionConfig);
         await this.afterSave.execute(connection.id);
         this.close();
         this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
@@ -99,6 +111,48 @@ implements IInitializableController {
     }
   };
 
+  private isConnectionNameAlreadyExists(name: string) {
+    for (const connection of this.connectionsResource.data.values()) {
+      if (connection.id !== this.model.connection.id && connection.name === name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private validate(config: ConnectionConfig) {
+    const validationStatus: IValidationStatus = { status: true, errorMessage: '' };
+
+    if (!config.name?.length) {
+      validationStatus.errorMessage = "Field 'name' can't be empty";
+    } else if (this.model.editing && this.isConnectionNameAlreadyExists(config.name)) {
+      validationStatus.errorMessage = 'Connection with this name already exists';
+    }
+
+    validationStatus.status = !validationStatus.errorMessage;
+    return validationStatus;
+  }
+
+  private getUniqueName(baseName: string) {
+    let index = 1;
+    let name = baseName;
+
+    const connectionsNames = new Set();
+    for (const connection of this.connectionsResource.data.values()) {
+      connectionsNames.add(connection.name);
+    }
+
+    while (true) {
+      if (!connectionsNames.has(name)) {
+        break;
+      }
+      name = `${baseName} (${index})`;
+      index++;
+    }
+
+    return name;
+  }
+
   private getConnectionConfig(): ConnectionConfig {
     const config: ConnectionConfig = {};
 
@@ -106,7 +160,7 @@ implements IInitializableController {
       config.connectionId = this.model.connection.id;
     }
 
-    config.name = this.model.connection.name;
+    config.name = this.model.connection.name.trim();
     config.description = this.model.connection.description;
     config.template = this.model.connection.template;
     config.driverId = this.model.connection.driverId;

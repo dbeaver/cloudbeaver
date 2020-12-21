@@ -40,10 +40,9 @@ export const ParametersForm = observer(function ParametersForm({
             <InputField
               type="text"
               name="host"
-              value={controller.config.host}
               disabled={controller.isConnecting}
               mod='surface'
-              onChange={value => controller.onChange('host', value)}
+              state={controller.config}
             >
               {translate('customConnection_custom_host')}
               <sub-label as="div">{translate('customConnection_custom_obligatory')}</sub-label>
@@ -53,11 +52,10 @@ export const ParametersForm = observer(function ParametersForm({
             <InputField
               type="number"
               name="port"
-              value={controller.config.port}
               disabled={controller.isConnecting}
               mod='surface'
+              state={controller.config}
               short
-              onChange={value => controller.onChange('port', value)}
             >
               {translate('customConnection_custom_port')}
             </InputField>
@@ -68,10 +66,9 @@ export const ParametersForm = observer(function ParametersForm({
         <InputField
           type="text"
           name="databaseName"
-          value={controller.config.databaseName}
           disabled={controller.isConnecting}
           mod='surface'
-          onChange={value => controller.onChange('databaseName', value)}
+          state={controller.config}
         >
           {translate('customConnection_custom_database')}
         </InputField>

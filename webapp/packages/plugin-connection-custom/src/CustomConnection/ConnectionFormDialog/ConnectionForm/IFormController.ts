@@ -13,5 +13,5 @@ export interface IFormController {
   config: ConnectionConfig;
   isUrlConnection: boolean;
   isConnecting: boolean;
-  onChange: <T extends keyof ConnectionConfig>(property: T, value: ConnectionConfig[T]) => void;
+  onChange: (value?: unknown, name?: string) => void;
 }
