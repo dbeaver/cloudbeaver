@@ -7,18 +7,23 @@
  */
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
-import { ConnectionsResource } from '../ConnectionsResource';
+import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
+import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
+import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
 
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
+  readonly connectionDetailsPlaceholder = new PlaceholderContainer<AdminConnection>();
+
   constructor(
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
@@ -55,6 +60,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
         }
       },
     });
+    this.connectionDetailsPlaceholder.add(Origin, 0);
+    this.connectionDetailsPlaceholder.add(Template, 1);
   }
 
   load(): void | Promise<void> { }

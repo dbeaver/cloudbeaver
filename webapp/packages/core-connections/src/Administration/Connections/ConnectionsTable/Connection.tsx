@@ -10,13 +10,14 @@ import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Checkbox
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Placeholder
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AdminConnection } from '../../ConnectionsResource';
+import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import { ConnectionEdit } from './ConnectionEdit';
 
 interface Props {
@@ -43,6 +44,7 @@ const styles = css`
 
 export const Connection = observer(function Connection({ connection }: Props) {
   const driversResource = useService(DBDriverResource);
+  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;
 
   return styled(useStyles(styles))(
@@ -58,7 +60,9 @@ export const Connection = observer(function Connection({ connection }: Props) {
       </TableColumnValue>
       <TableColumnValue expand>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
-      <TableColumnValue><Checkbox checked={connection.template} disabled /></TableColumnValue>
+      <TableColumnValue>
+        <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} context={connection} />
+      </TableColumnValue>
     </TableItem>
   );
 });
