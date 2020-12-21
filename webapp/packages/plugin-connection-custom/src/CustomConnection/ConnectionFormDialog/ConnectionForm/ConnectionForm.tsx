@@ -62,7 +62,6 @@ export const ConnectionForm = observer(function ConnectionForm({
               disabled={controller.isConnecting}
               mod='surface'
               state={controller.config}
-
             >
               {translate('customConnection_custom_name')}
             </InputField>
