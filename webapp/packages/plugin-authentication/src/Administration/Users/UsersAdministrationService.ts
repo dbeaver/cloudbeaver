@@ -7,7 +7,8 @@
  */
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -15,9 +16,12 @@ import { CreateUserService } from './CreateUserService';
 import { UsersAdministration } from './UsersAdministration';
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
+import { Origin } from './UsersTable/UserDetailsInfo/Origin';
 
 @injectable()
 export class UsersAdministrationService extends Bootstrap {
+  readonly userDetailsInfoPlaceholder = new PlaceholderContainer<AdminUser>();
+
   constructor(
     private administrationItemService: AdministrationItemService,
     private notificationService: NotificationService,
@@ -41,6 +45,7 @@ export class UsersAdministrationService extends Bootstrap {
       getDrawerComponent: () => UsersDrawerItem,
       onActivate: this.loadUsers.bind(this),
     });
+    this.userDetailsInfoPlaceholder.add(Origin, 0);
   }
 
   load(): void | Promise<void> { }

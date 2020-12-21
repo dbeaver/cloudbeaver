@@ -8,22 +8,28 @@
 
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
+import { css } from 'reshadow';
 
+import { AdminUser } from '@cloudbeaver/core-authentication';
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
-import { AdminConnection } from '../../../ConnectionsResource';
-import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
-
 interface Props {
-  context: AdminConnection;
+  context: AdminUser;
 }
+
+const USER_DETAILS_STYLES = css`
+  StaticImage {
+    width: 24px;
+    height: 24px;
+  }
+`;
 
 export const Origin: React.FC<Props> = observer(function Origin({ context }) {
   const isLocal = context.origin.type === 'local';
   const icon = isLocal ? '/icons/local_connection.svg' : context.origin.icon;
-  const title = isLocal ? 'Local connection' : context.origin.displayName;
+  const title = isLocal ? 'Local user' : context.origin.displayName;
 
-  return styled(CONNECTION_DETAILS_STYLES)(
+  return styled(USER_DETAILS_STYLES)(
     <StaticImage icon={icon} title={title} />
   );
 });

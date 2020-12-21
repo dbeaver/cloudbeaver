@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
@@ -17,7 +18,7 @@ interface Props {
   context: AdminConnection;
 }
 
-export const Template: React.FC<Props> = function Template({ context }) {
+export const Template: React.FC<Props> = observer(function Template({ context }) {
   if (!context.template) {
     return null;
   }
@@ -25,4 +26,4 @@ export const Template: React.FC<Props> = function Template({ context }) {
   return styled(CONNECTION_DETAILS_STYLES)(
     <StaticImage icon='/icons/template_connection.svg' title='Template connection' />
   );
-};
+});

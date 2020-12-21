@@ -11,10 +11,12 @@ import styled, { css } from 'reshadow';
 
 import { AdminUser } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
 
 const styles = css`
@@ -29,6 +31,8 @@ interface Props {
 }
 
 export const User: React.FC<Props> = observer(function User({ user, selectable }) {
+  const usersAdministrationService = useService(UsersAdministrationService);
+
   return styled(useStyles(styles))(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
       {selectable && (
@@ -41,7 +45,9 @@ export const User: React.FC<Props> = observer(function User({ user, selectable }
       </TableColumnValue>
       <TableColumnValue expand>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
-      <TableColumnValue />
+      <TableColumnValue>
+        <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} context={user} />
+      </TableColumnValue>
     </TableItem>
   );
 });
