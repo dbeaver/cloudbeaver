@@ -17,6 +17,8 @@ import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 import { ConnectionDetailsInfo } from './ConnectionsTable/ConnectionDetailsInfo';
+import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
+import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
 
 @injectable()
@@ -59,7 +61,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
         }
       },
     });
-    this.connectionDetailsPlaceholder.add(ConnectionDetailsInfo, 0);
+    this.connectionDetailsPlaceholder.add(Origin, 0);
+    this.connectionDetailsPlaceholder.add(Template, 1);
   }
 
   load(): void | Promise<void> { }
