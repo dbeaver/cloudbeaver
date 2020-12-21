@@ -69,10 +69,9 @@ implements IInitializableController {
   ): Promise<void> => this.loadDriver(driverId, prevValue);
 
   onFormChange = (value?: unknown, name?: string): void => {
-    if (name === 'name') {
-      return;
+    if (name !== 'name') {
+      this.updateNameTemplate(this.model.connection);
     }
-    this.updateNameTemplate(this.model.connection);
   };
 
   @action

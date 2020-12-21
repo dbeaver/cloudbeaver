@@ -72,10 +72,9 @@ implements IInitializableController, IDestructibleController {
   }
 
   onChange = (value?: unknown, name?: string): void => {
-    if (name === 'name') {
-      return;
+    if (name !== 'name') {
+      this.updateNameTemplate(this.config);
     }
-    this.updateNameTemplate(this.config);
   };
 
   onTestConnection = async () => {
@@ -212,7 +211,6 @@ implements IInitializableController, IDestructibleController {
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';
     this.config.url = this.driver.sampleURL || '';
-    this.config.name = this.isUrlConnection ? this.config.url : `${this.driver.name}@${this.config.host}`;
     this.config.driverId = this.driver.id;
     this.config.databaseName = this.driver.defaultDatabase;
     this.config.properties = {};
