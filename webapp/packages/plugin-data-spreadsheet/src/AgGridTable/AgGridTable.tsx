@@ -59,6 +59,7 @@ export const AgGridTable: React.FC<IAgGridTableProps> = observer(function AgGrid
         modules={allCommunityModules}
         frameworkComponents={agGridComponents}
         loadingCellRenderer="loadingCellRenderer"
+        suppressDragLeaveHidesColumns
         {...controller.dynamicOptions}
       />
     </ag-grid-theme>
