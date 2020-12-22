@@ -44,11 +44,6 @@ export class SqlResultTabsService {
       return;
     }
 
-    if (!editorState) {
-      console.error('executeEditorQuery connection not established');
-      return;
-    }
-
     if (!editorState.contextId) {
       console.error('executeEditorQuery contextId is not provided');
       return;
