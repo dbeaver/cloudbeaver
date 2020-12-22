@@ -17,7 +17,6 @@ import {
 } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorGroupMetadataService } from '../SqlEditorGroupMetadataService';
-import { SqlEditorService } from '../SqlEditorService';
 import { SqlExecutionState } from '../SqlExecutionState';
 
 @injectable()
@@ -27,7 +26,6 @@ export class SqlResultTabsService {
   constructor(
     private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private sqlEditorService: SqlEditorService
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
@@ -46,24 +44,17 @@ export class SqlResultTabsService {
       return;
     }
 
-    const context = await this.sqlEditorService.initEditorConnection(editorState);
-
-    if (!context) {
-      console.error('executeEditorQuery connection not established');
-      return;
-    }
-
-    if (!context.contextId) {
+    if (!editorState.contextId) {
       console.error('executeEditorQuery contextId is not provided');
       return;
     }
 
-    if (!context.connectionId) {
+    if (!editorState.connectionId) {
       console.error('executeEditorQuery connectionId is not provided');
       return;
     }
 
-    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(context.connectionId);
+    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(editorState.connectionId);
     const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
 
     if (dialectInfo?.scriptDelimiter && query.endsWith(dialectInfo?.scriptDelimiter)) {
@@ -73,10 +64,10 @@ export class SqlResultTabsService {
     let tabGroup: IQueryTabGroup;
 
     const sqlQueryParams: ISqlQueryParams = {
-      connectionId: context.connectionId,
-      objectCatalogId: context.objectCatalogId,
-      objectSchemaId: context.objectSchemaId,
-      contextId: context.contextId,
+      connectionId: editorState.connectionId,
+      objectCatalogId: editorState.objectCatalogId,
+      objectSchemaId: editorState.objectSchemaId,
+      contextId: editorState.contextId,
       query,
     };
 

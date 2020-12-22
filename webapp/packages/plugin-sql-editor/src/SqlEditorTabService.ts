@@ -117,12 +117,10 @@ export class SqlEditorTabService extends Bootstrap {
     const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
 
     if (isGroupEmpty) {
-      const group = tab.handlerState.queryTabGroups.splice(
+      tab.handlerState.queryTabGroups.splice(
         tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId),
         1
-      )[0];
-
-      await this.sqlEditorService.destroySqlContext(group.sqlQueryParams.connectionId, group.sqlQueryParams.contextId);
+      );
     }
 
     if (tab.handlerState.currentResultTabId === resultId) {
