@@ -106,24 +106,10 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   async closeResultTab(tab: ITab<ISqlEditorTabState>, resultId: string): Promise<void> {
-    const resultTabGroupId = tab.handlerState.resultTabs
-      .find(resultTab => resultTab.resultTabId === resultId)?.groupId;
-
     tab.handlerState.resultTabs.splice(
       tab.handlerState.resultTabs.findIndex(result => result.resultTabId === resultId),
       1
     );
-
-    const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
-
-    if (isGroupEmpty) {
-      const group = tab.handlerState.queryTabGroups.splice(
-        tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId),
-        1
-      )[0];
-
-      await this.sqlEditorService.destroySqlContext(group.sqlQueryParams.connectionId, group.sqlQueryParams.contextId);
-    }
 
     if (tab.handlerState.currentResultTabId === resultId) {
       if (tab.handlerState.resultTabs.length > 0) {
