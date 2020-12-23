@@ -26,7 +26,7 @@ import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type AdminConnection = AdminConnectionFragment;
-export type ConnectionNew = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean };
+export type NewConnection = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, AdminConnection> {
@@ -52,14 +52,6 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     }
 
     return this.data.has(id);
-  }
-
-  isNew(id: string): boolean {
-    const connection = this.get(id);
-    if (!connection) {
-      return false;
-    }
-    return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
   }
 
   getEmptyConnection(): AdminConnection {
@@ -97,11 +89,10 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   @action add(connection: AdminConnection, isNew = false): AdminConnection {
     this.changed = true;
 
-    this.cleanNewFlags();
-
-    const newConnection: ConnectionNew = {
+    const newConnection: NewConnection = {
       ...connection,
       [NEW_CONNECTION_SYMBOL]: isNew,
+      timestamp: Date.now(),
     };
     this.set(newConnection.id, newConnection);
 
@@ -152,6 +143,12 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
+  cleanNewFlags() {
+    for (const connection of this.data.values()) {
+      (connection as NewConnection)[NEW_CONNECTION_SYMBOL] = false;
+    }
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminConnection>> {
     const { connections } = await this.graphQLService.sdk.getConnections();
     this.data.clear();
@@ -165,12 +162,6 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     this.loadedKeyMetadata.set('all', true);
 
     return this.data;
-  }
-
-  private cleanNewFlags() {
-    for (const connection of this.data.values()) {
-      (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL] = false;
-    }
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {
@@ -200,4 +191,24 @@ export function isLocalConnection(connection: AdminConnection): boolean {
 
 export function isCloudConnection(connection: AdminConnection): boolean {
   return connection.origin.type === 'cloud';
+}
+
+export function isNewConnection(connection: AdminConnection | NewConnection): connection is NewConnection {
+  return (connection as NewConnection)[NEW_CONNECTION_SYMBOL];
+}
+
+export function compareConnections(a: AdminConnection, b: AdminConnection): number {
+  if (isNewConnection(a) && isNewConnection(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isNewConnection(b)) {
+    return 1;
+  }
+
+  if (isNewConnection(a)) {
+    return -1;
+  }
+
+  return a.name.localeCompare(b.name);
 }
