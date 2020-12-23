@@ -40,8 +40,8 @@ const styles = composes(
       box-sizing: border-box;
     }
     CommonDialogWrapper {
-      max-height: 594px;
-      min-height: 594px;
+      max-height: 610px;
+      min-height: 610px;
     }
     SubmittingForm {
       flex: 1;
