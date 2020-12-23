@@ -22,25 +22,7 @@ export class ConnectionsAdministrationController {
   readonly expandedItems = observable<string, boolean>(new Map());
   @computed
   get connections(): AdminConnection[] {
-    return Array.from(this.connectionsResource.data.values())
-      .sort((a, b) => {
-        const isANew = this.connectionsResource.isNew(a.id);
-        const isBNew = this.connectionsResource.isNew(b.id);
-
-        if (isANew && isBNew) {
-          return this.connectionsResource.getNewer(a.id, b.id);
-        }
-
-        if (isBNew) {
-          return 1;
-        }
-
-        if (isANew) {
-          return -1;
-        }
-
-        return a.name.localeCompare(b.name);
-      });
+    return Array.from(this.connectionsResource.data.values()).sort(this.connectionsResource.compareConnections);
   }
 
   @computed

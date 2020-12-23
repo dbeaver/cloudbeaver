@@ -54,21 +54,20 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return this.data.has(id);
   }
 
-  isNew(id: string): boolean {
-    const connection = this.get(id);
-    if (!connection) {
-      return false;
-    }
-    return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
-  }
-
-  getNewer(aId: string, bId: string): number {
-    const [a, b] = [this.get(aId), this.get(bId)] as ConnectionNew[];
-    if (!a || !b) {
-      return 0;
+  compareConnections(a: AdminConnection, b: AdminConnection): number {
+    if (isConnectionNew(a) && isConnectionNew(b)) {
+      return b.timestamp - a.timestamp;
     }
 
-    return b.timestamp - a.timestamp;
+    if (isConnectionNew(b)) {
+      return 1;
+    }
+
+    if (isConnectionNew(a)) {
+      return -1;
+    }
+
+    return a.name.localeCompare(b.name);
   }
 
   getEmptyConnection(): AdminConnection {
@@ -208,4 +207,8 @@ export function isLocalConnection(connection: AdminConnection): boolean {
 
 export function isCloudConnection(connection: AdminConnection): boolean {
   return connection.origin.type === 'cloud';
+}
+
+export function isConnectionNew(connection: AdminConnection | ConnectionNew): connection is ConnectionNew {
+  return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
 }

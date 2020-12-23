@@ -56,6 +56,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
       onActivate: this.loadConnections.bind(this),
       onDeActivate: async (configuration: boolean, outside: boolean) => {
         if (outside) {
+          this.connectionsResource.cleanNewFlags();
           await this.connectionInfoResource.refreshSession();
         }
       },

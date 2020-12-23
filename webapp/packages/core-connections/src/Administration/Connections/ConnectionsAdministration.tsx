@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
@@ -16,7 +15,6 @@ import { useController, useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
@@ -75,11 +73,6 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
 }) {
   const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
-  const connectionsResource = useService(ConnectionsResource);
-
-  useEffect(() => () => {
-    connectionsResource.cleanNewFlags();
-  }, [connectionsResource]);
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
     <layout-grid as="div">
