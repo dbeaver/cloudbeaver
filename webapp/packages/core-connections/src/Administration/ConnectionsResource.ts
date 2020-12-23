@@ -185,6 +185,18 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   }
 }
 
+export function isLocalConnection(connection: AdminConnection): boolean {
+  return connection.origin.type === 'local';
+}
+
+export function isCloudConnection(connection: AdminConnection): boolean {
+  return connection.origin.type === 'cloud';
+}
+
+export function isConnectionNew(connection: AdminConnection | ConnectionNew): connection is ConnectionNew {
+  return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
+}
+
 export function compareConnections(a: AdminConnection, b: AdminConnection): number {
   if (isConnectionNew(a) && isConnectionNew(b)) {
     return b.timestamp - a.timestamp;
@@ -199,16 +211,4 @@ export function compareConnections(a: AdminConnection, b: AdminConnection): numb
   }
 
   return a.name.localeCompare(b.name);
-}
-
-export function isLocalConnection(connection: AdminConnection): boolean {
-  return connection.origin.type === 'local';
-}
-
-export function isCloudConnection(connection: AdminConnection): boolean {
-  return connection.origin.type === 'cloud';
-}
-
-export function isConnectionNew(connection: AdminConnection | ConnectionNew): connection is ConnectionNew {
-  return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
 }
