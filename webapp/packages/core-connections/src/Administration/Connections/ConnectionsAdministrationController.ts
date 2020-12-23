@@ -13,7 +13,7 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
+import { AdminConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';
 
 @injectable()
 export class ConnectionsAdministrationController {
@@ -22,7 +22,7 @@ export class ConnectionsAdministrationController {
   readonly expandedItems = observable<string, boolean>(new Map());
   @computed
   get connections(): AdminConnection[] {
-    return Array.from(this.connectionsResource.data.values()).sort(this.connectionsResource.compareConnections);
+    return Array.from(this.connectionsResource.data.values()).sort(compareConnections);
   }
 
   @computed

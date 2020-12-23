@@ -54,22 +54,6 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return this.data.has(id);
   }
 
-  compareConnections(a: AdminConnection, b: AdminConnection): number {
-    if (isConnectionNew(a) && isConnectionNew(b)) {
-      return b.timestamp - a.timestamp;
-    }
-
-    if (isConnectionNew(b)) {
-      return 1;
-    }
-
-    if (isConnectionNew(a)) {
-      return -1;
-    }
-
-    return a.name.localeCompare(b.name);
-  }
-
   getEmptyConnection(): AdminConnection {
     return {
       id: uuid(),
@@ -199,6 +183,22 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
 
     this.set(id, connection);
   }
+}
+
+export function compareConnections(a: AdminConnection, b: AdminConnection): number {
+  if (isConnectionNew(a) && isConnectionNew(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isConnectionNew(b)) {
+    return 1;
+  }
+
+  if (isConnectionNew(a)) {
+    return -1;
+  }
+
+  return a.name.localeCompare(b.name);
 }
 
 export function isLocalConnection(connection: AdminConnection): boolean {
