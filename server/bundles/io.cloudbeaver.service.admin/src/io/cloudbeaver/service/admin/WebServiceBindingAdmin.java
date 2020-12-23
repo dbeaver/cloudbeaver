@@ -19,14 +19,19 @@ package io.cloudbeaver.service.admin;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
+import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.WebServiceBindingBase;
+import io.cloudbeaver.service.admin.impl.WebAdminLogsServlet;
 import io.cloudbeaver.service.admin.impl.WebServiceAdmin;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -88,6 +93,13 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setDefaultNavigatorSettings",
             env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
         ;
+    }
+
+    @Override
+    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
+        servletContextHandler.addServlet(
+            new ServletHolder("adminLogs", new WebAdminLogsServlet(application)),
+            application.getServicesURI() + "logs/*");
     }
 
 }
