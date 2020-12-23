@@ -26,7 +26,7 @@ import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type AdminConnection = AdminConnectionFragment;
-export type ConnectionNew = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean };
+export type ConnectionNew = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, AdminConnection> {
@@ -60,6 +60,15 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
       return false;
     }
     return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
+  }
+
+  getNewer(aId: string, bId: string): number {
+    const [a, b] = [this.get(aId), this.get(bId)] as ConnectionNew[];
+    if (!a || !b) {
+      return 0;
+    }
+
+    return b.timestamp - a.timestamp;
   }
 
   getEmptyConnection(): AdminConnection {
@@ -97,11 +106,10 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   @action add(connection: AdminConnection, isNew = false): AdminConnection {
     this.changed = true;
 
-    this.cleanNewFlags();
-
     const newConnection: ConnectionNew = {
       ...connection,
       [NEW_CONNECTION_SYMBOL]: isNew,
+      timestamp: Date.now(),
     };
     this.set(newConnection.id, newConnection);
 
@@ -152,6 +160,12 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
+  cleanNewFlags() {
+    for (const connection of this.data.values()) {
+      (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL] = false;
+    }
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminConnection>> {
     const { connections } = await this.graphQLService.sdk.getConnections();
     this.data.clear();
@@ -165,12 +179,6 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     this.loadedKeyMetadata.set('all', true);
 
     return this.data;
-  }
-
-  private cleanNewFlags() {
-    for (const connection of this.data.values()) {
-      (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL] = false;
-    }
   }
 
   private async deleteConnectionTask(key: ResourceKey<string>) {

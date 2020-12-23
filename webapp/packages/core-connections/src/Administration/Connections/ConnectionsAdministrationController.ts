@@ -27,8 +27,8 @@ export class ConnectionsAdministrationController {
         const isANew = this.connectionsResource.isNew(a.id);
         const isBNew = this.connectionsResource.isNew(b.id);
 
-        if (isANew === isBNew) {
-          return a.name.localeCompare(b.name);
+        if (isANew && isBNew) {
+          return this.connectionsResource.getNewer(a.id, b.id);
         }
 
         if (isBNew) {
