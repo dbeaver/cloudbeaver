@@ -67,7 +67,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("createConnectionConfiguration",
             env -> getService(env).createConnectionConfiguration(getWebSession(env), new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("copyConnectionConfiguration",
-            env -> getService(env).copyConnectionConfiguration(getWebSession(env), env.getArgument("nodePath")))
+            env -> getService(env).copyConnectionConfiguration(getWebSession(env), env.getArgument("nodePath"), new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("updateConnectionConfiguration",
             env -> getService(env).updateConnectionConfiguration(getWebSession(env), env.getArgument("id"), new WebConnectionConfig(env.getArgument("config"))))
         .dataFetcher("deleteConnectionConfiguration",

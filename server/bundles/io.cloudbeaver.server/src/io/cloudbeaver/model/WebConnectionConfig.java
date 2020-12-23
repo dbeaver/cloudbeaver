@@ -54,33 +54,35 @@ public class WebConnectionConfig {
     }
 
     public WebConnectionConfig(Map<String, Object> params) {
-        connectionId = JSONUtils.getString(params, "connectionId");
-        templateId = JSONUtils.getString(params, "templateId");
-        String dataSourceId = JSONUtils.getString(params, "dataSourceId");
-        if (CommonUtils.isEmpty(templateId) && !CommonUtils.isEmpty(dataSourceId)) {
-            templateId = dataSourceId;
+        if (!CommonUtils.isEmpty(params)) {
+            connectionId = JSONUtils.getString(params, "connectionId");
+            templateId = JSONUtils.getString(params, "templateId");
+            String dataSourceId = JSONUtils.getString(params, "dataSourceId");
+            if (CommonUtils.isEmpty(templateId) && !CommonUtils.isEmpty(dataSourceId)) {
+                templateId = dataSourceId;
+            }
+            driverId = JSONUtils.getString(params, "driverId");
+
+            template = JSONUtils.getBoolean(params, "template");
+            readOnly = JSONUtils.getBoolean(params, "readOnly");
+
+            host = JSONUtils.getString(params, "host");
+            port = JSONUtils.getString(params, "port");
+            serverName = JSONUtils.getString(params, "serverName");
+            databaseName = JSONUtils.getString(params, "databaseName");
+            url = JSONUtils.getString(params, "url");
+
+            name = JSONUtils.getString(params, "name");
+            description = JSONUtils.getString(params, "description");
+
+            properties = JSONUtils.getObjectOrNull(params, "properties");
+            userName = JSONUtils.getString(params, "userName");
+            userPassword = JSONUtils.getString(params, "userPassword");
+
+            authModelId = JSONUtils.getString(params, "authModelId");
+            credentials = JSONUtils.getObjectOrNull(params, "credentials");
+            saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
         }
-        driverId = JSONUtils.getString(params, "driverId");
-
-        template = JSONUtils.getBoolean(params, "template");
-        readOnly = JSONUtils.getBoolean(params, "readOnly");
-
-        host = JSONUtils.getString(params, "host");
-        port = JSONUtils.getString(params, "port");
-        serverName = JSONUtils.getString(params, "serverName");
-        databaseName = JSONUtils.getString(params, "databaseName");
-        url = JSONUtils.getString(params, "url");
-
-        name = JSONUtils.getString(params, "name");
-        description = JSONUtils.getString(params, "description");
-
-        properties = JSONUtils.getObjectOrNull(params, "properties");
-        userName = JSONUtils.getString(params, "userName");
-        userPassword = JSONUtils.getString(params, "userPassword");
-
-        authModelId = JSONUtils.getString(params, "authModelId");
-        credentials = JSONUtils.getObjectOrNull(params, "credentials");
-        saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
     }
 
     @Property

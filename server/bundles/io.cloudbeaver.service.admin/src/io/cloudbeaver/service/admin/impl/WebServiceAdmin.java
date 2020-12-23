@@ -276,7 +276,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException {
+    public WebConnectionInfo copyConnectionConfiguration(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException {
         try {
             DBNModel globalNavigatorModel = webSession.getNavigatorModel();
             DBPDataSourceRegistry globalDataSourceRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
@@ -291,6 +291,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             DBPDataSourceContainer dataSourceTemplate = ((DBNDataSource)srcNode).getDataSourceContainer();
 
             DBPDataSourceContainer newDataSource = globalDataSourceRegistry.createDataSource(dataSourceTemplate);
+            // Copy props from config
+            if (!CommonUtils.isEmpty(config.getName())) {
+                newDataSource.setName(config.getName());
+            }
+            if (!CommonUtils.isEmpty(config.getDescription())) {
+                newDataSource.setDescription(config.getDescription());
+            }
 
             ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
             globalDataSourceRegistry.addDataSource(newDataSource);
