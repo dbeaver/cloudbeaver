@@ -26,7 +26,7 @@ import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type AdminConnection = AdminConnectionFragment;
-export type ConnectionNew = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
+export type NewConnection = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
 export class ConnectionsResource extends CachedMapResource<string, AdminConnection> {
@@ -89,7 +89,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   @action add(connection: AdminConnection, isNew = false): AdminConnection {
     this.changed = true;
 
-    const newConnection: ConnectionNew = {
+    const newConnection: NewConnection = {
       ...connection,
       [NEW_CONNECTION_SYMBOL]: isNew,
       timestamp: Date.now(),
@@ -145,7 +145,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
 
   cleanNewFlags() {
     for (const connection of this.data.values()) {
-      (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL] = false;
+      (connection as NewConnection)[NEW_CONNECTION_SYMBOL] = false;
     }
   }
 
@@ -193,20 +193,20 @@ export function isCloudConnection(connection: AdminConnection): boolean {
   return connection.origin.type === 'cloud';
 }
 
-export function isConnectionNew(connection: AdminConnection | ConnectionNew): connection is ConnectionNew {
-  return (connection as ConnectionNew)[NEW_CONNECTION_SYMBOL];
+export function isNewConnection(connection: AdminConnection | NewConnection): connection is NewConnection {
+  return (connection as NewConnection)[NEW_CONNECTION_SYMBOL];
 }
 
 export function compareConnections(a: AdminConnection, b: AdminConnection): number {
-  if (isConnectionNew(a) && isConnectionNew(b)) {
+  if (isNewConnection(a) && isNewConnection(b)) {
     return b.timestamp - a.timestamp;
   }
 
-  if (isConnectionNew(b)) {
+  if (isNewConnection(b)) {
     return 1;
   }
 
-  if (isConnectionNew(a)) {
+  if (isNewConnection(a)) {
     return -1;
   }
 
