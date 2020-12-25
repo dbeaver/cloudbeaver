@@ -30,10 +30,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
-import org.jkiss.dbeaver.model.navigator.DBNContainer;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
@@ -94,6 +91,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
 
             for (DBNNode node : nodeChildren) {
+                if (node instanceof DBNDatabaseFolder && CommonUtils.isEmpty(((DBNDatabaseFolder) node).getMeta().getChildren(null))) {
+                    // Skip empty folders. Folder may become empty if their nested elements are provided by UI plugins.
+                    continue;
+                }
                 if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
