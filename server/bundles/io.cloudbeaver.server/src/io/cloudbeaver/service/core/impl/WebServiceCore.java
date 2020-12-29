@@ -289,7 +289,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException {
+    public WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException {
         try {
             DBNModel navigatorModel = webSession.getNavigatorModel();
             DBPDataSourceRegistry dataSourceRegistry = webSession.getSingletonProject().getDataSourceRegistry();
@@ -306,6 +306,15 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceContainer newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+
+            // Copy props from config
+            if (!CommonUtils.isEmpty(config.getName())) {
+                newDataSource.setName(config.getName());
+            }
+            if (!CommonUtils.isEmpty(config.getDescription())) {
+                newDataSource.setDescription(config.getDescription());
+            }
+
             dataSourceRegistry.addDataSource(newDataSource);
 
             return new WebConnectionInfo(webSession, newDataSource);

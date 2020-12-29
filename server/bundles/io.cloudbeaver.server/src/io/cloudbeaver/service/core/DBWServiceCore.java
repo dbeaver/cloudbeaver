@@ -96,7 +96,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException;
     @WebAction()
-    WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBWebException;
+    WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
 
     @WebAction
     WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;

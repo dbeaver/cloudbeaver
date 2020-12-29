@@ -82,7 +82,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("openConnection", env -> getService(env).openConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(getWebSession(env), env.getArgument("templateId")))
-            .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(getWebSession(env), env.getArgument("nodePath")))
+            .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
+                getWebSession(env),
+                env.getArgument("nodePath"),
+                new WebConnectionConfig(env.getArgument("config"))))
             .dataFetcher("initConnection", env -> getService(env).initConnection(getWebSession(env), env.getArgument("id"), env.getArgument("credentials"), env.getArgument("saveCredentials")))
             .dataFetcher("testConnection", env -> getService(env).testConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), env.getArgument("id")))
