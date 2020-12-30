@@ -22,3 +22,4 @@ export * from './DatabaseAuthModelsResource';
 export * from './DBDriverResource';
 export * from './useConnectionInfo';
 export * from './useDBDriver';
+export * from './getUniqueConnectionName';

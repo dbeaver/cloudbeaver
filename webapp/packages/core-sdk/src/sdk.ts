@@ -84,6 +84,7 @@ export interface QueryConnectionStateArgs {
 
 export interface QueryCopyConnectionConfigurationArgs {
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }
 
 export interface QueryCreateConnectionConfigurationArgs {
@@ -304,6 +305,7 @@ export interface MutationCloseConnectionArgs {
 
 export interface MutationCopyConnectionFromNodeArgs {
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }
 
 export interface MutationCreateConnectionArgs {
@@ -976,6 +978,7 @@ export interface CreateConnectionConfigurationQuery { connection: AdminConnectio
 
 export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }>;
 
 export interface CreateConnectionConfigurationFromNodeQuery { connection: AdminConnectionFragment }
@@ -1042,6 +1045,7 @@ export interface CreateConnectionMutation { connection: UserConnectionFragment }
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }>;
 
 export interface CreateConnectionFromNodeMutation { connection: UserConnectionFragment }
@@ -1708,8 +1712,8 @@ export const CreateConnectionConfigurationDocument = `
 }
     ${AdminConnectionFragmentDoc}`;
 export const CreateConnectionConfigurationFromNodeDocument = `
-    query createConnectionConfigurationFromNode($nodePath: String!) {
-  connection: copyConnectionConfiguration(nodePath: $nodePath) {
+    query createConnectionConfigurationFromNode($nodePath: String!, $config: ConnectionConfig) {
+  connection: copyConnectionConfiguration(nodePath: $nodePath, config: $config) {
     ...AdminConnection
   }
 }
@@ -1789,8 +1793,8 @@ export const CreateConnectionDocument = `
 }
     ${UserConnectionFragmentDoc}`;
 export const CreateConnectionFromNodeDocument = `
-    mutation createConnectionFromNode($nodePath: String!) {
-  connection: copyConnectionFromNode(nodePath: $nodePath) {
+    mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig) {
+  connection: copyConnectionFromNode(nodePath: $nodePath, config: $config) {
     ...UserConnection
   }
 }
