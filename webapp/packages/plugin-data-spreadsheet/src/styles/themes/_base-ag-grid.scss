@@ -20,16 +20,12 @@
       .ag-header-row {
         @include mdc-theme-prop(color, on-surface, false);
       }
-      
-      .ag-row {
-        border-right: 1px solid;
-        @include mdc-theme-prop(border-color, background, false);
-      }
 
       .ag-row,
       .ag-row:not(.ag-row-first) {
         border-top: none;
         border-bottom: solid 1px;
+        border-right: 1px solid;
         @include mdc-theme-prop(color, on-surface, false);
         @include mdc-theme-prop(border-color, background, false);
       }
@@ -56,7 +52,7 @@
       .ag-row.ag-row-hover {
         background-color: transparent;
         @include stripes-background($mdc-theme-secondary);
-        border-color: $color-positive;
+        border-bottom-color: $color-positive;
       }
 
       .ag-cell.ag-cell-inline-editing {
