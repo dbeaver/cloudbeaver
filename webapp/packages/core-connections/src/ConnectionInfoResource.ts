@@ -96,8 +96,11 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  @action async createFromNode(nodeId: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionFromNode({ nodePath: nodeId });
+  @action async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.createConnectionFromNode({
+      nodePath: nodeId,
+      config: { name: nodeName },
+    });
 
     return this.add(connection);
   }

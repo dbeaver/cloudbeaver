@@ -305,6 +305,7 @@ export interface MutationCloseConnectionArgs {
 
 export interface MutationCopyConnectionFromNodeArgs {
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }
 
 export interface MutationCreateConnectionArgs {
@@ -1044,6 +1045,7 @@ export interface CreateConnectionMutation { connection: UserConnectionFragment }
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
+  config?: Maybe<ConnectionConfig>;
 }>;
 
 export interface CreateConnectionFromNodeMutation { connection: UserConnectionFragment }
@@ -1791,8 +1793,8 @@ export const CreateConnectionDocument = `
 }
     ${UserConnectionFragmentDoc}`;
 export const CreateConnectionFromNodeDocument = `
-    mutation createConnectionFromNode($nodePath: String!) {
-  connection: copyConnectionFromNode(nodePath: $nodePath) {
+    mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig) {
+  connection: copyConnectionFromNode(nodePath: $nodePath, config: $config) {
     ...UserConnection
   }
 }

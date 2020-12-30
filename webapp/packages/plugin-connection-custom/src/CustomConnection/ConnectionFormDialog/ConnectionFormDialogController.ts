@@ -8,7 +8,7 @@
 
 import { observable, action } from 'mobx';
 
-import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource, getUniqueConnectionName } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -102,7 +102,8 @@ implements IInitializableController, IDestructibleController {
     this.isConnecting = true;
     this.error.clear();
     try {
-      connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+      const connectionNames = Array.from(this.connectionInfoResource.data.values()).map(connection => connection.name);
+      connectionConfig.name = getUniqueConnectionName(connectionConfig.name || 'Connection', connectionNames);
       const connection = await this.customConnectionService.createConnectionAsync(connectionConfig);
 
       this.notificationService.logSuccess({ title: `Connection ${connection.name} created` });
@@ -147,26 +148,6 @@ implements IInitializableController, IDestructibleController {
     }
     this.prevGeneratedName = name;
     config.name = name;
-  }
-
-  private getUniqueName(baseName: string) {
-    let index = 1;
-    let name = baseName;
-
-    const connectionsNames = new Set();
-    for (const connection of this.connectionInfoResource.data.values()) {
-      connectionsNames.add(connection.name);
-    }
-
-    while (true) {
-      if (!connectionsNames.has(name)) {
-        break;
-      }
-      name = `${baseName} (${index})`;
-      index++;
-    }
-
-    return name;
   }
 
   private getConnectionConfig(): ConnectionConfig {

@@ -16,6 +16,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
+import { getUniqueConnectionName } from '../../../getUniqueConnectionName';
 import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
 import { IConnectionFormModel } from './IConnectionFormModel';
 
@@ -86,7 +87,8 @@ implements IInitializableController {
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} updated` });
       } else {
-        connectionConfig.name = this.getUniqueName(connectionConfig.name!);
+        const connectionNames = Array.from(this.connectionsResource.data.values()).map(connection => connection.name);
+        connectionConfig.name = getUniqueConnectionName(connectionConfig.name || 'Connection', connectionNames);
         const connection = await this.connectionsResource.create(connectionConfig);
         await this.afterSave.execute(connection.id);
         this.close();
@@ -131,26 +133,6 @@ implements IInitializableController {
 
     validationStatus.status = !validationStatus.errorMessage;
     return validationStatus;
-  }
-
-  private getUniqueName(baseName: string) {
-    let index = 1;
-    let name = baseName;
-
-    const connectionsNames = new Set();
-    for (const connection of this.connectionsResource.data.values()) {
-      connectionsNames.add(connection.name);
-    }
-
-    while (true) {
-      if (!connectionsNames.has(name)) {
-        break;
-      }
-      name = `${baseName} (${index})`;
-      index++;
-    }
-
-    return name;
   }
 
   private getConnectionConfig(): ConnectionConfig {

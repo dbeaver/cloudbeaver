@@ -1,5 +1,5 @@
-mutation createConnectionFromNode($nodePath: String!) {
-  connection: copyConnectionFromNode(nodePath: $nodePath) {
+mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig) {
+  connection: copyConnectionFromNode(nodePath: $nodePath, config: $config) {
     ...UserConnection
   }
 }

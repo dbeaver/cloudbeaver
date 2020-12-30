@@ -16,13 +16,8 @@ export function getUniqueConnectionName(baseName: string, connectionNames: strin
   let index = 1;
   let name = baseName;
 
-  const names = new Set();
-  for (const connectionName of connectionNames) {
-    names.add(connectionName);
-  }
-
   while (true) {
-    if (!names.has(name)) {
+    if (!connectionNames.includes(name)) {
       break;
     }
     name = `${baseName} (${index})`;
