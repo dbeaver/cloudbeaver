@@ -252,6 +252,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
   private resetData(): void {
     this.selection.clear();
     if (this.api) {
+      this.api.setInfiniteRowCount(0, true); // we prevent ag-grid from requesting data on purgeInfiniteCache call
       this.api.purgeInfiniteCache(); // it will reset internal state
       this.api.setInfiniteRowCount(0, false);
     }
