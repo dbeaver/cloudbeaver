@@ -20,6 +20,11 @@
       .ag-header-row {
         @include mdc-theme-prop(color, on-surface, false);
       }
+      
+      .ag-row {
+        border-right: 1px solid;
+        @include mdc-theme-prop(border-color, background, false);
+      }
 
       .ag-row,
       .ag-row:not(.ag-row-first) {

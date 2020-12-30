@@ -25,6 +25,7 @@
   .ag-header {
     height: 28px;
     min-height: 28px;
+    width: max-content;
   }
   .ag-root-wrapper {
     border: none;
@@ -37,7 +38,7 @@
     line-height: 22px;
   }
   .ag-center-cols-container {
-    min-width: 100%;
+    min-width: max-content;
   }
   .ag-react-container {
     position: relative;

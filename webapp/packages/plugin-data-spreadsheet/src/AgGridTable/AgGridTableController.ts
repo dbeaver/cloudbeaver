@@ -321,6 +321,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
         headerName: v.label,
         field: `${i}`,
         width: Math.min(this.getColumnWidth(v, i, rows), columnMaxWidth),
+        minWidth: 45,
         // type: v.dataKind,
         editable: (params: any) => {
           const context: AgGridContext = params.context;
