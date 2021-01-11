@@ -106,10 +106,11 @@
 
     .cm-s-material .cm-keyword {
       color: $keyword;
+      font-weight: bold;
     }
 
     .cm-s-material .cm-operator {
-      color: $delimiter;
+      color: $operator;
     }
 
     .cm-s-material .cm-variable-2 {

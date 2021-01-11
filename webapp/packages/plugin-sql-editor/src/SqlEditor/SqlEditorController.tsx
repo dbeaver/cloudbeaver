@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import CodeMirror, {
-  EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
+import {
+  showHint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
 import { computed } from 'mobx';
 import { IControlledCodeMirror } from 'react-codemirror2';
@@ -20,9 +20,6 @@ import { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
-
-// allows to bypass rollup-commonjs error " 'showHint' is not exported by codemirror.js "
-const showHint = CodeMirror.showHint;
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
@@ -58,7 +55,6 @@ export class SqlEditorController implements IInitializableController {
 
   readonly options: EditorConfiguration = {
     theme: 'material',
-    mode: 'text/x-sql',
     lineNumbers: true,
     indentWithTabs: true,
     smartIndent: true,

@@ -5,8 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./codemirror.meta.d.ts" />
 
-import { Editor, EditorConfiguration, StringStream } from 'codemirror';
+import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
+import 'codemirror/mode/meta';
+import { observable } from 'mobx';
 import { IControlledCodeMirror } from 'react-codemirror2';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -27,13 +31,14 @@ export class CodeEditorController {
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 
+  @observable
   bindings: Omit<IControlledCodeMirror, 'value'> = {
-    options: COMMON_EDITOR_CONFIGURATION,
+    options: { ...COMMON_EDITOR_CONFIGURATION },
     editorDidMount: this.handleConfigure.bind(this),
     onBeforeChange: () => {},
   };
 
-  init(bindings?: Partial<IControlledCodeMirror>) {
+  init(bindings?: Partial<IControlledCodeMirror>): void {
     this.bindings.options = {
       ...COMMON_EDITOR_CONFIGURATION,
       ...(bindings?.options || {}),
@@ -49,37 +54,42 @@ export class CodeEditorController {
     }
   }
 
-  setDialect(dialect?: SqlDialectInfo) {
+  setDialect(dialect?: SqlDialectInfo): void {
+    if (this.dialect === dialect) {
+      return;
+    }
+
     this.dialect = dialect;
+
+    if (this.editor && this.dialect) {
+      const keywords = this.dialect.dataTypes
+        ?.map(v => v.toLowerCase())
+        .reduce((obj, value) => ({ ...obj, [value]: value }), {});
+
+      const builtin = [
+        ...this.dialect.functions || [],
+        ...this.dialect.reservedWords || [],
+      ].map(v => v.toLowerCase())
+        .reduce((obj, value) => ({
+          ...obj,
+          [value]: value,
+        }), {});
+
+      if (this.bindings.options && this.dialect.name) {
+        this.bindings.options.mode = {
+          name: findModeByName(this.dialect.name).mime,
+          keywords,
+          builtin,
+        };
+      }
+    }
   }
 
-  focus() {
+  focus(): void {
     this.editor?.focus();
   }
 
   private handleConfigure(editor: Editor) {
     this.editor = editor;
-    this.editor.addOverlay({
-      token: this.overlayModeToken.bind(this),
-    });
-  }
-
-  private overlayModeToken(stream: StringStream) {
-    stream.next();
-    if (!this.dialect) {
-      return null;
-    }
-    stream.eatWhile(/^[_\w\d]/);
-    const word = stream.current().toUpperCase().trim();
-    if (this.dialect.dataTypes?.includes(word)) {
-      return 'type';
-    }
-    if (this.dialect.functions?.includes(word)) {
-      return 'builtin';
-    }
-    if (this.dialect.reservedWords?.includes(word)) {
-      return 'keyword';
-    }
-    return null;
   }
 }
