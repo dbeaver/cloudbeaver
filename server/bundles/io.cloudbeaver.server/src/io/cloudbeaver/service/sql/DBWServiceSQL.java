@@ -49,14 +49,21 @@ public interface DBWServiceSQL extends DBWService {
     void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException;
 
     @WebAction
-    @NotNull
-    WebSQLExecuteInfo executeQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException;
+    WebAsyncTaskInfo asyncExecuteQuery(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBException;
 
     @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
-    WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter, WebDataFormat dataFormat) throws DBWebException;
+    WebAsyncTaskInfo asyncReadDataFromContainer(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String nodePath,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
     WebSQLExecuteInfo updateResultsData(
@@ -72,9 +79,6 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException;
-
-    @WebAction
-    WebAsyncTaskInfo asyncExecuteQuery(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBException;
 
     @WebAction
     WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
