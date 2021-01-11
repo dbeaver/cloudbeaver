@@ -75,9 +75,11 @@ export class CodeEditorController {
           [value]: value,
         }), {});
 
-      if (this.bindings.options && this.dialect.name) {
+      if (this.bindings.options) {
+        const name = this.dialect.name && findModeByName(this.dialect.name)?.mime;
+
         this.bindings.options.mode = {
-          name: findModeByName(this.dialect.name).mime,
+          name: name || COMMON_EDITOR_CONFIGURATION.mode,
           keywords,
           builtin,
         };

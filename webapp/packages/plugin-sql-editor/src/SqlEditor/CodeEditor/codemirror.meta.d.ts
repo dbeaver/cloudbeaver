@@ -16,5 +16,5 @@ declare module 'codemirror' {
     ext?: string[];
     alias?: string[];
   }
-  function findModeByName(name: string): ModeInfo;
+  function findModeByName(name: string): ModeInfo | undefined;
 }
