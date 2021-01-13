@@ -104,7 +104,7 @@ export const TableViewer = observer(function TableViewer({
         loading={dataModel.isLoading()}
         cancelDisabled={!dataModel.source.canCancel}
         overlay
-        onCancel={dataModel.source.cancel}
+        onCancel={() => dataModel.source.cancel()}
       />
     </table-viewer>
   );

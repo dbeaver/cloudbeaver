@@ -21,13 +21,10 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 
 @injectable()
 export class DataViewerTableService {
-  private source: ContainerDataSource;
-
   constructor(private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
     private graphQLService: GraphQLService,
     private notificationService: NotificationService) {
-    this.source = new ContainerDataSource(graphQLService, notificationService);
   }
 
   has(tableId: string): boolean {
@@ -57,6 +54,7 @@ export class DataViewerTableService {
     containerNodePath = ''
   ): Promise<TableViewerModel> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
+    const source = new ContainerDataSource(this.graphQLService, this.notificationService);
 
     return this.tableViewerStorageService.create(
       {
@@ -64,10 +62,10 @@ export class DataViewerTableService {
         connectionId,
         containerNodePath,
         access: connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default,
-        requestDataAsync: this.requestDataAsync.bind(this),
+        requestDataAsync: this.requestDataAsync.bind(this, source),
         saveChanges: this.saveChanges.bind(this),
       },
-      this.source
+      source
         .setOptions({
           connectionId,
           containerNodePath,
@@ -127,6 +125,7 @@ export class DataViewerTableService {
   }
 
   private async requestDataAsync(
+    source: ContainerDataSource,
     model: TableViewerModel,
     offset: number,
     count: number,
@@ -156,7 +155,7 @@ export class DataViewerTableService {
       },
     );
 
-    this.source.currentFetchTableProcess = fetchTableProcess;
+    source.currentFetchTableProcess = fetchTableProcess;
     const response = await fetchTableProcess.promise;
 
     const dataSet = response!.results[0].resultSet!; // we expect only one dataset for a table
