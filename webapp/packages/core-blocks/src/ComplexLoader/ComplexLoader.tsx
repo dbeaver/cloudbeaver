@@ -23,12 +23,16 @@ export function ComplexLoader<T>(props: ComplexLoaderProps<T>) {
   const notificationService = useService(NotificationService);
 
   useEffect(() => {
+    let unmounted = false;
     if (!content) {
       props
         .loader()
-        .then(value => setContent(value))
-        .catch(exception => notificationService.logException(exception, 'Can\'t load resource'));
+        .then(value => !unmounted && setContent(value))
+        .catch(exception => !unmounted && notificationService.logException(exception, 'Can\'t load resource'));
     }
+    return () => {
+      unmounted = true;
+    };
   }, [content]);
 
   if (!content || props.keepLoading) {

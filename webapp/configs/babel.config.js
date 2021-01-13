@@ -17,7 +17,13 @@ console.warn = (...args) => {
 module.exports = {
   compact: prod,
   presets: [
-    "@babel/preset-react",
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic",
+        "importSource": "preact-jsx-runtime"
+      }
+    ]
     ['@babel/preset-typescript', { isTSX: true, allExtensions:true }],
     [
       "@babel/preset-env",
@@ -43,7 +49,6 @@ module.exports = {
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
     ["@babel/plugin-proposal-object-rest-spread", { loose: true, useBuiltIns: true }],
-    'react-require',
     'reshadow/babel',
     /*!prod &&*/[
       "babel-plugin-module-resolver",

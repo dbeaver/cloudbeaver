@@ -19,12 +19,12 @@ export type CancellableExecutor<T> = (
  * 'then' method returns the ordinary promise
  */
 export class CancellablePromise<T> extends Promise<T> {
-  private _resolve: (value?: T | PromiseLike<T>) => void;
+  private _resolve: (value: T | PromiseLike<T>) => void;
   private _reject: (reason?: any) => void;
   private _cancel?: () => void;
 
   constructor(executor: CancellableExecutor<T>) {
-    let _resolve!: (value?: T | PromiseLike<T>) => void;
+    let _resolve!: (value: T | PromiseLike<T>) => void;
     let _reject!: (reason?: any) => void;
     super((resolve, reject) => {
       _resolve = resolve;
