@@ -50,7 +50,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     if (this.currentFetchTableProcess) {
       return this.currentFetchTableProcess.cancel();
     }
-    throw new Error('currentFetchTableProcess must be provided to run cancel method');
+    return false;
   }
 
   async request(
