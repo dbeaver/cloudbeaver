@@ -145,24 +145,28 @@ extend type Mutation {
 
     sqlContextDestroy( connectionId: ID!, contextId: ID! ): Boolean!
 
-    sqlExecuteQuery(
+    # Execute SQL and return results
+    asyncSqlExecuteQuery(
         connectionId: ID!,
         contextId: ID!,
         sql: String!,
         filter: SQLDataFilter,
-        dataFormat: ResultDataFormat
-    ): SQLExecuteInfo
+        dataFormat: ResultDataFormat    # requested data format. May be ignored by server
+    ): AsyncTaskInfo!
 
-    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
-
-    readDataFromContainer(
+    # Read data from table
+    asyncReadDataFromContainer(
         connectionId: ID!,
         contextId: ID!,
         containerNodePath: ID!,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat
-    ): SQLExecuteInfo
+    ): AsyncTaskInfo!
 
+    # Close results (free resources)
+    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
+
+    # Update single cell value
     updateResultsData(
         connectionId: ID!,
         contextId: ID!,
@@ -173,6 +177,7 @@ extend type Mutation {
         updateValues: Object
     ): SQLExecuteInfo
 
+    # Update multiple cell values
     updateResultsDataBatch(
         connectionId: ID!,
         contextId: ID!,
@@ -183,17 +188,7 @@ extend type Mutation {
         addedRows: [ SQLResultRow! ],
     ): SQLExecuteInfo
 
-    ### Async API
-
     # Returns SQLExecuteInfo
-    asyncSqlExecuteQuery(
-        connectionId: ID!,
-        contextId: ID!,
-        sql: String!,
-        filter: SQLDataFilter,
-        dataFormat: ResultDataFormat    # requested data format. May be ignored by server
-    ): AsyncTaskInfo!
-
     asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
 
 }

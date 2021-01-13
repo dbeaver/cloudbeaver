@@ -131,25 +131,6 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLExecuteInfo readDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String containerPath, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
-        try {
-            DBRProgressMonitor monitor = contextInfo.getProcessor().getWebSession().getProgressMonitor();
-
-            DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(monitor, containerPath, DBSDataContainer.class);
-
-            if (filter == null) {
-                // Use default filter
-                filter = new WebSQLDataFilter();
-            }
-
-            return contextInfo.getProcessor().readDataFromContainer(contextInfo, monitor, dataContainer, filter, dataFormat);
-        } catch (DBException e) {
-            if (e instanceof DBWebException) throw (DBWebException) e;
-            throw new DBWebException("Error reading data from '"  + containerPath + "'", e);
-        }
-    }
-
-    @Override
     public WebSQLExecuteInfo updateResultsData(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @NotNull List<Object> updateRow, @NotNull Map<String, Object> updateValues, WebDataFormat dataFormat) throws DBWebException {
         return contextInfo.getProcessor().updateResultsData(contextInfo, resultsId, updateRow, updateValues, dataFormat);
     }
@@ -178,6 +159,35 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL execute", runnable);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncReadDataFromContainer(@NotNull WebSQLContextInfo contextInfo, @NotNull String nodePath, @Nullable WebSQLDataFilter filter, @Nullable WebDataFormat dataFormat) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                try {
+                    monitor.beginTask("Read data", 1);
+                    monitor.subTask("Extra data from " + nodePath);
+
+                    DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(monitor, nodePath, DBSDataContainer.class);
+
+                    WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
+                        contextInfo,
+                        monitor,
+                        dataContainer,
+                        filter != null ? filter : new WebSQLDataFilter(),
+                        dataFormat);
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
     }
 
     @Override

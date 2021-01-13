@@ -14,14 +14,14 @@ import { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataSource<TOptions, TResult> {
+  implements IDatabaseDataSource<TOptions, TResult> {
   @observable offset: number;
   @observable count: number;
   @observable dataFormat: ResultDataFormat;
   @observable options: TOptions | null;
   @observable requestInfo: IRequestInfo;
   @observable supportedDataFormats: ResultDataFormat[];
-  abstract canCancel: boolean;
+  abstract get canCancel(): boolean;
 
   @observable private activeRequest: Promise<TResult[]> | null;
   @observable private activeSave: Promise<TResult[]> | null;
@@ -40,7 +40,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     };
   }
 
-  abstract cancel(): Promise<boolean>;
+  abstract cancel(): Promise<boolean> | boolean;
 
   isLoading(): boolean {
     return !!this.activeRequest;
@@ -71,7 +71,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeSave) {
       try {
         await this.activeSave;
-      } finally {}
+      } finally { }
     }
 
     if (this.activeRequest) {
@@ -97,7 +97,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeRequest) {
       try {
         await this.activeRequest;
-      } finally {}
+      } finally { }
     }
 
     if (this.activeSave) {

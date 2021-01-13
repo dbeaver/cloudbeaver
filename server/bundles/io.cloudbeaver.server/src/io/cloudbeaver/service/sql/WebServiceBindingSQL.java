@@ -69,23 +69,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                     return true;
             })
 
-            .dataFetcher("sqlExecuteQuery", env ->
-                getService(env).executeQuery(
-                    getSQLContext(env),
-                    env.getArgument("sql"),
-                    getDataFilter(env),
-                    getDataFormat(env)))
             .dataFetcher("sqlResultClose", env ->
                 getService(env).closeResult(
                     getSQLContext(env),
                     env.getArgument("resultId")))
 
-            .dataFetcher("readDataFromContainer", env ->
-                getService(env).readDataFromContainer(
-                    getSQLContext(env),
-                    env.getArgument("containerNodePath"),
-                    getDataFilter(env),
-                    getDataFormat(env)))
             .dataFetcher("updateResultsData", env ->
                 getService(env).updateResultsData(
                     getSQLContext(env),
@@ -105,6 +93,13 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
                 getService(env).asyncExecuteQuery(
                     getSQLContext(env),
                     env.getArgument("sql"),
+                    getDataFilter(env),
+                    getDataFormat(env)
+                ))
+            .dataFetcher("asyncReadDataFromContainer", env ->
+                getService(env).asyncReadDataFromContainer(
+                    getSQLContext(env),
+                    env.getArgument("containerNodePath"),
                     getDataFilter(env),
                     getDataFormat(env)
                 ))
