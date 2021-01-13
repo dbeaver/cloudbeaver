@@ -23,7 +23,7 @@ module.exports = {
         "runtime": "automatic",
         "importSource": "preact-jsx-runtime"
       }
-    ]
+    ],
     ['@babel/preset-typescript', { isTSX: true, allExtensions:true }],
     [
       "@babel/preset-env",
