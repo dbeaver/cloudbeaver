@@ -10,16 +10,18 @@ import { observable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { IExecutionContext } from '../IExecutionContext';
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataSource<TOptions, TResult> {
+implements IDatabaseDataSource<TOptions, TResult> {
   @observable offset: number;
   @observable count: number;
   @observable dataFormat: ResultDataFormat;
   @observable options: TOptions | null;
   @observable requestInfo: IRequestInfo;
+  @observable executionContext: IExecutionContext | null;
   @observable supportedDataFormats: ResultDataFormat[];
   abstract get canCancel(): boolean;
 
@@ -32,6 +34,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.options = null;
     this.activeRequest = null;
     this.activeSave = null;
+    this.executionContext = null;
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
     this.requestInfo = {
@@ -64,6 +67,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
     this.supportedDataFormats = dataFormats;
+    return this;
+  }
+
+  setExecutionContext(context: IExecutionContext | null): this {
+    this.executionContext = context;
     return this;
   }
 

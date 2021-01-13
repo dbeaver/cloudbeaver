@@ -17,6 +17,8 @@ import { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
 import { DataUpdate } from './DatabaseDataModel/IDatabaseDataSource';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import { IExecutionContext } from './IExecutionContext';
+import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
+import { IRequestDataResult } from './TableViewer/TableViewerModel';
 
 export interface IDataContainerOptions {
   containerNodePath: string;
@@ -31,7 +33,6 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
   @observable currentFetchTableProcess: FetchTableDataAsyncProcess | null;
-  private executionContext: IExecutionContext | null;
 
   get canCancel(): boolean {
     return this.currentFetchTableProcess ? this.currentFetchTableProcess.getState() === EDeferredState.PENDING : false;
@@ -120,6 +121,30 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     };
 
     throw new Error('Not implemented');
+  }
+
+  /**
+   * @deprecated will be refactored
+   */
+  async saveDataDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
+    const executionContext = await this.ensureContextCreated();
+
+    const response = await this.graphQLService.sdk.updateResultsDataBatch({
+      connectionId: executionContext.connectionId,
+      contextId: executionContext.contextId,
+      resultsId: resultId,
+      updatedRows: rows.map(row => ({ data: row.source, updateValues: row.values })),
+    });
+
+    const dataSet = response.result!.results[0].resultSet!; // we expect only one dataset for a table
+
+    return {
+      rows: dataSet.rows!,
+      columns: [], // not in use while saving data
+      duration: response.result!.duration,
+      isFullyLoaded: false, // not in use while saving data
+      statusMessage: 'Saved successfully',
+    };
   }
 
   async dispose(): Promise<void> {

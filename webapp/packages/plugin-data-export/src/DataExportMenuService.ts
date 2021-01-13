@@ -11,9 +11,9 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  IContextMenuItem, IMenuContext, CommonDialogService, ContextMenuService
+  IMenuContext, CommonDialogService, ContextMenuService
 } from '@cloudbeaver/core-dialogs';
-import { TableFooterMenuService, DataModelWrapper } from '@cloudbeaver/plugin-data-viewer';
+import { TableFooterMenuService, ITableFooterMenuContext } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
@@ -25,8 +25,8 @@ export class DataExportMenuService {
     private contextMenuService: ContextMenuService
   ) { }
 
-  register() {
-    const exportData: IContextMenuItem<DataModelWrapper> = {
+  register(): void {
+    this.tableFooterMenuService.registerMenuItem({
       id: 'export ',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -35,8 +35,7 @@ export class DataExportMenuService {
       title: 'data_transfer_dialog_export',
       icon: 'table-export',
       onClick: this.exportData.bind(this),
-    };
-    this.tableFooterMenuService.registerMenuItem(exportData);
+    });
 
     this.contextMenuService.addMenuItem<NavNode>(
       this.contextMenuService.getRootMenuToken(),
@@ -60,13 +59,18 @@ export class DataExportMenuService {
     );
   }
 
-  private exportData(context: IMenuContext<DataModelWrapper>) {
+  private exportData(context: IMenuContext<ITableFooterMenuContext>) {
+    const result = context.data.model.getResult(context.data.resultIndex);
+    if (!result) {
+      throw new Error('Result must be provided');
+    }
+
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: context.data.deprecatedModel.connectionId,
-      contextId: context.data.deprecatedModel.executionContext?.contextId,
-      containerNodePath: context.data.deprecatedModel.containerNodePath,
-      resultId: context.data.deprecatedModel.resultId,
-      sourceName: context.data.deprecatedModel.sourceName,
+      connectionId: context.data.model.deprecatedModel.connectionId,
+      contextId: context.data.model.source.executionContext?.contextId,
+      containerNodePath: context.data.model.deprecatedModel.containerNodePath,
+      resultId: result.id,
+      sourceName: context.data.model.deprecatedModel.sourceName,
     });
   }
 }

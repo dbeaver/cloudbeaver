@@ -27,16 +27,21 @@ const styles = css`
 `;
 
 interface TableFooterMenuProps {
+  resultIndex: number;
   model: DataModelWrapper;
   className?: string;
 }
 
-export const TableFooterMenu = observer(function TableFooterMenu({ model, className }: TableFooterMenuProps) {
+export const TableFooterMenu = observer(function TableFooterMenu({
+  resultIndex,
+  model,
+  className,
+}: TableFooterMenuProps) {
   const mainMenuService = useService(TableFooterMenuService);
 
   return styled(styles)(
     <menu-wrapper as="div" className={className}>
-      {mainMenuService.constructMenuWithContext(model).map((topItem, i) => (
+      {mainMenuService.constructMenuWithContext(model, resultIndex).map((topItem, i) => (
         <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}
     </menu-wrapper>

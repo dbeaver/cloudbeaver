@@ -52,7 +52,7 @@ type TableViewerProps = PropsWithChildren<{
 
 export const TableViewer = observer(function TableViewer({
   tableId,
-  resultIndex,
+  resultIndex = 0,
   presentationId,
   className,
   onPresentationChange,
@@ -60,13 +60,15 @@ export const TableViewer = observer(function TableViewer({
   const dataPresentationService = useService(DataPresentationService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const dataModel = tableViewerStorageService.get(tableId);
-  const result = dataModel?.getResult(resultIndex || 0);
+  const result = dataModel?.getResult(resultIndex);
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
-    if (presentation && presentation.dataFormat !== dataModel?.source.dataFormat) {
-      dataModel?.setDataFormat(presentation.dataFormat)
-        .reload();
+    if (presentation) {
+      if (presentation.dataFormat !== dataModel?.source.dataFormat) {
+        dataModel?.setDataFormat(presentation.dataFormat)
+          .reload();
+      }
       onPresentationChange(id);
     }
   }, [onPresentationChange, dataModel]);
@@ -97,7 +99,7 @@ export const TableViewer = observer(function TableViewer({
         />
         <table-data as='div'>
           <TableGrid model={dataModel} presentation={presentation} />
-          <TableFooter model={dataModel} />
+          <TableFooter model={dataModel} resultIndex={resultIndex} />
         </table-data>
       </table-content>
       <Loader

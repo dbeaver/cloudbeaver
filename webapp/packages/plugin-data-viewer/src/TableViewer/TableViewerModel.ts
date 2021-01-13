@@ -15,7 +15,6 @@ import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IExecutionContext } from '../IExecutionContext';
 import { ErrorDialog } from './ErrorDialog';
 import { RowDiff } from './TableDataModel/EditedRow';
 import { TableColumn } from './TableDataModel/TableColumn';
@@ -65,8 +64,6 @@ export interface ITableViewerModelOptions {
   tableId?: string;
   connectionId: string;
   containerNodePath?: string;
-  resultId?: string | null; // will be filled after fist data fetch
-  executionContext?: IExecutionContext | null; // will be filled before fist data fetch
   sourceName?: string; // TODO: refactor it, used for showing sql query for export
   noLoaderWhileRequestingDataAsync?: boolean;
   access?: DatabaseDataAccessMode;
@@ -90,8 +87,6 @@ export class TableViewerModel {
   tableId: string;
   connectionId: string;
   containerNodePath?: string;
-  resultId: string | null;
-  executionContext: IExecutionContext | null;
   sourceName?: string;
   noLoaderWhileRequestingDataAsync?: boolean;
 
@@ -153,8 +148,6 @@ export class TableViewerModel {
     this.tableId = options.tableId || uuid();
     this.connectionId = options.connectionId;
     this.containerNodePath = options.containerNodePath;
-    this.resultId = options.resultId || null;
-    this.executionContext = options.executionContext || null;
     this.sourceName = options.sourceName;
     this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
     this.access = options.access || DatabaseDataAccessMode.Default;

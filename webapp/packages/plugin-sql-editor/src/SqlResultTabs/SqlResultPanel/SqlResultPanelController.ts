@@ -23,7 +23,8 @@ import {
   RowDiff,
   TableViewerStorageService,
   TableViewerModel,
-  DatabaseDataAccessMode
+  DatabaseDataAccessMode,
+  DataModelWrapper
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { IResultDataTab, IQueryTabGroup } from '../../ISqlEditorTabState';
@@ -53,6 +54,7 @@ implements IInitializableController, IDestructibleController {
   private group!: IQueryTabGroup;
   private tabId!: string;
   private source: QueryDataSource;
+  private model: DataModelWrapper | null;
 
   constructor(
     private sqlResultService: SqlResultService,
@@ -64,6 +66,7 @@ implements IInitializableController, IDestructibleController {
     private sqlResultTabsService: SqlResultTabsService
   ) {
     this.source = new QueryDataSource(this.sqlEditorGroupMetadataService, this.sqlResultTabsService);
+    this.model = null;
   }
 
   async init(tabId: string, panelInit: IResultDataTab, group: IQueryTabGroup) {
@@ -112,15 +115,19 @@ implements IInitializableController, IDestructibleController {
           constraints: [],
           whereFilter: '',
         })
+          .setExecutionContext({
+            connectionId: this.group.sqlQueryParams.connectionId,
+            contextId: this.group.sqlQueryParams.contextId,
+            objectCatalogId: this.group.sqlQueryParams.objectCatalogId,
+            objectSchemaId: this.group.sqlQueryParams.objectSchemaId,
+          })
           .setDataFormat(dataSet.dataFormat || ResultDataFormat.Resultset)
           .setSupportedDataFormats(connectionInfo.supportedDataFormats);
 
-        const tableModel = this.tableViewerStorageService.create(
+        this.model = this.tableViewerStorageService.create(
           {
             tableId: this.getTableId(),
             connectionId: this.group.sqlQueryParams.connectionId,
-            executionContext: this.group.sqlQueryParams,
-            resultId: dataSet.resultSet.id,
             sourceName: this.group.sqlQueryParams.query,
             access: connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default,
             requestDataAsync: this.requestDataAsync.bind(this, sqlExecutionContext),
@@ -130,8 +137,9 @@ implements IInitializableController, IDestructibleController {
           this.source
         )
           .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default)
-          .setResults(this.source.getResults(response, fetchingSettings.fetchDefault) || [])
-          .deprecatedModel;
+          .setResults(this.source.getResults(response, fetchingSettings.fetchDefault) || []);
+
+        const tableModel = this.model.deprecatedModel;
 
         tableModel.insertRows(0, initialState.rows, !initialState.isFullyLoaded);
         tableModel.setColumns(initialState.columns);
@@ -214,27 +222,27 @@ implements IInitializableController, IDestructibleController {
     // /**
     //  * Note that each data fetching overwrites resultId
     //  */
-    const dataSet = response.results![this.panelInit.indexInResultSet]!.resultSet!;
-    await this.updateTableInfo(model, dataSet.id);
+    this.model?.setResults(this.source.getResults(response, fetchingSettings.fetchDefault) || []);
+    await this.updateTableInfo(model);
     return dataResults;
   }
 
-  private async updateTableInfo(model: TableViewerModel, resultId: string) {
+  private async updateTableInfo(model: TableViewerModel) {
     const connectionInfo = await this.connectionInfoResource.load(this.group.sqlQueryParams.connectionId);
 
-    model.resultId = resultId;
     model.access = connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default;
     model.sourceName = this.group.sqlQueryParams.query;
-    model.executionContext = this.group.sqlQueryParams;
     model.connectionId = this.group.sqlQueryParams.connectionId;
   }
 
   async saveChanges(model: TableViewerModel, diffs: RowDiff[]): Promise<IRequestDataResult> {
-    if (!model.resultId) {
-      throw new Error('resultId must be provided before saving changes');
+    const result = this.model?.getResult(this.panelInit.indexInResultSet);
+
+    if (!result) {
+      throw new Error('result must be provided before saving changes');
     }
 
-    const response = await this.sqlResultService.saveChanges(this.group.sqlQueryParams, model.resultId, diffs);
+    const response = await this.sqlResultService.saveChanges(this.group.sqlQueryParams, result.id, diffs);
 
     return this.sqlResultService.sqlExecuteInfoToData(response, this.panelInit.indexInResultSet);
   }

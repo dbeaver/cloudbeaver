@@ -13,6 +13,11 @@ import {
 
 import { DataModelWrapper } from '../../DataModelWrapper';
 
+export interface ITableFooterMenuContext {
+  model: DataModelWrapper;
+  resultIndex: number;
+}
+
 @injectable()
 export class TableFooterMenuService {
   static nodeContextType = 'NodeWithParent';
@@ -27,12 +32,12 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        return !context.data.deprecatedModel.isEdited();
+        return !context.data.model.deprecatedModel.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
-      onClick: context => context.data.deprecatedModel.saveChanges(),
+      onClick: context => context.data.model.deprecatedModel.saveChanges(),
     });
     this.registerMenuItem({
       id: 'cancel ',
@@ -40,26 +45,26 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        return !context.data.deprecatedModel.isEdited();
+        return !context.data.model.deprecatedModel.isEdited();
       },
       order: 2,
       title: 'ui_processing_cancel',
       icon: 'table-cancel',
-      onClick: context => context.data.deprecatedModel.cancelChanges(),
+      onClick: context => context.data.model.deprecatedModel.cancelChanges(),
     });
   }
 
-  constructMenuWithContext(model: DataModelWrapper): IMenuItem[] {
-    const context: IMenuContext<DataModelWrapper> = {
+  constructMenuWithContext(model: DataModelWrapper, resultIndex: number): IMenuItem[] {
+    const context: IMenuContext<ITableFooterMenuContext> = {
       menuId: this.tableFooterMenuToken,
       contextId: model.id,
       contextType: TableFooterMenuService.nodeContextType,
-      data: model,
+      data: { model, resultIndex },
     };
     return this.contextMenuService.createContextMenu(context, this.tableFooterMenuToken).menuItems;
   }
 
-  registerMenuItem(options: IContextMenuItem<DataModelWrapper>): void {
-    this.contextMenuService.addMenuItem<DataModelWrapper>(this.tableFooterMenuToken, options);
+  registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
+    this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
   }
 }

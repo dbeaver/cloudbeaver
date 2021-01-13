@@ -8,6 +8,7 @@
 
 import { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
 
+import { IExecutionContext } from '../IExecutionContext';
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DataUpdateType {
@@ -33,6 +34,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly dataFormat: ResultDataFormat;
+  readonly executionContext: IExecutionContext | null;
   readonly supportedDataFormats: ResultDataFormat[];
   readonly canCancel: boolean;
 
@@ -41,6 +43,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
+  setExecutionContext: (context: IExecutionContext | null) => this;
   requestData: (
     prevResults: TResult[]
   ) => Promise<TResult[]> | TResult[];

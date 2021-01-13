@@ -68,10 +68,12 @@ const tableFooterStyles = composes(
 );
 
 interface TableFooterProps {
+  resultIndex: number;
   model: DataModelWrapper;
 }
 
 export const TableFooter = observer(function TableFooter({
+  resultIndex,
   model,
 }: TableFooterProps) {
   const ref = useRef<HTMLInputElement>(null);
@@ -100,7 +102,7 @@ export const TableFooter = observer(function TableFooter({
           <input ref={ref} type="number" value={model.countGain} onBlur={handleChange} {...use({ mod: 'surface' })} />
         </SubmittingForm>
       </count>
-      <TableFooterMenu model={model} />
+      <TableFooterMenu model={model} resultIndex={resultIndex} />
       {(model.source.dataFormat === ResultDataFormat.Resultset
       && model.deprecatedModel.requestStatusMessage.length > 0) && (
         <time>
