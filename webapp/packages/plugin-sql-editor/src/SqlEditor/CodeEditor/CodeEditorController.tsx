@@ -61,14 +61,14 @@ export class CodeEditorController {
 
     this.dialect = dialect;
 
-    if (this.editor && this.dialect) {
-      const keywords = this.dialect.dataTypes
+    if (this.editor) {
+      const keywords = this.dialect?.dataTypes
         ?.map(v => v.toLowerCase())
         .reduce((obj, value) => ({ ...obj, [value]: value }), {});
 
       const builtin = [
-        ...this.dialect.functions || [],
-        ...this.dialect.reservedWords || [],
+        ...this.dialect?.functions || [],
+        ...this.dialect?.reservedWords || [],
       ].map(v => v.toLowerCase())
         .reduce((obj, value) => ({
           ...obj,
@@ -76,7 +76,7 @@ export class CodeEditorController {
         }), {});
 
       if (this.bindings.options) {
-        const name = this.dialect.name && findModeByName(this.dialect.name)?.mime;
+        const name = this.dialect?.name && findModeByName(this.dialect.name)?.mime;
 
         this.bindings.options.mode = {
           name: name || COMMON_EDITOR_CONFIGURATION.mode,
