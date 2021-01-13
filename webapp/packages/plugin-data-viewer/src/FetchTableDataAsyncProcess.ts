@@ -120,7 +120,7 @@ export class FetchTableDataAsyncProcess extends Deferred<SqlExecuteInfo> {
       contextId: tableDataParams.contextId,
       containerNodePath: tableDataParams.containerNodePath,
       filter,
-      dataFormat: dataFormat || undefined,
+      dataFormat,
     });
     return taskInfo;
   }
