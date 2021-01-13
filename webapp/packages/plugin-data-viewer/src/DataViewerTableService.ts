@@ -8,10 +8,12 @@
 
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource } from './ContainerDataSource';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataModel';
+import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import { IExecutionContext } from './IExecutionContext';
 import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
 import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
@@ -19,9 +21,13 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 
 @injectable()
 export class DataViewerTableService {
+  private source: ContainerDataSource;
+
   constructor(private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
-    private graphQLService: GraphQLService) {
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService) {
+    this.source = new ContainerDataSource(graphQLService, notificationService);
   }
 
   has(tableId: string): boolean {
@@ -39,7 +45,7 @@ export class DataViewerTableService {
             connectionId: model.deprecatedModel.executionContext.connectionId,
             contextId: model.deprecatedModel.executionContext.contextId,
           });
-        } catch {}
+        } catch { }
       }
     }
     this.tableViewerStorageService.remove(tableId);
@@ -61,7 +67,7 @@ export class DataViewerTableService {
         requestDataAsync: this.requestDataAsync.bind(this),
         saveChanges: this.saveChanges.bind(this),
       },
-      new ContainerDataSource(this.graphQLService)
+      this.source
         .setOptions({
           connectionId,
           containerNodePath,
@@ -123,7 +129,7 @@ export class DataViewerTableService {
   private async requestDataAsync(
     model: TableViewerModel,
     offset: number,
-    count: number
+    count: number,
   ): Promise<IRequestDataResult> {
     if (!model.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
@@ -134,25 +140,33 @@ export class DataViewerTableService {
       model.executionContext = executionContext;
     }
 
-    const { readDataFromContainer } = await this.graphQLService.sdk.readDataFromContainer({
-      connectionId: model.executionContext.connectionId,
-      contextId: model.executionContext.contextId,
-      containerNodePath: model.containerNodePath,
-      filter: {
+    const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
+
+    fetchTableProcess.start(
+      {
+        connectionId: model.executionContext.connectionId,
+        contextId: model.executionContext.contextId,
+        containerNodePath: model.containerNodePath,
+      },
+      {
         offset,
         limit: count,
         constraints: Array.from(model.getSortedColumns()),
         where: model.getQueryWhereFilter() || undefined,
       },
-    });
-    const dataSet = readDataFromContainer!.results[0].resultSet!; // we expect only one dataset for a table
+    );
+
+    this.source.currentFetchTableProcess = fetchTableProcess;
+    const response = await fetchTableProcess.promise;
+
+    const dataSet = response!.results[0].resultSet!; // we expect only one dataset for a table
     model.resultId = dataSet.id; // server generates new resultId on each fetch
 
     const result: IRequestDataResult = {
       rows: dataSet.rows!,
       columns: dataSet.columns!,
-      duration: readDataFromContainer!.duration,
-      statusMessage: readDataFromContainer!.statusMessage || '',
+      duration: response!.duration,
+      statusMessage: response!.statusMessage || '',
       isFullyLoaded: (dataSet.rows?.length || 0) < count,
     };
     return result;

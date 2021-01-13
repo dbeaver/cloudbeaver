@@ -6,11 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+
+import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
 import { DataUpdate } from './DatabaseDataModel/IDatabaseDataSource';
+import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import { IExecutionContext } from './IExecutionContext';
 
 export interface IDataContainerOptions {
@@ -25,18 +30,28 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
-  canCancel: boolean;
+  @observable currentFetchTableProcess: FetchTableDataAsyncProcess | null;
   private executionContext: IExecutionContext | null;
 
-  constructor(private graphQLService: GraphQLService) {
-    super();
-    this.executionContext = null;
-    this.canCancel = false;
+  get canCancel(): boolean {
+    return this.currentFetchTableProcess ? this.currentFetchTableProcess.getState() === EDeferredState.PENDING : false;
   }
 
-  cancel(): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  constructor(
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService,
+  ) {
+    super();
+    this.currentFetchTableProcess = null;
+    this.executionContext = null;
   }
+
+  cancel = (): boolean => {
+    if (this.currentFetchTableProcess) {
+      return this.currentFetchTableProcess.cancel();
+    }
+    throw new Error('currentFetchTableProcess must be provided to run cancel method');
+  };
 
   async request(
     prevResults: IDataContainerResult[]
@@ -44,31 +59,39 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     if (!this.options?.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
     }
+
     const executionContext = await this.ensureContextCreated();
     const limit = this.count;
 
-    const { readDataFromContainer } = await this.graphQLService.sdk.readDataFromContainer({
-      connectionId: executionContext.connectionId,
-      contextId: executionContext.contextId,
-      containerNodePath: this.options.containerNodePath,
-      filter: {
+    const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
+
+    fetchTableProcess.start(
+      {
+        connectionId: executionContext.connectionId,
+        contextId: executionContext.contextId,
+        containerNodePath: this.options.containerNodePath,
+      },
+      {
         offset: this.offset,
         limit,
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
       },
-      dataFormat: this.dataFormat,
-    });
+      this.dataFormat,
+    );
+
+    this.currentFetchTableProcess = fetchTableProcess;
+    const response = await fetchTableProcess.promise;
 
     this.requestInfo = {
-      requestDuration: readDataFromContainer?.duration || 0,
-      requestMessage: readDataFromContainer?.statusMessage || '',
+      requestDuration: response?.duration || 0,
+      requestMessage: response?.statusMessage || '',
     };
-    if (!readDataFromContainer?.results) {
+    if (!response?.results) {
       return prevResults;
     }
 
-    return readDataFromContainer.results.map<IDataContainerResult>(result => ({
+    return response.results.map<IDataContainerResult>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,

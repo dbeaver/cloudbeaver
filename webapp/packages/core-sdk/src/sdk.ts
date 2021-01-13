@@ -239,6 +239,7 @@ export interface QueryUpdateConnectionConfigurationArgs {
 }
 
 export interface Mutation {
+  asyncReadDataFromContainer: AsyncTaskInfo;
   asyncSqlExecuteQuery: AsyncTaskInfo;
   asyncSqlExecuteResults: SqlExecuteInfo;
   asyncTaskCancel?: Maybe<Scalars['Boolean']>;
@@ -256,18 +257,24 @@ export interface Mutation {
   /** @deprecated Field no longer supported */
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
-  readDataFromContainer?: Maybe<SqlExecuteInfo>;
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
   setConnectionNavigatorSettings: Scalars['Boolean'];
   sqlContextCreate: SqlContextInfo;
   sqlContextDestroy: Scalars['Boolean'];
   sqlContextSetDefaults: Scalars['Boolean'];
-  sqlExecuteQuery?: Maybe<SqlExecuteInfo>;
   sqlResultClose: Scalars['Boolean'];
   testConnection: ConnectionInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
   updateResultsData?: Maybe<SqlExecuteInfo>;
   updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
+}
+
+export interface MutationAsyncReadDataFromContainerArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  containerNodePath: Scalars['ID'];
+  filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
 }
 
 export interface MutationAsyncSqlExecuteQueryArgs {
@@ -330,14 +337,6 @@ export interface MutationOpenConnectionArgs {
   config: ConnectionConfig;
 }
 
-export interface MutationReadDataFromContainerArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  containerNodePath: Scalars['ID'];
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
-}
-
 export interface MutationSetConnectionNavigatorSettingsArgs {
   id: Scalars['ID'];
   settings: NavigatorSettingsInput;
@@ -359,14 +358,6 @@ export interface MutationSqlContextSetDefaultsArgs {
   contextId: Scalars['ID'];
   defaultCatalog?: Maybe<Scalars['ID']>;
   defaultSchema?: Maybe<Scalars['ID']>;
-}
-
-export interface MutationSqlExecuteQueryArgs {
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  sql: Scalars['String'];
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
 }
 
 export interface MutationSqlResultCloseArgs {
@@ -1206,6 +1197,21 @@ export interface GetAsyncTaskInfoMutation {
   );
 }
 
+export type AsyncReadDataFromContainerMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  containerNodePath: Scalars['ID'];
+  filter?: Maybe<SqlDataFilter>;
+  dataFormat?: Maybe<ResultDataFormat>;
+}>;
+
+export interface AsyncReadDataFromContainerMutation {
+  taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  );
+}
+
 export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -1236,27 +1242,6 @@ export interface GetSqlExecuteTaskResultsMutation {
       )>; }
     )>; }
   );
-}
-
-export type ReadDataFromContainerMutationVariables = Exact<{
-  connectionId: Scalars['ID'];
-  contextId: Scalars['ID'];
-  containerNodePath: Scalars['ID'];
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
-}>;
-
-export interface ReadDataFromContainerMutation {
-  readDataFromContainer?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
-    & { results: Array<(
-      Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
-      & { resultSet?: Maybe<(
-        Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
-      )>; }
-    )>; }
-  )>;
 }
 
 export type UpdateResultsDataMutationVariables = Exact<{
@@ -2025,6 +2010,22 @@ export const GetAsyncTaskInfoDocument = `
   }
 }
     `;
+export const AsyncReadDataFromContainerDocument = `
+    mutation asyncReadDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
+  taskInfo: asyncReadDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter, dataFormat: $dataFormat) {
+    id
+    name
+    running
+    status
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+    taskResult
+  }
+}
+    `;
 export const AsyncSqlExecuteQueryDocument = `
     mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
   taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter, dataFormat: $dataFormat) {
@@ -2044,39 +2045,6 @@ export const AsyncSqlExecuteQueryDocument = `
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
-    duration
-    statusMessage
-    results {
-      title
-      updateRowCount
-      sourceQuery
-      dataFormat
-      resultSet {
-        id
-        columns {
-          dataKind
-          entityName
-          fullTypeName
-          icon
-          label
-          maxLength
-          name
-          position
-          precision
-          readOnly
-          scale
-          typeName
-        }
-        rows
-        hasMoreData
-      }
-    }
-  }
-}
-    `;
-export const ReadDataFromContainerDocument = `
-    mutation readDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
-  readDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter, dataFormat: $dataFormat) {
     duration
     statusMessage
     results {
@@ -2476,14 +2444,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables): Promise<GetAsyncTaskInfoMutation> {
       return withWrapper(() => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables));
     },
+    asyncReadDataFromContainer(variables: AsyncReadDataFromContainerMutationVariables): Promise<AsyncReadDataFromContainerMutation> {
+      return withWrapper(() => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables));
+    },
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
       return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
     },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
-    },
-    readDataFromContainer(variables: ReadDataFromContainerMutationVariables): Promise<ReadDataFromContainerMutation> {
-      return withWrapper(() => client.request<ReadDataFromContainerMutation>(ReadDataFromContainerDocument, variables));
     },
     updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
       return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));
