@@ -96,7 +96,7 @@ export class TableDataModel {
   @action
   insertRows(position: number, rows: TableRow[]) {
     if (rows.length > 0) {
-      if (position > this.rows.length) {
+      if (position + rows.length > this.rows.length) {
         this.rows.length = position + rows.length;
       }
 

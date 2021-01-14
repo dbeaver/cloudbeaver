@@ -98,7 +98,12 @@ export const TableViewer = observer(function TableViewer({
           onPresentationChange={handlePresentationChange}
         />
         <table-data as='div'>
-          <TableGrid model={dataModel} presentation={presentation} />
+          {dataFormat !== presentation.dataFormat ? (
+            // eslint-disable-next-line react/no-unescaped-entities
+            <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>
+          ) : (
+            <TableGrid model={dataModel} presentation={presentation} />
+          )}
           <TableFooter model={dataModel} resultIndex={resultIndex} />
         </table-data>
       </table-content>

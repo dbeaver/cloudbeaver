@@ -203,8 +203,8 @@ implements IInitializableController, IDestructibleController {
       sqlExecutingState,
       this.group.sqlQueryParams,
       {
-        offset,
-        limit: count,
+        offset: 0,
+        limit: offset + count,
         constraints: Array.from(model.getSortedColumns()),
         where: model.getQueryWhereFilter() || undefined,
       },
@@ -212,6 +212,7 @@ implements IInitializableController, IDestructibleController {
     );
 
     this.source.sqlProcess = metadata.resultDataProcess;
+    this.source.setSlice(0, offset + count);
     const response = await metadata.resultDataProcess.promise;
     const dataResults = this.sqlResultService.sqlExecuteInfoToData(
       response,

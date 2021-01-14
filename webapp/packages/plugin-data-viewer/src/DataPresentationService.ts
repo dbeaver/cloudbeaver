@@ -60,7 +60,7 @@ export class DataPresentationService {
     if (presentationId) {
       const presentation = this.dataPresentations.get(presentationId);
 
-      if (presentation?.dataFormat === dataFormat) {
+      if (presentation) {
         return presentation;
       }
     }

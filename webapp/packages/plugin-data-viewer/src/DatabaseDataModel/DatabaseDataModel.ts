@@ -43,6 +43,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.isLoading();
   }
 
+  isDataAvailable(offset: number, count: number): boolean {
+    return this.source.offset <= offset && this.source.count >= count;
+  }
+
   async refresh(): Promise<void> {
     await this.requestData();
   }
@@ -93,6 +97,13 @@ implements IDatabaseDataModel<TOptions, TResult> {
   setOptions(options: TOptions): this {
     this.source.setOptions(options);
     return this;
+  }
+
+  async requestDataPortion(offset: number, count: number): Promise<void> {
+    if (!this.isDataAvailable(offset, count)) {
+      this.source.setSlice(offset, count);
+      this.results = await this.source.requestData(this.results);
+    }
   }
 
   async requestData(): Promise<void> {

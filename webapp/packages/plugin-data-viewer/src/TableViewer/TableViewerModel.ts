@@ -288,40 +288,33 @@ export class TableViewerModel {
 
   async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
     // try to return data from cache
-    if (this.tableDataModel.isChunkLoaded(rowOffset, count) || this.isFullyLoaded) {
-      const data: IRequestedData = {
-        rows: this.tableDataModel.getChunk(rowOffset, count),
-        columns: this.tableDataModel.getColumns(),
-        isFullyLoaded: this.isFullyLoaded,
-      };
-      return data;
-    }
+    if (!this.tableDataModel.isChunkLoaded(rowOffset, count) && !this.isFullyLoaded) {
+      this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
+      this.loading = true;
 
-    this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
-    this.loading = true;
+      try {
+        const response = await this.requestDataAsync(this, rowOffset, count);
 
-    try {
-      const response = await this.requestDataAsync(this, rowOffset, count);
-
-      this.insertRows(rowOffset, response.rows, !response.isFullyLoaded);
-      if (!this.tableDataModel.getColumns().length) {
-        this.tableDataModel.setColumns(response.columns);
+        this.insertRows(0, response.rows, !response.isFullyLoaded);
+        if (!this.tableDataModel.getColumns().length) {
+          this.tableDataModel.setColumns(response.columns);
+        }
+        this.clearErrors();
+        this.updateInfo(response.statusMessage, response.duration);
+      } catch (e) {
+        this.showError(e);
+        throw e;
+      } finally {
+        this.loading = false;
+        this._isLoaderVisible = false;
       }
-      this.clearErrors();
-      this.updateInfo(response.statusMessage, response.duration);
-      const data: IRequestedData = {
-        rows: response.rows,
-        columns: response.columns,
-        isFullyLoaded: response.isFullyLoaded,
-      };
-      return data;
-    } catch (e) {
-      this.showError(e);
-      throw e;
-    } finally {
-      this.loading = false;
-      this._isLoaderVisible = false;
     }
+
+    return {
+      rows: this.tableDataModel.getChunk(rowOffset, count),
+      columns: this.tableDataModel.getColumns(),
+      isFullyLoaded: this.isFullyLoaded,
+    };
   }
 
   onCellEditingStopped(rowNumber: number, column: string, value: any, editing: boolean): void {

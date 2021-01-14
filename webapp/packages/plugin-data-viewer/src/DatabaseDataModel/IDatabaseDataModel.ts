@@ -26,6 +26,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   readonly countGain: number;
 
   isLoading: () => boolean;
+  isDataAvailable: (offset: number, count: number) => boolean;
 
   getResult: (index: number) => TResult | null;
 
@@ -38,5 +39,6 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
 
   refresh: () => Promise<void>;
   reload: () => Promise<void>;
+  requestDataPortion: (offset: number, count: number) => Promise<void>;
   requestData: () => Promise<void>;
 }

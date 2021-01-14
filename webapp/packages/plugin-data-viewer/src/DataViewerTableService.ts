@@ -56,9 +56,14 @@ export class DataViewerTableService {
           offset: number,
           count: number,
         ): Promise<IRequestDataResult> => {
-          await dataModel
-            .setSlice(0, dataModel.countGain + dataModel.source.count)
-            .requestData();
+          source.setOptions({
+            connectionId,
+            containerNodePath,
+            constraints: Array.from(model.getSortedColumns()),
+            whereFilter: '',
+          });
+          dataModel.setSlice(0, offset + count);
+          await dataModel.requestData();
 
           const result = dataModel.getResult(0);
 
