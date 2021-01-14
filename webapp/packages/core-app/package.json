@@ -32,7 +32,7 @@
     "@cloudbeaver/core-executor": "^0.1.0",
     "react": "^16.x.x",
     "react-dom": "^16.x.x",
-    "reakit": "^1.1.1",
+    "reakit": "^1.x.x",
     "rxjs": "^6.x.x",
     "mobx": "^5.x.x",
     "mobx-react": "^6.x.x"
