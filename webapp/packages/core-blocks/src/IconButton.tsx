@@ -22,7 +22,10 @@ const styles = css`
     margin: 4px;
     height: 16px;
     width: 16px;
-
+    
+    &:active {
+      opacity: 0.7;
+    }
     & Icon {
       width: 100%;
       height: 100%;
