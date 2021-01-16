@@ -6,20 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import { observable } from 'mobx';
+
+import { NotificationService } from '@cloudbeaver/core-events';
+import { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import { EDeferredState } from '@cloudbeaver/core-utils';
 import {
-  DatabaseDataSource, DataUpdate, IDatabaseDataResult
+  DatabaseDataSource, DataUpdate, IDatabaseDataResult, IRequestDataResult, RowDiff
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlEditorGroupMetadata } from './ISqlEditorGroupMetadata';
 import { IQueryTabGroup } from './ISqlEditorTabState';
-import { SqlEditorGroupMetadataService } from './SqlEditorGroupMetadataService';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 export interface IDataContainerOptions {
   tabId: string;
-  resultTabId: string;
   sourceName: string;
   connectionId: string;
   whereFilter: string;
@@ -32,21 +33,26 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 }
 
 export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
-  canCancel: boolean;
+  get canCancel(): boolean {
+    return this.queryExecutionProcess?.getState() === EDeferredState.PENDING;
+  }
 
-  sqlProcess: SQLQueryExecutionProcess | null = null;
-  private metadata!: ISqlEditorGroupMetadata;
+  @observable queryExecutionProcess: SQLQueryExecutionProcess | null;
 
   constructor(
-    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService,
     private sqlResultTabsService: SqlResultTabsService
   ) {
     super();
-    this.canCancel = false;
+    this.queryExecutionProcess = null;
   }
 
-  cancel(): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  cancel(): boolean {
+    if (this.queryExecutionProcess) {
+      this.queryExecutionProcess.cancel();
+    }
+    return false;
   }
 
   save(
@@ -58,7 +64,6 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
 
   setOptions(options: IDataContainerOptions): this {
     this.options = options;
-    this.metadata = this.sqlEditorGroupMetadataService.getTabData(options.resultTabId);
     return this;
   }
 
@@ -89,10 +94,13 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       return prevResults;
     }
     const limit = this.count;
-
     const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.options.tabId);
-    this.metadata.start(
-      sqlExecutionContext,
+
+    this.queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
+
+    sqlExecutionContext.setCurrentlyExecutingQuery(this.queryExecutionProcess);
+
+    await this.queryExecutionProcess.start(
       this.options.group.sqlQueryParams,
       {
         offset: this.offset,
@@ -103,8 +111,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       this.dataFormat
     );
 
-    this.sqlProcess = this.metadata.resultDataProcess;
-    const response = await this.metadata.resultDataProcess.promise;
+    const response = await this.queryExecutionProcess.promise;
 
     const results = this.getResults(response, limit);
 
@@ -115,11 +122,40 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return results;
   }
 
-  async dispose(): Promise<void> {
-    if (!this.options) {
-      return;
+  async saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
+    const params = this.options?.group.sqlQueryParams;
+    if (!params) {
+      throw new Error('sqlQueryParams must be provided');
     }
 
-    await this.metadata.dispose(this.options.group.sqlQueryParams);
+    const response = await this.graphQLService.sdk.updateResultsDataBatch({
+      connectionId: params.connectionId,
+      contextId: params.contextId,
+      resultsId: resultId,
+      updatedRows: rows.map(row => ({ data: row.source, updateValues: row.values })),
+    });
+
+    const dataSet = response.result?.results[0].resultSet; // we expect only one dataset for a save
+
+    if (!dataSet) {
+      throw new Error('Response result wasn\'t provided');
+    }
+
+    this.requestInfo = {
+      requestDuration: response.result?.duration || 0,
+      requestMessage: 'Saved successfully',
+    };
+
+    return {
+      rows: dataSet.rows!,
+      columns: [], // not in use while saving data
+      duration: response.result?.duration,
+      isFullyLoaded: false, // not in use while saving data
+      statusMessage: 'Saved successfully',
+    };
+  }
+
+  async dispose(): Promise<void> {
+    // TODO: this.queryExecutionProcess maybe should be disposed somehow
   }
 }

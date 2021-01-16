@@ -14,6 +14,7 @@ import { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 
 export interface IDataPresentationProps {
   model: IDatabaseDataModel<any>;
+  resultIndex: number;
   className?: string;
 }
 

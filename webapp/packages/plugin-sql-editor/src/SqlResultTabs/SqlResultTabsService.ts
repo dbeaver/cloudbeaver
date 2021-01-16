@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap, isPromiseCancelledError } from '@cloudbeaver/core-utils';
-import { fetchingSettings } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataAccessMode, DataModelWrapper, fetchingSettings, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlEditorGroupMetadata } from '../ISqlEditorGroupMetadata';
 import {
   IQueryTabGroup, ISqlEditorTabState, ISqlQueryParams, IResultDataTab
 } from '../ISqlEditorTabState';
+import { QueryDataSource } from '../QueryDataSource';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
-import { SqlEditorGroupMetadataService } from '../SqlEditorGroupMetadataService';
 import { SqlExecutionState } from '../SqlExecutionState';
 
 @injectable()
@@ -24,8 +25,11 @@ export class SqlResultTabsService {
   private tabExecutionContext: MetadataMap<string, SqlExecutionState>;
 
   constructor(
-    private sqlEditorGroupMetadataService: SqlEditorGroupMetadataService,
     private sqlDialectInfoService: SqlDialectInfoService,
+    private tableViewerStorageService: TableViewerStorageService,
+    private graphQLService: GraphQLService,
+    private notificationService: NotificationService,
+    private connectionInfoResource: ConnectionInfoResource,
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
@@ -54,45 +58,49 @@ export class SqlResultTabsService {
       return;
     }
 
-    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(editorState.connectionId);
-    const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
-
-    if (dialectInfo?.scriptDelimiter && query.endsWith(dialectInfo?.scriptDelimiter)) {
-      query = query.slice(0, query.length - dialectInfo.scriptDelimiter.length);
-    }
-
+    let source: QueryDataSource;
+    let model: DataModelWrapper;
     let tabGroup: IQueryTabGroup;
+    let isNewTabCreated = false;
+
+    const connectionInfo = await this.connectionInfoResource.load(editorState.connectionId);
+    const currentTab = editorState.resultTabs.find(tab => tab.resultTabId === editorState.currentResultTabId);
 
     const sqlQueryParams: ISqlQueryParams = {
       connectionId: editorState.connectionId,
       objectCatalogId: editorState.objectCatalogId,
       objectSchemaId: editorState.objectSchemaId,
       contextId: editorState.contextId,
-      query,
+      query: await this.getSubQuery(editorState.connectionId, query),
     };
 
-    let isNewTabCreated = false;
-
     if (inNewTab || !currentTab?.groupId) {
-      const order = findMinimalFree(
-        editorState.queryTabGroups.map(group => group.order),
-        1
-      );
+      source = new QueryDataSource(this.graphQLService, this.notificationService, this);
+      model = this.tableViewerStorageService.create(source);
 
-      tabGroup = {
-        groupId: uuid(),
-        order,
-        sqlQueryParams,
-      };
-      editorState.queryTabGroups.push(tabGroup);
+      tabGroup = this.createGroup(sqlQueryParams, editorState, model.id);
 
       isNewTabCreated = true;
     } else {
       tabGroup = editorState.queryTabGroups.find(group => group.groupId === currentTab.groupId)!;
       tabGroup.sqlQueryParams = sqlQueryParams;
+      model = this.tableViewerStorageService.get(tabGroup.modelId)!;
+      source = model.source as any as QueryDataSource;
     }
 
-    let editorMetadata: ISqlEditorGroupMetadata;
+    model
+      .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
+
+    source.setOptions({
+      tabId: tabId,
+      group: tabGroup,
+      connectionId: sqlQueryParams.connectionId,
+      sourceName: sqlQueryParams.query,
+      constraints: [],
+      whereFilter: '',
+    })
+      .setExecutionContext(sqlQueryParams)
+      .setSupportedDataFormats(connectionInfo.supportedDataFormats);
 
     for (let [i, length] = [0, 1]; i < length; i++) {
       let resultTab = editorState.resultTabs.find(
@@ -117,22 +125,11 @@ export class SqlResultTabsService {
         editorState.currentResultTabId = resultTab.resultTabId;
 
         try {
-          editorMetadata = this.sqlEditorGroupMetadataService.getTabData(resultTab.resultTabId);
+          await model
+            .setSlice(0, fetchingSettings.fetchDefault)
+            .requestData();
 
-          // we should first render table, because we expect that table request first data portion
-          await editorMetadata.start(
-            this.getTabExecutionContext(tabId),
-            sqlQueryParams,
-            {
-              offset: 0,
-              limit: fetchingSettings.fetchDefault,
-            },
-            ResultDataFormat.Resultset
-          );
-
-          const data = await editorMetadata.resultDataProcess.promise;
-
-          length = data.results?.length || 1;
+          length = model.results.length;
 
           if (length === 1) {
             resultTab.name = this.getTabNameForOrder(tabGroup.order);
@@ -148,18 +145,48 @@ export class SqlResultTabsService {
         } catch (exception) {
           // remove first panel if execution was cancelled
           if (isPromiseCancelledError(exception) && isNewTabCreated) {
-            editorState.queryTabGroups = editorState.queryTabGroups.filter(group => group.groupId !== tabGroup.groupId);
-            editorState.resultTabs = editorState.resultTabs.filter(tab => tab.groupId !== tabGroup.groupId);
-            editorState.currentResultTabId = editorState.resultTabs[0]?.resultTabId;
+            this.removeGroup(editorState, tabGroup.groupId);
           }
-          return;
         }
-      } else {
-        this.sqlEditorGroupMetadataService
-          .getTabData(resultTab.resultTabId)
-          .resultDataProcess = editorMetadata!.resultDataProcess;
       }
     }
+  }
+
+  createGroup(
+    params: ISqlQueryParams,
+    tabState: ISqlEditorTabState,
+    modelId: string
+  ): IQueryTabGroup {
+    const order = findMinimalFree(
+      tabState.queryTabGroups.map(group => group.order),
+      1
+    );
+
+    const tabGroup: IQueryTabGroup = {
+      groupId: uuid(),
+      modelId,
+      order,
+      sqlQueryParams: params,
+    };
+    tabState.queryTabGroups.push(tabGroup);
+
+    return tabState.queryTabGroups.find(group => group.groupId === tabGroup.groupId)!;
+  }
+
+  async getSubQuery(connectionId: string, query: string): Promise<string> {
+    const dialectInfo = await this.sqlDialectInfoService.loadSqlDialectInfo(connectionId);
+
+    if (dialectInfo?.scriptDelimiter && query.endsWith(dialectInfo?.scriptDelimiter)) {
+      return query.slice(0, query.length - dialectInfo.scriptDelimiter.length);
+    }
+
+    return query;
+  }
+
+  removeGroup(tabState: ISqlEditorTabState, groupId: string): void {
+    tabState.queryTabGroups = tabState.queryTabGroups.filter(group => group.groupId !== groupId);
+    tabState.resultTabs = tabState.resultTabs.filter(tab => tab.groupId !== groupId);
+    tabState.currentResultTabId = tabState.resultTabs[0]?.resultTabId;
   }
 
   private createResultTab(

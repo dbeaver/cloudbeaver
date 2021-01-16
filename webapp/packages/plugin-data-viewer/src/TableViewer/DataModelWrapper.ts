@@ -10,12 +10,15 @@ import { observable } from 'mobx';
 
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { GQLError } from '@cloudbeaver/core-sdk';
 
+import { IDataContainerOptions } from '../ContainerDataSource';
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
+import { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
-import { ITableViewerModelOptions, TableViewerModel } from './TableViewerModel';
+import { RowDiff } from './TableDataModel/EditedRow';
+import { IRequestDataResult, TableViewerModel } from './TableViewerModel';
 
 const fetchingSettings = {
   fetchMin: 100,
@@ -23,20 +26,16 @@ const fetchingSettings = {
   fetchDefault: 200,
 };
 
-export class DataModelWrapper extends DatabaseDataModel<any> {
+export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, IDatabaseDataResult> {
   /**
    * @deprecated Use getModel instead
    */
-  readonly deprecatedModel: TableViewerModel;
+  @observable deprecatedModels: TableViewerModel[];
 
   /**
    * @deprecated will be refactored
    */
   get message() {
-    if (this.deprecatedModel.errorMessage.length > 0) {
-      return this.deprecatedModel.errorMessage;
-    }
-
     return this.errorMessage;
   }
 
@@ -44,7 +43,7 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
    * @deprecated will be refactored
    */
   get details() {
-    return this.deprecatedModel.hasDetails || this.hasDetails;
+    return this.hasDetails;
   }
 
   @observable private errorMessage: string;
@@ -53,52 +52,52 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
 
   constructor(
     private commonDialogService: CommonDialogService,
-    options: ITableViewerModelOptions,
     source: IDatabaseDataSource<any>
   ) {
     super(source);
-    if (options.tableId) {
-      this.id = options.tableId;
-    }
     this.countGain = this.getDefaultRowsCount();
     this.exception = null;
     this.errorMessage = '';
     this.hasDetails = false;
-    this.deprecatedModel = new TableViewerModel(options, commonDialogService);
+    this.deprecatedModels = [];
   }
 
   isLoading(): boolean {
-    return !this.deprecatedModel.noLoaderWhileRequestingDataAsync && (
-      this.deprecatedModel.isLoaderVisible || this.source.isLoading()
-    );
+    return this.source.isLoading();
+  }
+
+  /**
+   * @deprecated will be removed
+   */
+  getOldModel(resultIndex: number): TableViewerModel | null {
+    return this.deprecatedModels[resultIndex] || null;
   }
 
   async reload(): Promise<void> {
-    if (this.source.dataFormat === ResultDataFormat.Resultset) {
-      await this.deprecatedModel.refresh();
-    }
     this.setSlice(0, this.countGain);
     await this.requestData();
   }
 
   async refresh(): Promise<void> {
-    if (this.source.dataFormat === ResultDataFormat.Resultset) {
-      await this.deprecatedModel.refresh();
-      return;
-    }
     await this.requestData();
   }
 
   setCountGain(count: number): this {
     const realCount = this.getDefaultRowsCount(count);
     this.countGain = realCount;
-    this.deprecatedModel.setChunkSize(realCount);
+
+    for (const model of this.deprecatedModels) {
+      model.setChunkSize(realCount);
+    }
     return this;
   }
 
   setAccess(access: DatabaseDataAccessMode): this {
     this.access = access;
-    this.deprecatedModel.access = access;
+
+    for (const model of this.deprecatedModels) {
+      model.access = access;
+    }
     return this;
   }
 
@@ -111,22 +110,88 @@ export class DataModelWrapper extends DatabaseDataModel<any> {
     this.clearErrors();
     try {
       this.results = await this.source.requestData(this.results);
+      await this.setDeprecatedModelData();
     } catch (exception) {
       this.showError(exception);
       throw exception;
     }
   }
 
+  async requestDataPortion(offset: number, count: number): Promise<void> {
+    if (!this.isDataAvailable(offset, count)) {
+      this.source.setSlice(offset, count);
+      this.results = await this.source.requestData(this.results);
+      await this.setDeprecatedModelData();
+    }
+  }
+
   showDetails = (): void => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
-    } else {
-      this.deprecatedModel.onShowDetails();
     }
   };
 
   async dispose(): Promise<void> {
     await this.source.dispose();
+  }
+
+  /**
+   * @deprecated will be removed
+   */
+  private async setDeprecatedModelData() {
+    if (this.deprecatedModels.length !== this.results.length) {
+      this.deprecatedModels = this.deprecatedModels.slice(0, this.results.length);
+
+      for (let i = this.deprecatedModels.length; i < this.results.length; i++) {
+        this.deprecatedModels.push(new TableViewerModel({
+          access: this.access,
+          requestDataAsync: async (
+            model: TableViewerModel,
+            offset: number,
+            count: number,
+          ): Promise<IRequestDataResult> => {
+            this.source.setOptions({
+              ...this.source.options!,
+              constraints: Array.from(model.getSortedColumns()),
+            });
+            this.setSlice(0, offset + count);
+            await this.requestData();
+
+            const result = this.getResult(i);
+
+            if (!result) {
+              throw new Error('Result not exists');
+            }
+
+            return {
+              rows: result.data.rows!,
+              columns: result.data.columns!,
+              duration: this.source.requestInfo.requestDuration,
+              statusMessage: this.source.requestInfo.requestMessage,
+              isFullyLoaded: result.loadedFully,
+            };
+          },
+          saveChanges: async (data: TableViewerModel, rows: RowDiff[]): Promise<IRequestDataResult> => {
+            const result = this.getResult(i);
+
+            if (!result) {
+              throw new Error('It is expected that result was set after first fetch');
+            }
+
+            return await this.source.saveDataDeprecated(result.id, rows);
+          },
+        }, this.commonDialogService));
+      }
+    }
+
+    for (let i = 0; i < this.results.length; i++) {
+      const model = this.getOldModel(i)!;
+      const result = this.getResult(i)!;
+
+      model.refresh();
+      model.setColumns(result.data.columns);
+      model.insertRows(0, result.data.rows, !result.loadedFully);
+    }
   }
 
   private showError(exception: any) {

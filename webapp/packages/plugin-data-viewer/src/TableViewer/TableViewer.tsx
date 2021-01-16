@@ -34,7 +34,7 @@ const viewerStyles = css`
     flex: 1;
     overflow: hidden;
   }
-  table-data {
+  table-data, table-box {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -98,12 +98,14 @@ export const TableViewer = observer(function TableViewer({
           onPresentationChange={handlePresentationChange}
         />
         <table-data as='div'>
-          {dataFormat !== presentation.dataFormat ? (
-            // eslint-disable-next-line react/no-unescaped-entities
-            <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>
-          ) : (
-            <TableGrid model={dataModel} presentation={presentation} />
-          )}
+          <table-box as='div'>
+            <TableGrid
+              model={dataModel}
+              dataFormat={dataFormat}
+              presentation={presentation}
+              resultIndex={resultIndex}
+            />
+          </table-box>
           <TableFooter model={dataModel} resultIndex={resultIndex} />
         </table-data>
       </table-content>

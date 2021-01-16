@@ -32,12 +32,15 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        return !context.data.model.deprecatedModel.isEdited();
+        if (context.data.model.deprecatedModels.length === 0) {
+          return true;
+        }
+        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
-      onClick: context => context.data.model.deprecatedModel.saveChanges(),
+      onClick: context => context.data.model.getOldModel(context.data.resultIndex)?.saveChanges(),
     });
     this.registerMenuItem({
       id: 'cancel ',
@@ -45,12 +48,15 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        return !context.data.model.deprecatedModel.isEdited();
+        if (context.data.model.deprecatedModels.length === 0) {
+          return true;
+        }
+        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
       },
       order: 2,
       title: 'ui_processing_cancel',
       icon: 'table-cancel',
-      onClick: context => context.data.model.deprecatedModel.cancelChanges(),
+      onClick: context => context.data.model.getOldModel(context.data.resultIndex)?.cancelChanges(),
     });
   }
 

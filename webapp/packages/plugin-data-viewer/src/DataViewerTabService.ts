@@ -97,11 +97,21 @@ export class DataViewerTabService {
       return;
     }
 
-    await this.dataViewerTableService.create(
-      tab.id,
-      NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId),
-      tab.handlerState.objectId
-    );
+    let model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
+
+    if (!model) {
+      model = await this.dataViewerTableService.create(
+        NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId),
+        tab.handlerState.objectId
+      );
+      tab.handlerState.tableId = model.id;
+    }
+
+    // TODO: used for initial data fetch, but can repeat request each time data tab is selected,
+    //       so probably should be refactored and managed by presentation
+    if (model.results.length === 0) {
+      await model.requestData();
+    }
   }
 
   private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
@@ -109,6 +119,8 @@ export class DataViewerTabService {
   }
 
   private handleTabClose(tab: ITab<IObjectViewerTabState>) {
-    this.dataViewerTableService.removeTableModel(tab.id);
+    if (tab.handlerState.tableId) {
+      this.dataViewerTableService.removeTableModel(tab.handlerState.tableId);
+    }
   }
 }

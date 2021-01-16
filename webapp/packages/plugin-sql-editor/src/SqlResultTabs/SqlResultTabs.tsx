@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 
 import { ITab as TabClass } from '@cloudbeaver/core-app';
 import {
-  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, Loader, ITabData
+  Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, ITabData
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -21,8 +21,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorNavigatorService } from '../SqlEditorNavigatorService';
-import { SqlResultPanel } from './SqlResultPanel/SqlResultPanel';
-import { SqlResultTabsService } from './SqlResultTabsService';
+import { SqlResultPanel } from './SqlResultPanel';
 
 const styles = composes(
   css`
@@ -54,7 +53,6 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
   const style = useStyles(styles);
   const translate = useTranslate();
   const navigatorService = useService(SqlEditorNavigatorService);
-  const sqlResultTabsService = useService(SqlResultTabsService);
 
   const orderedTabs = useMemo(
     () => computed(
@@ -83,8 +81,6 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
 
   const currentId = tab.handlerState.currentResultTabId || '';
 
-  const executionState = sqlResultTabsService.getTabExecutionContext(tab.id);
-
   return styled(style)(
     <wrapper as="div">
       <TabsBox
@@ -102,12 +98,6 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
           </TabPanel>
         ))}
       </TabsBox>
-      <Loader
-        loading={executionState.isSqlExecuting}
-        cancelDisabled={!executionState.canCancel}
-        overlay
-        onCancel={executionState.cancelSQlExecuting}
-      />
     </wrapper>
   );
 });

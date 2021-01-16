@@ -29,9 +29,10 @@ export interface IResultDataTab {
 }
 
 export interface IQueryTabGroup {
-  order: number;
   groupId: string;
+  modelId: string;
   sqlQueryParams: ISqlQueryParams;
+  order: number;
 }
 
 export interface ISqlEditorTabState extends Partial<IExecutionContext> {

@@ -12,7 +12,7 @@ import { Subject, Observable } from 'rxjs';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
-import { uuid, MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import { ErrorDialog } from './ErrorDialog';
@@ -61,11 +61,6 @@ export interface IRequestDataResultOptions extends IRequestDataOptions {
 }
 
 export interface ITableViewerModelOptions {
-  tableId?: string;
-  connectionId: string;
-  containerNodePath?: string;
-  sourceName?: string; // TODO: refactor it, used for showing sql query for export
-  noLoaderWhileRequestingDataAsync?: boolean;
   access?: DatabaseDataAccessMode;
   requestDataAsync: (
     model: TableViewerModel,
@@ -84,12 +79,6 @@ export interface IRequestDataResult {
 }
 
 export class TableViewerModel {
-  tableId: string;
-  connectionId: string;
-  containerNodePath?: string;
-  sourceName?: string;
-  noLoaderWhileRequestingDataAsync?: boolean;
-
   @observable access: DatabaseDataAccessMode;
 
   requestDataAsync: (
@@ -104,22 +93,12 @@ export class TableViewerModel {
     return this.tableDataModel.isEmpty();
   }
 
-  get isLoaderVisible(): boolean {
-    return this._isLoaderVisible;
-  }
-
   get isFullyLoaded(): boolean {
     return !this._hasMoreRows;
   }
 
   getChunkSize = (): number => this._chunkSize;
   setChunkSize = (count: number): void => this.updateChunkSize(count);
-
-  @observable queryDuration = 0;
-  @observable requestStatusMessage = '';
-
-  @observable errorMessage = '';
-  @observable hasDetails = false;
 
   readonly tableDataModel = new TableDataModel();
   readonly tableEditor = new TableEditor(this.tableDataModel);
@@ -132,11 +111,8 @@ export class TableViewerModel {
   private loading = false;
 
   @observable private _hasMoreRows = true;
-  @observable private _isLoaderVisible = false;
   @observable private _chunkSize: number = this.getDefaultRowsCount();
-  @observable private queryWhereFilter: string | null = null;
 
-  private exception: GQLError | null = null;
   private sortedColumns = new MetadataMap<string, SqlDataFilterConstraint>(
     (colId, metadata) => ({ attribute: colId, orderPosition: metadata.count(), orderAsc: false })
   );
@@ -145,11 +121,6 @@ export class TableViewerModel {
     options: ITableViewerModelOptions,
     private commonDialogService: CommonDialogService
   ) {
-    this.tableId = options.tableId || uuid();
-    this.connectionId = options.connectionId;
-    this.containerNodePath = options.containerNodePath;
-    this.sourceName = options.sourceName;
-    this.noLoaderWhileRequestingDataAsync = options.noLoaderWhileRequestingDataAsync;
     this.access = options.access || DatabaseDataAccessMode.Default;
     this.requestDataAsync = options.requestDataAsync;
     this._saveChanges = options.saveChanges;
@@ -161,33 +132,16 @@ export class TableViewerModel {
 
   cancelFetch = (): void => { };
 
-  refresh = async (skipResetUpdate = false): Promise<void> => {
+  refresh = (skipResetUpdate = false): void => {
     if (!skipResetUpdate && this.isUpdateLocked()) {
       return;
     }
 
     this.resetData();
-    // if (skipDataLoad) {
-    //   await this.onRequestData(0, this.getChunkSize());
-    // }
     if (!skipResetUpdate) {
       this.resetSubject.next();
     }
   };
-
-  onShowDetails = (): void => {
-    if (this.exception) {
-      this.commonDialogService.open(ErrorDetailsDialog, this.exception);
-    }
-  };
-
-  getQueryWhereFilter(): string | null {
-    return this.queryWhereFilter;
-  }
-
-  setQueryWhereFilter(where: string | null): void {
-    this.queryWhereFilter = where;
-  }
 
   getSortedColumns(): IterableIterator<SqlDataFilterConstraint> {
     return this.sortedColumns.values();
@@ -216,12 +170,6 @@ export class TableViewerModel {
   @action
   setColumns(columns: TableColumn[]): void {
     this.tableDataModel.setColumns(columns);
-  }
-
-  @action
-  updateInfo(status: string, duration?: number): void {
-    this.queryDuration = duration || 0;
-    this.requestStatusMessage = status;
   }
 
   isEdited(): boolean {
@@ -289,7 +237,6 @@ export class TableViewerModel {
   async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {
     // try to return data from cache
     if (!this.tableDataModel.isChunkLoaded(rowOffset, count) && !this.isFullyLoaded) {
-      this._isLoaderVisible = !this.noLoaderWhileRequestingDataAsync;
       this.loading = true;
 
       try {
@@ -299,14 +246,8 @@ export class TableViewerModel {
         if (!this.tableDataModel.getColumns().length) {
           this.tableDataModel.setColumns(response.columns);
         }
-        this.clearErrors();
-        this.updateInfo(response.statusMessage, response.duration);
-      } catch (e) {
-        this.showError(e);
-        throw e;
       } finally {
         this.loading = false;
-        this._isLoaderVisible = false;
       }
     }
 
@@ -365,40 +306,13 @@ export class TableViewerModel {
   private resetData() {
     this.tableDataModel.resetData();
     this.tableEditor.cancelChanges(true);
-    this.requestStatusMessage = '';
-    this.queryDuration = 0;
     this._hasMoreRows = true;
-    this.errorMessage = '';
   }
 
   private async trySaveChanges(diffs: RowDiff[]) {
-    this._isLoaderVisible = true;
+    const data = await this._saveChanges(this, diffs);
 
-    try {
-      const data = await this._saveChanges(this, diffs);
-
-      this.tableEditor.applyChanges(data.rows);
-      this.clearErrors();
-      this.updateInfo(data.statusMessage, data.duration);
-    } finally {
-      this._isLoaderVisible = false;
-    }
-  }
-
-  private showError(exception: any) {
-    this.exception = null;
-    this.hasDetails = false;
-    if (exception instanceof GQLError) {
-      this.errorMessage = exception.errorText;
-      this.exception = exception;
-      this.hasDetails = exception.hasDetails();
-    } else {
-      this.errorMessage = `${exception.name}: ${exception.message}`;
-    }
-  }
-
-  private clearErrors() {
-    this.errorMessage = '';
+    this.tableEditor.applyChanges(data.rows);
   }
 
   private getDefaultRowsCount(count?: number) {

@@ -13,8 +13,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource } from './ContainerDataSource';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataModel';
-import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult, TableViewerModel } from './TableViewer/TableViewerModel';
+import { DataModelWrapper } from './TableViewer/DataModelWrapper';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
@@ -29,6 +28,10 @@ export class DataViewerTableService {
     return this.tableViewerStorageService.has(tableId);
   }
 
+  get(modelId: string): DataModelWrapper | undefined {
+    return this.tableViewerStorageService.get(modelId);
+  }
+
   async removeTableModel(tableId: string): Promise<void> {
     const model = this.tableViewerStorageService.get(tableId);
     if (model) {
@@ -38,57 +41,13 @@ export class DataViewerTableService {
   }
 
   async create(
-    tabId: string,
     connectionId: string,
     containerNodePath = ''
-  ): Promise<TableViewerModel> {
+  ): Promise<DataModelWrapper> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
     const source = new ContainerDataSource(this.graphQLService, this.notificationService);
 
     const dataModel = this.tableViewerStorageService.create(
-      {
-        tableId: tabId,
-        connectionId,
-        containerNodePath,
-        access: connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default,
-        requestDataAsync: async (
-          model: TableViewerModel,
-          offset: number,
-          count: number,
-        ): Promise<IRequestDataResult> => {
-          source.setOptions({
-            connectionId,
-            containerNodePath,
-            constraints: Array.from(model.getSortedColumns()),
-            whereFilter: '',
-          });
-          dataModel.setSlice(0, offset + count);
-          await dataModel.requestData();
-
-          const result = dataModel.getResult(0);
-
-          if (!result) {
-            throw new Error('Result not exists');
-          }
-
-          return {
-            rows: result.data.rows!,
-            columns: result.data.columns!,
-            duration: dataModel.source.requestInfo.requestDuration,
-            statusMessage: dataModel.source.requestInfo.requestMessage,
-            isFullyLoaded: result.loadedFully,
-          };
-        },
-        saveChanges: async (data: TableViewerModel, rows: RowDiff[]): Promise<IRequestDataResult> => {
-          const result = dataModel.getResult(0);
-
-          if (!result) {
-            throw new Error('It is expected that result was set after first fetch');
-          }
-
-          return await source.saveDataDeprecated(result.id, rows);
-        },
-      },
       source
         .setOptions({
           connectionId,
@@ -100,6 +59,6 @@ export class DataViewerTableService {
     )
       .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
 
-    return dataModel.deprecatedModel;
+    return dataModel;
   }
 }

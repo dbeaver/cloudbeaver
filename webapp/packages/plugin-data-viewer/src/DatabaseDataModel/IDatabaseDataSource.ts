@@ -9,6 +9,8 @@
 import { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
 
 import { IExecutionContext } from '../IExecutionContext';
+import { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
+import { IRequestDataResult } from '../TableViewer/TableViewerModel';
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DataUpdateType {
@@ -51,6 +53,10 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
     prevResults: TResult[],
     data: DataUpdate
   ) => Promise<TResult[]> | TResult[];
+  /**
+   * @deprecated will be refactored
+   */
+  saveDataDeprecated: (resultId: string, rows: RowDiff[]) => Promise<IRequestDataResult>;
   cancel: () => Promise<boolean> | boolean;
   dispose: () => Promise<void>;
 }

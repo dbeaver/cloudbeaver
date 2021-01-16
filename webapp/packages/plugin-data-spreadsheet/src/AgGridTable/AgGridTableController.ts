@@ -300,7 +300,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
   private getMaxColumnWidth() {
     if (!this.gridContainer) {
-      console.info('Can"t get grid container width, default value will be used');
+      console.warn('Can\'t get grid container width, default value will be used');
       return MAX_WIDTH_COLUMN_DEFAULT_VALUE;
     }
 

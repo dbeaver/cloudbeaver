@@ -11,6 +11,8 @@ import { observable } from 'mobx';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { IExecutionContext } from '../IExecutionContext';
+import { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
+import { IRequestDataResult } from '../TableViewer/TableViewerModel';
 import { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
@@ -46,7 +48,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   abstract cancel(): Promise<boolean> | boolean;
 
   isLoading(): boolean {
-    return !!this.activeRequest;
+    return !!this.activeRequest || !!this.activeSave;
   }
 
   setSlice(offset: number, count: number): this {
@@ -67,6 +69,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
     this.supportedDataFormats = dataFormats;
+    this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
     return this;
   }
 
@@ -124,8 +127,32 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
   }
 
+  async saveDataDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
+    if (this.activeRequest) {
+      try {
+        await this.activeRequest;
+      } finally { }
+    }
+
+    if (this.activeSave) {
+      return this.activeSave as any;
+    }
+
+    try {
+      const promise = this.saveDeprecated(resultId, rows);
+
+      if (promise instanceof Promise) {
+        this.activeSave = promise as any;
+      }
+      return await promise as any;
+    } finally {
+      this.activeSave = null;
+    }
+  }
+
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[], data: DataUpdate): Promise<TResult[]> | TResult[];
+  abstract saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult>;
 
   abstract dispose(): Promise<void>;
 }

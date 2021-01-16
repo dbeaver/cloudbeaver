@@ -6,20 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DataModelWrapper, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import { observer } from 'mobx-react';
+
+import { DataModelWrapper, IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridTableLoader } from './AgGridTable/AgGridTableLoader';
 
-interface Props {
-  model: IDatabaseDataModel<any, any>;
-  className?: string;
-}
-
-export function Spreadsheet({
+export const Spreadsheet: React.FC<IDataPresentationProps> = observer(function Spreadsheet({
   model,
+  resultIndex,
   className,
-}: Props) {
-  const deprecated = (model as DataModelWrapper).deprecatedModel;
+}) {
+  const deprecated = (model as DataModelWrapper).getOldModel(resultIndex);
+
+  if (!deprecated) {
+    return null;
+  }
 
   return <AgGridTableLoader tableModel={deprecated} className={className} />;
-}
+});

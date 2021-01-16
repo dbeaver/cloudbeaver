@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { ObjectPagePanelProps } from '@cloudbeaver/plugin-object-viewer';
 
 import { IDataViewerPageState } from '../IDataViewerPageState';
@@ -33,9 +34,13 @@ export const DataViewerPanel = observer(function DataViewerPanel({
     }
   }, [page, tab]);
 
+  if (!tab.handlerState.tableId) {
+    return <TextPlaceholder>Table model not loaded</TextPlaceholder>;
+  }
+
   return (
     <TableViewer
-      tableId={tab.id}
+      tableId={tab.handlerState.tableId}
       resultIndex={pageState?.resultIndex}
       presentationId={pageState?.presentationId}
       onPresentationChange={handlePresentationChange}

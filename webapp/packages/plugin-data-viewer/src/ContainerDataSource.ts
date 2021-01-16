@@ -22,6 +22,7 @@ import { IRequestDataResult } from './TableViewer/TableViewerModel';
 
 export interface IDataContainerOptions {
   containerNodePath: string;
+  sourceName?: string; // TODO: should be refactored, used only in QueryDataSource
   connectionId: string;
   whereFilter: string;
   constraints: SqlDataFilterConstraint[];
@@ -35,7 +36,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   @observable currentFetchTableProcess: FetchTableDataAsyncProcess | null;
 
   get canCancel(): boolean {
-    return this.currentFetchTableProcess ? this.currentFetchTableProcess.getState() === EDeferredState.PENDING : false;
+    return this.currentFetchTableProcess?.getState() === EDeferredState.PENDING;
   }
 
   constructor(
@@ -126,7 +127,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   /**
    * @deprecated will be refactored
    */
-  async saveDataDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
+  async saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
     const executionContext = await this.ensureContextCreated();
 
     const response = await this.graphQLService.sdk.updateResultsDataBatch({
@@ -137,6 +138,11 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     });
 
     const dataSet = response.result!.results[0].resultSet!; // we expect only one dataset for a table
+
+    this.requestInfo = {
+      requestDuration: response.result?.duration || 0,
+      requestMessage: 'Saved successfully',
+    };
 
     return {
       rows: dataSet.rows!,

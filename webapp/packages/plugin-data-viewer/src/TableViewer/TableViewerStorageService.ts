@@ -15,7 +15,6 @@ import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import { DataModelWrapper } from './DataModelWrapper';
-import { ITableViewerModelOptions } from './TableViewerModel';
 
 @injectable()
 export class TableViewerStorageService {
@@ -27,7 +26,7 @@ export class TableViewerStorageService {
     return this.tableModelMap.has(tableId);
   }
 
-  get(tableId: string): DataModelWrapper | null | undefined {
+  get(tableId: string): DataModelWrapper | undefined {
     return this.tableModelMap.get(tableId) as DataModelWrapper;
   }
 
@@ -35,12 +34,10 @@ export class TableViewerStorageService {
    * @deprecated Use add method instead
    */
   create(
-    options: ITableViewerModelOptions,
     source: IDatabaseDataSource<any, any>
   ): DataModelWrapper {
     return this.add(new DataModelWrapper(
       this.commonDialogService,
-      options,
       source
     )) as DataModelWrapper;
   }

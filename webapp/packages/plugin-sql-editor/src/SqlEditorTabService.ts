@@ -26,6 +26,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -44,6 +45,7 @@ export class SqlEditorTabService extends Bootstrap {
     private notificationService: NotificationService,
     private sqlEditorService: SqlEditorService,
     private connectionInfo: ConnectionInfoResource,
+    private readonly tableViewerStorageService: TableViewerStorageService,
   ) {
     super();
     this.tabExecutionState = new Map();
@@ -117,10 +119,11 @@ export class SqlEditorTabService extends Bootstrap {
     const isGroupEmpty = !tab.handlerState.resultTabs.some(resultTab => resultTab.groupId === resultTabGroupId);
 
     if (isGroupEmpty) {
-      tab.handlerState.queryTabGroups.splice(
+      const group = tab.handlerState.queryTabGroups.splice(
         tab.handlerState.queryTabGroups.findIndex(queryTabGroup => queryTabGroup.groupId === resultTabGroupId),
         1
       );
+      this.tableViewerStorageService.remove(group[0].modelId);
     }
 
     if (tab.handlerState.currentResultTabId === resultId) {

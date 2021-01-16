@@ -11,7 +11,6 @@ import { useCallback, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { DataModelWrapper } from '../DataModelWrapper';
@@ -103,14 +102,7 @@ export const TableFooter = observer(function TableFooter({
         </SubmittingForm>
       </count>
       <TableFooterMenu model={model} resultIndex={resultIndex} />
-      {(model.source.dataFormat === ResultDataFormat.Resultset
-      && model.deprecatedModel.requestStatusMessage.length > 0) && (
-        <time>
-          {model.deprecatedModel.requestStatusMessage} - {model.deprecatedModel.queryDuration}ms
-        </time>
-      )}
-      {(model.source.dataFormat !== ResultDataFormat.Resultset
-      && model.source.requestInfo.requestMessage.length > 0) && (
+      {model.source.requestInfo.requestMessage.length > 0 && (
         <time>
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>

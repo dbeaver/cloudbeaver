@@ -46,23 +46,21 @@ export const TableWhereFilter = observer(function TableWhereFilter({
   context,
 }: Props) {
   const translate = useTranslate();
-  const [filterValue, setValue] = useState(() => (context.source as ContainerDataSource).options?.whereFilter || '');
+  const [filterValue, setValue] = useState(() => context.source.options?.whereFilter || '');
 
   const handleApply = useCallback(() => {
-    (context.source as ContainerDataSource).options!.whereFilter = filterValue;
-    context.deprecatedModel.setQueryWhereFilter(filterValue);
+    context.source.options!.whereFilter = filterValue;
     context.refresh();
   }, [context, filterValue]);
 
   const resetFilter = useCallback(
     () => {
-      const applyNeeded = context.deprecatedModel.getQueryWhereFilter() === filterValue;
+      const applyNeeded = context.source.options?.whereFilter === filterValue;
 
       setValue('');
 
       if (applyNeeded) {
-        (context.source as ContainerDataSource).options!.whereFilter = '';
-        context.deprecatedModel.setQueryWhereFilter('');
+        context.source.options!.whereFilter = '';
         context.refresh();
       }
     },

@@ -61,16 +61,21 @@ export class DataExportMenuService {
 
   private exportData(context: IMenuContext<ITableFooterMenuContext>) {
     const result = context.data.model.getResult(context.data.resultIndex);
+
     if (!result) {
       throw new Error('Result must be provided');
     }
 
+    if (!context.data.model.source.options) {
+      throw new Error('Source options must be provided');
+    }
+
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: context.data.model.deprecatedModel.connectionId,
+      connectionId: context.data.model.source.options.connectionId,
       contextId: context.data.model.source.executionContext?.contextId,
-      containerNodePath: context.data.model.deprecatedModel.containerNodePath,
+      containerNodePath: context.data.model.source.options.containerNodePath,
       resultId: result.id,
-      sourceName: context.data.model.deprecatedModel.sourceName,
+      sourceName: context.data.model.source.options.sourceName,
     });
   }
 }

@@ -12,13 +12,16 @@ import styled, { css } from 'reshadow';
 
 import { Button, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DataPresentationOptions } from '../DataPresentationService';
 import { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
   model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
+  dataFormat: ResultDataFormat;
   presentation: DataPresentationOptions;
+  resultIndex: number;
 }>;
 
 const styles = css`
@@ -34,8 +37,11 @@ const styles = css`
 
 export const TableGrid = observer(function TableGrid({
   model,
+  dataFormat,
   presentation,
+  resultIndex,
 }: TableGridProps) {
+  const depModel = model.getOldModel(resultIndex);
   const translate = useTranslate();
 
   // TODO: probably must be implemented in presentation component
@@ -52,12 +58,16 @@ export const TableGrid = observer(function TableGrid({
       </error>
     );
   }
+  if (dataFormat !== presentation.dataFormat) {
+    // eslint-disable-next-line react/no-unescaped-entities
+    return <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>;
+  }
 
   const Presentation = presentation.getPresentationComponent();
 
-  if ((model.deprecatedModel.isFullyLoaded && model.deprecatedModel.isEmpty)) {
+  if ((depModel?.isFullyLoaded && depModel?.isEmpty)) {
     return styled(styles)(<TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>);
   }
 
-  return styled(styles)(<Presentation model={model} />);
+  return styled(styles)(<Presentation model={model} resultIndex={resultIndex} />);
 });
