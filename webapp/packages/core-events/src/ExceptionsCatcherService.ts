@@ -14,6 +14,9 @@ import { NotificationService } from './NotificationService';
 export class ExceptionsCatcherService {
   baseCatcher: OnErrorEventHandler | null = null;
 
+  private ignored: string[] = [];
+  private messageTitle = 'Uncatched exception';
+
   constructor(private notificationService: NotificationService) { }
 
   subscribe() {
@@ -25,6 +28,10 @@ export class ExceptionsCatcherService {
     window.onerror = this.baseCatcher;
   }
 
+  ignore(message: string) {
+    this.ignored.push(message);
+  }
+
   private catcher = (
     event: Event | string,
     source?: string,
@@ -33,9 +40,14 @@ export class ExceptionsCatcherService {
     _error?: Error
   ) => {
     if (_error) {
-      this.notificationService.logException(_error, 'Uncatched exception');
+      this.notificationService.logException(_error, this.messageTitle);
     } else {
-      this.notificationService.logError({ title: event as string });
+      const message = String(event);
+      this.notificationService.logError({
+        title: this.messageTitle,
+        message,
+        isSilent: this.ignored.includes(message),
+      });
     }
 
     if (this.baseCatcher) {
