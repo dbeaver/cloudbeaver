@@ -58,7 +58,12 @@ export const TableGrid = observer(function TableGrid({
       </error>
     );
   }
+
   if (dataFormat !== presentation.dataFormat) {
+    if (model.isLoading()) {
+      return null;
+    }
+
     // eslint-disable-next-line react/no-unescaped-entities
     return <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>;
   }
