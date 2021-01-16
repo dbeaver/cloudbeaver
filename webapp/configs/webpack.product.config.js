@@ -28,7 +28,8 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          test: /[\\/]node_modules[\\/](?!@ag-grid)(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          // TODO: we need another way to detect libraries to exclude
+          test: /[\\/]node_modules[\\/](?!(@ag-grid|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
           name: 'vendors',
           chunks: 'all',
         },
