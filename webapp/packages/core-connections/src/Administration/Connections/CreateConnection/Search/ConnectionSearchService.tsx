@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
@@ -18,8 +18,8 @@ import { CreateConnectionService } from '../../CreateConnectionService';
 
 @injectable()
 export class ConnectionSearchService {
-  @observable hosts = 'localhost';
-  @observable databases: AdminConnectionSearchInfo[];
+  hosts = 'localhost';
+  databases: AdminConnectionSearchInfo[];
 
   get disabled(): boolean {
     return this.createConnectionService.disabled;
@@ -35,6 +35,11 @@ export class ConnectionSearchService {
     private createConnectionService: CreateConnectionService,
     private administrationScreenService: AdministrationScreenService
   ) {
+    makeObservable(this, {
+      hosts: observable,
+      databases: observable,
+    });
+
     this.databases = [];
     this.search = this.search.bind(this);
     this.change = this.change.bind(this);

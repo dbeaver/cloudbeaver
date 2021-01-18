@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -16,12 +16,16 @@ import { UsersAdministrationNavigationService } from './UsersAdministrationNavig
 
 @injectable()
 export class CreateUserService {
-  @observable user: AdminUserInfo | null = null;
+  user: AdminUserInfo | null = null;
 
   constructor(
     private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService,
     private readonly usersResource: UsersResource,
   ) {
+    makeObservable(this, {
+      user: observable,
+    });
+
     this.user = null;
 
     this.clearUserTemplate = this.clearUserTemplate.bind(this);

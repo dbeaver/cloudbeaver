@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable } from 'mobx';
+import { action, observable, makeObservable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -79,7 +79,7 @@ export interface IRequestDataResult {
 }
 
 export class TableViewerModel {
-  @observable access: DatabaseDataAccessMode;
+  access: DatabaseDataAccessMode;
 
   requestDataAsync: (
     model: TableViewerModel,
@@ -110,8 +110,8 @@ export class TableViewerModel {
   private updating = false;
   private loading = false;
 
-  @observable private _hasMoreRows = true;
-  @observable private _chunkSize: number = this.getDefaultRowsCount();
+  private _hasMoreRows = true;
+  private _chunkSize: number = this.getDefaultRowsCount();
 
   private sortedColumns = new MetadataMap<string, SqlDataFilterConstraint>(
     (colId, metadata) => ({ attribute: colId, orderPosition: metadata.count(), orderAsc: false })
@@ -121,6 +121,16 @@ export class TableViewerModel {
     options: ITableViewerModelOptions,
     private commonDialogService: CommonDialogService
   ) {
+    makeObservable<TableViewerModel, '_hasMoreRows' | '_chunkSize' | 'updateChunkSize' | 'resetData'>(this, {
+      access: observable,
+      _hasMoreRows: observable,
+      _chunkSize: observable,
+      insertRows: action,
+      setColumns: action,
+      updateChunkSize: action,
+      resetData: action,
+    });
+
     this.access = options.access || DatabaseDataAccessMode.Default;
     this.requestDataAsync = options.requestDataAsync;
     this._saveChanges = options.saveChanges;
@@ -160,14 +170,12 @@ export class TableViewerModel {
     this.sortedColumns.delete(colId);
   }
 
-  @action
   insertRows(position: number, rows: TableRow[], hasMore: boolean): void {
     const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
     this.tableDataModel.insertRows(position, rows);
     this._hasMoreRows = isRowsAddition ? hasMore : this._hasMoreRows;
   }
 
-  @action
   setColumns(columns: TableColumn[]): void {
     this.tableDataModel.setColumns(columns);
   }
@@ -296,13 +304,11 @@ export class TableViewerModel {
     return false;
   }
 
-  @action
   private updateChunkSize(value: number) {
     this._chunkSize = this.getDefaultRowsCount(value);
     this.chunkChangeSubject.next();
   }
 
-  @action
   private resetData() {
     this.tableDataModel.resetData();
     this.tableEditor.cancelChanges(true);

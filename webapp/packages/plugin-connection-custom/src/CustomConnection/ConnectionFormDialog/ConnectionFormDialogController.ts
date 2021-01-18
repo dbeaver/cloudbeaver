@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action } from 'mobx';
+import { observable, action, makeObservable } from 'mobx';
 
 import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource, getUniqueConnectionName } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
@@ -25,11 +25,11 @@ interface IValidationStatus {
 @injectable()
 export class ConnectionFormDialogController
 implements IInitializableController, IDestructibleController {
-  @observable isLoading = true;
-  @observable isConnecting = false;
-  @observable driver!: DBDriver;
-  @observable authModel?: DatabaseAuthModel;
-  @observable config: ConnectionConfig = {
+  isLoading = true;
+  isConnecting = false;
+  driver!: DBDriver;
+  authModel?: DatabaseAuthModel;
+  config: ConnectionConfig = {
     name: '',
     driverId: '',
     host: '',
@@ -58,7 +58,16 @@ implements IInitializableController, IDestructibleController {
     private commonDialogService: CommonDialogService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
     private connectionInfoResource: ConnectionInfoResource,
-  ) { }
+  ) {
+    makeObservable<ConnectionFormDialogController, 'setDriverDefaults'>(this, {
+      isLoading: observable,
+      isConnecting: observable,
+      driver: observable,
+      authModel: observable,
+      config: observable,
+      setDriverDefaults: action,
+    });
+  }
 
   init(driver: DBDriver, onClose: () => void) {
     this.driver = driver;
@@ -187,7 +196,6 @@ implements IInitializableController, IDestructibleController {
     return validationStatus;
   }
 
-  @action
   private setDriverDefaults() {
     this.config.host = this.driver.defaultServer || 'localhost';
     this.config.port = this.driver.defaultPort || '';

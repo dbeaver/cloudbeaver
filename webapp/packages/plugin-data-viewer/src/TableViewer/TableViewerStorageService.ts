@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -18,9 +18,13 @@ import { DataModelWrapper } from './DataModelWrapper';
 
 @injectable()
 export class TableViewerStorageService {
-  @observable private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
+  private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
-  constructor(private commonDialogService: CommonDialogService) {}
+  constructor(private commonDialogService: CommonDialogService) {
+    makeObservable<TableViewerStorageService, 'tableModelMap'>(this, {
+      tableModelMap: observable,
+    });
+  }
 
   has(tableId: string): boolean {
     return this.tableModelMap.has(tableId);

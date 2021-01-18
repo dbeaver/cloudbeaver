@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, when } from 'mobx';
+import { observable, when, makeObservable } from 'mobx';
 
 import { NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
@@ -18,9 +18,9 @@ import { DdlViewerService } from '../DdlViewerService';
 
 @injectable()
 export class DdlViewerController implements IInitializableController, IDestructibleController {
-  @observable isLoading = true;
-  @observable metadata = '';
-  @observable dialect?: SqlDialectInfo;
+  isLoading = true;
+  metadata = '';
+  dialect?: SqlDialectInfo;
 
   private nodeId!: string;
 
@@ -29,7 +29,13 @@ export class DdlViewerController implements IInitializableController, IDestructi
     private navNodeManagerService: NavNodeManagerService,
     private sqlDialectInfoService: SqlDialectInfoService,
     private notificationService: NotificationService
-  ) { }
+  ) {
+    makeObservable(this, {
+      isLoading: observable,
+      metadata: observable,
+      dialect: observable,
+    });
+  }
 
   init(nodeId: string) {
     this.nodeId = nodeId;

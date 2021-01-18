@@ -8,7 +8,6 @@
 
 import {
   ConnectionDialogsService,
-  NavigationTabsService,
   NavigationTreeContextMenuService,
   LogViewerMenuService,
   ConnectionSchemaManagerService
@@ -33,7 +32,6 @@ export class AppBootstrap {
     private logViewerMenuService: LogViewerMenuService,
     private sessionExpireService: SessionExpireService,
     private navigationTreeContextMenuService: NavigationTreeContextMenuService,
-    private navigationTabsService: NavigationTabsService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService
   ) { }
 

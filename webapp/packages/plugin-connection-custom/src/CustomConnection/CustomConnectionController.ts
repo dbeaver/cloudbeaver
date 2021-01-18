@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
@@ -19,11 +19,10 @@ export enum ConnectionStep {
 
 @injectable()
 export class CustomConnectionController implements IInitializableController {
-  @observable step = ConnectionStep.Driver;
-  @observable isLoading = true;
-  @observable driver: DBDriver | null = null;
+  step = ConnectionStep.Driver;
+  isLoading = true;
+  driver: DBDriver | null = null;
 
-  @computed
   get drivers(): DBDriver[] {
     return Array
       .from(this.dbDriverResource.data.values())
@@ -33,7 +32,14 @@ export class CustomConnectionController implements IInitializableController {
   constructor(
     private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService
-  ) { }
+  ) {
+    makeObservable(this, {
+      step: observable,
+      isLoading: observable,
+      driver: observable,
+      drivers: computed,
+    });
+  }
 
   init() {
     this.loadDBDrivers();

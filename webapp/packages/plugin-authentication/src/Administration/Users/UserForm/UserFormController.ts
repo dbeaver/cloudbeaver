@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { isLocalUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { AdminConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -27,19 +27,18 @@ interface IUserCredentials {
 
 @injectable()
 export class UserFormController implements IInitializableController, IDestructibleController {
-  @observable
   readonly selectedConnections: Map<string, boolean>;
 
-  @observable grantedConnections: AdminConnectionGrantInfo[];
-  @observable isSaving: boolean;
-  @observable isLoading: boolean;
-  @observable credentials: IUserCredentials;
+  grantedConnections: AdminConnectionGrantInfo[];
+  isSaving: boolean;
+  isLoading: boolean;
+  credentials: IUserCredentials;
 
-  @computed get connections(): AdminConnection[] {
+  get connections(): AdminConnection[] {
     return Array.from(this.connectionsResource.data.values());
   }
 
-  @computed get roles(): AdminRoleInfo[] {
+  get roles(): AdminRoleInfo[] {
     return Array.from(this.rolesResource.data.values());
   }
 
@@ -65,6 +64,16 @@ export class UserFormController implements IInitializableController, IDestructib
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource
   ) {
+    makeObservable(this, {
+      selectedConnections: observable,
+      grantedConnections: observable,
+      isSaving: observable,
+      isLoading: observable,
+      credentials: observable,
+      connections: computed,
+      roles: computed,
+    });
+
     this.selectedConnections = new Map();
     this.grantedConnections = [];
     this.isSaving = false;

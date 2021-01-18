@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import {
   NavigationTabsService,
@@ -37,7 +37,7 @@ import { SqlExecutionState } from './SqlExecutionState';
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
-  @observable readonly tabExecutionState: Map<string, SqlExecutionState>;
+  readonly tabExecutionState: Map<string, SqlExecutionState>;
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
   constructor(
@@ -48,6 +48,11 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly tableViewerStorageService: TableViewerStorageService,
   ) {
     super();
+
+    makeObservable(this, {
+      tabExecutionState: observable,
+    });
+
     this.tabExecutionState = new Map();
 
     this.tabHandler = this.navigationTabsService

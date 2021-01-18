@@ -23,7 +23,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     hot: true,
     proxy: {
       '/api': {
-        target: 'http://stage-aws.web.dbeaver.net:8095/',
+        target: env.server,
       },
     },
   },

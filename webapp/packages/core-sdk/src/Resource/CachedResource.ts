@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
@@ -23,7 +23,6 @@ export abstract class CachedResource<
   TParam,
   TKey = TParam
 > {
-  @observable
   data: TData;
 
   readonly onDataOutdated: IExecutor<TParam>;
@@ -31,12 +30,16 @@ export abstract class CachedResource<
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
 
-  @observable
   protected loading = false;
 
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
+    makeObservable<CachedResource<TData, TParam, TKey>, 'loading'>(this, {
+      data: observable,
+      loading: observable,
+    });
+
     this.includes = this.includes.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 import type { Subscription } from 'rxjs';
 
 import type {
@@ -42,7 +42,7 @@ const MAX_WIDTH_COLUMN_DEFAULT_VALUE = 300;
 
 @injectable()
 export class AgGridTableController implements IInitializableController, IDestructibleController {
-  @observable refreshId = 0;
+  refreshId = 0;
   gridContainer: HTMLElement | null = null;
 
   private readonly datasource: IDatasource = {
@@ -89,12 +89,20 @@ export class AgGridTableController implements IInitializableController, IDestruc
     onCellEditingStopped: this.handleCellEditingStopped.bind(this),
   };
 
-  @observable columns: ColDef[] = [];
+  columns: ColDef[] = [];
+
+  constructor() {
+    makeObservable(this, {
+      refreshId: observable,
+      columns: observable,
+      dynamicOptions: computed,
+    });
+  }
 
   /**
    * use this object to dynamically change ag-grid properties
    */
-  @computed get dynamicOptions(): GridOptions {
+  get dynamicOptions(): GridOptions {
     return {
       enableRangeSelection: !!this.selection,
     };

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
@@ -37,7 +37,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return this.queryExecutionProcess?.getState() === EDeferredState.PENDING;
   }
 
-  @observable queryExecutionProcess: SQLQueryExecutionProcess | null;
+  queryExecutionProcess: SQLQueryExecutionProcess | null;
 
   constructor(
     private graphQLService: GraphQLService,
@@ -45,6 +45,11 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     private sqlResultTabsService: SqlResultTabsService
   ) {
     super();
+
+    makeObservable(this, {
+      queryExecutionProcess: observable,
+    });
+
     this.queryExecutionProcess = null;
   }
 

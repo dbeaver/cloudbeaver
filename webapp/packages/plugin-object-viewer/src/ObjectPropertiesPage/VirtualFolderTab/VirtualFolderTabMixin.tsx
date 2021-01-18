@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -14,11 +14,15 @@ import { VirtualFolderTabData } from './VirtualFolderTabData';
 
 @injectable()
 export class VirtualFolderTabMixin {
-  @observable isActivated = false;
+  isActivated = false;
 
   constructor(
     private virtualFolderTabData: VirtualFolderTabData,
-  ) {}
+  ) {
+    makeObservable(this, {
+      isActivated: observable,
+    });
+  }
 
   getChildrenId() {
     return this.virtualFolderTabData.childrenIds;

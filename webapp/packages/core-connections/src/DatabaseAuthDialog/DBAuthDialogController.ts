@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -23,8 +23,8 @@ interface IDBAuthConfig {
 }
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
-  @observable isAuthenticating = false;
-  @observable config: IDBAuthConfig = {
+  isAuthenticating = false;
+  config: IDBAuthConfig = {
     credentials: {},
     saveCredentials: false,
   };
@@ -40,7 +40,12 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     private connectionInfoResource: ConnectionInfoResource,
     private commonDialogService: CommonDialogService,
     private dbDriverResource: DBDriverResource
-  ) { }
+  ) {
+    makeObservable(this, {
+      isAuthenticating: observable,
+      config: observable,
+    });
+  }
 
   init(connectionId: string, onClose: () => void) {
     this.connectionId = connectionId;

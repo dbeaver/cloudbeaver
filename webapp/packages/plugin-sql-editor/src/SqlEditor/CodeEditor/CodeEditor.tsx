@@ -32,7 +32,7 @@ export interface CodeEditorProps {
   className?: string;
 }
 
-export const CodeEditor = observer(forwardRef<CodeEditorController, CodeEditorProps>(
+export const CodeEditor = observer<CodeEditorProps, CodeEditorController>(
   function CodeEditor(props, ref) {
     const controller = useController(CodeEditorController, props.bindings);
     controller.setDialect(props.dialect);
@@ -47,4 +47,4 @@ export const CodeEditor = observer(forwardRef<CodeEditorController, CodeEditorPr
         />
       </code-editor>
     );
-  }));
+  }, { forwardRef: true });

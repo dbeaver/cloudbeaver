@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
 import { EditedRow, RowDiff } from './EditedRow';
@@ -20,11 +20,15 @@ export class TableEditor {
   readonly onRowsUpdate: Observable<number[]>;
   readonly onCancelChanges: Observable<null>;
 
-  @observable private editedRows = new Map<number, EditedRow>();
+  private editedRows = new Map<number, EditedRow>();
   private rowsUpdateSubject: Subject<number[]>;
   private cancelChangesSubject: Subject<null>;
 
   constructor(private dataModel: TableDataModel) {
+    makeObservable<TableEditor, 'editedRows'>(this, {
+      editedRows: observable,
+    });
+
     this.rowsUpdateSubject = new Subject();
     this.cancelChangesSubject = new Subject();
     this.onRowsUpdate = this.rowsUpdateSubject.asObservable();

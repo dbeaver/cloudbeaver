@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -35,6 +35,11 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   protected metadata: MetadataMap<string, INodeMetadata>;
   constructor(private graphQLService: GraphQLService) {
     super(new Map());
+
+    makeObservable(this, {
+      setDetails: action,
+    });
+
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
       outdated: true,
       loading: false,
@@ -42,7 +47,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     }));
   }
 
-  @action setDetails(keyObject: ResourceKey<string>, state: boolean): void {
+  setDetails(keyObject: ResourceKey<string>, state: boolean): void {
     ResourceKeyUtils.forEach(keyObject, key => {
       const metadata = this.metadata.get(key);
 

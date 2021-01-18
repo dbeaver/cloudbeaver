@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -42,6 +42,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     super(new Map());
+
+    makeObservable(this, {
+      setDetails: action,
+    });
+
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
       outdated: true,
       loading: false,
@@ -50,7 +55,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }
 
-  @action setDetails(keyObject: ResourceKey<string>, state: boolean): void {
+  setDetails(keyObject: ResourceKey<string>, state: boolean): void {
     ResourceKeyUtils.forEach(keyObject, key => {
       const children = resourceKeyList(this.getNestedChildren(key));
       this.navNodeInfoResource.setDetails(children, state);

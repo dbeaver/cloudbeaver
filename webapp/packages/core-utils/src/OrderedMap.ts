@@ -6,21 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, makeObservable } from 'mobx';
 
 export class OrderedMap<K, V> {
   private indexes = observable.array<K>([], { deep: false });
-  @observable.shallow private map: Map<K, V> = new Map<K, V>();
+  private map: Map<K, V> = new Map<K, V>();
 
-  @computed get keys(): K[] {
+  get keys(): K[] {
     return this.indexes;
   }
 
-  @computed get values(): V[] {
+  get values(): V[] {
     return this.indexes.map(i => this.map.get(i)!);
   }
 
   constructor(private toKey?: (val: V) => K) {
+    makeObservable<OrderedMap<K, V>, 'map'>(this, {
+      map: observable.shallow,
+      keys: computed,
+      values: computed,
+      add: action,
+      addValue: action,
+      remove: action,
+      removeAll: action,
+      bulkUpdate: action,
+      bulkRewrite: action,
+      sort: action,
+    });
   }
 
   get(key: K): V | undefined {
@@ -31,7 +43,6 @@ export class OrderedMap<K, V> {
     return this.map.has(key);
   }
 
-  @action
   add(key: K, value: V): void {
     if (this.map.has(key)) {
       return; // no overwrite
@@ -40,7 +51,6 @@ export class OrderedMap<K, V> {
     this.map.set(key, value);
   }
 
-  @action
   addValue(value: V): void {
     if (!this.toKey) {
       throw Error('no toKey method');
@@ -48,7 +58,6 @@ export class OrderedMap<K, V> {
     this.add(this.toKey(value), value);
   }
 
-  @action
   remove(key: K): void {
     if (!this.map.has(key)) {
       return;
@@ -57,13 +66,11 @@ export class OrderedMap<K, V> {
     this.indexes.remove(key);
   }
 
-  @action
   removeAll(): void {
     this.indexes.clear();
     this.map.clear();
   }
 
-  @action
   bulkUpdate(values: V[]): void {
     if (!this.toKey) {
       throw Error('no toKey method');
@@ -71,13 +78,11 @@ export class OrderedMap<K, V> {
     values.forEach(v => this.add(this.toKey!(v), v));
   }
 
-  @action
   bulkRewrite(values: V[]): void {
     this.removeAll();
     this.bulkUpdate(values);
   }
 
-  @action
   sort(comparator: (a: V, B: V) => number): void {
     const sorted = this.indexes
       .slice()

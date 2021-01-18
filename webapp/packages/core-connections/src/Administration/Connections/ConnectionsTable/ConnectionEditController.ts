@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import {
   injectable, IInitializableController, IDestructibleController
@@ -21,23 +21,23 @@ import { AdminConnection, ConnectionsResource } from '../../ConnectionsResource'
 @injectable()
 export class ConnectionEditController
 implements IInitializableController, IDestructibleController {
-  @observable grantedSubjects: AdminConnectionGrantInfo[] | null = null;
-  @observable isLoading = true;
-  @observable credentials: Record<string, string> = {};
-  @observable connection: AdminConnection | null = null;
+  grantedSubjects: AdminConnectionGrantInfo[] | null = null;
+  isLoading = true;
+  credentials: Record<string, string> = {};
+  connection: AdminConnection | null = null;
 
-  @computed get isDisabled() {
+  get isDisabled() {
     return this.isLoading;
   }
 
-  @computed get driver() {
+  get driver() {
     if (!this.connection?.driverId) {
       return null;
     }
     return this.dbDriverResource.get(this.connection.driverId) || null;
   }
 
-  @computed get availableDrivers() {
+  get availableDrivers() {
     if (!this.connection) {
       return [];
     }
@@ -55,6 +55,16 @@ implements IInitializableController, IDestructibleController {
     private dbDriverResource: DBDriverResource,
     private dbAuthModelsResource: DatabaseAuthModelsResource
   ) {
+    makeObservable(this, {
+      grantedSubjects: observable,
+      isLoading: observable,
+      credentials: observable,
+      connection: observable,
+      isDisabled: computed,
+      driver: computed,
+      availableDrivers: computed,
+    });
+
     this.updateConnectionInfo = this.updateConnectionInfo.bind(this);
   }
 

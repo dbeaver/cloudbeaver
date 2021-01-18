@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
@@ -38,10 +38,10 @@ export class AdministrationScreenService {
   static setupItemSubRouteName = 'setup.item.sub';
   static setupItemSubParamRouteName = 'setup.item.sub.param';
 
-  @observable info: IAdministrationScreenInfo;
-  @observable itemState: Map<string, any>;
+  info: IAdministrationScreenInfo;
+  itemState: Map<string, any>;
 
-  @computed get activeScreen(): IAdministrationItemRoute | null {
+  get activeScreen(): IAdministrationItemRoute | null {
     return this.getScreen(this.screenService.routerService.state);
   }
 
@@ -60,6 +60,12 @@ export class AdministrationScreenService {
     private autoSaveService: LocalStorageSaveService,
     private serverConfigResource: ServerConfigResource
   ) {
+    makeObservable(this, {
+      info: observable,
+      itemState: observable,
+      activeScreen: computed,
+    });
+
     this.info = {
       mode: false,
     };
@@ -201,7 +207,7 @@ export class AdministrationScreenService {
   }
 
   async handleActivate(state: RouterState, prevState?: RouterState): Promise<void> {
-    if (!await this.checkPermissions(state)) {
+    if (!(await this.checkPermissions(state))) {
       return;
     }
 
@@ -218,12 +224,12 @@ export class AdministrationScreenService {
     }
   }
 
-  private async checkPermissions(state: RouterState) {
+  private async checkPermissions(state: RouterState): Promise<boolean> {
     if (!this.isAdministrationRouteActive(state.name)) {
-      return;
+      return false;
     }
 
-    if (!await this.isAccessProvided(state)) {
+    if (!(await this.isAccessProvided(state))) {
       this.screenService.navigateToRoot();
       return false;
     }
@@ -244,7 +250,7 @@ export class AdministrationScreenService {
 
     await this.ensurePermissions.execute();
 
-    if (!await this.permissionsService.hasAsync(EAdminPermission.admin)) {
+    if (!(await this.permissionsService.hasAsync(EAdminPermission.admin))) {
       return false;
     }
 

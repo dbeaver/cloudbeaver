@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
@@ -30,7 +30,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   /**
    * @deprecated Use getModel instead
    */
-  @observable deprecatedModels: TableViewerModel[];
+  deprecatedModels: TableViewerModel[];
 
   /**
    * @deprecated will be refactored
@@ -46,15 +46,23 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
     return this.hasDetails;
   }
 
-  @observable private errorMessage: string;
-  @observable private exception: Error | null;
-  @observable private hasDetails: boolean;
+  private errorMessage: string;
+  private exception: Error | null;
+  private hasDetails: boolean;
 
   constructor(
     private commonDialogService: CommonDialogService,
     source: IDatabaseDataSource<any>
   ) {
     super(source);
+
+    makeObservable<DataModelWrapper, 'errorMessage' | 'exception' | 'hasDetails'>(this, {
+      deprecatedModels: observable,
+      errorMessage: observable,
+      exception: observable,
+      hasDetails: observable,
+    });
+
     this.countGain = this.getDefaultRowsCount();
     this.exception = null;
     this.errorMessage = '';

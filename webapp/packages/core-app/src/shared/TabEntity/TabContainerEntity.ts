@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, makeObservable } from 'mobx';
 
 import type { ITab, ITabContainer } from '@cloudbeaver/core-blocks';
 import { Entity, IServiceInjector, MixinProvider } from '@cloudbeaver/core-di';
@@ -15,7 +15,7 @@ import { ITabContainerEntity, TabContainerToken } from './TabContainerToken';
 import { TabEntity } from './TabEntity';
 
 export class TabContainerEntity extends Entity implements ITabContainer, ITabContainerEntity {
-  @computed get tabs(): ITab[] {
+  get tabs(): ITab[] {
     return this.tabsOrder.map(id => {
       const tabEntity = this.getTabEntity(id);
       return tabEntity.getViewModel();
@@ -26,15 +26,24 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
     return this._activeTabId;
   }
 
-  @observable private _activeTabId: string | null = null;
+  private _activeTabId: string | null = null;
   private tabsOrder = observable.array<string>();
 
   constructor(providers: Array<MixinProvider<any>>, id?: string) {
     super(providers, id);
+
+    makeObservable<TabContainerEntity, '_activeTabId'>(this, {
+      tabs: computed,
+      _activeTabId: observable,
+      addTabEntity: action,
+      closeTab: action,
+      activateTab: action,
+      addTabsAfter: action,
+    });
+
     this.addMixin(TabContainerToken, this);
   }
 
-  @action
   addTabEntity(tabEntity: TabEntity, desiredTabPosition?: number) {
     this.addChild(tabEntity);
     if (desiredTabPosition === undefined || desiredTabPosition < 0) {
@@ -44,7 +53,6 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
     }
   }
 
-  @action
   closeTab(tabId: string) {
     const tabModel = this.getTabEntity(tabId).getTabModel();
     if (tabModel.onClose) {
@@ -54,7 +62,6 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
     this.tabsOrder.remove(tabId);
   }
 
-  @action
   activateTab(tabId: string | null) {
     if (tabId === null) {
       this._activeTabId = null;
@@ -72,7 +79,6 @@ export class TabContainerEntity extends Entity implements ITabContainer, ITabCon
     return tabEntity.getServiceInjector();
   }
 
-  @action
   addTabsAfter(tabEntities: TabEntity[], tabId: string) {
     tabEntities.forEach((tabEntity, index) => {
       const previousTabId = index === 0 ? tabId : tabEntities[index - 1].id;

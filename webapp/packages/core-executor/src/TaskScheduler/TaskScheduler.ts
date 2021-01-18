@@ -6,23 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import type { ITask } from './ITask';
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
 
 export class TaskScheduler<TIdentifier> {
-  @computed get activeList(): TIdentifier[] {
+  get activeList(): TIdentifier[] {
     return this.queue.map(task => task.id);
   }
 
-  @observable.shallow
   private readonly queue: Array<ITask<TIdentifier>>;
 
   private readonly isBlocked: BlockedExecution<TIdentifier> | null;
 
   constructor(isBlocked: BlockedExecution<TIdentifier> | null = null) {
+    makeObservable<TaskScheduler<TIdentifier>, 'queue'>(this, {
+      activeList: computed,
+      queue: observable.shallow,
+    });
+
     this.queue = [];
     this.isBlocked = isBlocked;
   }

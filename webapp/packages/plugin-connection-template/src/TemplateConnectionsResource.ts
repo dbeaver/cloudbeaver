@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionsResource } from '@cloudbeaver/core-connections';
@@ -16,7 +16,7 @@ import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class TemplateConnectionsResource extends CachedDataResource<Connection[], void> {
-  @observable loaded: boolean;
+  loaded: boolean;
   constructor(
     private graphQLService: GraphQLService,
     private permissionsService: PermissionsService,
@@ -24,6 +24,11 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
     appAuthService: AppAuthService,
   ) {
     super([]);
+
+    makeObservable(this, {
+      loaded: observable,
+    });
+
     this.loaded = false;
     connectionsResource.onDataUpdate.addHandler(() => this.markOutdated());
     appAuthService.auth.addHandler(() => this.markOutdated());
@@ -34,7 +39,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   }
 
   protected async loader(): Promise<Connection[]> {
-    if (!await this.permissionsService.hasAsync(EPermission.public)) {
+    if (!(await this.permissionsService.hasAsync(EPermission.public))) {
       this.loaded = true;
       return [];
     }

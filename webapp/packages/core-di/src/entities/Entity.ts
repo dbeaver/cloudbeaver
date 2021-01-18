@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -20,11 +20,15 @@ export class Entity {
   readonly id: string;
 
   protected container = new DIContainer();
-  @observable.shallow protected children = new Map<string, Entity>();
+  protected children = new Map<string, Entity>();
 
   private mixins: Array<InjectionToken<any>> = [];
 
   constructor(providers: Array<MixinProvider<any>> = [], id?: string) {
+    makeObservable<Entity, 'children'>(this, {
+      children: observable.shallow,
+    });
+
     this.id = id || uuid();
     this.addMixin(Entity, this);
     this.addMixin(ServiceInjectorToken, this.getServiceInjector());

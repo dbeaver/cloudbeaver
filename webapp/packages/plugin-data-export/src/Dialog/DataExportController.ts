@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import type { IProperty } from '@cloudbeaver/core-blocks';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
@@ -25,15 +25,15 @@ export enum DataExportStep {
 
 @injectable()
 export class DataExportController implements IInitializableController, IDestructibleController {
-  @observable step = DataExportStep.DataTransferProcessor;
+  step = DataExportStep.DataTransferProcessor;
   get isLoading(): boolean {
     return this.dataExportService.processors.isLoading();
   }
 
-  @observable isExporting = false;
-  @observable processor: DataTransferProcessorInfo | null = null;
+  isExporting = false;
+  processor: DataTransferProcessorInfo | null = null;
 
-  @computed get processors(): DataTransferProcessorInfo[] {
+  get processors(): DataTransferProcessorInfo[] {
     return Array
       .from(
         this.dataExportService.processors.data.values()
@@ -41,8 +41,8 @@ export class DataExportController implements IInitializableController, IDestruct
       .sort(sortProcessors);
   }
 
-  @observable processorProperties: any = {};
-  @observable properties: IProperty[] = [];
+  processorProperties: any = {};
+  properties: IProperty[] = [];
 
   readonly error = new GQLErrorCatcher();
 
@@ -54,7 +54,16 @@ export class DataExportController implements IInitializableController, IDestruct
     private dataExportService: DataExportService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService
-  ) { }
+  ) {
+    makeObservable(this, {
+      step: observable,
+      isExporting: observable,
+      processor: observable,
+      processors: computed,
+      processorProperties: observable,
+      properties: observable,
+    });
+  }
 
   init(context: IExportContext, close: () => void): void {
     this.context = context;

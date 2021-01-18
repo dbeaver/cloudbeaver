@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { IProperty } from '@cloudbeaver/core-blocks';
 import { DBDriver, DriverPropertiesService } from '@cloudbeaver/core-connections';
@@ -27,11 +27,11 @@ export type DriverPropertyInfoWithStaticId = ObjectPropertyInfo & StaticId;
 
 @injectable()
 export class DriverPropertiesController implements IInitializableController {
-  @observable isLoading = false;
-  @observable driver!: DBDriver;
-  @observable hasDetails = false;
-  @observable responseMessage: string | null = null;
-  @observable driverProperties = observable<IProperty>([]);
+  isLoading = false;
+  driver!: DBDriver;
+  hasDetails = false;
+  responseMessage: string | null = null;
+  driverProperties = observable<IProperty>([]);
 
   private loaded = false;
   private state!: Record<string, string>;
@@ -39,7 +39,15 @@ export class DriverPropertiesController implements IInitializableController {
   constructor(
     private driverPropertiesService: DriverPropertiesService,
     private notificationService: NotificationService
-  ) { }
+  ) {
+    makeObservable(this, {
+      isLoading: observable,
+      driver: observable,
+      hasDetails: observable,
+      responseMessage: observable,
+      driverProperties: observable,
+    });
+  }
 
   init(driver: DBDriver, state: Record<string, string>) {
     this.driver = driver;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { ITab } from '@cloudbeaver/core-app';
 import type { DynamicStyle } from '@cloudbeaver/core-theming';
@@ -47,7 +47,7 @@ export interface ObjectPageOptions<T = unknown> {
 export class ObjectPage<T = unknown> {
   key: string;
   priority: number;
-  @observable order?: number;
+  order?: number;
   getTabComponent: () => ObjectPageTabComponent<T>;
   getPanelComponent: () => ObjectPagePanelComponent<T>;
   onSelect?: ObjectPageCallback<T>;
@@ -55,6 +55,10 @@ export class ObjectPage<T = unknown> {
   onRestore?: ObjectPageRestoreCallback<T>;
 
   constructor(options: ObjectPageOptions<T>) {
+    makeObservable(this, {
+      order: observable,
+    });
+
     this.key = options.key;
     this.priority = options.priority;
     this.order = options.order;

@@ -6,18 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import type { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
 export class SqlExecutionState {
-  @computed get isSqlExecuting(): boolean {
+  constructor() {
+    makeObservable<SqlExecutionState, 'currentlyExecutingQuery'>(this, {
+      isSqlExecuting: computed,
+      canCancel: computed,
+      currentlyExecutingQuery: observable,
+    });
+  }
+
+  get isSqlExecuting(): boolean {
     return this.currentlyExecutingQuery ? this.currentlyExecutingQuery.isInProgress : false;
   }
 
-  @computed get canCancel(): boolean {
+  get canCancel(): boolean {
     return this.currentlyExecutingQuery ? this.currentlyExecutingQuery.getState() === EDeferredState.PENDING : false;
   }
 
@@ -27,7 +35,7 @@ export class SqlExecutionState {
     }
   };
 
-  @observable private currentlyExecutingQuery: SQLQueryExecutionProcess | null = null;
+  private currentlyExecutingQuery: SQLQueryExecutionProcess | null = null;
 
   async setCurrentlyExecutingQuery(queryExecutionProcess: SQLQueryExecutionProcess): Promise<void> {
     if (this.currentlyExecutingQuery) {

@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  observable, action,
-  computed, IKeyValueMap
-} from 'mobx';
+import { observable, action, computed, IKeyValueMap, makeObservable } from 'mobx';
 import { Subject } from 'rxjs';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
@@ -33,15 +30,15 @@ const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
 @injectable()
 export class NavigationTabsService {
-  @observable handlers = new Map<string, TabHandler>();
-  @observable tabsMap = new Map<string, ITab>();
-  @observable state = new Map<string, TabsState>();
+  handlers = new Map<string, TabHandler>();
+  tabsMap = new Map<string, ITab>();
+  state = new Map<string, TabsState>();
 
-  @computed get currentTabId(): string {
+  get currentTabId(): string {
     return this.userTabsState.currentId;
   }
 
-  @computed get tabIdList(): string[] {
+  get tabIdList(): string[] {
     return Array.from(this.tabsMap.values())
       .filter(tab => tab.restored && tab.userId === this.userInfoResource.getId())
       .map(tab => tab.id);
@@ -73,19 +70,33 @@ export class NavigationTabsService {
     private administrationScreenService: AdministrationScreenService,
     appAuthService: AppAuthService
   ) {
+    makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
+      handlers: observable,
+      tabsMap: observable,
+      state: observable,
+      currentTabId: computed,
+      tabIdList: computed,
+      openTab: action,
+      selectTab: action,
+      closeTab: action,
+      registerTabHandler: action,
+      updateHandlerState: action,
+      unloadTabs: action,
+    });
+
     this.autoSaveService.withAutoSave(
       this.tabsMap,
       `${NAVIGATION_TABS_BASE_KEY}_tab_map`,
-      (json): IKeyValueMap<ITab> => {
-        const map: IKeyValueMap<ITab> = {};
-        for (const [key, value] of Object.entries(json as IKeyValueMap<ITab>)) {
+      map => {
+        for (const [key, value] of Array.from(map.entries())) {
           if (
             typeof value.id === 'string'
             && typeof value.handlerId === 'string'
             && typeof value.userId === 'string'
           ) {
             value.restored = false;
-            map[key] = value;
+          } else {
+            map.delete(key);
           }
         }
         return map;
@@ -95,15 +106,14 @@ export class NavigationTabsService {
     this.autoSaveService.withAutoSave(
       this.state,
       NAVIGATION_TABS_BASE_KEY,
-      (json): IKeyValueMap<TabsState> => {
-        const map: IKeyValueMap<TabsState> = {};
-        for (const [key, value] of Object.entries(json as IKeyValueMap<TabsState>)) {
+      map => {
+        for (const [key, value] of Array.from(map.entries())) {
           if (
-            typeof value.currentId === 'string'
-            && Array.isArray(value.history)
-            && Array.isArray(value.tabs)
+            typeof value.currentId !== 'string'
+            || !Array.isArray(value.history)
+            || !Array.isArray(value.tabs)
           ) {
-            map[key] = value;
+            map.delete(key);
           }
         }
         return map;
@@ -119,7 +129,7 @@ export class NavigationTabsService {
       });
   }
 
-  @action openTab(tab: ITab, isSelected?: boolean): void {
+  openTab(tab: ITab, isSelected?: boolean): void {
     this.tabsMap.set(tab.id, tab);
     this.userTabsState.tabs.push(tab.id);
 
@@ -128,7 +138,7 @@ export class NavigationTabsService {
     }
   }
 
-  @action async selectTab(tabId: string, skipHandlers?: boolean): Promise<void> {
+  async selectTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     if (tabId === '') {
       this.userTabsState.currentId = '';
     }
@@ -153,7 +163,7 @@ export class NavigationTabsService {
     this.tabSelectSubject.next(tab);
   }
 
-  @action async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {
+  async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {
     if (!this.userTabsState.tabs.includes(tabId)) {
       return;
     }
@@ -173,15 +183,13 @@ export class NavigationTabsService {
     }
   }
 
-  @action registerTabHandler<TState>(
-    options: TabHandlerOptions<TState>
-  ): TabHandler<TState> {
+  registerTabHandler<TState>(options: TabHandlerOptions<TState>): TabHandler<TState> {
     const tabHandler = new TabHandler(options);
     this.handlers.set(options.key, tabHandler);
     return tabHandler;
   }
 
-  @action updateHandlerState<T>(tabId: string, state: T): void {
+  updateHandlerState<T>(tabId: string, state: T): void {
     const tab = this.tabsMap.get(tabId);
     if (tab) {
       tab.handlerState = state;
@@ -246,7 +254,7 @@ export class NavigationTabsService {
     }
   }
 
-  @action private async unloadTabs() {
+  private async unloadTabs() {
     if (this.administrationScreenService.isConfigurationMode) {
       return;
     }
@@ -309,10 +317,10 @@ export class NavigationTabsService {
     try {
       const handler = this.handlers.get(tab.handlerId);
 
-      if (!handler || (handler.onRestore && !await handler.onRestore(tab))) {
+      if (!handler || (handler.onRestore && !(await handler.onRestore(tab)))) {
         restoreFail = true;
       }
-    } catch {
+    } catch (exception) {
       restoreFail = true;
     }
 

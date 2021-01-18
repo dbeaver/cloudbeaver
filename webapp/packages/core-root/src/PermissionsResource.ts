@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
@@ -15,13 +15,18 @@ import { SessionResource } from './SessionResource';
 
 @injectable()
 export class PermissionsResource extends CachedDataResource<Set<string>, void> {
-  @observable private loaded: boolean;
+  private loaded: boolean;
 
   constructor(
     private graphQLService: GraphQLService,
     private sessionResource: SessionResource
   ) {
     super(new Set());
+
+    makeObservable<PermissionsResource, 'loaded'>(this, {
+      loaded: observable,
+    });
+
     this.loaded = false;
     this.sessionResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.sessionResource.onDataUpdate.addHandler(() => { this.load(); });

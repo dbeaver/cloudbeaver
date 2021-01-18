@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -19,10 +19,14 @@ const FadeTimeout = 5000;
 @injectable()
 export class NotificationItemController implements IInitializableController {
   closeAfter = 0;
-  @observable isDetailsDialogOpen = false;
+  isDetailsDialogOpen = false;
   private notification!: INotification<any>;
 
-  constructor(private commonDialogService: CommonDialogService) {}
+  constructor(private commonDialogService: CommonDialogService) {
+    makeObservable(this, {
+      isDetailsDialogOpen: observable,
+    });
+  }
 
   init(notification: INotification<any>): void {
     this.notification = notification;

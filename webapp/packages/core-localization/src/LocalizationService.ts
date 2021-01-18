@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable } from 'mobx';
+import { action, observable, makeObservable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -26,12 +26,11 @@ const LANG_SETTINGS_KEY = 'langSettings';
 
 @injectable()
 export class LocalizationService extends Bootstrap {
-  @observable settings = {
+  settings = {
     language: DEFAULT_LOCALE_NAME,
   };
 
   // observable.shallow - don't treat locales as observables
-  @observable.shallow
   private localeMap: Map<string, Map<string, string>> = new Map();
 
   private localeProviders: ILocaleProvider[] = [];
@@ -44,6 +43,12 @@ export class LocalizationService extends Bootstrap {
     private settingsService: SettingsService
   ) {
     super();
+
+    makeObservable<LocalizationService, 'localeMap' | 'setCurrentLocale'>(this, {
+      settings: observable,
+      localeMap: observable.shallow,
+      setCurrentLocale: action,
+    });
   }
 
   addProvider(provider: ILocaleProvider): void {
@@ -109,7 +114,6 @@ export class LocalizationService extends Bootstrap {
     }
   }
 
-  @action
   private setCurrentLocale(lang: string) {
     this.settings.language = lang;
   }

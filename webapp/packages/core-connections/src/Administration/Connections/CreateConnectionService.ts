@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { TabsContainer } from '@cloudbeaver/core-blocks';
@@ -26,13 +26,13 @@ export interface ICreateMethodOptions {
 
 @injectable()
 export class CreateConnectionService {
-  @observable disabled = false;
-  @observable connection: AdminConnection | null;
-  @observable availableDrivers: string[];
-  @observable credentials: Record<string, string | number>;
-  @observable grantedSubjects: AdminConnectionGrantInfo[] | null;
+  disabled = false;
+  connection: AdminConnection | null;
+  availableDrivers: string[];
+  credentials: Record<string, string | number>;
+  grantedSubjects: AdminConnectionGrantInfo[] | null;
 
-  @computed get driver(): DBDriver | undefined {
+  get driver(): DBDriver | undefined {
     if (!this.connection?.driverId) {
       return;
     }
@@ -47,6 +47,15 @@ export class CreateConnectionService {
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService
   ) {
+    makeObservable(this, {
+      disabled: observable,
+      connection: observable,
+      availableDrivers: observable,
+      credentials: observable,
+      grantedSubjects: observable,
+      driver: computed,
+    });
+
     this.credentials = {};
     this.availableDrivers = [];
     this.grantedSubjects = null;

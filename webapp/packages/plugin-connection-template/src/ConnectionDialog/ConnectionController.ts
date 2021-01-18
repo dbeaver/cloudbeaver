@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import {
   DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver
@@ -34,14 +34,14 @@ export interface IConnectionController {
 @injectable()
 export class ConnectionController
 implements IInitializableController, IDestructibleController, IConnectionController {
-  @observable step = ConnectionStep.ConnectionTemplateSelect;
-  @observable isLoading = true;
-  @observable isConnecting = false;
-  @observable template: Connection | null = null;
-  @observable authModel?: DatabaseAuthModel;
-  @observable credentials: any = { };
-  @observable hasDetails = false;
-  @observable responseMessage: string | null = null;
+  step = ConnectionStep.ConnectionTemplateSelect;
+  isLoading = true;
+  isConnecting = false;
+  template: Connection | null = null;
+  authModel?: DatabaseAuthModel;
+  credentials: any = { };
+  hasDetails = false;
+  responseMessage: string | null = null;
 
   private exception: GQLError | null = null;
   private onClose!: () => void;
@@ -69,7 +69,18 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
     private dbAuthModelsResource: DatabaseAuthModelsResource
-  ) { }
+  ) {
+    makeObservable(this, {
+      step: observable,
+      isLoading: observable,
+      isConnecting: observable,
+      template: observable,
+      authModel: observable,
+      credentials: observable,
+      hasDetails: observable,
+      responseMessage: observable,
+    });
+  }
 
   init(onClose: () => void): void {
     this.onClose = onClose;

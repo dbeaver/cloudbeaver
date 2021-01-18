@@ -10,7 +10,7 @@
 
 import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
 import 'codemirror/mode/meta';
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -31,12 +31,17 @@ export class CodeEditorController {
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 
-  @observable
   bindings: Omit<IControlledCodeMirror, 'value'> = {
     options: { ...COMMON_EDITOR_CONFIGURATION },
     editorDidMount: this.handleConfigure.bind(this),
     onBeforeChange: () => {},
   };
+
+  constructor() {
+    makeObservable(this, {
+      bindings: observable,
+    });
+  }
 
   init(bindings?: Partial<IControlledCodeMirror>): void {
     this.bindings.options = {
@@ -67,8 +72,8 @@ export class CodeEditorController {
         .reduce((obj, value) => ({ ...obj, [value]: value }), {});
 
       const builtin = [
-        ...this.dialect?.functions || [],
-        ...this.dialect?.reservedWords || [],
+        ...(this.dialect?.functions || []),
+        ...(this.dialect?.reservedWords || []),
       ].map(v => v.toLowerCase())
         .reduce((obj, value) => ({
           ...obj,

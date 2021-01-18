@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import {
   injectable, IInitializableController
@@ -27,7 +27,7 @@ interface IValidationStatus {
 @injectable()
 export class ConnectionFormController
 implements IInitializableController {
-  @observable isSaving: boolean;
+  isSaving: boolean;
 
   readonly afterSave: IExecutor<string>;
 
@@ -43,7 +43,7 @@ implements IInitializableController {
   }
 
   /** It will be loaded by options controller */
-  @computed get driver(): DBDriver | null {
+  get driver(): DBDriver | null {
     return this.dbDriverResource.get(this.model.connection.driverId) || null;
   }
 
@@ -55,6 +55,11 @@ implements IInitializableController {
     private notificationService: NotificationService,
     private dbDriverResource: DBDriverResource
   ) {
+    makeObservable(this, {
+      isSaving: observable,
+      driver: computed,
+    });
+
     this.isSaving = false;
     this.afterSave = new Executor();
   }

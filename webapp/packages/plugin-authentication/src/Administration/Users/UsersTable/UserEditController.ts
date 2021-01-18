@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -18,10 +18,10 @@ import { GQLErrorCatcher, AdminUserInfo, ResourceKeyUtils, ResourceKey } from '@
 @injectable()
 export class UserEditController
 implements IInitializableController, IDestructibleController {
-  @observable isLoading = true;
-  @observable user: AdminUserInfo | null = null;
+  isLoading = true;
+  user: AdminUserInfo | null = null;
 
-  @computed get isDisabled() {
+  get isDisabled() {
     return this.usersResource.isDataLoading(this.userId);
   }
 
@@ -33,6 +33,12 @@ implements IInitializableController, IDestructibleController {
     private notificationService: NotificationService,
     private usersResource: UsersResource
   ) {
+    makeObservable(this, {
+      isLoading: observable,
+      user: observable,
+      isDisabled: computed,
+    });
+
     this.updateUser = this.updateUser.bind(this);
   }
 

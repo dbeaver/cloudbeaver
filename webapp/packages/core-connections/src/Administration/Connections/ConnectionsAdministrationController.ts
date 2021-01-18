@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -17,20 +17,18 @@ import { AdminConnection, compareConnections, ConnectionsResource } from '../Con
 
 @injectable()
 export class ConnectionsAdministrationController {
-  @observable isProcessing = false;
+  isProcessing = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
-  @computed
   get connections(): AdminConnection[] {
     return Array.from(this.connectionsResource.data.values()).sort(compareConnections);
   }
 
-  @computed
   get isLoading(): boolean {
     return this.connectionsResource.isLoading() || this.isProcessing;
   }
 
-  @computed get itemsSelected(): boolean {
+  get itemsSelected(): boolean {
     return Array.from(this.selectedItems.values()).some(v => v);
   }
 
@@ -38,7 +36,14 @@ export class ConnectionsAdministrationController {
     private notificationService: NotificationService,
     private connectionsResource: ConnectionsResource,
     private commonDialogService: CommonDialogService
-  ) { }
+  ) {
+    makeObservable(this, {
+      isProcessing: observable,
+      connections: computed,
+      isLoading: computed,
+      itemsSelected: computed,
+    });
+  }
 
   update = async (): Promise<void> => {
     try {

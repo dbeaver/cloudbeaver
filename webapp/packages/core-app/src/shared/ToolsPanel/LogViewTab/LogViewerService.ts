@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable } from 'mobx';
+import { action, observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -19,13 +19,13 @@ import type { ILogEntry } from './ILogEntry';
 
 @injectable()
 export class LogViewerService {
-  @observable _isActive = false;
+  _isActive = false;
 
   get isActive(): boolean {
     return this._isActive;
   }
 
-  @observable private log: ILogEntry[] = [];
+  private log: ILogEntry[] = [];
   private interval: any = null;
   private failedRequestsCount = 0;
   private maxFailedRequests = 0;
@@ -37,6 +37,13 @@ export class LogViewerService {
     private permissionsService: PermissionsService,
     private permissionsResource: PermissionsResource,
   ) {
+    makeObservable<LogViewerService, 'log' | 'addNewEntries'>(this, {
+      _isActive: observable,
+      log: observable,
+      clearLog: action,
+      addNewEntries: action,
+    });
+
     this.permissionsResource.onDataUpdate.addHandler(this.stopIfHasNoPermission.bind(this));
   }
 
@@ -76,7 +83,6 @@ export class LogViewerService {
     this._isActive = false;
   }
 
-  @action
   clearLog(): void {
     this.log = [];
   }
@@ -94,7 +100,6 @@ export class LogViewerService {
     return entries;
   }
 
-  @action
   private addNewEntries(entries: ILogEntry[]) {
     this.log.unshift(...entries.reverse());
     const maxLogEntries = this.coreSettingsService.settings.getValue('app.logViewer.maxLogRecords');

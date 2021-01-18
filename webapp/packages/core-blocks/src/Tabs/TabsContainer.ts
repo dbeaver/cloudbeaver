@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import type { TabProps } from './Tab/TabProps';
 import type { ITabData } from './TabsContext';
@@ -39,15 +39,19 @@ export interface ITabInfo<
 }
 
 export class TabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
-  @observable.shallow
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
 
-  @computed get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
+  get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
     return Array.from(this.tabInfoMap.values())
       .sort((a, b) => a.order - b.order);
   }
 
   constructor() {
+    makeObservable(this, {
+      tabInfoMap: observable.shallow,
+      tabInfoList: computed,
+    });
+
     this.tabInfoMap = new Map();
   }
 

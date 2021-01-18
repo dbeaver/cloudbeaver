@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import {
@@ -67,7 +67,7 @@ export class ConnectionSchemaManagerService {
     return this.activeItem.getCurrentSchemaId(this.activeItem.context);
   }
 
-  @computed get currentObjectCatalog(): ObjectContainer | undefined {
+  get currentObjectCatalog(): ObjectContainer | undefined {
     if (!this.currentConnectionId || !this.currentObjectCatalogId) {
       return;
     }
@@ -78,7 +78,7 @@ export class ConnectionSchemaManagerService {
     );
   }
 
-  @computed get currentObjectSchema(): ObjectContainer | undefined {
+  get currentObjectSchema(): ObjectContainer | undefined {
     if (!this.currentConnectionId || !this.currentObjectSchemaId || !this.currentObjectCatalogId) {
       return;
     }
@@ -90,7 +90,7 @@ export class ConnectionSchemaManagerService {
     );
   }
 
-  @computed get objectContainerList(): ObjectContainer[] | undefined {
+  get objectContainerList(): ObjectContainer[] | undefined {
     if (!this.currentConnectionId) {
       return;
     }
@@ -116,8 +116,8 @@ export class ConnectionSchemaManagerService {
       && !this.connectionsManagerService.connectionObjectContainers.isLoading();
   }
 
-  @observable private activeItem: IActiveItem<any> | null = null;
-  @observable private activeItemHistory: Array<IActiveItem<any>> = [];
+  private activeItem: IActiveItem<any> | null = null;
+  private activeItemHistory: Array<IActiveItem<any>> = [];
 
   constructor(
     private navigationTabsService: NavigationTabsService,
@@ -127,6 +127,13 @@ export class ConnectionSchemaManagerService {
     private notificationService: NotificationService,
     private appAuthService: AppAuthService
   ) {
+    makeObservable<ConnectionSchemaManagerService, 'activeItem' | 'activeItemHistory'>(this, {
+      currentObjectCatalog: computed,
+      currentObjectSchema: computed,
+      objectContainerList: computed,
+      activeItem: observable,
+      activeItemHistory: observable,
+    });
   }
 
   registerCallbacks(): void {

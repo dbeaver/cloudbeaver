@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, makeObservable } from 'mobx';
 
 import { PromiseCancelledError } from './PromiseCancelledError';
 import { PromiseExecutor } from './PromiseExecutor';
@@ -23,20 +23,36 @@ export enum EDeferredState {
  * Wrapper for promise to use with mobx to control state of a promise
  */
 export class Deferred<T> {
-  @observable private payload: T | undefined;
-  @observable private rejectionReason: any;
-  @observable private state: EDeferredState = EDeferredState.PENDING;
+  private payload: T | undefined;
+  private rejectionReason: any;
+  private state: EDeferredState = EDeferredState.PENDING;
 
   private promiseExecutor = new PromiseExecutor<T>();
+
+  constructor() {
+    makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(this, {
+      payload: observable,
+      rejectionReason: observable,
+      state: observable,
+      isInProgress: computed,
+      isFinished: computed,
+      toResolved: action,
+      toRejected: action,
+      toCancelled: action,
+      toCancelling: action,
+      toPending: action,
+    });
+  }
+
   get promise(): Promise<T> {
     return this.promiseExecutor.promise;
   }
 
-  @computed get isInProgress() {
+  get isInProgress() {
     return this.state === EDeferredState.PENDING || this.state === EDeferredState.CANCELLING;
   }
 
-  @computed get isFinished() {
+  get isFinished() {
     return !this.isInProgress;
   }
 
@@ -59,35 +75,30 @@ export class Deferred<T> {
 
   cancel() {}
 
-  @action
   protected toResolved(value: T): void {
     this.state = EDeferredState.RESOLVED;
     this.payload = value;
     this.promiseExecutor.resolve(value);
   }
 
-  @action
   protected toRejected(reason?: any): void {
     this.state = EDeferredState.REJECTED;
     this.rejectionReason = reason;
     this.promiseExecutor.reject(reason);
   }
 
-  @action
   protected toCancelled(reason?: any): void {
     this.state = EDeferredState.CANCELLED;
     this.rejectionReason = reason;
     this.promiseExecutor.reject(new PromiseCancelledError(reason));
   }
 
-  @action
   protected toCancelling(): void {
     if (this.state === EDeferredState.PENDING) {
       this.state = EDeferredState.CANCELLING;
     }
   }
 
-  @action
   protected toPending(): void {
     if (this.state === EDeferredState.CANCELLING) {
       this.state = EDeferredState.PENDING;

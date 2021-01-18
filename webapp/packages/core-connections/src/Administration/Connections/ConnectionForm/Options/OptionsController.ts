@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed } from 'mobx';
+import { action, computed, makeObservable } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -19,27 +19,27 @@ import type { IConnectionFormModel } from '../IConnectionFormModel';
 @injectable()
 export class OptionsController
 implements IInitializableController {
-  @computed get drivers(): DBDriver[] {
+  get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
   }
 
-  @computed get driver(): DBDriver | undefined {
+  get driver(): DBDriver | undefined {
     return this.dbDriverResource.get(this.model.connection.driverId);
   }
 
-  @computed get authModel(): DatabaseAuthModel | null {
+  get authModel(): DatabaseAuthModel | null {
     if (!this.model.connection?.authModel && !this.driver) {
       return null;
     }
     return this.dbAuthModelsResource.get(this.model.connection?.authModel || this.driver!.defaultAuthModel) || null;
   }
 
-  @computed get authModelLoading(): boolean {
+  get authModelLoading(): boolean {
     return this.dbAuthModelsResource.isLoading();
   }
 
-  @computed get properties(): ObjectPropertyInfo[] | undefined {
+  get properties(): ObjectPropertyInfo[] | undefined {
     if (this.model.connection.authProperties.length) {
       return this.model.connection.authProperties;
     }
@@ -55,7 +55,16 @@ implements IInitializableController {
     private notificationService: NotificationService,
     private dbAuthModelsResource: DatabaseAuthModelsResource,
     private dbDriverResource: DBDriverResource,
-  ) { }
+  ) {
+    makeObservable<OptionsController, 'setDefaults'>(this, {
+      drivers: computed,
+      driver: computed,
+      authModel: computed,
+      authModelLoading: computed,
+      properties: computed,
+      setDefaults: action,
+    });
+  }
 
   init(model: IConnectionFormModel): void {
     this.model = model;
@@ -74,7 +83,6 @@ implements IInitializableController {
     }
   };
 
-  @action
   private setDefaults(prevDriverId: string | null) {
     this.setDefaultParameters(prevDriverId);
     this.cleanCredentials();

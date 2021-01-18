@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 import createRouter, {
   State, Router, SubscribeFn, SubscribeState
 } from 'router5';
@@ -32,12 +32,19 @@ export class RouterService extends Bootstrap {
 
   readonly router: Router;
 
-  @observable private currentState: RouterState;
-  @observable private currentRoute = '';
-  @observable private currentParams: Record<string, any> = {};
+  private currentState: RouterState;
+  private currentRoute = '';
+  private currentParams: Record<string, any> = {};
 
   constructor() {
     super();
+
+    makeObservable<RouterService, 'currentState' | 'currentRoute' | 'currentParams'>(this, {
+      currentState: observable,
+      currentRoute: observable,
+      currentParams: observable,
+    });
+
     this.router = createRouter();
     this.currentState = this.router.getState();
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, makeObservable } from 'mobx';
 
 import type { ITab } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
@@ -16,14 +16,22 @@ import { ObjectPage, ObjectPageOptions, ObjectPageCallback } from './ObjectPage'
 
 @injectable()
 export class DBObjectPageService {
-  @observable pages = new Map<string, ObjectPage<any>>();
+  pages = new Map<string, ObjectPage<any>>();
 
-  @computed get orderedPages(): Array<ObjectPage<any>> {
+  constructor() {
+    makeObservable(this, {
+      pages: observable,
+      orderedPages: computed,
+      register: action,
+    });
+  }
+
+  get orderedPages(): Array<ObjectPage<any>> {
     return Array.from(this.pages.values())
       .sort(this.comparePages.bind(this));
   }
 
-  @action register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
+  register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
     const objectPage = new ObjectPage(options);
     this.pages.set(options.key, objectPage);
     return objectPage;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
 import type { TableColumn } from './TableColumn';
@@ -24,6 +24,15 @@ export class TableDataModel {
   private columns: TableColumn[] = [];
 
   constructor() {
+    makeObservable(this, {
+      resetData: action,
+      updateRows: action,
+      updateRow: action,
+      updateCell: action,
+      insertRows: action,
+      setColumns: action,
+    });
+
     this.rowsUpdateSubject = new Subject();
     this.onRowsUpdate = this.rowsUpdateSubject.asObservable();
   }
@@ -66,26 +75,22 @@ export class TableDataModel {
     return [...this.rows[rowNumber]];
   }
 
-  @action
   resetData(): void {
     this.rows = [];
     this.columns = [];
   }
 
-  @action
   updateRows(newRows: SomeTableRows): void {
     for (const [key, row] of newRows) {
       this.updateRow(key, row);
     }
   }
 
-  @action
   updateRow(rowIndex: number, value: TableRow): void {
     this.rows[rowIndex] = value;
     this.rowsUpdateSubject.next([rowIndex]);
   }
 
-  @action
   updateCell(rowIndex: number, cellIndex: number, value: CellValue): void {
     const row = this.rows[rowIndex];
     if (row && cellIndex < row.length) {
@@ -93,7 +98,6 @@ export class TableDataModel {
     }
   }
 
-  @action
   insertRows(position: number, rows: TableRow[]): void {
     if (rows.length > 0) {
       if (position + rows.length > this.rows.length) {
@@ -104,7 +108,6 @@ export class TableDataModel {
     }
   }
 
-  @action
   setColumns(columns: TableColumn[]): void {
     this.columns = [...columns];
   }

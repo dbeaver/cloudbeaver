@@ -9,7 +9,7 @@
   "types": "src/index.ts",
   "scripts": {
     "prebuild": "rimraf lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config",
+    "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "gql:gen": "graphql-codegen",
     "gql:gen:dev": "graphql-codegen --watch",

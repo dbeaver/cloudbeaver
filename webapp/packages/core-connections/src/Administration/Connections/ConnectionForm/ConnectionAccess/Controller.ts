@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, makeObservable } from 'mobx';
 
 import { UsersResource, RolesResource, AdminUser } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
@@ -20,18 +20,18 @@ import type { IConnectionFormModel } from '../IConnectionFormModel';
 @injectable()
 export class Controller
 implements IInitializableController {
-  @observable loading = false;
-  @observable selectedSubjects: Map<string, boolean> = new Map();
+  loading = false;
+  selectedSubjects: Map<string, boolean> = new Map();
 
-  @computed get users(): AdminUser[] {
+  get users(): AdminUser[] {
     return Array.from(this.usersResource.data.values());
   }
 
-  @computed get roles(): AdminRoleInfo[] {
+  get roles(): AdminRoleInfo[] {
     return Array.from(this.rolesResource.data.values());
   }
 
-  @computed private get accessLoaded() {
+  private get accessLoaded() {
     return !!this.model.grantedSubjects;
   }
 
@@ -49,6 +49,14 @@ implements IInitializableController {
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
   ) {
+    makeObservable<Controller, 'accessLoaded'>(this, {
+      loading: observable,
+      selectedSubjects: observable,
+      users: computed,
+      roles: computed,
+      accessLoaded: computed,
+    });
+
     this.saveSubjectPermissions = this.saveSubjectPermissions.bind(this);
   }
 

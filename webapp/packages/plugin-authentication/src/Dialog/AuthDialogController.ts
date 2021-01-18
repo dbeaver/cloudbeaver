@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
@@ -17,15 +17,15 @@ import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class AuthDialogController implements IInitializableController, IDestructibleController {
-  @observable provider: AuthProvider | null = null;
-  @observable isAuthenticating = false;
-  @observable credentials = {};
+  provider: AuthProvider | null = null;
+  isAuthenticating = false;
+  credentials = {};
 
   get isLoading(): boolean {
     return this.authProvidersResource.isLoading();
   }
 
-  @computed get providers(): AuthProvider[] {
+  get providers(): AuthProvider[] {
     return this.authProvidersResource
       .data
       .concat()
@@ -41,7 +41,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authProvidersResource: AuthProvidersResource,
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
-  ) { }
+  ) {
+    makeObservable(this, {
+      provider: observable,
+      isAuthenticating: observable,
+      credentials: observable,
+      providers: computed,
+    });
+  }
 
   init(onClose: () => void) {
     this.close = onClose;

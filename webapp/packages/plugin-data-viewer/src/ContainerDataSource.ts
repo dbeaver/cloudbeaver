@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
@@ -33,7 +33,7 @@ export interface IDataContainerResult extends IDatabaseDataResult {
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
-  @observable currentFetchTableProcess: FetchTableDataAsyncProcess | null;
+  currentFetchTableProcess: FetchTableDataAsyncProcess | null;
 
   get canCancel(): boolean {
     return this.currentFetchTableProcess?.getState() === EDeferredState.PENDING;
@@ -44,6 +44,11 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     private notificationService: NotificationService,
   ) {
     super();
+
+    makeObservable(this, {
+      currentFetchTableProcess: observable,
+    });
+
     this.currentFetchTableProcess = null;
     this.executionContext = null;
   }

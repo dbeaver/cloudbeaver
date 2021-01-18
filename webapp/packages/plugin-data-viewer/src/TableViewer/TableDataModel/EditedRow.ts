@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { TableRow, RowValues } from './TableRow';
 
@@ -18,9 +18,13 @@ export interface RowDiff {
 
 export class EditedRow {
   readonly newRow: TableRow;
-  @observable private editedCells = new Set<number>();
+  private editedCells = new Set<number>();
 
   constructor(readonly rowIndex: number, readonly source: TableRow) {
+    makeObservable<EditedRow, 'editedCells'>(this, {
+      editedCells: observable,
+    });
+
     this.newRow = [...source];
   }
 

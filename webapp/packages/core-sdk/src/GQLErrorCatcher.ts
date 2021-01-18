@@ -6,16 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action } from 'mobx';
+import { observable, action, makeObservable } from 'mobx';
 
 import { GQLError } from './GQLError';
 
 export class GQLErrorCatcher {
-  @observable hasDetails = false;
-  @observable responseMessage: string | null = null;
-  @observable exception: GQLError | null = null;
+  hasDetails = false;
+  responseMessage: string | null = null;
+  exception: GQLError | null = null;
 
-  @action catch(exception: any): boolean {
+  constructor() {
+    makeObservable(this, {
+      hasDetails: observable,
+      responseMessage: observable,
+      exception: observable,
+      catch: action,
+      clear: action,
+    });
+  }
+
+  catch(exception: any): boolean {
     if (exception instanceof GQLError) {
       this.responseMessage = exception.errorText;
       this.hasDetails = exception.hasDetails();
@@ -26,7 +36,7 @@ export class GQLErrorCatcher {
     return false;
   }
 
-  @action clear() {
+  clear() {
     this.hasDetails = false;
     this.responseMessage = null;
     this.exception = null;

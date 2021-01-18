@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 import { Observable, Subject } from 'rxjs';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -40,6 +40,11 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     private graphQLService: GraphQLService
   ) {
     super(new Map());
+
+    makeObservable(this, {
+      add: action,
+    });
+
     this.changed = false;
     this.connectionCreateSubject = new Subject<AdminConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
@@ -86,7 +91,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return this.add(connection, true);
   }
 
-  @action add(connection: AdminConnection, isNew = false): AdminConnection {
+  add(connection: AdminConnection, isNew = false): AdminConnection {
     this.changed = true;
 
     const newConnection: NewConnection = {

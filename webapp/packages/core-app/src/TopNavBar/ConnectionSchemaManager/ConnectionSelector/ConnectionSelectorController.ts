@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import {
   ConnectionInfoResource,
@@ -26,7 +26,7 @@ export class ConnectionSelectorController {
   connectionMenu: IMenuItem;
   objectContainerMenu: IMenuItem;
 
-  @computed get currentConnection(): Connection | undefined {
+  get currentConnection(): Connection | undefined {
     if (!this.connectionSelectorService.currentConnectionId) {
       return;
     }
@@ -36,7 +36,7 @@ export class ConnectionSelectorController {
     );
   }
 
-  @computed get currentConnectionIcon(): string | undefined {
+  get currentConnectionIcon(): string | undefined {
     if (!this.currentConnection) {
       return;
     }
@@ -58,7 +58,7 @@ export class ConnectionSelectorController {
       );
   }
 
-  @computed get objectContainerSelectionDisabled(): boolean {
+  get objectContainerSelectionDisabled(): boolean {
     return !this.connectionSelectorService.isConnectionChangeable
       || this.getObjectContainerItems().length === 0;
   }
@@ -83,7 +83,7 @@ export class ConnectionSelectorController {
     return value;
   }
 
-  @computed private get currentObjectContainerIcon(): string {
+  private get currentObjectContainerIcon(): string {
     if (this.connectionSelectorService.currentObjectSchema?.features?.includes(EObjectFeature.schema)) {
     // TODO move such kind of icon paths to a set of constants
       return 'schema_system';
@@ -100,6 +100,13 @@ export class ConnectionSelectorController {
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
   ) {
+    makeObservable<ConnectionSelectorController, 'currentObjectContainerIcon'>(this, {
+      currentConnection: computed,
+      currentConnectionIcon: computed,
+      objectContainerSelectionDisabled: computed,
+      currentObjectContainerIcon: computed,
+    });
+
     this.connectionMenu = new ComputedMenuItemModel({
       id: 'connectionsDropdown',
       isDisabled: () => !this.connectionSelectorService.isConnectionChangeable

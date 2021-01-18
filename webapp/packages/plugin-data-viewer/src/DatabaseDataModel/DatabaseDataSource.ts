@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -18,19 +18,31 @@ import type { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseD
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {
-  @observable offset: number;
-  @observable count: number;
-  @observable dataFormat: ResultDataFormat;
-  @observable options: TOptions | null;
-  @observable requestInfo: IRequestInfo;
-  @observable executionContext: IExecutionContext | null;
-  @observable supportedDataFormats: ResultDataFormat[];
+  offset: number;
+  count: number;
+  dataFormat: ResultDataFormat;
+  options: TOptions | null;
+  requestInfo: IRequestInfo;
+  executionContext: IExecutionContext | null;
+  supportedDataFormats: ResultDataFormat[];
   abstract get canCancel(): boolean;
 
-  @observable private activeRequest: Promise<TResult[]> | null;
-  @observable private activeSave: Promise<TResult[]> | null;
+  private activeRequest: Promise<TResult[]> | null;
+  private activeSave: Promise<TResult[]> | null;
 
   constructor() {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave'>(this, {
+      offset: observable,
+      count: observable,
+      dataFormat: observable,
+      options: observable,
+      requestInfo: observable,
+      executionContext: observable,
+      supportedDataFormats: observable,
+      activeRequest: observable,
+      activeSave: observable,
+    });
+
     this.offset = 0;
     this.count = 0;
     this.options = null;

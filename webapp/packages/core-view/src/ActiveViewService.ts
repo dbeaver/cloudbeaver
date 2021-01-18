@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import type { IExtension } from '@cloudbeaver/core-extensions';
@@ -20,7 +20,13 @@ export type IActiveItemProvider<T> = () => IActiveView<T> | null;
 
 @injectable()
 export class ActiveViewService {
-  @observable private activeView: IActiveItemProvider<any> | null = null;
+  private activeView: IActiveItemProvider<any> | null = null;
+
+  constructor() {
+    makeObservable<ActiveViewService, 'activeView'>(this, {
+      activeView: observable,
+    });
+  }
 
   get view() {
     if (this.activeView) {

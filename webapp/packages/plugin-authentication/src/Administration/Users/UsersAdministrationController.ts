@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { AdminUser, AuthProvidersResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
@@ -17,12 +17,12 @@ import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UsersAdministrationController implements IInitializableController {
-  @observable isDeleting = false;
+  isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   readonly error = new GQLErrorCatcher();
 
-  @computed get users(): AdminUser[] {
+  get users(): AdminUser[] {
     return Array.from(this.usersResource.data.values())
       .sort((a, b) => {
         if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
@@ -47,7 +47,7 @@ export class UsersAdministrationController implements IInitializableController {
     return this.usersResource.isLoading() || this.isDeleting;
   }
 
-  @computed get itemsSelected(): boolean {
+  get itemsSelected(): boolean {
     return Array.from(this.selectedItems.values()).some(v => v);
   }
 
@@ -56,9 +56,15 @@ export class UsersAdministrationController implements IInitializableController {
     private authProvidersResource: AuthProvidersResource,
     private usersResource: UsersResource,
     private commonDialogService: CommonDialogService,
-  ) { }
+  ) {
+    makeObservable(this, {
+      isDeleting: observable,
+      users: computed,
+      itemsSelected: computed,
+    });
+  }
 
-  init(): void{
+  init(): void {
     this.authProvidersResource.load();
   }
 

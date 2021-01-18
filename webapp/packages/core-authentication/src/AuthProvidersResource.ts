@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { PermissionsResource } from '@cloudbeaver/core-root';
@@ -20,13 +20,18 @@ export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>;
 
 @injectable()
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], void> {
-  @observable private loaded;
+  private loaded;
 
   constructor(
     private graphQLService: GraphQLService,
     private permissionsResource: PermissionsResource
   ) {
     super([]);
+
+    makeObservable<AuthProvidersResource, 'loaded'>(this, {
+      loaded: observable,
+    });
+
     this.loaded = false;
     this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
   }

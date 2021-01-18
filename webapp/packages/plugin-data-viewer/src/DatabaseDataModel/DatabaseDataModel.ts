@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -18,10 +18,10 @@ import type { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
 implements IDatabaseDataModel<TOptions, TResult> {
   id: string;
-  @observable results: TResult[];
+  results: TResult[];
   source: IDatabaseDataSource<TOptions, TResult>;
-  @observable access: DatabaseDataAccessMode;
-  @observable countGain: number;
+  access: DatabaseDataAccessMode;
+  countGain: number;
 
   get requestInfo(): IRequestInfo {
     return this.source.requestInfo;
@@ -32,6 +32,12 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
+    makeObservable(this, {
+      results: observable,
+      access: observable,
+      countGain: observable,
+    });
+
     this.id = uuid();
     this.source = source;
     this.countGain = 0;

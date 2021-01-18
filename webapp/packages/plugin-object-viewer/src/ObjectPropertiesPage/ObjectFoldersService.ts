@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { TabEntity } from '@cloudbeaver/core-app';
 import type { ITab } from '@cloudbeaver/core-blocks';
@@ -35,10 +35,13 @@ export class ObjectFoldersService {
     private objectFoldersTabService: ObjectFoldersTabService,
     private rootContainerService: RootContainerService
   ) {
+    makeObservable(this, {
+      createTabsContainer: action,
+    });
+
     this.rootContainerService.registerEntityInRootContainer(this.tabContainersStorage);
   }
 
-  @action
   createTabsContainer(nodeId: string): ObjectFoldersTabContainer {
     const tabContainer = new ObjectFoldersTabContainer(nodeId);
     this.tabContainersStorage.addChild(tabContainer);

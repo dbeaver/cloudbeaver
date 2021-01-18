@@ -93,11 +93,6 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: [resolve('node_modules'), resolve('../../node_modules')],
-      // fallback: { 
-      //   "crypto": require.resolve("crypto-browserify"),
-      //   "stream": require.resolve("stream-browserify"),
-      //   "readable-stream": require.resolve("readable-stream")
-      // },
       alias: {
         react: 'preact/compat',
         react$: 'preact/compat',

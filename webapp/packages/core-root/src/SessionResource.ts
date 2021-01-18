@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -21,7 +21,6 @@ export type SessionState = SessionStateFragment;
 
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null, void> {
-  @observable
   private loaded: boolean;
 
   constructor(
@@ -29,6 +28,11 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     private serverConfiguration: ServerConfigResource
   ) {
     super(null);
+
+    makeObservable<SessionResource, 'loaded'>(this, {
+      loaded: observable,
+    });
+
     this.serverConfiguration.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.serverConfiguration.onDataUpdate.addHandler(() => { this.load(); });
     this.loaded = false;

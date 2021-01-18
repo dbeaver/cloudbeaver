@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -37,6 +37,15 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     sessionResource: SessionResource
   ) {
     super(new Map());
+
+    makeObservable(this, {
+      refreshSession: action,
+      createFromTemplate: action,
+      createConnection: action,
+      createFromNode: action,
+      add: action,
+    });
+
     this.onConnectionCreate = new Executor();
     this.onConnectionClose = new Executor();
     this.sessionUpdate = false;
@@ -51,7 +60,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     appAuthService.auth.addHandler(() => this.refreshSession(true));
   }
 
-  @action async refreshSession(sessionUpdate?: boolean): Promise<void> {
+  async refreshSession(sessionUpdate?: boolean): Promise<void> {
     this.sessionUpdate = sessionUpdate === true;
     try {
       const connectionsList = resourceKeyList(Array.from(this.data.keys()));
@@ -84,19 +93,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
   }
 
-  @action async createFromTemplate(templateId: string): Promise<Connection> {
+  async createFromTemplate(templateId: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({ templateId });
     return this.add(connection);
   }
 
-  @action async createConnection(config: ConnectionConfig): Promise<Connection> {
+  async createConnection(config: ConnectionConfig): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnection({
       config,
     });
     return this.add(connection);
   }
 
-  @action async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {
+  async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromNode({
       nodePath: nodeId,
       config: { name: nodeName },
@@ -105,7 +114,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  @action async add(connection: Connection): Promise<Connection> {
+  async add(connection: Connection): Promise<Connection> {
     const exists = this.data.has(connection.id);
     this.set(connection.id, connection);
 

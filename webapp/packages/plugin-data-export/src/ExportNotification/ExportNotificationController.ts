@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, computed } from 'mobx';
+import { observable, computed, makeObservable } from 'mobx';
 
 import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
@@ -24,7 +24,7 @@ interface ExportNotificationStatus {
 }
 @injectable()
 export class ExportNotificationController implements IInitializableController {
-  @observable isDetailsDialogOpen = false;
+  isDetailsDialogOpen = false;
 
   get isSuccess(): boolean {
     return this.process?.getState() === EDeferredState.RESOLVED;
@@ -46,7 +46,7 @@ export class ExportNotificationController implements IInitializableController {
     return !!this.process?.getRejectionReason();
   }
 
-  @computed get sourceName(): string {
+  get sourceName(): string {
     if (!this.task) {
       return '';
     }
@@ -83,7 +83,12 @@ export class ExportNotificationController implements IInitializableController {
     private dataExportProcessService: DataExportProcessService,
     private navNodeManagerService: NavNodeManagerService,
     private localization: LocalizationService
-  ) {}
+  ) {
+    makeObservable(this, {
+      isDetailsDialogOpen: observable,
+      sourceName: computed,
+    });
+  }
 
   init(notification: INotification<{ source: string }>): void {
     this.notification = notification;

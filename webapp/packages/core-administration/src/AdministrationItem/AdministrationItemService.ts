@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import type { RouterState } from '@cloudbeaver/core-routing';
@@ -20,7 +20,13 @@ import { orderAdministrationItems } from './orderAdministrationItems';
 
 @injectable()
 export class AdministrationItemService {
-  @observable items: IAdministrationItem[] = [];
+  items: IAdministrationItem[] = [];
+
+  constructor() {
+    makeObservable(this, {
+      items: observable,
+    });
+  }
 
   getDefaultItem(configurationWizard: boolean): string | null {
     const items = this.items.filter(filterConfigurationWizard(configurationWizard));
@@ -132,13 +138,13 @@ export class AdministrationItemService {
       return false;
     }
 
-    if (item.canActivate && !await item.canActivate(configurationWizard, outside)) {
+    if (item.canActivate && !(await item.canActivate(configurationWizard, outside))) {
       return false;
     }
 
     if (screen.sub) {
       const sub = this.getItemSub(item, screen.sub);
-      if (sub?.canActivate && !await sub.canActivate(screen.param, configurationWizard)) {
+      if (sub?.canActivate && !(await sub.canActivate(screen.param, configurationWizard))) {
         return false;
       }
     }

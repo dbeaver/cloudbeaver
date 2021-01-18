@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, makeObservable } from 'mobx';
 
 import './styles/main/normalize.css';
 import './styles/main/app-loading-screen.css';
@@ -34,7 +34,7 @@ const DEFAULT_THEME_ID = 'light';
 
 @injectable()
 export class ThemeService {
-  @computed get themes(): ITheme[] {
+  get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
   }
 
@@ -42,7 +42,7 @@ export class ThemeService {
     return this.settings.currentThemeId;
   }
 
-  @computed get currentTheme(): ITheme {
+  get currentTheme(): ITheme {
     let theme = this.themeMap.get(this.settings.currentThemeId);
     if (!theme) {
       theme = this.themeMap.get(DEFAULT_THEME_ID)!;
@@ -51,8 +51,8 @@ export class ThemeService {
     return theme;
   }
 
-  @observable.shallow private themeMap: Map<string, ITheme> = new Map();
-  @observable private settings = {
+  private themeMap: Map<string, ITheme> = new Map();
+  private settings = {
     currentThemeId: DEFAULT_THEME_ID,
   };
 
@@ -60,6 +60,14 @@ export class ThemeService {
     private notificationService: NotificationService,
     private settingsService: SettingsService
   ) {
+    makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
+      themes: computed,
+      currentTheme: computed,
+      themeMap: observable.shallow,
+      settings: observable,
+      setCurrentThemeId: action,
+    });
+
     this.loadAllThemes();
   }
 
@@ -90,7 +98,6 @@ export class ThemeService {
     return this.setCurrentThemeId(themeId);
   }
 
-  @action
   private setCurrentThemeId(themeId: string) {
     this.settings.currentThemeId = themeId;
   }

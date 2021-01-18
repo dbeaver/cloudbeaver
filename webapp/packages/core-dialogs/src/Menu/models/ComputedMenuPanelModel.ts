@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
@@ -18,11 +18,15 @@ export interface IComputedMenuPanelOptions {
 export class ComputedMenuPanelModel implements IMenuPanel {
   id: string;
 
-  @computed get menuItems() {
+  get menuItems() {
     return this.options.menuItemsGetter();
   }
 
   constructor(private options: IComputedMenuPanelOptions) {
+    makeObservable(this, {
+      menuItems: computed,
+    });
+
     this.id = this.options.id;
   }
 }

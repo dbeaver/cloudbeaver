@@ -8,6 +8,7 @@
 
 import {
   autorun,
+  ObservableMap,
   set,
   toJS
 } from 'mobx';
@@ -18,7 +19,7 @@ let id = 0;
 
 @injectable()
 export class LocalStorageSaveService {
-  withAutoSave<T>(store: T, name?: string, remap?: (savedStore: any) => any): void {
+  withAutoSave<T>(store: T, name?: string, remap?: (savedStore: T) => T): void {
     let firstRun = true;
     const storeId = name || ++id;
 
@@ -28,11 +29,8 @@ export class LocalStorageSaveService {
 
         if (state) {
           try {
-            if (remap) {
-              set(store, remap(JSON.parse(state)));
-            } else {
-              set(store, JSON.parse(state));
-            }
+            const parsed = this.parseData(store, state, remap);
+            set(store, parsed);
           } catch (e) {
             console.log('Error when parsing local storage value', e);
           }
@@ -41,7 +39,50 @@ export class LocalStorageSaveService {
         firstRun = false;
       }
 
-      localStorage.setItem(`${storeId}`, JSON.stringify(toJS(store)));
+      localStorage.setItem(
+        `${storeId}`,
+        this.stringifyData(store)
+      );
     });
+  }
+
+  private parseData(store: any, data: any, remap?: (savedStore: any) => any): any {
+    if (store instanceof ObservableMap) {
+      data = this.parseMap(data);
+    } else {
+      data = JSON.parse(data);
+    }
+
+    if (remap) {
+      data = remap(data);
+    }
+
+    if (store instanceof ObservableMap) {
+      data = Array.from((data as Map<any, any>).entries())
+        .reduce<{
+        [key: string]: any;
+      }>((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {});
+    }
+
+    return data;
+  }
+
+  private stringifyData(store: any): string {
+    if (store instanceof ObservableMap) {
+      return this.stringifyMap(toJS(store));
+    }
+
+    return JSON.stringify(toJS(store));
+  }
+
+  private stringifyMap(map: Map<any, any>): string {
+    return JSON.stringify(Array.from(map.entries()));
+  }
+
+  private parseMap(data: string): Map<any, any> {
+    return new Map(JSON.parse(data));
   }
 }

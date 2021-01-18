@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
@@ -25,8 +25,8 @@ export interface IValidationStatusContext {
 
 @injectable()
 export class ServerConfigurationService {
-  @observable state: IServerConfigurationPageState;
-  @observable loading: boolean;
+  state: IServerConfigurationPageState;
+  loading: boolean;
   readonly validationTask: IExecutor<boolean>;
 
   constructor(
@@ -36,6 +36,11 @@ export class ServerConfigurationService {
     private readonly notificationService: NotificationService,
     private readonly usersResource: UsersResource
   ) {
+    makeObservable(this, {
+      state: observable,
+      loading: observable,
+    });
+
     this.loading = true;
     this.state = this.getConfig();
     this.validationTask = new Executor();
@@ -82,7 +87,7 @@ export class ServerConfigurationService {
       throw new Error('No state available');
     }
 
-    if (!await this.validate()) {
+    if (!(await this.validate())) {
       return false;
     }
 

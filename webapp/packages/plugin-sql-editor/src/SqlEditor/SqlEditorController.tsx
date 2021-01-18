@@ -9,7 +9,7 @@
 import {
   showHint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
-import { computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import type { ITab } from '@cloudbeaver/core-app';
@@ -23,7 +23,7 @@ import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
-  @computed get dialect(): SqlDialectInfo | undefined {
+  get dialect(): SqlDialectInfo | undefined {
     if (!this.tab.handlerState.connectionId) {
       return undefined;
     }
@@ -31,7 +31,7 @@ export class SqlEditorController implements IInitializableController {
     return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.connectionId);
   }
 
-  @computed get isActionsDisabled(): boolean {
+  get isActionsDisabled(): boolean {
     return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isSqlExecuting;
   }
 
@@ -86,7 +86,7 @@ export class SqlEditorController implements IInitializableController {
     editorDidMount: this.handleEditorConfigure.bind(this),
   };
 
-  @computed get value() {
+  get value() {
     return this.tab.handlerState.query;
   }
 
@@ -97,7 +97,13 @@ export class SqlEditorController implements IInitializableController {
     private sqlResultTabsService: SqlResultTabsService,
     private sqlDialectInfoService: SqlDialectInfoService,
     private sqlEditorService: SqlEditorService
-  ) { }
+  ) {
+    makeObservable(this, {
+      dialect: computed,
+      isActionsDisabled: computed,
+      value: computed,
+    });
+  }
 
   init(tab: ITab<ISqlEditorTabState>) {
     this.tab = tab;

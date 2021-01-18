@@ -9,9 +9,9 @@
   "types": "src/index.ts",
   "scripts": {
     "prebuild": "rimraf lib/*",
-    "build": "webpack --config ../../configs/webpack.product.config",
-    "dev": "webpack-dev-server --progress --config=../../configs/webpack.product.dev.config --port=3100",
-    "analyse": "webpack --config ../../configs/webpack.product.config --profile --json > ./lib/stats.json",
+    "build": "webpack --config ../../configs/webpack.product.config.js",
+    "dev": "webpack serve --env development --progress --config=../../configs/webpack.product.dev.config.js --port=3100",
+    "analyse": "webpack --config ../../configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "webpack-bundle-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
@@ -32,6 +32,5 @@
     "@cloudbeaver/plugin-ddl-viewer": "0.1.0",
     "@cloudbeaver/plugin-object-viewer": "0.1.0",
     "@cloudbeaver/plugin-sql-editor": "0.1.0"
-  },
-  "buildVersion": "0.13.0"
+  }
 }
