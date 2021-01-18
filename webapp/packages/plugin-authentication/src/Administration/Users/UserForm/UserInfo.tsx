@@ -64,7 +64,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 type='password'
                 name='password'
                 autoComplete='new-password'
-                placeholder={controller.editing ? '••••••' : ''}
+                placeholder={editing ? '••••••' : ''}
                 value={controller.credentials.password}
                 disabled={controller.isSaving}
                 mod='surface'
@@ -78,7 +78,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               <InputField
                 type='password'
                 name='password_repeat'
-                placeholder={controller.editing ? '••••••' : ''}
+                placeholder={editing ? '••••••' : ''}
                 value={controller.credentials.passwordRepeat}
                 disabled={controller.isSaving}
                 mod='surface'
