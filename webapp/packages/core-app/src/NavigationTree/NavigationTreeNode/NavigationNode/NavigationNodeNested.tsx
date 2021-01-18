@@ -7,7 +7,7 @@
  */
 
 import { computed } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import styled from 'reshadow';
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useState, useMemo } from 'react';
 
 import { ItemListSearch, ItemList } from '@cloudbeaver/core-blocks';

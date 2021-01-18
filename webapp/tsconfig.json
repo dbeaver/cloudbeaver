@@ -13,6 +13,7 @@
       "dom",
       "ES2019"
     ],
+    "useDefineForClassFields": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,

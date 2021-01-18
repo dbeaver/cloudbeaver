@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createHash } from 'crypto';
+import md5 from 'md5';
 
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -29,9 +29,7 @@ export class AuthProviderService {
     const credentialsProcessed = { ...credentials };
     for (const parameter of provider.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed) {
-        const md5Hash = createHash('md5')
-          .update(credentialsProcessed[parameter.id])
-          .digest('hex')
+        const md5Hash = md5(credentialsProcessed[parameter.id])
           .toUpperCase();
         credentialsProcessed[parameter.id] = md5Hash;
       }

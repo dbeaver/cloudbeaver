@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ReactElement } from 'react';
-
+import type { TabPanelElement } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
-export function TabContext(injector: IServiceInjector, Panel: () => ReactElement | null) {
+export function TabContext(injector: IServiceInjector, Panel: TabPanelElement) {
   return (
     <AppContext app={injector}>
       <Panel />

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObserver } from 'mobx-react';
+import { useObserver } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';

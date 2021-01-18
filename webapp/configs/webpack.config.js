@@ -7,7 +7,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 // Temporary solution to remove wrong warning messages (it's was fixed https://github.com/microsoft/TypeScript/pull/35200 in typescript 3.8)
 class IgnoreNotFoundExportPlugin {
   apply(compiler) {
-    const messageRegExp = /export '.*'( \(reexported as '.*'\))? was not found in/
+    const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/
     function doneHook(stats) {
       stats.compilation.warnings = stats.compilation.warnings.filter(function (warn) {
         if (messageRegExp.test(warn.message)) {
@@ -25,6 +25,15 @@ class IgnoreNotFoundExportPlugin {
 }
 
 module.exports = (env, argv) => {
+  process.env.NODE_ENV = argv.mode || 'development'
+
+  function getBaseStyleLoader() {
+    if(argv.mode !== 'production') {
+      return 'style-loader'
+    }
+    return MiniCssExtractPlugin.loader;
+  }
+
   function generateStyleLoaders(options = { hasModule: false }) {
     const moduleScope = options.hasModule ? 'local' : 'global';
     const modules = {
@@ -39,12 +48,7 @@ module.exports = (env, argv) => {
     ];
 
     return [
-      {
-        loader: MiniCssExtractPlugin.loader,
-        options: {
-          hot: argv.mode !== 'production',
-        },
-      },
+      getBaseStyleLoader(),
       'cache-loader',
       {
         loader: 'css-loader',
@@ -76,8 +80,6 @@ module.exports = (env, argv) => {
     ];
   }
 
-  process.env.NODE_ENV = argv.mode || 'development'
-
   var babelLoader = {
     loader: 'babel-loader',
     options: {
@@ -91,6 +93,11 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: [resolve('node_modules'), resolve('../../node_modules')],
+      // fallback: { 
+      //   "crypto": require.resolve("crypto-browserify"),
+      //   "stream": require.resolve("stream-browserify"),
+      //   "readable-stream": require.resolve("readable-stream")
+      // },
       alias: {
         react: 'preact/compat',
         react$: 'preact/compat',
@@ -124,12 +131,7 @@ module.exports = (env, argv) => {
             {
               include: /node_modules/,
               use: [
-                {
-                  loader: MiniCssExtractPlugin.loader,
-                  options: {
-                    hot: argv.mode !== 'production',
-                  },
-                },
+                getBaseStyleLoader(),
                 'css-loader',
                 'sass-loader'
               ]
@@ -141,7 +143,7 @@ module.exports = (env, argv) => {
         },
       ]
     },
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
     plugins: [
       // new ESLintPlugin(options), //TODO: maybe later
       new ForkTsCheckerWebpackPlugin({

@@ -18,17 +18,18 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     'webpack-dev-server/client?http://localhost:3100',
     './src/index.ts',
   ],
+  mode: 'development',
   devServer: {
     hot: true,
     proxy: {
       '/api': {
-        target: argv.server,
+        target: 'http://stage-aws.web.dbeaver.net:8095/',
       },
     },
   },
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'eval-source-map',
   optimization: {
-    namedModules: true,
+    moduleIds: "named"
   },
   plugins: [
     new CopyWebpackPlugin({
@@ -38,7 +39,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       _VERSION_: JSON.stringify(package.version),
     }),
     new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), inject: 'html', version: package.version }),
-    new webpack.HotModuleReplacementPlugin(), // enable HMR globally
+    // new webpack.HotModuleReplacementPlugin(),
     // new BundleAnalyzerPlugin()
   ],
 });

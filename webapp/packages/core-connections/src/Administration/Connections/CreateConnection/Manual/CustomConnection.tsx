@@ -7,7 +7,7 @@
  */
 
 import { computed } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
 import { Loader } from '@cloudbeaver/core-blocks';

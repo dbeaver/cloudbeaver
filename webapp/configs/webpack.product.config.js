@@ -38,7 +38,6 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     usedExports: true,
     sideEffects: true,
     minimize: true,
-    namedModules: true,
     concatenateModules: true,
   },
   plugins: [

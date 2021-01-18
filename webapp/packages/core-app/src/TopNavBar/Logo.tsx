@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 
 import { AppLogo } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';

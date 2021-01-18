@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle } from 'react';
 import { Controlled as CodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';

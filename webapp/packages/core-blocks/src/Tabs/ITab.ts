@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ReactElement } from 'react';
+export type TabPanelElement = React.FunctionComponent<any> | (() => React.ReactElement | null);
 
 export interface ITab {
   tabId: string;
@@ -16,7 +16,7 @@ export interface ITab {
   onClose?: () => void;
   onActivate: () => void;
 
-  panel: () => ReactElement | null;
+  panel: TabPanelElement;
 }
 
 export interface ITabContainer {

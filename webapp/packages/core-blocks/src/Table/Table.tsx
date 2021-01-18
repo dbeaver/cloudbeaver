@@ -7,7 +7,7 @@
  */
 
 import { observable, computed } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useMemo } from 'react';
 import styled, { use } from 'reshadow';
 

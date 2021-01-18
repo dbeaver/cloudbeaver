@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer, useObserver } from 'mobx-react';
+import { observer, useObserver } from 'mobx-react-lite';
 import {
   forwardRef, Ref, useCallback
 } from 'react';

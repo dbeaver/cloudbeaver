@@ -21,7 +21,6 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     //   chunks: 'all',
     // },
     // minimize: false,
-    // namedModules: false,
     // concatenateModules: false,
   },
   plugins: [

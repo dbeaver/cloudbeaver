@@ -7,7 +7,7 @@
  */
 
 import { computed } from 'mobx';
-import { observer, useLocalStore } from 'mobx-react';
+import { observer, useLocalStore } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 

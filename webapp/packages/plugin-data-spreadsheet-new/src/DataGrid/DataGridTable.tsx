@@ -9,7 +9,7 @@
 import 'react-data-grid/dist/react-data-grid.css';
 
 import { computed } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo } from 'react';
 import DataGrid, { Column } from 'react-data-grid';
 import styled from 'reshadow';
