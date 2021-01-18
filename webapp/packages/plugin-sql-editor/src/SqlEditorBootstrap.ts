@@ -60,8 +60,10 @@ export class SqlEditorBootstrap {
 
   private isSQLEntryDisabled() {
     const activeView = this.activeViewService.view;
-    if (activeView && ExtensionUtils.from(activeView.extensions).has(isConnectionProvider)) {
-      return false;
+    if (activeView) {
+      return !ExtensionUtils
+        .from(activeView.extensions)
+        .has(isConnectionProvider);
     }
     return !this.connectionSchemaManagerService.currentConnectionId;
   }
