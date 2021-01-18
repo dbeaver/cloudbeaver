@@ -48,6 +48,7 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   user!: AdminUserInfo;
+  editing!: boolean;
 
   readonly error: GQLErrorCatcher;
 
@@ -55,7 +56,6 @@ export class UserFormController implements IInitializableController, IDestructib
   private connectionAccessChanged: boolean;
   private connectionAccessLoaded: boolean;
   private collapse!: () => void;
-  private editing!: boolean;
 
   constructor(
     private notificationService: NotificationService,
