@@ -77,10 +77,10 @@ export class NavigationTreeService {
   }
 
   getView(): IActiveView<string> | null {
-    const context = this.selectedNodes[0];
-    if (!context) {
+    if (!this.selectedNodes.length) {
       return null;
     }
+    const context = this.selectedNodes[0];
 
     return {
       context,

@@ -13,6 +13,7 @@ interface ExtensionExecutor {
     predicate: (extension: IExtension<any>) => extension is T,
     action: (extension: T) => void
   ) => this;
+  has: (checker: (extension: IExtension<any>) => boolean) => boolean;
 }
 
 export const ExtensionUtils = {
@@ -28,6 +29,9 @@ export const ExtensionUtils = {
           }
         }
         return this;
+      },
+      has(checker: (extension: IExtension<any>) => boolean): boolean {
+        return extensions.some(extension => checker(extension));
       },
     };
   },

@@ -14,7 +14,7 @@ import {
   NavNode, ConnectionSchemaManagerService,
   isObjectCatalogProvider, isObjectSchemaProvider
 } from '@cloudbeaver/core-app';
-import { ConnectionsManagerService, isConnectionProvider } from '@cloudbeaver/core-connections';
+import { isConnectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
@@ -27,11 +27,10 @@ export class SqlEditorBootstrap {
   constructor(
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
-    private connectionsManagerService: ConnectionsManagerService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
     private activeViewService: ActiveViewService
-  ) {}
+  ) { }
 
   async bootstrap() {
     this.mainMenuService.registerRootItem(
@@ -40,7 +39,7 @@ export class SqlEditorBootstrap {
         title: 'SQL',
         order: 2,
         onClick: this.openSQLEditor.bind(this),
-        isDisabled: () => !this.connectionsManagerService.hasAnyConnection(),
+        isDisabled: () => this.isSQLEntryDisabled(),
       }
     );
     this.contextMenuService.addMenuItem<NavNode>(this.contextMenuService.getRootMenuToken(), {
@@ -57,6 +56,14 @@ export class SqlEditorBootstrap {
         this.sqlEditorNavigatorService.openNewEditor(connectionId);
       },
     });
+  }
+
+  private isSQLEntryDisabled() {
+    const activeView = this.activeViewService.view;
+    if (activeView && ExtensionUtils.from(activeView.extensions).has(isConnectionProvider)) {
+      return false;
+    }
+    return !this.connectionSchemaManagerService.currentConnectionId;
   }
 
   private openSQLEditor() {
