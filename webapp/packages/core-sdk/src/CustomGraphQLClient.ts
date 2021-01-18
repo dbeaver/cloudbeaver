@@ -10,7 +10,7 @@ import { GraphQLClient } from 'graphql-request';
 import { Variables, ClientError } from 'graphql-request/dist/src/types';
 
 import { GQLError } from './GQLError';
-import { IResponseInterceptor } from './IResponseInterceptor';
+import type { IResponseInterceptor } from './IResponseInterceptor';
 
 export class CustomGraphQLClient extends GraphQLClient {
   private interceptors: IResponseInterceptor[] = [];

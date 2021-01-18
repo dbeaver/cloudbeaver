@@ -7,15 +7,15 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DataPresentationOptions } from '../DataPresentationService';
-import { DataModelWrapper } from './DataModelWrapper';
+import type { DataPresentationOptions } from '../DataPresentationService';
+import type { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
   model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>

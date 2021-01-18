@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-import { IExecutor } from './IExecutor';
+import type { IExecutor } from './IExecutor';
 
 export function useFormValidator(
   validationTask: IExecutor<boolean>,

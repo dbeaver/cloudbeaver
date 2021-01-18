@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { ObjectPagePanelProps } from './ObjectPage';
+import type { ObjectPagePanelProps } from './ObjectPage';
 
 export const DBObjectPagePanel = observer(function DBObjectPagePanel({
   tab,

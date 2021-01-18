@@ -12,7 +12,7 @@ import { useState, useMemo } from 'react';
 import { ItemListSearch, ItemList } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { DBDriver } from '../../../../DBDriverResource';
+import type { DBDriver } from '../../../../DBDriverResource';
 import { Driver } from './Driver';
 
 interface Props {

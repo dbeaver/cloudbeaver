@@ -15,7 +15,7 @@ import {
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { AdminConnection } from '../../ConnectionsResource';
+import type { AdminConnection } from '../../ConnectionsResource';
 import { Connection } from './Connection';
 
 const styles = composes(

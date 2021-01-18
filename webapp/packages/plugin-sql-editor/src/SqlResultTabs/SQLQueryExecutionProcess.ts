@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NotificationService } from '@cloudbeaver/core-events';
+import type { NotificationService } from '@cloudbeaver/core-events';
 import {
   AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter, ResultDataFormat
 } from '@cloudbeaver/core-sdk';
@@ -14,7 +14,7 @@ import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState
 } from '@cloudbeaver/core-utils';
 
-import { ISqlQueryParams } from '../ISqlEditorTabState';
+import type { ISqlQueryParams } from '../ISqlEditorTabState';
 
 const DELAY_BETWEEN_TRIES = 1000;
 

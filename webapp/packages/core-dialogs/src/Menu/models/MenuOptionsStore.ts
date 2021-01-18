@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TLocalizationToken } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
-import { IMenuPanel } from '../IMenuPanel';
+import type { IMenuPanel } from '../IMenuPanel';
 
 const DEFAULT_ITEM_ORDER = 100;
 

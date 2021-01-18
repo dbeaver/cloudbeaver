@@ -10,11 +10,11 @@ import { action, computed } from 'mobx';
 
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminConnectionFragment, DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionFragment, DatabaseAuthModel, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
 import { DBDriver, DBDriverResource } from '../../../../DBDriverResource';
-import { IConnectionFormModel } from '../IConnectionFormModel';
+import type { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class OptionsController

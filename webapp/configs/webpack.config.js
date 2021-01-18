@@ -2,6 +2,7 @@ const { resolve, join } = require('path');
 const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 // Temporary solution to remove wrong warning messages (it's was fixed https://github.com/microsoft/TypeScript/pull/35200 in typescript 3.8)
 class IgnoreNotFoundExportPlugin {
@@ -9,7 +10,7 @@ class IgnoreNotFoundExportPlugin {
     const messageRegExp = /export '.*'( \(reexported as '.*'\))? was not found in/
     function doneHook(stats) {
       stats.compilation.warnings = stats.compilation.warnings.filter(function (warn) {
-        if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
+        if (messageRegExp.test(warn.message)) {
           return false
         }
         return true;
@@ -142,6 +143,7 @@ module.exports = (env, argv) => {
     },
     devtool: 'cheap-module-source-map',
     plugins: [
+      // new ESLintPlugin(options), //TODO: maybe later
       new ForkTsCheckerWebpackPlugin({
         typescript: {
           diagnosticOptions: {

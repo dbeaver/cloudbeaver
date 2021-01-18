@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
-import { AdminConnection } from '../../ConnectionsResource';
+import type { AdminConnection } from '../../ConnectionsResource';
 
 export interface IConnectionFormModel {
   connection: AdminConnection;

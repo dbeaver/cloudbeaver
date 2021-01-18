@@ -11,10 +11,10 @@ import {
 } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ICellEditorParams, ICellEditorComp } from '@ag-grid-community/core';
+import type { ICellEditorParams, ICellEditorComp } from '@ag-grid-community/core';
 import { InlineEditor, InlineEditorControls } from '@cloudbeaver/core-app';
 
-import { AgGridContext } from '../AgGridContext';
+import type { AgGridContext } from '../AgGridContext';
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;

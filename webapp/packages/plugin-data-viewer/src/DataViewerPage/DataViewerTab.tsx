@@ -13,9 +13,9 @@ import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
+import type { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
 
-import { IDataViewerPageState } from '../IDataViewerPageState';
+import type { IDataViewerPageState } from '../IDataViewerPageState';
 
 export const DataViewerTab = observer(function DataViewerTab({
   tab, page, onSelect, style,

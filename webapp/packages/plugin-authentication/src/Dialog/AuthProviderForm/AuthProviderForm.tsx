@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { AuthProvider } from '@cloudbeaver/core-authentication';
+import type { AuthProvider } from '@cloudbeaver/core-authentication';
 import { InputField, useFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 

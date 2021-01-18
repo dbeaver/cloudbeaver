@@ -11,9 +11,9 @@ import { autorun } from 'mobx';
 import { ITab, NavigationTabsService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 
-import { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectFoldersService } from './ObjectFoldersService';
-import { ObjectFoldersTabContainer } from './ObjectFoldersTabsContainer/ObjectFoldersTabContainer';
+import type { ObjectFoldersTabContainer } from './ObjectFoldersTabsContainer/ObjectFoldersTabContainer';
 
 @injectable()
 export class ObjectFoldersController implements IInitializableController, IDestructibleController {

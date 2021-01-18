@@ -8,7 +8,7 @@
 
 import styled from 'reshadow';
 
-import { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
+import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';

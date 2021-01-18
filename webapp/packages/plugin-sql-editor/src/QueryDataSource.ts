@@ -8,16 +8,16 @@
 
 import { observable } from 'mobx';
 
-import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import type { NotificationService } from '@cloudbeaver/core-events';
+import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataSource, DataUpdate, IDatabaseDataResult, IRequestDataResult, RowDiff
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { IQueryTabGroup } from './ISqlEditorTabState';
+import type { IQueryTabGroup } from './ISqlEditorTabState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
+import type { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 export interface IDataContainerOptions {
   tabId: string;

@@ -12,7 +12,7 @@ import { useCallback } from 'react';
 import { FieldCheckbox, FormBox, FormBoxElement, FormGroup, InputField, InputGroup, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { IUserFormProps } from './UserFormService';
+import type { IUserFormProps } from './UserFormService';
 
 export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({
   controller,

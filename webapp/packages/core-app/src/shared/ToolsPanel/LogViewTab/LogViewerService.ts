@@ -15,7 +15,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { CoreSettingsService } from '../../../CoreSettingsService';
-import { ILogEntry } from './ILogEntry';
+import type { ILogEntry } from './ILogEntry';
 
 @injectable()
 export class LogViewerService {

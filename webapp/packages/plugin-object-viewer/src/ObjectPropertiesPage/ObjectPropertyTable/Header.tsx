@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { TableColumnHeader } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`

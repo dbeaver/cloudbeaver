@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { PlaceholderContainer } from './PlaceholderContainer';
+import type { PlaceholderContainer } from './PlaceholderContainer';
 
 type Props<T = unknown> = T extends unknown ? {
   container: PlaceholderContainer<T>;

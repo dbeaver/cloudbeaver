@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { UserAuthInfo } from '@cloudbeaver/core-sdk';
+import type { UserAuthInfo } from '@cloudbeaver/core-sdk';
 
 import { UserInfoResource } from './UserInfoResource';
 

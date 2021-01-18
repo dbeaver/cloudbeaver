@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IMenuPanel } from '../IMenuPanel';
+import type { IMenuPanel } from '../IMenuPanel';
 import {
   ComputedMenuItemModel, IComputedMenuItemOptions
 } from '../models/ComputedMenuItemModel';
@@ -21,11 +21,11 @@ export class StaticMenu {
   private menuStore = new MenuOptionsStore<IComputedMenuItemOptions>();
   private menuModels = new Map<string, IMenuPanel>();
 
-  addRootPanel(panelId: string) {
+  addRootPanel(panelId: string): void {
     this.menuStore.addRootPanel(panelId);
   }
 
-  addMenuItem(panelId: string, params: IComputedMenuItemOptions) {
+  addMenuItem(panelId: string, params: IComputedMenuItemOptions): void {
     this.menuStore.addMenuItem(panelId, params);
   }
 

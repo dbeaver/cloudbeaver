@@ -13,7 +13,7 @@ import { TabHandlerTabProps, useNode } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { IObjectViewerTabState } from './IObjectViewerTabState';
+import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
 export const ObjectViewerTab = observer(function ObjectViewerTab({
   tab, handler, onSelect, onClose, style,

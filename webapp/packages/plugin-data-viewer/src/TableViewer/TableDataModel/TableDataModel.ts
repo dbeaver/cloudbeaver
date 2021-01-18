@@ -9,8 +9,8 @@
 import { action } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
-import { TableColumn } from './TableColumn';
-import { CellValue, SomeTableRows, TableRow } from './TableRow';
+import type { TableColumn } from './TableColumn';
+import type { CellValue, SomeTableRows, TableRow } from './TableRow';
 
 /**
  * This model contains read-only data from a server database table.
@@ -28,11 +28,11 @@ export class TableDataModel {
     this.onRowsUpdate = this.rowsUpdateSubject.asObservable();
   }
 
-  getRows() {
+  getRows(): TableRow[] {
     return this.rows;
   }
 
-  getColumns() {
+  getColumns(): TableColumn[] {
     return this.columns;
   }
 
@@ -40,7 +40,7 @@ export class TableDataModel {
     return this.rows.length === 0;
   }
 
-  isChunkLoaded(offset: number, count: number) {
+  isChunkLoaded(offset: number, count: number): boolean {
     return (
       (this.rows.length > offset && !!this.rows[offset])
       && (this.rows.length > offset + count - 1 && !!this.rows[offset + count - 1])
@@ -67,26 +67,26 @@ export class TableDataModel {
   }
 
   @action
-  resetData() {
+  resetData(): void {
     this.rows = [];
     this.columns = [];
   }
 
   @action
-  updateRows(newRows: SomeTableRows) {
+  updateRows(newRows: SomeTableRows): void {
     for (const [key, row] of newRows) {
       this.updateRow(key, row);
     }
   }
 
   @action
-  updateRow(rowIndex: number, value: TableRow) {
+  updateRow(rowIndex: number, value: TableRow): void {
     this.rows[rowIndex] = value;
     this.rowsUpdateSubject.next([rowIndex]);
   }
 
   @action
-  updateCell(rowIndex: number, cellIndex: number, value: CellValue) {
+  updateCell(rowIndex: number, cellIndex: number, value: CellValue): void {
     const row = this.rows[rowIndex];
     if (row && cellIndex < row.length) {
       row[cellIndex] = value;
@@ -94,7 +94,7 @@ export class TableDataModel {
   }
 
   @action
-  insertRows(position: number, rows: TableRow[]) {
+  insertRows(position: number, rows: TableRow[]): void {
     if (rows.length > 0) {
       if (position + rows.length > this.rows.length) {
         this.rows.length = position + rows.length;
@@ -105,7 +105,7 @@ export class TableDataModel {
   }
 
   @action
-  setColumns(columns: TableColumn[]) {
+  setColumns(columns: TableColumn[]): void {
     this.columns = [...columns];
   }
 }

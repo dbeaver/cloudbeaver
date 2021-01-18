@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PluginManifest } from '@cloudbeaver/core-di';
+import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/ConfigurationWizardPagesBootstrapService';
 import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService';

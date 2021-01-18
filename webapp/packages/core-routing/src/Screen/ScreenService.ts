@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SubscribeState } from 'router5';
+import type { SubscribeState } from 'router5';
 
 import { injectable } from '@cloudbeaver/core-di';
 
 import { RouterService } from '../RouterService';
-import { IScreen, ScreenRoute } from './IScreen';
+import type { IScreen, ScreenRoute } from './IScreen';
 
 @injectable()
 export class ScreenService {

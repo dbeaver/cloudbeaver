@@ -8,8 +8,8 @@
 
 import { computed, observable } from 'mobx';
 
-import { TabProps } from './Tab/TabProps';
-import { ITabData } from './TabsContext';
+import type { TabProps } from './Tab/TabProps';
+import type { ITabData } from './TabsContext';
 
 export type TabContainerTabComponent<TProps = Record<string, any>> = React.FC<TabProps & TProps>;
 export type TabContainerPanelComponent<TProps = Record<string, any>> = React.FC<{ tabId: string } & TProps>;

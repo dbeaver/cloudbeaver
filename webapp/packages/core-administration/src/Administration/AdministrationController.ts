@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../AdministrationItem/filterConfigurationWizard';
-import { IAdministrationItem } from '../AdministrationItem/IAdministrationItem';
+import type { IAdministrationItem } from '../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../AdministrationItem/orderAdministrationItems';
 
 @injectable()

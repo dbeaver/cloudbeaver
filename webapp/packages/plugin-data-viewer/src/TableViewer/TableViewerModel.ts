@@ -16,11 +16,11 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import { ErrorDialog } from './ErrorDialog';
-import { RowDiff } from './TableDataModel/EditedRow';
-import { TableColumn } from './TableDataModel/TableColumn';
+import type { RowDiff } from './TableDataModel/EditedRow';
+import type { TableColumn } from './TableDataModel/TableColumn';
 import { TableDataModel } from './TableDataModel/TableDataModel';
 import { TableEditor } from './TableDataModel/TableEditor';
-import { TableRow } from './TableDataModel/TableRow';
+import type { TableRow } from './TableDataModel/TableRow';
 
 export const fetchingSettings = {
   fetchMin: 100,

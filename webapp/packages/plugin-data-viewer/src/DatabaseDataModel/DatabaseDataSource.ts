@@ -10,11 +10,11 @@ import { observable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { IExecutionContext } from '../IExecutionContext';
-import { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult } from '../TableViewer/TableViewerModel';
-import { IDatabaseDataResult } from './IDatabaseDataResult';
-import { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { IExecutionContext } from '../IExecutionContext';
+import type { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
+import type { IRequestDataResult } from '../TableViewer/TableViewerModel';
+import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { DataUpdate, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {

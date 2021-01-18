@@ -12,7 +12,7 @@ import { Subject, Observable } from 'rxjs';
 import { ConnectionAuthService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IActiveView } from '@cloudbeaver/core-view';
+import type { IActiveView } from '@cloudbeaver/core-view';
 
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';

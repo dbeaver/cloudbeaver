@@ -12,7 +12,7 @@ import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
-import { NavNode } from './EntityTypes';
+import type { NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
 import { NodeManagerUtils } from './NodeManagerUtils';
 

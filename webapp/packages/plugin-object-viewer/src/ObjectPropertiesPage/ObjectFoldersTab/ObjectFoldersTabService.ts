@@ -7,7 +7,7 @@
  */
 
 import { NavNodeManagerService, TabEntity } from '@cloudbeaver/core-app';
-import { ITab } from '@cloudbeaver/core-blocks';
+import type { ITab } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { ObjectFolderTabModel } from './ObjectFolderTabModel';

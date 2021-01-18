@@ -8,7 +8,7 @@
 
 import { createContext, PropsWithChildren } from 'react';
 
-import { IServiceInjector } from './IApp';
+import type { IServiceInjector } from './IApp';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 export type TableColumn = Pick<
 SqlResultColumn,

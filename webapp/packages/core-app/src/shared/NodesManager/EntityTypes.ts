@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DatabaseObjectInfo, NavigatorNodeInfo } from '@cloudbeaver/core-sdk';
+import type { DatabaseObjectInfo, NavigatorNodeInfo } from '@cloudbeaver/core-sdk';
 
 export type NavNodeInfo = NavigatorNodeInfo;
 

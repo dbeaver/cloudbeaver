@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { NavNode } from './EntityTypes';
+import type { NavNode } from './EntityTypes';
 
 type NavNodeInfo = NavNodeInfoFragment;
 

@@ -19,7 +19,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { IObjectViewerTabState } from './IObjectViewerTabState';
+import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';

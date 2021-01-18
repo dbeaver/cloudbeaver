@@ -8,10 +8,10 @@
 
 import { computed } from 'mobx';
 
-import { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
-import { TLocalizationToken } from '@cloudbeaver/core-localization';
+import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import { IMenuItemOptions } from './MenuOptionsStore';
+import type { IMenuItemOptions } from './MenuOptionsStore';
 
 export interface IComputedMenuItemOptions extends IMenuItemOptions {
   onClick?: () => void;

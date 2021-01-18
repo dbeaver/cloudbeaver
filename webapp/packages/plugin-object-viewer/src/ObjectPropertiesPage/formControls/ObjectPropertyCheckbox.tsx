@@ -13,7 +13,7 @@ import { Checkbox } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { additionalProps, getValue, matchType } from '../helpers';
-import { ObjectPropertyProps } from './ObjectPropertyProps';
+import type { ObjectPropertyProps } from './ObjectPropertyProps';
 
 const styles = css`
   form-checkbox {

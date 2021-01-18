@@ -9,7 +9,7 @@
 import { action } from 'mobx';
 
 import { TabEntity } from '@cloudbeaver/core-app';
-import { ITab } from '@cloudbeaver/core-blocks';
+import type { ITab } from '@cloudbeaver/core-blocks';
 import { Entity, injectable, RootContainerService } from '@cloudbeaver/core-di';
 
 import { ObjectFoldersTabService } from './ObjectFoldersTab/ObjectFoldersTabService';

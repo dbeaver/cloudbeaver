@@ -14,7 +14,7 @@ import {
   ListItem, ListItemIcon, StaticImage, ListItemName
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { DBDriverResource } from '../../../../DBDriverResource';

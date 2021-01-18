@@ -14,7 +14,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Icon } from '../../Icons';
 import { TabContext } from '../TabContext';
-import { TabProps } from './TabProps';
+import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
 export const Tab: React.FC<TabProps> = function Tab({

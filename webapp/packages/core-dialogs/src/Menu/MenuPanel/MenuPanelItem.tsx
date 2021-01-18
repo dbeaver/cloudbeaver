@@ -10,7 +10,7 @@ import { useObserver } from 'mobx-react';
 import styled from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
-import { IMenuItem } from '@cloudbeaver/core-dialogs';
+import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, Style } from '@cloudbeaver/core-theming';
 
@@ -21,7 +21,10 @@ interface MenuPanelItemProps {
   style?: Style[];
 }
 
-export function MenuPanelItem({ menuItem, style = [] }: MenuPanelItemProps) {
+export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelItem({
+  menuItem,
+  style = [],
+}) {
   const { title, panel } = useObserver(() => ({ // TODO: provide title and panel via props
     title: menuItem.title,
     panel: menuItem.panel,
@@ -35,4 +38,4 @@ export function MenuPanelItem({ menuItem, style = [] }: MenuPanelItemProps) {
       {panel && <Icon name="arrow" viewBox="0 0 16 16" />}
     </menu-panel-item>
   );
-}
+};

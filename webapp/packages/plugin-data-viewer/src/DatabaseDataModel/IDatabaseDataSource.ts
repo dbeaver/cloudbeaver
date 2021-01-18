@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
 
-import { IExecutionContext } from '../IExecutionContext';
-import { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult } from '../TableViewer/TableViewerModel';
-import { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IExecutionContext } from '../IExecutionContext';
+import type { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
+import type { IRequestDataResult } from '../TableViewer/TableViewerModel';
+import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DataUpdateType {
   delete,

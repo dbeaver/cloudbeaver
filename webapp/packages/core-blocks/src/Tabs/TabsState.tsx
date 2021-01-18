@@ -12,7 +12,7 @@ import { useTabState } from 'reakit/Tab';
 import { Executor, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { TabsContainer } from './TabsContainer';
+import type { TabsContainer } from './TabsContainer';
 import { TabsContext, ITabsContext, ITabData } from './TabsContext';
 
 type Props<T = Record<string, any>> = T & React.PropsWithChildren<{

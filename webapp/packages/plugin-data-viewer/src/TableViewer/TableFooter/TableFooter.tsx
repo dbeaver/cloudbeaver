@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { DataModelWrapper } from '../DataModelWrapper';
+import type { DataModelWrapper } from '../DataModelWrapper';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(

@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import {
   ListItem, ListItemDescription, ListItemName, ListItemIcon, StaticImage
 } from '@cloudbeaver/core-blocks';
-import { DBDriver, Connection } from '@cloudbeaver/core-connections';
+import type { DBDriver, Connection } from '@cloudbeaver/core-connections';
 
 interface Props {
   template: Connection;

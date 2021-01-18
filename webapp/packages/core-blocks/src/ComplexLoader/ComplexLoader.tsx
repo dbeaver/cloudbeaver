@@ -18,8 +18,8 @@ export interface ComplexLoaderProps<T> {
   children: (content: T) => JSX.Element;
 }
 
-export function ComplexLoader<T>(props: ComplexLoaderProps<T>) {
-  const [content, setContent] = useState<T | null>(null);
+export const ComplexLoader: React.FC<ComplexLoaderProps<any>> = function ComplexLoader(props) {
+  const [content, setContent] = useState<unknown | null>(null);
   const notificationService = useService(NotificationService);
 
   useEffect(() => {
@@ -40,4 +40,4 @@ export function ComplexLoader<T>(props: ComplexLoaderProps<T>) {
   }
 
   return props.children(content);
-}
+};

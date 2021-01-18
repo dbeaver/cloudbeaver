@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { HTMLProps } from 'react';
+import type { HTMLProps } from 'react';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
@@ -16,7 +16,7 @@ type IconProps = HTMLProps<HTMLDivElement> & {
   type: ENotificationType;
 };
 
-export function NotificationMark({ type, ...props }: IconProps) {
+export const NotificationMark: React.FC<IconProps> = function NotificationMark({ type, ...props }) {
   return (
     <div {...props}>
       {type === ENotificationType.Info && <IconOrImage icon='/icons/info_icon.svg' />}
@@ -24,4 +24,4 @@ export function NotificationMark({ type, ...props }: IconProps) {
       {type === ENotificationType.Success && <IconOrImage icon='/icons/success_icon.svg' />}
     </div>
   );
-}
+};

@@ -14,7 +14,7 @@ import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ObjectPagePanelProps } from '../ObjectPage/ObjectPage';
+import type { ObjectPagePanelProps } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
 
 const viewerStyles = composes(

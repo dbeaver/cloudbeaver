@@ -7,9 +7,9 @@
  */
 
 import { computed, observable } from 'mobx';
-import { Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 
-import {
+import type {
   GridApi,
   ColumnApi,
   GridReadyEvent,
@@ -28,7 +28,7 @@ import {
   TableViewerModel, SortModel, AgGridRow, IAgGridCol, DatabaseDataAccessMode
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { AgGridContext } from './AgGridContext';
+import type { AgGridContext } from './AgGridContext';
 import { TableSelection } from './TableSelection/TableSelection';
 
 /** title margin + type icon width + sort icon width + title margin right + box padding  */

@@ -8,17 +8,17 @@
 
 import { observable } from 'mobx';
 
-import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import type { NotificationService } from '@cloudbeaver/core-events';
+import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
-import { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
-import { DataUpdate } from './DatabaseDataModel/IDatabaseDataSource';
+import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
+import type { DataUpdate } from './DatabaseDataModel/IDatabaseDataSource';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
-import { IExecutionContext } from './IExecutionContext';
-import { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import { IRequestDataResult } from './TableViewer/TableViewerModel';
+import type { IExecutionContext } from './IExecutionContext';
+import type { RowDiff } from './TableViewer/TableDataModel/EditedRow';
+import type { IRequestDataResult } from './TableViewer/TableViewerModel';
 
 export interface IDataContainerOptions {
   containerNodePath: string;

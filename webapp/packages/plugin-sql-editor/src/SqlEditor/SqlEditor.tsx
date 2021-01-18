@@ -15,7 +15,7 @@ import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
 import { CodeEditor } from './CodeEditor/CodeEditor';
-import { CodeEditorController } from './CodeEditor/CodeEditorController';
+import type { CodeEditorController } from './CodeEditor/CodeEditorController';
 import { SqlEditorController } from './SqlEditorController';
 
 type SqlEditorProps = PropsWithChildren<{

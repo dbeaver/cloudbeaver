@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { IProperty, PropertiesTable, ErrorMessage } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import type { DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';

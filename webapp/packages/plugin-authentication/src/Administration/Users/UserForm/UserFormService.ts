@@ -8,9 +8,9 @@
 
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 
-import { UserFormController } from './UserFormController';
+import type { UserFormController } from './UserFormController';
 
 export interface IUserFormProps {
   user: AdminUserInfo;

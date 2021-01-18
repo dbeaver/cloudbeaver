@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IServiceInjector } from '../IApp';
+import type { IServiceInjector } from '../IApp';
 import { createValueToken } from '../InjectionToken';
 
 export const ServiceInjectorToken = createValueToken<IServiceInjector>('IServiceInjector');

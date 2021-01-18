@@ -14,7 +14,7 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState
 } from '@cloudbeaver/plugin-object-viewer';
@@ -22,7 +22,7 @@ import {
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
 import { DataViewerTableService } from './DataViewerTableService';
-import { IDataViewerPageState } from './IDataViewerPageState';
+import type { IDataViewerPageState } from './IDataViewerPageState';
 
 @injectable()
 export class DataViewerTabService {

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
-import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 
 interface Props {
   activeScreen: IAdministrationItemRoute | null;

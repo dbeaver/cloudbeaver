@@ -13,8 +13,8 @@ import { Loader, PropertiesTable, useTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormController } from '../ConnectionFormController';
-import { IConnectionFormModel } from '../IConnectionFormModel';
+import type { ConnectionFormController } from '../ConnectionFormController';
+import type { IConnectionFormModel } from '../IConnectionFormModel';
 import { DriverPropertiesController } from './DriverPropertiesController';
 
 const styles = css`

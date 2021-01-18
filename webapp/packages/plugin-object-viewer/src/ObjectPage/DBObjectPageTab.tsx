@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
-import { ITab } from '@cloudbeaver/core-app';
-import { Style } from '@cloudbeaver/core-theming';
+import type { ITab } from '@cloudbeaver/core-app';
+import type { Style } from '@cloudbeaver/core-theming';
 
-import { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { ObjectPage } from './ObjectPage';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { ObjectPage } from './ObjectPage';
 
 export interface DBObjectPageTabProps {
   tab: ITab<IObjectViewerTabState>;

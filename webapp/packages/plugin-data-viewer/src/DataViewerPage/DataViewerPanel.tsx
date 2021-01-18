@@ -10,9 +10,9 @@ import { observer } from 'mobx-react';
 import { useCallback } from 'react';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { ObjectPagePanelProps } from '@cloudbeaver/plugin-object-viewer';
+import type { ObjectPagePanelProps } from '@cloudbeaver/plugin-object-viewer';
 
-import { IDataViewerPageState } from '../IDataViewerPageState';
+import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewer } from '../TableViewer/TableViewer';
 
 export const DataViewerPanel = observer(function DataViewerPanel({

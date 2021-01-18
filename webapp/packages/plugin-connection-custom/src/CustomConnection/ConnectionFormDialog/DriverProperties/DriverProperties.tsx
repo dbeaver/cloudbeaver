@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, PropertiesTable } from '@cloudbeaver/core-blocks';
-import { DBDriver } from '@cloudbeaver/core-connections';
+import type { DBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 

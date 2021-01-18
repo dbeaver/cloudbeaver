@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
-import { ITab } from '@cloudbeaver/core-blocks';
+import type { ITab } from '@cloudbeaver/core-blocks';
 import { Entity, inject, injectable } from '@cloudbeaver/core-di';
 
 import { ITabContainerEntity, TabContainerToken } from './TabContainerToken';

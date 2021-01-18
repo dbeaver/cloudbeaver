@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ILogEntry } from '../ILogEntry';
+import type { ILogEntry } from '../ILogEntry';
 
 const styles = css`
   message {

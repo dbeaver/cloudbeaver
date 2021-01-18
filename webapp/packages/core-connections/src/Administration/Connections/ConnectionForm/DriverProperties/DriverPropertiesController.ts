@@ -8,10 +8,10 @@
 
 import { observable } from 'mobx';
 
-import { IProperty } from '@cloudbeaver/core-blocks';
+import type { IProperty } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DriverPropertiesService } from '../../../../DriverPropertiesService';

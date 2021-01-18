@@ -38,7 +38,7 @@ import { INDEX_COLUMN_DEF } from '../../AgGridTableController';
 import {
   IAgColumnClickEvent, COLUMN_CLICK_EVENT_TYPE
 } from '../../TableColumnHeader/TableColumnHeader';
-import { TableSelection } from '../../TableSelection/TableSelection';
+import type { TableSelection } from '../../TableSelection/TableSelection';
 
 interface CellKeyDownEvent extends AgGridEvent{
   event: KeyboardEvent;

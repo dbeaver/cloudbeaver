@@ -8,7 +8,7 @@
 
 import { useContext } from 'react';
 
-import { MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { TabContext } from './TabContext';
 import { TabsContext } from './TabsContext';

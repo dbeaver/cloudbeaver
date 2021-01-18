@@ -16,7 +16,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AdminConnection } from '../../ConnectionsResource';
+import type { AdminConnection } from '../../ConnectionsResource';
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import { ConnectionEdit } from './ConnectionEdit';
 

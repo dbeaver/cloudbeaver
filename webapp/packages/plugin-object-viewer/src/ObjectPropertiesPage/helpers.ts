@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export function getValue(value: string | { displayName: string }) {
   if (value === null || value === undefined) {

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITypedConstructor } from './ITypedConstructor';
+import type { ITypedConstructor } from './ITypedConstructor';
 
 /**
  * there are no way in js to check that function is constructor. So we expect that <T> is object, not function

@@ -8,7 +8,7 @@
 
 import { computed, observable } from 'mobx';
 
-import { ITask } from './ITask';
+import type { ITask } from './ITask';
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
 

@@ -10,7 +10,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { NavNode } from '../../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';

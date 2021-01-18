@@ -7,12 +7,12 @@
  */
 
 import { createContext } from 'react';
-import { TabStateReturn } from 'reakit/Tab';
+import type { TabStateReturn } from 'reakit/Tab';
 
-import { IExecutor } from '@cloudbeaver/core-executor';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { TabsContainer } from './TabsContainer';
+import type { TabsContainer } from './TabsContainer';
 
 export interface ITabData<T = Record<string, any>> {
   tabId: string;

@@ -21,7 +21,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import { ENodeFeature } from './ENodeFeature';
-import { NavNodeInfo, NavNode } from './EntityTypes';
+import type { NavNodeInfo, NavNode } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';

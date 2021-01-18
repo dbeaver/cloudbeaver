@@ -14,7 +14,7 @@ import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { AgGridReact } from '@ag-grid-community/react';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
+import type { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
 import BaseStyles from '../styles/base.scss';
 import { agGridStyles } from '../styles/styles';

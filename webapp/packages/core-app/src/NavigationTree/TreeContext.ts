@@ -8,7 +8,7 @@
 
 import { createContext } from 'react';
 
-import { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../shared/NodesManager/EntityTypes';
 
 export interface ITreeContext {
   control?: React.FC<{

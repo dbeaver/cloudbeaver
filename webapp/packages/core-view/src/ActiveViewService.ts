@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IExtension } from '@cloudbeaver/core-extensions';
+import type { IExtension } from '@cloudbeaver/core-extensions';
 
 export interface IActiveView<T> {
   context: T;

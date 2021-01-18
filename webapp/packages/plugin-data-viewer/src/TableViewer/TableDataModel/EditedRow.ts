@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 
-import { TableRow, RowValues } from './TableRow';
+import type { TableRow, RowValues } from './TableRow';
 
 export interface RowDiff {
   rowIndex: number;

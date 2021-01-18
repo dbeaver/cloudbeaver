@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { CustomGraphQLClient } from './CustomGraphQLClient';
 import { EnvironmentService } from './EnvironmentService';
-import { IResponseInterceptor } from './IResponseInterceptor';
+import type { IResponseInterceptor } from './IResponseInterceptor';
 import { getSdk } from './sdk';
 
 @injectable()

@@ -9,7 +9,7 @@
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { ILogEntry } from '../ILogEntry';
+import type { ILogEntry } from '../ILogEntry';
 import { LogEntryDetailsDialog } from './LogEntryDetailsDialog';
 
 @injectable()

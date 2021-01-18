@@ -16,7 +16,7 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icons';
-import { IProperty } from './IProperty';
+import type { IProperty } from './IProperty';
 import { PropertyValueSelector } from './PropertyValueSelector';
 
 const styles = composes(

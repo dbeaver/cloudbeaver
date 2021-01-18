@@ -16,7 +16,7 @@ import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ServerConfig } from '@cloudbeaver/core-sdk';
 
-import { IServerConfigurationPageState } from './IServerConfigurationPageState';
+import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
 export interface IValidationStatusContext {
   getState: () => boolean;

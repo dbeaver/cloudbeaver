@@ -8,12 +8,12 @@
 
 import { observable } from 'mobx';
 
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode, IDatabaseDataModel } from './IDatabaseDataModel';
-import { IDatabaseDataResult } from './IDatabaseDataResult';
-import { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
 implements IDatabaseDataModel<TOptions, TResult> {

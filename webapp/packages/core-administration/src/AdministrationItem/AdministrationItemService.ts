@@ -9,13 +9,13 @@
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { RouterState } from '@cloudbeaver/core-routing';
+import type { RouterState } from '@cloudbeaver/core-routing';
 
 import { filterConfigurationWizard } from './filterConfigurationWizard';
 import {
   IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem, AdministrationItemType
 } from './IAdministrationItem';
-import { IAdministrationItemRoute } from './IAdministrationItemRoute';
+import type { IAdministrationItemRoute } from './IAdministrationItemRoute';
 import { orderAdministrationItems } from './orderAdministrationItems';
 
 @injectable()

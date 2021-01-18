@@ -14,7 +14,7 @@ import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-blocks'
 import { useController } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import { AdministrationController } from './AdministrationController';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';

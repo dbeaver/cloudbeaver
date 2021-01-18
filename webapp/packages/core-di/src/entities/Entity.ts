@@ -11,9 +11,9 @@ import { observable } from 'mobx';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DIContainer } from '../DIContainer';
-import { IServiceInjector } from '../IApp';
-import { InjectionToken } from '../InjectionToken';
-import { ITypedConstructor } from '../ITypedConstructor';
+import type { IServiceInjector } from '../IApp';
+import type { InjectionToken } from '../InjectionToken';
+import type { ITypedConstructor } from '../ITypedConstructor';
 import { ServiceInjectorToken } from './ServiceInjectorToken';
 
 export class Entity {
@@ -31,7 +31,7 @@ export class Entity {
     this.addProviders(providers);
   }
 
-  addChild(entity: Entity) {
+  addChild(entity: Entity): void {
     if (this.children.has(entity.id)) {
       throw new Error(`Entity (${this.id}) already contains child entity (${entity.id})`);
     }
@@ -39,7 +39,7 @@ export class Entity {
     entity.bindWithParent(this);
   }
 
-  removeChild(id: string) {
+  removeChild(id: string): void {
     if (!this.children.has(id)) {
       throw new Error(`Child entity (${id}) not found in entity (${this.id})`);
     }
@@ -50,7 +50,7 @@ export class Entity {
     }
   }
 
-  removeAll() {
+  removeAll(): void {
     const ids: string[] = [];
 
     for (const [key, value] of this.children) {
@@ -74,14 +74,14 @@ export class Entity {
     return this.container;
   }
 
-  protected bindWithParent(entity: Entity) {
+  protected bindWithParent(entity: Entity): void {
     this.container.bindWithParent(entity.container);
   }
 
   /**
    * Destroy mixins in the reverse order of addition
    */
-  destroyEntity() {
+  destroyEntity(): void {
     this.mixins.reverse().forEach(token => {
       const mixin = this.getMixin(token) as IDestroyableMixin;
       if (mixin.destruct) {
@@ -90,7 +90,7 @@ export class Entity {
     });
   }
 
-  protected addProviders(providers: Array<MixinProvider<any>>) {
+  protected addProviders(providers: Array<MixinProvider<any>>): void {
     providers.forEach(provider => {
       if (typeof provider === 'function') {
         this.addMixin(provider);

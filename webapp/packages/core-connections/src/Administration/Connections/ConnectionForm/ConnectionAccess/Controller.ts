@@ -11,12 +11,11 @@ import { computed, observable } from 'mobx';
 import { UsersResource, RolesResource, AdminUser } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AdminRoleInfo, AdminSubjectType } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../../../ConnectionsResource';
-import { ConnectionFormController } from '../ConnectionFormController';
-import { IConnectionFormModel } from '../IConnectionFormModel';
+import type { ConnectionFormController } from '../ConnectionFormController';
+import type { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class Controller

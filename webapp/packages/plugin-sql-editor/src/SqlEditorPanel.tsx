@@ -8,13 +8,13 @@
 
 import styled, { css } from 'reshadow';
 
-import { TabHandlerPanelProps } from '@cloudbeaver/core-app';
+import type { TabHandlerPanelProps } from '@cloudbeaver/core-app';
 import {
   splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles
 } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditor } from './SqlEditor';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 

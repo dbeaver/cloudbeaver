@@ -13,6 +13,7 @@ generates:
   src/sdk.ts:
     plugins:
       - add: '/* eslint-disable max-len */'
+      - add: '// @ts-expect-error uncontrolled'
       - typescript
       - typescript-operations
       - typescript-graphql-request

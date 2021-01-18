@@ -8,7 +8,7 @@
 
 import { useContext, useEffect, useRef } from 'react';
 
-import { IExecutorHandler } from '@cloudbeaver/core-executor';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 
 import { ITabData, TabsContext } from '../TabsContext';
 

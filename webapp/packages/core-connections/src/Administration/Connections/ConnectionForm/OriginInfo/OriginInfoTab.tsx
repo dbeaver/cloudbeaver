@@ -13,7 +13,7 @@ import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-block
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { IConnectionFormProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../ConnectionFormService';
 
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({
   model,

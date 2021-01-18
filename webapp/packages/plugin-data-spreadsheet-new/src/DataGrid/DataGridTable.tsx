@@ -15,9 +15,9 @@ import DataGrid, { Column } from 'react-data-grid';
 import styled from 'reshadow';
 import { css } from 'reshadow';
 
-import { SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { TextTools } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { ResultSetTools } from '../ResultSetTools';
 

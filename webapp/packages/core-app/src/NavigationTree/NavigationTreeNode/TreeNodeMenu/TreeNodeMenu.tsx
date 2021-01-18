@@ -15,7 +15,7 @@ import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 
-import { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { NavigationTreeContextMenuService } from '../../NavigationTreeContextMenuService';
 import { treeNodeMenuStyles } from './treeNodeMenuStyles';
 

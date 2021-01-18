@@ -14,8 +14,7 @@ import { InlineEditor } from '@cloudbeaver/core-app';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ContainerDataSource } from '../../ContainerDataSource';
-import { DataModelWrapper } from '../DataModelWrapper';
+import type { DataModelWrapper } from '../DataModelWrapper';
 
 const styles = composes(
   css`

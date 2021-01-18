@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IMenuItemOptions } from '../models/MenuOptionsStore';
-import { IMenuContext } from './IMenuContext';
+import type { IMenuItemOptions } from '../models/MenuOptionsStore';
+import type { IMenuContext } from './IMenuContext';
 
 /**
  * Options allow to create context menu item

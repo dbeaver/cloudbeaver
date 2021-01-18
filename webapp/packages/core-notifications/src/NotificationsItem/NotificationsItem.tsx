@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 
 import { Snackbar } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { INotification } from '@cloudbeaver/core-events';
+import type { INotification } from '@cloudbeaver/core-events';
 
 import { NotificationItemController } from './NotificationItemController';
 

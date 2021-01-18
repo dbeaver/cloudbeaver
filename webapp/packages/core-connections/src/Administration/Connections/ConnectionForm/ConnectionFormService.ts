@@ -9,8 +9,8 @@
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionFormController } from './ConnectionFormController';
-import { IConnectionFormModel } from './IConnectionFormModel';
+import type { ConnectionFormController } from './ConnectionFormController';
+import type { IConnectionFormModel } from './IConnectionFormModel';
 
 export interface IConnectionFormProps {
   model: IConnectionFormModel;

@@ -17,7 +17,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { UserFormController } from './UserFormController';

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITheme } from './ThemeService';
+import type { ITheme } from './ThemeService';
 
 export const themes: ITheme[] = [
   {

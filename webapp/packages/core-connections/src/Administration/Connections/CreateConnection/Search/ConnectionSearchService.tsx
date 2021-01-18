@@ -11,10 +11,9 @@ import { observable } from 'mobx';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { uuid } from '@cloudbeaver/core-utils';
+import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
-import { AdminConnection, ConnectionsResource } from '../../../ConnectionsResource';
+import { ConnectionsResource } from '../../../ConnectionsResource';
 import { CreateConnectionService } from '../../CreateConnectionService';
 
 @injectable()

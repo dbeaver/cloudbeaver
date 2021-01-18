@@ -18,7 +18,7 @@ import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { themes } from './themes';
-import { ClassCollection } from './themeUtils';
+import type { ClassCollection } from './themeUtils';
 
 const COMMON_STYLES: any[] = [];
 
@@ -56,8 +56,10 @@ export class ThemeService {
     currentThemeId: DEFAULT_THEME_ID,
   };
 
-  constructor(private notificationService: NotificationService,
-    private settingsService: SettingsService) {
+  constructor(
+    private notificationService: NotificationService,
+    private settingsService: SettingsService
+  ) {
     this.loadAllThemes();
   }
 

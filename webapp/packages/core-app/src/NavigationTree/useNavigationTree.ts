@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavigationTreeService } from './NavigationTreeService';
 
 interface INavigationTree {

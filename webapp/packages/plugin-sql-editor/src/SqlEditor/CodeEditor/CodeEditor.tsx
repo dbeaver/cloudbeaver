@@ -18,7 +18,7 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
 
 import { useController } from '@cloudbeaver/core-di';
-import { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { SqlEditorStyles } from '../theme';

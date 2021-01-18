@@ -7,7 +7,7 @@
  */
 
 import { EXTENSION_SYMBOL } from './constants';
-import { IExtension } from './IExtension';
+import type { IExtension } from './IExtension';
 
 export function createExtension<T>(
   extension: Record<string, any>,

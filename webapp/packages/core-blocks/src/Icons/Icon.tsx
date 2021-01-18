@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SVGAttributes } from 'react';
+import type { SVGAttributes } from 'react';
 
-export function Icon(props: SVGAttributes<any>) {
+export const Icon: React.FC<SVGAttributes<any>> = function Icon(props) {
   const { name = '', className, ...rest } = props;
   const cn = `icon ${className || ''}`;
   const url = name.startsWith('/') ? name : `icons/icons.svg#${name}`;
@@ -17,4 +17,4 @@ export function Icon(props: SVGAttributes<any>) {
       <use href={url} />
     </svg>
   );
-}
+};

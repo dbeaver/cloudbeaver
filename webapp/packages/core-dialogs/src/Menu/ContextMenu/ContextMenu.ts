@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TLocalizationToken } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { IMenuPanel } from '../IMenuPanel';
+import type { IMenuPanel } from '../IMenuPanel';
 import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
 import { MenuOptionsStore } from '../models/MenuOptionsStore';
-import { IContextMenuItem } from './IContextMenuItem';
-import { IMenuContext } from './IMenuContext';
+import type { IContextMenuItem } from './IContextMenuItem';
+import type { IMenuContext } from './IMenuContext';
 
 /**
  * this class allows to store IContextMenuItem in a tree structure

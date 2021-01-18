@@ -28,7 +28,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTab } from './SqlEditorTab';

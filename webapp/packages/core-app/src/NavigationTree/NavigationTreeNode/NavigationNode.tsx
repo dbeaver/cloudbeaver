@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
 
-import { NavNode } from '../../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';

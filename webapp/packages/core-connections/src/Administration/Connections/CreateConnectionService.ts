@@ -11,10 +11,10 @@ import { computed, observable } from 'mobx';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../DBDriverResource';
-import { AdminConnection } from '../ConnectionsResource';
+import type { AdminConnection } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 export interface ICreateMethodOptions {
@@ -89,7 +89,7 @@ export class CreateConnectionService {
     this.connectionsAdministrationNavService.navToCreate(method);
   }
 
-  cancelCreate(): void{
+  cancelCreate(): void {
     this.clearConnectionTemplate();
     this.connectionsAdministrationNavService.navToRoot();
   }

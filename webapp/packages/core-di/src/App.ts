@@ -7,11 +7,11 @@
  */
 
 import { Bootstrap } from './Bootstrap';
-import { DIContainer } from './DIContainer';
+import type { DIContainer } from './DIContainer';
 import { RootContainerService } from './entities/RootContainerService';
-import { IServiceCollection, IServiceInjector } from './IApp';
+import type { IServiceCollection, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
-import { PluginManifest } from './PluginManifest';
+import type { PluginManifest } from './PluginManifest';
 
 export class App {
   private plugins: PluginManifest[];
@@ -25,11 +25,11 @@ export class App {
     this.getServiceCollection().addServiceByToken(RootContainerService, rootContainerService);
   }
 
-  registerChildContainer(container: DIContainer) {
+  registerChildContainer(container: DIContainer): void {
     this.diWrapper.registerChildContainer(container);
   }
 
-  addPlugin(manifest: PluginManifest) {
+  addPlugin(manifest: PluginManifest): void {
     this.plugins.push(manifest);
   }
 
@@ -42,7 +42,7 @@ export class App {
   }
 
   // first phase register all dependencies
-  registerServices() {
+  registerServices(): void {
     for (const plugin of this.plugins) {
       if (plugin.registerServices) {
         plugin.registerServices(this.getServiceCollection());
@@ -56,7 +56,7 @@ export class App {
     }
   }
 
-  async initializeServices() {
+  async initializeServices(): Promise<void> {
     for (const plugin of this.plugins) {
       for (const service of plugin.providers) {
         if (service.prototype instanceof Bootstrap) {
@@ -70,7 +70,7 @@ export class App {
     }
   }
 
-  async loadServices() {
+  async loadServices(): Promise<void> {
     for (const plugin of this.plugins) {
       for (const service of plugin.providers) {
         if (service.prototype instanceof Bootstrap) {
@@ -85,7 +85,7 @@ export class App {
   }
 
   // second phase - run init scripts todo run it based on dependency tree
-  async initializePlugins() {
+  async initializePlugins(): Promise<void> {
     for (const plugin of this.plugins) {
       if (plugin.initialize) {
         await plugin.initialize(this.getServiceInjector());
@@ -94,7 +94,7 @@ export class App {
   }
 
   // third initialization phase? (never called)
-  async load() {
+  async load(): Promise<void> {
     for (const plugin of this.plugins) {
       if (plugin.load) {
         // todo run it based on dependency tree

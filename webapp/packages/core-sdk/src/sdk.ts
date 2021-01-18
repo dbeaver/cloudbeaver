@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+// @ts-expect-error uncontrolled
 import { GraphQLClient } from 'graphql-request';
 export type Maybe<T> = T;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

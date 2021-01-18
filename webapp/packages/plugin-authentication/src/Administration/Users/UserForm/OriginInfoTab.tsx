@@ -13,7 +13,7 @@ import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-block
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { IUserFormProps } from './UserFormService';
+import type { IUserFormProps } from './UserFormService';
 
 export const OriginInfoTab: TabContainerTabComponent<IUserFormProps> = observer(function OriginInfoTab({
   user,

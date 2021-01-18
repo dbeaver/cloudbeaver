@@ -11,7 +11,7 @@ import {
   GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList
 } from '@cloudbeaver/core-sdk';
 
-import { DBObject } from './EntityTypes';
+import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 
 @injectable()

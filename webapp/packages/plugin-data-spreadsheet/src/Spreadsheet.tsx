@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { DataModelWrapper, IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
+import type { DataModelWrapper, IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { AgGridTableLoader } from './AgGridTable/AgGridTableLoader';
 

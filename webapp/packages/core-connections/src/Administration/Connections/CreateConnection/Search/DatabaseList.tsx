@@ -14,7 +14,7 @@ import {
   ItemListSearch, ItemList, SubmittingForm, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { Database } from './Database';

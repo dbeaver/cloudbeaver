@@ -15,7 +15,7 @@ import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
-import { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
+import type { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
 import { ConnectionEditController } from './ConnectionEditController';
 
 const styles = composes(

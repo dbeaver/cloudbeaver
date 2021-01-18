@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabStateReturn } from 'reakit/Tab';
+import type { TabStateReturn } from 'reakit/Tab';
 
 export interface TabPanelProps {
   tabId: string;

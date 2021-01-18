@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NotificationService } from '@cloudbeaver/core-events';
+import type { NotificationService } from '@cloudbeaver/core-events';
 import {
   AsyncTaskInfo, GraphQLService, ServerInternalError, DataTransferParameters
 } from '@cloudbeaver/core-sdk';

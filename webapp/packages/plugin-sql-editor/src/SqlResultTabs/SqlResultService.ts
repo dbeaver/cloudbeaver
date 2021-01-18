@@ -8,9 +8,9 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
-import { IRequestDataResult, RowDiff } from '@cloudbeaver/plugin-data-viewer';
+import type { IRequestDataResult, RowDiff } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlQueryParams } from '../ISqlEditorTabState';
+import type { ISqlQueryParams } from '../ISqlEditorTabState';
 
 @injectable()
 export class SqlResultService {

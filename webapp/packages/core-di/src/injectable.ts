@@ -8,7 +8,7 @@
 
 import { injectable as inversifyInjectable, inject as inversifyInject } from 'inversify';
 
-import { ValueToken } from './InjectionToken';
+import type { ValueToken } from './InjectionToken';
 
 export function injectable(): (target: any) => any {
   return inversifyInjectable();

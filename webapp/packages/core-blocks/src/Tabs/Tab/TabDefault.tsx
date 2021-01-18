@@ -13,10 +13,10 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { TabContext } from '../TabContext';
-import { ITabData } from '../TabsContext';
+import type { ITabData } from '../TabsContext';
 import { Tab } from './Tab';
 import { TabIcon } from './TabIcon';
-import { TabProps } from './TabProps';
+import type { TabProps } from './TabProps';
 import { TabTitle } from './TabTitle';
 
 interface Props<T = Record<string, any>> {

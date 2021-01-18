@@ -11,7 +11,7 @@ import { observable, when } from 'mobx';
 import { NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-app';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
 import { DdlViewerService } from '../DdlViewerService';

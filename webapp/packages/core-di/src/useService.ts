@@ -9,8 +9,8 @@
 import { useContext } from 'react';
 
 import { appContext } from './AppContext';
-import { IServiceConstructor } from './IApp';
-import { ValueToken } from './InjectionToken';
+import type { IServiceConstructor } from './IApp';
+import type { ValueToken } from './InjectionToken';
 
 export function useService<T>(ctor: IServiceConstructor<T>): T {
   const app = useContext(appContext);

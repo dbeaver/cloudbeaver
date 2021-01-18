@@ -21,8 +21,8 @@ import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormController } from '../ConnectionFormController';
-import { IConnectionFormModel } from '../IConnectionFormModel';
+import type { ConnectionFormController } from '../ConnectionFormController';
+import type { IConnectionFormModel } from '../IConnectionFormModel';
 import { OptionsController } from './OptionsController';
 import { ParametersForm } from './ParametersForm';
 

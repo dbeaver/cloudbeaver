@@ -17,7 +17,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
-import { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
+import type { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
 import { CreateConnectionService } from '../CreateConnectionService';
 
 const styles = composes(

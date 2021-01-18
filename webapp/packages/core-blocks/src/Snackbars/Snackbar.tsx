@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { Button } from '@cloudbeaver/core-blocks';
-import { ENotificationType } from '@cloudbeaver/core-events';
+import type { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { useStateDelay } from '../useStateDelay';

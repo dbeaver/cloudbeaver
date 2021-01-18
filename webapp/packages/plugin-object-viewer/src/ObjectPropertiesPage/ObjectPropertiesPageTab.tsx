@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ObjectPageTabProps } from '../ObjectPage/ObjectPage';
+import type { ObjectPageTabProps } from '../ObjectPage/ObjectPage';
 
 export const ObjectPropertiesPageTab = observer(function ObjectPropertiesPageTab({
   page, onSelect, style,

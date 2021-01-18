@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export type ObjectPropertyProps = PropsWithChildren<{
   objectProperty?: ObjectPropertyInfo;

@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 
-import { IDriver } from './Driver';
+import type { IDriver } from './Driver';
 import { DriverSelector } from './DriverSelector';
 
 const styles = css`

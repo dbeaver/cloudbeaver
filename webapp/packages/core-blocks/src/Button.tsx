@@ -68,14 +68,14 @@ type ButtonProps = (
   download?: boolean;
 };
 
-export function Button({
+export const Button: React.FC<ButtonProps> = function Button({
   children,
   mod,
   tag = 'button',
   ...rest
-}: ButtonProps) {
+}) {
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
     <Button {...rest}><ripple as="div" />{children}</Button>
   );
-}
+};

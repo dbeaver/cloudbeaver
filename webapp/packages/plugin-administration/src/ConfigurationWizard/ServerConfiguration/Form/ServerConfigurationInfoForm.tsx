@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 
 import { FormGroup, InputGroup, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 interface Props {
   serverConfig: ServerConfigInput;

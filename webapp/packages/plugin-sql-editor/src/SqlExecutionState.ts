@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
-import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
+import type { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
 export class SqlExecutionState {
   @computed get isSqlExecuting(): boolean {

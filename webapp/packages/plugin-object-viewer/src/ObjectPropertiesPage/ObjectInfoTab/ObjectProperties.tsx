@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';

@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader, BORDER_TAB_STYLES
 } from '@cloudbeaver/core-blocks';
-import { DBDriver } from '@cloudbeaver/core-connections';
+import type { DBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';

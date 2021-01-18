@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
-import { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 interface Props {
   tableModel: IDatabaseDataModel<any, any>;

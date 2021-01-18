@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
-import { MenuInitialState } from 'reakit/Menu';
+import type { ButtonHTMLAttributes, PropsWithChildren } from 'react';
+import type { MenuInitialState } from 'reakit/Menu';
 
-import { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { Style } from '@cloudbeaver/core-theming';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import type { Style } from '@cloudbeaver/core-theming';
 
 export type MenuMod = 'primary' | 'surface' | 'secondary';
 

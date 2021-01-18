@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { EnvironmentService } from '@cloudbeaver/core-sdk';

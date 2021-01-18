@@ -19,7 +19,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionFormController } from './ConnectionFormController';
 import { ConnectionFormService } from './ConnectionFormService';
-import { IConnectionFormModel } from './IConnectionFormModel';
+import type { IConnectionFormModel } from './IConnectionFormModel';
 
 const styles = composes(
   css`

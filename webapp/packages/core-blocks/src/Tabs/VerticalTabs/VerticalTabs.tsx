@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { useStyles, Style } from '@cloudbeaver/core-theming';
 
-import { ITabContainer } from '../ITab';
+import type { ITabContainer } from '../ITab';
 import { TabList } from '../TabList';
 import { TabsState } from '../TabsState';
 import { VerticalTabHeader } from './VerticalTabHeader';

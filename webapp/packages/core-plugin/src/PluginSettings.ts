@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ISettingsSource } from '@cloudbeaver/core-settings';
+import type { ISettingsSource } from '@cloudbeaver/core-settings';
 
 export class PluginSettings<T> implements ISettingsSource {
   constructor(

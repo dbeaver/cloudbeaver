@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import styled from 'reshadow';
 import { css } from 'reshadow';
 
-import { AdminUser } from '@cloudbeaver/core-authentication';
+import type { AdminUser } from '@cloudbeaver/core-authentication';
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
 interface Props {

@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { InputField } from '@cloudbeaver/core-blocks';
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';

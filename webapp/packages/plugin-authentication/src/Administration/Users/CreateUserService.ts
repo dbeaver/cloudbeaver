@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 

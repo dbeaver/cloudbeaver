@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExecutionContextProvider } from './ExecutionContext';
-import { IExecutorHandler } from './IExecutorHandler';
+import type { IExecutionContextProvider } from './ExecutionContext';
+import type { IExecutorHandler } from './IExecutorHandler';
 
 export interface IExecutor<T = unknown> {
   execute: (data: T) => Promise<IExecutionContextProvider<T>>;

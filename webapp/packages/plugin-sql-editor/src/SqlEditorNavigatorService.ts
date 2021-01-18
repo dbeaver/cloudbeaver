@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
 import { SqlExecutionState } from './SqlExecutionState';
 

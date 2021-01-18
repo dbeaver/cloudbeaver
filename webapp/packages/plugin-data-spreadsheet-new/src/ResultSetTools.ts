@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 
 export const ResultSetTools = {
   getHeaders(resultSet: SqlResultSet): string[] {

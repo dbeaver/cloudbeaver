@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 import { Button } from 'reakit';
 import styled, { css } from 'reshadow';
 

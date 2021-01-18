@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
-import { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
+import type { TableViewerModel } from '@cloudbeaver/plugin-data-viewer';
 
 interface Props {
   tableModel: TableViewerModel;

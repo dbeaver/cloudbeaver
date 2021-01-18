@@ -10,8 +10,8 @@ import { observable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
 import { EditedRow, RowDiff } from './EditedRow';
-import { TableDataModel } from './TableDataModel';
-import { TableRow, SomeTableRows } from './TableRow';
+import type { TableDataModel } from './TableDataModel';
+import type { TableRow, SomeTableRows } from './TableRow';
 
 /**
  *  when user edit data in e table this class store changes until they will be applied

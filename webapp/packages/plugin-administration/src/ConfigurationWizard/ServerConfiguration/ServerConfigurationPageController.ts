@@ -10,7 +10,7 @@ import { AdministrationScreenService, ConfigurationWizardService } from '@cloudb
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
-import { IServerConfigurationPageState } from './IServerConfigurationPageState';
+import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 @injectable()

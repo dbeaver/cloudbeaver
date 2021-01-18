@@ -17,9 +17,9 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { IActiveView } from '@cloudbeaver/core-view';
+import type { IActiveView } from '@cloudbeaver/core-view';
 
-import { ITab } from './ITab';
+import type { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
 import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
 

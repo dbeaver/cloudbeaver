@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabProps } from '@cloudbeaver/core-blocks';
+import type { TabProps } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 
 export interface IDataPresentationProps {
   model: IDatabaseDataModel<any>;

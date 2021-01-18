@@ -11,10 +11,10 @@
 import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
 import 'codemirror/mode/meta';
 import { observable } from 'mobx';
-import { IControlledCodeMirror } from 'react-codemirror2';
+import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
   theme: 'material',

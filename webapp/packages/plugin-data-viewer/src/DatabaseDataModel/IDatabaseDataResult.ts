@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 export interface IDatabaseDataResult {
   id: string;

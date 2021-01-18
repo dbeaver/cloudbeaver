@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react';
 import styled from 'reshadow';
 
-import { TabHandlerTabProps } from '@cloudbeaver/core-app';
+import type { TabHandlerTabProps } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle, ITabData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 
 export const SqlEditorTab = observer(function SqlEditorTab({
   tab, onSelect, onClose, style,

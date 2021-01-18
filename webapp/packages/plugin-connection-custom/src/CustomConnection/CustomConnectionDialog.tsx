@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { useController } from '@cloudbeaver/core-di';
-import { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { ConnectionFormDialog } from './ConnectionFormDialog/ConnectionFormDialog';

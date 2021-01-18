@@ -14,14 +14,14 @@ import {
   Table, TableHeader, TableColumnHeader, TableBody,
   TableItem, TableColumnValue, TableItemSelect, StaticImage, TextPlaceholder
 } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { IUserFormProps } from './UserFormService';
+import type { IUserFormProps } from './UserFormService';
 
 const styles = composes(
   css`

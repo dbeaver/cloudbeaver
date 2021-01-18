@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { Style } from '@cloudbeaver/core-theming';
+import type { Style } from '@cloudbeaver/core-theming';
 
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';

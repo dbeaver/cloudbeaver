@@ -14,10 +14,10 @@ import { SessionService, ServerService } from '@cloudbeaver/core-root';
 import { GraphQLService, ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
-import { ILocaleProvider } from './IlocaleProvider';
+import type { ILocaleProvider } from './ILocaleProvider';
 import { defaultENLocale } from './locales/en';
 import { defaultRULocale } from './locales/ru';
-import { TLocalizationToken } from './TLocalizationToken';
+import type { TLocalizationToken } from './TLocalizationToken';
 
 export type ServerLanguageShort = Pick<ServerLanguage, 'isoCode' | 'nativeName'>;
 

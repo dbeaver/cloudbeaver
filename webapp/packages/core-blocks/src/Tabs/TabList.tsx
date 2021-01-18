@@ -9,7 +9,7 @@
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
-import { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { DynamicStyle } from '@cloudbeaver/core-theming';
 
 import { TabDefault } from './Tab/TabDefault';
 import { TabsContext } from './TabsContext';

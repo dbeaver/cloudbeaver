@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { LogEntry } from '@cloudbeaver/core-sdk';
+import type { LogEntry } from '@cloudbeaver/core-sdk';
 
 export interface ILogEntry extends LogEntry {
   id: string;

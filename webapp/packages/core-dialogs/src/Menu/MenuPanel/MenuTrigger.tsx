@@ -18,7 +18,7 @@ import styled, { use } from 'reshadow';
 
 import { useStyles, Style } from '@cloudbeaver/core-theming';
 
-import {
+import type {
   IMenuItem, IMenuPanel, MenuTriggerProps
 } from '../IMenuPanel';
 import { MenuPanelItem } from './MenuPanelItem';

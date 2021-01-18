@@ -14,7 +14,7 @@ import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
-import { IAdministrationItem } from '../../AdministrationItem/IAdministrationItem';
+import type { IAdministrationItem } from '../../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems';
 import { AdministrationScreenService } from '../AdministrationScreenService';
 

@@ -10,10 +10,10 @@ import { observer } from 'mobx-react';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ITab } from '@cloudbeaver/core-app';
+import type { ITab } from '@cloudbeaver/core-app';
 import { TableViewer } from '@cloudbeaver/plugin-data-viewer';
 
-import { IResultDataTab, ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { IResultDataTab, ISqlEditorTabState } from '../ISqlEditorTabState';
 
 const style = css`
   result-panel {

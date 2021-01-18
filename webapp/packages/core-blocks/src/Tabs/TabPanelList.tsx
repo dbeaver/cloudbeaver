@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { TabPanel } from './TabPanel';
-import { ITabInfo } from './TabsContainer';
+import type { ITabInfo } from './TabsContainer';
 import { TabsContext } from './TabsContext';
 
 interface Props {

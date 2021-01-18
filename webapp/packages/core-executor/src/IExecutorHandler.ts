@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExecutionContextProvider } from './ExecutionContext';
+import type { IExecutionContextProvider } from './ExecutionContext';
 
 export type IExecutorHandler<T> = (
   data: T,

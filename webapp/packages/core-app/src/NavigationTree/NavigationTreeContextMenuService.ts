@@ -9,7 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
-import { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 
 @injectable()

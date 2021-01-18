@@ -15,7 +15,7 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { NavNode } from '../../../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';

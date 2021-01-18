@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ISettingsSource } from './ISettingsSource';
+import type { ISettingsSource } from './ISettingsSource';
 
 export class SettingsSource implements ISettingsSource {
   protected store = new Map<string, any>();

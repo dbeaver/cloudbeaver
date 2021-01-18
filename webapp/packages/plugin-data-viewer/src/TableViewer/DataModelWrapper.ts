@@ -8,16 +8,16 @@
 
 import { observable } from 'mobx';
 
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import type { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLError } from '@cloudbeaver/core-sdk';
 
-import { IDataContainerOptions } from '../ContainerDataSource';
+import type { IDataContainerOptions } from '../ContainerDataSource';
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
-import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
-import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
-import { RowDiff } from './TableDataModel/EditedRow';
+import type { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
+import type { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
+import type { RowDiff } from './TableDataModel/EditedRow';
 import { IRequestDataResult, TableViewerModel } from './TableViewerModel';
 
 const fetchingSettings = {
@@ -35,14 +35,14 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   /**
    * @deprecated will be refactored
    */
-  get message() {
+  get message(): string {
     return this.errorMessage;
   }
 
   /**
    * @deprecated will be refactored
    */
-  get details() {
+  get details(): boolean {
     return this.hasDetails;
   }
 

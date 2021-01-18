@@ -13,7 +13,7 @@ import { Deferred, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { ExportFromContainerProcess } from './ExportFromContainerProcess';
 import { ExportFromResultsProcess } from './ExportFromResultsProcess';
-import { IExportContext } from './IExportContext';
+import type { IExportContext } from './IExportContext';
 
 interface Process {
   taskId: string;

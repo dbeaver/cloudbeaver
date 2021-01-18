@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react';
 
 import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, InputGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../../../ConnectionsResource';
-import { IConnectionFormProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../ConnectionFormService';
 
 interface IState {
   properties: ObjectPropertyInfo[];

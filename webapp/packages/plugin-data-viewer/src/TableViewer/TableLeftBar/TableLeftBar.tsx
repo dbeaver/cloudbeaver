@@ -11,10 +11,10 @@ import styled, { css } from 'reshadow';
 
 import { ITabData, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
 

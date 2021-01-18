@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Style } from '@cloudbeaver/core-theming';
+import type { Style } from '@cloudbeaver/core-theming';
 
-import { IRouteParams } from './IRouteParams';
+import type { IRouteParams } from './IRouteParams';
 
 export enum AdministrationItemType {
   Default,

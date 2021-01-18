@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IAdministrationItem } from './IAdministrationItem';
+import type { IAdministrationItem } from './IAdministrationItem';
 
 export function orderAdministrationItems(configuration: boolean) {
   return (itemA: IAdministrationItem, itemB: IAdministrationItem): number => {

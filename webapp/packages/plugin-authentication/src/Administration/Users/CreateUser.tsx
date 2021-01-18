@@ -9,7 +9,7 @@
 import styled, { css } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
-import { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { UserForm } from './UserForm/UserForm';

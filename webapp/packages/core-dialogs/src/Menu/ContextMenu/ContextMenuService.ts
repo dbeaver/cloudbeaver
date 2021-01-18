@@ -8,10 +8,10 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { IMenuPanel } from '../IMenuPanel';
+import type { IMenuPanel } from '../IMenuPanel';
 import { ContextMenu } from './ContextMenu';
-import { IContextMenuItem } from './IContextMenuItem';
-import { IMenuContext } from './IMenuContext';
+import type { IContextMenuItem } from './IContextMenuItem';
+import type { IMenuContext } from './IMenuContext';
 
 @injectable()
 export class ContextMenuService {

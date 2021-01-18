@@ -7,8 +7,8 @@
  */
 
 import { ExecutionContext, IExecutionContextProvider } from './ExecutionContext';
-import { IExecutor } from './IExecutor';
-import { IExecutorHandler } from './IExecutorHandler';
+import type { IExecutor } from './IExecutor';
+import type { IExecutorHandler } from './IExecutorHandler';
 import { BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler';
 
 export class Executor<T = unknown> implements IExecutor<T> {

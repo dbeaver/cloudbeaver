@@ -15,7 +15,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
-import { IProperty } from './IProperty';
+import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';
 

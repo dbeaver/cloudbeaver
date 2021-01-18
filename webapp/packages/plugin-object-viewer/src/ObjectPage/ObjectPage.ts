@@ -8,10 +8,10 @@
 
 import { observable } from 'mobx';
 
-import { ITab } from '@cloudbeaver/core-app';
-import { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { ITab } from '@cloudbeaver/core-app';
+import type { DynamicStyle } from '@cloudbeaver/core-theming';
 
-import { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 
 export interface ObjectPageTabProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;

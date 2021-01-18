@@ -9,12 +9,12 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { ITab } from '@cloudbeaver/core-app';
+import type { ITab } from '@cloudbeaver/core-app';
 import { VerticalTabs } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectFoldersController } from './ObjectFoldersController';
 
 const styles = composes(

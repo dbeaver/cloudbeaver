@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExtension } from './IExtension';
+import type { IExtension } from './IExtension';
 
 interface ExtensionExecutor {
   on: <T extends IExtension<any>>(

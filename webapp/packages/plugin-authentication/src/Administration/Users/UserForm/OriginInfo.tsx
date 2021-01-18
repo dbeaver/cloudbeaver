@@ -10,12 +10,12 @@ import { observer } from 'mobx-react';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import { IUserFormProps } from './UserFormService';
+import type { IUserFormProps } from './UserFormService';
 
 interface IState {
   properties: ObjectPropertyInfo[];

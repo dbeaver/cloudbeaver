@@ -13,7 +13,7 @@ import { FormGroup, InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { AdminConnection } from '../../../ConnectionsResource';
+import type { AdminConnection } from '../../../ConnectionsResource';
 
 interface ParametersFormProps {
   connection: AdminConnection;

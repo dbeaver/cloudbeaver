@@ -8,7 +8,7 @@
 
 import { connectionProvider } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { IExtension } from '@cloudbeaver/core-extensions';
+import type { IExtension } from '@cloudbeaver/core-extensions';
 
 import { objectCatalogProvider } from './extensions/IObjectCatalogProvider';
 import { objectSchemaProvider } from './extensions/IObjectSchemaProvider';

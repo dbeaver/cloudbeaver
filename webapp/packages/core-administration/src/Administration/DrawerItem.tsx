@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
+import type { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
 import { ConfigurationWizardService } from '../AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 
 export const DrawerItem = observer(function DrawerItem({

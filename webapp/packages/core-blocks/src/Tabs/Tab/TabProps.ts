@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
-import { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { DynamicStyle } from '@cloudbeaver/core-theming';
 
-import { ITabData } from '../TabsContext';
+import type { ITabData } from '../TabsContext';
 
 export type TabProps = PropsWithChildren<{
   tabId: string;

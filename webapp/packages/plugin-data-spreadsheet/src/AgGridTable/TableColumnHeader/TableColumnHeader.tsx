@@ -9,9 +9,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { AgEvent, GridApi, Column } from '@ag-grid-community/core';
+import type { AgEvent, GridApi, Column } from '@ag-grid-community/core';
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
-import { SortMode } from '@cloudbeaver/plugin-data-viewer';
+import type { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 interface HeaderProps {
   api: GridApi;

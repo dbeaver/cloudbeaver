@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Route, State as RouterState } from 'router5';
+import type { Route, State as RouterState } from 'router5';
 
 export type ScreenRoute = Omit<Route, 'children'>;
 

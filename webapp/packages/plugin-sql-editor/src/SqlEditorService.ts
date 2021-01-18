@@ -10,9 +10,9 @@ import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
-import { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
+import type { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
-import { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
 
 @injectable()

@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { DataModelWrapper } from '../../DataModelWrapper';
+import type { DataModelWrapper } from '../../DataModelWrapper';
 import { TableFooterMenuItem } from './TableFooterMenuItem';
 import { TableFooterMenuService } from './TableFooterMenuService';
 

@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { TabElementProps } from '@cloudbeaver/core-blocks';
+import type { TabElementProps } from '@cloudbeaver/core-blocks';
 
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';

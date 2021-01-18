@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 
 import { ItemList } from '@cloudbeaver/core-blocks';
-import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { ProcessorItem } from './ProcessorItem';
 

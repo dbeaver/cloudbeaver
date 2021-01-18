@@ -13,12 +13,12 @@ import {
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../../DBDriverResource';
 import { getUniqueConnectionName } from '../../../getUniqueConnectionName';
 import { ConnectionsResource, isLocalConnection } from '../../ConnectionsResource';
-import { IConnectionFormModel } from './IConnectionFormModel';
+import type { IConnectionFormModel } from './IConnectionFormModel';
 
 interface IValidationStatus {
   status: boolean;

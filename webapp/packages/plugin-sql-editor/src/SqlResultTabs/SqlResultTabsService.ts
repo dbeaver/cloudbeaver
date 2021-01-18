@@ -13,7 +13,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap, isPromiseCancelledError } from '@cloudbeaver/core-utils';
 import { DatabaseDataAccessMode, DataModelWrapper, fetchingSettings, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import {
+import type {
   IQueryTabGroup, ISqlEditorTabState, ISqlQueryParams, IResultDataTab
 } from '../ISqlEditorTabState';
 import { QueryDataSource } from '../QueryDataSource';

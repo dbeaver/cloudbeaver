@@ -13,7 +13,7 @@ import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { DataModelWrapper } from '../DataModelWrapper';
+import type { DataModelWrapper } from '../DataModelWrapper';
 import { TableHeaderService } from './TableHeaderService';
 
 const styles = composes(

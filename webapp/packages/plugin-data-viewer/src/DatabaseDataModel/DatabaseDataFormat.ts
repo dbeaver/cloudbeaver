@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DatabaseDataModel } from './DatabaseDataModel';
+import type { DatabaseDataModel } from './DatabaseDataModel';
 
 export interface DatabaseDataFormat<T> {
   processResult: (model: DatabaseDataModel<any, any>, data: T) => void;

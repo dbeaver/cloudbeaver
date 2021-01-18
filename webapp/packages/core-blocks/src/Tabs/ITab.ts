@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 export interface ITab {
   tabId: string;

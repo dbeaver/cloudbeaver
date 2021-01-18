@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react';
-import { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 import styled from 'reshadow';
 
 import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';

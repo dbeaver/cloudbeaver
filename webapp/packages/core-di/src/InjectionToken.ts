@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITypedConstructor } from './ITypedConstructor';
+import type { ITypedConstructor } from './ITypedConstructor';
 
 /**
  * Use this token to inject value as a service

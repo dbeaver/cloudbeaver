@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
-import { AdminConnection } from '../../../ConnectionsResource';
+import type { AdminConnection } from '../../../ConnectionsResource';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
 interface Props {

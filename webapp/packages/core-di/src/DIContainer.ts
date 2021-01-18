@@ -8,8 +8,8 @@
 
 import { Container } from 'inversify';
 
-import { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
-import { InjectionToken } from './InjectionToken';
+import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
+import type { InjectionToken } from './InjectionToken';
 import { isConstructor } from './isConstructor';
 
 export class DIContainer implements IServiceInjector, IServiceCollection {
@@ -25,12 +25,12 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     }
   }
 
-  bindWithParent(parent: DIContainer) {
+  bindWithParent(parent: DIContainer): void {
     this.container.parent = parent.container;
     this.parent = parent;
   }
 
-  unbindParent() {
+  unbindParent(): void {
     this.container.parent = null;
     this.parent = null;
   }

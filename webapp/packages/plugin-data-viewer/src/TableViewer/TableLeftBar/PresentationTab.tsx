@@ -14,8 +14,8 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
-import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DataPresentationOptions } from '../../DataPresentationService';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { DataPresentationOptions } from '../../DataPresentationService';
 
 interface Props {
   model: IDatabaseDataModel<any>;

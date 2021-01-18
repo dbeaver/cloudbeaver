@@ -13,9 +13,9 @@ import { useNode } from '@cloudbeaver/core-app';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { IExportContext } from '../IExportContext';
+import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
 
 const styles = css`

@@ -7,8 +7,8 @@
  */
 
 import { DIContainer } from './DIContainer';
-import { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
-import { ValueToken } from './InjectionToken';
+import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
+import type { ValueToken } from './InjectionToken';
 
 export interface IDiWrapper {
   injector: IServiceInjector;

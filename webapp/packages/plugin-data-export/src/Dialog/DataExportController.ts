@@ -8,7 +8,7 @@
 
 import { observable, computed } from 'mobx';
 
-import { IProperty } from '@cloudbeaver/core-blocks';
+import type { IProperty } from '@cloudbeaver/core-blocks';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,7 +16,7 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';
-import { IExportContext } from '../IExportContext';
+import type { IExportContext } from '../IExportContext';
 
 export enum DataExportStep {
   DataTransferProcessor,

@@ -11,7 +11,7 @@ import {
   ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
 } from '@cloudbeaver/core-dialogs';
 
-import { DataModelWrapper } from '../../DataModelWrapper';
+import type { DataModelWrapper } from '../../DataModelWrapper';
 
 export interface ITableFooterMenuContext {
   model: DataModelWrapper;

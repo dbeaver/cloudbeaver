@@ -15,7 +15,7 @@ import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { CoreSettingsService } from '../CoreSettingsService';
-import { NavNode } from '../shared/NodesManager/EntityTypes';
+import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { useChildren } from '../shared/useChildren';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { ITreeContext, TreeContext } from './TreeContext';

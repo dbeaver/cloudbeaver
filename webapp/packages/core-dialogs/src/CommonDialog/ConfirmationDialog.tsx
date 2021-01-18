@@ -13,7 +13,7 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { commonDialogStyle } from './CommonDialog/styles';
-import { DialogComponent } from './CommonDialogService';
+import type { DialogComponent } from './CommonDialogService';
 
 const style = css`
   footer {

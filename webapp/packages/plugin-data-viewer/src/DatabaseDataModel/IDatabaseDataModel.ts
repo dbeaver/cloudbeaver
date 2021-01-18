@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { IDatabaseDataResult } from './IDatabaseDataResult';
-import { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export enum DatabaseDataAccessMode {
   Default,

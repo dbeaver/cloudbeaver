@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ServerError } from './sdk';
+import type { ServerError } from './sdk';
 
 export class ServerInternalError extends Error implements ServerError {
   readonly errorCode?: string;

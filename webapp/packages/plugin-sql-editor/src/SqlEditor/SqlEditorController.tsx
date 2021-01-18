@@ -10,13 +10,13 @@ import {
   showHint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
 import { computed } from 'mobx';
-import { IControlledCodeMirror } from 'react-codemirror2';
+import type { IControlledCodeMirror } from 'react-codemirror2';
 
-import { ITab } from '@cloudbeaver/core-app';
+import type { ITab } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
-import { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
-import { ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';

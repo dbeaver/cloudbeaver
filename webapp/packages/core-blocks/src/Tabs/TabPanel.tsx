@@ -10,7 +10,7 @@ import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
 import { TabContext } from './TabContext';
-import { TabPanelProps } from './TabPanelProps';
+import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 
 export const TabPanel: React.FC<TabPanelProps> = function TabPanel({

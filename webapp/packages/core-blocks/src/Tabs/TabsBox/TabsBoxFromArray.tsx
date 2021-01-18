@@ -13,7 +13,7 @@ import { useStyles, Style } from '@cloudbeaver/core-theming';
 
 import { Tab } from '../Tab';
 import { TabPanel } from '../TabPanel';
-import { ITabData } from '../TabsContext';
+import type { ITabData } from '../TabsContext';
 import { TabsBox } from './TabsBox';
 
 export interface TabElementProps {

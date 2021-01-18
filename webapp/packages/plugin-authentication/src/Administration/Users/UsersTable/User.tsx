@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react';
 import styled, { css } from 'reshadow';
 
-import { AdminUser } from '@cloudbeaver/core-authentication';
+import type { AdminUser } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder
 } from '@cloudbeaver/core-blocks';

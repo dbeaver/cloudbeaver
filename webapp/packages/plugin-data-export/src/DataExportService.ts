@@ -8,12 +8,12 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DataTransferParameters } from '@cloudbeaver/core-sdk';
+import type { DataTransferParameters } from '@cloudbeaver/core-sdk';
 
 import { DataExportProcessService } from './DataExportProcessService';
 import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
 import { ExportNotification } from './ExportNotification/ExportNotification';
-import { IExportContext } from './IExportContext';
+import type { IExportContext } from './IExportContext';
 
 @injectable()
 export class DataExportService {

@@ -20,11 +20,11 @@ import {
   FormBoxElement,
   FormGroup,
 } from '@cloudbeaver/core-blocks';
-import { DBDriver } from '@cloudbeaver/core-connections';
+import type { DBDriver } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { IFormController } from './IFormController';
+import type { IFormController } from './IFormController';
 import { ParametersForm } from './ParametersForm';
 
 interface ConnectionFormProps {

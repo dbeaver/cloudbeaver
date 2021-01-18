@@ -11,7 +11,7 @@ import {
 } from 'react';
 
 import { appContext } from './AppContext';
-import {
+import type {
   IServiceConstructor, IInitializableController, IDestructibleController, ExtractInitArgs
 } from './IApp';
 

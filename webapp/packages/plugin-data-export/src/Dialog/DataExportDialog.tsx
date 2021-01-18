@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react';
 
 import { useController } from '@cloudbeaver/core-di';
-import { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
-import { IExportContext } from '../IExportContext';
+import type { IExportContext } from '../IExportContext';
 import { DataExportController, DataExportStep } from './DataExportController';
 import { ProcessorConfigureDialog } from './ProcessorConfigureDialog';
 import { ProcessorSelectDialog } from './ProcessorSelectDialog';

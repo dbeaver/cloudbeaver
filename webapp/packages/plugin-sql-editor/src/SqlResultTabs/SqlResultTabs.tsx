@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ITab as TabClass } from '@cloudbeaver/core-app';
+import type { ITab as TabClass } from '@cloudbeaver/core-app';
 import {
   Tab, TabPanel, TabTitle, TabsBox, TextPlaceholder, ITabData
 } from '@cloudbeaver/core-blocks';
@@ -19,7 +19,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlEditorNavigatorService } from '../SqlEditorNavigatorService';
 import { SqlResultPanel } from './SqlResultPanel';
 

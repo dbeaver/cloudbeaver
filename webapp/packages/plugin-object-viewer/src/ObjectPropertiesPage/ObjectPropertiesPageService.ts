@@ -11,11 +11,11 @@ import {
 } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
-import { ObjectPage } from '../ObjectPage/ObjectPage';
+import type { ObjectPage } from '../ObjectPage/ObjectPage';
 import { ObjectViewerTabService } from '../ObjectViewerTabService';
 import { ObjectPropertiesPagePanel } from './ObjectPropertiesPagePanel';
 import { ObjectPropertiesPageTab } from './ObjectPropertiesPageTab';

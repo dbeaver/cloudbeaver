@@ -15,8 +15,8 @@ import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
-import { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
-import { IRouteParams } from '../AdministrationItem/IRouteParams';
+import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import type { IRouteParams } from '../AdministrationItem/IRouteParams';
 import { EAdminPermission } from '../EAdminPermission';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';

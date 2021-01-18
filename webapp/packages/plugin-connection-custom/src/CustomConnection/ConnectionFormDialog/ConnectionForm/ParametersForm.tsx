@@ -13,7 +13,7 @@ import { InputField } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { IFormController } from './IFormController';
+import type { IFormController } from './IFormController';
 
 interface ParametersFormProps {
   controller: IFormController;

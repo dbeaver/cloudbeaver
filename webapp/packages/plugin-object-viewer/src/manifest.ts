@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import type { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';

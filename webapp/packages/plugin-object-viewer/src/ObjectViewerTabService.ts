@@ -22,13 +22,13 @@ import {
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
-import { IObjectViewerTabContext } from './IObjectViewerTabContext';
-import { IObjectViewerTabState } from './IObjectViewerTabState';
+import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
+import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
-import { ObjectPage } from './ObjectPage/ObjectPage';
+import type { ObjectPage } from './ObjectPage/ObjectPage';
 import { ObjectViewerPanel } from './ObjectViewerPanel';
 import { ObjectViewerTab } from './ObjectViewerTab';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';

@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react';
 
-import { TLocalizationToken } from './TLocalizationToken';
+import type { TLocalizationToken } from './TLocalizationToken';
 import { useTranslate } from './useTranslate';
 
 interface Props {

@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DIContainer } from '../DIContainer';
-import { Entity } from './Entity';
+import type { DIContainer } from '../DIContainer';
+import type { Entity } from './Entity';
 
 /**
  * The service allows to register new child container in Root Scope
@@ -20,7 +20,7 @@ export class RootContainerService {
     this.register = register;
   }
 
-  registerEntityInRootContainer(entity: Entity) {
+  registerEntityInRootContainer(entity: Entity): void {
     // entity.container is a protected property and it is the only place where the protection should be broken
     // eslint-disable-next-line dot-notation
     this.register(entity['container']);

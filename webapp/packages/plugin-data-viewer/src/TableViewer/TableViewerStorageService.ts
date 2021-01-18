@@ -11,9 +11,9 @@ import { observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
-import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
+import type { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import { DataModelWrapper } from './DataModelWrapper';
 
 @injectable()

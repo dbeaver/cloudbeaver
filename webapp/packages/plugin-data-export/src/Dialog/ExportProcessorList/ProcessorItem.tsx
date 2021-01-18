@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import {
   ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
 } from '@cloudbeaver/core-blocks';
-import { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 interface ProcessorItemProps {
   processor: DataTransferProcessorInfo;

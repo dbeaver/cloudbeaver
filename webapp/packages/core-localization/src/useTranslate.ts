@@ -9,7 +9,7 @@
 import { useService } from '@cloudbeaver/core-di';
 
 import { LocalizationService } from './LocalizationService';
-import { TLocalizationToken } from './TLocalizationToken';
+import type { TLocalizationToken } from './TLocalizationToken';
 
 export function useTranslate(): ((token: TLocalizationToken) => string) {
   const localizationService = useService(LocalizationService);

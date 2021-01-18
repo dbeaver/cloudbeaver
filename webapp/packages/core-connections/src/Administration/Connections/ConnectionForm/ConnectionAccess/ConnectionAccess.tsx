@@ -26,8 +26,8 @@ import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormController } from '../ConnectionFormController';
-import { IConnectionFormModel } from '../IConnectionFormModel';
+import type { ConnectionFormController } from '../ConnectionFormController';
+import type { IConnectionFormModel } from '../IConnectionFormModel';
 import { Controller } from './Controller';
 
 const styles = composes(

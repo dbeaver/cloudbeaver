@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
+import type {
   IServiceConstructor, IServiceCollection, IServiceInjector
 } from './IApp';
 
