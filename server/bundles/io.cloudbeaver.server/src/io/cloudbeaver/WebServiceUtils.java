@@ -248,7 +248,7 @@ public class WebServiceUtils {
         DBPDataSourceContainer dataSource = null;
         if (!CommonUtils.isEmpty(connectionId)) {
             dataSource = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(connectionId);
-            if (dataSource == null && webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            if (dataSource == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || CBApplication.getInstance().isConfigurationMode())) {
                 // If called for new connection in admin mode then this connection may absent in session registry yet
                 dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);
             }
