@@ -43,7 +43,7 @@ cd ../webapp
 
 yarn
 lerna run bootstrap
-lerna run build --stream --scope=@cloudbeaver/product-default -- -- --mode=production
+lerna run build --stream --scope=@cloudbeaver/product-default
 
 cd ../deploy
 

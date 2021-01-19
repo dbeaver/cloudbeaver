@@ -1,11 +1,12 @@
-const { merge } = require('webpack-merge');
-const webpack = require('webpack');
+const { getAssets, withTimestamp, requireOriginal } = require('./webpack.product.utils');
+const { merge } = requireOriginal('webpack-merge');
+const webpack = requireOriginal('webpack');
 const { resolve } = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = requireOriginal('html-webpack-plugin');
+const CopyWebpackPlugin = requireOriginal('copy-webpack-plugin');
+const TerserPlugin = requireOriginal("terser-webpack-plugin");
 
 const commonConfig = require('./webpack.config.js');
-const { withTimestamp, getAssets } = require('./webpack.product.utils');
 
 const main = resolve('src/index.ts');
 const outputDir = resolve('lib');
@@ -23,8 +24,9 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     path: outputDir,
   },
   optimization: {
+    minimize: true,
     runtimeChunk: 'single',
-    moduleIds: 'hashed',
+    moduleIds: 'deterministic',
     splitChunks: {
       cacheGroups: {
         vendor: {
@@ -37,8 +39,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     },
     usedExports: true,
     sideEffects: true,
-    minimize: true,
     concatenateModules: true,
+    
+    minimizer: [new TerserPlugin({
+      extractComments: /Copyright \(C\)/i,
+    })],
   },
   plugins: [
     new CopyWebpackPlugin({
@@ -47,6 +52,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(timestampVersion),
     }),
-    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), inject: 'html', version: timestampVersion }),
+    new HtmlWebpackPlugin({ 
+      template: resolve('src/index.html.ejs'), 
+      inject: 'body', 
+      version: timestampVersion 
+    }),
   ],
 });

@@ -1,5 +1,4 @@
-const test = process.env.NODE_ENV === "test";
-const prod = process.env.NODE_ENV === "production";
+const devMode = process.env.NODE_ENV !== 'production';
 const { warn } = console;
 
 // Prevents resolution warnings from babel-plugin-module-resolver
@@ -15,7 +14,7 @@ console.warn = (...args) => {
 };
 
 module.exports = {
-  compact: prod,
+  compact: !devMode,
   presets: [
     [
       "@babel/preset-react",
@@ -50,7 +49,7 @@ module.exports = {
     ['@babel/plugin-proposal-class-properties', { loose: false }],
     ["@babel/plugin-proposal-object-rest-spread", { loose: true, useBuiltIns: true }],
     'reshadow/babel',
-    /*!prod &&*/[
+    /*devMode &&*/[
       "babel-plugin-module-resolver",
       {
         alias: {

@@ -1,15 +1,12 @@
-const { merge } = require('webpack-merge');
-const webpack = require('webpack');
-const { resolve } = require('path')
+const { getAssets, requireOriginal } = require('./webpack.product.utils');
+const { merge } = requireOriginal('webpack-merge');
+const { resolve } = require('path');
+const webpack = requireOriginal('webpack');
 
 const commonConfig = require('./webpack.config.js')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-
-const { getAssets } = require('./webpack.product.utils');
-
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const package = require(resolve('package.json'))
 
@@ -38,8 +35,11 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(package.version),
     }),
-    new HtmlWebpackPlugin({ template: resolve('src/index.html.ejs'), inject: 'html', version: package.version }),
-    // new webpack.HotModuleReplacementPlugin(),
-    // new BundleAnalyzerPlugin()
+    new HtmlWebpackPlugin({ 
+      template: resolve('src/index.html.ejs'), 
+      inject: 'body', 
+      version: package.version 
+    }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 });

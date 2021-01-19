@@ -1,8 +1,9 @@
+const { requireOriginal } = require('./webpack.product.utils');
 const { resolve, join } = require('path');
-const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const ESLintPlugin = require('eslint-webpack-plugin');
+const ModuleDependencyWarning = requireOriginal("webpack/lib/ModuleDependencyWarning");
+const MiniCssExtractPlugin = requireOriginal('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = requireOriginal('fork-ts-checker-webpack-plugin');
+const ESLintPlugin = requireOriginal('eslint-webpack-plugin');
 
 // Temporary solution to remove wrong warning messages (it's was fixed https://github.com/microsoft/TypeScript/pull/35200 in typescript 3.8)
 class IgnoreNotFoundExportPlugin {
@@ -10,7 +11,7 @@ class IgnoreNotFoundExportPlugin {
     const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/
     function doneHook(stats) {
       stats.compilation.warnings = stats.compilation.warnings.filter(function (warn) {
-        if (messageRegExp.test(warn.message)) {
+        if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
           return false
         }
         return true;
@@ -25,12 +26,12 @@ class IgnoreNotFoundExportPlugin {
 }
 
 module.exports = (env, argv) => {
-  process.env.NODE_ENV = argv.mode || 'development'
-
+  process.env.NODE_ENV = argv.mode;
+  const devMode = argv.mode !== 'production';
   function getBaseStyleLoader() {
-    if(argv.mode !== 'production') {
-      return 'style-loader'
-    }
+    // if(devMode) {
+    //   return 'style-loader'
+    // }
     return MiniCssExtractPlugin.loader;
   }
 
@@ -38,7 +39,7 @@ module.exports = (env, argv) => {
     const moduleScope = options.hasModule ? 'local' : 'global';
     const modules = {
       mode: moduleScope,
-      localIdentName: '[local]___[hash:base64:5]',
+      localIdentName: '[local]___[fullhash:base64:5]',
     };
 
     const postCssPlugins = [
@@ -88,8 +89,8 @@ module.exports = (env, argv) => {
   }
 
   return {
+    // target: !devMode ? "web" : "browserslist",
     cache: true,
-    mode: argv.mode || 'development',
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       modules: [resolve('node_modules'), resolve('../../node_modules')],
@@ -153,8 +154,8 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // all options are optional
-        filename: argv.mode !== 'production' ? '[name].css' : '[name].[hash].css',
-        chunkFilename: argv.mode !== 'production' ? '[name].css' : '[name].[hash].css',
+        filename: devMode ? '[name].css' : '[name].[contenthash].css',
+        chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
         ignoreOrder: false, // Enable to remove warnings about conflicting order
       }),
     ]

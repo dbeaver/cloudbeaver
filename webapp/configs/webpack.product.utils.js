@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { resolve } = require('path');
+const paths = [resolve('.')];
 
 function withTimestamp(version) {
   return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`
@@ -41,4 +42,8 @@ function getAssets(package, to) {
   return patterns.filter(pattern => fs.existsSync(pattern.from))
 }
 
-module.exports = { withTimestamp, getAssets }
+module.exports = { 
+  withTimestamp, 
+  getAssets,
+  requireOriginal: module => require(require.resolve(module, { paths}))
+}

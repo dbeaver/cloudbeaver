@@ -9,8 +9,8 @@
   "types": "src/index.ts",
   "scripts": {
     "prebuild": "rimraf lib/*",
-    "build": "webpack --config ../../configs/webpack.product.config.js",
-    "dev": "webpack serve --env development --progress --config=../../configs/webpack.product.dev.config.js --port=3100",
+    "build": "webpack --mode=production --config ../../configs/webpack.product.config.js",
+    "dev": "webpack serve --mode=development --progress --config=../../configs/webpack.product.dev.config.js --port=3100",
     "analyse": "webpack --config ../../configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "webpack-bundle-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
