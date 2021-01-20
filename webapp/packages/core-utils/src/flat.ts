@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function flat(array: any[]) {
+export function flat<T extends any[]>(array: T): Array<FlatArray<T, 1>> {
   if (array.flat) {
     return array.flat();
   }

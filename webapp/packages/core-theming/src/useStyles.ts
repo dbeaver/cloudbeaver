@@ -17,7 +17,7 @@ import { ThemeService } from './ThemeService';
 import { applyComposes, ClassCollection, Composes } from './themeUtils';
 
 export type BaseStyles = ClassCollection | Composes;
-export type ThemeSelector = (theme: string) => Promise<BaseStyles | BaseStyles[]>;
+export type ThemeSelector = (theme: string) => Promise<undefined | BaseStyles | BaseStyles[]>;
 export type Style = BaseStyles | ThemeSelector;
 export type DynamicStyle = Style | boolean | undefined;
 
@@ -48,7 +48,7 @@ export function useStyles(
     stylesRef.current = componentStyles;
     lastThemeRef.current = currentThemeId;
     const staticStyles: BaseStyles[] = [];
-    const themedStyles = [];
+    const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
 
     for (const style of filteredStyles) {
       const data = (typeof style === 'object' || style instanceof Composes) ? style : style(currentThemeId);
@@ -65,7 +65,8 @@ export function useStyles(
       Promise
         .all(themedStyles)
         .then(styles => {
-          loadedStyles.current = flat([staticStyles, styles]);
+          loadedStyles.current = flat([staticStyles, flat(styles)])
+            .filter(Boolean) as BaseStyles[];
           forceUpdate(patch + 1);
         });
     }

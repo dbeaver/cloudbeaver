@@ -33,7 +33,7 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
         styles.push(value.styles);
       }
       composes.push(value);
-    } else if (value) {
+    } else {
       styles.push(value);
     }
   }
