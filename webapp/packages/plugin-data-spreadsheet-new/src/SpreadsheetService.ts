@@ -11,14 +11,12 @@ import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
 @injectable()
 export class SpreadsheetService extends Bootstrap {
   constructor(
     private dataPresentationService: DataPresentationService,
-    private dataGridSettingsService: DataGridSettingsService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -26,11 +24,6 @@ export class SpreadsheetService extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    const hidden = this.dataGridSettingsService.settings.getValue('hidden');
-    if (hidden) {
-      return;
-    }
-
     this.dataPresentationService.add({
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,

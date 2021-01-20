@@ -12,7 +12,9 @@ import styled from 'reshadow';
 import {
   verticalRotatedTabStyles, Tab, TabIcon, TabTitle
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
+import { DataGridSettingsService } from '@cloudbeaver/plugin-data-spreadsheet-new';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { DataPresentationOptions } from '../../DataPresentationService';
@@ -31,6 +33,11 @@ export const PresentationTab = observer(function PresentationTab({
   style,
 }: Props) {
   const styles = useStyles(verticalRotatedTabStyles, style);
+  const reactDataGridSettings = useService(DataGridSettingsService);
+
+  if (presentation.id === 'spreadsheet_grid' && reactDataGridSettings.settings.getValue('hidden')) {
+    return null;
+  }
 
   if (presentation.getTabComponent) {
     const Tab = presentation.getTabComponent();
