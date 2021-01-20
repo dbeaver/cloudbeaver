@@ -16,9 +16,7 @@ import type {
   IDatasource,
   IGetRowsParams,
   ColDef,
-  ValueGetterParams,
   GridOptions,
-  CellClassParams,
   SortChangedEvent,
   RowNode,
   CellEditingStoppedEvent
@@ -68,7 +66,52 @@ export class AgGridTableController implements IInitializableController, IDestruc
    * ag-grid options that is set and not changed during AgGridComponent lifetime
    */
   private readonly gridOptions: GridOptions = {
-    defaultColDef: defaultColumnDef,
+    defaultColDef: {
+      ...defaultColumnDef,
+
+      editable: params => {
+        const context: AgGridContext = params.context;
+        return !(context.isReadonly() || params.colDef.headerComponentParams.readOnly);
+      },
+      valueGetter: params => {
+        if (!params.data) {
+          return '';
+        }
+        const value = params.data[params.colDef.field || 'node.id'];
+
+        if (value !== null && typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+
+        return value;
+      },
+      cellClass: params => {
+        const classes: string[] = [];
+        const context: AgGridContext = params.context;
+        if (context.isCellEdited(params.node.rowIndex || 0, params.colDef?.colId || '')) {
+          classes.push('cell-edited');
+        }
+        if (params.value === null) {
+          classes.push('cell-null');
+        }
+        return classes.join(' ');
+      },
+      cellRendererSelector: props => {
+        if (props.colDef.colId === INDEX_COLUMN_DEF.colId && !props.data) {
+          return { component: 'indexCellRenderer' };
+        }
+
+        if (typeof props.value === 'string' && props.value.length > 1000) {
+          return props.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
+        }
+
+        if (props.value === null) {
+          return '[null]';
+        }
+
+        return props.value;
+      },
+    },
 
     rowHeight: 24,
     headerHeight: 28,
@@ -327,54 +370,17 @@ export class AgGridTableController implements IInitializableController, IDestruc
     const columnMaxWidth = this.getMaxColumnWidth();
     return [
       INDEX_COLUMN_DEF,
-      ...columns.map((v, i) => ({
+      ...columns.map<ColDef>((v, i) => ({
         colId: v.name,
         headerName: v.label,
         field: `${i}`,
         width: Math.min(this.getColumnWidth(v, i, rows), columnMaxWidth),
         minWidth: 45,
-        // type: v.dataKind,
-        editable: (params: any) => {
-          const context: AgGridContext = params.context;
-          return !(context.isReadonly() || v.readOnly);
-        },
-        valueGetter: (params: ValueGetterParams) => {
-          if (!params.data) {
-            return '';
-          }
-          const value = params.data[params.colDef.field || 'node.id'];
-
-          if (value !== null && typeof value === 'object') {
-            return JSON.stringify(value);
-          }
-
-          return value;
-        },
         headerComponentParams: {
           icon: v.icon,
+          readOnly: v.readOnly,
         },
-        cellRenderer: (params: CellClassParams) => {
-          if (typeof params.value === 'string' && params.value.length > 1000) {
-            return params.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
-          }
-
-          if (params.value === null) {
-            return '[null]';
-          }
-
-          return params.value;
-        },
-        cellClass: (params: any) => {
-          const classes: string[] = [];
-          const context: AgGridContext = params.context;
-          if (context.isCellEdited(params.node.rowIndex, params.colDef.colId)) {
-            classes.push('cell-edited');
-          }
-          if (params.value === null) {
-            classes.push('cell-null');
-          }
-          return classes.join(' ');
-        },
+        // type: v.dataKind,
       })
       ),
     ];
