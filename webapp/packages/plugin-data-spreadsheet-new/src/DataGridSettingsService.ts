@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  hidden: true,
+  hidden: false,
 };
 
 export type DataGridSettings = typeof defaultSettings;
