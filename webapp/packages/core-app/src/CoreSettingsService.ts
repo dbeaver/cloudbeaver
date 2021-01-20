@@ -15,6 +15,7 @@ const defaultSettings = {
   'app.logViewer.logBatchSize': 2000,
   'app.logViewer.maxFailedRequests': 3,
   'app.navigationTree.childrenLimit': 500,
+  'app.reactDataGrid.hidden': true,
 };
 
 export type CoreSettings = typeof defaultSettings;

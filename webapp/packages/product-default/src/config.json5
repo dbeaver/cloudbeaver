@@ -7,7 +7,7 @@
         user: {
             defaultTheme: "light",
             defaultLanguage: "en"
-        },
+        }, 
         app: {
             // Log viewer config
             logViewer: {
@@ -15,6 +15,9 @@
                 logBatchSize: 1000,
                 maxLogRecords: 2000,
                 maxFailedRequests: 3
+            },
+            reactDataGrid: {
+                hidden: true
             }
         }
     },
