@@ -164,7 +164,7 @@ export class RangeController implements IRangeController {
     if (!this.selection) {
       return;
     }
-    const lastRowId = this.gridApi.getInfiniteRowCount() - 1 - (this.rowModel.isLastRowFound() ? 0 : 1);
+    const lastRowId = (this.gridApi.getInfiniteRowCount() || 0) - 1 - (this.rowModel.isLastRowIndexKnown() ? 0 : 1);
     if (event.columnId === INDEX_COLUMN_DEF.colId!) {
       this.selection.selectRange(
         0,
@@ -394,7 +394,7 @@ export class RangeController implements IRangeController {
       const columns = this.columnController.getAllDisplayedColumns();
 
       if (nodes.length > 0 && columns.length > 0) {
-        this.gridApi.setFocusedCell((node || nodes[0]).rowIndex, columns[0]);
+        this.gridApi.setFocusedCell((node || nodes[0]).rowIndex || 0, columns[0]);
       }
     }
   }

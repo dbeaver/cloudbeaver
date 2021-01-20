@@ -15,9 +15,9 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@ag-grid-community/infinite-row-model": "^23.1.1",
-    "@ag-grid-community/core": "^23.1.1",
-    "@ag-grid-community/react": "^23.1.1"
+    "@ag-grid-community/infinite-row-model": "^25.0.1",
+    "@ag-grid-community/core": "^25.0.1",
+    "@ag-grid-community/react": "^25.0.1"
   },
   "peerDependencies": {
     "@cloudbeaver/plugin-data-viewer": "^0.1.0",

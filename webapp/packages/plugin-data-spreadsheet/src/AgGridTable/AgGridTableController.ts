@@ -203,9 +203,11 @@ export class AgGridTableController implements IInitializableController, IDestruc
       for (const rowIndex of rows) {
         const rowNode = this.api.getRowNode(`${rowIndex}`);
 
-        rowNode.setData([...this.gridModel.tableEditor.getRowValue(rowIndex)]);
+        if (rowNode) {
+          rowNode.setData([...this.gridModel.tableEditor.getRowValue(rowIndex)]);
 
-        updatedRows.push(rowNode);
+          updatedRows.push(rowNode);
+        }
       }
 
       this.api.redrawRows({ rowNodes: updatedRows });
@@ -381,15 +383,14 @@ export class AgGridTableController implements IInitializableController, IDestruc
 
 const defaultColumnDef: ColDef = {
   sortable: true,
-  filter: true,
   resizable: true,
   editable: true,
   cellEditor: 'plainTextEditor',
 };
 
 export const INDEX_COLUMN_DEF: ColDef = {
-  headerName: '#',
   colId: `${Number.MAX_SAFE_INTEGER}`,
+  headerName: '#',
   field: `${Number.MAX_SAFE_INTEGER}`,
   width: 70,
   pinned: 'left',
@@ -399,8 +400,7 @@ export const INDEX_COLUMN_DEF: ColDef = {
   editable: false,
   sortable: false,
   lockPosition: true,
-  valueGetter: props => props.node.rowIndex + 1,
-  cellRendererSelector: props => ({ component: !props.data ? 'indexCellRenderer' : undefined }),
+  valueGetter: 'node.rowIndex + 1',
 };
 
 function isColumnsChanged(oldColumns: ColDef[], newColumns: IAgGridCol[] = []): boolean {

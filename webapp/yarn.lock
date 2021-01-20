@@ -2,22 +2,22 @@
 # yarn lockfile v1
 
 
-"@ag-grid-community/core@^23.1.1", "@ag-grid-community/core@~23.2.0":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-23.2.1.tgz#532104da04dcc636bf01364116bcb66804d6de04"
-  integrity sha512-ZW4r6mICsCDX3xME2CpXLf+/EsKYO/EO1hq0QInBXJVFp7FC9/VPSpplo2iy8pPFZjkLQ5gb1yg9WcMo50+9CA==
+"@ag-grid-community/core@^25.0.1", "@ag-grid-community/core@~25.0.0":
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-25.0.1.tgz#a96fa7cd52683384d684322654fc59fb36cc76f2"
+  integrity sha512-dvDFM+/qsnGdTtNLp0mYlSZRUMGItKXbfUMnboCQXmRc/RZkssiiqLrZCTrOK9svfSh1Ayzv3+QSbGsEh7TyZA==
 
-"@ag-grid-community/infinite-row-model@^23.1.1":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/infinite-row-model/-/infinite-row-model-23.2.1.tgz#a9087619306aa5767de69142c462974198027843"
-  integrity sha512-uIgVeZ5yhZ273EU/h6JsMBmPG4OhMQODxtpiy9d3ipJ8bMX2H6yVtGKIONWuUORCoX+tF1GPFZACAH/rCNxR/g==
+"@ag-grid-community/infinite-row-model@^25.0.1":
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/infinite-row-model/-/infinite-row-model-25.0.1.tgz#be1e921ad39d6d5c355c803852f94b36520ea905"
+  integrity sha512-x1B3xPqmFAUI8Y0PHZqEN65WgKdD+g610UYNpYKMtEoqqCCRYDig5pvsV+HSKfPIichYsVV/w8IJ4cTguxLzew==
   dependencies:
-    "@ag-grid-community/core" "~23.2.0"
+    "@ag-grid-community/core" "~25.0.0"
 
-"@ag-grid-community/react@^23.1.1":
-  version "23.2.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/react/-/react-23.2.1.tgz#e47baca884b18a671e468622d4da03c547a38f52"
-  integrity sha512-xvP+ABtDtKADcOQ5dOqOdYN9lT3CYYWSY3yVbWwtAnVzFIaRq6nHvlmIogRp3dzxVA/shOBuRMdmEbPKTYUA4g==
+"@ag-grid-community/react@^25.0.1":
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/react/-/react-25.0.1.tgz#a242139987963a074277201f49ad83638b189704"
+  integrity sha512-DLHESbyJAKizICwiszR4pwXrYRz/V/uPTSP/WNeIl1P+adH4zzRcO51IHwQkbIvfXps2Ou8HabpRGTbxLjlMnA==
   dependencies:
     prop-types "^15.6.2"
 
