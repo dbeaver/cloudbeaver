@@ -31,6 +31,7 @@ export interface DataPresentationOptions {
   dataFormat: ResultDataFormat;
   title?: string;
   icon?: string;
+  hidden?: () => boolean;
   getPresentationComponent: () => DataPresentationComponent;
   getTabComponent?: () => PresentationTabComponent;
   onActivate?: () => void;
@@ -53,8 +54,13 @@ export class DataPresentationService {
   }
 
   getSupportedList(dataFormat: ResultDataFormat | ResultDataFormat[]): DataPresentationOptions[] {
-    return Array.from(this.dataPresentations.values())
-      .filter(presentation => presentation.dataFormat === dataFormat || dataFormat.includes(presentation.dataFormat));
+    return Array.from(this.dataPresentations.values()).filter(presentation => {
+      if (presentation.hidden?.()) {
+        return false;
+      }
+
+      return presentation.dataFormat === dataFormat || dataFormat.includes(presentation.dataFormat);
+    });
   }
 
   getSupported(dataFormat: ResultDataFormat, presentationId: string | undefined): DataPresentationOptions | null {
