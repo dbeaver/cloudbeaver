@@ -17,7 +17,7 @@ export type DataGridSettings = typeof defaultSettings;
 
 @injectable()
 export class DataGridSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('react_data_grid', defaultSettings);
+  readonly settings = this.pluginManagerService.getPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }
 }
