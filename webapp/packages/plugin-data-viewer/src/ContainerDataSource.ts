@@ -67,12 +67,12 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       throw new Error('containerNodePath must be provided for table');
     }
 
+    this.currentFetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
     const executionContext = await this.ensureContextCreated();
+
     const limit = this.count;
 
-    const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
-
-    fetchTableProcess.start(
+    this.currentFetchTableProcess.start(
       {
         connectionId: executionContext.connectionId,
         contextId: executionContext.contextId,
@@ -87,8 +87,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       this.dataFormat,
     );
 
-    this.currentFetchTableProcess = fetchTableProcess;
-    const response = await fetchTableProcess.promise;
+    const response = await this.currentFetchTableProcess.promise;
 
     this.requestInfo = {
       requestDuration: response?.duration || 0,
@@ -170,6 +169,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   private async ensureContextCreated(): Promise<IExecutionContext> {
     if (!this.executionContext) {
       if (!this.options) {
+        this.currentFetchTableProcess = null;
         throw new Error('Options must be provided');
       }
       this.executionContext = await this.createExecutionContext(this.options.connectionId);
