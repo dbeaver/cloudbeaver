@@ -10,18 +10,14 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  'app.logViewer.refreshTimeout': 3000,
-  'app.logViewer.maxLogRecords': 1000,
-  'app.logViewer.logBatchSize': 2000,
-  'app.logViewer.maxFailedRequests': 3,
-  'app.navigationTree.childrenLimit': 500,
+  hidden: true,
 };
 
-export type CoreSettings = typeof defaultSettings;
+export type DataGridSettings = typeof defaultSettings;
 
 @injectable()
-export class CoreSettingsService {
-  readonly settings = this.pluginManagerService.getPluginSettings('core', defaultSettings);
+export class DataGridSettingsService {
+  readonly settings = this.pluginManagerService.getPluginSettings('react_data_grid', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }
 }

@@ -6,19 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
 @injectable()
 export class SpreadsheetService extends Bootstrap {
   constructor(
     private dataPresentationService: DataPresentationService,
-    private coreSettingsService: CoreSettingsService,
+    private dataGridSettingsService: DataGridSettingsService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -26,7 +26,7 @@ export class SpreadsheetService extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    const hidden = this.coreSettingsService.settings.getValue('app.reactDataGrid.hidden');
+    const hidden = this.dataGridSettingsService.settings.getValue('hidden');
     if (hidden) {
       return;
     }

@@ -16,10 +16,10 @@
                 maxLogRecords: 2000,
                 maxFailedRequests: 3
             },
-            reactDataGrid: {
-                hidden: true
-            }
         }
+    },
+    react_data_grid: {
+        hidden: true
     },
     // Notifications config
     core_events: {
