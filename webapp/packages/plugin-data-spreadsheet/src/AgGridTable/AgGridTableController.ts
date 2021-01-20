@@ -77,6 +77,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
         if (!params.data) {
           return '';
         }
+
         const value = params.data[params.colDef.field || 'node.id'];
 
         if (value !== null && typeof value === 'object') {
@@ -96,11 +97,7 @@ export class AgGridTableController implements IInitializableController, IDestruc
         }
         return classes.join(' ');
       },
-      cellRendererSelector: props => {
-        if (props.colDef.colId === INDEX_COLUMN_DEF.colId && !props.data) {
-          return { component: 'indexCellRenderer' };
-        }
-
+      valueFormatter: props => {
         if (typeof props.value === 'string' && props.value.length > 1000) {
           return props.value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
         }
@@ -109,7 +106,14 @@ export class AgGridTableController implements IInitializableController, IDestruc
           return '[null]';
         }
 
-        return props.value;
+        return String(props.value);
+      },
+      cellRendererSelector: props => {
+        if (props.colDef.colId === INDEX_COLUMN_DEF.colId && !props.data) {
+          return { component: 'indexCellRenderer' };
+        }
+
+        return {};
       },
     },
 
