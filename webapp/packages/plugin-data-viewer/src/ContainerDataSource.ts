@@ -68,6 +68,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
 
     const executionContext = await this.ensureContextCreated();
+    const offset = this.offset;
     const limit = this.count;
 
     const fetchTableProcess = new FetchTableDataAsyncProcess(this.graphQLService, this.notificationService);
@@ -79,7 +80,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         containerNodePath: this.options.containerNodePath,
       },
       {
-        offset: this.offset,
+        offset,
         limit,
         constraints: this.options.constraints,
         where: this.options.whereFilter || undefined,
@@ -102,8 +103,6 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
-      // allays returns false
-      // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
     }));
   }

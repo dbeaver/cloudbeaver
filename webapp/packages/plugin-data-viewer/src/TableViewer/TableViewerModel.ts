@@ -171,9 +171,8 @@ export class TableViewerModel {
   }
 
   insertRows(position: number, rows: TableRow[], hasMore: boolean): void {
-    const isRowsAddition = this.tableDataModel.getRows().length < position + rows.length;
     this.tableDataModel.insertRows(position, rows);
-    this._hasMoreRows = isRowsAddition ? hasMore : this._hasMoreRows;
+    this._hasMoreRows = hasMore;
   }
 
   setColumns(columns: TableColumn[]): void {

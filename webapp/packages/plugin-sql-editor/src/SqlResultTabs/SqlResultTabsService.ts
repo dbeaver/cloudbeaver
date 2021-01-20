@@ -76,7 +76,9 @@ export class SqlResultTabsService {
 
     if (inNewTab || !currentTab?.groupId) {
       source = new QueryDataSource(this.graphQLService, this.notificationService, this);
-      model = this.tableViewerStorageService.create(source);
+      model = this.tableViewerStorageService.create(source)
+        .setCountGain()
+        .setSlice(0);
 
       tabGroup = this.createGroup(sqlQueryParams, editorState, model.id);
 

@@ -32,7 +32,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
 
   setCountGain: (count: number) => this;
   setAccess: (access: DatabaseDataAccessMode) => this;
-  setSlice: (offset: number, count: number) => this;
+  setSlice: (offset: number, count?: number) => this;
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;

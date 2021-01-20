@@ -90,7 +90,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
     await this.requestData();
   }
 
-  setCountGain(count: number): this {
+  setCountGain(count?: number): this {
     const realCount = this.getDefaultRowsCount(count);
     this.countGain = realCount;
 

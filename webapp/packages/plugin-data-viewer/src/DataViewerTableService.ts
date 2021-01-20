@@ -57,6 +57,8 @@ export class DataViewerTableService {
         })
         .setSupportedDataFormats(connectionInfo.supportedDataFormats)
     )
+      .setCountGain()
+      .setSlice(0)
       .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
 
     return dataModel;

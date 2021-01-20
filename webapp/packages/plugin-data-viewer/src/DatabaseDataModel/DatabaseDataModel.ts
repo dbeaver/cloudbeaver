@@ -85,7 +85,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this;
   }
 
-  setSlice(offset: number, count: number): this {
+  setSlice(offset: number, count = this.countGain): this {
     this.source.setSlice(offset, count);
     return this;
   }
