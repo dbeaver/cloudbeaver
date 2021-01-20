@@ -9,6 +9,9 @@
 /// <reference path="./codemirror.meta.d.ts" />
 
 import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
+import 'codemirror/mode/sql/sql';
+import 'codemirror/addon/hint/sql-hint';
+import 'codemirror/addon/hint/show-hint';
 import 'codemirror/mode/meta';
 import { observable, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -44,6 +47,10 @@ export class CodeEditorController {
   }
 
   init(bindings?: Partial<IControlledCodeMirror>): void {
+    this.setBindings(bindings);
+  }
+
+  setBindings(bindings?: Partial<IControlledCodeMirror>): void {
     this.bindings.options = {
       ...COMMON_EDITOR_CONFIGURATION,
       ...(bindings?.options || {}),
@@ -67,27 +74,32 @@ export class CodeEditorController {
     this.dialect = dialect;
 
     if (this.editor) {
-      const keywords = this.dialect?.dataTypes
-        ?.map(v => v.toLowerCase())
-        .reduce((obj, value) => ({ ...obj, [value]: value }), {});
+      let keywords: Record<string, boolean> | undefined;
+      let builtin: Record<string, boolean> | undefined;
 
-      const builtin = [
-        ...(this.dialect?.functions || []),
-        ...(this.dialect?.reservedWords || []),
-      ].map(v => v.toLowerCase())
-        .reduce((obj, value) => ({
-          ...obj,
-          [value]: value,
-        }), {});
+      if (this.dialect?.dataTypes) {
+        keywords = this.arrayToMap(this.dialect.dataTypes.map(v => v.toLowerCase()));
+      }
+
+      if (this.dialect?.functions || this.dialect?.reservedWords) {
+        builtin = this.arrayToMap([
+          ...(this.dialect.functions || []),
+          ...(this.dialect.reservedWords || []),
+        ].map(v => v.toLowerCase()));
+      }
 
       if (this.bindings.options) {
         const name = this.dialect?.name && findModeByName(this.dialect.name)?.mime;
 
-        this.bindings.options.mode = {
-          name: name || COMMON_EDITOR_CONFIGURATION.mode,
-          keywords,
-          builtin,
-        };
+        if (this.dialect) {
+          this.bindings.options.mode = {
+            name: name || COMMON_EDITOR_CONFIGURATION.mode,
+            keywords,
+            builtin,
+          };
+        } else {
+          this.bindings.options.mode = name || COMMON_EDITOR_CONFIGURATION.mode;
+        }
       }
     }
   }
@@ -98,5 +110,12 @@ export class CodeEditorController {
 
   private handleConfigure(editor: Editor) {
     this.editor = editor;
+  }
+
+  private arrayToMap(array: string[]): { [key: string]: boolean } {
+    return array.reduce((obj, value) => ({
+      ...obj,
+      [value]: true,
+    }), {});
   }
 }

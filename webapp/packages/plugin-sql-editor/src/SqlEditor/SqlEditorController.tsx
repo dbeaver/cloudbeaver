@@ -5,9 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./codemirror.hint.d.ts" />
 
 import {
-  showHint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
+  hint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
 import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -62,10 +64,6 @@ export class SqlEditorController implements IInitializableController {
     autofocus: true,
     lineWrapping: true,
     showHint: true,
-    hintOptions: {
-      completeSingle: true,
-      hint: this.getHandleAutocomplete(),
-    },
     extraKeys: {
       // Execute sql script
       'Ctrl-Enter': () => { this.handleExecute(); },
@@ -74,9 +72,9 @@ export class SqlEditorController implements IInitializableController {
       'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
 
       // Autocomplete
-      'Ctrl-Space': showHint, // classic for windows, linux
-      'Shift-Ctrl-Space': showHint,
-      'Alt-Space': showHint, // workaround for binded 'Ctrl-Space' by input switch in macOS
+      'Ctrl-Space': this.showHint.bind(this), // classic for windows, linux
+      'Shift-Ctrl-Space': this.showHint.bind(this),
+      'Alt-Space': this.showHint.bind(this), // workaround for binded 'Ctrl-Space' by input switch in macOS
     },
   };
 
@@ -108,6 +106,13 @@ export class SqlEditorController implements IInitializableController {
   init(tab: ITab<ISqlEditorTabState>) {
     this.tab = tab;
     this.loadDialect();
+  }
+
+  private showHint(editor: Editor) {
+    editor.showHint({
+      completeSingle: true,
+      hint: this.getHandleAutocomplete(),
+    });
   }
 
   private async loadDialect(): Promise<SqlDialectInfo | undefined> {
@@ -151,12 +156,8 @@ export class SqlEditorController implements IInitializableController {
 
   private getHandleAutocomplete(): AsyncHintFunction {
     const handleAutocomplete: AsyncHintFunction = (editor, callback) => {
-      if (!this.tab.handlerState.connectionId) {
-        console.warn('getHandleAutocomplete connectionId is not provided');
-        return;
-      }
-      if (!this.tab.handlerState.contextId) {
-        console.warn('getHandleAutocomplete contextId is not provided');
+      if (!this.tab.handlerState.connectionId || !this.tab.handlerState.contextId) {
+        this.editor?.showHint({ hint: hint.sql }); // we show default sql-hint
         return;
       }
       const cursor = editor.getCursor('from');

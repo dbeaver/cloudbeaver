@@ -7,14 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useImperativeHandle } from 'react';
 import { Controlled as CodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';
 
 import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/sql/sql';
-import 'codemirror/addon/hint/sql-hint';
-import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
 
 import { useController } from '@cloudbeaver/core-di';
@@ -37,6 +34,9 @@ export const CodeEditor = observer<CodeEditorProps, CodeEditorController>(
     const controller = useController(CodeEditorController, props.bindings);
     controller.setDialect(props.dialect);
 
+    useEffect(() => {
+      controller.setBindings(props.bindings);
+    }, [controller, props.bindings]);
     useImperativeHandle(ref, () => controller, [controller]);
 
     return styled(useStyles(SqlEditorStyles))(
