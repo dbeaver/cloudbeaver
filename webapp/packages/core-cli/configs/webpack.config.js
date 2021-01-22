@@ -53,7 +53,7 @@ module.exports = (env, argv) => {
 
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
-      require('postcss-discard-comments'),
+      // require('postcss-discard-comments'),
       require('reshadow/postcss')({ scopeBehaviour: moduleScope })
     ];
 

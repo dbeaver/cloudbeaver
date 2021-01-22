@@ -36,6 +36,7 @@
     "json5-loader": "^4.0.1",
     "mini-css-extract-plugin": "^1.3.4",
     "peer-deps-externals-webpack-plugin": "^1.0.4",
+    "postcss": "^8.2.4",
     "postcss-discard-comments": "^4.0.2",
     "postcss-loader": "^4.1.0",
     "postcss-preset-env": "^6.7.0",
