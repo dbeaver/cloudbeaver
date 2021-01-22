@@ -1,11 +1,9 @@
-const { requireOriginal } = require('./webpack.product.utils');
 const { resolve, join } = require('path');
-const ModuleDependencyWarning = requireOriginal("webpack/lib/ModuleDependencyWarning");
-const MiniCssExtractPlugin = requireOriginal('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = requireOriginal('fork-ts-checker-webpack-plugin');
-const ESLintPlugin = requireOriginal('eslint-webpack-plugin');
+const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+// const ESLintPlugin = require('eslint-webpack-plugin');
 
-// Temporary solution to remove wrong warning messages (it's was fixed https://github.com/microsoft/TypeScript/pull/35200 in typescript 3.8)
 class IgnoreNotFoundExportPlugin {
   apply(compiler) {
     const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/
@@ -25,21 +23,32 @@ class IgnoreNotFoundExportPlugin {
   }
 }
 
+const nodeModules = [
+  resolve('node_modules'), // product
+  resolve('../../node_modules'), // workspace
+  resolve('../../node_modules/@cloudbeaver/core-cli/node_modules') // core-cli
+]
+
 module.exports = (env, argv) => {
   process.env.NODE_ENV = argv.mode;
   const devMode = argv.mode !== 'production';
-  function getBaseStyleLoader() {
-    // if(devMode) {
-    //   return 'style-loader'
-    // }
-    return MiniCssExtractPlugin.loader;
+  function getBaseStyleLoaders() {
+    const loaders = [];
+
+    if(devMode) {
+      loaders.push('style-loader')
+    }else{
+      loaders.push(MiniCssExtractPlugin.loader);
+    }
+
+    return loaders;
   }
 
   function generateStyleLoaders(options = { hasModule: false }) {
     const moduleScope = options.hasModule ? 'local' : 'global';
     const modules = {
       mode: moduleScope,
-      localIdentName: '[local]___[fullhash:base64:5]',
+      localIdentName: '[local]___[hash:base64:5]',
     };
 
     const postCssPlugins = [
@@ -49,12 +58,10 @@ module.exports = (env, argv) => {
     ];
 
     return [
-      getBaseStyleLoader(),
-      'cache-loader',
+      ...getBaseStyleLoaders(),
       {
         loader: 'css-loader',
         options: {
-          importLoaders: 1,
           modules: modules,
           sourceMap: true,
         }
@@ -74,7 +81,7 @@ module.exports = (env, argv) => {
           sourceMap: true,
           sassOptions: {
             implementation: require('node-sass'),
-            includePaths: [resolve('node_modules'), resolve('../../node_modules')]
+            includePaths: nodeModules
           },
         }
       }
@@ -93,13 +100,16 @@ module.exports = (env, argv) => {
     cache: true,
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
-      modules: [resolve('node_modules'), resolve('../../node_modules')],
+      modules: nodeModules,
       alias: {
         react: 'preact/compat',
         react$: 'preact/compat',
         'react-dom': 'preact/compat',
         'react-dom$': 'preact/compat',
       },
+    },
+    resolveLoader: {
+      modules: nodeModules
     },
     module: {
       rules: [
@@ -112,8 +122,6 @@ module.exports = (env, argv) => {
           test: /\.(ts|js)x?$/,
           exclude: /node_modules/,
           use: [
-            'cache-loader',
-            // 'reshadow/webpack/loader',
             babelLoader
           ]
         },
@@ -127,7 +135,7 @@ module.exports = (env, argv) => {
             {
               include: /node_modules/,
               use: [
-                getBaseStyleLoader(),
+                ...getBaseStyleLoaders(),
                 'css-loader',
                 'sass-loader'
               ]

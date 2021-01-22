@@ -21,6 +21,6 @@
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
     "mobx": "^5.x.x",
-    "mobx-react": "^6.x.x"
+    "mobx-react-lite": "^3.x.x"
   }
 }

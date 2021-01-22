@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import md5 from 'md5';
-
 import { injectable } from '@cloudbeaver/core-di';
+import { md5 } from '@cloudbeaver/core-utils';
 
 import { AuthProvidersResource } from './AuthProvidersResource';
 

@@ -1,7 +1,6 @@
-const { requireOriginal } = require('./webpack.product.utils');
-const { merge } = requireOriginal('webpack-merge');
+const { merge } = require('webpack-merge');
 const { resolve } = require('path');
-var PeerDepsExternalsPlugin = requireOriginal('peer-deps-externals-webpack-plugin');
+var PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const commonConfig = require('./webpack.config.js');
 
 var main = resolve('src/index.ts');

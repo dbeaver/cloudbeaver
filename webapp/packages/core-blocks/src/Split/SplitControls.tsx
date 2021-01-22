@@ -40,6 +40,7 @@ export function SplitControls() {
   }, [isResizing]);
 
   const handleCollapse = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
+    console.log('collapse', mode, state);
     event.stopPropagation();
     if (mode === 'maximize') {
       setMode('resize');
@@ -48,9 +49,10 @@ export function SplitControls() {
       setMode('minimize');
       setState(getMainSize());
     }
-  }, [mode, setMode]);
+  }, [mode, state, setMode]);
 
   const handleExpand = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
+    console.log('expand', mode, state);
     event.stopPropagation();
     if (mode === 'minimize') {
       setMode('resize');
@@ -59,7 +61,7 @@ export function SplitControls() {
       setMode('maximize');
       setState(getMainSize());
     }
-  }, [mode, setMode]);
+  }, [mode, state, setMode]);
 
   return styled(styles)(
     <container as="div" {...use({ split, inverse, mode: inverseMode })}>

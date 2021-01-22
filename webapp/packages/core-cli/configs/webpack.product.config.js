@@ -1,10 +1,10 @@
-const { getAssets, withTimestamp, requireOriginal } = require('./webpack.product.utils');
-const { merge } = requireOriginal('webpack-merge');
-const webpack = requireOriginal('webpack');
+const { getAssets, withTimestamp } = require('./webpack.product.utils');
+const { merge } = require('webpack-merge');
+const webpack = require('webpack');
 const { resolve } = require('path');
-const HtmlWebpackPlugin = requireOriginal('html-webpack-plugin');
-const CopyWebpackPlugin = requireOriginal('copy-webpack-plugin');
-const TerserPlugin = requireOriginal("terser-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 const commonConfig = require('./webpack.config.js');
 

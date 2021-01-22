@@ -44,6 +44,5 @@ function getAssets(package, to) {
 
 module.exports = { 
   withTimestamp, 
-  getAssets,
-  requireOriginal: module => require(require.resolve(module, { paths}))
+  getAssets
 }

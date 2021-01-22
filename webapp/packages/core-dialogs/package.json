@@ -26,7 +26,7 @@
     "reakit": "^1.x.x",
     "react": "^16.x.x",
     "mobx": "^5.x.x",
-    "reshadow": "^0.0.1-alpha.78",
-    "mobx-react": "^6.x.x"
+    "reshadow": "^0.x.x",
+    "mobx-react-lite": "^3.x.x"
   }
 }

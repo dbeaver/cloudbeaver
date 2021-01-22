@@ -15,6 +15,8 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@types/md5": "^2.2.1",
+    "md5": "^2.3.0",
     "uuid": "^7.0.3"
   },
   "peerDependencies": {

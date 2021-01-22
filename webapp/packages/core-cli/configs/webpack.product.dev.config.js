@@ -1,7 +1,7 @@
-const { getAssets, requireOriginal } = require('./webpack.product.utils');
-const { merge } = requireOriginal('webpack-merge');
+const { getAssets } = require('./webpack.product.utils');
+const { merge } = require('webpack-merge');
 const { resolve } = require('path');
-const webpack = requireOriginal('webpack');
+const webpack = require('webpack');
 
 const commonConfig = require('./webpack.config.js')
 

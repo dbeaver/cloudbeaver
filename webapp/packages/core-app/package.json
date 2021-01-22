@@ -35,6 +35,6 @@
     "reakit": "^1.x.x",
     "rxjs": "^6.x.x",
     "mobx": "^5.x.x",
-    "mobx-react": "^6.x.x"
+    "mobx-react-lite": "^3.x.x"
   }
 }

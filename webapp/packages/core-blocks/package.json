@@ -27,10 +27,10 @@
     "@cloudbeaver/core-theming": "^0.1.0",
     "@cloudbeaver/core-dialogs": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0",
-    "reshadow": "^0.0.1-alpha.78",
+    "reshadow": "^0.x.x",
     "reakit": "^1.x.x",
     "react": "^16.x.x",
     "mobx": "^5.x.x",
-    "mobx-react": "^6.x.x"
+    "mobx-react-lite": "^3.x.x"
   }
 }
