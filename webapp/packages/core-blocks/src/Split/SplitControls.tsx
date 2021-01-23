@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { buttonStyles } from './splitButtonStyles';
 
-export function SplitControls() {
+export const SplitControls: React.FC = function SplitControls() {
   const {
     split, mode, isResizing, setMode, setSize, isMainSecond, getMainSize,
   } = useContext(SplitContext);
@@ -34,13 +34,10 @@ export function SplitControls() {
   }
 
   useEffect(() => {
-    if (isResizing) {
-      setState(getMainSize());
-    }
+    setState(getMainSize());
   }, [isResizing]);
 
   const handleCollapse = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    console.log('collapse', mode, state);
     event.stopPropagation();
     if (mode === 'maximize') {
       setMode('resize');
@@ -52,7 +49,6 @@ export function SplitControls() {
   }, [mode, state, setMode]);
 
   const handleExpand = useCallback((event: React.SyntheticEvent<HTMLButtonElement>) => {
-    console.log('expand', mode, state);
     event.stopPropagation();
     if (mode === 'minimize') {
       setMode('resize');
@@ -85,4 +81,4 @@ export function SplitControls() {
       )}
     </container>
   );
-}
+};
