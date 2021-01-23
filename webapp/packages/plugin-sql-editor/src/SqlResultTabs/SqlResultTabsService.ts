@@ -10,7 +10,7 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { uuid, MetadataMap, isPromiseCancelledError } from '@cloudbeaver/core-utils';
+import { uuid, MetadataMap, EDeferredState } from '@cloudbeaver/core-utils';
 import { DatabaseDataAccessMode, DataModelWrapper, fetchingSettings, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type {
@@ -146,8 +146,10 @@ export class SqlResultTabsService {
             );
         } catch (exception) {
           // remove first panel if execution was cancelled
-          if (isPromiseCancelledError(exception) && isNewTabCreated) {
+          if (source.queryExecutionProcess?.getState() === EDeferredState.CANCELLED && isNewTabCreated) {
             this.removeGroup(editorState, tabGroup.groupId);
+            const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
+            this.notificationService.logException(exception, 'Query execution Error', message);
           }
         }
       }

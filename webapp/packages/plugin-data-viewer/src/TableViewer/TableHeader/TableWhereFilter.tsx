@@ -48,23 +48,26 @@ export const TableWhereFilter = observer(function TableWhereFilter({
   const [filterValue, setValue] = useState(() => context.source.options?.whereFilter || '');
 
   const handleApply = useCallback(() => {
+    if (context.isLoading()) {
+      return;
+    }
     context.source.options!.whereFilter = filterValue;
     context.refresh();
   }, [context, filterValue]);
 
-  const resetFilter = useCallback(
-    () => {
-      const applyNeeded = context.source.options?.whereFilter === filterValue;
+  const resetFilter = useCallback(() => {
+    if (context.isLoading()) {
+      return;
+    }
+    const applyNeeded = context.source.options?.whereFilter === filterValue;
 
-      setValue('');
+    setValue('');
 
-      if (applyNeeded) {
-        context.source.options!.whereFilter = '';
-        context.refresh();
-      }
-    },
-    [context, filterValue]
-  );
+    if (applyNeeded) {
+      context.source.options!.whereFilter = '';
+      context.refresh();
+    }
+  }, [context, filterValue]);
 
   return styled(useStyles(styles))(
     <InlineEditor
@@ -73,6 +76,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
+      disabled={context.isLoading() || context.results.length > 1}
       simple
       onSave={handleApply}
       onUndo={resetFilter}

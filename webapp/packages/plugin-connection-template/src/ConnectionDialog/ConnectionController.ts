@@ -15,7 +15,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
+import { DatabaseAuthModel, DetailsError } from '@cloudbeaver/core-sdk';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
 
@@ -43,7 +43,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   hasDetails = false;
   responseMessage: string | null = null;
 
-  private exception: GQLError | null = null;
+  private exception: DetailsError | null = null;
   private onClose!: () => void;
   private isDistructed = false;
 
@@ -152,8 +152,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   private showError(exception: Error, message: string) {
-    if (exception instanceof GQLError && !this.isDistructed) {
-      this.responseMessage = exception.errorText;
+    if (exception instanceof DetailsError && !this.isDistructed) {
+      this.responseMessage = exception.errorMessage;
       this.hasDetails = exception.hasDetails();
       this.exception = exception;
     } else {

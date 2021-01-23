@@ -33,6 +33,7 @@ export interface InlineEditorProps {
   hideSave?: boolean;
   hideCancel?: boolean;
   edited?: boolean;
+  disabled?: boolean;
   autofocus?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
@@ -52,6 +53,7 @@ export const InlineEditor = observer(function InlineEditor({
   hideSave,
   hideCancel,
   edited = false,
+  disabled,
   autofocus,
   onChange,
   onSave,
@@ -103,6 +105,7 @@ export const InlineEditor = observer(function InlineEditor({
           tabIndex={tabIndex}
           placeholder={placeholder}
           autoComplete="off"
+          disabled={disabled}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />

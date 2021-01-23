@@ -3,6 +3,7 @@ export * from './Resource/CachedMapResource';
 export * from './Resource/CachedResource';
 export * from './Resource/ResourceKeyList';
 export * from './CustomGraphQLClient';
+export * from './DetailsError';
 export * from './EnvironmentService';
 export * from './EServerErrorCode';
 export * from './getErrorDetails';

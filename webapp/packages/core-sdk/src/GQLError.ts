@@ -11,10 +11,12 @@
 
 import type { GraphQLResponse, GraphQLRequestContext, ClientError } from 'graphql-request/dist/src/types';
 
-export class GQLError extends Error {
+import { DetailsError } from './DetailsError';
+
+export class GQLError extends DetailsError {
   response: GraphQLResponse;
   request: GraphQLRequestContext;
-  errorText: string;
+  errorMessage: string;
   errorCode?: string;
   isTextBody = false; // true when server returns not GQLError object but plain text or html error
 
@@ -25,9 +27,9 @@ export class GQLError extends Error {
     this.request = clientError.request;
     if (typeof clientError.response.error === 'string') {
       this.isTextBody = true;
-      this.errorText = clientError.response.error;
+      this.errorMessage = clientError.response.error;
     } else {
-      this.errorText = clientError.response.errors?.map(e => e.message).join('\n') || 'unknown error';
+      this.errorMessage = clientError.response.errors?.map(e => e.message).join('\n') || 'unknown error';
 
       const firstError = clientError.response.errors?.[0];
       this.errorCode = firstError?.extensions?.webErrorCode;

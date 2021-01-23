@@ -44,21 +44,6 @@ export const TableGrid = observer(function TableGrid({
   const depModel = model.getOldModel(resultIndex);
   const translate = useTranslate();
 
-  // TODO: probably must be implemented in presentation component
-  if (model.message.length > 0) {
-    return styled(styles)(
-      <error as="div">
-        {model.message}
-        <br /><br />
-        {model.details && (
-          <Button type='button' mod={['outlined']} onClick={model.showDetails}>
-            {translate('ui_errors_details')}
-          </Button>
-        )}
-      </error>
-    );
-  }
-
   if (dataFormat !== presentation.dataFormat) {
     if (model.isLoading()) {
       return null;
@@ -74,5 +59,7 @@ export const TableGrid = observer(function TableGrid({
     return styled(styles)(<TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>);
   }
 
-  return styled(styles)(<Presentation model={model} resultIndex={resultIndex} />);
+  return styled(styles)(
+    <Presentation model={model} resultIndex={resultIndex} />
+  );
 });

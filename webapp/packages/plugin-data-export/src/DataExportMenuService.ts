@@ -31,6 +31,9 @@ export class DataExportMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
+      isDisabled(context) {
+        return context.data.model.isLoading() || !context.data.model.getResult(context.data.resultIndex);
+      },
       order: 5,
       title: 'data_transfer_dialog_export',
       icon: 'table-export',

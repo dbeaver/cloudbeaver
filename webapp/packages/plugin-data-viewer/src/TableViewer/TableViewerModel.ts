@@ -11,7 +11,7 @@ import { Subject, Observable } from 'rxjs';
 
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { DetailsError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
@@ -218,9 +218,9 @@ export class TableViewerModel {
         let hasDetails = false;
         let message = `${exception.name}: ${exception.message}`;
 
-        if (exception instanceof GQLError) {
+        if (exception instanceof DetailsError) {
           hasDetails = exception.hasDetails();
-          message = exception.errorText;
+          message = exception.errorMessage;
         }
 
         const state = await this.commonDialogService.open(

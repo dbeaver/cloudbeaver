@@ -153,9 +153,7 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   private onError(error: Error, status?: string) {
     // if task failed to execute during cancelling - it means it was cancelled successfully
     if (this.getState() === EDeferredState.CANCELLING) {
-      this.toCancelled();
-      const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
-      this.notificationService.logException(error, 'Query execution Error', message);
+      this.toCancelled(error);
     } else {
       this.toRejected(error);
     }

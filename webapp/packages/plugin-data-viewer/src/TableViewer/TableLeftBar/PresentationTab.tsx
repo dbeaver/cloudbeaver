@@ -42,11 +42,16 @@ export const PresentationTab = observer(function PresentationTab({
         style={verticalRotatedTabStyles}
         model={model}
         presentation={presentation}
+        disabled={model.isLoading()}
       />
     );
   }
   return styled(styles)(
-    <Tab tabId={presentation.id} style={[verticalRotatedTabStyles, style]}>
+    <Tab
+      tabId={presentation.id}
+      style={[verticalRotatedTabStyles, style]}
+      disabled={model.isLoading()}
+    >
       <TabIcon icon={presentation.icon} />
       <TabTitle>{presentation.title}</TabTitle>
     </Tab>

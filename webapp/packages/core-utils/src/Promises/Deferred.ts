@@ -90,7 +90,7 @@ export class Deferred<T> {
   protected toCancelled(reason?: any): void {
     this.state = EDeferredState.CANCELLED;
     this.rejectionReason = reason;
-    this.promiseExecutor.reject(new PromiseCancelledError(reason));
+    this.promiseExecutor.reject(reason);
   }
 
   protected toCancelling(): void {

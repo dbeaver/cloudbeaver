@@ -40,13 +40,13 @@ export class ErrorModel {
         });
 
       this.textToCopy = error.isTextBody
-        ? error.errorText
+        ? error.errorMessage
         : this.textToCopy = this.errors
           .map(error => `${error.message}\n${error.stackTrace}`)
           .join('------------------\n');
 
       if (error.isTextBody) {
-        this.htmlBody = error.errorText;
+        this.htmlBody = error.errorMessage;
       }
     } else if (error instanceof ServerInternalError) {
       this.errors = [

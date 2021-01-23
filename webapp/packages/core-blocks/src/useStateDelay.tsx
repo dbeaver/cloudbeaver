@@ -14,16 +14,18 @@ export function useStateDelay(state: boolean, delay: number, callback?: () => vo
   callbackRef.current = callback;
 
   useEffect(() => {
-    if (!state) {
+    if (state === delayedState) {
       return;
     }
     const timerId = setTimeout(() => {
-      setState(true);
-      callbackRef.current?.();
+      setState(state);
+      if (state) {
+        callbackRef.current?.();
+      }
     }, delay);
 
     return () => clearTimeout(timerId);
-  }, [state, delay]);
+  }, [state, delayedState, delay]);
 
   return delayedState;
 }

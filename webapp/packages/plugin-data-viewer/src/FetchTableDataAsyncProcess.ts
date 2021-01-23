@@ -158,9 +158,7 @@ export class FetchTableDataAsyncProcess extends Deferred<SqlExecuteInfo> {
   private onError(error: Error, status?: string) {
     // if task failed to execute during cancelling - it means it was cancelled successfully
     if (this.getState() === EDeferredState.CANCELLING) {
-      this.toCancelled();
-      const message = `Data fetch has been canceled${status ? `: ${status}` : ''}`;
-      this.notificationService.logException(error, 'Data fetch Error', message);
+      this.toCancelled(error);
     } else {
       this.toRejected(error);
     }

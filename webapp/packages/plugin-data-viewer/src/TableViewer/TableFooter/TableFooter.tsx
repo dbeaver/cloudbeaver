@@ -94,11 +94,24 @@ export const TableFooter = observer(function TableFooter({
   return styled(useStyles(tableFooterStyles))(
     <table-footer as="div">
       <reload as="div">
-        <IconButton type="button" name='reload' viewBox="0 0 16 16" onClick={() => model.refresh()} />
+        <IconButton
+          type="button"
+          name='reload'
+          viewBox="0 0 16 16"
+          disabled={model.isLoading()}
+          onClick={() => model.refresh()}
+        />
       </reload>
       <count as="div">
         <SubmittingForm onSubmit={handleChange}>
-          <input ref={ref} type="number" value={model.countGain} onBlur={handleChange} {...use({ mod: 'surface' })} />
+          <input
+            ref={ref}
+            type="number"
+            value={model.countGain}
+            disabled={model.isLoading()}
+            onBlur={handleChange}
+            {...use({ mod: 'surface' })}
+          />
         </SubmittingForm>
       </count>
       <TableFooterMenu model={model} resultIndex={resultIndex} />

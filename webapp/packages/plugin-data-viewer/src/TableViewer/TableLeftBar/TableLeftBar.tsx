@@ -71,7 +71,12 @@ export const TableLeftBar = observer(function TableLeftBar({
       <TabsState currentTabId={presentationId} onChange={changePresentation}>
         <TabList>
           {presentations.map(presentation => (
-            <Tab key={presentation.id} presentation={presentation} model={model} style={styles} />
+            <Tab
+              key={presentation.id}
+              presentation={presentation}
+              model={model}
+              style={styles}
+            />
           ))}
         </TabList>
       </TabsState>

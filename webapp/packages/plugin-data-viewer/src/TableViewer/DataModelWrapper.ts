@@ -10,11 +10,11 @@ import { observable, makeObservable } from 'mobx';
 
 import type { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError } from '@cloudbeaver/core-sdk';
+import { DetailsError } from '@cloudbeaver/core-sdk';
 
 import type { IDataContainerOptions } from '../ContainerDataSource';
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
-import type { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
+import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
 import type { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import type { RowDiff } from './TableDataModel/EditedRow';
@@ -128,15 +128,32 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   async requestDataPortion(offset: number, count: number): Promise<void> {
     if (!this.isDataAvailable(offset, count)) {
       this.source.setSlice(offset, count);
-      this.results = await this.source.requestData(this.results);
-      await this.setDeprecatedModelData();
+      this.clearErrors();
+      try {
+        this.results = await this.source.requestData(this.results);
+        await this.setDeprecatedModelData();
+      } catch (exception) {
+        this.showError(exception);
+        throw exception;
+      }
     }
   }
 
+  /**
+   * @deprecated will be refactored
+   */
   showDetails = (): void => {
     if (this.exception) {
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
+  };
+
+  /**
+   * @deprecated will be refactored
+   */
+  clearErrors = (): void => {
+    this.errorMessage = '';
+    this.exception = null;
   };
 
   async dispose(): Promise<void> {
@@ -199,24 +216,22 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
       model.refresh();
       model.setColumns(result.data.columns);
       model.insertRows(0, result.data.rows, !result.loadedFully);
+      model.access = this.results.length > 1
+        ? DatabaseDataAccessMode.Readonly
+        : this.access;
     }
   }
 
   private showError(exception: any) {
     this.exception = null;
     this.hasDetails = false;
-    if (exception instanceof GQLError) {
-      this.errorMessage = exception.errorText;
+    if (exception instanceof DetailsError) {
+      this.errorMessage = exception.errorMessage;
       this.exception = exception;
       this.hasDetails = exception.hasDetails();
     } else {
       this.errorMessage = `${exception.name}: ${exception.message}`;
     }
-  }
-
-  private clearErrors() {
-    this.errorMessage = '';
-    this.exception = null;
   }
 
   private getDefaultRowsCount(count?: number) {

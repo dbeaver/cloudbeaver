@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
+import type { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 export interface ISqlQueryParams extends IExecutionContext {
   query: string;

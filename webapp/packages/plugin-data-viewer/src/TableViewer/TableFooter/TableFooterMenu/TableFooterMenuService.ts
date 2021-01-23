@@ -35,7 +35,7 @@ export class TableFooterMenuService {
         if (context.data.model.deprecatedModels.length === 0) {
           return true;
         }
-        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
+        return context.data.model.isLoading() || !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
