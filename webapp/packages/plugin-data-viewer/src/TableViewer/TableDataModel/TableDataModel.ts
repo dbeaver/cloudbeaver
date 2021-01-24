@@ -46,7 +46,7 @@ export class TableDataModel {
   }
 
   isEmpty(): boolean {
-    return this.rows.length === 0;
+    return this.columns.length === 0;
   }
 
   isChunkLoaded(offset: number, count: number): boolean {
