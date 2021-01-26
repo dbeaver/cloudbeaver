@@ -6,18 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridLoader } from './DataGrid/DataGridLoader';
 
-interface Props {
-  model: IDatabaseDataModel<any, any>;
-  className?: string;
-}
-
-export const SpreadsheetGrid: React.FC<Props> = function SpreadsheetGrid({
+export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid({
   model,
   className,
+  resultIndex,
 }) {
-  return <DataGridLoader tableModel={model} className={className} />;
+  return <DataGridLoader tableModel={model} resultIndex={resultIndex} className={className} />;
 };

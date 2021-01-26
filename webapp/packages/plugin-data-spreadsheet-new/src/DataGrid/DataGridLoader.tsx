@@ -13,6 +13,7 @@ import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 interface Props {
   tableModel: IDatabaseDataModel<any, any>;
+  resultIndex: number;
   className?: string;
 }
 
@@ -21,17 +22,16 @@ async function loader() {
   return { DataGridTable };
 }
 
-export const DataGridLoader: React.FC<Props> = observer(function DataGridLoader({ tableModel, className }) {
+export const DataGridLoader: React.FC<Props> = observer(function DataGridLoader({
+  tableModel, resultIndex, className,
+}) {
   return (
     <ComplexLoader
       loader={loader}
       placeholder={<Loader />}
     >
       {({ DataGridTable }) => (
-        <DataGridTable
-          model={tableModel}
-          className={className}
-        />
+        <DataGridTable model={tableModel} resultIndex={resultIndex} className={className} />
       )}
     </ComplexLoader>
   );
