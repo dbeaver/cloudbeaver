@@ -14,7 +14,6 @@ import { copyToClipboard } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
-import type { IPosition } from './DataGridSelection/useGridSelectionContext';
 
 const styles = css`
   grid-container {
@@ -33,43 +32,31 @@ const EVENT_KEY_CODE = {
   C: 'KeyC',
 };
 
-function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells: Map<string, IPosition>) {
+function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells: Map<number, number[]>) {
   if (!modelData.rows) {
     return;
   }
 
-  const orderedSelectedCells = Array.from((selectedCells.values())).sort((a, b) => {
-    if (a.rowIdx === b.rowIdx) {
-      return a.idx - b.idx;
-    }
-    return a.rowIdx - b.rowIdx;
-  });
+  const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
 
-  const selectedRows: Map<number, Set<number>> = new Map();
   const selectedColumns: Set<number> = new Set();
 
-  for (const { idx, rowIdx } of orderedSelectedCells.values()) {
-    if (!selectedColumns.has(idx)) {
-      selectedColumns.add(idx);
+  for (const colIndexes of orderedSelectedCells.values()) {
+    for (const colIdx of colIndexes) {
+      selectedColumns.add(colIdx);
     }
-
-    if (!selectedRows.has(rowIdx)) {
-      selectedRows.set(rowIdx, new Set([idx]));
-      continue;
-    }
-    selectedRows.set(rowIdx, selectedRows.get(rowIdx)!.add(idx));
   }
 
-  const sortedSelectedColumns = Array.from(selectedColumns.values()).sort();
+  const columns = [...selectedColumns].sort();
 
   let data = '';
-  for (const [rowIdx, colIndexes] of selectedRows.entries()) {
-    for (const column of sortedSelectedColumns) {
-      if (column !== sortedSelectedColumns[0]) {
+  for (const [rowIdx, colIndexes] of orderedSelectedCells.entries()) {
+    for (const column of columns) {
+      if (column !== columns[0]) {
         data += '\t';
       }
 
-      if (colIndexes.has(column)) {
+      if (colIndexes.includes(column)) {
         const value = modelData.rows?.[rowIdx][column - 1];
         data += value;
       }
@@ -83,7 +70,7 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
 // needed for event.code
 type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
-export const DataGridTableContainer: React.FC<Props> = function DataGridTableContainer(props) {
+export const DataGridTableContainer: React.FC<Props> = function DataGridTableContainer({ modelResultData, children }) {
   const selectionContext = useContext(DataGridSelectionContext);
 
   if (!selectionContext) {
@@ -91,18 +78,18 @@ export const DataGridTableContainer: React.FC<Props> = function DataGridTableCon
   }
 
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if (!props.modelResultData) {
+    if (!modelResultData) {
       return;
     }
 
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
-      copyGridSelectedDataToClipboard(props.modelResultData.data, selectionContext.selectedCells);
+      copyGridSelectedDataToClipboard(modelResultData.data, selectionContext.selectedCells);
     }
-  }, [props.modelResultData, selectionContext.selectedCells]);
+  }, [modelResultData, selectionContext.selectedCells]);
 
   return styled(styles)(
     <grid-container as='div' tabIndex={-1} onKeyDown={onKeydownHandler}>
-      {props.children}
+      {children}
     </grid-container>
   );
 };

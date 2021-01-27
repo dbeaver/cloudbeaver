@@ -14,14 +14,14 @@ import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
-export interface IPosition {
+interface IPosition {
   idx: number;
   rowIdx: number;
 }
 
 export function useGridSelectionContext(modelResultData: IDatabaseDataResult | null) {
-  const [selectedCells] = useState(() => observable.map<string, IPosition>());
-  const [currentSelectedCell, setCurrentSelectedCell] = useState<IPosition | null>(null);
+  const [selectedCells] = useState(() => observable.map<number, number[]>());
+  const [lastSelectedCell, setLastSelectedCell] = useState<IPosition | null>(null);
 
   const selectRow = useCallback(action((rowIdx: number, multiple: boolean) => {
     if (!modelResultData) {
@@ -35,50 +35,95 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     }
 
     // we don't include index column
+    const rowSelection = [];
     for (let i = 1; i <= columnsLength; i++) {
-      const hash = getHash(i, rowIdx);
-      selectedCells.set(hash, { idx: i, rowIdx });
+      rowSelection.push(i);
     }
+
+    selectedCells.set(rowIdx, rowSelection);
   }), [selectedCells, modelResultData]);
 
+  const isRowSelected = useCallback((rowIdx: number) => {
+    if (!modelResultData) {
+      throw new Error('Model result data must be provided');
+    }
+
+    const columnsLength = (modelResultData.data as SqlResultSet).columns?.length || 0;
+
+    return selectedCells.get(rowIdx)?.length === columnsLength;
+  }, [modelResultData, selectedCells]);
+
+  const unSelectRow = useCallback((rowIdx: number) => {
+    selectedCells.delete(rowIdx);
+  }, [selectedCells]);
+
   const selectRange = useCallback(action((idx: number, rowIdx: number) => {
-    if (!currentSelectedCell) {
+    if (!lastSelectedCell) {
       throw new Error('Current selected cell must be provided');
     }
 
-    const rowRange = rowIdx - currentSelectedCell.rowIdx;
-    const columnRange = idx - currentSelectedCell.idx;
-
-    // TODO we don't need this, will refactor
-    const isColumnToBottom = columnRange > 0;
-    const isRowToBottom = rowRange > 0;
-
     selectedCells.clear();
 
-    for (let column = 0; column <= Math.abs(columnRange); column++) {
-      const idx = isColumnToBottom ? column + currentSelectedCell.idx : currentSelectedCell.idx - column;
-      if (idx === 0) {
-        continue;
-      }
-      for (let row = 0; row <= Math.abs(rowRange); row++) {
-        const rowIdx = isRowToBottom ? row + currentSelectedCell.rowIdx : currentSelectedCell.rowIdx - row;
+    const left = Math.min(idx, lastSelectedCell.idx);
+    const right = Math.max(idx, lastSelectedCell.idx);
+    const top = Math.min(rowIdx, lastSelectedCell.rowIdx);
+    const bottom = Math.max(rowIdx, lastSelectedCell.rowIdx);
 
-        const hash = getHash(idx, rowIdx);
-        selectedCells.set(hash, { idx, rowIdx });
-      }
+    const rowSelection = [];
+    for (let colIdx = left; colIdx <= right; colIdx++) {
+      rowSelection.push(colIdx);
     }
-  }), [selectedCells, currentSelectedCell]);
+    for (let rowIdx = top; rowIdx <= bottom; rowIdx++) {
+      selectedCells.set(rowIdx, rowSelection);
+    }
+  }), [selectedCells, lastSelectedCell]);
+
+  const isSelected = useCallback((idx: number, rowIdx: number) => {
+    if (!selectedCells.has(rowIdx)) {
+      return false;
+    }
+
+    const rowSelection = selectedCells.get(rowIdx)!;
+    return rowSelection.indexOf(idx) !== -1;
+  },
+  [selectedCells]);
+
+  const unSelect = useCallback((idx: number, rowIdx: number) => {
+    if (!selectedCells.has(rowIdx)) {
+      return false;
+    }
+
+    const rowSelection = selectedCells.get(rowIdx)!;
+    const targetIndex = rowSelection.indexOf(idx);
+
+    if (targetIndex !== -1) {
+      rowSelection.splice(targetIndex, 1);
+      selectedCells.set(rowIdx, rowSelection);
+      return true;
+    }
+    return false;
+  }, [selectedCells]);
+
+  const selectCell = useCallback((idx: number, rowIdx: number) => {
+    const rowSelection = selectedCells.get(rowIdx);
+    if (rowSelection === undefined) {
+      return;
+    }
+
+    rowSelection.push(idx);
+    selectedCells.set(rowIdx, rowSelection);
+  }, [selectedCells]);
 
   const select = useCallback((idx: number, rowIdx: number, multiple: boolean, range: boolean) => {
-    setCurrentSelectedCell({ idx: idx === 0 ? idx + 1 : idx, rowIdx });
+    setLastSelectedCell({ idx: idx === 0 ? idx + 1 : idx, rowIdx });
     if (selectedCells.size > 0 && range) {
-      selectRange(idx, rowIdx);
+      selectRange(idx === 0 ? idx + 1 : idx, rowIdx);
       return;
     }
 
     // it's index column
     if (idx === 0) {
-      selectRow(rowIdx, multiple);
+      multiple && isRowSelected(rowIdx) ? unSelectRow(rowIdx) : selectRow(rowIdx, multiple);
       return;
     }
 
@@ -86,21 +131,18 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
       selectedCells.clear();
     }
 
-    const hash = getHash(idx, rowIdx);
-
-    if (selectedCells.has(hash)) {
-      selectedCells.delete(hash);
+    if (!selectedCells.has(rowIdx)) {
+      selectedCells.set(rowIdx, [idx]);
       return;
     }
 
-    selectedCells.set(hash, { idx, rowIdx });
-  }, [selectedCells, selectRow, selectRange]);
+    if (isSelected(idx, rowIdx)) {
+      unSelect(idx, rowIdx);
+      return;
+    }
 
-  const isSelected = useCallback((idx: number, rowIdx: number) => {
-    const hash = getHash(idx, rowIdx);
-    return selectedCells.has(hash);
-  },
-  [selectedCells]);
+    selectCell(idx, rowIdx);
+  }, [selectedCells, selectRow, selectRange, unSelect, isSelected, selectCell, isRowSelected, unSelectRow]);
 
   const context: IDataGridSelectionContext = useMemo(() => ({
     selectedCells,
@@ -109,8 +151,4 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
   }), [selectedCells, select, isSelected]);
 
   return context;
-}
-
-function getHash(idx: number, rowIdx: number) {
-  return `${idx}_${rowIdx}`;
 }

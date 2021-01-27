@@ -66,23 +66,22 @@ const headerStyles = css`
   sort-icon > Icon[|active] {
     fill: #338ECC;
   }
+  sort-icon:hover > Icon {
+    width: 9px;
+  }
   sort-icon[|disabled] {
     opacity: 0.7;
     cursor: default;
   }
-  sort-icon:hover > Icon {
-    width: 9px;
-  }
-  sort-icon[|disabled]:hover > Icon {
-    width: 8px;
-  }
 `;
 
 function getColumn(colIdx: number, source: SqlResultSet) {
-  return source.columns?.[colIdx - 1];
+  return source.columns?.[colIdx];
 }
 
-export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeaderNew(props) {
+export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeaderNew({
+  column: calculatedColumn,
+}) {
   const dataGridContext = useContext(DataGridContext);
   const gridSortingContext = useContext(DataGridSortingContext);
 
@@ -90,13 +89,9 @@ export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer
     throw new Error('Data grid context or sorting context are missed');
   }
 
-  const { model, resultIndex } = dataGridContext;
-  const { column: calculatedColumn } = props;
-  const { setSortMode } = gridSortingContext;
+  const model = dataGridContext.model;
   const columnName = calculatedColumn.name as string;
-  const column = useMemo(
-    () => computed(() => getColumn(calculatedColumn.idx, model.getResult(resultIndex).data)),
-    [model, resultIndex, calculatedColumn.idx]).get();
+  const column = getColumn(Number(calculatedColumn.key), model.getResult(dataGridContext.resultIndex).data);
 
   const loading = model.isLoading();
 
@@ -104,28 +99,24 @@ export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer
   const sortable = true;
   const currentSortMode = gridSortingContext.getSortMode(columnName);
 
-  const handleSort = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (loading) {
-        return;
-      }
+  const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (loading) {
+      return;
+    }
 
-      const sort = currentSortMode;
-      let nextSort: SortMode;
-      switch (sort) {
-        case 'asc':
-          nextSort = 'desc';
-          break;
-        case 'desc':
-          nextSort = null;
-          break;
-        default:
-          nextSort = 'asc';
-      }
-      setSortMode(columnName, nextSort, e.ctrlKey || e.metaKey);
-    },
-    [loading, currentSortMode, setSortMode, columnName]
-  );
+    let nextSort: SortMode;
+    switch (currentSortMode) {
+      case 'asc':
+        nextSort = 'desc';
+        break;
+      case 'desc':
+        nextSort = null;
+        break;
+      default:
+        nextSort = 'asc';
+    }
+    gridSortingContext.setSortMode(columnName, nextSort, e.ctrlKey || e.metaKey);
+  };
 
   return styled(headerStyles)(
     <table-header as="div">

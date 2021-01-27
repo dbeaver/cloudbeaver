@@ -8,9 +8,7 @@
 
 import type { FormatterProps } from 'react-data-grid';
 
-export const CellFormatter: React.FC<FormatterProps> = function CellFormatter(props) {
-  const { row, column } = props;
-
+export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ row, column }) {
   return (
     <div>
       {JSON.stringify(row[column.key])}

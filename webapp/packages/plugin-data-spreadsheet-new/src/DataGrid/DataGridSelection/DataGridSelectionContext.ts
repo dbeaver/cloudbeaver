@@ -8,10 +8,8 @@
 
 import { createContext } from 'react';
 
-import type { IPosition } from './useGridSelectionContext';
-
 export interface IDataGridSelectionContext {
-  selectedCells: Map<string, IPosition>;
+  selectedCells: Map<number, number[]>;
   select: (idx: number, rowIdx: number, multiple: boolean, range: boolean) => void;
   isSelected: (idx: number, rowIdx: number) => boolean;
 }
