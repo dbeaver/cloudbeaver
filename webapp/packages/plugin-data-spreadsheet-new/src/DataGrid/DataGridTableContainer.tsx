@@ -50,14 +50,14 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
   const columns = [...selectedColumns].sort();
 
   let data = '';
-  for (const [rowIdx, colIndexes] of orderedSelectedCells.entries()) {
+  for (const [rowIdx, colIndexes] of orderedSelectedCells) {
     for (const column of columns) {
       if (column !== columns[0]) {
         data += '\t';
       }
 
       if (colIndexes.includes(column)) {
-        const value = modelData.rows?.[rowIdx][column - 1];
+        const value = modelData.rows?.[rowIdx][column];
         data += value;
       }
     }

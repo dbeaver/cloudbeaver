@@ -10,8 +10,8 @@ import { createContext } from 'react';
 
 export interface IDataGridSelectionContext {
   selectedCells: Map<number, number[]>;
-  select: (idx: number, rowIdx: number, multiple: boolean, range: boolean) => void;
-  isSelected: (idx: number, rowIdx: number) => boolean;
+  select: (key: string, rowIdx: number, multiple: boolean, range: boolean) => void;
+  isSelected: (key: string, rowIdx: number) => boolean;
 }
 
 export const DataGridSelectionContext = createContext<IDataGridSelectionContext | null>(null);

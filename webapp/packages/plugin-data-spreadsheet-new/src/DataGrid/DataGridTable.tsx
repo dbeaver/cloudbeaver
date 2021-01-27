@@ -64,7 +64,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   const modelResultData = model?.getResult(resultIndex);
 
   const gridSortingContext = useGridSortingContext(model);
-  const gridSelectionContext = useGridSelectionContext(modelResultData);
+  const gridSelectionContext = useGridSelectionContext(modelResultData, { indexColumnKey: indexColumn.key });
 
   const handleScroll = useCallback(
     async (event: React.UIEvent<HTMLDivElement>) => {

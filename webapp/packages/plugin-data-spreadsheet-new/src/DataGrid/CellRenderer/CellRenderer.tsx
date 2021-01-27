@@ -29,10 +29,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const { rowIdx, column } = props;
   const { isSelected, select } = gridSelectionContext;
 
-  const selected = isSelected(column.idx, rowIdx);
+  const selected = isSelected(column.key, rowIdx);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    select(column.idx, rowIdx, event.ctrlKey, event.shiftKey);
+    select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
   }, [column, rowIdx, select]);
 
   return styled(styles)(
