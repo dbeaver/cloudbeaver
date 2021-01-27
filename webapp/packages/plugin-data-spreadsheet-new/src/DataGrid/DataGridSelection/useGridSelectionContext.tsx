@@ -120,7 +120,6 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     }
 
     rowSelection.push(idx);
-    selectedCells.set(rowIdx, rowSelection);
   }, [selectedCells]);
 
   const select = useCallback((key: string, rowIdx: number, multiple: boolean, range: boolean) => {
