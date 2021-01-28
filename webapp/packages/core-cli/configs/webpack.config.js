@@ -147,7 +147,7 @@ module.exports = (env, argv) => {
         },
       ]
     },
-    devtool: 'source-map',
+    // devtool: 'source-map',
     plugins: [
       // new ESLintPlugin(options), //TODO: maybe later
       new ForkTsCheckerWebpackPlugin({
