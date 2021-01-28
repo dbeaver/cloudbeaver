@@ -2,8 +2,10 @@
 <plugin>
     <!-- Resource mappings -->
     <extension point="org.jkiss.dbeaver.resources">
+        <resource name="drivers/db2"/>
         <resource name="drivers/mysql/mysql8"/>
         <resource name="drivers/mariadb"/>
+        <resource name="drivers/oracle"/>
         <resource name="drivers/postgresql"/>
         <resource name="drivers/clickhouse"/>
         <resource name="drivers/derby"/>
@@ -15,8 +17,10 @@
 
     <!-- Bundles  -->
     <extension point="org.jkiss.dbeaver.product.bundles">
+        <bundle id="drivers.db2" label="DB2 drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
+        <bundle id="drivers.oracle" label="Oracle drivers"/>
         <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
         <bundle id="drivers.clickhouse" label="Clickhouse drivers"/>
         <bundle id="drivers.derby" label="Derby drivers"/>
@@ -28,8 +32,10 @@
 
     <!-- Enabled drivers -->
     <extension point="io.cloudbeaver.driver">
+        <driver id="db2:db2"/>
         <driver id="mysql:mysql8"/>
         <driver id="mysql:mariaDB"/>
+        <driver id="oracle:oracle_thin"/>
         <driver id="postgresql:postgres-jdbc"/>
         <driver id="jaybird:jaybird"/>
         <driver id="generic:yandex_clickhouse"/>

@@ -11,13 +11,15 @@
     </properties>
 
     <modules>
-        <module>mysql</module>
-        <module>mariadb</module>
-        <module>postgresql</module>
-        <module>jaybird</module>
         <module>clickhouse</module>
+        <module>db2</module>
         <module>derby</module>
         <module>h2</module>
+        <module>jaybird</module>
+        <module>mysql</module>
+        <module>mariadb</module>
+        <module>oracle</module>
+        <module>postgresql</module>
         <module>sqlite</module>
         <module>sqlserver</module>
     </modules>
