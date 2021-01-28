@@ -43,7 +43,10 @@ cd ../webapp
 
 yarn
 lerna run bootstrap
-lerna run build --stream --scope=@cloudbeaver/product-default
+lerna run build --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
+if [[ "$?" -ne 0 ]] ; then
+  echo 'Application build failed'; exit $rc
+fi
 
 cd ../deploy
 

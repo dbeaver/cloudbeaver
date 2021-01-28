@@ -31,6 +31,7 @@ const nodeModules = [
 
 module.exports = (env, argv) => {
   process.env.NODE_ENV = argv.mode;
+  const devTool = 'source-map' in env && 'source-map';
   const devMode = argv.mode !== 'production';
   function getBaseStyleLoaders() {
     const loaders = [];
@@ -147,7 +148,7 @@ module.exports = (env, argv) => {
         },
       ]
     },
-    // devtool: 'source-map',
+    devtool: devTool,
     plugins: [
       // new ESLintPlugin(options), //TODO: maybe later
       new ForkTsCheckerWebpackPlugin({
