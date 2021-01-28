@@ -20,6 +20,8 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -168,6 +170,10 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getCredentials() {
         return credentials;
+    }
+
+    public List<String> getNetworkHandlersConfig() {
+        return new ArrayList<>();
     }
 
     @Property
