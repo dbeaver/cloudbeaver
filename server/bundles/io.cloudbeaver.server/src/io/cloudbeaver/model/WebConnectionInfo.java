@@ -269,6 +269,10 @@ public class WebConnectionInfo {
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
+    public List<String> getNetworkHandlersConfig() {
+        return new ArrayList<>();
+    }
+
     @Property
     public Map<String, Object> getCredentials() {
         //dataSourceContainer.getConnectionConfiguration().getCredentialsProvider().getCredentials();

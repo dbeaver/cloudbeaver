@@ -289,11 +289,11 @@ input ConnectionConfig {
     #### deprecated fields
 
     # ID of predefined datasource
-    dataSourceId: ID @deprecated
+    dataSourceId: ID #@deprecated
 
     # Direct user credentials
-    userName: String @deprecated
-    userPassword: String @deprecated
+    userName: String #@deprecated
+    userPassword: String #@deprecated
 }
 
 type NavigatorSettings {
