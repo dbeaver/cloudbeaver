@@ -162,6 +162,8 @@ type DriverInfo {
     anonymousAccess: Boolean
     defaultAuthModel: ID!
     applicableAuthModel: [ID!]!
+
+    applicableNetworkHandlers: [ID]!
 }
 
 enum ResultDataFormat {
@@ -169,6 +171,32 @@ enum ResultDataFormat {
     document,
     graph,
     timeseries
+}
+
+## Network handler config
+
+enum NetworkHandlerType {
+    TUNNEL,
+    PROXY,
+    CONFIG
+}
+
+type NetworkHandlerDescriptor {
+    id: ID!
+    codeName: String!
+    label: String
+    description: String
+    secured: Boolean
+    type: NetworkHandlerType
+}
+
+type NetworkHandlerConfig {
+    id: ID!
+    enabled: Boolean
+    userName: String
+    password: String
+    savePassword: Boolean
+    properties: Object
 }
 
 # Connection instance
@@ -203,6 +231,8 @@ type ConnectionInfo {
     authNeeded: Boolean!
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
+
+    networkHandlersConfig: [NetworkHandlerConfig!]!
 
     # Supported features (provided etc)
     features: [ String! ]!
@@ -252,14 +282,18 @@ input ConnectionConfig {
     authModelId: ID
     credentials: Object
 
+    # Networki handlers
+
+    networkHandlersConfig: [Object!]!
+
     #### deprecated fields
 
     # ID of predefined datasource
-    dataSourceId: ID
+    dataSourceId: ID @deprecated
 
     # Direct user credentials
-    userName: String # @deprecated
-    userPassword: String # deprecated
+    userName: String @deprecated
+    userPassword: String @deprecated
 }
 
 type NavigatorSettings {
@@ -305,11 +339,11 @@ extend type Query {
 
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
+    authModels: [DatabaseAuthModel!]!
+    networkHandlers: [NetworkHandlerDescriptor!]!
 
     # List of template connections.
     templateConnections: [ ConnectionInfo! ]!
-
-    authModels: [DatabaseAuthModel!]!
 
     # Return connection state
     connectionState( id: ID! ): ConnectionInfo! @deprecated
