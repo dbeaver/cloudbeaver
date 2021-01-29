@@ -24,7 +24,7 @@ generates:
         field: false
         inputValue: false
         object: false
-      maybeValue: T
+      maybeValue: T # T | null
       scalars:
         Object: any
         JSON: "{ [key: string]: any }"
