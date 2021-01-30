@@ -27,6 +27,8 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
 
 import java.util.Arrays;
@@ -195,6 +197,15 @@ public class WebDatabaseDriverConfig {
     public String[] getApplicableAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
             .map(DBPAuthModelDescriptor::getId).toArray(String[]::new);
+    }
+
+    @Property
+    public String[] getApplicableNetworkHandlers() {
+        if (driver.isEmbedded()) {
+            return new String[0];
+        }
+        return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
+            .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
     }
 
     @Property

@@ -271,7 +271,7 @@ public class WebConnectionInfo {
     }
 
     public List<DBWHandlerConfiguration> getNetworkHandlersConfig() {
-        return new ArrayList<>();
+        return dataSourceContainer.getConnectionConfiguration().getHandlers();
     }
 
     @Property
