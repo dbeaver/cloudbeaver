@@ -189,6 +189,7 @@ public class WebConnectionConfig {
         this.saveCredentials = saveCredentials;
     }
 
+    @Property
     public Map<String, Object> getProviderProperties() {
         return providerProperties;
     }

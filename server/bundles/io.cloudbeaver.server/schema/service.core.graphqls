@@ -242,6 +242,7 @@ type ConnectionInfo {
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
 
+    providerProperties: Object!
     networkHandlersConfig: [NetworkHandlerConfig!]!
 
     # Supported features (provided etc)
@@ -294,7 +295,7 @@ input ConnectionConfig {
 
     # Map of provider properties (name/value)
 
-    providerProperties: [Object!]!
+    providerProperties: Object
 
     # Network handlers. Map of id->property map (name/value).
 

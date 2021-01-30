@@ -172,6 +172,13 @@ public class WebServiceUtils {
         if (config.getAuthModelId() != null) {
             dsConfig.setAuthModelId(config.getAuthModelId());
         }
+        // Save provider props
+        if (config.getProviderProperties() != null) {
+            dsConfig.setProviderProperties(new LinkedHashMap<>());
+            for (Map.Entry<String, Object> e : config.getProviderProperties().entrySet()) {
+                dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
+            }
+        }
     }
 
     public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties, boolean saveCredentials) {

@@ -290,4 +290,9 @@ public class WebConnectionInfo {
         this.savedAuthProperties = authProperties;
     }
 
+    @Property
+    public Map<String, String> getProviderProperties() {
+        return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
+    }
+
 }
