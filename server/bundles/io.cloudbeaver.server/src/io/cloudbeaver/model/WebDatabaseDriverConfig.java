@@ -213,4 +213,11 @@ public class WebDatabaseDriverConfig {
         return AuthModelDatabaseNative.ID;
     }
 
+    @Property
+    public WebPropertyInfo[] getProviderProperties() {
+        return Arrays.stream(driver.getProviderPropertyDescriptors())
+            .map(p -> new WebPropertyInfo(webSession, p, null))
+            .toArray(WebPropertyInfo[]::new);
+    }
+
 }

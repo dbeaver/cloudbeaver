@@ -27,7 +27,6 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web connection info
@@ -270,8 +270,10 @@ public class WebConnectionInfo {
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
-    public List<DBWHandlerConfiguration> getNetworkHandlersConfig() {
-        return dataSourceContainer.getConnectionConfiguration().getHandlers();
+    @Property
+    public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
+        return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
+            .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
     }
 
     @Property
