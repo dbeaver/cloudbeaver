@@ -26,6 +26,7 @@ const styles = css`
 interface Props {
   children: React.ReactNode;
   modelResultData: IDatabaseDataResult | null;
+  className?: string;
 }
 
 const EVENT_KEY_CODE = {
@@ -70,7 +71,9 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
 // needed for event.code
 type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
-export const DataGridTableContainer: React.FC<Props> = function DataGridTableContainer({ modelResultData, children }) {
+export const DataGridTableContainer: React.FC<Props> = function DataGridTableContainer({
+  modelResultData, children, className,
+}) {
   const selectionContext = useContext(DataGridSelectionContext);
 
   if (!selectionContext) {
@@ -88,7 +91,7 @@ export const DataGridTableContainer: React.FC<Props> = function DataGridTableCon
   }, [modelResultData, selectionContext.selectedCells]);
 
   return styled(styles)(
-    <grid-container as='div' tabIndex={-1} onKeyDown={onKeydownHandler}>
+    <grid-container as='div' tabIndex={-1} className={className} onKeyDown={onKeydownHandler}>
       {children}
     </grid-container>
   );

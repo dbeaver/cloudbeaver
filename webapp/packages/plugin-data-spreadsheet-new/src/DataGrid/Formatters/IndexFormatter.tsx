@@ -8,10 +8,10 @@
 
 import type { FormatterProps } from 'react-data-grid';
 
-export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ row, column }) {
+export const IndexFormatter: React.FC<FormatterProps> = function IndexFormatter({ rowIdx }) {
   return (
-    <div>
-      {JSON.stringify(row[column.key])}
-    </div>
+    <index-formatter as='div'>
+      {rowIdx + 1}
+    </index-formatter>
   );
 };

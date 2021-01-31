@@ -6,15 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import 'react-data-grid/dist/react-data-grid.css';
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo } from 'react';
 import DataGrid from 'react-data-grid';
 import type { Column } from 'react-data-grid';
 import styled from 'reshadow';
-import { css } from 'reshadow';
 
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -22,21 +19,18 @@ import { TextTools } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { ResultSetTools } from '../ResultSetTools';
-import { CellFormatter } from './CellFormatter/CellFormatter';
+import baseStyles from '../styles/base.scss';
+import { reactGridStyles } from '../styles/styles';
 import { DataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
 import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
 import { useGridSortingContext } from './DataGridSorting/useGridSortingContext';
 import { DataGridTableContainer } from './DataGridTableContainer';
+import { CellFormatter } from './Formatters/CellFormatter';
+import { IndexFormatter } from './Formatters/IndexFormatter';
 import { RowRenderer } from './RowRenderer/RowRenderer';
 import { TableColumnHeaderNew } from './TableColumnHeader/TableColumnHeader-new';
-
-const baseStyles = css`
-  DataGrid {
-    flex: 1;
-  }
-`;
 
 interface Props {
   model: IDatabaseDataModel<any>;
@@ -51,15 +45,16 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 
 const indexColumn: Column<any[], any> = {
   key: Number.MAX_SAFE_INTEGER + '',
-  name: '#',
-  width: 100,
+  name: <div className='cell-index-column-name'>#</div>,
+  minWidth: 60,
+  width: 60,
   resizable: false,
   frozen: true,
-  formatter: ({ rowIdx }: any) => <b>{rowIdx + 1}</b>,
+  formatter: IndexFormatter,
 };
 
-export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex }) {
-  const styles = useStyles(baseStyles);
+export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
+  const styles = useStyles(reactGridStyles, baseStyles);
 
   const modelResultData = model?.getResult(resultIndex);
 
@@ -108,7 +103,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
         }
         return rowStrings[i];
       }),
-    }).map(v => v + 16 + 32 + 20 + 24);
+    }).map(v => v + 16 + 32 + 20);
 
     // TODO: we need some result type specified formatter to common actions with data
     const rows = (modelResultData.data as SqlResultSet).rows || [];
@@ -117,6 +112,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
       key: i + '',
       name: col.name!,
       width: Math.min(300, measuredCells[i]),
+      minWidth: 40,
       resizable: true,
       headerRenderer: TableColumnHeaderNew,
       formatter: CellFormatter,
@@ -130,10 +126,11 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     <DataGridContext.Provider value={{ model, resultIndex }}>
       <DataGridSortingContext.Provider value={gridSortingContext}>
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
-          <DataGridTableContainer modelResultData={modelResultData}>
+          <DataGridTableContainer modelResultData={modelResultData} className={`cb-react-grid-theme ${className}`}>
             <DataGrid
               columns={columns}
               rows={rows}
+              headerRowHeight={28}
               rowHeight={24}
               rowRenderer={RowRenderer}
               onScroll={handleScroll}
