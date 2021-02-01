@@ -1,0 +1,67 @@
+/*
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import "@cloudbeaver/core-theming/src/styles/branding";
+
+@mixin base-react-grid() {
+  :global {
+    .cb-react-grid-theme {
+      @include mdc-theme-prop(color, on-surface, false);
+
+      .rdg-header-row {
+        @include mdc-theme-prop(background-color, surface, false);
+      }
+
+      .rdg-row {
+        @include mdc-theme-prop(border-color, background, false);
+      }
+
+      .rdg-row:hover,
+      .rdg-row:hover .rdg-cell-frozen {
+        @include stripes-background($mdc-theme-secondary);
+        border-bottom: 1px solid;
+        border-bottom-color: $color-positive;
+      }
+
+      .rdg-cell {
+        @include mdc-theme-prop(border-color, background, false);
+        &:focus {
+          outline: 0;
+        }
+      }
+
+      .rdg-cell-frozen {
+        @include mdc-theme-prop(background-color, surface, false);
+      }
+
+      .rdg-cell-selected {
+        box-shadow: inset 0 0 0 1px #0091ea;
+      }
+
+      .rdg-cell-custom-selected {
+        background-color: rgba(0, 145, 234, 0.3);
+        box-shadow: inset 0 0 0 1px #0091ea;
+      }
+
+      .cell-formatter {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .cell-index-column-name {
+        margin-left: 8px;
+      }
+
+      .cell-null {
+        text-transform: uppercase;
+        opacity: 0.65;
+      }
+    }
+  }
+}

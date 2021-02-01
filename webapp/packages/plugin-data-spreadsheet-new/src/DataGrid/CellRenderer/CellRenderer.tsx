@@ -10,15 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
-import styled, { css, use } from 'reshadow';
 
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-
-const styles = css`
-  Cell[|selected] {
-    background-color: rgba(0, 145, 234, 0.3);
-  }
-`;
 
 export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function CellRenderer(props) {
   const gridSelectionContext = useContext(DataGridSelectionContext);
@@ -26,16 +19,19 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     throw new Error('Grid selection context must be provided');
   }
 
+  let classes = '';
   const { rowIdx, column } = props;
   const { isSelected, select } = gridSelectionContext;
 
-  const selected = isSelected(column.key, rowIdx);
+  if (isSelected(column.key, rowIdx)) {
+    classes += 'rdg-cell-custom-selected';
+  }
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
   }, [column, rowIdx, select]);
 
-  return styled(styles)(
-    <Cell onClick={onClickHandler} {...use({ selected })} {...props} />
+  return (
+    <Cell className={classes} onClick={onClickHandler} {...props} />
   );
 });

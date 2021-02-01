@@ -33,10 +33,10 @@ const headerStyles = css`
     overflow: hidden;
   }
   icon {
-    height: 16px;
+    display: flex;
   }
   StaticImage {
-    height: 100%;
+    height: 16px;
   }
   name {
     margin-left: 8px;
