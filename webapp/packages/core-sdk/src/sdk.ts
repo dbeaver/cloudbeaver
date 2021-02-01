@@ -3,6 +3,8 @@
 import { GraphQLClient } from 'graphql-request';
 export type Maybe<T> = T;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
   ID: string;
@@ -47,6 +49,7 @@ export interface Query {
   navNodeChildren: NavigatorNodeInfo[];
   navNodeInfo: NavigatorNodeInfo;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
+  networkHandlers: NetworkHandlerDescriptor[];
   readSessionLog: LogEntry[];
   revokeUserRole?: Maybe<Scalars['Boolean']>;
   searchConnections: AdminConnectionSearchInfo[];
@@ -494,13 +497,13 @@ export interface DriverInfo {
   license?: Maybe<Scalars['String']>;
   custom?: Maybe<Scalars['Boolean']>;
   promotedScore?: Maybe<Scalars['Int']>;
-  connectionProperties?: Maybe<Scalars['Object']>;
-  defaultConnectionProperties?: Maybe<Scalars['Object']>;
-  driverProperties?: Maybe<ObjectPropertyInfo[]>;
-  driverParameters?: Maybe<Scalars['Object']>;
+  driverProperties: ObjectPropertyInfo[];
+  driverParameters: Scalars['Object'];
+  providerProperties: ObjectPropertyInfo[];
   anonymousAccess?: Maybe<Scalars['Boolean']>;
   defaultAuthModel: Scalars['ID'];
   applicableAuthModel: Array<Scalars['ID']>;
+  applicableNetworkHandlers: Array<Maybe<Scalars['ID']>>;
 }
 
 export enum ResultDataFormat {
@@ -508,6 +511,31 @@ export enum ResultDataFormat {
   Document = 'document',
   Graph = 'graph',
   Timeseries = 'timeseries'
+}
+
+export enum NetworkHandlerType {
+  Tunnel = 'TUNNEL',
+  Proxy = 'PROXY',
+  Config = 'CONFIG'
+}
+
+export interface NetworkHandlerDescriptor {
+  id: Scalars['ID'];
+  codeName: Scalars['String'];
+  label: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  secured: Scalars['Boolean'];
+  type?: Maybe<NetworkHandlerType>;
+  properties: ObjectPropertyInfo[];
+}
+
+export interface NetworkHandlerConfig {
+  id: Scalars['ID'];
+  enabled: Scalars['Boolean'];
+  userName?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  savePassword: Scalars['Boolean'];
+  properties: Scalars['Object'];
 }
 
 export interface ConnectionInfo {
@@ -534,6 +562,8 @@ export interface ConnectionInfo {
   authNeeded: Scalars['Boolean'];
   authModel?: Maybe<Scalars['ID']>;
   authProperties: ObjectPropertyInfo[];
+  providerProperties: Scalars['Object'];
+  networkHandlersConfig: NetworkHandlerConfig[];
   features: Array<Scalars['String']>;
   navigatorSettings: NavigatorSettings;
   supportedDataFormats: ResultDataFormat[];
@@ -564,6 +594,8 @@ export interface ConnectionConfig {
   saveCredentials?: Maybe<Scalars['Boolean']>;
   authModelId?: Maybe<Scalars['ID']>;
   credentials?: Maybe<Scalars['Object']>;
+  providerProperties?: Maybe<Scalars['Object']>;
+  networkHandlersConfig?: Maybe<Array<Scalars['Object']>>;
   dataSourceId?: Maybe<Scalars['ID']>;
   userName?: Maybe<Scalars['String']>;
   userPassword?: Maybe<Scalars['String']>;
@@ -949,7 +981,7 @@ export type RevokeUserRoleQuery = Pick<Query, 'revokeUserRole'>;
 
 export type SetConnectionsQueryVariables = Exact<{
   userId: Scalars['ID'];
-  connections: Array<Scalars['ID']>;
+  connections: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
 export interface SetConnectionsQuery { grantedConnections: Query['setSubjectConnectionAccess'] }
@@ -992,14 +1024,14 @@ export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetConnectionsQuery { connections: AdminConnectionFragment[] }
 
 export type SearchDatabasesQueryVariables = Exact<{
-  hosts: Array<Scalars['String']>;
+  hosts: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 export interface SearchDatabasesQuery { databases: Array<Pick<AdminConnectionSearchInfo, 'displayName' | 'host' | 'port' | 'possibleDrivers' | 'defaultDriver'>> }
 
 export type SetConnectionAccessQueryVariables = Exact<{
   connectionId: Scalars['ID'];
-  subjects: Array<Scalars['ID']>;
+  subjects: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
 export type SetConnectionAccessQuery = Pick<Query, 'setConnectionSubjectAccess'>;
@@ -1065,7 +1097,7 @@ export type DriverPropertiesQueryVariables = Exact<{
 export interface DriverPropertiesQuery {
   driver: Array<(
     Pick<DriverInfo, 'driverParameters'>
-    & { driverProperties?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>>> }
+    & { driverProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>> }
   )>;
 }
 
@@ -1249,7 +1281,7 @@ export type UpdateResultsDataMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  sourceRowValues: Array<Maybe<Scalars['Object']>>;
+  sourceRowValues: Array<Maybe<Scalars['Object']>> | Maybe<Scalars['Object']>;
   values?: Maybe<Scalars['Object']>;
 }>;
 
@@ -1267,9 +1299,9 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  updatedRows?: Maybe<SqlResultRow[]>;
-  deletedRows?: Maybe<SqlResultRow[]>;
-  addedRows?: Maybe<SqlResultRow[]>;
+  updatedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
+  deletedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
+  addedRows?: Maybe<SqlResultRow[] | SqlResultRow>;
 }>;
 
 export interface UpdateResultsDataBatchMutation {
@@ -1682,12 +1714,19 @@ export const RevokeUserRoleDocument = `
     `;
 export const SetConnectionsDocument = `
     query setConnections($userId: ID!, $connections: [ID!]!) {
-  grantedConnections: setSubjectConnectionAccess(subjectId: $userId, connections: $connections)
+  grantedConnections: setSubjectConnectionAccess(
+    subjectId: $userId
+    connections: $connections
+  )
 }
     `;
 export const SetUserCredentialsDocument = `
     query setUserCredentials($userId: ID!, $providerId: ID!, $credentials: Object!) {
-  setUserCredentials(userId: $userId, providerId: $providerId, credentials: $credentials)
+  setUserCredentials(
+    userId: $userId
+    providerId: $providerId
+    credentials: $credentials
+  )
 }
     `;
 export const CreateConnectionConfigurationDocument = `
@@ -1884,7 +1923,11 @@ export const GetDriverByIdDocument = `
     `;
 export const InitConnectionDocument = `
     mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
-  connection: initConnection(id: $id, credentials: $credentials, saveCredentials: $saveCredentials) {
+  connection: initConnection(
+    id: $id
+    credentials: $credentials
+    saveCredentials: $saveCredentials
+  ) {
     ...UserConnection
   }
 }
@@ -1919,7 +1962,11 @@ export const TestConnectionDocument = `
     `;
 export const ExportDataFromContainerDocument = `
     query exportDataFromContainer($connectionId: ID!, $containerNodePath: ID!, $parameters: DataTransferParameters!) {
-  taskInfo: dataTransferExportDataFromContainer(connectionId: $connectionId, containerNodePath: $containerNodePath, parameters: $parameters) {
+  taskInfo: dataTransferExportDataFromContainer(
+    connectionId: $connectionId
+    containerNodePath: $containerNodePath
+    parameters: $parameters
+  ) {
     id
     running
     taskResult
@@ -1933,7 +1980,12 @@ export const ExportDataFromContainerDocument = `
     `;
 export const ExportDataFromResultsDocument = `
     query exportDataFromResults($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $parameters: DataTransferParameters!) {
-  taskInfo: dataTransferExportDataFromResults(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, parameters: $parameters) {
+  taskInfo: dataTransferExportDataFromResults(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    parameters: $parameters
+  ) {
     id
     running
     taskResult
@@ -2013,7 +2065,13 @@ export const GetAsyncTaskInfoDocument = `
     `;
 export const AsyncReadDataFromContainerDocument = `
     mutation asyncReadDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
-  taskInfo: asyncReadDataFromContainer(connectionId: $connectionId, contextId: $contextId, containerNodePath: $containerNodePath, filter: $filter, dataFormat: $dataFormat) {
+  taskInfo: asyncReadDataFromContainer(
+    connectionId: $connectionId
+    contextId: $contextId
+    containerNodePath: $containerNodePath
+    filter: $filter
+    dataFormat: $dataFormat
+  ) {
     id
     name
     running
@@ -2029,7 +2087,13 @@ export const AsyncReadDataFromContainerDocument = `
     `;
 export const AsyncSqlExecuteQueryDocument = `
     mutation asyncSqlExecuteQuery($connectionId: ID!, $contextId: ID!, $query: String!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
-  taskInfo: asyncSqlExecuteQuery(connectionId: $connectionId, contextId: $contextId, sql: $query, filter: $filter, dataFormat: $dataFormat) {
+  taskInfo: asyncSqlExecuteQuery(
+    connectionId: $connectionId
+    contextId: $contextId
+    sql: $query
+    filter: $filter
+    dataFormat: $dataFormat
+  ) {
     id
     name
     running
@@ -2078,7 +2142,13 @@ export const GetSqlExecuteTaskResultsDocument = `
     `;
 export const UpdateResultsDataDocument = `
     mutation updateResultsData($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $sourceRowValues: [Object]!, $values: Object) {
-  result: updateResultsData(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, updateRow: $sourceRowValues, updateValues: $values) {
+  result: updateResultsData(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    updateRow: $sourceRowValues
+    updateValues: $values
+  ) {
     duration
     results {
       updateRowCount
@@ -2092,7 +2162,14 @@ export const UpdateResultsDataDocument = `
     `;
 export const UpdateResultsDataBatchDocument = `
     mutation updateResultsDataBatch($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $updatedRows: [SQLResultRow!], $deletedRows: [SQLResultRow!], $addedRows: [SQLResultRow!]) {
-  result: updateResultsDataBatch(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, updatedRows: $updatedRows, deletedRows: $deletedRows, addedRows: $addedRows) {
+  result: updateResultsDataBatch(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    updatedRows: $updatedRows
+    deletedRows: $deletedRows
+    addedRows: $addedRows
+  ) {
     duration
     results {
       updateRowCount
@@ -2158,7 +2235,13 @@ export const NavRefreshNodeDocument = `
     `;
 export const QuerySqlCompletionProposalsDocument = `
     query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $maxResults: Int) {
-  sqlCompletionProposals(connectionId: $connectionId, contextId: $contextId, maxResults: $maxResults, position: $position, query: $query) {
+  sqlCompletionProposals(
+    connectionId: $connectionId
+    contextId: $contextId
+    maxResults: $maxResults
+    position: $position
+    query: $query
+  ) {
     cursorPosition
     displayString
     icon
@@ -2279,7 +2362,11 @@ export const TouchSessionDocument = `
     `;
 export const SqlContextCreateDocument = `
     mutation sqlContextCreate($connectionId: ID!, $defaultCatalog: String, $defaultSchema: String) {
-  context: sqlContextCreate(connectionId: $connectionId, defaultCatalog: $defaultCatalog, defaultSchema: $defaultSchema) {
+  context: sqlContextCreate(
+    connectionId: $connectionId
+    defaultCatalog: $defaultCatalog
+    defaultSchema: $defaultSchema
+  ) {
     id
     defaultCatalog
     defaultSchema
@@ -2293,12 +2380,21 @@ export const SqlContextDestroyDocument = `
     `;
 export const SqlContextSetDefaultsDocument = `
     mutation sqlContextSetDefaults($connectionId: ID!, $contextId: ID!, $defaultCatalog: ID, $defaultSchema: ID) {
-  context: sqlContextSetDefaults(connectionId: $connectionId, contextId: $contextId, defaultCatalog: $defaultCatalog, defaultSchema: $defaultSchema)
+  context: sqlContextSetDefaults(
+    connectionId: $connectionId
+    contextId: $contextId
+    defaultCatalog: $defaultCatalog
+    defaultSchema: $defaultSchema
+  )
 }
     `;
 export const SqlResultCloseDocument = `
     mutation sqlResultClose($connectionId: ID!, $contextId: ID!, $resultId: ID!) {
-  result: sqlResultClose(connectionId: $connectionId, contextId: $contextId, resultId: $resultId)
+  result: sqlResultClose(
+    connectionId: $connectionId
+    contextId: $contextId
+    resultId: $resultId
+  )
 }
     `;
 
