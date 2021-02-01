@@ -45,7 +45,8 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 
 const indexColumn: Column<any[], any> = {
   key: Number.MAX_SAFE_INTEGER + '',
-  name: <div className='cell-index-column-name'>#</div>,
+  name: '#',
+  headerCellClass: 'cell-index-column-name',
   minWidth: 60,
   width: 60,
   resizable: false,
@@ -126,8 +127,9 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     <DataGridContext.Provider value={{ model, resultIndex }}>
       <DataGridSortingContext.Provider value={gridSortingContext}>
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
-          <DataGridTableContainer modelResultData={modelResultData} className={`cb-react-grid-theme ${className}`}>
+          <DataGridTableContainer modelResultData={modelResultData}>
             <DataGrid
+              className={`cb-react-grid-theme ${className}`}
               columns={columns}
               rows={rows}
               headerRowHeight={28}
