@@ -6,11 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { CachedResource } from './CachedResource';
 import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
+
+export type CachedMapResourceGetter<
+  TRealKey extends ResourceKey<TKey>,
+  TKey,
+  TValue
+> = TRealKey extends ResourceKeyList<TKey>
+  ? Array<TValue | undefined>
+  : TValue | undefined;
 
 @injectable()
 export abstract class CachedMapResource<TKey, TValue> extends CachedResource<
@@ -21,10 +31,23 @@ TKey
   readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
   readonly onItemDelete: IExecutor<ResourceKey<TKey>>;
 
+  get values(): TValue[] {
+    return Array.from(this.data.values());
+  }
+
+  get keys(): TKey[] {
+    return Array.from(this.data.keys());
+  }
+
   constructor(defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
     this.onItemAdd = new Executor(null, this.includes);
     this.onItemDelete = new Executor(null, this.includes);
+
+    makeObservable(this, {
+      values: computed,
+      keys: computed,
+    });
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
@@ -130,7 +153,7 @@ TKey
     return this.data.has(key);
   }
 
-  protected includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
+  includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
     return ResourceKeyUtils.includes(param, key);
   }
 }
