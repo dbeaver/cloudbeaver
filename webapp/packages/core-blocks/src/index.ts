@@ -48,6 +48,8 @@ export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './useClipboard';
 export * from './useFocus';
+export * from './useMapResource';
+export * from './useObjectRef';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useAppLoadingScreen';

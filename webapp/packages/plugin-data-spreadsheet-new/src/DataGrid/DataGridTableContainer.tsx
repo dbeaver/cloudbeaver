@@ -17,6 +17,7 @@ import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionC
 
 const styles = css`
   grid-container {
+    outline: 0;
     display: flex;
     flex-direction: column;
     flex: 1;

@@ -19,9 +19,12 @@ import {
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
   ObjectPropertyInfo,
-  ResourceKeyUtils
+  ResourceKeyUtils,
+  ConnectionInfo
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+
+import type { DBDriver } from '../DBDriverResource';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
@@ -188,6 +191,10 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
 
     this.set(id, connection);
   }
+}
+
+export function isJDBCConnection(driver?: DBDriver, connection?: ConnectionInfo): boolean {
+  return connection?.useUrl || !driver?.sampleURL || false;
 }
 
 export function isLocalConnection(connection: AdminConnection): boolean {
