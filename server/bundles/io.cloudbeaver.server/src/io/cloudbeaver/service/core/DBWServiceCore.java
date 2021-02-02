@@ -23,7 +23,6 @@ import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -44,7 +43,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebDatabaseAuthModel> getAuthModels(WebSession webSession);
 
     @WebAction
-    List<? extends DBWHandlerDescriptor> getNetworkHandlers(WebSession webSession);
+    List<WebNetworkHandlerDescriptor> getNetworkHandlers(WebSession webSession);
 
     @Deprecated
     @WebAction

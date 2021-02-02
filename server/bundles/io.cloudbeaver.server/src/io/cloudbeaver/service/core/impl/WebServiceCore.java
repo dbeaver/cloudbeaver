@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
@@ -82,8 +81,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<? extends DBWHandlerDescriptor> getNetworkHandlers(WebSession webSession) {
-        return NetworkHandlerRegistry.getInstance().getDescriptors();
+    public List<WebNetworkHandlerDescriptor> getNetworkHandlers(WebSession webSession) {
+        return NetworkHandlerRegistry.getInstance().getDescriptors().stream()
+            .map(d -> new WebNetworkHandlerDescriptor(webSession, d)).collect(Collectors.toList());
     }
 
     @Deprecated
