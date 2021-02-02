@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavigatorSettingsInput, ServerConfigInput } from '@cloudbeaver/core-sdk';
+import type { NavigatorSettingsInput, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 export interface IServerConfigurationPageState {
   serverConfig: ServerConfigInput;

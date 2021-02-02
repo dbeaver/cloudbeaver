@@ -1134,6 +1134,13 @@ export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: 
 
 export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionConnections'>;
 
+export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
+  id: Scalars['ID'];
+  settings: NavigatorSettingsInput;
+}>;
+
+export type SetConnectionNavigatorSettingsMutation = Pick<Mutation, 'setConnectionNavigatorSettings'>;
+
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetTemplateConnectionsQuery { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
@@ -1937,6 +1944,11 @@ export const RefreshSessionConnectionsDocument = `
   refreshSessionConnections
 }
     `;
+export const SetConnectionNavigatorSettingsDocument = `
+    mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
+  setConnectionNavigatorSettings(id: $id, settings: $settings)
+}
+    `;
 export const GetTemplateConnectionsDocument = `
     query getTemplateConnections {
   connections: templateConnections {
@@ -2516,6 +2528,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     refreshSessionConnections(variables?: RefreshSessionConnectionsMutationVariables): Promise<RefreshSessionConnectionsMutation> {
       return withWrapper(() => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables));
+    },
+    setConnectionNavigatorSettings(variables: SetConnectionNavigatorSettingsMutationVariables): Promise<SetConnectionNavigatorSettingsMutation> {
+      return withWrapper(() => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables));
     },
     getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));

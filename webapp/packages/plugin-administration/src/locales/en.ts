@@ -22,6 +22,8 @@ export default [
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable custom connections'],
+  ['administration_configuration_wizard_configuration_navigation_tree_view', 'Enable navigation tree simple view'],
+  ['administration_configuration_wizard_configuration_navigation_tree_view_description', "By default, all user's new connections will contain only basic information in navigation tree"],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create custom connections. Otherwise, all new connections can be created from the administration part only'],
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Hide Folders'],

@@ -22,6 +22,7 @@ export * from './shared/NavigationTabs/TabNavigationContext';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
 export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
+export * from './shared/NodesManager/NavNodeManagerService';
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/NavigationTreeService';

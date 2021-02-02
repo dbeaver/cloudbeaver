@@ -6,24 +6,32 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionViewService, CONNECTION_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
 
 @injectable()
 export class NavigationTreeContextMenuService {
   static nodeContextType = 'NodeWithParent';
+  private static nodeViewMenuItemToken = 'nodeView';
   private static menuToken = 'navTreeMenu';
 
   constructor(
     private contextMenuService: ContextMenuService,
-    private navNodeManagerService: NavNodeManagerService
+    private navNodeManagerService: NavNodeManagerService,
+    private connectionViewService: ConnectionViewService
   ) { }
 
   getMenuToken() {
     return NavigationTreeContextMenuService.menuToken;
+  }
+
+  getNodeViewMenuItemToken() {
+    return NavigationTreeContextMenuService.nodeViewMenuItemToken;
   }
 
   constructMenuWithContext(node: NavNode): IMenuPanel {
@@ -33,6 +41,52 @@ export class NavigationTreeContextMenuService {
       contextType: NavigationTreeContextMenuService.nodeContextType,
       data: node,
     });
+  }
+
+  registerNodeViewMenuItem() {
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.contextMenuService.getRootMenuToken(),
+      {
+        id: this.getNodeViewMenuItemToken(),
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+        },
+        order: 2,
+        title: 'app_navigationTree_connection_view',
+        isPanel: true,
+      }
+    );
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.getNodeViewMenuItemToken(),
+      {
+        id: 'simple',
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+        },
+        onClick: context => {
+          const node = context.data;
+          this.connectionViewService.changeConnectionView(node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+        },
+        title: 'app_navigationTree_connection_view_simple_option',
+      }
+    );
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.getNodeViewMenuItemToken(),
+      {
+        id: 'advanced',
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+        },
+        title: 'app_navigationTree_connection_view_advanced_option',
+        onClick: context => {
+          const node = context.data;
+          this.connectionViewService.changeConnectionView(node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
+        },
+      }
+    );
   }
 
   registerMenuItems() {
@@ -67,5 +121,7 @@ export class NavigationTreeContextMenuService {
         },
       }
     );
+
+    this.registerNodeViewMenuItem();
   }
 }
