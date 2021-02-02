@@ -152,8 +152,7 @@ export class ServerConfigurationService {
           customConnectionsEnabled: true,
           sessionExpireTime: 30,
         },
-        navigatorConfig: CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced,
-
+        navigatorConfig: { ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced },
       };
     }
 
@@ -165,7 +164,7 @@ export class ServerConfigurationService {
         customConnectionsEnabled: config.supportsCustomConnections,
         sessionExpireTime: (config.sessionExpireTime ?? 1800000) / 1000 / 60,
       },
-      navigatorConfig: config.defaultNavigatorSettings,
+      navigatorConfig: { ...config.defaultNavigatorSettings },
     };
   }
 }

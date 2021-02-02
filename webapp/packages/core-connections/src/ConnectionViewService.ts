@@ -6,29 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NavNodeManagerService, NodeManagerUtils } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
+
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
 
 @injectable()
 export class ConnectionViewService {
   constructor(
     private graphQLService: GraphQLService,
-    private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService
   ) { }
 
-  async changeConnectionView(nodeId: string, settings: NavigatorSettingsInput): Promise<void> {
-    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
+  async changeConnectionView(connectionId: string, simple: boolean): Promise<void> {
+    const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
 
     try {
       await this.graphQLService.sdk.setConnectionNavigatorSettings({
         id: connectionId,
         settings,
       });
-
-      await this.navNodeManagerService.refreshTree(nodeId);
     } catch (exception) {
       this.notificationService.logException(exception);
     }

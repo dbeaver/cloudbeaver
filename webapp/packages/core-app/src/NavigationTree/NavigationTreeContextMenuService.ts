@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionViewService, CONNECTION_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
+import { ConnectionViewService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerService';
+import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 
 @injectable()
 export class NavigationTreeContextMenuService {
@@ -43,6 +44,12 @@ export class NavigationTreeContextMenuService {
     });
   }
 
+  private async onNodeViewOptionMenuItemClick(nodeId: string, simple: boolean) {
+    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
+    await this.connectionViewService.changeConnectionView(connectionId, simple);
+    await this.navNodeManagerService.refreshTree(nodeId);
+  }
+
   registerNodeViewMenuItem() {
     this.contextMenuService.addMenuItem<NavNode>(
       this.contextMenuService.getRootMenuToken(),
@@ -61,30 +68,24 @@ export class NavigationTreeContextMenuService {
       this.getNodeViewMenuItemToken(),
       {
         id: 'simple',
+        title: 'app_navigationTree_connection_view_option_simple',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        onClick: context => {
-          const node = context.data;
-          this.connectionViewService.changeConnectionView(node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
-        },
-        title: 'app_navigationTree_connection_view_simple_option',
+        onClick: async context => await this.onNodeViewOptionMenuItemClick(context.data.id, true),
       }
     );
     this.contextMenuService.addMenuItem<NavNode>(
       this.getNodeViewMenuItemToken(),
       {
         id: 'advanced',
+        title: 'app_navigationTree_connection_view_option_advanced',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        title: 'app_navigationTree_connection_view_advanced_option',
-        onClick: context => {
-          const node = context.data;
-          this.connectionViewService.changeConnectionView(node.id, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
-        },
+        onClick: async context => await this.onNodeViewOptionMenuItemClick(context.data.id, false),
       }
     );
   }
