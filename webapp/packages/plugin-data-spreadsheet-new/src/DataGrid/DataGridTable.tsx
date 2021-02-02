@@ -111,7 +111,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
     const columns: Array<Column<any[], any>> = (modelResultData.data as SqlResultSet).columns!.map((col, i) => ({
       key: i + '',
-      name: col.name!,
+      name: col.label!,
       width: Math.min(300, measuredCells[i]),
       minWidth: 40,
       resizable: true,
