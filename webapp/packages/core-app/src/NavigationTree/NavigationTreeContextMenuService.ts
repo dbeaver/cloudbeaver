@@ -9,6 +9,7 @@
 import { ConnectionViewService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
@@ -24,7 +25,8 @@ export class NavigationTreeContextMenuService {
   constructor(
     private contextMenuService: ContextMenuService,
     private navNodeManagerService: NavNodeManagerService,
-    private connectionViewService: ConnectionViewService
+    private connectionViewService: ConnectionViewService,
+    private notificationService: NotificationService
   ) { }
 
   getMenuToken() {
@@ -44,10 +46,15 @@ export class NavigationTreeContextMenuService {
     });
   }
 
-  private async onNodeViewOptionMenuItemClick(nodeId: string, simple: boolean) {
+  private async changeConnectionView(nodeId: string, simple: boolean) {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
-    await this.connectionViewService.changeConnectionView(connectionId, simple);
-    await this.navNodeManagerService.refreshTree(nodeId);
+
+    try {
+      await this.connectionViewService.changeConnectionView(connectionId, simple);
+      await this.navNodeManagerService.refreshTree(nodeId);
+    } catch (exception) {
+      this.notificationService.logException(exception);
+    }
   }
 
   registerNodeViewMenuItem() {
@@ -73,7 +80,7 @@ export class NavigationTreeContextMenuService {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        onClick: async context => await this.onNodeViewOptionMenuItemClick(context.data.id, true),
+        onClick: async context => await this.changeConnectionView(context.data.id, true),
       }
     );
     this.contextMenuService.addMenuItem<NavNode>(
@@ -85,7 +92,7 @@ export class NavigationTreeContextMenuService {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        onClick: async context => await this.onNodeViewOptionMenuItemClick(context.data.id, false),
+        onClick: async context => await this.changeConnectionView(context.data.id, false),
       }
     );
   }

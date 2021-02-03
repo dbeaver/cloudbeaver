@@ -7,7 +7,6 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
@@ -16,19 +15,14 @@ import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSet
 export class ConnectionViewService {
   constructor(
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService
   ) { }
 
   async changeConnectionView(connectionId: string, simple: boolean): Promise<void> {
     const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
 
-    try {
-      await this.graphQLService.sdk.setConnectionNavigatorSettings({
-        id: connectionId,
-        settings,
-      });
-    } catch (exception) {
-      this.notificationService.logException(exception);
-    }
+    await this.graphQLService.sdk.setConnectionNavigatorSettings({
+      id: connectionId,
+      settings,
+    });
   }
 }
