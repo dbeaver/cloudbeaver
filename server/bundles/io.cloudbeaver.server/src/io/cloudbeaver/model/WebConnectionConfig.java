@@ -20,6 +20,8 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +52,7 @@ public class WebConnectionConfig {
     private Map<String, Object> credentials;
     private boolean saveCredentials;
     private Map<String, Object> providerProperties;
-    private Map<String, Object> networkHandlersConfig;
+    private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
 
     public WebConnectionConfig() {
     }
@@ -86,7 +88,11 @@ public class WebConnectionConfig {
             saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
 
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
-            networkHandlersConfig = JSONUtils.getObjectOrNull(params, "networkHandlersConfig");
+
+            networkHandlersConfig = new ArrayList<>();
+            for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
+                networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
+            }
         }
     }
 
@@ -175,8 +181,7 @@ public class WebConnectionConfig {
         return credentials;
     }
 
-    @Property
-    public Map<String, Object> getNetworkHandlersConfig() {
+    public List<WebNetworkHandlerConfigInput> getNetworkHandlersConfig() {
         return networkHandlersConfig;
     }
 

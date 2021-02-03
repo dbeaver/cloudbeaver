@@ -260,6 +260,46 @@ type ObjectOrigin {
     details: [ObjectPropertyInfo!]
 }
 
+type NavigatorSettings {
+    showSystemObjects: Boolean!
+    showUtilityObjects: Boolean!
+    showOnlyEntities: Boolean!
+    mergeEntities: Boolean!
+    hideFolders: Boolean!
+    hideSchemas: Boolean!
+    hideVirtualModel: Boolean!
+}
+
+type LogEntry {
+    time: DateTime
+    type: String!
+    message: String
+    stackTrace: String
+}
+
+####################################################
+# Input types
+####################################################
+
+input NavigatorSettingsInput {
+    showSystemObjects: Boolean!
+    showUtilityObjects: Boolean!
+    showOnlyEntities: Boolean!
+    mergeEntities: Boolean!
+    hideFolders: Boolean!
+    hideSchemas: Boolean!
+    hideVirtualModel: Boolean!
+}
+
+input NetworkHandlerConfigInput {
+    id: ID!
+    enabled: Boolean
+    userName: String
+    password: String
+    savePassword: Boolean
+    properties: Object
+}
+
 # Configuration of particular connection. Used for new connection create. Includes auth info
 input ConnectionConfig {
     # used only for testing created connection
@@ -299,7 +339,7 @@ input ConnectionConfig {
 
     # Network handlers. Map of id->property map (name/value).
 
-    networkHandlersConfig: [Object!]
+    networkHandlersConfig: [NetworkHandlerConfigInput]
 
     #### deprecated fields
 
@@ -309,33 +349,6 @@ input ConnectionConfig {
     # Direct user credentials
     userName: String #@deprecated
     userPassword: String #@deprecated
-}
-
-type NavigatorSettings {
-    showSystemObjects: Boolean!
-    showUtilityObjects: Boolean!
-    showOnlyEntities: Boolean!
-    mergeEntities: Boolean!
-    hideFolders: Boolean!
-    hideSchemas: Boolean!
-    hideVirtualModel: Boolean!
-}
-
-input NavigatorSettingsInput {
-    showSystemObjects: Boolean!
-    showUtilityObjects: Boolean!
-    showOnlyEntities: Boolean!
-    mergeEntities: Boolean!
-    hideFolders: Boolean!
-    hideSchemas: Boolean!
-    hideVirtualModel: Boolean!
-}
-
-type LogEntry {
-    time: DateTime
-    type: String!
-    message: String
-    stackTrace: String
 }
 
 ####################################################
