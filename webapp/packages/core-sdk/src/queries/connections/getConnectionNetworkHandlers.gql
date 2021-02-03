@@ -1,0 +1,12 @@
+query getConnectionNetworkHandlers($connectionId: ID!) {
+  connection: connectionInfo(id: $connectionId) {
+    networkHandlersConfig {
+      id
+      enabled
+      userName
+      password
+      savePassword
+      properties
+    }
+  }
+}

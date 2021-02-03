@@ -21,6 +21,7 @@ export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './DatabaseAuthModelsResource';
 export * from './DBDriverResource';
+export * from './NetworkHandlerResource';
 export * from './useConnectionInfo';
 export * from './useDBDriver';
 export * from './getUniqueConnectionName';

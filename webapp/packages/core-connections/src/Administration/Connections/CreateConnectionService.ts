@@ -11,7 +11,7 @@ import { computed, observable, makeObservable } from 'mobx';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionGrantInfo, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { DBDriver, DBDriverResource } from '../../DBDriverResource';
 import type { AdminConnection } from '../ConnectionsResource';
@@ -31,6 +31,7 @@ export class CreateConnectionService {
   availableDrivers: string[];
   credentials: Record<string, string | number>;
   grantedSubjects: AdminConnectionGrantInfo[] | null;
+  networkHandlersState: NetworkHandlerConfigInput[];
 
   get driver(): DBDriver | undefined {
     if (!this.connection?.driverId) {
@@ -53,11 +54,13 @@ export class CreateConnectionService {
       availableDrivers: observable,
       credentials: observable,
       grantedSubjects: observable,
+      networkHandlersState: observable,
       driver: computed,
     });
 
     this.credentials = {};
     this.availableDrivers = [];
+    this.networkHandlersState = [];
     this.grantedSubjects = null;
     this.connection = null;
     this.tabsContainer = new TabsContainer();

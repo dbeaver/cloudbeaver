@@ -27,6 +27,15 @@ fragment AdminConnection on ConnectionInfo {
   authProperties {
     ...UserConnectionAuthProperties
   }
+  
+  networkHandlersConfig {
+    id
+    enabled
+    userName
+    password
+    savePassword
+    properties
+  }
 
   features
   supportedDataFormats

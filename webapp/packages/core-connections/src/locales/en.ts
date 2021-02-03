@@ -32,6 +32,13 @@ export default [
   ['connections_connection_test_fail', 'Connection test failed'],
   ['connections_connection_create_fail', 'Fail to create connection'],
   ['connections_connection_save_fail', 'Fail to save connection'],
+  ['connections_network_handler_ssh_tunnel_title', 'SSH Tunnel'],
+  ['connections_network_handler_ssh_tunnel_enable', 'Use SSH Tunnel'],
+  ['connections_network_handler_ssh_tunnel_host', 'Host'],
+  ['connections_network_handler_ssh_tunnel_port', 'Port'],
+  ['connections_network_handler_ssh_tunnel_user', 'User'],
+  ['connections_network_handler_ssh_tunnel_password', 'Password'],
+  ['connections_network_handler_ssh_tunnel_save_password', 'Save Password'],
   ['connections_driver_search_placeholder', 'Type driver name...'],
   ['connections_not_found', 'No database connections were found'],
 ];

@@ -16,6 +16,9 @@ import { DriverProperties } from './DriverProperties/DriverProperties';
 import { Options } from './Options/Options';
 import { OriginInfo } from './OriginInfo/OriginInfo';
 import { OriginInfoTab } from './OriginInfo/OriginInfoTab';
+import { SSH } from './SSH/SSH';
+import { SSH_TUNNEL_ID } from './SSH/SSH_TUNNEL_ID';
+import { SSHTab } from './SSH/SSHTab';
 
 @injectable()
 export class ConnectionFormBaseBootstrap extends Bootstrap {
@@ -39,6 +42,13 @@ export class ConnectionFormBaseBootstrap extends Bootstrap {
       order: 2,
       panel: () => DriverProperties,
       isDisabled: (tabId, props) => !props?.controller.driver,
+    });
+    this.connectionFormService.tabsContainer.add({
+      key: 'ssh',
+      order: 3,
+      panel: () => SSH,
+      tab: () => SSHTab,
+      isHidden: (tabId, props) => !props?.controller.driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID),
     });
     this.connectionFormService.tabsContainer.add({
       key: 'origin',

@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionGrantInfo, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import type { AdminConnection } from '../../ConnectionsResource';
 
 export interface IConnectionFormModel {
   connection: AdminConnection;
+  networkHandlersState: NetworkHandlerConfigInput[];
   credentials: Record<string, string | number>;
   grantedSubjects: AdminConnectionGrantInfo[] | null;
   availableDrivers: string[];

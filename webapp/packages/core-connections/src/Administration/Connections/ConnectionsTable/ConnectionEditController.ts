@@ -12,7 +12,7 @@ import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, ResourceKeyUtils, ResourceKey } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, ResourceKeyUtils, ResourceKey, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { DatabaseAuthModelsResource } from '../../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../../DBDriverResource';
@@ -25,6 +25,7 @@ implements IInitializableController, IDestructibleController {
   isLoading = true;
   credentials: Record<string, string> = {};
   connection: AdminConnection | null = null;
+  networkHandlersState: NetworkHandlerConfigInput[] = [];
 
   get isDisabled() {
     return this.isLoading;
@@ -60,6 +61,7 @@ implements IInitializableController, IDestructibleController {
       isLoading: observable,
       credentials: observable,
       connection: observable,
+      networkHandlersState: observable,
       isDisabled: computed,
       driver: computed,
       availableDrivers: computed,

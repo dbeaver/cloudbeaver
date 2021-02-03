@@ -20,7 +20,8 @@ import {
   AdminConnectionSearchInfo,
   ObjectPropertyInfo,
   ResourceKeyUtils,
-  ConnectionInfo
+  ConnectionInfo,
+  NetworkHandlerConfig
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
@@ -74,6 +75,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
         type: 'local',
         displayName: 'Local',
       },
+      networkHandlersConfig: [],
     } as Partial<AdminConnection> as any;
   }
 
@@ -140,6 +142,11 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     const { subjects } = await this.graphQLService.sdk.getConnectionAccess({ connectionId });
 
     return subjects;
+  }
+
+  async loadNetworkHandlers(connectionId: string): Promise<NetworkHandlerConfig[]> {
+    const { connection } = await this.graphQLService.sdk.getConnectionNetworkHandlers({ connectionId });
+    return connection.networkHandlersConfig;
   }
 
   async loadOrigin(connectionId: string): Promise<ObjectPropertyInfo[]> {

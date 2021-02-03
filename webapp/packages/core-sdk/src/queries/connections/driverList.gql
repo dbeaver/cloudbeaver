@@ -15,5 +15,6 @@ query driverList {
 
     defaultAuthModel
     # applicableAuthModel
+    applicableNetworkHandlers
   }
 }

@@ -44,6 +44,9 @@ const switchStyles = composes(
     field label {
       width: auto;
     }
+    switch-control {
+      margin-left: 2px;
+    }
   `
 );
 

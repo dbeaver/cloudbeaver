@@ -29,6 +29,7 @@ DriverInfo,
 | 'anonymousAccess'
 | 'promotedScore'
 | 'defaultAuthModel'
+| 'applicableNetworkHandlers'
 >;
 
 @injectable()

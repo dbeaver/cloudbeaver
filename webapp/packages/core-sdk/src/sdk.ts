@@ -578,6 +578,42 @@ export interface ObjectOrigin {
   details?: Maybe<ObjectPropertyInfo[]>;
 }
 
+export interface NavigatorSettings {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
+}
+
+export interface LogEntry {
+  time?: Maybe<Scalars['DateTime']>;
+  type: Scalars['String'];
+  message?: Maybe<Scalars['String']>;
+  stackTrace?: Maybe<Scalars['String']>;
+}
+
+export interface NavigatorSettingsInput {
+  showSystemObjects: Scalars['Boolean'];
+  showUtilityObjects: Scalars['Boolean'];
+  showOnlyEntities: Scalars['Boolean'];
+  mergeEntities: Scalars['Boolean'];
+  hideFolders: Scalars['Boolean'];
+  hideSchemas: Scalars['Boolean'];
+  hideVirtualModel: Scalars['Boolean'];
+}
+
+export interface NetworkHandlerConfigInput {
+  id: Scalars['ID'];
+  enabled?: Maybe<Scalars['Boolean']>;
+  userName?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  savePassword?: Maybe<Scalars['Boolean']>;
+  properties?: Maybe<Scalars['Object']>;
+}
+
 export interface ConnectionConfig {
   connectionId?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
@@ -595,37 +631,10 @@ export interface ConnectionConfig {
   authModelId?: Maybe<Scalars['ID']>;
   credentials?: Maybe<Scalars['Object']>;
   providerProperties?: Maybe<Scalars['Object']>;
-  networkHandlersConfig?: Maybe<Array<Scalars['Object']>>;
+  networkHandlersConfig?: Maybe<NetworkHandlerConfigInput[]>;
   dataSourceId?: Maybe<Scalars['ID']>;
   userName?: Maybe<Scalars['String']>;
   userPassword?: Maybe<Scalars['String']>;
-}
-
-export interface NavigatorSettings {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
-  hideFolders: Scalars['Boolean'];
-  hideSchemas: Scalars['Boolean'];
-  hideVirtualModel: Scalars['Boolean'];
-}
-
-export interface NavigatorSettingsInput {
-  showSystemObjects: Scalars['Boolean'];
-  showUtilityObjects: Scalars['Boolean'];
-  showOnlyEntities: Scalars['Boolean'];
-  mergeEntities: Scalars['Boolean'];
-  hideFolders: Scalars['Boolean'];
-  hideSchemas: Scalars['Boolean'];
-  hideVirtualModel: Scalars['Boolean'];
-}
-
-export interface LogEntry {
-  time?: Maybe<Scalars['DateTime']>;
-  type: Scalars['String'];
-  message?: Maybe<Scalars['String']>;
-  stackTrace?: Maybe<Scalars['String']>;
 }
 
 export interface ObjectDescriptor {
@@ -1088,7 +1097,7 @@ export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
 
 export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface DriverListQuery { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel'>> }
+export interface DriverListQuery { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers'>> }
 
 export type DriverPropertiesQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -1109,6 +1118,12 @@ export interface GetAuthModelsQuery {
     & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'validValues' | 'defaultValue' | 'features' | 'order'>> }
   )>;
 }
+
+export type GetConnectionNetworkHandlersQueryVariables = Exact<{
+  connectionId: Scalars['ID'];
+}>;
+
+export interface GetConnectionNetworkHandlersQuery { connection: { networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> } }
 
 export type GetConnectionOriginDetailsQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1202,7 +1217,7 @@ export interface NavGetStructContainersQuery { navGetStructContainers: { catalog
 
 export type AdminConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
-  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[] }
+  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> }
 );
 
 export type AdminUserInfoFragment = (
@@ -1225,6 +1240,8 @@ export type UserConnectionFragment = Pick<ConnectionInfo, 'id' | 'name' | 'descr
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
 
+export type UserConnectionNetworkHandlerPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'order' | 'features'>;
+
 export type GetAsyncTaskInfoMutationVariables = Exact<{
   taskId: Scalars['String'];
   removeOnFinish: Scalars['Boolean'];
@@ -1235,6 +1252,15 @@ export interface GetAsyncTaskInfoMutation {
     Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
     & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
   );
+}
+
+export type GetNetworkHandlersQueryVariables = Exact<{ [key: string]: never }>;
+
+export interface GetNetworkHandlersQuery {
+  handlers: Array<(
+    Pick<NetworkHandlerDescriptor, 'id' | 'codeName' | 'label' | 'description' | 'secured' | 'type'>
+    & { properties: UserConnectionNetworkHandlerPropertiesFragment[] }
+  )>;
 }
 
 export type AsyncReadDataFromContainerMutationVariables = Exact<{
@@ -1523,6 +1549,14 @@ export const AdminConnectionFragmentDoc = `
   authProperties {
     ...UserConnectionAuthProperties
   }
+  networkHandlersConfig {
+    id
+    enabled
+    userName
+    password
+    savePassword
+    properties
+  }
   features
   supportedDataFormats
 }
@@ -1588,6 +1622,20 @@ export const UserConnectionFragmentDoc = `
   authModel
   features
   supportedDataFormats
+}
+    `;
+export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
+    fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  order
+  features
 }
     `;
 export const AsyncTaskCancelDocument = `
@@ -1859,6 +1907,7 @@ export const DriverListDocument = `
     anonymousAccess
     promotedScore
     defaultAuthModel
+    applicableNetworkHandlers
   }
 }
     `;
@@ -1895,6 +1944,20 @@ export const GetAuthModelsDocument = `
       defaultValue
       features
       order
+    }
+  }
+}
+    `;
+export const GetConnectionNetworkHandlersDocument = `
+    query getConnectionNetworkHandlers($connectionId: ID!) {
+  connection: connectionInfo(id: $connectionId) {
+    networkHandlersConfig {
+      id
+      enabled
+      userName
+      password
+      savePassword
+      properties
     }
   }
 }
@@ -2075,6 +2138,21 @@ export const GetAsyncTaskInfoDocument = `
   }
 }
     `;
+export const GetNetworkHandlersDocument = `
+    query getNetworkHandlers {
+  handlers: networkHandlers {
+    id
+    codeName
+    label
+    description
+    secured
+    type
+    properties {
+      ...UserConnectionNetworkHandlerProperties
+    }
+  }
+}
+    ${UserConnectionNetworkHandlerPropertiesFragmentDoc}`;
 export const AsyncReadDataFromContainerDocument = `
     mutation asyncReadDataFromContainer($connectionId: ID!, $contextId: ID!, $containerNodePath: ID!, $filter: SQLDataFilter, $dataFormat: ResultDataFormat) {
   taskInfo: asyncReadDataFromContainer(
@@ -2517,6 +2595,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
       return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
     },
+    getConnectionNetworkHandlers(variables: GetConnectionNetworkHandlersQueryVariables): Promise<GetConnectionNetworkHandlersQuery> {
+      return withWrapper(() => client.request<GetConnectionNetworkHandlersQuery>(GetConnectionNetworkHandlersDocument, variables));
+    },
     getConnectionOriginDetails(variables: GetConnectionOriginDetailsQueryVariables): Promise<GetConnectionOriginDetailsQuery> {
       return withWrapper(() => client.request<GetConnectionOriginDetailsQuery>(GetConnectionOriginDetailsDocument, variables));
     },
@@ -2555,6 +2636,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables): Promise<GetAsyncTaskInfoMutation> {
       return withWrapper(() => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables));
+    },
+    getNetworkHandlers(variables?: GetNetworkHandlersQueryVariables): Promise<GetNetworkHandlersQuery> {
+      return withWrapper(() => client.request<GetNetworkHandlersQuery>(GetNetworkHandlersDocument, variables));
     },
     asyncReadDataFromContainer(variables: AsyncReadDataFromContainerMutationVariables): Promise<AsyncReadDataFromContainerMutation> {
       return withWrapper(() => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables));

@@ -1,0 +1,13 @@
+query getNetworkHandlers {
+  handlers: networkHandlers {
+    id
+    codeName
+    label
+    description
+    secured
+    type
+    properties {
+      ...UserConnectionNetworkHandlerProperties
+    }
+  }
+}

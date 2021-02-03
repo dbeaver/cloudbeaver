@@ -53,7 +53,7 @@ implements IInitializableController {
   constructor(
     private connectionsResource: ConnectionsResource,
     private notificationService: NotificationService,
-    private dbDriverResource: DBDriverResource
+    private dbDriverResource: DBDriverResource,
   ) {
     makeObservable(this, {
       isSaving: observable,
@@ -171,6 +171,7 @@ implements IInitializableController {
     if (Object.keys(this.model.connection.properties).length > 0) {
       config.properties = this.model.connection.properties;
     }
+    config.networkHandlersConfig = this.model.networkHandlersState;
 
     return config;
   }

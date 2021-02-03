@@ -31,6 +31,13 @@ export default [
   ['connections_connection_test_fail', 'Не удалось выполнить подключение'],
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
+  ['connections_network_handler_ssh_tunnel_title', 'SSH Тунель'],
+  ['connections_network_handler_ssh_tunnel_enable', 'Использовать SSH Тунель'],
+  ['connections_network_handler_ssh_tunnel_host', 'Хост'],
+  ['connections_network_handler_ssh_tunnel_port', 'Порт'],
+  ['connections_network_handler_ssh_tunnel_user', 'Пользователь'],
+  ['connections_network_handler_ssh_tunnel_password', 'Пароль'],
+  ['connections_network_handler_ssh_tunnel_save_password', 'Сохранить пароль'],
   ['connections_driver_search_placeholder', 'Введите название драйвера...'],
   ['connections_not_found', 'Подключения к базам данных не найдены'],
 ];

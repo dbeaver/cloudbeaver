@@ -1,0 +1,12 @@
+fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  order
+  features
+}

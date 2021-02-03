@@ -13,6 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
+import { NetworkHandlerResource } from '../../NetworkHandlerResource';
 import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
@@ -30,7 +31,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private connectionsResource: ConnectionsResource,
     private dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
-    private connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly networkHandlerResource: NetworkHandlerResource
   ) {
     super();
   }
@@ -83,6 +85,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     try {
       await this.connectionsResource.loadAll();
       await this.dbDriverResource.loadAll();
+      await this.networkHandlerResource.loadAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Error occurred while loading connections');
     }
