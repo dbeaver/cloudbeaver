@@ -19,7 +19,7 @@ type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   selectedId?: string;
   orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
-  container?: TabsContainer<T>;
+  container?: TabsContainer<T, any>;
   localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
@@ -49,6 +49,8 @@ export function TabsState<T = Record<string, any>>({
     selectedId = container.tabInfoList[0].key;
   }
 
+  // TODO: according react documentation fallback local state should be placed in another useState
+  //       to avoid memory release from useMemo()
   const tabsState = useMemo(() => localState || new MetadataMap<string, any>(), [localState]);
   const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());

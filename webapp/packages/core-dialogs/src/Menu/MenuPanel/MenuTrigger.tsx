@@ -71,7 +71,7 @@ const MenuPanel = observer(function MenuPanel({
   }
 
   return styled(styles)(
-    <Menu {...menu} aria-label={panel.id}>
+    <Menu {...menu} aria-label={panel.id} modal>
       {panel.menuItems.map(item => (
         <MenuPanelElement key={item.id} item={item} menu={menu} style={style} />
       ))}
