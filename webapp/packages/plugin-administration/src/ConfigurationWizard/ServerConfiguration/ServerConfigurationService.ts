@@ -10,6 +10,7 @@ import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
@@ -130,8 +131,8 @@ export class ServerConfigurationService {
     }
     if (this.administrationScreenService.isConfigurationMode) {
       if (!this.state.serverConfig.adminName
-      || this.state.serverConfig.adminName.length < 6
-      || !this.state.serverConfig.adminPassword
+        || this.state.serverConfig.adminName.length < 6
+        || !this.state.serverConfig.adminPassword
       ) {
         return false;
       }
@@ -151,15 +152,7 @@ export class ServerConfigurationService {
           customConnectionsEnabled: true,
           sessionExpireTime: 30,
         },
-        navigatorConfig: {
-          hideFolders: false,
-          hideSchemas: false,
-          hideVirtualModel: false,
-          mergeEntities: false,
-          showOnlyEntities: false,
-          showSystemObjects: false,
-          showUtilityObjects: false,
-        },
+        navigatorConfig: { ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced },
       };
     }
 
@@ -171,15 +164,7 @@ export class ServerConfigurationService {
         customConnectionsEnabled: config.supportsCustomConnections,
         sessionExpireTime: (config.sessionExpireTime ?? 1800000) / 1000 / 60,
       },
-      navigatorConfig: {
-        hideFolders: false,
-        hideSchemas: false,
-        hideVirtualModel: false,
-        mergeEntities: false,
-        showOnlyEntities: false,
-        showSystemObjects: false,
-        showUtilityObjects: false,
-      },
+      navigatorConfig: { ...config.defaultNavigatorSettings },
     };
   }
 }

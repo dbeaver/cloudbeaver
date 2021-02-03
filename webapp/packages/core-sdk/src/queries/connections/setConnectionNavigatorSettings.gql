@@ -1,0 +1,3 @@
+mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
+  setConnectionNavigatorSettings(id: $id, settings: $settings)
+}

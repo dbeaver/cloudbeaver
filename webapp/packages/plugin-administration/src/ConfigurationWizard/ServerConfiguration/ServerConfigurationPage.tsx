@@ -19,6 +19,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { ServerConfigurationAdminForm } from './Form/ServerConfigurationAdminForm';
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
+import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
@@ -111,6 +112,7 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
                   </FormBoxElement>
                   <FormBoxElement>
                     <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
+                    <ServerConfigurationNavigatorViewForm configs={controller.state} />
                   </FormBoxElement>
                 </FormBox>
               </>
