@@ -46,7 +46,6 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 const indexColumn: Column<any[], any> = {
   key: Number.MAX_SAFE_INTEGER + '',
   name: '#',
-  headerCellClass: 'cell-index-column-name',
   minWidth: 60,
   width: 60,
   resizable: false,
