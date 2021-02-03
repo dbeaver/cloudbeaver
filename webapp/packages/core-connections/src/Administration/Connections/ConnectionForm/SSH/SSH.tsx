@@ -24,7 +24,9 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
     const config = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
     model.networkHandlersState.push({
       id: SSH_TUNNEL_ID,
-      properties: {},
+      properties: {
+        port: 22,
+      },
       ...config,
     });
   }
@@ -49,8 +51,20 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   return (
     <SubmittingForm onSubmit={controller.save}>
       <FormBox>
-        <FormBoxElement>
+        <FormBoxElement max>
           <FormGroup><br /></FormGroup>
+          <FormGroup>
+            <Switch
+              name="enabled"
+              state={state}
+              mod={['primary']}
+              disabled={disabled}
+            >
+              {translate('connections_network_handler_ssh_tunnel_enable')}
+            </Switch>
+          </FormGroup>
+        </FormBoxElement>
+        <FormBoxElement>
           <FormGroup>
             <InputField
               type="text"
@@ -64,7 +78,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
           </FormGroup>
           <FormGroup>
             <InputField
-              type="text"
+              type="number"
               name="port"
               state={state.properties}
               disabled={disabled || !enabled}
@@ -73,19 +87,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               {translate('connections_network_handler_ssh_tunnel_port')}
             </InputField>
           </FormGroup>
-          <FormGroup>
-            <Switch
-              name="enabled"
-              state={state}
-              mod={['primary']}
-              disabled={disabled}
-            >
-              {translate('connections_network_handler_ssh_tunnel_enable')}
-            </Switch>
-          </FormGroup>
         </FormBoxElement>
         <FormBoxElement>
-          <FormGroup><br /></FormGroup>
           <FormGroup>
             <InputField
               type="text"
@@ -101,6 +104,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
             <InputField
               type="text"
               name="password"
+              placeholder={model.editing && state.savePassword ? '••••••' : ''}
               state={state}
               disabled={disabled || !enabled}
               mod='surface'

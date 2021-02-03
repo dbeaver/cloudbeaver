@@ -123,6 +123,7 @@ export class CreateConnectionService {
   clearConnectionTemplate(): void {
     this.connection = null;
     this.availableDrivers = [];
+    this.networkHandlersState = [];
     this.credentials = {};
     this.grantedSubjects = null;
   }
