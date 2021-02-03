@@ -339,7 +339,7 @@ input ConnectionConfig {
 
     # Network handlers. Map of id->property map (name/value).
 
-    networkHandlersConfig: [NetworkHandlerConfigInput]
+    networkHandlersConfig: [NetworkHandlerConfigInput!]
 
     #### deprecated fields
 
