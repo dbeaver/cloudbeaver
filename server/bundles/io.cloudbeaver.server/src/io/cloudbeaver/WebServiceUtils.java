@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
@@ -36,12 +37,15 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
@@ -178,6 +182,43 @@ public class WebServiceUtils {
             for (Map.Entry<String, Object> e : config.getProviderProperties().entrySet()) {
                 dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
             }
+        }
+        // Save network handlers
+        if (config.getNetworkHandlersConfig() != null) {
+            for (WebNetworkHandlerConfigInput nhc : config.getNetworkHandlersConfig()) {
+                DBWHandlerConfiguration handlerConfig = dsConfig.getHandler(nhc.getId());
+                if (handlerConfig == null) {
+                    NetworkHandlerDescriptor handlerDescriptor = NetworkHandlerRegistry.getInstance().getDescriptor(nhc.getId());
+                    if (handlerDescriptor == null) {
+                        log.warn("Can't find network handler '" + nhc.getId() + "'");
+                        continue;
+                    } else {
+                        handlerConfig = new DBWHandlerConfiguration(handlerDescriptor, null);
+                        updateHandlerConfig(handlerConfig, nhc);
+                    }
+                } else {
+                    updateHandlerConfig(handlerConfig, nhc);
+                }
+                dsConfig.updateHandler(handlerConfig);
+            }
+        }
+    }
+
+    private static void updateHandlerConfig(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
+        if (cfgInput.isEnabled() != null) {
+            handlerConfig.setEnabled(cfgInput.isEnabled());
+        }
+        if (cfgInput.isSavePassword() != null) {
+            handlerConfig.setSavePassword(cfgInput.isSavePassword());
+        }
+        if (cfgInput.getUserName() != null) {
+            handlerConfig.setUserName(cfgInput.getUserName());
+        }
+        if (cfgInput.getPassword() != null) {
+            handlerConfig.setPassword(cfgInput.getPassword());
+        }
+        if (cfgInput.getProperties() != null) {
+            handlerConfig.setProperties(cfgInput.getProperties());
         }
     }
 

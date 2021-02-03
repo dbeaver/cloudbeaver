@@ -37,14 +37,6 @@ public class WebNetworkHandlerConfigInput {
         return CommonUtils.valueOf(DBWHandlerType.class, JSONUtils.getString(cfg, "type"), null);
     }
 
-    public Boolean isSecured() {
-        if (cfg.containsKey("secured")) {
-            return JSONUtils.getBoolean(cfg, "secured");
-        } else {
-            return null;
-        }
-    }
-
     public String getId() {
         return JSONUtils.getString(cfg, "id");
     }
