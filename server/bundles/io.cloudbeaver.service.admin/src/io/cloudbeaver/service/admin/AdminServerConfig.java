@@ -35,6 +35,8 @@ public class AdminServerConfig {
     private boolean anonymousAccessEnabled;
     private boolean authenticationEnabled;
     private boolean customConnectionsEnabled;
+    private boolean publicCredentialsSaveEnabled;
+    private boolean adminCredentialsSaveEnabled;
 
     private long sessionExpireTime;
 
@@ -47,6 +49,8 @@ public class AdminServerConfig {
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
         this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled", appConfig.isAuthenticationEnabled());
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
+        this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+        this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
         this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
     }
@@ -79,24 +83,20 @@ public class AdminServerConfig {
         return anonymousAccessEnabled;
     }
 
-    public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
-        this.anonymousAccessEnabled = anonymousAccessEnabled;
-    }
-
     public boolean isAuthenticationEnabled() {
         return authenticationEnabled;
-    }
-
-    public void setAuthenticationEnabled(boolean authenticationEnabled) {
-        this.authenticationEnabled = authenticationEnabled;
     }
 
     public boolean isCustomConnectionsEnabled() {
         return customConnectionsEnabled;
     }
 
-    public void setCustomConnectionsEnabled(boolean customConnectionsEnabled) {
-        this.customConnectionsEnabled = customConnectionsEnabled;
+    public boolean isPublicCredentialsSaveEnabled() {
+        return publicCredentialsSaveEnabled;
+    }
+
+    public boolean isAdminCredentialsSaveEnabled() {
+        return adminCredentialsSaveEnabled;
     }
 
     public long getSessionExpireTime() {

@@ -71,6 +71,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
       useUrl: false,
       authProperties: [],
       properties: {},
+      providerProperties: {},
       origin: {
         type: 'local',
         displayName: 'Local',

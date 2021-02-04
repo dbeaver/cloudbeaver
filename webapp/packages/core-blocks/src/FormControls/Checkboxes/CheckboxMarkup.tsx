@@ -78,10 +78,12 @@ interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElemen
   indeterminate?: boolean;
 }
 
-export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({ label, className, ...rest }) {
+export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
+  label, className, title, ...rest
+}) {
   return styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled
     && checkboxState.disabled, rest.checked && checkboxState.checked))(
-    <checkbox-container className={className} as='div'>
+    <checkbox-container className={className} title={title} as='div'>
       <checkbox as='div'>
         <checkbox-input as='input' type='checkbox' {...rest} />
         <checkbox-background as='div'>

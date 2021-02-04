@@ -573,6 +573,8 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
                     JSONUtils.field(json, "authenticationEnabled", appConfig.isAuthenticationEnabled());
                     JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
+                    JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+                    JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());

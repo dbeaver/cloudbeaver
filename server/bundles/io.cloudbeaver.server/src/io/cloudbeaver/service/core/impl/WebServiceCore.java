@@ -38,9 +38,16 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
+import org.jkiss.dbeaver.model.net.DBWTunnel;
+import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -363,6 +370,59 @@ public class WebServiceCore implements DBWServiceCore {
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);
+        }
+    }
+
+    @Override
+    public WebNetworkEndpointInfo testNetworkHandler(WebSession webSession, WebNetworkHandlerConfigInput nhConfig) throws DBWebException {
+        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+        monitor.beginTask("Instantiate SSH tunnel", 2);
+
+        NetworkHandlerDescriptor handlerDescriptor = NetworkHandlerRegistry.getInstance().getDescriptor(nhConfig.getId());
+        if (handlerDescriptor == null) {
+            throw new DBWebException("Network handler '" + nhConfig.getId() + "' not found");
+        }
+        try {
+            DBWNetworkHandler handler = handlerDescriptor.createHandler(DBWNetworkHandler.class);
+            if (handler instanceof DBWTunnel) {
+                DBWTunnel tunnel = (DBWTunnel)handler;
+                DBPConnectionConfiguration connectionConfig = new DBPConnectionConfiguration();
+                connectionConfig.setHostName("localhost");
+                connectionConfig.setHostPort(CommonUtils.toString(nhConfig.getProperties().get(DBWHandlerConfiguration.PROP_PORT)));
+                try {
+                    monitor.subTask("Initialize tunnel");
+
+                    DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
+                    configuration.setUserName(nhConfig.getUserName());
+                    configuration.setPassword(nhConfig.getPassword());
+                    configuration.setSavePassword(true);
+                    configuration.setEnabled(true);
+                    configuration.setProperties(nhConfig.getProperties());
+                    tunnel.initializeHandler(monitor, DBWorkbench.getPlatform(), configuration, connectionConfig);
+                    monitor.worked(1);
+                    // Get info
+                    Object implementation = tunnel.getImplementation();
+                    if (implementation instanceof SSHImplementation) {
+                        return new WebNetworkEndpointInfo(
+                            "Connected",
+                            ((SSHImplementation) implementation).getClientVersion(),
+                            ((SSHImplementation) implementation).getServerVersion());
+                    } else {
+                        return new WebNetworkEndpointInfo("Connected");
+                    }
+                } finally {
+                    monitor.subTask("Close tunnel");
+                    tunnel.closeTunnel(monitor);
+                    monitor.worked(1);
+                }
+            } else {
+                return new WebNetworkEndpointInfo(nhConfig.getId() + " is not a tunnel");
+            }
+        } catch (Exception e) {
+            throw new DBWebException("Error testing network handler endpoint", e);
+        } finally {
+            // Close it
+            monitor.done();
         }
     }
 

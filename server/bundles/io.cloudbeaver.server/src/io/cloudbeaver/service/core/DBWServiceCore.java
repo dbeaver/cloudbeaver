@@ -105,6 +105,9 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
+    WebNetworkEndpointInfo testNetworkHandler(WebSession webSession, WebNetworkHandlerConfigInput nhConfig) throws DBWebException;
+
+    @WebAction
     WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException;
 
     @WebAction

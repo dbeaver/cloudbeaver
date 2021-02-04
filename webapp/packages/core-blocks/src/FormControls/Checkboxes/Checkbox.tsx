@@ -89,7 +89,15 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     return null;
   }
 
-  let checked = state ? state[name] : checkedControlled;
+  let checked = checkedControlled;
+
+  if (state) {
+    if (typeof state[name] === 'string') {
+      checked = state[name] === 'true';
+    } else {
+      checked = state[name];
+    }
+  }
 
   if (Array.isArray(checked)) {
     checked = checked.includes(value);

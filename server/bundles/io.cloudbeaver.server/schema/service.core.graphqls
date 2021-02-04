@@ -84,6 +84,10 @@ type ServerConfig {
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean
+
+    publicCredentialsSaveEnabled: Boolean
+    adminCredentialsSaveEnabled: Boolean
+
     sessionExpireTime: Int
     localHostAddress: String
 
@@ -251,6 +255,12 @@ type ConnectionInfo {
     supportedDataFormats: [ ResultDataFormat! ]!
 }
 
+type NetworkEndpointInfo {
+    message: String
+    clientVersion: String
+    serverVersion: String
+}
+
 type ObjectOrigin {
     type: ID!
     subType: ID
@@ -408,6 +418,9 @@ extend type Mutation {
 
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig! ): ConnectionInfo!
+
+    # Test connection configuration. Returns remote server version
+    testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
     initConnection( id: ID!, credentials: Object, saveCredentials: Boolean ): ConnectionInfo!

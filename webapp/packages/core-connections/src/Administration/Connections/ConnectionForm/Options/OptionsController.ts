@@ -18,7 +18,7 @@ import type { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class OptionsController
-implements IInitializableController {
+  implements IInitializableController {
   get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
@@ -44,6 +44,10 @@ implements IInitializableController {
       return this.model.connection.authProperties;
     }
     return this.authModel?.properties;
+  }
+
+  get providerProperties(): ObjectPropertyInfo[] | undefined {
+    return this.dbDriverResource.get(this.model.connection.driverId)?.providerProperties;
   }
 
   private model!: IConnectionFormModel;
@@ -87,6 +91,7 @@ implements IInitializableController {
     this.setDefaultParameters(prevDriverId);
     this.cleanCredentials();
     this.model.connection.properties = {};
+    this.model.connection.providerProperties = {};
     this.model.connection.authModel = this.driver?.defaultAuthModel;
   }
 

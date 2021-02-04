@@ -8,7 +8,7 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import DataGrid from 'react-data-grid';
 import type { Column } from 'react-data-grid';
 import styled from 'reshadow';
@@ -21,7 +21,8 @@ import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { ResultSetTools } from '../ResultSetTools';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
-import { DataGridContext } from './DataGridContext';
+import { CellEditor } from './CellEditor/CellEditor';
+import { DataGridContext, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
 import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
@@ -30,7 +31,7 @@ import { DataGridTableContainer } from './DataGridTableContainer';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { RowRenderer } from './RowRenderer/RowRenderer';
-import { TableColumnHeaderNew } from './TableColumnHeader/TableColumnHeader-new';
+import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 
 interface Props {
   model: IDatabaseDataModel<any>;
@@ -54,6 +55,7 @@ const indexColumn: Column<any[], any> = {
 };
 
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
+  const editorRef = useRef<HTMLDivElement>(null);
   const styles = useStyles(reactGridStyles, baseStyles);
 
   const modelResultData = model?.getResult(resultIndex);
@@ -114,16 +116,36 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
       width: Math.min(300, measuredCells[i]),
       minWidth: 40,
       resizable: true,
-      headerRenderer: TableColumnHeaderNew,
+      editable: true,
+      headerRenderer: TableColumnHeader,
       formatter: CellFormatter,
+      editor: CellEditor,
+      editorOptions: {
+        onCellKeyDown: event => {
+          event.preventDefault();
+          event.stopPropagation();
+        },
+        onNavigation: event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          return false;
+        },
+      },
     }));
     columns.unshift(indexColumn);
 
     return { rows, columns };
   }), [modelResultData]).get();
 
+  const gridContext = useMemo<IDataGridContext>(() => ({
+    model,
+    resultIndex,
+    getEditorPortal: () => editorRef.current,
+  }), [model, resultIndex, editorRef]);
+
   return styled(styles)(
-    <DataGridContext.Provider value={{ model, resultIndex }}>
+    <DataGridContext.Provider value={gridContext}>
       <DataGridSortingContext.Provider value={gridSortingContext}>
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
           <DataGridTableContainer modelResultData={modelResultData}>
@@ -136,6 +158,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
               rowRenderer={RowRenderer}
               onScroll={handleScroll}
             />
+            <div ref={editorRef} />
           </DataGridTableContainer>
         </DataGridSelectionContext.Provider>
       </DataGridSortingContext.Provider>

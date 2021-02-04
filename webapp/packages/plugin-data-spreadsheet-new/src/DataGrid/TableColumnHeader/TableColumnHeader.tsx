@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useMemo } from 'react';
+import { useContext } from 'react';
 import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css, use } from 'reshadow';
 
@@ -79,7 +78,7 @@ function getColumn(colIdx: number, source: SqlResultSet) {
   return source.columns?.[colIdx];
 }
 
-export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeaderNew({
+export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeader({
   column: calculatedColumn,
 }) {
   const dataGridContext = useContext(DataGridContext);
@@ -91,7 +90,7 @@ export const TableColumnHeaderNew: React.FC<HeaderRendererProps<any>> = observer
 
   const model = dataGridContext.model;
   const columnName = calculatedColumn.name as string;
-  const column = getColumn(Number(calculatedColumn.key), model.getResult(dataGridContext.resultIndex).data);
+  const column = getColumn(Number(calculatedColumn.key), model.getResult(dataGridContext.resultIndex)?.data);
 
   const loading = model.isLoading();
 

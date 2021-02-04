@@ -78,6 +78,16 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isPublicCredentialsSaveEnabled() {
+        return application.getAppConfiguration().isPublicCredentialsSaveEnabled();
+    }
+
+    @Property
+    public boolean isAdminCredentialsSaveEnabled() {
+        return application.getAppConfiguration().isAdminCredentialsSaveEnabled();
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }

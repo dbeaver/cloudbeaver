@@ -15,6 +15,18 @@ query driverList {
 
     defaultAuthModel
     # applicableAuthModel
+
+    providerProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      defaultValue
+      validValues
+      features
+      order
+    }
     applicableNetworkHandlers
   }
 }
