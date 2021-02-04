@@ -130,7 +130,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-            node.refreshNode(monitor, this);
+            if (node instanceof DBNDataSource) {
+                // Do not refresh entire tree - just clear child nodes
+                // Otherwise refresh may fail if navigator settings were changed.
+                ((DBNDataSource) node).cleanupNode();
+            } else {
+                node.refreshNode(monitor, this);
+            }
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error refreshing navigator node '"  + nodePath + "'", e);
