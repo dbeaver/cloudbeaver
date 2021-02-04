@@ -210,6 +210,8 @@ public class WebServiceUtils {
         }
         if (cfgInput.isSavePassword() != null) {
             handlerConfig.setSavePassword(cfgInput.isSavePassword());
+        } else {
+            handlerConfig.setSavePassword(false);
         }
         if (cfgInput.getUserName() != null) {
             handlerConfig.setUserName(cfgInput.getUserName());
