@@ -33,6 +33,8 @@ public class CBAppConfig {
     private boolean supportsCustomConnections = true;
     private boolean supportsConnectionBrowser = false;
     private boolean supportsUserWorkspaces = false;
+    private boolean publicCredentialsSaveEnabled = true;
+    private boolean adminCredentialsSaveEnabled = true;
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
     private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
@@ -76,6 +78,22 @@ public class CBAppConfig {
 
     public boolean isSupportsUserWorkspaces() {
         return supportsUserWorkspaces;
+    }
+
+    public boolean isPublicCredentialsSaveEnabled() {
+        return publicCredentialsSaveEnabled;
+    }
+
+    public void setPublicCredentialsSaveEnabled(boolean publicCredentialsSaveEnabled) {
+        this.publicCredentialsSaveEnabled = publicCredentialsSaveEnabled;
+    }
+
+    public boolean isAdminCredentialsSaveEnabled() {
+        return adminCredentialsSaveEnabled;
+    }
+
+    public void setAdminCredentialsSaveEnabled(boolean adminCredentialsSaveEnabled) {
+        this.adminCredentialsSaveEnabled = adminCredentialsSaveEnabled;
     }
 
     public String[] getEnabledDrivers() {

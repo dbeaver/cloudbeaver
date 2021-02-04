@@ -54,6 +54,8 @@ input ServerConfigInput {
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean
     customConnectionsEnabled: Boolean
+    publicCredentialsSaveEnabled: Boolean
+    adminCredentialsSaveEnabled: Boolean
 
     sessionExpireTime: Int
 }
