@@ -1157,6 +1157,10 @@ export type GetDriverByIdQueryVariables = Exact<{
 
 export interface GetDriverByIdQuery { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon'>> }
 
+export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export interface GetTemplateConnectionsQuery { connections: UserConnectionFragment[] }
+
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
@@ -1176,15 +1180,17 @@ export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
 
 export type SetConnectionNavigatorSettingsMutation = Pick<Mutation, 'setConnectionNavigatorSettings'>;
 
-export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
-
-export interface GetTemplateConnectionsQuery { connections: Array<Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>> }
-
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
 export interface TestConnectionMutation { testConnection: Pick<ConnectionInfo, 'id'> }
+
+export type TestNetworkHandlerMutationVariables = Exact<{
+  config: NetworkHandlerConfigInput;
+}>;
+
+export interface TestNetworkHandlerMutation { testNetworkHandler: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
 
 export type ExportDataFromContainerQueryVariables = Exact<{
   connectionId: Scalars['ID'];
@@ -1245,6 +1251,8 @@ export type AdminUserInfoFragment = (
   & { origin: ObjectOriginInfoFragment }
 );
 
+export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
+
 export type NavNodeInfoFragment = (
   Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
   & { object?: Maybe<Pick<DatabaseObjectInfo, 'features'>>; nodeDetails?: Maybe<NavNodePropertiesFragment[]> }
@@ -1256,7 +1264,10 @@ export type ObjectOriginInfoFragment = Pick<ObjectOrigin, 'type' | 'subType' | '
 
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
 
-export type UserConnectionFragment = Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>;
+export type UserConnectionFragment = (
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
+  & { navigatorSettings: AllNavigatorSettingsFragment }
+);
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
 
@@ -1474,7 +1485,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 export interface ServerConfigQuery {
   serverConfig: (
     Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
-    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'> }
+    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment }
   );
 }
 
@@ -1631,6 +1642,17 @@ export const SessionStateFragmentDoc = `
   locale
 }
     `;
+export const AllNavigatorSettingsFragmentDoc = `
+    fragment AllNavigatorSettings on NavigatorSettings {
+  showSystemObjects
+  showUtilityObjects
+  showOnlyEntities
+  mergeEntities
+  hideFolders
+  hideSchemas
+  hideVirtualModel
+}
+    `;
 export const UserConnectionFragmentDoc = `
     fragment UserConnection on ConnectionInfo {
   id
@@ -1643,8 +1665,11 @@ export const UserConnectionFragmentDoc = `
   authModel
   features
   supportedDataFormats
+  navigatorSettings {
+    ...AllNavigatorSettings
+  }
 }
-    `;
+    ${AllNavigatorSettingsFragmentDoc}`;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
     fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
   id
@@ -2023,6 +2048,13 @@ export const GetDriverByIdDocument = `
   }
 }
     `;
+export const GetTemplateConnectionsDocument = `
+    query getTemplateConnections {
+  connections: templateConnections {
+    ...UserConnection
+  }
+}
+    ${UserConnectionFragmentDoc}`;
 export const InitConnectionDocument = `
     mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
   connection: initConnection(
@@ -2044,26 +2076,19 @@ export const SetConnectionNavigatorSettingsDocument = `
   setConnectionNavigatorSettings(id: $id, settings: $settings)
 }
     `;
-export const GetTemplateConnectionsDocument = `
-    query getTemplateConnections {
-  connections: templateConnections {
-    id
-    name
-    description
-    driverId
-    connected
-    readOnly
-    authNeeded
-    authModel
-    features
-    supportedDataFormats
-  }
-}
-    `;
 export const TestConnectionDocument = `
     mutation testConnection($config: ConnectionConfig!) {
   testConnection(config: $config) {
     id
+  }
+}
+    `;
+export const TestNetworkHandlerDocument = `
+    mutation testNetworkHandler($config: NetworkHandlerConfigInput!) {
+  testNetworkHandler(config: $config) {
+    message
+    clientVersion
+    serverVersion
   }
 }
     `;
@@ -2454,17 +2479,11 @@ export const ServerConfigDocument = `
     }
     productConfiguration
     defaultNavigatorSettings {
-      showSystemObjects
-      showUtilityObjects
-      showOnlyEntities
-      mergeEntities
-      hideFolders
-      hideSchemas
-      hideVirtualModel
+      ...AllNavigatorSettings
     }
   }
 }
-    `;
+    ${AllNavigatorSettingsFragmentDoc}`;
 export const SessionPermissionsDocument = `
     query sessionPermissions {
   permissions: sessionPermissions
@@ -2636,6 +2655,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getDriverById(variables: GetDriverByIdQueryVariables): Promise<GetDriverByIdQuery> {
       return withWrapper(() => client.request<GetDriverByIdQuery>(GetDriverByIdDocument, variables));
     },
+    getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
+      return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
+    },
     initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
       return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
     },
@@ -2645,11 +2667,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     setConnectionNavigatorSettings(variables: SetConnectionNavigatorSettingsMutationVariables): Promise<SetConnectionNavigatorSettingsMutation> {
       return withWrapper(() => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables));
     },
-    getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
-      return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
-    },
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));
+    },
+    testNetworkHandler(variables: TestNetworkHandlerMutationVariables): Promise<TestNetworkHandlerMutation> {
+      return withWrapper(() => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables));
     },
     exportDataFromContainer(variables: ExportDataFromContainerQueryVariables): Promise<ExportDataFromContainerQuery> {
       return withWrapper(() => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables));

@@ -26,7 +26,7 @@ interface IValidationStatus {
 }
 @injectable()
 export class ConnectionFormController
-  implements IInitializableController {
+implements IInitializableController {
   isSaving: boolean;
 
   readonly afterSave: IExecutor<string>;
@@ -174,7 +174,26 @@ export class ConnectionFormController
     if (Object.keys(this.model.connection.properties).length > 0) {
       config.properties = this.model.connection.properties;
     }
-    config.networkHandlersConfig = this.model.networkHandlersState;
+
+    if (this.model.networkHandlersState.length > 0) {
+      config.networkHandlersConfig = [];
+
+      for (const handler of this.model.networkHandlersState) {
+        const initialConfig = this.model.connection.networkHandlersConfig.find(h => h.id === handler.id);
+
+        if (handler.enabled !== initialConfig?.enabled
+          || handler.savePassword !== initialConfig?.savePassword
+          || handler.userName !== initialConfig?.userName
+          || (
+            (initialConfig?.password === null && handler.password !== '')
+              || (handler.password?.length || 0) > 0
+          )
+          || handler.properties.host !== initialConfig?.properties.host
+          || handler.properties.port !== initialConfig?.properties.port) {
+          config.networkHandlersConfig.push(handler);
+        }
+      }
+    }
 
     if (Object.keys(this.model.connection.providerProperties).length > 0) {
       config.providerProperties = this.model.connection.providerProperties;

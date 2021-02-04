@@ -1,0 +1,9 @@
+fragment AllNavigatorSettings on NavigatorSettings {
+  showSystemObjects
+  showUtilityObjects
+  showOnlyEntities
+  mergeEntities
+  hideFolders
+  hideSchemas
+  hideVirtualModel
+}
