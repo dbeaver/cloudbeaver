@@ -262,7 +262,7 @@ export interface Mutation {
   openConnection: ConnectionInfo;
   openSession: SessionInfo;
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
-  setConnectionNavigatorSettings: Scalars['Boolean'];
+  setConnectionNavigatorSettings: ConnectionInfo;
   sqlContextCreate: SqlContextInfo;
   sqlContextDestroy: Scalars['Boolean'];
   sqlContextSetDefaults: Scalars['Boolean'];
@@ -1178,7 +1178,7 @@ export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
   settings: NavigatorSettingsInput;
 }>;
 
-export type SetConnectionNavigatorSettingsMutation = Pick<Mutation, 'setConnectionNavigatorSettings'>;
+export interface SetConnectionNavigatorSettingsMutation { connection: UserConnectionFragment }
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -2073,9 +2073,11 @@ export const RefreshSessionConnectionsDocument = `
     `;
 export const SetConnectionNavigatorSettingsDocument = `
     mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
-  setConnectionNavigatorSettings(id: $id, settings: $settings)
+  connection: setConnectionNavigatorSettings(id: $id, settings: $settings) {
+    ...UserConnection
+  }
 }
-    `;
+    ${UserConnectionFragmentDoc}`;
 export const TestConnectionDocument = `
     mutation testConnection($config: ConnectionConfig!) {
   testConnection(config: $config) {

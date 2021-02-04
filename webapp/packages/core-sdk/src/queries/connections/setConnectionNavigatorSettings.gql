@@ -1,3 +1,5 @@
 mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
-  setConnectionNavigatorSettings(id: $id, settings: $settings)
+  connection: setConnectionNavigatorSettings(id: $id, settings: $settings) {
+    ...UserConnection
+  }
 }

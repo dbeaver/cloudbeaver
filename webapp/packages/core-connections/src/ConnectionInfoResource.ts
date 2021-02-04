@@ -141,13 +141,13 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     await this.performUpdate(id, async () => {
       const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
 
-      await this.graphQLService.sdk.setConnectionNavigatorSettings({
+      const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
         id,
         settings,
       });
-    });
 
-    await this.refresh(id); // TODO: setConnectionNavigatorSettings should return ConnectionInfo
+      this.set(id, connection);
+    });
 
     return this.get(id)!;
   }
