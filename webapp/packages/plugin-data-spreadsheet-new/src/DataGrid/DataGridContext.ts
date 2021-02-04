@@ -10,9 +10,10 @@ import { createContext } from 'react';
 
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-interface IDataGridContext {
-  model: IDatabaseDataModel<any, any>;
+export interface IDataGridContext {
+  model: IDatabaseDataModel<any>;
   resultIndex: number;
+  getEditorPortal: () => HTMLDivElement | null;
 }
 
 export const DataGridContext = createContext<IDataGridContext | null>(null);

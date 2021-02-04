@@ -53,8 +53,8 @@ export const InlineEditorStyles = composes(
       letter-spacing: inherit;
       outline: none;
       border: none;
-      padding-left: 11px; /* because of left border */
-      padding-right: 12px;
+      padding-left: 8px;
+      padding-right: 8px;
       padding-top: 1px; /* because of -1px top */
       line-height: 24px;
       width: 100%;
