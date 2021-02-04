@@ -17,6 +17,7 @@ import { CheckboxMarkup } from './CheckboxMarkup';
 export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
   value?: string;
   checkboxLabel?: string;
+  title?: string;
   mod?: 'surface';
   long?: boolean;
 };
@@ -52,6 +53,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   value,
   state,
   checkboxLabel,
+  title,
   checked: checkedControlled,
   children,
   className,
@@ -89,7 +91,15 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     return null;
   }
 
-  let checked = state ? state[name] : checkedControlled;
+  let checked = checkedControlled;
+
+  if (state) {
+    if (typeof state[name] === 'string') {
+      checked = state[name] === 'true';
+    } else {
+      checked = state[name];
+    }
+  }
 
   if (Array.isArray(checked)) {
     checked = checked.includes(value);
@@ -102,6 +112,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       id={value || name}
       checked={checked}
       label={checkboxLabel}
+      title={title}
       className={className}
       onChange={handleChange}
       {...use({ mod })}

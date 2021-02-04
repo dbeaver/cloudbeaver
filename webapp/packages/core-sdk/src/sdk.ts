@@ -268,6 +268,7 @@ export interface Mutation {
   sqlContextSetDefaults: Scalars['Boolean'];
   sqlResultClose: Scalars['Boolean'];
   testConnection: ConnectionInfo;
+  testNetworkHandler: NetworkEndpointInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
   updateResultsData?: Maybe<SqlExecuteInfo>;
   updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
@@ -374,6 +375,10 @@ export interface MutationTestConnectionArgs {
   config: ConnectionConfig;
 }
 
+export interface MutationTestNetworkHandlerArgs {
+  config: NetworkHandlerConfigInput;
+}
+
 export interface MutationUpdateResultsDataArgs {
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
@@ -448,6 +453,8 @@ export interface ServerConfig {
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
   supportsWorkspaces?: Maybe<Scalars['Boolean']>;
+  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   sessionExpireTime?: Maybe<Scalars['Int']>;
   localHostAddress?: Maybe<Scalars['String']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
@@ -567,6 +574,12 @@ export interface ConnectionInfo {
   features: Array<Scalars['String']>;
   navigatorSettings: NavigatorSettings;
   supportedDataFormats: ResultDataFormat[];
+}
+
+export interface NetworkEndpointInfo {
+  message?: Maybe<Scalars['String']>;
+  clientVersion?: Maybe<Scalars['String']>;
+  serverVersion?: Maybe<Scalars['String']>;
 }
 
 export interface ObjectOrigin {
@@ -844,6 +857,8 @@ export interface ServerConfigInput {
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
+  publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   sessionExpireTime?: Maybe<Scalars['Int']>;
 }
 
@@ -1097,7 +1112,12 @@ export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
 
 export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
 
-export interface DriverListQuery { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers'>> }
+export interface DriverListQuery {
+  driverList: Array<(
+    Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers'>
+    & { providerProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>> }
+  )>;
+}
 
 export type DriverPropertiesQueryVariables = Exact<{
   driverId: Scalars['ID'];
@@ -1216,7 +1236,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
   & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> }
 );
 
@@ -1540,6 +1560,7 @@ export const AdminConnectionFragmentDoc = `
   databaseName
   url
   properties
+  providerProperties
   features
   origin {
     ...ObjectOriginInfo
@@ -1907,6 +1928,17 @@ export const DriverListDocument = `
     anonymousAccess
     promotedScore
     defaultAuthModel
+    providerProperties {
+      id
+      displayName
+      description
+      category
+      dataType
+      defaultValue
+      validValues
+      features
+      order
+    }
     applicableNetworkHandlers
   }
 }

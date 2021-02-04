@@ -85,7 +85,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
           <ObjectPropertyInfoForm
             autofillToken={`section-${controller.template?.id || ''} section-auth`}
             properties={controller.authModel.properties}
-            credentials={controller.credentials}
+            state={controller.credentials}
             disabled={controller.isConnecting}
           />
         </SubmittingForm>

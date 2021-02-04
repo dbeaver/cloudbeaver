@@ -15,6 +15,7 @@ fragment AdminConnection on ConnectionInfo {
   databaseName
   url
   properties
+  providerProperties
     
   features
 

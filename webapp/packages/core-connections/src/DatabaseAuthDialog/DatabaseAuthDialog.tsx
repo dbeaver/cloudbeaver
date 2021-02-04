@@ -101,7 +101,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                 <ObjectPropertyInfoForm
                   autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
                   properties={connection.connectionInfo?.authProperties}
-                  credentials={controller.config.credentials}
+                  state={controller.config.credentials}
                   disabled={controller.isAuthenticating}
                 />
                 <FormGroup>

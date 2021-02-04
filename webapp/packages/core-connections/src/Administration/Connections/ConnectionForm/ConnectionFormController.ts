@@ -26,7 +26,7 @@ interface IValidationStatus {
 }
 @injectable()
 export class ConnectionFormController
-implements IInitializableController {
+  implements IInitializableController {
   isSaving: boolean;
 
   readonly afterSave: IExecutor<string>;
@@ -80,7 +80,10 @@ implements IInitializableController {
     const connectionConfig = this.getConnectionConfig();
     const validation = this.validate(connectionConfig);
     if (!validation.status) {
-      this.notificationService.logError({ title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error', message: validation.errorMessage });
+      this.notificationService.logError({
+        title: this.model.editing ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error',
+        message: validation.errorMessage,
+      });
       return;
     }
 
@@ -133,7 +136,7 @@ implements IInitializableController {
     if (!config.name?.length) {
       validationStatus.errorMessage = "Field 'name' can't be empty";
     } else if (this.model.editing && this.isConnectionNameAlreadyExists(config.name)) {
-      validationStatus.errorMessage = 'Connection with this name already exists';
+      validationStatus.errorMessage = `Connection with ${config.name} name already exists`;
     }
 
     validationStatus.status = !validationStatus.errorMessage;
@@ -172,6 +175,10 @@ implements IInitializableController {
       config.properties = this.model.connection.properties;
     }
     config.networkHandlersConfig = this.model.networkHandlersState;
+
+    if (Object.keys(this.model.connection.providerProperties).length > 0) {
+      config.providerProperties = this.model.connection.providerProperties;
+    }
 
     return config;
   }

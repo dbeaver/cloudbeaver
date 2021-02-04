@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, InputGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -94,7 +94,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
         <FormGroup><br /></FormGroup>
         <ObjectPropertyInfoForm
           properties={state.properties}
-          credentials={state.state}
+          state={state.state}
           editable={false}
           autoHide
         />

@@ -15,21 +15,22 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type DBDriver = Pick<
-DriverInfo,
-| 'id'
-| 'name'
-| 'icon'
-| 'description'
-| 'defaultPort'
-| 'defaultDatabase'
-| 'defaultServer'
-| 'defaultUser'
-| 'sampleURL'
-| 'embedded'
-| 'anonymousAccess'
-| 'promotedScore'
-| 'defaultAuthModel'
-| 'applicableNetworkHandlers'
+  DriverInfo,
+  | 'id'
+  | 'name'
+  | 'icon'
+  | 'description'
+  | 'defaultPort'
+  | 'defaultDatabase'
+  | 'defaultServer'
+  | 'defaultUser'
+  | 'sampleURL'
+  | 'embedded'
+  | 'anonymousAccess'
+  | 'promotedScore'
+  | 'defaultAuthModel'
+  | 'applicableNetworkHandlers'
+  | 'providerProperties'
 >;
 
 @injectable()

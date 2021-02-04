@@ -89,7 +89,7 @@ export const ConnectionForm = observer(function ConnectionForm({
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
                 properties={controller.authModel.properties}
-                credentials={controller.config.credentials}
+                state={controller.config.credentials}
                 disabled={controller.isConnecting}
               />
               <FormGroup>
