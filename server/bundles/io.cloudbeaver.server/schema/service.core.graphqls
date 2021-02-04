@@ -432,7 +432,7 @@ extend type Mutation {
     deleteConnection( id: ID! ): Boolean!
 
     # Changes navigator settings for connection
-    setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): Boolean!
+    setConnectionNavigatorSettings( id: ID!, settings: NavigatorSettingsInput!): ConnectionInfo!
 
     #### Generic async functions
 
