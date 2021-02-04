@@ -32,5 +32,7 @@ export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, Navigator
 };
 
 export function isSimpleNavigatorView(settings: NavigatorSettingsInput): boolean {
-  return settings.hideVirtualModel && settings.showOnlyEntities && settings.hideFolders;
+  const simple = CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple;
+  return !Object.keys(simple)
+    .some(key => settings[key as keyof NavigatorSettingsInput] !== simple[key as keyof NavigatorSettingsInput]);
 }

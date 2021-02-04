@@ -1,0 +1,5 @@
+query getTemplateConnections {
+  connections: templateConnections {
+    ...UserConnection
+  }
+}

@@ -11,4 +11,8 @@ fragment UserConnection on ConnectionInfo {
 
   features
   supportedDataFormats
+
+  navigatorSettings {
+    ...AllNavigatorSettings
+  }
 }

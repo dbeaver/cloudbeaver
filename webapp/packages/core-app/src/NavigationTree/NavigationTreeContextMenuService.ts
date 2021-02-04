@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionViewService } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, isSimpleNavigatorView } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -25,8 +25,8 @@ export class NavigationTreeContextMenuService {
   constructor(
     private contextMenuService: ContextMenuService,
     private navNodeManagerService: NavNodeManagerService,
-    private connectionViewService: ConnectionViewService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private connectionInfoResource: ConnectionInfoResource
   ) { }
 
   getMenuToken() {
@@ -46,11 +46,23 @@ export class NavigationTreeContextMenuService {
     });
   }
 
+  private isConnectionSimpleView(nodeId: string): boolean {
+    const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
+
+    const connection = this.connectionInfoResource.get(connectionId);
+
+    if (!connection) {
+      return false;
+    }
+
+    return isSimpleNavigatorView(connection.navigatorSettings);
+  }
+
   private async changeConnectionView(nodeId: string, simple: boolean) {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
 
     try {
-      await this.connectionViewService.changeConnectionView(connectionId, simple);
+      await this.connectionInfoResource.changeConnectionView(connectionId, simple);
       await this.navNodeManagerService.refreshTree(nodeId);
     } catch (exception) {
       this.notificationService.logException(exception);
@@ -76,6 +88,7 @@ export class NavigationTreeContextMenuService {
       {
         id: 'simple',
         title: 'app_navigationTree_connection_view_option_simple',
+        isDisabled: context => this.isConnectionSimpleView(context.data.id),
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
@@ -88,6 +101,7 @@ export class NavigationTreeContextMenuService {
       {
         id: 'advanced',
         title: 'app_navigationTree_connection_view_option_advanced',
+        isDisabled: context => !this.isConnectionSimpleView(context.data.id),
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
