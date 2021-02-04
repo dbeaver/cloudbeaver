@@ -14,6 +14,7 @@ import { InputField } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { FieldCheckbox } from '../FormControls/Checkboxes/FieldCheckbox';
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';
 import { FormGroup } from '../FormControls/FormGroup';
 import { isControlPresented } from '../FormControls/isControlPresented';
@@ -48,6 +49,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 }) {
   const href = property.features.includes('href');
   const password = property.features.includes('password');
+  const checkbox = property.dataType === 'Boolean';
   let description: string | undefined;
 
   if (href) {
@@ -73,6 +75,19 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     description = 'Password saved';
   }
 
+  if (checkbox) {
+    return (
+      <FieldCheckbox
+        name={property.id!}
+        state={state}
+        checkboxLabel={property.displayName}
+        title={property.description}
+        disabled={disabled}
+        mod='surface'
+      />
+    );
+  }
+
   return (
     <InputField
       type={password ? 'password' : 'text'}
@@ -93,7 +108,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 
 interface ObjectPropertyFormProps {
   properties: ObjectPropertyInfo[] | undefined;
-  credentials: Record<string, string | number>;
+  state: Record<string, string | number>;
   editable?: boolean;
   autofillToken?: string;
   className?: string;
@@ -106,7 +121,7 @@ interface ObjectPropertyFormProps {
 
 export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoForm({
   properties,
-  credentials,
+  state,
   editable = true,
   autofillToken = '',
   className,
@@ -134,7 +149,7 @@ export const ObjectPropertyInfoForm: React.FC<ObjectPropertyFormProps> = observe
         <FormGroup key={property.id}>
           <RenderField
             property={property}
-            state={credentials}
+            state={state}
             editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}

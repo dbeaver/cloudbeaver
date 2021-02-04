@@ -140,7 +140,7 @@ export const Options = observer(function Options({
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
                 properties={controller.properties}
-                credentials={model.credentials}
+                state={model.credentials}
                 disabled={disabled}
                 showRememberTip
               />
@@ -157,6 +157,18 @@ export const Options = observer(function Options({
             </>
           )}
         </FormBoxElement>
+        {controller.providerProperties && controller.providerProperties.length > 0 && (
+          <FormBoxElement>
+            <FormGroup>
+              <InputGroup>{translate('connections_connection_edit_settings')}</InputGroup>
+            </FormGroup>
+            <ObjectPropertyInfoForm
+              properties={controller.providerProperties}
+              state={model.connection.providerProperties}
+              disabled={disabled}
+            />
+          </FormBoxElement>
+        )}
       </FormBox>
     </SubmittingForm>
   );

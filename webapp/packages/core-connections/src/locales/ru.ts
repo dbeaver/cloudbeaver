@@ -15,6 +15,7 @@ export default [
   ['connections_connection_create_search_database', 'Найти'],
   ['connections_connection_edit_save_credentials', ' Запомнить данные'],
   ['connections_connection_edit_authentication', 'Авторизация'],
+  ['connections_connection_edit_settings', 'Настройки'],
   ['connections_connection_edit_access', 'Доступ'],
   ['connections_connection_edit_access_load_failed', 'Не удалось загрузить информацию доступа'],
   ['connections_connection_edit_access_role', 'Роль'],
