@@ -1186,6 +1186,12 @@ export type TestConnectionMutationVariables = Exact<{
 
 export interface TestConnectionMutation { testConnection: Pick<ConnectionInfo, 'id'> }
 
+export type TestNetworkHandlerMutationVariables = Exact<{
+  config: NetworkHandlerConfigInput;
+}>;
+
+export interface TestNetworkHandlerMutation { testNetworkHandler: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
+
 export type ExportDataFromContainerQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
@@ -2067,6 +2073,15 @@ export const TestConnectionDocument = `
   }
 }
     `;
+export const TestNetworkHandlerDocument = `
+    mutation testNetworkHandler($config: NetworkHandlerConfigInput!) {
+  testNetworkHandler(config: $config) {
+    message
+    clientVersion
+    serverVersion
+  }
+}
+    `;
 export const ExportDataFromContainerDocument = `
     query exportDataFromContainer($connectionId: ID!, $containerNodePath: ID!, $parameters: DataTransferParameters!) {
   taskInfo: dataTransferExportDataFromContainer(
@@ -2650,6 +2665,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     testConnection(variables: TestConnectionMutationVariables): Promise<TestConnectionMutation> {
       return withWrapper(() => client.request<TestConnectionMutation>(TestConnectionDocument, variables));
+    },
+    testNetworkHandler(variables: TestNetworkHandlerMutationVariables): Promise<TestNetworkHandlerMutation> {
+      return withWrapper(() => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables));
     },
     exportDataFromContainer(variables: ExportDataFromContainerQueryVariables): Promise<ExportDataFromContainerQuery> {
       return withWrapper(() => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables));

@@ -7,11 +7,13 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import {
   NetworkHandlerDescriptor,
   GraphQLService,
   CachedMapResource,
-  resourceKeyList
+  resourceKeyList,
+  NetworkHandlerConfigInput
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -19,7 +21,10 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 export class NetworkHandlerResource extends CachedMapResource<string, NetworkHandlerDescriptor> {
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
-  constructor(private graphQLService: GraphQLService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService
+  ) {
     super(new Map());
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
@@ -30,6 +35,17 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     }
 
     return this.data.has(id);
+  }
+
+  async test(config: NetworkHandlerConfigInput): Promise<void> {
+    try {
+      await this.graphQLService.sdk.testNetworkHandler({ config });
+      this.notificationService.logSuccess({
+        title: 'connections_network_handler_test_success',
+      });
+    } catch (exception) {
+      this.notificationService.logException(exception, 'connections_network_handler_test_fail');
+    }
   }
 
   async loadAll(): Promise<Map<string, NetworkHandlerDescriptor>> {

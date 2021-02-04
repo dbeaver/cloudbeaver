@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapResource, FieldCheckbox, Switch } from '@cloudbeaver/core-blocks';
+import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapResource, FieldCheckbox, Switch, FormFieldDescription, Button } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
@@ -20,19 +20,28 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   model,
   controller,
 }) {
+  const initialConfig = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+
   if (!model.networkHandlersState.some(state => state.id === SSH_TUNNEL_ID)) {
-    const config = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
     model.networkHandlersState.push({
       id: SSH_TUNNEL_ID,
+      enabled: false,
+      password: '',
+      savePassword: true,
+      userName: '',
+      ...initialConfig,
+
       properties: {
         port: 22,
+        host: '',
+        ...initialConfig?.properties,
       },
-      ...config,
     });
   }
+
   const state = model.networkHandlersState.find(state => state.id === SSH_TUNNEL_ID)!;
 
-  useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID, {
+  const resource = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
       if (Object.keys(state).length === 0) {
         for (const property of handler.properties) {
@@ -44,9 +53,17 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
     },
   });
 
+  const testConnection = () => resource.resource.test(state);
+
   const translate = useTranslate();
   const disabled = controller.isDisabled;
   const enabled = state.enabled || false;
+  const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
+  let passwordHint = '';
+
+  if (initialConfig?.password === '') {
+    passwordHint = '••••••';
+  }
 
   return (
     <SubmittingForm onSubmit={controller.save}>
@@ -102,9 +119,9 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
           </FormGroup>
           <FormGroup>
             <InputField
-              type="text"
+              type="password"
               name="password"
-              placeholder={model.editing && state.savePassword ? '••••••' : ''}
+              placeholder={passwordHint}
               state={state}
               disabled={disabled || !enabled}
               mod='surface'
@@ -121,6 +138,18 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               disabled={disabled || !enabled}
               mod='surface'
             />
+          </FormGroup>
+          <FormGroup>
+            <FormFieldDescription>
+              <Button
+                type='button'
+                mod={['outlined']}
+                disabled={disabled || !enabled || !passwordFilled}
+                onClick={testConnection}
+              >
+                {translate('connections_network_handler_test')}
+              </Button>
+            </FormFieldDescription>
           </FormGroup>
         </FormBoxElement>
       </FormBox>
