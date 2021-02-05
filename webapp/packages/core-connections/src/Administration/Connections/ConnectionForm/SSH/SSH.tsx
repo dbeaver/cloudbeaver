@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapResource, FieldCheckbox, Switch, FormFieldDescription, Button } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
@@ -20,6 +21,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   model,
   controller,
 }) {
+  const [loading, setLoading] = useState(false);
   const initialConfig = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
   if (!model.networkHandlersState.some(state => state.id === SSH_TUNNEL_ID)) {
@@ -53,10 +55,14 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
     },
   });
 
-  const testConnection = () => resource.resource.test(state);
+  const testConnection = async () => {
+    setLoading(true);
+    await resource.resource.test(state);
+    setLoading(false);
+  };
 
   const translate = useTranslate();
-  const disabled = controller.isDisabled;
+  const disabled = controller.isDisabled || loading;
   const enabled = state.enabled || false;
   const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
   let passwordHint = '';
