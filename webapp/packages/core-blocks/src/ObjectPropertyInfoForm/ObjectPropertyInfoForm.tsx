@@ -51,7 +51,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   const href = property.features.includes('href');
   const password = property.features.includes('password');
   const checkbox = property.dataType === 'Boolean';
-  const comboBox = property.dataType === 'String' && property.validValues && property.validValues.length > 0;
+  const combobox = property.validValues && property.validValues.length > 0;
   let description: string | undefined;
 
   if (href) {
@@ -90,7 +90,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
     );
   }
 
-  if (comboBox) {
+  if (combobox) {
     return (
       <Combobox
         name={property.id!}

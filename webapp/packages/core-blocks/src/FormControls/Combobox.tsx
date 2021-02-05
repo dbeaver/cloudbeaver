@@ -153,7 +153,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   if (state) {
     if (name in state) {
       value = state[name];
-    } else if (rest.defaultValue) {
+    } else if (rest.defaultValue !== undefined) {
       value = rest.defaultValue;
     }
   }
