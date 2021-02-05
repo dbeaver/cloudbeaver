@@ -11,6 +11,9 @@ query serverConfig {
     anonymousAccessEnabled
     authenticationEnabled
 
+    adminCredentialsSaveEnabled
+    publicCredentialsSaveEnabled
+
     configurationMode
     developmentMode
 

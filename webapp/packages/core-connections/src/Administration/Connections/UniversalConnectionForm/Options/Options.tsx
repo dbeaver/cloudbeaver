@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   InputField,
   ObjectPropertyInfoForm,
@@ -48,6 +49,8 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
   } = props;
   const translate = useTranslate();
   const { setDefaults, updateNameTemplate } = useOptions(props);
+  const { credentialsSavingEnabled } = useAdministrationSettings();
+
   const driver = useMapResource(
     DBDriverResource,
     data.config.driverId || null,
@@ -174,16 +177,18 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
                 disabled={form.disabled}
                 showRememberTip
               />
-              <FormGroup>
-                <FieldCheckbox
-                  name="saveCredentials"
-                  value={data.config.connectionId + 'authNeeded'}
-                  state={data.config}
-                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                  disabled={form.disabled}
-                  mod='surface'
-                />
-              </FormGroup>
+              {credentialsSavingEnabled && (
+                <FormGroup>
+                  <FieldCheckbox
+                    name="saveCredentials"
+                    value={data.config.connectionId + 'authNeeded'}
+                    state={data.config}
+                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    disabled={form.disabled}
+                    mod='surface'
+                  />
+                </FormGroup>
+              )}
             </>
           )}
         </FormBoxElement>

@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   SubmittingForm,
   ErrorMessage,
@@ -79,6 +80,8 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
   const translate = useTranslate();
 
+  const { credentialsSavingEnabled } = useAdministrationSettings();
+
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       title={connection.connectionInfo?.name}
@@ -104,16 +107,18 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                   state={controller.config.credentials}
                   disabled={controller.isAuthenticating}
                 />
-                <FormGroup>
-                  <FieldCheckbox
-                    name="saveCredentials"
-                    value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
-                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                    disabled={controller.isAuthenticating}
-                    state={controller.config}
-                    mod='surface'
-                  />
-                </FormGroup>
+                {credentialsSavingEnabled && (
+                  <FormGroup>
+                    <FieldCheckbox
+                      name="saveCredentials"
+                      value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
+                      checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                      disabled={controller.isAuthenticating}
+                      state={controller.config}
+                      mod='surface'
+                    />
+                  </FormGroup>
+                )}
               </FormBoxElement>
             </FormBox>
           </SubmittingForm>
