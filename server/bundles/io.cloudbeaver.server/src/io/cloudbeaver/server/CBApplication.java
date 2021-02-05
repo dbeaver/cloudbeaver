@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
@@ -90,8 +89,6 @@ public class CBApplication extends BaseApplicationImpl {
     // Persistence
     private CBDatabase database;
     private CBSecurityController securityController;
-
-    private DBNBrowseSettings defaultNavigatorSettings = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
@@ -527,6 +524,11 @@ public class CBApplication extends BaseApplicationImpl {
         configurationMode = CommonUtils.isEmpty(serverName);
     }
 
+    public synchronized void flushConfiguration() throws DBException {
+        saveRuntimeConfig(serverName, maxSessionIdleTime, appConfiguration);
+    }
+
+
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
             String anonymousRoleId = appConfig.getAnonymousUserRole();
@@ -576,6 +578,30 @@ public class CBApplication extends BaseApplicationImpl {
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
 
+                    {
+                        // Save only differences in def navigator settings
+                        DBNBrowseSettings navSettings = appConfig.getDefaultNavigatorSettings();
+
+                        json.name("defaultNavigatorSettings");
+                        json.beginObject();
+                        if (navSettings.isShowSystemObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowSystemObjects())
+                            JSONUtils.field(json, "showSystemObjects", navSettings.isShowSystemObjects());
+                        if (navSettings.isShowUtilityObjects() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowUtilityObjects())
+                            JSONUtils.field(json, "showUtilityObjects", navSettings.isShowUtilityObjects());
+                        if (navSettings.isShowOnlyEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isShowOnlyEntities())
+                            JSONUtils.field(json, "showOnlyEntities", navSettings.isShowOnlyEntities());
+                        if (navSettings.isMergeEntities() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeEntities())
+                            JSONUtils.field(json, "mergeEntities", navSettings.isMergeEntities());
+                        if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
+                            JSONUtils.field(json, "hideFolders", navSettings.isHideFolders());
+                        if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
+                            JSONUtils.field(json, "hideSchemas", navSettings.isHideSchemas());
+                        if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
+                            JSONUtils.field(json, "hideVirtualModel", navSettings.isHideVirtualModel());
+
+                        json.endObject();
+                    }
+
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
                     }
@@ -588,14 +614,6 @@ public class CBApplication extends BaseApplicationImpl {
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
-    }
-
-    public DBNBrowseSettings getDefaultNavigatorSettings() {
-        return defaultNavigatorSettings;
-    }
-
-    public void setDefaultNavigatorSettings(DBNBrowseSettings defaultNavigatorSettings) {
-        this.defaultNavigatorSettings = defaultNavigatorSettings;
     }
 
 }

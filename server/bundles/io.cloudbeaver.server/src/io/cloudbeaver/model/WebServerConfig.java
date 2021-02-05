@@ -133,7 +133,7 @@ public class WebServerConfig {
 
     @Property
     public DBNBrowseSettings getDefaultNavigatorSettings() {
-        return application.getDefaultNavigatorSettings();
+        return application.getAppConfiguration().getDefaultNavigatorSettings();
     }
 
 }

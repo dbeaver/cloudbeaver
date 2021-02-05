@@ -17,6 +17,8 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -26,6 +28,8 @@ import java.util.Map;
  * Application configuration
  */
 public class CBAppConfig {
+    public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
+
     private boolean anonymousAccessEnabled = true;
     private boolean authenticationEnabled = true;
     private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
@@ -38,6 +42,7 @@ public class CBAppConfig {
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
     private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
+    private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
 
     public boolean isAuthenticationEnabled() {
@@ -106,6 +111,14 @@ public class CBAppConfig {
 
     public String getDefaultAuthProvider() {
         return defaultAuthProvider;
+    }
+
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
+        return defaultNavigatorSettings;
+    }
+
+    public void setDefaultNavigatorSettings(DBNBrowseSettings defaultNavigatorSettings) {
+        this.defaultNavigatorSettings = new DataSourceNavigatorSettings(defaultNavigatorSettings);
     }
 
     public Map<String, Object> getPlugins() {

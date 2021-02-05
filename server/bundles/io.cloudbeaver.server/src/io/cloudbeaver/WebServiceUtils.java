@@ -141,11 +141,13 @@ public class WebServiceUtils {
         ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         // Set default navigator settings
-        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(newDataSource.getNavigatorSettings());
-        navSettings.setShowSystemObjects(false);
+        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(
+            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+        //navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
         saveAuthProperties(newDataSource, newDataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
+
 
         return newDataSource;
     }

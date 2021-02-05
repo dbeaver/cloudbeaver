@@ -299,7 +299,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 newDataSource.setDescription(config.getDescription());
             }
 
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
             globalDataSourceRegistry.addDataSource(newDataSource);
 
             return new WebConnectionInfo(webSession, newDataSource);
@@ -352,6 +352,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
             appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
+
+            appConfig.setDefaultNavigatorSettings(
+                CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+
             String adminName = config.getAdminName();
             String adminPassword = config.getAdminPassword();
             if (CommonUtils.isEmpty(adminName)) {
@@ -386,8 +390,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) {
-        CBApplication.getInstance().setDefaultNavigatorSettings(settings);
+    public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException {
+        CBApplication.getInstance().getAppConfiguration().setDefaultNavigatorSettings(settings);
+//        try {
+//            CBApplication.getInstance().flushConfiguration();
+//        } catch (DBException e) {
+//            throw new DBWebException("Error saving server configuration", e);
+//        }
         return true;
     }
 

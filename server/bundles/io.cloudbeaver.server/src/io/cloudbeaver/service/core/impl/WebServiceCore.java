@@ -219,7 +219,6 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(config.getDescription())) {
             newDataSource.setDescription(config.getDescription());
         }
-        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
         try {
             newDataSource.connect(webSession.getProgressMonitor(), true, false);
         } catch (DBException e) {
@@ -274,6 +273,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (CommonUtils.isEmpty(newDataSource.getName())) {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));
         }
+
         sessionRegistry.addDataSource(newDataSource);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -293,7 +293,7 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
 
-        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+        ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
         sessionRegistry.addDataSource(newDataSource);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -319,7 +319,7 @@ public class WebServiceCore implements DBWServiceCore {
 
             DBPDataSourceContainer newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getDefaultNavigatorSettings());
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
             // Copy props from config
             if (!CommonUtils.isEmpty(config.getName())) {
