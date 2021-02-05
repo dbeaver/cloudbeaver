@@ -20,6 +20,7 @@ import { ServerConfigurationAdminForm } from './Form/ServerConfigurationAdminFor
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
+import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
 import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
@@ -113,6 +114,9 @@ export const ServerConfigurationPage = observer(function ServerConfigurationPage
                   <FormBoxElement>
                     <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
                     <ServerConfigurationNavigatorViewForm configs={controller.state} />
+                  </FormBoxElement>
+                  <FormBoxElement>
+                    <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
                   </FormBoxElement>
                 </FormBox>
               </>

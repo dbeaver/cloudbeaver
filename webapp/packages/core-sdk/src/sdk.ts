@@ -2472,6 +2472,8 @@ export const ServerConfigDocument = `
     sessionExpireTime
     anonymousAccessEnabled
     authenticationEnabled
+    adminCredentialsSaveEnabled
+    publicCredentialsSaveEnabled
     configurationMode
     developmentMode
     supportedLanguages {

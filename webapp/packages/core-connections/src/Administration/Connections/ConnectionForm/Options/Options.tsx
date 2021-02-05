@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   InputField,
   ObjectPropertyInfoForm,
@@ -52,6 +53,7 @@ export const Options = observer(function Options({
   const translate = useTranslate();
   const disabled = formController.isDisabled;
   const isOriginLocal = formController.local;
+  const { credentialsSavingEnabled } = useAdministrationSettings();
 
   return styled(useStyles(styles))(
     <SubmittingForm onChange={controller.onFormChange} onSubmit={formController.save}>
@@ -144,16 +146,18 @@ export const Options = observer(function Options({
                 disabled={disabled}
                 showRememberTip
               />
-              <FormGroup>
-                <FieldCheckbox
-                  name="saveCredentials"
-                  value={model.connection.id + 'authNeeded'}
-                  state={model.connection}
-                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                  disabled={disabled}
-                  mod='surface'
-                />
-              </FormGroup>
+              {credentialsSavingEnabled && (
+                <FormGroup>
+                  <FieldCheckbox
+                    name="saveCredentials"
+                    value={model.connection.id + 'authNeeded'}
+                    state={model.connection}
+                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    disabled={disabled}
+                    mod='surface'
+                  />
+                </FormGroup>
+              )}
             </>
           )}
         </FormBoxElement>

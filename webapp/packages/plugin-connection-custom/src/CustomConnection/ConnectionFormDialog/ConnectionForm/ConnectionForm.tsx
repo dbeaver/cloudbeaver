@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   InputField,
   useFocus,
@@ -50,6 +51,7 @@ export const ConnectionForm = observer(function ConnectionForm({
 }: ConnectionFormProps) {
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const { credentialsSavingEnabled } = useAdministrationSettings();
 
   return styled(useStyles(connectionFormStyles))(
     <SubmittingForm ref={focusedRef} onChange={controller.onChange}>
@@ -92,16 +94,18 @@ export const ConnectionForm = observer(function ConnectionForm({
                 state={controller.config.credentials}
                 disabled={controller.isConnecting}
               />
-              <FormGroup>
-                <FieldCheckbox
-                  name="saveCredentials"
-                  value={controller.authModel.id}
-                  state={controller.config}
-                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                  disabled={controller.isConnecting}
-                  mod='surface'
-                />
-              </FormGroup>
+              {credentialsSavingEnabled && (
+                <FormGroup>
+                  <FieldCheckbox
+                    name="saveCredentials"
+                    value={controller.authModel.id}
+                    state={controller.config}
+                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    disabled={controller.isConnecting}
+                    mod='surface'
+                  />
+                </FormGroup>
+              )}
             </>
           )}
         </FormBoxElement>
