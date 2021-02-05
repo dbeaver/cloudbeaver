@@ -15,6 +15,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FieldCheckbox } from '../FormControls/Checkboxes/FieldCheckbox';
+import { Combobox } from '../FormControls/Combobox';
 import { FormFieldDescription } from '../FormControls/FormFieldDescription';
 import { FormGroup } from '../FormControls/FormGroup';
 import { isControlPresented } from '../FormControls/isControlPresented';
@@ -50,6 +51,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   const href = property.features.includes('href');
   const password = property.features.includes('password');
   const checkbox = property.dataType === 'Boolean';
+  const comboBox = property.dataType === 'String' && property.validValues && property.validValues.length > 0;
   let description: string | undefined;
 
   if (href) {
@@ -85,6 +87,24 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         disabled={disabled}
         mod='surface'
       />
+    );
+  }
+
+  if (comboBox) {
+    return (
+      <Combobox
+        name={property.id!}
+        state={state}
+        items={property.validValues!}
+        keySelector={value => value}
+        valueSelector={value => value}
+        defaultValue={property.defaultValue}
+        mod="surface"
+        title={property.description}
+        disabled={disabled}
+      >
+        {property.displayName ?? ''}
+      </Combobox>
     );
   }
 

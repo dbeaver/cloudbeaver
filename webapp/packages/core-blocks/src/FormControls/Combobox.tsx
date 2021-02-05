@@ -127,6 +127,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   propertyName,
   items,
   children,
+  title,
   className,
   mod,
   long,
@@ -147,7 +148,15 @@ export const Combobox: ComboboxType = observer(function Combobox({
     gutter: 4,
   });
   const [searchValue, setSearchValue] = useState('');
-  const value = state ? state[name] : controlledValue;
+  let value: string | number | readonly string[] | undefined = controlledValue;
+
+  if (state) {
+    if (name in state) {
+      value = state[name];
+    } else if (rest.defaultValue) {
+      value = rest.defaultValue;
+    }
+  }
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,11 +214,12 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   return styled(useStyles(baseFormControlStyles, styles))(
     <field as="div" className={className} {...use({ long })}>
-      <field-label as='label'>{children}</field-label>
+      <field-label title={title} as='label'>{children}</field-label>
       <input-box as="div">
         <input
           ref={ref}
           name={name}
+          title={title}
           value={selectedItem ? valueSelector(selectedItem) : searchValue}
           readOnly={!!selectedItem || readOnly}
           onChange={handleChange}
