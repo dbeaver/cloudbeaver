@@ -21,8 +21,12 @@ function getCredentialsSavingSetting(config: ServerConfig, isAdmin: boolean) {
     return true;
   }
 
+  if (!config.adminCredentialsSaveEnabled!) {
+    return false;
+  }
+
   if (isAdmin) {
-    return config.adminCredentialsSaveEnabled!;
+    return true;
   }
 
   return config.publicCredentialsSaveEnabled!;

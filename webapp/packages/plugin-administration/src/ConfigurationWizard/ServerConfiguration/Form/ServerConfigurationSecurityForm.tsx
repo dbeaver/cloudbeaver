@@ -44,6 +44,7 @@ export const ServerConfigurationSecurityForm: React.FC<Props> = observer(functio
           description={translate('administration_configuration_wizard_configuration_security_public_credentials_description')}
           mod={['primary']}
           state={serverConfig}
+          disabled={!serverConfig.adminCredentialsSaveEnabled}
           autoHide
           long
         >

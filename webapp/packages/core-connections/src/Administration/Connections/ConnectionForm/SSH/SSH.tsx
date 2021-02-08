@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapResource, FieldCheckbox, Switch, FormFieldDescription, Button } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -23,6 +24,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
 }) {
   const [loading, setLoading] = useState(false);
   const initialConfig = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+  const { credentialsSavingEnabled } = useAdministrationSettings();
 
   if (!model.networkHandlersState.some(state => state.id === SSH_TUNNEL_ID)) {
     model.networkHandlersState.push({
@@ -135,16 +137,18 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               {translate('connections_network_handler_ssh_tunnel_password')}
             </InputField>
           </FormGroup>
-          <FormGroup>
-            <FieldCheckbox
-              name="savePassword"
-              value={SSH_TUNNEL_ID + ' savePassword'}
-              state={state}
-              checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
-              disabled={disabled || !enabled}
-              mod='surface'
-            />
-          </FormGroup>
+          {credentialsSavingEnabled && (
+            <FormGroup>
+              <FieldCheckbox
+                name="savePassword"
+                value={SSH_TUNNEL_ID + ' savePassword'}
+                state={state}
+                checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
+                disabled={disabled || !enabled}
+                mod='surface'
+              />
+            </FormGroup>
+          )}
           <FormGroup>
             <FormFieldDescription>
               <Button
