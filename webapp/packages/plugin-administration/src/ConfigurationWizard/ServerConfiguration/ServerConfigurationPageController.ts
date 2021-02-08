@@ -39,6 +39,10 @@ export class ServerConfigurationPageController {
     if (!this.state.serverConfig.authenticationEnabled) {
       this.state.serverConfig.anonymousAccessEnabled = true;
     }
+
+    if (!this.state.serverConfig.adminCredentialsSaveEnabled) {
+      this.state.serverConfig.publicCredentialsSaveEnabled = false;
+    }
   };
 
   save = async (): Promise<void> => {
