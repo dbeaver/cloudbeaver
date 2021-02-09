@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2020 DBeaver Corp and others
+ * Copyright (C) 2010-2021 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWService;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.sql.WebSQLContextInfo;
-import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
+import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLProcessor;
 
 import java.util.List;
 
