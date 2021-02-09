@@ -14,7 +14,7 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DetailsError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
+import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataSource';
 import { ErrorDialog } from './ErrorDialog';
 import type { RowDiff } from './TableDataModel/EditedRow';
 import type { TableColumn } from './TableDataModel/TableColumn';

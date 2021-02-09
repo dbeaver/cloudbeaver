@@ -19,7 +19,7 @@ export const Spreadsheet: React.FC<IDataPresentationProps> = observer(function S
 }) {
   const deprecated = (model as DataModelWrapper).getOldModel(resultIndex);
 
-  if (!deprecated || (model.results.length === 0 && model.isLoading())) {
+  if (!deprecated || (model.source.results.length === 0 && model.isLoading())) {
     return null;
   }
 

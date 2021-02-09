@@ -11,27 +11,48 @@ import { useCallback, useContext } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
+import { EditingContext } from '../../Editing/EditingContext';
+import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 
 export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function CellRenderer(props) {
-  const gridSelectionContext = useContext(DataGridSelectionContext);
-  if (!gridSelectionContext) {
-    throw new Error('Grid selection context must be provided');
-  }
+  const context = useContext(DataGridContext);
+  const selectionContext = useContext(DataGridSelectionContext);
+  const editingContext = useContext(EditingContext);
+  const editor = context?.model.source.getEditor(context.resultIndex);
 
-  let classes = '';
+  const classes: string[] = [];
   const { rowIdx, column } = props;
-  const { isSelected, select } = gridSelectionContext;
 
-  if (isSelected(column.key, rowIdx)) {
-    classes += 'rdg-cell-custom-selected';
+  if (selectionContext?.isSelected(column.key, rowIdx)) {
+    classes.push('rdg-cell-custom-selected');
   }
 
-  const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
-  }, [column, rowIdx, select]);
+  if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
+    classes.push('rdg-cell-custom-editing');
+  }
+
+  if (editor?.isCellEdited(rowIdx, Number(column.key))) {
+    classes.push('rdg-cell-custom-edited');
+  }
+
+  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    selectionContext?.select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
+  }, [column, rowIdx, selectionContext]);
+
+  const handleDoubleClick = useCallback(() => {
+    editingContext?.edit({ idx: column.idx, rowIdx });
+  }, [column, rowIdx]);
+
+  const row = editor?.get(rowIdx) || props.row;
 
   return (
-    <Cell className={classes} onClick={onClickHandler} {...props} />
+    <Cell
+      className={classes.join(' ')}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      {...props}
+      row={row}
+    />
   );
 });

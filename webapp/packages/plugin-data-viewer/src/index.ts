@@ -2,6 +2,7 @@ import { manifest } from './manifest';
 
 export default manifest;
 
+export * from './DatabaseDataModel/DatabaseDataEditor';
 export * from './DatabaseDataModel/DatabaseDataFormat';
 export * from './DatabaseDataModel/DatabaseDataModel';
 export * from './DatabaseDataModel/DatabaseDataSource';

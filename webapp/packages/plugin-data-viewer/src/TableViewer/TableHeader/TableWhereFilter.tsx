@@ -76,7 +76,7 @@ export const TableWhereFilter = observer(function TableWhereFilter({
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
-      disabled={context.isLoading() || context.results.length > 1}
+      disabled={context.isLoading() || context.source.results.length > 1}
       simple
       onSave={handleApply}
       onUndo={resetFilter}

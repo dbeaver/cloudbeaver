@@ -6,53 +6,53 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ResultDataFormat, SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionContext } from '../IExecutionContext';
 import type { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
 import type { IRequestDataResult } from '../TableViewer/TableViewerModel';
+import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-
-export enum DataUpdateType {
-  delete,
-  update,
-  add
-}
 
 export interface IRequestInfo {
   readonly requestDuration: number;
   readonly requestMessage: string;
 }
 
-export interface DataUpdate<T = any> {
-  data: SqlResultSet;
-  dataUpdate: SqlResultSet;
-  type: DataUpdateType;
+export enum DatabaseDataAccessMode {
+  Default,
+  Readonly
 }
 
 export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+  readonly access: DatabaseDataAccessMode;
+  readonly dataFormat: ResultDataFormat;
+  readonly supportedDataFormats: ResultDataFormat[];
+  readonly editor: IDatabaseDataEditor<TResult> | null;
+  readonly results: TResult[];
   readonly offset: number;
   readonly count: number;
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
-  readonly dataFormat: ResultDataFormat;
   readonly executionContext: IExecutionContext | null;
-  readonly supportedDataFormats: ResultDataFormat[];
   readonly canCancel: boolean;
 
   isLoading: () => boolean;
+
+  getEditor: (resultIndex: number) => IDatabaseDataResultEditor;
+  getResult: (index: number) => TResult | null;
+
+  setResults: (results: TResult[]) => this;
+  setEditor: (editor: IDatabaseDataEditor<TResult>) => this;
+  setAccess: (access: DatabaseDataAccessMode) => this;
   setSlice: (offset: number, count: number) => this;
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IExecutionContext | null) => this;
-  requestData: (
-    prevResults: TResult[]
-  ) => Promise<TResult[]> | TResult[];
-  saveData: (
-    prevResults: TResult[],
-    data: DataUpdate
-  ) => Promise<TResult[]> | TResult[];
+
+  requestData: () => Promise<void> | void;
+  saveData: () => Promise<void> | void;
   /**
    * @deprecated will be refactored
    */

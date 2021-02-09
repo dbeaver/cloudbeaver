@@ -9,10 +9,11 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo, SqlResultSet } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 import {
-  DatabaseDataSource, DataUpdate, IDatabaseDataResult, IRequestDataResult, RowDiff
+  DatabaseDataEditor,
+  DatabaseDataSource, IDatabaseDataResult, IRequestDataResult, RowDiff
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IQueryTabGroup } from './ISqlEditorTabState';
@@ -29,7 +30,7 @@ export interface IDataContainerOptions {
 }
 
 export interface IDataContainerResult extends IDatabaseDataResult {
-
+  data: SqlResultSet | undefined;
 }
 
 export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
@@ -51,6 +52,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     });
 
     this.queryExecutionProcess = null;
+    this.editor = new DatabaseDataEditor();
   }
 
   cancel(): boolean {
@@ -60,11 +62,56 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return false;
   }
 
-  save(
-    prevResults: IDataContainerResult[],
-    data: DataUpdate<any>
-  ): IDataContainerResult[] | Promise<IDataContainerResult[]> {
-    throw new Error('Method not implemented.');
+  async save(
+    prevResults: IDataContainerResult[]
+  ): Promise<IDataContainerResult[]> {
+    const params = this.options?.group.sqlQueryParams;
+    if (!params) {
+      throw new Error('sqlQueryParams must be provided');
+    }
+
+    const changes = this.editor?.getChanges();
+
+    if (!changes) {
+      return prevResults;
+    }
+
+    for (const update of changes) {
+      const response = await this.graphQLService.sdk.updateResultsDataBatch({
+        connectionId: params.connectionId,
+        contextId: params.contextId,
+        resultsId: update.resultId,
+        updatedRows: Array.from(update.diff.values()).map(diff => ({
+          data: diff.source,
+          updateValues: diff.update.reduce((obj, value, index) => {
+            if (value !== diff.source[index]) {
+              obj[index] = value;
+            }
+            return obj;
+          }, {}),
+        })),
+      });
+
+      this.requestInfo = {
+        requestDuration: response.result?.duration || 0,
+        requestMessage: 'Saved successfully',
+      };
+
+      const result = prevResults.find(result => result.id === update.resultId)!;
+      const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+
+      if (responseResult?.resultSet?.rows && result.data?.rows) {
+        let i = 0;
+        for (const row of update.diff.keys()) {
+          result.data.rows[row] = responseResult.resultSet.rows[i];
+          i++;
+        }
+      }
+
+      this.editor?.cancelResultChanges(result);
+    }
+
+    return prevResults;
   }
 
   setOptions(options: IDataContainerOptions): this {

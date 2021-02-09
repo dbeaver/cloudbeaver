@@ -9,12 +9,12 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlDataFilterConstraint, SqlResultSet } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
+import { DatabaseDataEditor } from './DatabaseDataModel/DatabaseDataEditor';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
-import type { DataUpdate } from './DatabaseDataModel/IDatabaseDataSource';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import type { IExecutionContext } from './IExecutionContext';
 import type { RowDiff } from './TableViewer/TableDataModel/EditedRow';
@@ -29,7 +29,7 @@ export interface IDataContainerOptions {
 }
 
 export interface IDataContainerResult extends IDatabaseDataResult {
-
+  data: SqlResultSet | undefined;
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
@@ -51,6 +51,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     this.currentFetchTableProcess = null;
     this.executionContext = null;
+    this.editor = new DatabaseDataEditor();
   }
 
   cancel(): boolean {
@@ -108,24 +109,52 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   async save(
-    prevResults: IDataContainerResult[],
-    data: DataUpdate
+    prevResults: IDataContainerResult[]
   ): Promise<IDataContainerResult[]> {
     const executionContext = await this.ensureContextCreated();
 
-    const response = await this.graphQLService.sdk.updateResultsDataBatch({
-      connectionId: executionContext.connectionId,
-      contextId: executionContext.contextId,
-      resultsId: data.data.id,
-      // updatedRows: this.getRowsDiff(data),
-    });
+    const changes = this.editor?.getChanges();
 
-    this.requestInfo = {
-      requestDuration: response.result?.duration || 0,
-      requestMessage: 'Saved successfully',
-    };
+    if (!changes) {
+      return prevResults;
+    }
 
-    throw new Error('Not implemented');
+    for (const update of changes) {
+      const response = await this.graphQLService.sdk.updateResultsDataBatch({
+        connectionId: executionContext.connectionId,
+        contextId: executionContext.contextId,
+        resultsId: update.resultId,
+        updatedRows: Array.from(update.diff.values()).map(diff => ({
+          data: diff.source,
+          updateValues: diff.update.reduce((obj, value, index) => {
+            if (value !== diff.source[index]) {
+              obj[index] = value;
+            }
+            return obj;
+          }, {}),
+        })),
+      });
+
+      this.requestInfo = {
+        requestDuration: response.result?.duration || 0,
+        requestMessage: 'Saved successfully',
+      };
+
+      const result = prevResults.find(result => result.id === update.resultId)!;
+      const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+
+      if (responseResult?.resultSet?.rows && result.data?.rows) {
+        let i = 0;
+        for (const row of update.diff.keys()) {
+          result.data.rows[row] = responseResult.resultSet.rows[i];
+          i++;
+        }
+      }
+
+      this.editor?.cancelResultChanges(result);
+    }
+
+    return prevResults;
   }
 
   /**

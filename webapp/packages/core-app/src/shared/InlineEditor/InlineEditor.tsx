@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import {
   useEffect, useRef, useCallback, ChangeEvent
 } from 'react';
+import { useImperativeHandle } from 'react';
 import styled, { use } from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
@@ -35,6 +36,7 @@ export interface InlineEditorProps {
   edited?: boolean;
   disabled?: boolean;
   autofocus?: boolean;
+  active?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
   onReject?: () => void;
@@ -42,7 +44,7 @@ export interface InlineEditorProps {
   className?: string;
 }
 
-export const InlineEditor = observer(function InlineEditor({
+export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>(function InlineEditor({
   name,
   value,
   type = 'text',
@@ -55,12 +57,13 @@ export const InlineEditor = observer(function InlineEditor({
   edited = false,
   disabled,
   autofocus,
+  active,
   onChange,
   onSave,
   onUndo,
   onReject,
   className,
-}: InlineEditorProps) {
+}, ref) {
   const commonDialogService = useService(CommonDialogService);
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>| string) => {
@@ -79,23 +82,28 @@ export const InlineEditor = observer(function InlineEditor({
   }, [value, commonDialogService, onSave, onReject, handleChange]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      onSave();
-    }
-    if (event.key === 'Esc' && onReject) {
-      onReject();
+    switch (event.key) {
+      case 'Enter':
+        onSave();
+        break;
+      case 'Escape':
+        onReject?.();
+        break;
     }
   }, [onSave, onReject]);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (autofocus) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, []);
 
+  useImperativeHandle(ref, () => inputRef.current!);
+
   return styled(useStyles(InlineEditorStyles))(
-    <editor as="div" className={className}>
+    <editor as="div" className={className} {...use({ active })}>
       <editor-container as="div">
         <input
           ref={inputRef}
@@ -118,4 +126,4 @@ export const InlineEditor = observer(function InlineEditor({
       </editor-actions>
     </editor>
   );
-});
+}, { forwardRef: true });

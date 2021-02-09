@@ -11,16 +11,14 @@ import { observable, makeObservable } from 'mobx';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataAccessMode, IDatabaseDataModel } from './IDatabaseDataModel';
+import type { IDatabaseDataModel } from './IDatabaseDataModel';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
 implements IDatabaseDataModel<TOptions, TResult> {
   id: string;
-  results: TResult[];
   source: IDatabaseDataSource<TOptions, TResult>;
-  access: DatabaseDataAccessMode;
   countGain: number;
 
   get requestInfo(): IRequestInfo {
@@ -33,16 +31,12 @@ implements IDatabaseDataModel<TOptions, TResult> {
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     makeObservable(this, {
-      results: observable,
-      access: observable,
       countGain: observable,
     });
 
     this.id = uuid();
     this.source = source;
     this.countGain = 0;
-    this.results = [];
-    this.access = DatabaseDataAccessMode.Default;
   }
 
   isLoading(): boolean {
@@ -53,35 +47,22 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.offset <= offset && this.source.count >= count;
   }
 
-  async refresh(): Promise<void> {
-    await this.requestData();
-  }
-
-  async reload(): Promise<void> {
-    this.setSlice(0, this.countGain);
-    await this.requestData();
+  getResult(index: number): TResult | null {
+    return this.source.getResult(index);
   }
 
   setResults(results: TResult[]): this {
-    this.results = results;
+    this.source.setResults(results);
+    return this;
+  }
+
+  setAccess(access: DatabaseDataAccessMode): this {
+    this.source.setAccess(access);
     return this;
   }
 
   setCountGain(count: number): this {
     this.countGain = count;
-    return this;
-  }
-
-  getResult(index: number): TResult | null {
-    if (this.results.length > index) {
-      return this.results[index];
-    }
-
-    return null;
-  }
-
-  setAccess(access: DatabaseDataAccessMode): this {
-    this.access = access;
     return this;
   }
 
@@ -105,14 +86,23 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this;
   }
 
+  async refresh(): Promise<void> {
+    await this.requestData();
+  }
+
+  async reload(): Promise<void> {
+    this.setSlice(0, this.countGain);
+    await this.requestData();
+  }
+
   async requestDataPortion(offset: number, count: number): Promise<void> {
     if (!this.isDataAvailable(offset, count)) {
       this.source.setSlice(offset, count);
-      this.results = await this.source.requestData(this.results);
+      await this.source.requestData();
     }
   }
 
   async requestData(): Promise<void> {
-    this.results = await this.source.requestData(this.results);
+    await this.source.requestData();
   }
 }

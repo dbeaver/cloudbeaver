@@ -9,18 +9,11 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
-
-export enum DatabaseDataAccessMode {
-  Default,
-  Readonly
-}
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
 export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
-  readonly results: TResult[];
   readonly source: IDatabaseDataSource<TOptions, TResult>;
-  readonly access: DatabaseDataAccessMode;
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
   readonly countGain: number;
@@ -30,8 +23,8 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
 
   getResult: (index: number) => TResult | null;
 
-  setCountGain: (count: number) => this;
   setAccess: (access: DatabaseDataAccessMode) => this;
+  setCountGain: (count: number) => this;
   setSlice: (offset: number, count?: number) => this;
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;

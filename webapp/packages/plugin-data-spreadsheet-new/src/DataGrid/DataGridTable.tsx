@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import DataGrid from 'react-data-grid';
 import type { Column } from 'react-data-grid';
+import type { Position } from 'react-data-grid/lib/types';
 import styled from 'reshadow';
 
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
@@ -18,10 +19,11 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { TextTools } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
+import { EditingContext } from '../Editing/EditingContext';
+import { useEditing } from '../Editing/useEditing';
 import { ResultSetTools } from '../ResultSetTools';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
-import { CellEditor } from './CellEditor/CellEditor';
 import { DataGridContext, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
@@ -62,6 +64,37 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const gridSortingContext = useGridSortingContext(model);
   const gridSelectionContext = useGridSelectionContext(modelResultData, { indexColumnKey: indexColumn.key });
+  const editingContext = useEditing({
+    onEdit: (position, key) => {
+      const editor = model.source.getEditor(resultIndex);
+
+      // TODO: not works yet
+      switch (key) {
+        case 'Delete':
+        case 'Backspace':
+          editor.setCell(position.rowIdx, position.idx, '');
+          break;
+        default:
+          if (key) {
+            editor.setCell(position.rowIdx, position.idx, key);
+          }
+      }
+
+      return true;
+    },
+  });
+
+  useEffect(() => {
+    if (model.isLoading()) {
+      editingContext.close();
+    }
+  }, [model.isLoading()]);
+
+  const handleFocusChange = (position: Position) => {
+    if (!editingContext.isEditing(position)) {
+      editingContext.close();
+    }
+  };
 
   const handleScroll = useCallback(
     async (event: React.UIEvent<HTMLDivElement>) => {
@@ -110,28 +143,11 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     // TODO: we need some result type specified formatter to common actions with data
     const rows = (modelResultData.data as SqlResultSet).rows || [];
 
-    const columns: Array<Column<any[], any>> = (modelResultData.data as SqlResultSet).columns!.map((col, i) => ({
-      key: i + '',
+    const columns = (modelResultData.data as SqlResultSet).columns!.map<Column<any[], any>>((col, columnIndex) => ({
+      key: columnIndex + '',
       name: col.label!,
-      width: Math.min(300, measuredCells[i]),
-      minWidth: 40,
-      resizable: true,
-      editable: true,
+      width: Math.min(300, measuredCells[columnIndex]),
       headerRenderer: TableColumnHeader,
-      formatter: CellFormatter,
-      editor: CellEditor,
-      editorOptions: {
-        onCellKeyDown: event => {
-          event.preventDefault();
-          event.stopPropagation();
-        },
-        onNavigation: event => {
-          event.preventDefault();
-          event.stopPropagation();
-
-          return false;
-        },
-      },
     }));
     columns.unshift(indexColumn);
 
@@ -148,18 +164,26 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     <DataGridContext.Provider value={gridContext}>
       <DataGridSortingContext.Provider value={gridSortingContext}>
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
-          <DataGridTableContainer modelResultData={modelResultData}>
-            <DataGrid
-              className={`cb-react-grid-theme ${className}`}
-              columns={columns}
-              rows={rows}
-              headerRowHeight={28}
-              rowHeight={24}
-              rowRenderer={RowRenderer}
-              onScroll={handleScroll}
-            />
-            <div ref={editorRef} />
-          </DataGridTableContainer>
+          <EditingContext.Provider value={editingContext}>
+            <DataGridTableContainer modelResultData={modelResultData}>
+              <DataGrid
+                className={`cb-react-grid-theme ${className}`}
+                columns={columns}
+                defaultColumnOptions={{
+                  minWidth: 40,
+                  resizable: true,
+                  formatter: CellFormatter,
+                }}
+                rows={rows}
+                headerRowHeight={28}
+                rowHeight={24}
+                rowRenderer={RowRenderer}
+                onSelectedCellChange={handleFocusChange}
+                onScroll={handleScroll}
+              />
+              <div ref={editorRef} />
+            </DataGridTableContainer>
+          </EditingContext.Provider>
         </DataGridSelectionContext.Provider>
       </DataGridSortingContext.Provider>
     </DataGridContext.Provider>

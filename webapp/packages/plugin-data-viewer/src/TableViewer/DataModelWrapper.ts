@@ -14,9 +14,8 @@ import { DetailsError } from '@cloudbeaver/core-sdk';
 
 import type { IDataContainerOptions } from '../ContainerDataSource';
 import { DatabaseDataModel } from '../DatabaseDataModel/DatabaseDataModel';
-import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
-import type { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
+import { DatabaseDataAccessMode, IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
 import type { RowDiff } from './TableDataModel/EditedRow';
 import { IRequestDataResult, TableViewerModel } from './TableViewerModel';
 
@@ -101,7 +100,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   }
 
   setAccess(access: DatabaseDataAccessMode): this {
-    this.access = access;
+    this.source.setAccess(access);
 
     for (const model of this.deprecatedModels) {
       model.access = access;
@@ -117,7 +116,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
   async requestData(): Promise<void> {
     this.clearErrors();
     try {
-      this.results = await this.source.requestData(this.results);
+      await this.source.requestData();
       await this.setDeprecatedModelData();
     } catch (exception) {
       this.showError(exception);
@@ -130,7 +129,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
       this.source.setSlice(offset, count);
       this.clearErrors();
       try {
-        this.results = await this.source.requestData(this.results);
+        await this.source.requestData();
         await this.setDeprecatedModelData();
       } catch (exception) {
         this.showError(exception);
@@ -164,12 +163,12 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
    * @deprecated will be removed
    */
   private async setDeprecatedModelData() {
-    if (this.deprecatedModels.length !== this.results.length) {
-      this.deprecatedModels = this.deprecatedModels.slice(0, this.results.length);
+    if (this.deprecatedModels.length !== this.source.results.length) {
+      this.deprecatedModels = this.deprecatedModels.slice(0, this.source.results.length);
 
-      for (let i = this.deprecatedModels.length; i < this.results.length; i++) {
+      for (let i = this.deprecatedModels.length; i < this.source.results.length; i++) {
         this.deprecatedModels.push(new TableViewerModel({
-          access: this.access,
+          access: this.source.access,
           requestDataAsync: async (
             model: TableViewerModel,
             offset: number,
@@ -209,16 +208,16 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
       }
     }
 
-    for (let i = 0; i < this.results.length; i++) {
+    for (let i = 0; i < this.source.results.length; i++) {
       const model = this.getOldModel(i)!;
       const result = this.getResult(i)!;
 
       model.refresh();
       model.setColumns(result.data.columns);
       model.insertRows(0, result.data.rows, !result.loadedFully);
-      model.access = this.results.length > 1
+      model.access = this.source.results.length > 1
         ? DatabaseDataAccessMode.Readonly
-        : this.access;
+        : this.source.access;
     }
   }
 

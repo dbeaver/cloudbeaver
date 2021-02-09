@@ -131,7 +131,7 @@ export class SqlResultTabsService {
             .setSlice(0, fetchingSettings.fetchDefault)
             .requestData();
 
-          length = model.results.length;
+          length = model.source.results.length;
 
           if (length === 1) {
             resultTab.name = this.getTabNameForOrder(tabGroup.order);

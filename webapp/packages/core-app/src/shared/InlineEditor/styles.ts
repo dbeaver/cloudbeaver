@@ -38,7 +38,7 @@ export const InlineEditorStyles = composes(
     border: solid 1px;
   }
 
-  editor:focus-within {
+  editor:focus-within, editor[|active] {
     border-color: #01cca3;
   }
 
@@ -73,7 +73,7 @@ export const InlineEditorStyles = composes(
     border: solid 1px;
   }
 
-  editor:focus-within {
+  editor:focus-within, editor[|active] {
     & editor-actions {
       border-top-color:  #01cca3;
       border-right-color: #01cca3;
@@ -95,7 +95,7 @@ export const InlineEditorStyles = composes(
     left: auto;
   }
 
-  editor:focus-within {
+  editor:focus-within, editor[|active] {
     & editor-actions[|position=bottom],
     & editor-actions[|position=top] {
       border-left-color: #01cca3;

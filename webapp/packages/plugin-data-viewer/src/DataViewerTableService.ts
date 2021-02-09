@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource } from './ContainerDataSource';
-import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataModel';
+import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
 import type { DataModelWrapper } from './TableViewer/DataModelWrapper';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 

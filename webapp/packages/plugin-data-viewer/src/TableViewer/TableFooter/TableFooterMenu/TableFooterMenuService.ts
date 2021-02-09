@@ -35,12 +35,26 @@ export class TableFooterMenuService {
         if (context.data.model.deprecatedModels.length === 0) {
           return true;
         }
-        return context.data.model.isLoading() || !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
+        const editor = context.data.model.source.getEditor(context.data.resultIndex);
+
+        return context.data.model.isLoading()
+        || (!context.data.model.getOldModel(context.data.resultIndex)?.isEdited()
+        && !editor.isEdited());
       },
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
-      onClick: context => context.data.model.getOldModel(context.data.resultIndex)?.saveChanges(),
+      onClick: context => {
+        const editor = context.data.model.source.getEditor(context.data.resultIndex);
+
+        if (context.data.model.getOldModel(context.data.resultIndex)?.isEdited()) {
+          context.data.model.getOldModel(context.data.resultIndex)?.saveChanges();
+        }
+
+        if (editor.isEdited()) {
+          context.data.model.source.saveData();
+        }
+      },
     });
     this.registerMenuItem({
       id: 'cancel ',
@@ -51,12 +65,21 @@ export class TableFooterMenuService {
         if (context.data.model.deprecatedModels.length === 0) {
           return true;
         }
-        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited();
+
+        const editor = context.data.model.source.getEditor(context.data.resultIndex);
+
+        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited()
+        && !editor.isEdited();
       },
       order: 2,
       title: 'ui_processing_cancel',
       icon: 'table-cancel',
-      onClick: context => context.data.model.getOldModel(context.data.resultIndex)?.cancelChanges(),
+      onClick: context => {
+        context.data.model.getOldModel(context.data.resultIndex)?.cancelChanges();
+
+        const editor = context.data.model.source.getEditor(context.data.resultIndex);
+        editor.cancelChanges();
+      },
     });
   }
 
