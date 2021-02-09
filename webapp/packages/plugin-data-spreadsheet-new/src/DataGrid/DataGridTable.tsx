@@ -8,12 +8,13 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataGrid from 'react-data-grid';
 import type { Column } from 'react-data-grid';
 import type { Position } from 'react-data-grid/lib/types';
 import styled from 'reshadow';
 
+import { Executor } from '@cloudbeaver/core-executor';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { TextTools } from '@cloudbeaver/core-utils';
@@ -24,7 +25,7 @@ import { useEditing } from '../Editing/useEditing';
 import { ResultSetTools } from '../ResultSetTools';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
-import { DataGridContext, IDataGridContext } from './DataGridContext';
+import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
 import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
@@ -59,6 +60,7 @@ const indexColumn: Column<any[], any> = {
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const styles = useStyles(reactGridStyles, baseStyles);
+  const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const modelResultData = model?.getResult(resultIndex);
 
@@ -156,6 +158,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const gridContext = useMemo<IDataGridContext>(() => ({
     model,
+    columnResize,
     resultIndex,
     getEditorPortal: () => editorRef.current,
   }), [model, resultIndex, editorRef]);
@@ -179,6 +182,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
                 rowHeight={24}
                 rowRenderer={RowRenderer}
                 onSelectedCellChange={handleFocusChange}
+                onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />

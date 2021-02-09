@@ -8,11 +8,18 @@
 
 import { createContext } from 'react';
 
+import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+
+export interface IColumnResizeInfo {
+  column: number;
+  width: number;
+}
 
 export interface IDataGridContext {
   model: IDatabaseDataModel<any>;
   resultIndex: number;
+  columnResize: IExecutor<IColumnResizeInfo>;
   getEditorPortal: () => HTMLDivElement | null;
 }
 

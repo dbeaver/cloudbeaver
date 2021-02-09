@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import type { EditorProps } from 'react-data-grid';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
@@ -15,7 +15,7 @@ import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
 
-import { DataGridContext } from '../DataGridContext';
+import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 
 const styles = css`
   editor {
@@ -59,6 +59,18 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   useImperativeHandle(ref, () => ({
     focus: () => inputRef.current?.focus(),
   }));
+
+  useEffect(() => {
+    function resize(data: IColumnResizeInfo) {
+      if (elementRef && popperRef && data.column === column.idx) {
+        popperRef.style.width = (data.width + 1) + 'px';
+      }
+    }
+
+    context.columnResize.addHandler(resize);
+
+    return () => context.columnResize.removeHandler(resize);
+  }, [elementRef, popperRef, column]);
 
   useLayoutEffect(() => {
     if (elementRef && popperRef) {
