@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -189,7 +190,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Deprecated
     @Override
-    public WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig config) throws DBWebException {
+    public WebConnectionInfo openConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
         String templateId = config.getTemplateId();
         if (CommonUtils.isEmpty(templateId)) {
             throw new DBWebException("Only preconfigured data sources are supported yet");
@@ -233,9 +234,15 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties, Boolean saveCredentials) throws DBWebException {
+    public WebConnectionInfo initConnection(
+        @NotNull WebSession webSession,
+        @NotNull String connectionId,
+        @NotNull Map<String, Object> authProperties,
+        @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
+        @Nullable Boolean saveCredentials) throws DBWebException
+    {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
-        connectionInfo.setSavedAuthProperties(authProperties);
+        connectionInfo.setSavedCredentials(authProperties, networkCredentials);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
         if (dataSourceContainer.isConnected()) {
@@ -253,10 +260,18 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceContainer.setSavePassword(oldSavePassword);
         }
         if (saveCredentials != null && saveCredentials) {
-            // Save credentials in the datasource
-            if (!CommonUtils.isEmpty(authProperties)) {
-                authProperties.forEach((s, o) ->
-                    dataSourceContainer.getConnectionConfiguration().setAuthProperty(s, CommonUtils.toString(o)));
+            // Save all passed credentials in the datasource container
+            WebServiceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
+            // Mark all specified network configs as saved
+            if (networkCredentials != null) {
+                networkCredentials.forEach(c -> {
+                    if (c.isEnabled() && !CommonUtils.isEmpty(c.getUserName())) {
+                        DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
+                        if (handlerCfg != null) {
+                            handlerCfg.setSavePassword(true);
+                        }
+                    }
+                });
             }
             dataSourceContainer.setSavePassword(true);
             dataSourceContainer.persistConfiguration();
@@ -266,7 +281,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
+    public WebConnectionInfo createConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException {
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
@@ -456,6 +471,9 @@ public class WebServiceCore implements DBWServiceCore {
         if (forceDelete) {
             webSession.getSingletonProject().getDataSourceRegistry().removeDataSource(dataSourceContainer);
             webSession.removeConnection(connectionInfo);
+        } else {
+            // Just reset saved credentials
+            connectionInfo.setSavedCredentials(null, null);
         }
 
         return connectionInfo;

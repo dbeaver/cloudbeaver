@@ -49,7 +49,9 @@ public class WebConnectionInfo {
     private String connectTime;
     private String serverVersion;
     private String clientVersion;
-    private Map<String, Object> savedAuthProperties;
+
+    private transient Map<String, Object> savedAuthProperties;
+    private transient List<WebNetworkHandlerConfigInput> savedNetworkCredentials;
 
     public WebConnectionInfo(WebSession session, DBPDataSourceContainer ds) {
         this.session = session;
@@ -286,8 +288,13 @@ public class WebConnectionInfo {
         return savedAuthProperties;
     }
 
-    public void setSavedAuthProperties(Map<String, Object> authProperties) {
+    public List<WebNetworkHandlerConfigInput> getSavedNetworkCredentials() {
+        return savedNetworkCredentials;
+    }
+
+    public void setSavedCredentials(Map<String, Object> authProperties, List<WebNetworkHandlerConfigInput> networkCredentials) {
         this.savedAuthProperties = authProperties;
+        this.savedNetworkCredentials = networkCredentials;
     }
 
     @Property

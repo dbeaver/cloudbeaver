@@ -666,15 +666,9 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     return false;
                 }
             }
-
-            // Properties passed from web
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
-                // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
-                Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
-                if (authProperties != null) {
-                    authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
-                }
+                WebServiceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }
 
             // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)

@@ -32,6 +32,9 @@ import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Web service implementation
@@ -88,7 +91,20 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env),
                 env.getArgument("nodePath"),
                 new WebConnectionConfig(env.getArgument("config"))))
-            .dataFetcher("initConnection", env -> getService(env).initConnection(getWebSession(env), env.getArgument("id"), env.getArgument("credentials"), env.getArgument("saveCredentials")))
+            .dataFetcher("initConnection", env -> {
+                    List<Map<String, Object>> networkCredentials = env.getArgument("networkCredentials");
+                    List<WebNetworkHandlerConfigInput> nhc = null;
+                    if (networkCredentials != null) {
+                        nhc = networkCredentials.stream().map(WebNetworkHandlerConfigInput::new).collect(Collectors.toList());
+                    }
+                    return getService(env).initConnection(
+                        getWebSession(env),
+                        env.getArgument("id"),
+                        env.getArgument("credentials"),
+                        nhc,
+                        env.getArgument("saveCredentials"));
+                }
+            )
             .dataFetcher("testConnection", env -> getService(env).testConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))))
             .dataFetcher("closeConnection", env -> getService(env).closeConnection(getWebSession(env), env.getArgument("id")))

@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -54,6 +55,7 @@ import org.jkiss.utils.CommonUtils;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -306,5 +308,26 @@ public class WebServiceUtils {
             }
         }
         return dataSource;
+    }
+
+    public static void saveCredentialsInDataSource(WebConnectionInfo webConnectionInfo, DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+        // Properties passed from web
+        // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
+        Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
+        if (authProperties != null) {
+            authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
+        }
+        List<WebNetworkHandlerConfigInput> networkCredentials = webConnectionInfo.getSavedNetworkCredentials();
+        if (networkCredentials != null) {
+            networkCredentials.forEach(c -> {
+                if (c.isEnabled()) {
+                    DBWHandlerConfiguration handlerCfg = configuration.getHandler(c.getId());
+                    if (handlerCfg != null) {
+                        handlerCfg.setUserName(c.getUserName());
+                        handlerCfg.setPassword(c.getPassword());
+                    }
+                }
+            });
+        }
     }
 }

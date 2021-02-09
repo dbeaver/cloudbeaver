@@ -22,6 +22,7 @@ import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import javax.servlet.http.HttpServletRequest;
@@ -88,13 +89,22 @@ public interface DBWServiceCore extends DBWService {
     // Replaced with initConnection
     @Deprecated
     @WebAction
-    WebConnectionInfo openConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
+    WebConnectionInfo openConnection(
+        @NotNull WebSession webSession,
+        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo initConnection(WebSession webSession, String connectionId, Map<String, Object> authProperties, Boolean saveCredentials) throws DBWebException;
+    WebConnectionInfo initConnection(
+        @NotNull WebSession webSession,
+        @NotNull String connectionId,
+        @NotNull Map<String, Object> authProperties,
+        @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
+        @Nullable Boolean saveCredentials) throws DBWebException;
 
     @WebAction
-    WebConnectionInfo createConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException;
+    WebConnectionInfo createConnection(
+        @NotNull WebSession webSession,
+        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
     WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException;

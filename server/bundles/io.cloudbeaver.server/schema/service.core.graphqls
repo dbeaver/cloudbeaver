@@ -423,7 +423,7 @@ extend type Mutation {
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, credentials: Object, saveCredentials: Boolean ): ConnectionInfo!
+    initConnection( id: ID!, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID! ): ConnectionInfo!
