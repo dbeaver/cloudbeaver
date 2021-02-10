@@ -1,6 +1,6 @@
 
 /*
- * cloudbeaver - Cloud Database Manager
+ * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2021 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
