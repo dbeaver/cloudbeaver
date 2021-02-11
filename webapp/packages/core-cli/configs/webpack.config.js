@@ -36,11 +36,12 @@ module.exports = (env, argv) => {
   function getBaseStyleLoaders() {
     const loaders = [];
 
-    if(devMode) {
-      loaders.push('style-loader')
-    }else{
+    // Broke styles order in dev mode
+    // if(devMode) {
+      // loaders.push('style-loader')
+    // }else{
       loaders.push(MiniCssExtractPlugin.loader);
-    }
+    // }
 
     return loaders;
   }
