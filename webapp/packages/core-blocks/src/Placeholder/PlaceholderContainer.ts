@@ -10,26 +10,26 @@ import { observable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
-export interface PlaceholderProps<T = unknown> {
+export interface PlaceholderProps<T = undefined> {
   context: T;
 }
 
-export type PlaceholderComponent<T = unknown> = React.FunctionComponent<PlaceholderProps<T>>;
+export type PlaceholderComponent<T = undefined> = React.FunctionComponent<PlaceholderProps<T>>;
 
-export interface PlaceholderElement<T = unknown> {
+export interface PlaceholderElement<T = undefined> {
   id: string;
   component: PlaceholderComponent<T>;
   order?: number;
 }
 
-export class PlaceholderContainer<T = any> {
+export class PlaceholderContainer<T = undefined> {
   private placeholders = observable<PlaceholderElement<T>>([], { deep: false });
 
-  get() {
+  get(): Array<PlaceholderElement<T>> {
     return this.placeholders;
   }
 
-  add(component: PlaceholderComponent<T>, order?: number) {
+  add(component: PlaceholderComponent<T>, order?: number): void {
     const placeholder: PlaceholderElement<T> = {
       id: uuid(),
       component,
