@@ -10,7 +10,7 @@ import { action, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
   UserConnectionFragment,
@@ -54,9 +54,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
-    this.onItemAdd.addHandler(() => !this.sessionUpdate);
-    this.onItemDelete.addHandler(() => !this.sessionUpdate);
-    this.onConnectionCreate.addHandler(() => !this.sessionUpdate);
+    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
+    this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
+    this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
     sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
     appAuthService.auth.addHandler(() => this.refreshSession(true));
   }

@@ -6,14 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ExecutionContext, IExecutionContextProvider } from './ExecutionContext';
+import { ExecutionContext } from './ExecutionContext';
+import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
+import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
 import type { IExecutor } from './IExecutor';
 import type { IExecutorHandler } from './IExecutorHandler';
+import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 import { BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler';
 
 export class Executor<T = unknown> implements IExecutor<T> {
-  private handlers: Array<IExecutorHandler<any>> = [];
-  private postHandlers: Array<IExecutorHandler<any>> = [];
+  private collection: ExecutorHandlersCollection<T>;
   private scheduler: TaskScheduler<T>;
 
   constructor(
@@ -21,47 +23,65 @@ export class Executor<T = unknown> implements IExecutor<T> {
     isBlocked: BlockedExecution<T> | null = null
   ) {
     this.scheduler = new TaskScheduler(isBlocked);
+    this.collection = new ExecutorHandlersCollection();
   }
 
-  async execute(data: T): Promise<IExecutionContextProvider<T>> {
+  before<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+    this.collection.before(executor, map);
+    return this;
+  }
+
+  next<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+    this.collection.next(executor, map);
+    return this;
+  }
+
+  async execute(
+    data: T,
+    context?: IExecutionContext<T>,
+    scope?: IExecutorHandlersCollection<T>
+  ): Promise<IExecutionContextProvider<T>> {
     data = this.getDefaultData(data);
 
     return await this.scheduler.schedule(data, async () => {
-      const context = new ExecutionContext(data);
-
-      try {
-        for (const handler of this.handlers) {
-          const result = await handler(data, context);
-
-          if (result === false) {
-            return context;
-          }
-        }
-      } finally {
-        for (const handler of this.postHandlers) {
-          await handler(data, context);
-        }
+      if (!context) {
+        context = new ExecutionContext(data);
       }
-      return context;
+      return this.collection.execute(data, context, scope);
+    });
+  }
+
+  async executeScope(
+    data: T,
+    scoped?: IExecutorHandlersCollection<T>,
+    context?: IExecutionContext<T>
+  ): Promise<IExecutionContextProvider<T>> {
+    data = this.getDefaultData(data);
+
+    return await this.scheduler.schedule(data, async () => {
+      if (!context) {
+        context = new ExecutionContext(data);
+      }
+      return this.collection.execute(data, context, scoped);
     });
   }
 
   addHandler(handler: IExecutorHandler<T>): this {
-    this.handlers.push(handler);
+    this.collection.addHandler(handler);
     return this;
   }
 
   removeHandler(handler: IExecutorHandler<T>): void {
-    this.handlers = this.handlers.filter(h => h !== handler);
+    this.collection.removeHandler(handler);
   }
 
   addPostHandler(handler: IExecutorHandler<T>): this {
-    this.postHandlers.push(handler);
+    this.collection.addPostHandler(handler);
     return this;
   }
 
   removePostHandler(handler: IExecutorHandler<T>): void {
-    this.postHandlers = this.postHandlers.filter(h => h !== handler);
+    this.collection.removePostHandler(handler);
   }
 
   private getDefaultData(data: T): T {

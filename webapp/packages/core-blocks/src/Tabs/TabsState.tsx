@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
-import { Executor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { TabsContainer } from './TabsContainer';
@@ -79,14 +79,14 @@ export function TabsState<T = Record<string, any>>({
   }
 
   useEffect(() => {
-    const openHandler: IExecutorHandler<ITabData<T>> = data => {
+    const openHandler: IExecutorHandler<ITabData<T>> = (data, contexts) => {
       dynamic.current.open?.(data);
       if (dynamic.current.selectedId === data.tabId) {
-        return false;
+        ExecutorInterrupter.interrupt(contexts);
+        return;
       }
       dynamic.current.selectedId = data.tabId;
       dynamic.current.state.setSelectedId(data.tabId);
-      return undefined;
     };
     const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.current.close?.(data);
 
