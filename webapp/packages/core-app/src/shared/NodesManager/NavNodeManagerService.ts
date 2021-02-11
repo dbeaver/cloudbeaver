@@ -393,7 +393,7 @@ export class NavNodeManagerService extends Bootstrap {
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ): Promise<void | false> {
+  ): Promise<void> {
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {

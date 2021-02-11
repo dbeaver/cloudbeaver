@@ -84,7 +84,7 @@ export function useMapResource<
       try {
         await actions?.onLoad?.(resource);
 
-        if (key === null || resource.isLoaded(key)) {
+        if (key === null) {
           return;
         }
 
