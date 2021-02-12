@@ -10,9 +10,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import type { IExecutor } from './IExecutor';
+import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
 export function useFormValidator(
-  validationTask: IExecutor<boolean>,
+  validationTask: IExecutor<any> | IExecutorHandlersCollection<any>,
   ref: React.RefObject<HTMLFormElement>,
   callback?: () => void
 ): void {

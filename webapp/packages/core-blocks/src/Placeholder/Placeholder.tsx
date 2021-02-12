@@ -10,15 +10,15 @@ import { observer } from 'mobx-react-lite';
 
 import type { PlaceholderContainer } from './PlaceholderContainer';
 
-type Props<T = unknown> = T extends unknown ? {
+type Props<T> = {
   container: PlaceholderContainer<T>;
-  context?: T;
+} & (T extends undefined ? {
+  context?: undefined;
 } : {
-  container: PlaceholderContainer<T>;
   context: T;
-};
+});
 
-export const Placeholder = observer(function Placeholder<T = unknown>({ container, context }: Props<T>) {
+export const Placeholder = observer(function Placeholder<T>({ container, context }: Props<T>) {
   return (
     <>
       {container.get().map(({ id, component: Component }) => <Component key={id} context={context!} />)}

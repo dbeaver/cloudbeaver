@@ -7,24 +7,37 @@
  */
 
 import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
+import type { IExecutor } from './IExecutor';
 import type { IExecutorHandler } from './IExecutorHandler';
-import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export interface IExecutor<T = unknown> {
+export type ChainLinkType = 'next' | 'before';
+
+export interface IChainLink<T> {
+  executor: IExecutor<any>;
+  map?: (data: T) => any;
+  type: ChainLinkType;
+}
+
+export interface IExecutorHandlersCollection<T = unknown> {
+  readonly handlers: Array<IExecutorHandler<T>>;
+  readonly postHandlers: Array<IExecutorHandler<T>>;
+  readonly chain: Array<IChainLink<T>>;
+
   before: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   next: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   execute: (
     data: T,
-    context?: IExecutionContext<T>,
-    scope?: IExecutorHandlersCollection<T>
-  ) => Promise<IExecutionContextProvider<T>>;
-  executeScope: (
-    data: T,
-    scope?: IExecutorHandlersCollection<T>,
-    context?: IExecutionContext<T>
+    context: IExecutionContext<T>,
+    scoped?: IExecutorHandlersCollection<T>
   ) => Promise<IExecutionContextProvider<T>>;
   addHandler: (handler: IExecutorHandler<T>) => this;
   removeHandler: (handler: IExecutorHandler<T>) => void;
   addPostHandler: (handler: IExecutorHandler<T>) => this;
   removePostHandler: (handler: IExecutorHandler<T>) => void;
+
+  for: (link: IExecutor<any>) => IExecutorHandlersCollection<T>;
+  getLinkHandlers: (
+    link: IExecutor<any>,
+    scoped?: IExecutorHandlersCollection<T>
+  ) => IExecutorHandlersCollection<T> | undefined;
 }

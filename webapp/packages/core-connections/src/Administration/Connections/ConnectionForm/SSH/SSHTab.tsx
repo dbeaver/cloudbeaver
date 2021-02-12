@@ -15,6 +15,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource } from '../../../../NetworkHandlerResource';
 import type { IConnectionFormProps } from '../ConnectionFormService';
+import { SSH_TUNNEL_ID } from './SSH_TUNNEL_ID';
 
 export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab({
   model,
@@ -23,7 +24,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   ...rest
 }) {
   const styles = useStyles(style);
-  const handler = useMapResource(NetworkHandlerResource, 'ssh_tunnel');
+  const handler = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID);
 
   return styled(styles)(
     <Tab {...rest} style={style}>

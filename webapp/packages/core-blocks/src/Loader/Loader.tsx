@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useState, useEffect } from 'react';
 import styled, { use } from 'reshadow';
 
@@ -14,6 +15,12 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
 import { loaderStyles, overlayStyles } from './loaderStyles';
+
+type LoaderState = {
+  isLoading: () => boolean;
+} | {
+  loading: boolean;
+};
 
 interface Props {
   /** if false, nothing will be rendered, by default true */
@@ -31,6 +38,8 @@ interface Props {
   small?: boolean;
   className?: string;
   fullSize?: boolean;
+  state?: LoaderState | LoaderState[];
+  children?: () => React.ReactElement<any, any> | null;
   onCancel?: () => void;
 }
 
@@ -39,7 +48,7 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
-export const Loader: React.FC<Props> = function Loader({
+export const Loader: React.FC<Props> = observer(function Loader({
   cancelDisabled,
   overlay,
   message,
@@ -49,8 +58,22 @@ export const Loader: React.FC<Props> = function Loader({
   fullSize,
   className,
   loading = true,
+  state,
+  children,
   onCancel,
 }) {
+  if (state) {
+    state = Array.isArray(state) ? state : [state];
+
+    for (const element of state) {
+      if ('loading' in element) {
+        loading = element.loading;
+      } else if ('isLoading' in element) {
+        loading = element.isLoading();
+      }
+    }
+  }
+
   const style = useStyles(loaderStyles, overlay && overlayStyles);
   const [isVisible, setVisible] = useState(loading);
   const spinnerURL = (secondary || overlay) ? spinnerType.secondary : spinnerType.primary;
@@ -68,7 +91,7 @@ export const Loader: React.FC<Props> = function Loader({
   }, [loading]);
 
   if (!isVisible) {
-    return null;
+    return children?.() || null;
   }
 
   return styled(style)(
@@ -88,4 +111,4 @@ export const Loader: React.FC<Props> = function Loader({
       )}
     </loader>
   );
-};
+});
