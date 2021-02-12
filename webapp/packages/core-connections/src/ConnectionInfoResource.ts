@@ -18,11 +18,12 @@ import {
   CachedMapResource,
   ConnectionConfig,
   UserConnectionAuthPropertiesFragment,
-  resourceKeyList
+  resourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
+import type { DBAuthPartialConfig } from './DatabaseAuthDialog/DBAuthDialogController';
 
 export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 
@@ -128,9 +129,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return observedConnection;
   }
 
-  async init(id: string, credentials?: Record<string, any>, saveCredentials?: boolean): Promise<Connection> {
+  async init(id: string, config?: DBAuthPartialConfig): Promise<Connection> {
     await this.performUpdate(id, async () => {
-      const connection = await this.initConnection(id, credentials, saveCredentials);
+      const connection = await this.initConnection(id, config);
       this.set(id, connection);
     });
 
@@ -200,8 +201,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return authProperties;
   }
 
-  private async initConnection(id: string, credentials?: any, saveCredentials?: boolean): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.initConnection({ id, credentials, saveCredentials });
+  private async initConnection(id: string, config?: DBAuthPartialConfig): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.initConnection({ id, ...config });
 
     return connection;
   }

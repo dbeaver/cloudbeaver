@@ -19,7 +19,7 @@ import {
   FieldCheckbox,
   FormBox,
   FormBoxElement,
-  FormGroup
+  FormGroup,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -30,6 +30,7 @@ import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
+import { SSHAuthForm } from './SSHAuthForm';
 
 const styles = composes(
   css`
@@ -60,6 +61,7 @@ const styles = composes(
     }
     FormBox {
       align-items: center;
+      justify-content: center;
     }
     ErrorMessage {
       position: sticky;
@@ -69,18 +71,27 @@ const styles = composes(
   `
 );
 
+const SSH_TUNNEL_ID = 'ssh_tunnel';
+
 export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   payload,
   options,
   rejectDialog,
 }: DialogComponentProps<string>) {
   const connection = useConnectionInfo(payload);
+
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const controller = useController(DBAuthDialogController, payload, rejectDialog);
   const translate = useTranslate();
-
   const { credentialsSavingEnabled } = useAdministrationSettings();
+
+  const SSHConfig = connection.connectionInfo?.networkHandlersConfig.find(
+    handler => handler.id === SSH_TUNNEL_ID
+  );
+
+  const isAuthNeeded = connection.connectionInfo?.authNeeded;
+  const isSSHAuthNeeded = SSHConfig?.enabled && !SSHConfig.savePassword;
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -100,26 +111,37 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
             <FormBox>
-              <FormBoxElement>
-                <ObjectPropertyInfoForm
-                  autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
-                  properties={connection.connectionInfo?.authProperties}
-                  state={controller.config.credentials}
-                  disabled={controller.isAuthenticating}
-                />
-                {credentialsSavingEnabled && (
-                  <FormGroup>
-                    <FieldCheckbox
-                      name="saveCredentials"
-                      value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
-                      checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                      disabled={controller.isAuthenticating}
-                      state={controller.config}
-                      mod='surface'
-                    />
-                  </FormGroup>
-                )}
-              </FormBoxElement>
+              {isAuthNeeded && (
+                <FormBoxElement>
+                  <ObjectPropertyInfoForm
+                    autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
+                    properties={connection.connectionInfo?.authProperties}
+                    state={controller.config.credentials}
+                    disabled={controller.isAuthenticating}
+                  />
+                  {credentialsSavingEnabled && (
+                    <FormGroup>
+                      <FieldCheckbox
+                        name="saveCredentials"
+                        value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
+                        checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                        disabled={controller.isAuthenticating}
+                        state={controller.config}
+                        mod='surface'
+                      />
+                    </FormGroup>
+                  )}
+                </FormBoxElement>
+              )}
+              {isSSHAuthNeeded && SSHConfig && (
+                <FormBoxElement>
+                  <SSHAuthForm
+                    controller={controller}
+                    SSHConfig={SSHConfig}
+                    allowSavePassword={credentialsSavingEnabled}
+                  />
+                </FormBoxElement>
+              )}
             </FormBox>
           </SubmittingForm>
         )}

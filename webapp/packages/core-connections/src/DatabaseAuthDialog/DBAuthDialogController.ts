@@ -12,20 +12,23 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
-
 interface IDBAuthConfig {
   credentials: any;
+  networkCredentials: NetworkHandlerConfigInput[];
   saveCredentials: boolean;
 }
+
+export type DBAuthPartialConfig = Partial<IDBAuthConfig>;
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
   config: IDBAuthConfig = {
     credentials: {},
+    networkCredentials: [],
     saveCredentials: false,
   };
 
@@ -65,7 +68,8 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      await this.connectionInfoResource.init(this.connectionId, this.config.credentials, this.config.saveCredentials);
+      const connectionConfig = this.getConfig();
+      await this.connectionInfoResource.init(this.connectionId, connectionConfig);
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
@@ -81,6 +85,21 @@ export class DBAuthDialogController implements IInitializableController, IDestru
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   };
+
+  private getConfig() {
+    const config: DBAuthPartialConfig = {};
+
+    if (Object.keys(this.config.credentials).length > 0) {
+      config.credentials = this.config.credentials;
+      config.saveCredentials = this.config.saveCredentials;
+    }
+
+    if (this.config.networkCredentials.length > 0) {
+      config.networkCredentials = this.config.networkCredentials;
+    }
+
+    return config;
+  }
 
   private async loadAuthModel() {
     try {

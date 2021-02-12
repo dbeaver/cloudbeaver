@@ -15,4 +15,13 @@ fragment UserConnection on ConnectionInfo {
   navigatorSettings {
     ...AllNavigatorSettings
   }
+
+  networkHandlersConfig {
+    id
+    enabled
+    userName
+    password
+    savePassword
+    properties
+  }
 }
