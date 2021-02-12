@@ -33,9 +33,9 @@ export class ConnectionAuthService {
       return connection;
     }
 
-    const SSHConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
+    const sshConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
 
-    const isSSHAuthNeeded = SSHConfig?.enabled && !SSHConfig?.savePassword;
+    const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig?.savePassword;
 
     if (connection.authNeeded || isSSHAuthNeeded) {
       await this.commonDialogService.open(DatabaseAuthDialog, connectionId);
