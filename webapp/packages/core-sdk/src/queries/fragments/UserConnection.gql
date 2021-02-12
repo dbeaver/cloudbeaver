@@ -19,9 +19,6 @@ fragment UserConnection on ConnectionInfo {
   networkHandlersConfig {
     id
     enabled
-    userName
-    password
     savePassword
-    properties
   }
 }

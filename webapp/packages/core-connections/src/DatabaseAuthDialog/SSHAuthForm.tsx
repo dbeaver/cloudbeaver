@@ -7,19 +7,20 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 import styled, { css } from 'reshadow';
 
-import { FieldCheckbox, FormGroup, InputField, InputGroup } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, FormGroup, InputField, InputGroup, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { NetworkHandlerConfig } from '@cloudbeaver/core-sdk';
 
-import type { DBAuthDialogController } from './DBAuthDialogController';
+import { NetworkHandlerResource } from '../NetworkHandlerResource';
+import type { IDBAuthConfig } from './DBAuthDialogController';
 
 interface Props {
-  controller: DBAuthDialogController;
-  SSHConfig: NetworkHandlerConfig;
+  config: Required<IDBAuthConfig>;
+  sshConfig: Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>;
   allowSavePassword: boolean;
+  disabled: boolean;
 }
 
 const styles = css`
@@ -30,21 +31,25 @@ const styles = css`
 `;
 
 export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
-  controller, SSHConfig, allowSavePassword,
+  config, sshConfig, allowSavePassword, disabled,
 }) {
   const translate = useTranslate();
-  const disabled = controller.isAuthenticating;
+  const handler = useMapResource(NetworkHandlerResource, sshConfig.id);
 
-  if (!controller.config.networkCredentials.some(state => state.id === SSHConfig.id)) {
-    controller.config.networkCredentials.push({ ...SSHConfig });
+  if (!config.networkCredentials.some(state => state.id === sshConfig.id)) {
+    config.networkCredentials.push({
+      userName: '',
+      password: '',
+      ...sshConfig,
+    });
   }
 
-  const state = controller.config.networkCredentials.find(state => state.id === SSHConfig.id)!;
+  const state = config.networkCredentials.find(state => state.id === sshConfig.id)!;
 
   return styled(styles)(
     <form-container as='div'>
       <FormGroup>
-        <InputGroup>SSH</InputGroup>
+        <InputGroup>{translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}</InputGroup>
       </FormGroup>
       <FormGroup>
         <InputField
@@ -72,7 +77,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
         <FormGroup>
           <FieldCheckbox
             name="savePassword"
-            value={SSHConfig.id + ' savePassword'}
+            value={sshConfig.id + ' savePassword'}
             state={state}
             checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
             disabled={disabled}

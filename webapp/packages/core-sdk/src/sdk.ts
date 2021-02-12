@@ -1268,7 +1268,7 @@ export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessT
 
 export type UserConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> }
+  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>> }
 );
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1673,10 +1673,7 @@ export const UserConnectionFragmentDoc = `
   networkHandlersConfig {
     id
     enabled
-    userName
-    password
     savePassword
-    properties
   }
 }
     ${AllNavigatorSettingsFragmentDoc}`;

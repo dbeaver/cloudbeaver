@@ -26,9 +26,10 @@ import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dia
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { SSH_TUNNEL_ID } from '../NetworkHandlerResource';
 import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
-import { DBAuthDialogController } from './DBAuthDialogController';
+import { DBAuthDialogController, IDBAuthConfig } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 import { SSHAuthForm } from './SSHAuthForm';
 
@@ -70,8 +71,6 @@ const styles = composes(
     }
   `
 );
-
-const SSH_TUNNEL_ID = 'ssh_tunnel';
 
 export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   payload,
@@ -136,9 +135,10 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
               {isSSHAuthNeeded && SSHConfig && (
                 <FormBoxElement>
                   <SSHAuthForm
-                    controller={controller}
-                    SSHConfig={SSHConfig}
+                    config={(controller.config as Required<IDBAuthConfig>)}
+                    sshConfig={SSHConfig}
                     allowSavePassword={credentialsSavingEnabled}
+                    disabled={controller.isAuthenticating}
                   />
                 </FormBoxElement>
               )}

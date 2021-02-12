@@ -16,13 +16,12 @@ import { GQLErrorCatcher, NetworkHandlerConfigInput } from '@cloudbeaver/core-sd
 
 import { ConnectionInfoResource } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
-interface IDBAuthConfig {
-  credentials: any;
-  networkCredentials: NetworkHandlerConfigInput[];
-  saveCredentials: boolean;
+export interface IDBAuthConfig {
+  credentials?: any;
+  networkCredentials?: NetworkHandlerConfigInput[];
+  saveCredentials?: boolean;
 }
 
-export type DBAuthPartialConfig = Partial<IDBAuthConfig>;
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
@@ -68,8 +67,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      const connectionConfig = this.getConfig();
-      await this.connectionInfoResource.init(this.connectionId, connectionConfig);
+      await this.connectionInfoResource.init(this.connectionId, this.getConfig());
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
@@ -87,14 +85,14 @@ export class DBAuthDialogController implements IInitializableController, IDestru
   };
 
   private getConfig() {
-    const config: DBAuthPartialConfig = {};
+    const config: IDBAuthConfig = {};
 
-    if (Object.keys(this.config.credentials).length > 0) {
+    if (this.config.credentials && Object.keys(this.config.credentials).length > 0) {
       config.credentials = this.config.credentials;
       config.saveCredentials = this.config.saveCredentials;
     }
 
-    if (this.config.networkCredentials.length > 0) {
+    if (this.config.networkCredentials && this.config.networkCredentials.length > 0) {
       config.networkCredentials = this.config.networkCredentials;
     }
 

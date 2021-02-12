@@ -11,15 +11,14 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import { Connection, ConnectionInfoResource } from './ConnectionInfoResource';
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
-
-const SSH_TUNNEL_ID = 'ssh_tunnel';
+import { SSH_TUNNEL_ID } from './NetworkHandlerResource';
 
 @injectable()
 export class ConnectionAuthService {
   constructor(
     private connectionInfoResource: ConnectionInfoResource,
     private commonDialogService: CommonDialogService
-  ) {}
+  ) { }
 
   async auth(connectionId: string): Promise<Connection> {
     let connection = this.connectionInfoResource.get(connectionId);

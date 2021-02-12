@@ -9,6 +9,7 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
+import { SSH_TUNNEL_ID } from '../../../NetworkHandlerResource';
 import { isLocalConnection } from '../../ConnectionsResource';
 import { ConnectionAccess } from './ConnectionAccess/ConnectionAccess';
 import { ConnectionFormService } from './ConnectionFormService';
@@ -17,7 +18,6 @@ import { Options } from './Options/Options';
 import { OriginInfo } from './OriginInfo/OriginInfo';
 import { OriginInfoTab } from './OriginInfo/OriginInfoTab';
 import { SSH } from './SSH/SSH';
-import { SSH_TUNNEL_ID } from './SSH/SSH_TUNNEL_ID';
 import { SSHTab } from './SSH/SSHTab';
 
 @injectable()
