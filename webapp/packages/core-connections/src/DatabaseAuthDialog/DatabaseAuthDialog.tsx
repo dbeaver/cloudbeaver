@@ -85,12 +85,12 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   const translate = useTranslate();
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  const SSHConfig = connection.connectionInfo?.networkHandlersConfig.find(
+  const sshConfig = connection.connectionInfo?.networkHandlersConfig.find(
     handler => handler.id === SSH_TUNNEL_ID
   );
 
   const isAuthNeeded = connection.connectionInfo?.authNeeded;
-  const isSSHAuthNeeded = SSHConfig?.enabled && !SSHConfig.savePassword;
+  const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig.savePassword;
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -132,11 +132,11 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                   )}
                 </FormBoxElement>
               )}
-              {isSSHAuthNeeded && SSHConfig && (
+              {isSSHAuthNeeded && sshConfig && (
                 <FormBoxElement>
                   <SSHAuthForm
                     config={(controller.config as Required<IDBAuthConfig>)}
-                    sshConfig={SSHConfig}
+                    sshConfig={sshConfig}
                     allowSavePassword={credentialsSavingEnabled}
                     disabled={controller.isAuthenticating}
                   />
