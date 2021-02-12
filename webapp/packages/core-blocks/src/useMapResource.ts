@@ -59,27 +59,27 @@ export function useMapResource<
 
   const [result] = useState<IMapResourceResult<TKeyArg, TResource>>(() => ({
     get resource() {
-      return refObj.current.resource;
+      return refObj.resource;
     },
     get data() {
-      if (refObj.current.key === null) {
+      if (refObj.key === null) {
         return undefined;
       }
 
-      return resource.get(refObj.current.key);
+      return resource.get(refObj.key);
     },
     isLoading: () => {
-      if (refObj.current.key === null) {
+      if (refObj.key === null) {
         return false;
       }
 
-      return resource.isDataLoading(refObj.current.key);
+      return resource.isDataLoading(refObj.key);
     },
   }));
 
   useEffect(() => {
     (async () => {
-      const { resource, actions, prevData } = refObj.current;
+      const { resource, actions, prevData } = refObj;
 
       try {
         await actions?.onLoad?.(resource);
@@ -97,7 +97,7 @@ export function useMapResource<
             prevData
           );
         } finally {
-          refObj.current.prevData = newData;
+          refObj.prevData = newData;
         }
       } catch (exception) {
         notifications.logException(exception, 'Can\'t load data');

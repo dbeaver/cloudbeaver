@@ -54,9 +54,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
-    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
-    this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
-    this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
+    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
     appAuthService.auth.addHandler(() => this.refreshSession(true));
   }
@@ -104,6 +104,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       config,
     });
     return this.add(connection);
+  }
+
+  async testConnection(config: ConnectionConfig): Promise<void> {
+    await this.graphQLService.sdk.testConnection({
+      config,
+    });
   }
 
   async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {
