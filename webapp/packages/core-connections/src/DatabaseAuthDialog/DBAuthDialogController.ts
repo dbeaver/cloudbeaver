@@ -14,18 +14,16 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import { ConnectionInfoResource } from '../ConnectionInfoResource';
+import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
-export interface IDBAuthConfig {
-  credentials?: any;
-  networkCredentials?: NetworkHandlerConfigInput[];
-  saveCredentials?: boolean;
+export interface IFormInitConfig extends Omit<Required<ConnectionInitConfig>, 'id'> {
+  networkCredentials: NetworkHandlerConfigInput[];
 }
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
-  config: IDBAuthConfig = {
+  config: IFormInitConfig = {
     credentials: {},
     networkCredentials: [],
     saveCredentials: false,
@@ -67,7 +65,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      await this.connectionInfoResource.init(this.connectionId, this.getConfig());
+      await this.connectionInfoResource.init(this.getConfig());
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
@@ -85,14 +83,16 @@ export class DBAuthDialogController implements IInitializableController, IDestru
   };
 
   private getConfig() {
-    const config: IDBAuthConfig = {};
+    const config: ConnectionInitConfig = {
+      id: this.connectionId,
+    };
 
-    if (this.config.credentials && Object.keys(this.config.credentials).length > 0) {
+    if (Object.keys(this.config.credentials).length > 0) {
       config.credentials = this.config.credentials;
       config.saveCredentials = this.config.saveCredentials;
     }
 
-    if (this.config.networkCredentials && this.config.networkCredentials.length > 0) {
+    if (this.config.networkCredentials.length > 0) {
       config.networkCredentials = this.config.networkCredentials;
     }
 

@@ -29,7 +29,7 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { SSH_TUNNEL_ID } from '../NetworkHandlerResource';
 import { useConnectionInfo } from '../useConnectionInfo';
 import { useDBDriver } from '../useDBDriver';
-import { DBAuthDialogController, IDBAuthConfig } from './DBAuthDialogController';
+import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 import { SSHAuthForm } from './SSHAuthForm';
 
@@ -135,7 +135,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
               {isSSHAuthNeeded && sshConfig && (
                 <FormBoxElement>
                   <SSHAuthForm
-                    config={(controller.config as Required<IDBAuthConfig>)}
+                    config={controller.config}
                     sshConfig={sshConfig}
                     allowSavePassword={credentialsSavingEnabled}
                     disabled={controller.isAuthenticating}

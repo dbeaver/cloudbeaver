@@ -40,7 +40,7 @@ export class ConnectionAuthService {
     if (connection.authNeeded || isSSHAuthNeeded) {
       await this.commonDialogService.open(DatabaseAuthDialog, connectionId);
     } else {
-      await this.connectionInfoResource.init(connectionId);
+      await this.connectionInfoResource.init({ id: connectionId });
     }
 
     return this.connectionInfoResource.get(connectionId)!;

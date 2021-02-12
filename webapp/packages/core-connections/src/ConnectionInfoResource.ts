@@ -19,13 +19,14 @@ import {
   ConnectionConfig,
   UserConnectionAuthPropertiesFragment,
   resourceKeyList,
+  InitConnectionMutationVariables,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from './Administration/ConnectionsResource';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
-import type { IDBAuthConfig } from './DatabaseAuthDialog/DBAuthDialogController';
 
 export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
+export type ConnectionInitConfig = InitConnectionMutationVariables;
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
@@ -129,13 +130,13 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return observedConnection;
   }
 
-  async init(id: string, config?: IDBAuthConfig): Promise<Connection> {
-    await this.performUpdate(id, async () => {
-      const connection = await this.initConnection(id, config);
-      this.set(id, connection);
+  async init(config: ConnectionInitConfig): Promise<Connection> {
+    await this.performUpdate(config.id, async () => {
+      const connection = await this.initConnection(config);
+      this.set(config.id, connection);
     });
 
-    return this.get(id)!;
+    return this.get(config.id)!;
   }
 
   async changeConnectionView(id: string, simple: boolean): Promise<Connection> {
@@ -201,8 +202,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return authProperties;
   }
 
-  private async initConnection(id: string, config?: IDBAuthConfig): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.initConnection({ id, ...config });
+  private async initConnection(config: ConnectionInitConfig): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.initConnection({ ...config });
 
     return connection;
   }

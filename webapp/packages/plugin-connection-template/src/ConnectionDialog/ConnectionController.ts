@@ -33,13 +33,13 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
   template: Connection | null = null;
   authModel?: DatabaseAuthModel;
-  credentials: any = { };
+  credentials: any = {};
   hasDetails = false;
   responseMessage: string | null = null;
 
@@ -111,7 +111,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
 
       try {
-        await this.connectionInfoResource.init(connection.id, this.credentials);
+        await this.connectionInfoResource.init({ id: connection.id, credentials: this.credentials });
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} established` });
         this.onClose();

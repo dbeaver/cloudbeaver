@@ -14,10 +14,10 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import type { NetworkHandlerConfig } from '@cloudbeaver/core-sdk';
 
 import { NetworkHandlerResource } from '../NetworkHandlerResource';
-import type { IDBAuthConfig } from './DBAuthDialogController';
+import type { IFormInitConfig } from './DBAuthDialogController';
 
 interface Props {
-  config: Required<IDBAuthConfig>;
+  config: IFormInitConfig;
   sshConfig: Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>;
   allowSavePassword: boolean;
   disabled: boolean;
