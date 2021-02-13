@@ -25,7 +25,7 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService
   ) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 

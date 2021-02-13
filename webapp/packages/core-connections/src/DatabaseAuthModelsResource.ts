@@ -17,7 +17,7 @@ import {
 @injectable()
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
   constructor(private graphQLService: GraphQLService) {
-    super(new Map());
+    super();
   }
 
   protected async loader(key: string): Promise<Map<string, DatabaseAuthModel>> {

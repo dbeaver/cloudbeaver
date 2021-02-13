@@ -1,0 +1,41 @@
+fragment DatabaseDriver on DriverInfo {
+  id
+  name
+  icon
+  description
+  defaultPort
+  defaultDatabase
+  defaultServer
+  defaultUser
+  sampleURL
+  embedded
+  anonymousAccess
+  promotedScore
+
+  defaultAuthModel
+  # applicableAuthModel
+  applicableNetworkHandlers
+
+  providerProperties @include(if: $includeProviderProperties) {
+    id
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+    features
+    order
+  }
+
+  driverProperties @include(if: $includeDriverProperties) {
+    id
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+  }
+  driverParameters @include(if: $includeDriverParameters)
+}

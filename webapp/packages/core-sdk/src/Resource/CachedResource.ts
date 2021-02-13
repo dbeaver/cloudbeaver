@@ -8,7 +8,6 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -17,7 +16,6 @@ export interface ICachedResourceMetadata {
   loading: boolean;
 }
 
-@injectable()
 export abstract class CachedResource<
   TData,
   TParam,

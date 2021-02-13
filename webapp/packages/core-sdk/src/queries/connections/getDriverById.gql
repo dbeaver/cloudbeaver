@@ -1,7 +1,0 @@
-query getDriverById($driverId: ID!) {
-  driverList(id: $driverId) {
-    id
-    name
-    icon
-  }
-}

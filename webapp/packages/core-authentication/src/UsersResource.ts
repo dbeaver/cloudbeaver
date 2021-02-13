@@ -42,7 +42,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 

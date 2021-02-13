@@ -8,10 +8,8 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 
-@injectable()
 export abstract class LocalResource<
   TData,
   TParam,
@@ -30,7 +28,7 @@ export abstract class LocalResource<
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
-    makeObservable<LocalResource, 'outdated' | 'dataLoading' | 'loading'>(this, {
+    makeObservable<LocalResource<TData, TParam>, 'outdated' | 'dataLoading' | 'loading'>(this, {
       data: observable,
       outdated: observable,
       dataLoading: observable,

@@ -37,7 +37,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     appAuthService: AppAuthService,
     sessionResource: SessionResource
   ) {
-    super(new Map());
+    super();
 
     makeObservable(this, {
       refreshSession: action,

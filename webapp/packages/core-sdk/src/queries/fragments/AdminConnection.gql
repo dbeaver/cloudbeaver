@@ -6,6 +6,7 @@ fragment AdminConnection on ConnectionInfo {
 
   template
   connected
+  provided
   useUrl
   readOnly
   saveCredentials
@@ -36,6 +37,10 @@ fragment AdminConnection on ConnectionInfo {
     password
     savePassword
     properties
+  }
+
+  navigatorSettings {
+    ...AllNavigatorSettings
   }
 
   features

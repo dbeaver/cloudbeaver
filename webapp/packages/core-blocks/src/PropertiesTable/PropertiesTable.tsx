@@ -6,15 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer, useLocalStore } from 'mobx-react-lite';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
+import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';
@@ -32,19 +32,14 @@ interface PropertiesTableProps {
   className?: string;
 }
 
-export const PropertiesTable = observer(function PropertiesTable({
-  properties,
-  propertiesState,
-  readOnly,
-  onKeyChange,
-  onChange,
-  onAdd,
-  onRemove,
-  className,
-}: PropertiesTableProps) {
+export const PropertiesTable = observer(function PropertiesTable(props: PropertiesTableProps) {
+  const { className, onAdd, readOnly, propertiesState } = props;
+  const propsRef = useObjectRef(props);
   const translate = useTranslate();
   const state = useLocalStore<PropertiesState>(() => (propertiesState || {}));
+
   const changeName = useCallback((id: string, key: string) => {
+    const { properties, onKeyChange } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
@@ -63,9 +58,10 @@ export const PropertiesTable = observer(function PropertiesTable({
       onKeyChange(property.key, key);
     }
     property.key = key;
-  }, [properties]);
+  }, []);
 
   const changeValue = useCallback((id: string, value: string) => {
+    const { properties, onChange } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
@@ -77,9 +73,10 @@ export const PropertiesTable = observer(function PropertiesTable({
     if (onChange) {
       onChange(state);
     }
-  }, [properties, onChange]);
+  }, []);
 
   const removeProperty = useCallback((id: string) => {
+    const { properties, onRemove } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
@@ -95,15 +92,15 @@ export const PropertiesTable = observer(function PropertiesTable({
       onRemove(id);
     }
     properties.splice(properties.indexOf(property), 1);
-  }, [properties, onRemove]);
+  }, []);
 
   const isKeyUnique = useCallback(
-    (key: string) => properties.filter(property => property.key === key).length === 1,
+    (key: string) => propsRef.properties.filter(property => property.key === key).length === 1,
     []
   );
 
-  const alphabetOrderProperties = useMemo(() => computed(() => properties.slice().sort(
-    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''))), [properties]);
+  const alphabetOrderProperties = propsRef.properties.slice().sort(
+    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''));
 
   return styled(useStyles(PROPERTIES_TABLE_STYLES))(
     <properties as="div" className={className}>
@@ -119,7 +116,7 @@ export const PropertiesTable = observer(function PropertiesTable({
         </properties-header-right>
       </properties-header>
       <properties-list as="div">
-        {alphabetOrderProperties.get().map(property => (
+        {alphabetOrderProperties.map(property => (
           <PropertyItem
             key={property.id}
             property={property}
