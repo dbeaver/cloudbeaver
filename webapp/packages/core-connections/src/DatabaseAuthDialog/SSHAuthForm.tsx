@@ -11,14 +11,13 @@ import styled, { css } from 'reshadow';
 
 import { FieldCheckbox, FormGroup, InputField, InputGroup, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { NetworkHandlerConfig } from '@cloudbeaver/core-sdk';
 
 import { NetworkHandlerResource } from '../NetworkHandlerResource';
-import type { IFormInitConfig } from './DBAuthDialogController';
+import type { IFormInitConfig } from './IFormInitConfig';
 
 interface Props {
   config: IFormInitConfig;
-  sshConfig: Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>;
+  sshHandlerId: string;
   allowSavePassword: boolean;
   disabled: boolean;
 }
@@ -31,20 +30,21 @@ const styles = css`
 `;
 
 export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
-  config, sshConfig, allowSavePassword, disabled,
+  config, sshHandlerId, allowSavePassword, disabled,
 }) {
   const translate = useTranslate();
-  const handler = useMapResource(NetworkHandlerResource, sshConfig.id);
+  const handler = useMapResource(NetworkHandlerResource, sshHandlerId);
 
-  if (!config.networkCredentials.some(state => state.id === sshConfig.id)) {
+  if (!config.networkCredentials.some(state => state.id === sshHandlerId)) {
     config.networkCredentials.push({
+      id: sshHandlerId,
       userName: '',
       password: '',
-      ...sshConfig,
+      savePassword: false,
     });
   }
 
-  const state = config.networkCredentials.find(state => state.id === sshConfig.id)!;
+  const state = config.networkCredentials.find(state => state.id === sshHandlerId)!;
 
   return styled(styles)(
     <form-container as='div'>
@@ -77,7 +77,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
         <FormGroup>
           <FieldCheckbox
             name="savePassword"
-            value={sshConfig.id + ' savePassword'}
+            value={sshHandlerId + ' savePassword'}
             state={state}
             checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
             disabled={disabled}

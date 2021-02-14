@@ -12,13 +12,11 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
-export interface IFormInitConfig extends Omit<Required<ConnectionInitConfig>, 'id'> {
-  networkCredentials: NetworkHandlerConfigInput[];
-}
+import type { IFormInitConfig } from './IFormInitConfig';
 
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
