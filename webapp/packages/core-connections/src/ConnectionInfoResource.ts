@@ -203,7 +203,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   private async initConnection(config: ConnectionInitConfig): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.initConnection({ ...config });
+    const { connection } = await this.graphQLService.sdk.initConnection(config);
 
     return connection;
   }
