@@ -335,6 +335,7 @@ export interface MutationDeleteConnectionArgs {
 export interface MutationInitConnectionArgs {
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }
 
@@ -1164,6 +1165,7 @@ export interface GetTemplateConnectionsQuery { connections: UserConnectionFragme
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[] | NetworkHandlerConfigInput>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -1266,7 +1268,7 @@ export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessT
 
 export type UserConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-  & { navigatorSettings: AllNavigatorSettingsFragment }
+  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>> }
 );
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1484,7 +1486,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'configurationMode' | 'developmentMode'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment }
   );
 }
@@ -1667,6 +1669,11 @@ export const UserConnectionFragmentDoc = `
   supportedDataFormats
   navigatorSettings {
     ...AllNavigatorSettings
+  }
+  networkHandlersConfig {
+    id
+    enabled
+    savePassword
   }
 }
     ${AllNavigatorSettingsFragmentDoc}`;
@@ -2056,10 +2063,11 @@ export const GetTemplateConnectionsDocument = `
 }
     ${UserConnectionFragmentDoc}`;
 export const InitConnectionDocument = `
-    mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
+    mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!], $saveCredentials: Boolean) {
   connection: initConnection(
     id: $id
     credentials: $credentials
+    networkCredentials: $networkCredentials
     saveCredentials: $saveCredentials
   ) {
     ...UserConnection

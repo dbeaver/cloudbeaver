@@ -14,18 +14,16 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
-import { ConnectionInfoResource } from '../ConnectionInfoResource';
+import { ConnectionInfoResource, ConnectionInitConfig } from '../ConnectionInfoResource';
 import { DBDriverResource } from '../DBDriverResource';
+import type { IFormInitConfig } from './IFormInitConfig';
 
-interface IDBAuthConfig {
-  credentials: any;
-  saveCredentials: boolean;
-}
 @injectable()
 export class DBAuthDialogController implements IInitializableController, IDestructibleController {
   isAuthenticating = false;
-  config: IDBAuthConfig = {
+  config: IFormInitConfig = {
     credentials: {},
+    networkCredentials: [],
     saveCredentials: false,
   };
 
@@ -65,7 +63,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     this.isAuthenticating = true;
     try {
-      await this.connectionInfoResource.init(this.connectionId, this.config.credentials, this.config.saveCredentials);
+      await this.connectionInfoResource.init(this.getConfig());
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
@@ -81,6 +79,23 @@ export class DBAuthDialogController implements IInitializableController, IDestru
       this.commonDialogService.open(ErrorDetailsDialog, this.error.exception);
     }
   };
+
+  private getConfig() {
+    const config: ConnectionInitConfig = {
+      id: this.connectionId,
+    };
+
+    if (Object.keys(this.config.credentials).length > 0) {
+      config.credentials = this.config.credentials;
+      config.saveCredentials = this.config.saveCredentials;
+    }
+
+    if (this.config.networkCredentials.length > 0) {
+      config.networkCredentials = this.config.networkCredentials;
+    }
+
+    return config;
+  }
 
   private async loadAuthModel() {
     try {

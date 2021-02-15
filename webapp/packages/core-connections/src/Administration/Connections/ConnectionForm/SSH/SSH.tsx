@@ -14,9 +14,8 @@ import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapR
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { NetworkHandlerResource } from '../../../../NetworkHandlerResource';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../../../NetworkHandlerResource';
 import type { IConnectionFormProps } from '../ConnectionFormService';
-import { SSH_TUNNEL_ID } from './SSH_TUNNEL_ID';
 
 export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSH({
   model,
