@@ -1,34 +1,18 @@
 /*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2021 DBeaver Corp and others
+ * cloudbeaver - Cloud Database Manager
+ * Copyright (C) 2020 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
+import { useCallback } from 'react';
 
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
-
-const styles = css`
-  grid-container {
-    outline: 0;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-`;
-
-interface Props {
-  children: React.ReactNode;
-  modelResultData: IDatabaseDataResult | null;
-  className?: string;
-}
+import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 
 const EVENT_KEY_CODE = {
   C: 'KeyC',
@@ -72,28 +56,19 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
 // needed for event.code
 type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
-export const DataGridTableContainer: React.FC<Props> = function DataGridTableContainer({
-  modelResultData, children, className,
-}) {
-  const selectionContext = useContext(DataGridSelectionContext);
-
-  if (!selectionContext) {
-    throw new Error('Selection context must be provided');
-  }
-
+export function useGridSelectedCellsCopy(
+  modelResultData: IDatabaseDataResult | null,
+  selectionContext: IDataGridSelectionContext | null
+) {
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if (!modelResultData) {
+    if (!modelResultData || !selectionContext) {
       return;
     }
 
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
       copyGridSelectedDataToClipboard(modelResultData.data, selectionContext.selectedCells);
     }
-  }, [modelResultData, selectionContext.selectedCells]);
+  }, [modelResultData, selectionContext]);
 
-  return styled(styles)(
-    <grid-container as='div' tabIndex={-1} className={className} onKeyDown={onKeydownHandler}>
-      {children}
-    </grid-container>
-  );
-};
+  return { onKeydownHandler };
+}

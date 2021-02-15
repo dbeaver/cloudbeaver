@@ -10,7 +10,7 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataGrid from 'react-data-grid';
-import type { Column } from 'react-data-grid';
+import type { Column, DataGridHandle } from 'react-data-grid';
 import type { Position } from 'react-data-grid/lib/types';
 import styled from 'reshadow';
 
@@ -30,11 +30,13 @@ import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionC
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
 import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
 import { useGridSortingContext } from './DataGridSorting/useGridSortingContext';
-import { DataGridTableContainer } from './DataGridTableContainer';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { RowRenderer } from './RowRenderer/RowRenderer';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
+import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
+import { useGridDragging } from './useGridDragging';
+import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
 
 interface Props {
   model: IDatabaseDataModel<any>;
@@ -47,17 +49,19 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
   return target.clientHeight + target.scrollTop === target.scrollHeight;
 }
 
-const indexColumn: Column<any[], any> = {
+export const indexColumn: Column<any[], any> = {
   key: Number.MAX_SAFE_INTEGER + '',
   name: '#',
   minWidth: 60,
   width: 60,
   resizable: false,
   frozen: true,
+  headerRenderer: TableIndexColumnHeader,
   formatter: IndexFormatter,
 };
 
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
+  const dataGridRef = useRef<DataGridHandle>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
@@ -65,7 +69,10 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   const modelResultData = model?.getResult(resultIndex);
 
   const gridSortingContext = useGridSortingContext(model);
-  const gridSelectionContext = useGridSelectionContext(modelResultData, { indexColumnKey: indexColumn.key });
+  const gridSelectionContext = useGridSelectionContext(modelResultData, {
+    // we need idx + 1 to keep our api in sync with react data grid api
+    select: ({ idx, rowIdx }) => dataGridRef.current?.selectCell({ idx: idx + 1, rowIdx }),
+  });
   const editingContext = useEditing({
     onEdit: (position, key) => {
       const editor = model.source.getEditor(resultIndex);
@@ -84,6 +91,14 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
       return true;
     },
+  });
+
+  const { onKeydownHandler } = useGridSelectedCellsCopy(modelResultData, gridSelectionContext);
+  const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
+    onDragOver: (startPosition, currentPosiition, event) =>
+      gridSelectionContext.selectRange(startPosition, currentPosiition, event.ctrlKey, true),
+    onDragEnd: (startPosition, currentPosiition, event) =>
+      gridSelectionContext.selectRange(startPosition, currentPosiition, event.ctrlKey, false),
   });
 
   useEffect(() => {
@@ -161,15 +176,24 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     columnResize,
     resultIndex,
     getEditorPortal: () => editorRef.current,
-  }), [model, resultIndex, editorRef]);
+    getDataGridApi: () => dataGridRef.current,
+  }), [model, resultIndex, editorRef, dataGridRef]);
 
   return styled(styles)(
     <DataGridContext.Provider value={gridContext}>
       <DataGridSortingContext.Provider value={gridSortingContext}>
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
           <EditingContext.Provider value={editingContext}>
-            <DataGridTableContainer modelResultData={modelResultData}>
+            <grid-container
+              as='div'
+              className="cb-react-grid-container"
+              tabIndex={-1}
+              onKeyDown={onKeydownHandler}
+              onMouseDown={onMouseDownHandler}
+              onMouseMove={onMouseMoveHandler}
+            >
               <DataGrid
+                ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
                 columns={columns}
                 defaultColumnOptions={{
@@ -186,7 +210,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />
-            </DataGridTableContainer>
+            </grid-container>
           </EditingContext.Provider>
         </DataGridSelectionContext.Provider>
       </DataGridSortingContext.Provider>
