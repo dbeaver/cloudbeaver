@@ -9,7 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { IProperty } from '@cloudbeaver/core-blocks';
-import { DBDriver, DriverPropertiesService } from '@cloudbeaver/core-connections';
+import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -37,7 +37,7 @@ export class DriverPropertiesController implements IInitializableController {
   private state!: Record<string, string>;
 
   constructor(
-    private driverPropertiesService: DriverPropertiesService,
+    private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService
   ) {
     makeObservable(this, {
@@ -70,8 +70,8 @@ export class DriverPropertiesController implements IInitializableController {
     }
     this.isLoading = true;
     try {
-      const driverProperties = await this.driverPropertiesService.loadDriverProperties(this.driver.id);
-      this.driverProperties = observable(driverProperties.map<IProperty>(property => ({
+      const driver = await this.dbDriverResource.load(this.driver.id, ['driverProperties']);
+      this.driverProperties = observable(driver.driverProperties.map<IProperty>(property => ({
         id: property.id!,
         key: property.id!,
         displayName: property.displayName!,

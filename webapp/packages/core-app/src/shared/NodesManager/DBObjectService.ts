@@ -20,7 +20,7 @@ export class DBObjectService extends CachedMapResource<string, DBObject> {
     private graphQLService: GraphQLService,
     private navNodeInfoResource: NavNodeInfoResource
   ) {
-    super(new Map());
+    super();
     this.navNodeInfoResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.navNodeInfoResource.onItemDelete.addHandler(this.delete.bind(this));
   }

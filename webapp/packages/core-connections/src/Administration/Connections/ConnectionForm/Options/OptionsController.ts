@@ -18,7 +18,7 @@ import type { IConnectionFormModel } from '../IConnectionFormModel';
 
 @injectable()
 export class OptionsController
-  implements IInitializableController {
+implements IInitializableController {
   get drivers(): DBDriver[] {
     return Array.from(this.dbDriverResource.data.values())
       .filter(({ id }) => this.model.availableDrivers.includes(id));
@@ -173,7 +173,7 @@ export class OptionsController
     }
 
     try {
-      await this.dbDriverResource.load(driverId);
+      await this.dbDriverResource.load(driverId, ['providerProperties']);
       await this.dbAuthModelsResource.load(
         this.model.connection.authModel || this.driver!.defaultAuthModel
       );

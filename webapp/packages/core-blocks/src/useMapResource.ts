@@ -26,38 +26,50 @@ interface IActions<TResource> {
   ) => Promise<any> | any;
 }
 
+interface KeyWithIncludes<TKey, TIncludes> {
+  key: TKey | null;
+  includes: TIncludes;
+}
+
 interface IMapResourceResult<
   TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
-  TResource extends CachedMapResource<any, any>
+  TResource extends CachedMapResource<any, any>,
+  TIncludes extends Array<keyof CachedMapResourceValue<TResource>>
 > {
-  data: CachedMapResourceGetter<TKeyArg, CachedMapResourceKey<TResource>, CachedMapResourceValue<TResource>>;
+  data: CachedMapResourceGetter<TKeyArg, CachedMapResourceKey<TResource>, CachedMapResourceValue<TResource>, TIncludes>;
   resource: TResource;
   isLoading: () => boolean;
+  isLoaded: () => boolean;
 }
 
 export function useMapResource<
   TResource extends CachedMapResource<any, any>,
   TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
+  TIncludes extends Array<keyof CachedMapResourceValue<TResource>> = []
 >(
   ctor: IServiceConstructor<TResource>,
-  key: TKeyArg | null,
+  keyObj: TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes>,
   actions?: IActions<TResource>
-): IMapResourceResult<TKeyArg, TResource> {
+): IMapResourceResult<TKeyArg, TResource, TIncludes> {
   const resource = useService(ctor);
   const notifications = useService(NotificationService);
+  const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
+  const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
 
   const refObj = useObjectRef({
     resource,
     key,
+    includes,
     actions,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedMapResourceValue<TResource>,
   }, {
     resource,
     key,
+    includes,
     actions,
   });
 
-  const [result] = useState<IMapResourceResult<TKeyArg, TResource>>(() => ({
+  const [result] = useState<IMapResourceResult<TKeyArg, TResource, TIncludes>>(() => ({
     get resource() {
       return refObj.resource;
     },
@@ -67,6 +79,13 @@ export function useMapResource<
       }
 
       return resource.get(refObj.key);
+    },
+    isLoaded: () => {
+      if (refObj.key === null) {
+        return false;
+      }
+
+      return resource.isLoaded(refObj.key, refObj.includes);
     },
     isLoading: () => {
       if (refObj.key === null) {
@@ -88,7 +107,7 @@ export function useMapResource<
           return;
         }
 
-        const newData = await resource.load(key);
+        const newData = await resource.load(key, includes);
 
         try {
           await actions?.onData?.(
@@ -103,7 +122,7 @@ export function useMapResource<
         notifications.logException(exception, 'Can\'t load data');
       }
     })();
-  }, [key]);
+  }, [key, includes]);
 
   return result;
 }

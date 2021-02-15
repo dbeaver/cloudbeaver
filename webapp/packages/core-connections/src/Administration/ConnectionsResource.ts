@@ -43,7 +43,7 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   constructor(
     private graphQLService: GraphQLService
   ) {
-    super(new Map());
+    super();
 
     makeObservable(this, {
       add: action,

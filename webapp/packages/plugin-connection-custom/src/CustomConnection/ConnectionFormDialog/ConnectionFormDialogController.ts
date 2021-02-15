@@ -8,7 +8,7 @@
 
 import { observable, action, makeObservable } from 'mobx';
 
-import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource, getUniqueConnectionName } from '@cloudbeaver/core-connections';
+import { DBDriver, DatabaseAuthModelsResource, ConnectionInfoResource, getUniqueConnectionName, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -53,6 +53,7 @@ implements IInitializableController, IDestructibleController {
   private maxHostLength = 20;
 
   constructor(
+    private dbDriverResource: DBDriverResource,
     private customConnectionService: CustomConnectionService,
     private notificationService: NotificationService,
     private commonDialogService: CommonDialogService,
@@ -222,6 +223,7 @@ implements IInitializableController, IDestructibleController {
     }
 
     try {
+      await this.dbDriverResource.load(this.driver.id, ['providerProperties']);
       this.authModel = await this.dbAuthModelsResource.load(this.driver.defaultAuthModel);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load driver auth model');

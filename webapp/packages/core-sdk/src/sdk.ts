@@ -335,6 +335,7 @@ export interface MutationDeleteConnectionArgs {
 export interface MutationInitConnectionArgs {
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[]>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }
 
@@ -1110,25 +1111,14 @@ export type DeleteConnectionMutationVariables = Exact<{
 
 export type DeleteConnectionMutation = Pick<Mutation, 'deleteConnection'>;
 
-export type DriverListQueryVariables = Exact<{ [key: string]: never }>;
-
-export interface DriverListQuery {
-  driverList: Array<(
-    Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers'>
-    & { providerProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>> }
-  )>;
-}
-
-export type DriverPropertiesQueryVariables = Exact<{
-  driverId: Scalars['ID'];
+export type DriverListQueryVariables = Exact<{
+  driverId?: Maybe<Scalars['ID']>;
+  includeProviderProperties: Scalars['Boolean'];
+  includeDriverProperties: Scalars['Boolean'];
+  includeDriverParameters: Scalars['Boolean'];
 }>;
 
-export interface DriverPropertiesQuery {
-  driver: Array<(
-    Pick<DriverInfo, 'driverParameters'>
-    & { driverProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>> }
-  )>;
-}
+export interface DriverListQuery { drivers: DatabaseDriverFragment[] }
 
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -1151,12 +1141,6 @@ export type GetConnectionOriginDetailsQueryVariables = Exact<{
 
 export interface GetConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> } } }
 
-export type GetDriverByIdQueryVariables = Exact<{
-  driverId: Scalars['ID'];
-}>;
-
-export interface GetDriverByIdQuery { driverList: Array<Pick<DriverInfo, 'id' | 'name' | 'icon'>> }
-
 export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetTemplateConnectionsQuery { connections: UserConnectionFragment[] }
@@ -1164,6 +1148,7 @@ export interface GetTemplateConnectionsQuery { connections: UserConnectionFragme
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[] | NetworkHandlerConfigInput>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -1242,8 +1227,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
-  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> }
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
+  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
 );
 
 export type AdminUserInfoFragment = (
@@ -1252,6 +1237,11 @@ export type AdminUserInfoFragment = (
 );
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
+
+export type DatabaseDriverFragment = (
+  MakeOptional<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers' | 'driverParameters'>, 'driverParameters'>
+  & { providerProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'features' | 'order'>>; driverProperties: Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues'>> }
+);
 
 export type NavNodeInfoFragment = (
   Pick<NavigatorNodeInfo, 'id' | 'name' | 'hasChildren' | 'nodeType' | 'icon' | 'folder' | 'inline' | 'navigable' | 'features'>
@@ -1266,7 +1256,7 @@ export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessT
 
 export type UserConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-  & { navigatorSettings: AllNavigatorSettingsFragment }
+  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>> }
 );
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1484,7 +1474,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'configurationMode' | 'developmentMode'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'configurationMode' | 'developmentMode'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment }
   );
 }
@@ -1555,6 +1545,17 @@ export const UserConnectionAuthPropertiesFragmentDoc = `
   order
 }
     `;
+export const AllNavigatorSettingsFragmentDoc = `
+    fragment AllNavigatorSettings on NavigatorSettings {
+  showSystemObjects
+  showUtilityObjects
+  showOnlyEntities
+  mergeEntities
+  hideFolders
+  hideSchemas
+  hideVirtualModel
+}
+    `;
 export const AdminConnectionFragmentDoc = `
     fragment AdminConnection on ConnectionInfo {
   id
@@ -1563,6 +1564,7 @@ export const AdminConnectionFragmentDoc = `
   driverId
   template
   connected
+  provided
   useUrl
   readOnly
   saveCredentials
@@ -1589,11 +1591,15 @@ export const AdminConnectionFragmentDoc = `
     savePassword
     properties
   }
+  navigatorSettings {
+    ...AllNavigatorSettings
+  }
   features
   supportedDataFormats
 }
     ${ObjectOriginInfoFragmentDoc}
-${UserConnectionAuthPropertiesFragmentDoc}`;
+${UserConnectionAuthPropertiesFragmentDoc}
+${AllNavigatorSettingsFragmentDoc}`;
 export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
@@ -1603,6 +1609,45 @@ export const AdminUserInfoFragmentDoc = `
   }
 }
     ${ObjectOriginInfoFragmentDoc}`;
+export const DatabaseDriverFragmentDoc = `
+    fragment DatabaseDriver on DriverInfo {
+  id
+  name
+  icon
+  description
+  defaultPort
+  defaultDatabase
+  defaultServer
+  defaultUser
+  sampleURL
+  embedded
+  anonymousAccess
+  promotedScore
+  defaultAuthModel
+  applicableNetworkHandlers
+  providerProperties @include(if: $includeProviderProperties) {
+    id
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+    features
+    order
+  }
+  driverProperties @include(if: $includeDriverProperties) {
+    id
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+  }
+  driverParameters @include(if: $includeDriverParameters)
+}
+    `;
 export const NavNodePropertiesFragmentDoc = `
     fragment NavNodeProperties on ObjectPropertyInfo {
   id
@@ -1642,17 +1687,6 @@ export const SessionStateFragmentDoc = `
   locale
 }
     `;
-export const AllNavigatorSettingsFragmentDoc = `
-    fragment AllNavigatorSettings on NavigatorSettings {
-  showSystemObjects
-  showUtilityObjects
-  showOnlyEntities
-  mergeEntities
-  hideFolders
-  hideSchemas
-  hideVirtualModel
-}
-    `;
 export const UserConnectionFragmentDoc = `
     fragment UserConnection on ConnectionInfo {
   id
@@ -1667,6 +1701,11 @@ export const UserConnectionFragmentDoc = `
   supportedDataFormats
   navigatorSettings {
     ...AllNavigatorSettings
+  }
+  networkHandlersConfig {
+    id
+    enabled
+    savePassword
   }
 }
     ${AllNavigatorSettingsFragmentDoc}`;
@@ -1938,52 +1977,12 @@ export const DeleteConnectionDocument = `
 }
     `;
 export const DriverListDocument = `
-    query driverList {
-  driverList {
-    id
-    name
-    icon
-    description
-    defaultPort
-    defaultDatabase
-    defaultServer
-    defaultUser
-    sampleURL
-    embedded
-    anonymousAccess
-    promotedScore
-    defaultAuthModel
-    providerProperties {
-      id
-      displayName
-      description
-      category
-      dataType
-      defaultValue
-      validValues
-      features
-      order
-    }
-    applicableNetworkHandlers
+    query driverList($driverId: ID, $includeProviderProperties: Boolean!, $includeDriverProperties: Boolean!, $includeDriverParameters: Boolean!) {
+  drivers: driverList(id: $driverId) {
+    ...DatabaseDriver
   }
 }
-    `;
-export const DriverPropertiesDocument = `
-    query driverProperties($driverId: ID!) {
-  driver: driverList(id: $driverId) {
-    driverProperties {
-      id
-      displayName
-      description
-      category
-      dataType
-      defaultValue
-      validValues
-    }
-    driverParameters
-  }
-}
-    `;
+    ${DatabaseDriverFragmentDoc}`;
 export const GetAuthModelsDocument = `
     query getAuthModels {
   models: authModels {
@@ -2039,15 +2038,6 @@ export const GetConnectionOriginDetailsDocument = `
   }
 }
     `;
-export const GetDriverByIdDocument = `
-    query getDriverById($driverId: ID!) {
-  driverList(id: $driverId) {
-    id
-    name
-    icon
-  }
-}
-    `;
 export const GetTemplateConnectionsDocument = `
     query getTemplateConnections {
   connections: templateConnections {
@@ -2056,10 +2046,11 @@ export const GetTemplateConnectionsDocument = `
 }
     ${UserConnectionFragmentDoc}`;
 export const InitConnectionDocument = `
-    mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
+    mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!], $saveCredentials: Boolean) {
   connection: initConnection(
     id: $id
     credentials: $credentials
+    networkCredentials: $networkCredentials
     saveCredentials: $saveCredentials
   ) {
     ...UserConnection
@@ -2641,11 +2632,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     deleteConnection(variables: DeleteConnectionMutationVariables): Promise<DeleteConnectionMutation> {
       return withWrapper(() => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables));
     },
-    driverList(variables?: DriverListQueryVariables): Promise<DriverListQuery> {
+    driverList(variables: DriverListQueryVariables): Promise<DriverListQuery> {
       return withWrapper(() => client.request<DriverListQuery>(DriverListDocument, variables));
-    },
-    driverProperties(variables: DriverPropertiesQueryVariables): Promise<DriverPropertiesQuery> {
-      return withWrapper(() => client.request<DriverPropertiesQuery>(DriverPropertiesDocument, variables));
     },
     getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
       return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
@@ -2655,9 +2643,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getConnectionOriginDetails(variables: GetConnectionOriginDetailsQueryVariables): Promise<GetConnectionOriginDetailsQuery> {
       return withWrapper(() => client.request<GetConnectionOriginDetailsQuery>(GetConnectionOriginDetailsDocument, variables));
-    },
-    getDriverById(variables: GetDriverByIdQueryVariables): Promise<GetDriverByIdQuery> {
-      return withWrapper(() => client.request<GetDriverByIdQuery>(GetDriverByIdDocument, variables));
     },
     getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));

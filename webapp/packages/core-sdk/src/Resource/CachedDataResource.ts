@@ -6,11 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
-
 import { CachedResource } from './CachedResource';
 
-@injectable()
 export abstract class CachedDataResource<
   TData,
   TParam,

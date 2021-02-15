@@ -1,5 +1,5 @@
-mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
-  connection: initConnection(id: $id, credentials: $credentials, saveCredentials: $saveCredentials) {
+mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!],  $saveCredentials: Boolean, ) {
+  connection: initConnection(id: $id, credentials: $credentials, networkCredentials: $networkCredentials, saveCredentials: $saveCredentials) {
     ...UserConnection
   }
 }

@@ -171,9 +171,8 @@ implements IInitializableController {
         config.credentials = this.model.credentials;
       }
     }
-    if (Object.keys(this.model.connection.properties).length > 0) {
-      config.properties = this.model.connection.properties;
-    }
+
+    config.properties = this.model.connection.properties;
 
     if (this.model.networkHandlersState.length > 0) {
       config.networkHandlersConfig = [];

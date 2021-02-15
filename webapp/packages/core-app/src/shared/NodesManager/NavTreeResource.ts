@@ -16,7 +16,9 @@ import {
   isResourceKeyList,
   ResourceKeyList,
   resourceKeyList,
-  NavNodeChildrenQuery as fake, ResourceKeyUtils, ICachedResourceMetadata
+  NavNodeChildrenQuery as fake,
+  ResourceKeyUtils,
+  ICachedMapResourceMetadata
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -29,7 +31,7 @@ export interface NodePath {
 
 type NavNodeChildrenQuery = fake & NodePath;
 
-interface INodeMetadata extends ICachedResourceMetadata {
+interface INodeMetadata extends ICachedMapResourceMetadata<string[]> {
   withDetails: boolean;
 }
 
@@ -41,7 +43,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private graphQLService: GraphQLService,
     private navNodeInfoResource: NavNodeInfoResource
   ) {
-    super(new Map());
+    super();
 
     makeObservable(this, {
       setDetails: action,
@@ -51,6 +53,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       outdated: true,
       loading: false,
       withDetails: false,
+      includes: [],
+      loadedIncludes: [],
     }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }

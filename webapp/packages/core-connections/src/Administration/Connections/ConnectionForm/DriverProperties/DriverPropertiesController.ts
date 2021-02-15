@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { DriverPropertiesService } from '../../../../DriverPropertiesService';
+import { DBDriverResource } from '../../../../DBDriverResource';
 
 interface StaticId {
   staticId: string;
@@ -35,7 +35,7 @@ export class DriverPropertiesController {
   private state!: Record<string, string>;
 
   constructor(
-    private driverPropertiesService: DriverPropertiesService,
+    private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService
   ) {
     makeObservable(this, {
@@ -68,8 +68,8 @@ export class DriverPropertiesController {
     }
     this.isLoading = true;
     try {
-      const driverProperties = await this.driverPropertiesService.loadDriverProperties(this.driverId);
-      this.driverProperties = observable(driverProperties.map<IProperty>(property => ({
+      const driver = await this.dbDriverResource.load(this.driverId, ['driverProperties']);
+      this.driverProperties = observable(driver.driverProperties.map<IProperty>(property => ({
         id: property.id!,
         key: property.id!,
         keyPlaceholder: property.id,

@@ -17,6 +17,8 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+export const SSH_TUNNEL_ID = 'ssh_tunnel';
+
 @injectable()
 export class NetworkHandlerResource extends CachedMapResource<string, NetworkHandlerDescriptor> {
   private loadedKeyMetadata: MetadataMap<string, boolean>;
@@ -25,7 +27,7 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService
   ) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
