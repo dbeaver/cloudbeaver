@@ -18,7 +18,7 @@ import type { IFormInitConfig } from './IFormInitConfig';
 interface Props {
   config: IFormInitConfig;
   sshHandlerId: string;
-  allowSavePassword: boolean;
+  allowPasswordSave: boolean;
   disabled: boolean;
 }
 
@@ -30,7 +30,7 @@ const styles = css`
 `;
 
 export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
-  config, sshHandlerId, allowSavePassword, disabled,
+  config, sshHandlerId, allowPasswordSave, disabled,
 }) {
   const translate = useTranslate();
   const handler = useMapResource(NetworkHandlerResource, sshHandlerId);
@@ -73,7 +73,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
           {translate('connections_network_handler_ssh_tunnel_password')}
         </InputField>
       </FormGroup>
-      {allowSavePassword && (
+      {allowPasswordSave && (
         <FormGroup>
           <FieldCheckbox
             name="savePassword"

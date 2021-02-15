@@ -13,8 +13,7 @@ import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   ErrorMessage, SubmittingForm, Loader, useFocus, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
-import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
-import { SSHAuthForm } from '@cloudbeaver/core-connections';
+import { SSH_TUNNEL_ID, SSHAuthForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -125,7 +124,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
                   sshHandlerId={sshConfig.id}
                   config={controller.config}
                   disabled={controller.isConnecting}
-                  allowSavePassword={credentialsSavingEnabled}
+                  allowPasswordSave={credentialsSavingEnabled}
                 />
               </FormBoxElement>
             )}

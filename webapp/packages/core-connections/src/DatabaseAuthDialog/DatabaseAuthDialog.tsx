@@ -137,7 +137,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                   <SSHAuthForm
                     config={controller.config}
                     sshHandlerId={sshConfig.id}
-                    allowSavePassword={credentialsSavingEnabled}
+                    allowPasswordSave={credentialsSavingEnabled}
                     disabled={controller.isAuthenticating}
                   />
                 </FormBoxElement>
