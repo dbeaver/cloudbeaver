@@ -25,12 +25,12 @@ interface IGridSelectionOptions {
   select: (position: Pick<IPosition, 'idx' | 'rowIdx'>) => void;
 }
 
-export function isIndexCol(columnKey: string): boolean {
+export function isIndexColumn(columnKey: string): boolean {
   return columnKey === indexColumn.key;
 }
 
-export function getColIdxFromColKey(columnKey: string): number {
-  return isIndexCol(columnKey) ? 0 : Number(columnKey);
+export function getColumnIdxFromColumnKey(columnKey: string): number {
+  return isIndexColumn(columnKey) ? 0 : Number(columnKey);
 }
 
 export function useGridSelectionContext(modelResultData: IDatabaseDataResult | null, options: IGridSelectionOptions) {
@@ -105,7 +105,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
         }
 
         const currentRowSelection = selectedCells.get(rowIdx) || [];
-        selectedCells.set(rowIdx, [...currentRowSelection, ...rowSelection]);
+        selectedCells.set(rowIdx, [...new Set([...currentRowSelection, ...rowSelection])]);
       }
 
       options.select({ idx: lastPosition.idx, rowIdx: lastPosition.rowIdx });
@@ -141,7 +141,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     }
 
     const rowsLength = (modelResultData.data as SqlResultSet).rows?.length || 0;
-    const columnIndex = getColIdxFromColKey(columnKey);
+    const columnIndex = getColumnIdxFromColumnKey(columnKey);
 
     if (isColumnSelected(columnIndex, rowsLength)) {
       unSelectColumn(columnIndex, rowsLength);
@@ -174,7 +174,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     options.select({ idx: -1, rowIdx: 0 });
   }, [modelResultData, selectedCells, options]);
 
-  const isSelected = useCallback((key: string, rowIdx: number) => {
+  const isSelected = useCallback((columnKey: string, rowIdx: number) => {
     if (!selectedCells.has(rowIdx) && !temporarySelectedCells.has(rowIdx)) {
       return false;
     }
@@ -182,7 +182,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     const rowSelection = selectedCells.get(rowIdx);
     const temporaryRowSelection = temporarySelectedCells.get(rowIdx);
 
-    const idx = Number.parseInt(key);
+    const idx = Number(columnKey);
 
     return !!(rowSelection?.includes(idx) || temporaryRowSelection?.includes(idx));
   },
@@ -200,6 +200,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
       rowSelection.splice(targetIndex, 1);
       return true;
     }
+
     return false;
   }, [selectedCells]);
 
@@ -213,11 +214,11 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     rowSelection.push(idx);
   }, [selectedCells]);
 
-  const select = useCallback((key: string, rowIdx: number, multiple: boolean, range: boolean) => {
-    const isIndexColumn = isIndexCol(key);
-    const columnIndex = getColIdxFromColKey(key);
+  const select = useCallback((columnKey: string, rowIdx: number, multiple: boolean, range: boolean) => {
+    const isIndexCol = isIndexColumn(columnKey);
+    const columnIndex = getColumnIdxFromColumnKey(columnKey);
 
-    setLastSelectedCell({ idx: columnIndex, rowIdx, isIndexColumn });
+    setLastSelectedCell({ idx: columnIndex, rowIdx, isIndexColumn: isIndexCol });
 
     if (selectedCells.size > 0 && range && lastSelectedCell) {
       selectRange(
@@ -226,12 +227,12 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
           rowIdx: lastSelectedCell.rowIdx,
           isIndexColumn: lastSelectedCell.isIndexColumn,
         },
-        { idx: columnIndex, rowIdx, isIndexColumn },
+        { idx: columnIndex, rowIdx, isIndexColumn: isIndexCol },
         multiple);
       return;
     }
 
-    if (isIndexColumn) {
+    if (isIndexCol) {
       if (multiple && isRowSelected(rowIdx)) {
         unSelectRow(rowIdx);
       } else {
@@ -244,7 +245,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
       selectedCells.clear();
     }
 
-    if (isSelected(key, rowIdx)) {
+    if (isSelected(columnKey, rowIdx)) {
       unSelect(columnIndex, rowIdx);
       return;
     }

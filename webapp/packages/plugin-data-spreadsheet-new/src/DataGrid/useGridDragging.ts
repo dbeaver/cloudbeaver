@@ -8,7 +8,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
-import { getColIdxFromColKey, IPosition, isIndexCol } from './DataGridSelection/useGridSelectionContext';
+import { getColumnIdxFromColumnKey, IPosition, isIndexColumn } from './DataGridSelection/useGridSelectionContext';
 
 interface IDraggingPosition {
   idx: number;
@@ -53,13 +53,17 @@ function getCellPositionFromEvent(event: React.MouseEvent<HTMLDivElement, MouseE
   }
 
   const rowIdx = cell.getAttribute('data-rowindex');
-  const colKey = cell.getAttribute('data-columnkey');
+  const columnKey = cell.getAttribute('data-columnkey');
 
-  if (!rowIdx || !colKey) {
+  if (!rowIdx || !columnKey) {
     return;
   }
 
-  return { rowIdx: Number(rowIdx), colIdx: getColIdxFromColKey(colKey), isIndexColumn: isIndexCol(colKey) };
+  return {
+    rowIdx: Number(rowIdx),
+    colIdx: getColumnIdxFromColumnKey(columnKey),
+    isIndexColumn: isIndexColumn(columnKey),
+  };
 }
 
 function isDraggingStarted(delta: number | null, threshold: number) {
