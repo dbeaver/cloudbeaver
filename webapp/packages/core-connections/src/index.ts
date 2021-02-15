@@ -18,6 +18,8 @@ export * from './EConnectionFeature';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './DatabaseAuthModelsResource';
+export * from './DatabaseAuthDialog/IFormInitConfig';
+export * from './DatabaseAuthDialog/SSHAuthForm';
 export * from './DBDriverResource';
 export * from './NetworkHandlerResource';
 export * from './useConnectionInfo';

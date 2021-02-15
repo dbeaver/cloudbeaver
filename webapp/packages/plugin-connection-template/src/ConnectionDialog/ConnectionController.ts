@@ -9,8 +9,9 @@
 import { observable, makeObservable } from 'mobx';
 
 import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver
+  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig
 } from '@cloudbeaver/core-connections';
+import type { IFormInitConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -26,20 +27,25 @@ export enum ConnectionStep {
 
 export interface IConnectionController {
   template: Connection | null;
-  credentials: any;
+  config: IFormInitConfig;
   isConnecting: boolean;
   onConnect: () => void;
 }
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
   template: Connection | null = null;
   authModel?: DatabaseAuthModel;
-  credentials: any = { };
+  config: IFormInitConfig = {
+    credentials: {},
+    networkCredentials: [],
+    saveCredentials: false,
+  };
+
   hasDetails = false;
   responseMessage: string | null = null;
 
@@ -76,7 +82,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       isConnecting: observable,
       template: observable,
       authModel: observable,
-      credentials: observable,
+      config: observable,
       hasDetails: observable,
       responseMessage: observable,
     });
@@ -111,7 +117,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
 
       try {
-        await this.connectionInfoResource.init(connection.id, this.credentials);
+        await this.connectionInfoResource.init(this.getConfig(connection.id));
 
         this.notificationService.logSuccess({ title: `Connection ${connection.name} established` });
         this.onClose();
@@ -131,7 +137,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
     await this.loadAuthModel();
     this.clearError();
-    this.credentials = {};
+    this.config = {
+      credentials: {},
+      networkCredentials: [],
+      saveCredentials: false,
+    };
 
     this.step = ConnectionStep.Connection;
     if (!this.authModel) {
@@ -144,6 +154,23 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       this.commonDialogService.open(ErrorDetailsDialog, this.exception);
     }
   };
+
+  private getConfig(connectionId: string) {
+    const config: ConnectionInitConfig = {
+      id: connectionId,
+    };
+
+    if (Object.keys(this.config.credentials).length > 0) {
+      config.credentials = this.config.credentials;
+      config.saveCredentials = this.config.saveCredentials;
+    }
+
+    if (this.config.networkCredentials.length > 0) {
+      config.networkCredentials = this.config.networkCredentials;
+    }
+
+    return config;
+  }
 
   private clearError() {
     this.responseMessage = null;

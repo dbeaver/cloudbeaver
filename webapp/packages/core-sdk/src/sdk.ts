@@ -1148,6 +1148,7 @@ export interface GetTemplateConnectionsQuery { connections: UserConnectionFragme
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
+  networkCredentials?: Maybe<NetworkHandlerConfigInput[] | NetworkHandlerConfigInput>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -1255,7 +1256,7 @@ export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessT
 
 export type UserConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-  & { navigatorSettings: AllNavigatorSettingsFragment }
+  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>> }
 );
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1701,6 +1702,11 @@ export const UserConnectionFragmentDoc = `
   navigatorSettings {
     ...AllNavigatorSettings
   }
+  networkHandlersConfig {
+    id
+    enabled
+    savePassword
+  }
 }
     ${AllNavigatorSettingsFragmentDoc}`;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
@@ -2040,10 +2046,11 @@ export const GetTemplateConnectionsDocument = `
 }
     ${UserConnectionFragmentDoc}`;
 export const InitConnectionDocument = `
-    mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
+    mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!], $saveCredentials: Boolean) {
   connection: initConnection(
     id: $id
     credentials: $credentials
+    networkCredentials: $networkCredentials
     saveCredentials: $saveCredentials
   ) {
     ...UserConnection
