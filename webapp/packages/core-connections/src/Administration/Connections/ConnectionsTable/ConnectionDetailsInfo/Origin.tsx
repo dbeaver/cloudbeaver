@@ -20,8 +20,12 @@ interface Props {
 
 export const Origin: React.FC<Props> = observer(function Origin({ context }) {
   const isLocal = context.origin.type === 'local';
-  const icon = isLocal ? '/icons/local_connection.svg' : context.origin.icon;
-  const title = isLocal ? 'Local connection' : context.origin.displayName;
+  const icon = context.origin.icon;
+  const title = context.origin.displayName;
+
+  if (isLocal) {
+    return null;
+  }
 
   return styled(CONNECTION_DETAILS_STYLES)(
     <StaticImage icon={icon} title={title} />
