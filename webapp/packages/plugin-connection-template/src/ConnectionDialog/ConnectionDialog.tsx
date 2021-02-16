@@ -47,6 +47,9 @@ const styles = css`
     align-items: center;
     justify-content: center;
   }
+  FormBoxElement {
+    flex-grow: 0;
+  }
 `;
 
 export const ConnectionDialog = observer(function ConnectionDialog({

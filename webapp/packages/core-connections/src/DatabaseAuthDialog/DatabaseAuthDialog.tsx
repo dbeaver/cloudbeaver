@@ -64,6 +64,9 @@ const styles = composes(
       align-items: center;
       justify-content: center;
     }
+    FormBoxElement {
+      flex-grow: 0;
+    }
     ErrorMessage {
       position: sticky;
       bottom: 0;
