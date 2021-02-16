@@ -380,6 +380,8 @@ extend type Query {
     authModels: [DatabaseAuthModel!]!
     networkHandlers: [NetworkHandlerDescriptor!]!
 
+    # List of user connections.
+    userConnections( id: ID ): [ ConnectionInfo! ]!
     # List of template connections.
     templateConnections: [ ConnectionInfo! ]!
 
