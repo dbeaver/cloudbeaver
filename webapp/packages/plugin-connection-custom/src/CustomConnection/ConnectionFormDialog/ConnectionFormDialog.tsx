@@ -43,6 +43,7 @@ const styles = composes(
       min-height: 610px;
     }
     SubmittingForm {
+      position: relative;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -121,13 +122,10 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
         noBodyPadding
         onReject={onClose}
       >
-        <Loader loading={formState.form.loading}>
-          {() => styled(style)(
-            <SubmittingForm onSubmit={formState.save}>
-              <TabPanelList style={style} />
-            </SubmittingForm>
-          )}
-        </Loader>
+        <SubmittingForm onSubmit={formState.save}>
+          <TabPanelList style={style} />
+          <Loader loading={formState.form.loading} overlay />
+        </SubmittingForm>
         {/* {controller.error.responseMessage && (
           <ErrorMessage
             text={controller.error.responseMessage}
