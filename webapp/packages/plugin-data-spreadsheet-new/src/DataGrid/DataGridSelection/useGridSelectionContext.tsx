@@ -39,6 +39,11 @@ export function useGridSelectionContext(tableData: ITableData) {
       const lastRowIdx = Math.max(startPosition, lastPosition);
 
       for (let rowIdx = firstRowIdx; rowIdx <= lastRowIdx; rowIdx++) {
+        if (isRowSelected(rowIdx)) {
+          selectedCells.delete(rowIdx);
+          continue;
+        }
+
         if (temporary) {
           temporarySelectedCells.set(rowIdx, rowSelection);
         } else {
@@ -48,18 +53,10 @@ export function useGridSelectionContext(tableData: ITableData) {
     }), [selectedCells, temporarySelectedCells]);
 
   const isRowSelected = useCallback((rowIdx: number) => {
-    if (!tableData) {
-      throw new Error('Table data must be provided');
-    }
-
     const columnsLength = tableData.columns?.length;
 
     return selectedCells.get(rowIdx)?.length === columnsLength;
   }, [tableData, selectedCells]);
-
-  const unSelectRow = useCallback((rowIdx: number) => {
-    selectedCells.delete(rowIdx);
-  }, [selectedCells]);
 
   const selectRange = useCallback(action(
     (startPosition: number, lastPosition: number, columns: number[], multiple: boolean, temporary = false) => {
@@ -118,15 +115,6 @@ export function useGridSelectionContext(tableData: ITableData) {
     return result;
   }, [selectedCells, tableData]);
 
-  const unSelectColumn = useCallback((columnIndex: number) => {
-    const rowsLength = tableData.rows?.length || 0;
-
-    for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
-      const rowSelection = selectedCells.get(rowIdx) || [];
-      selectedCells.set(rowIdx, [...rowSelection.filter(colIdx => colIdx !== columnIndex)]);
-    }
-  }, [selectedCells, tableData]);
-
   const selectColumn = useCallback(action((columnKey: string, multiple: boolean) => {
     if (!multiple) {
       selectedCells.clear();
@@ -135,15 +123,17 @@ export function useGridSelectionContext(tableData: ITableData) {
     const rowsLength = tableData.rows?.length || 0;
     const columnIndex = Number(columnKey);
 
-    if (isColumnSelected(columnIndex)) {
-      unSelectColumn(columnIndex);
-    } else {
-      for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
-        const rowSelection = selectedCells.get(rowIdx) || [];
+    const isSelected = isColumnSelected(columnIndex);
+
+    for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
+      const rowSelection = selectedCells.get(rowIdx) || [];
+      if (isSelected) {
+        selectedCells.set(rowIdx, [...rowSelection.filter(colIdx => colIdx !== columnIndex)]);
+      } else {
         selectedCells.set(rowIdx, [...rowSelection, columnIndex]);
       }
     }
-  }), [tableData, selectedCells, isColumnSelected, unSelectColumn]);
+  }), [tableData, selectedCells, isColumnSelected]);
 
   const selectTable = useCallback(() => {
     const rowsLength = tableData.rows?.length || 0;
@@ -216,11 +206,8 @@ export function useGridSelectionContext(tableData: ITableData) {
       }
 
       if (isIndexColumn) {
-        if (multiple && isRowSelected(rowIdx)) {
-          unSelectRow(rowIdx);
-        } else {
-          selectRows(rowIdx, rowIdx, multiple);
-        }
+        selectRows(rowIdx, rowIdx, multiple);
+
         return;
       }
 
@@ -241,8 +228,6 @@ export function useGridSelectionContext(tableData: ITableData) {
       isSelected,
       selectRows,
       selectCell,
-      isRowSelected,
-      unSelectRow,
       lastSelectedCell,
       updateMultiSelection,
     ]);
