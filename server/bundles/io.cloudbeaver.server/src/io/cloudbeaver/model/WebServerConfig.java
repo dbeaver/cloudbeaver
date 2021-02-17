@@ -88,6 +88,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isLicenseRequired() {
+        return application.isLicenseRequired();
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }

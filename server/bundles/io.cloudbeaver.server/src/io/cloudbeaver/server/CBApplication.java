@@ -619,4 +619,15 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // License management
+
+    public boolean isLicenseRequired() {
+        return false;
+    }
+
+    public boolean isLicenseValid() {
+        return false;
+    }
+
 }
