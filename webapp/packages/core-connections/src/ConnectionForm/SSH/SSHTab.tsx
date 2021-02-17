@@ -13,12 +13,10 @@ import { TabTitle, Tab, TabContainerTabComponent, useMapResource } from '@cloudb
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../../../NetworkHandlerResource';
-import type { IConnectionFormProps } from '../ConnectionFormService';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
+import type { IConnectionFormTabProps } from '../ConnectionFormService';
 
-export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab({
-  model,
-  controller,
+export const SSHTab: TabContainerTabComponent<IConnectionFormTabProps> = observer(function SSHTab({
   style,
   ...rest
 }) {

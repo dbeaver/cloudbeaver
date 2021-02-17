@@ -34,7 +34,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-  implements IInitializableController, IDestructibleController, IConnectionController {
+implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;

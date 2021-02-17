@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -16,8 +17,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
-import type { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
+import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
+import type { IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
 import { CreateConnectionService } from '../CreateConnectionService';
 
 const styles = composes(
@@ -120,24 +121,30 @@ export const CreateConnection = observer(function CreateConnection({
   configurationWizard,
 }: Props) {
   const style = useStyles(styles);
-  const service = useService(CreateConnectionService);
+  const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
 
-  if (service.connection) {
+  const [options] = useState<IConnectionFormOptions>({
+    mode: 'create',
+    type: 'admin',
+  });
+
+  if (createConnectionService.data) {
     return styled(style)(
       <connection-create as='div'>
         <title-bar as='div'>
-          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={service.clearConnectionTemplate} /></back-button>
-          {service.driver?.icon && <StaticImage icon={service.driver.icon} />}
-          {service.driver?.name ?? translate('connections_administration_connection_create')}
+          <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} /></back-button>
+          {createConnectionService.driver?.icon && <StaticImage icon={createConnectionService.driver.icon} />}
+          {createConnectionService.driver?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
-          <IconButton name="cross" viewBox="0 0 24 24" onClick={service.cancelCreate} />
+          <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <connection-create-content as='div'>
           <ConnectionForm
-            model={service as IConnectionFormModel}
-            onBack={service.clearConnectionTemplate}
-            onCancel={service.clearConnectionTemplate}
+            data={createConnectionService.data}
+            options={options}
+            onCancel={createConnectionService.clearConnectionTemplate}
+            onSave={createConnectionService.clearConnectionTemplate}
           />
         </connection-create-content>
         <connection-create-footer as='div' />
@@ -149,20 +156,20 @@ export const CreateConnection = observer(function CreateConnection({
     <connection-create as='div'>
       <TabsState
         currentTabId={method}
-        container={service.tabsContainer}
+        container={createConnectionService.tabsContainer}
         manual
         lazy
-        onChange={({ tabId }) => service.setCreateMethod(tabId)}
+        onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
       >
         <title-bar as='div'>
           {translate('connections_administration_connection_create')}
           <fill as="div" />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={service.cancelCreate} />
+          <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <TabList style={[style, BORDER_TAB_STYLES]} />
         <connection-create-content as='div'>
           <TabPanelList style={[style, BORDER_TAB_STYLES]} />
-          {service.disabled && <Loader overlay />}
+          {createConnectionService.disabled && <Loader overlay />}
         </connection-create-content>
         <connection-create-footer as='div' />
       </TabsState>

@@ -1,5 +1,13 @@
-mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
+mutation setConnectionNavigatorSettings(
+  $id: ID!,
+  $settings: NavigatorSettingsInput!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: setConnectionNavigatorSettings(id: $id, settings: $settings) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }

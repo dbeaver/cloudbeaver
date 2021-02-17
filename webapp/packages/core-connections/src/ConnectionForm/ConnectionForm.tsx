@@ -7,17 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
   TabsState, TabList,
-  Button, BORDER_TAB_STYLES, TabPanelList
+  Button, BORDER_TAB_STYLES, TabPanelList, Placeholder, useObjectRef
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormService, IConnectionForm, IConnectionFormData, IConnectionFormOptions } from './ConnectionFormService';
+import { ConnectionFormService, IConnectionFormData, IConnectionFormOptions } from './ConnectionFormService';
+import { useConnectionFormState } from './useConnectionFormState';
 
 const styles = composes(
   css`
@@ -69,57 +71,65 @@ const styles = composes(
 interface Props {
   data: IConnectionFormData;
   options: IConnectionFormOptions;
-  onBack?: () => void;
   onCancel?: () => void;
+  onSave?: () => void;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
   data,
   options,
-  onBack = () => {},
   onCancel = () => {},
+  onSave = () => {},
 }: Props) {
+  const props = useObjectRef({ onSave });
   const style = [styles, BORDER_TAB_STYLES];
-  const service = useService(ConnectionFormService);
   const translate = useTranslate();
-  const form: IConnectionForm = {
-    disabled: false,
-    loading: false,
-    onSubmit: () => {},
-    originLocal: true,
-  };
+  const service = useService(ConnectionFormService);
+  const formState = useConnectionFormState(data, options);
+
+  useEffect(() => {
+    formState.submittingHandlers.addPostHandler((data, contexts) => {
+      const validation = contexts.getContext(service.connectionStatusContext);
+
+      if (validation.saved && data.submitType === 'submit') {
+        props.onSave();
+      }
+    });
+  }, []);
 
   return styled(useStyles(style))(
     <TabsState
       container={service.tabsContainer}
+      localState={data.partsState}
       data={data}
-      form={form}
+      form={formState}
       options={options}
     >
       <box as='div'>
         <TabList style={style}>
           <fill as="div" />
+          <Placeholder container={service.actionsContainer} context={{ data, form: formState.form, options }} />
           <Button
             type="button"
-            disabled={form.disabled}
+            disabled={formState.form.disabled}
             mod={['outlined']}
-            onClick={onBack}
+            onClick={onCancel}
           >
             {translate('ui_processing_cancel')}
           </Button>
           <Button
             type="button"
-            disabled={form.disabled}
+            disabled={formState.form.disabled}
             mod={['outlined']}
-            onClick={() => {}}
+            onClick={formState.test}
           >
             {translate('connections_connection_test')}
           </Button>
           <Button
             type="button"
-            disabled={form.disabled}
+            disabled={formState.form.disabled}
             mod={['unelevated']}
-            onClick={() => {}}
+            onClick={formState.save}
           >
             {translate(options.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
           </Button>

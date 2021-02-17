@@ -1,4 +1,4 @@
-fragment AdminConnection on ConnectionInfo {
+fragment DatabaseConnection on ConnectionInfo {
   id
   name
   description
@@ -17,32 +17,31 @@ fragment AdminConnection on ConnectionInfo {
   url
   properties
   providerProperties
-    
-  features
 
-  origin {
+  features
+  supportedDataFormats
+
+  origin @include(if: $includeOrigin) {
     ...ObjectOriginInfo
   }
 
   authNeeded
   authModel
-  authProperties {
+
+  authProperties @include(if: $includeAuthProperties) {
     ...UserConnectionAuthProperties
   }
-  
+
   networkHandlersConfig {
     id
     enabled
-    userName
-    password
+    userName @include(if: $customIncludeNetworkHandlerCredentials)
+    password @include(if: $customIncludeNetworkHandlerCredentials)
     savePassword
-    properties
+    properties @include(if: $customIncludeNetworkHandlerCredentials)
   }
 
   navigatorSettings {
     ...AllNavigatorSettings
   }
-
-  features
-  supportedDataFormats
 }

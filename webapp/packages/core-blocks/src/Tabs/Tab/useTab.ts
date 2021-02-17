@@ -10,6 +10,7 @@ import { useContext, useEffect, useRef } from 'react';
 
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 
+import { useObjectRef } from '../../useObjectRef';
 import { ITabData, TabsContext } from '../TabsContext';
 
 export function useTab(
@@ -22,28 +23,24 @@ export function useTab(
     throw new Error('TabsContext not provided');
   }
 
-  const dynamic = useRef({
+  const dynamic = useObjectRef({
     tabId,
     open: onOpen,
     close: onClose,
   });
 
-  dynamic.current.tabId = tabId;
-  dynamic.current.open = onOpen;
-  dynamic.current.close = onClose;
-
   useEffect(() => {
     const openHandler: IExecutorHandler<ITabData<any>> = data => {
-      if (dynamic.current.tabId !== data.tabId) {
+      if (dynamic.tabId !== data.tabId) {
         return;
       }
-      dynamic.current.open?.(data);
+      dynamic.open?.(data);
     };
     const closeHandler: IExecutorHandler<ITabData<any>> = data => {
-      if (dynamic.current.tabId !== data.tabId) {
+      if (dynamic.tabId !== data.tabId) {
         return;
       }
-      dynamic.current.close?.(data);
+      dynamic.close?.(data);
     };
 
     state.openExecutor.addHandler(openHandler);

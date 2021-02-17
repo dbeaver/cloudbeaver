@@ -85,7 +85,7 @@ export class ConnectionSearchService {
   select(database: AdminConnectionSearchInfo): void {
     this.createConnectionService.setConnectionTemplate(
       {
-        ...this.connectionsResource.getEmptyConnection(),
+        ...this.connectionsResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,
         port: `${database.port}`,

@@ -26,7 +26,7 @@ type NavNodeInfo = NavNodeInfoFragment;
 
 export const ROOT_NODE_PATH = '';
 
-interface INodeMetadata extends ICachedMapResourceMetadata<NavNode> {
+interface INodeMetadata extends ICachedMapResourceMetadata {
   withDetails: boolean;
 }
 
@@ -45,7 +45,6 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       loading: false,
       withDetails: false,
       includes: [],
-      loadedIncludes: [],
     }));
   }
 

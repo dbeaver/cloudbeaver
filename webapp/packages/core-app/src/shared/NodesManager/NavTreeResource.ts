@@ -31,7 +31,7 @@ export interface NodePath {
 
 type NavNodeChildrenQuery = fake & NodePath;
 
-interface INodeMetadata extends ICachedMapResourceMetadata<string[]> {
+interface INodeMetadata extends ICachedMapResourceMetadata {
   withDetails: boolean;
 }
 
@@ -54,7 +54,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       loading: false,
       withDetails: false,
       includes: [],
-      loadedIncludes: [],
     }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
   }

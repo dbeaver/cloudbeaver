@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
@@ -17,15 +17,19 @@ import {
   Textarea,
   InputGroup,
   Combobox,
-  SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup, TabContainerTabComponent, useMapResource
+  SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup, TabContainerPanelComponent, useMapResource
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { DatabaseAuthModelsResource } from '../../../../DatabaseAuthModelsResource';
-import { DBDriverResource } from '../../../../DBDriverResource';
-import { isJDBCConnection } from '../../../ConnectionsResource';
-import type { IConnectionFormProps } from '../ConnectionFormService';
+import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
+import { DBDriverResource } from '../../DBDriverResource';
+import { isJDBCConnection } from '../../isJDBCConnection';
+import { IConnectionFormTabProps, ConnectionFormService } from '../ConnectionFormService';
+import { useConnectionData } from '../useConnectionData';
 import { ParametersForm } from './ParametersForm';
 import { useOptions } from './useOptions';
 
@@ -35,49 +39,95 @@ const styles = css`
     flex-direction: column;
     flex: 1;
     padding-top: 16px;
-  }
-  parameters-type-container {
-    max-width: 630px;
+    padding-bottom: 16px;
+    overflow: auto;
   }
 `;
 
-export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(function Options(props) {
+export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function Options(props) {
   const {
     data,
     form,
     options,
   } = props;
+  const service = useService(ConnectionFormService);
+  const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
-  const { setDefaults, updateNameTemplate } = useOptions(props);
+
+  useFormValidator(form.submittingHandlers.for(service.formValidationTask), formRef);
+  useConnectionData(data, data => {
+    if (!data.config.credentials) {
+      data.config.credentials = {};
+    }
+
+    if (!data.config.providerProperties) {
+      data.config.providerProperties = {};
+    }
+
+    if (!data.info) {
+      return;
+    }
+
+    data.config.connectionId = data.info.id;
+
+    data.config.name = data.info.name.trim();
+    data.config.description = data.info.description;
+    data.config.template = data.info.template;
+    data.config.driverId = data.info.driverId;
+    data.availableDrivers = [data.info.driverId];
+
+    data.config.host = data.info.host;
+    data.config.port = data.info.port;
+    data.config.databaseName = data.info.databaseName;
+    data.config.url = data.info.url;
+
+    data.config.authModelId = data.info.authModel;
+    data.config.saveCredentials = data.info.saveCredentials;
+
+    for (const property of data.info.authProperties) {
+      if (!property.features.includes('password')) {
+        data.config.credentials[property.id!] = property.value;
+      }
+    }
+
+    data.config.providerProperties = { ...data.info.providerProperties };
+  });
+  const optionsHook = useOptions({ data, form: form.form, options });
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const driver = useMapResource(
     DBDriverResource,
-    data.config.driverId || null,
+    { key: data.config.driverId || null, includes: ['includeProviderProperties'] },
     {
       onLoad: async resource => {
-        resource.loadAll();
+        if (data.availableDrivers && data.availableDrivers.length > 1) {
+          await resource.load(resourceKeyList(data.availableDrivers), ['includeProviderProperties']);
+        }
 
         if (!data.config.driverId && data.info) {
           data.info.authModel = undefined;
         }
       },
-      onData: (data, resource, prevData) => setDefaults(data, prevData),
+      onData: (data, resource, prevData) => optionsHook.setDefaults(data, prevData),
     }
   );
 
   const handleFormChange = useCallback((value?: unknown, name?: string) => {
     if (name !== 'name') {
-      updateNameTemplate(driver.data);
+      optionsHook.updateNameTemplate(driver.data);
     }
-  }, [updateNameTemplate]);
+  }, []);
 
   const { data: authModel } = useMapResource(
     DatabaseAuthModelsResource,
-    data.info?.authModel || driver.data?.defaultAuthModel || null
+    data.info?.authModel || driver.data?.defaultAuthModel || null,
+    {
+      onData: data => optionsHook.setAuthModel(data),
+    }
   );
 
   const JDBC = isJDBCConnection(driver.data, data.info);
+  const admin = options.type === 'admin';
   const edit = options.mode === 'edit';
   const drivers = driver.resource.values.filter(({ id }) => data.availableDrivers?.includes(id));
   let properties = authModel?.properties;
@@ -87,30 +137,34 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
   }
 
   return styled(useStyles(styles))(
-    <SubmittingForm onChange={handleFormChange} onSubmit={form.onSubmit}>
+    <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
       <FormBox>
         <FormBoxElement>
-          <FormGroup>
-            <Combobox
-              name='driverId'
-              state={data.config}
-              items={drivers}
-              keySelector={driver => driver.id}
-              valueSelector={driver => driver?.name ?? ''}
-              readOnly={edit || drivers.length < 2}
-              mod="surface"
-              disabled={form.disabled}
-            >
-              {translate('connections_connection_driver')}
-            </Combobox>
-          </FormGroup>
+          {(admin || edit) && (
+            <FormGroup>
+              <Combobox
+                name='driverId'
+                state={data.config}
+                items={drivers}
+                keySelector={driver => driver.id}
+                valueSelector={driver => driver?.name ?? ''}
+                readOnly={edit || drivers.length < 2}
+                mod="surface"
+                disabled={form.form.disabled}
+              >
+                {translate('connections_connection_driver')}
+              </Combobox>
+            </FormGroup>
+          )}
           <FormGroup>
             <InputField
               type="text"
               name="name"
+              minLength={1}
               state={data.config}
-              disabled={form.disabled}
+              disabled={form.form.disabled}
               mod='surface'
+              required
             >
               {translate('connections_connection_name')}
             </InputField>
@@ -120,20 +174,20 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
               name="description"
               rows={3}
               state={data.config}
-              disabled={form.disabled}
+              disabled={form.form.disabled}
               mod='surface'
             >
               {translate('connections_connection_description')}
             </Textarea>
           </FormGroup>
-          {form.originLocal && (
+          {admin && form.form.originLocal && (
             <FormGroup>
               <FieldCheckbox
                 name="template"
                 value={data.config.connectionId}
                 state={data.config}
                 checkboxLabel={translate('connections_connection_template')}
-                disabled={edit || form.disabled}
+                disabled={edit || form.form.disabled}
                 // autoHide={} // maybe better to use autoHide
                 mod='surface'
               />
@@ -148,7 +202,7 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
                   type="text"
                   name="url"
                   state={data.config}
-                  disabled={form.disabled}
+                  disabled={form.form.disabled}
                   autoComplete={`section-${data.config.driverId || 'driver'} section-jdbc`}
                   mod='surface'
                 >
@@ -159,8 +213,8 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
               <ParametersForm
                 config={data.config}
                 embedded={driver.data?.embedded}
-                disabled={form.disabled}
-                readOnly={!form.originLocal}
+                disabled={form.form.disabled}
+                readOnly={!form.form.originLocal}
               />
             )}
           </parameters-type-container>
@@ -173,8 +227,8 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
               <ObjectPropertyInfoForm
                 autofillToken='new-password'
                 properties={properties}
-                credentials={data.config.credentials}
-                disabled={form.disabled}
+                state={data.config.credentials}
+                disabled={form.form.disabled}
                 showRememberTip
               />
               {credentialsSavingEnabled && (
@@ -184,11 +238,25 @@ export const Options: TabContainerTabComponent<IConnectionFormProps> = observer(
                     value={data.config.connectionId + 'authNeeded'}
                     state={data.config}
                     checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                    disabled={form.disabled}
+                    disabled={form.form.disabled}
                     mod='surface'
                   />
                 </FormGroup>
               )}
+            </>
+          )}
+        </FormBoxElement>
+        <FormBoxElement>
+          {driver.isLoaded() && driver.data && driver.data.providerProperties.length > 0 && (
+            <>
+              <FormGroup>
+                <InputGroup>{translate('connections_connection_edit_settings')}</InputGroup>
+              </FormGroup>
+              <ObjectPropertyInfoForm
+                properties={driver.data.providerProperties}
+                state={data.config.providerProperties}
+                disabled={form.form.disabled}
+              />
             </>
           )}
         </FormBoxElement>

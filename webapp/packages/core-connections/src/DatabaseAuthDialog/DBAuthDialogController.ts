@@ -99,7 +99,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadAuthModel() {
     try {
-      await this.connectionInfoResource.loadAuthModel(this.connectionId);
+      await this.connectionInfoResource.load(this.connectionId, ['includeAuthProperties']);
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth model');
     }

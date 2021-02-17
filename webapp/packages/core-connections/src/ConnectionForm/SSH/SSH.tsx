@@ -14,35 +14,42 @@ import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapR
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../../../NetworkHandlerResource';
-import type { IConnectionFormProps } from '../ConnectionFormService';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
+import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import { useConnectionData } from '../useConnectionData';
 
-export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSH({
-  model,
-  controller,
+export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function SSH({
+  data,
+  form,
 }) {
   const [loading, setLoading] = useState(false);
-  const initialConfig = model.connection.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+  const initialConfig = data.info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  if (!model.networkHandlersState.some(state => state.id === SSH_TUNNEL_ID)) {
-    model.networkHandlersState.push({
-      id: SSH_TUNNEL_ID,
-      enabled: false,
-      password: '',
-      savePassword: true,
-      userName: '',
-      ...initialConfig,
+  useConnectionData(data, data => {
+    if (!data.config.networkHandlersConfig) {
+      data.config.networkHandlersConfig = [];
+    }
 
-      properties: {
-        port: 22,
-        host: '',
-        ...initialConfig?.properties,
-      },
-    });
-  }
+    if (!data.config.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
+      data.config.networkHandlersConfig.push({
+        id: SSH_TUNNEL_ID,
+        enabled: false,
+        password: '',
+        savePassword: true,
+        userName: '',
+        ...initialConfig,
 
-  const state = model.networkHandlersState.find(state => state.id === SSH_TUNNEL_ID)!;
+        properties: {
+          port: 22,
+          host: '',
+          ...initialConfig?.properties,
+        },
+      });
+    }
+  });
+
+  const state = data.config.networkHandlersConfig!.find(state => state.id === SSH_TUNNEL_ID)!;
 
   const resource = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
@@ -63,7 +70,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   };
 
   const translate = useTranslate();
-  const disabled = controller.isDisabled || loading;
+  const disabled = form.form.disabled || loading;
   const enabled = state.enabled || false;
   const passwordFilled = (initialConfig?.password === null && state.password !== '') || (state.password?.length || 0) > 0;
   let passwordHint = '';
@@ -73,7 +80,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
   }
 
   return (
-    <SubmittingForm onSubmit={controller.save}>
+    <SubmittingForm onSubmit={form.save}>
       <FormBox>
         <FormBoxElement max>
           <FormGroup><br /></FormGroup>

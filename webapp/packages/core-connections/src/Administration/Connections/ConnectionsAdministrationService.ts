@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { NetworkHandlerResource } from '../../NetworkHandlerResource';
-import { AdminConnection, ConnectionsResource } from '../ConnectionsResource';
+import { DatabaseConnection, ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
@@ -23,7 +23,7 @@ import { CreateConnectionService } from './CreateConnectionService';
 
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
-  readonly connectionDetailsPlaceholder = new PlaceholderContainer<AdminConnection>();
+  readonly connectionDetailsPlaceholder = new PlaceholderContainer<DatabaseConnection>();
 
   constructor(
     private administrationItemService: AdministrationItemService,

@@ -950,6 +950,7 @@ export interface GetSessionUserQuery { user?: Maybe<Pick<UserAuthInfo, 'userId' 
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
+  customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 export interface CreateUserQuery { user: AdminUserInfoFragment }
@@ -972,12 +973,6 @@ export type GetRolesListQueryVariables = Exact<{
 
 export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> }
 
-export type GetUserOriginQueryVariables = Exact<{
-  userId: Scalars['ID'];
-}>;
-
-export interface GetUserOriginQuery { user: Array<Maybe<{ origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'order' | 'value' | 'validValues' | 'defaultValue' | 'features'>>> } }>> }
-
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
 }>;
@@ -986,6 +981,7 @@ export interface GetUserGrantedConnectionsQuery { grantedConnections: Array<Pick
 
 export type GetUsersListQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
+  customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 export interface GetUsersListQuery { users: Array<Maybe<AdminUserInfoFragment>> }
@@ -1021,16 +1017,24 @@ export type SetUserCredentialsQuery = Pick<Query, 'setUserCredentials'>;
 
 export type CreateConnectionConfigurationQueryVariables = Exact<{
   config: ConnectionConfig;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionConfigurationQuery { connection: AdminConnectionFragment }
+export interface CreateConnectionConfigurationQuery { connection: DatabaseConnectionFragment }
 
 export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   nodePath: Scalars['String'];
   config?: Maybe<ConnectionConfig>;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionConfigurationFromNodeQuery { connection: AdminConnectionFragment }
+export interface CreateConnectionConfigurationFromNodeQuery { connection: DatabaseConnectionFragment }
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1044,9 +1048,14 @@ export type GetConnectionAccessQueryVariables = Exact<{
 
 export interface GetConnectionAccessQuery { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
 
-export type GetConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetConnectionsQueryVariables = Exact<{
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
+}>;
 
-export interface GetConnectionsQuery { connections: AdminConnectionFragment[] }
+export interface GetConnectionsQuery { connections: DatabaseConnectionFragment[] }
 
 export type SearchDatabasesQueryVariables = Exact<{
   hosts: Array<Scalars['String']> | Scalars['String'];
@@ -1064,46 +1073,64 @@ export type SetConnectionAccessQuery = Pick<Query, 'setConnectionSubjectAccess'>
 export type UpdateConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
   config: ConnectionConfig;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface UpdateConnectionConfigurationQuery { connection: AdminConnectionFragment }
+export interface UpdateConnectionConfigurationQuery { connection: DatabaseConnectionFragment }
 
 export type CloseConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CloseConnectionMutation { connection: UserConnectionFragment }
-
-export type ConnectionAuthPropertiesQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export interface ConnectionAuthPropertiesQuery { connection: { authProperties: UserConnectionAuthPropertiesFragment[] } }
+export interface CloseConnectionMutation { connection: DatabaseConnectionFragment }
 
 export type ConnectionInfoQueryVariables = Exact<{
   id: Scalars['ID'];
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface ConnectionInfoQuery { connection: UserConnectionFragment }
+export interface ConnectionInfoQuery { connection: DatabaseConnectionFragment }
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionMutation { connection: UserConnectionFragment }
+export interface CreateConnectionMutation { connection: DatabaseConnectionFragment }
 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   nodePath: Scalars['String'];
   config?: Maybe<ConnectionConfig>;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionFromNodeMutation { connection: UserConnectionFragment }
+export interface CreateConnectionFromNodeMutation { connection: DatabaseConnectionFragment }
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface CreateConnectionFromTemplateMutation { connection: UserConnectionFragment }
+export interface CreateConnectionFromTemplateMutation { connection: DatabaseConnectionFragment }
 
 export type DeleteConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1129,30 +1156,27 @@ export interface GetAuthModelsQuery {
   )>;
 }
 
-export type GetConnectionNetworkHandlersQueryVariables = Exact<{
-  connectionId: Scalars['ID'];
+export type GetTemplateConnectionsQueryVariables = Exact<{
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface GetConnectionNetworkHandlersQuery { connection: { networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>> } }
-
-export type GetConnectionOriginDetailsQueryVariables = Exact<{
-  connectionId: Scalars['ID'];
-}>;
-
-export interface GetConnectionOriginDetailsQuery { connection: { origin: { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> } } }
-
-export type GetTemplateConnectionsQueryVariables = Exact<{ [key: string]: never }>;
-
-export interface GetTemplateConnectionsQuery { connections: UserConnectionFragment[] }
+export interface GetTemplateConnectionsQuery { connections: DatabaseConnectionFragment[] }
 
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
   credentials?: Maybe<Scalars['Object']>;
   networkCredentials?: Maybe<NetworkHandlerConfigInput[] | NetworkHandlerConfigInput>;
   saveCredentials?: Maybe<Scalars['Boolean']>;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface InitConnectionMutation { connection: UserConnectionFragment }
+export interface InitConnectionMutation { connection: DatabaseConnectionFragment }
 
 export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -1161,9 +1185,13 @@ export type RefreshSessionConnectionsMutation = Pick<Mutation, 'refreshSessionCo
 export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
   id: Scalars['ID'];
   settings: NavigatorSettingsInput;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
 }>;
 
-export interface SetConnectionNavigatorSettingsMutation { connection: UserConnectionFragment }
+export interface SetConnectionNavigatorSettingsMutation { connection: DatabaseConnectionFragment }
 
 export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1226,17 +1254,17 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
-export type AdminConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'authNeeded' | 'authModel' | 'supportedDataFormats'>
-  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
-);
-
 export type AdminUserInfoFragment = (
   Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
   & { origin: ObjectOriginInfoFragment }
 );
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
+
+export type DatabaseConnectionFragment = (
+  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'supportedDataFormats' | 'authNeeded' | 'authModel'>
+  & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<MakeOptional<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>, 'userName' | 'password' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
+);
 
 export type DatabaseDriverFragment = (
   MakeOptional<Pick<DriverInfo, 'id' | 'name' | 'icon' | 'description' | 'defaultPort' | 'defaultDatabase' | 'defaultServer' | 'defaultUser' | 'sampleURL' | 'embedded' | 'anonymousAccess' | 'promotedScore' | 'defaultAuthModel' | 'applicableNetworkHandlers' | 'driverParameters'>, 'driverParameters'>
@@ -1250,14 +1278,12 @@ export type NavNodeInfoFragment = (
 
 export type NavNodePropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>;
 
-export type ObjectOriginInfoFragment = Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>;
+export type ObjectOriginInfoFragment = (
+  Pick<ObjectOrigin, 'type' | 'subType' | 'displayName' | 'icon'>
+  & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> }
+);
 
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
-
-export type UserConnectionFragment = (
-  Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'connected' | 'readOnly' | 'authNeeded' | 'authModel' | 'features' | 'supportedDataFormats'>
-  & { navigatorSettings: AllNavigatorSettingsFragment; networkHandlersConfig: Array<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'savePassword'>> }
-);
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
 
@@ -1455,9 +1481,14 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
 
-export type GetSessionConnectionsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetSessionConnectionsQueryVariables = Exact<{
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
+}>;
 
-export interface GetSessionConnectionsQuery { state: { connections: UserConnectionFragment[] } }
+export interface GetSessionConnectionsQuery { state: { connections: DatabaseConnectionFragment[] } }
 
 export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -1529,8 +1560,29 @@ export const ObjectOriginInfoFragmentDoc = `
   subType
   displayName
   icon
+  details @include(if: $customIncludeOriginDetails) {
+    id
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+    value
+    features
+    order
+  }
 }
     `;
+export const AdminUserInfoFragmentDoc = `
+    fragment AdminUserInfo on AdminUserInfo {
+  userId
+  grantedRoles
+  origin {
+    ...ObjectOriginInfo
+  }
+}
+    ${ObjectOriginInfoFragmentDoc}`;
 export const UserConnectionAuthPropertiesFragmentDoc = `
     fragment UserConnectionAuthProperties on ObjectPropertyInfo {
   id
@@ -1556,8 +1608,8 @@ export const AllNavigatorSettingsFragmentDoc = `
   hideVirtualModel
 }
     `;
-export const AdminConnectionFragmentDoc = `
-    fragment AdminConnection on ConnectionInfo {
+export const DatabaseConnectionFragmentDoc = `
+    fragment DatabaseConnection on ConnectionInfo {
   id
   name
   description
@@ -1575,40 +1627,30 @@ export const AdminConnectionFragmentDoc = `
   properties
   providerProperties
   features
-  origin {
+  supportedDataFormats
+  origin @include(if: $includeOrigin) {
     ...ObjectOriginInfo
   }
   authNeeded
   authModel
-  authProperties {
+  authProperties @include(if: $includeAuthProperties) {
     ...UserConnectionAuthProperties
   }
   networkHandlersConfig {
     id
     enabled
-    userName
-    password
+    userName @include(if: $customIncludeNetworkHandlerCredentials)
+    password @include(if: $customIncludeNetworkHandlerCredentials)
     savePassword
-    properties
+    properties @include(if: $customIncludeNetworkHandlerCredentials)
   }
   navigatorSettings {
     ...AllNavigatorSettings
   }
-  features
-  supportedDataFormats
 }
     ${ObjectOriginInfoFragmentDoc}
 ${UserConnectionAuthPropertiesFragmentDoc}
 ${AllNavigatorSettingsFragmentDoc}`;
-export const AdminUserInfoFragmentDoc = `
-    fragment AdminUserInfo on AdminUserInfo {
-  userId
-  grantedRoles
-  origin {
-    ...ObjectOriginInfo
-  }
-}
-    ${ObjectOriginInfoFragmentDoc}`;
 export const DatabaseDriverFragmentDoc = `
     fragment DatabaseDriver on DriverInfo {
   id
@@ -1687,28 +1729,6 @@ export const SessionStateFragmentDoc = `
   locale
 }
     `;
-export const UserConnectionFragmentDoc = `
-    fragment UserConnection on ConnectionInfo {
-  id
-  name
-  description
-  driverId
-  connected
-  readOnly
-  authNeeded
-  authModel
-  features
-  supportedDataFormats
-  navigatorSettings {
-    ...AllNavigatorSettings
-  }
-  networkHandlersConfig {
-    id
-    enabled
-    savePassword
-  }
-}
-    ${AllNavigatorSettingsFragmentDoc}`;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
     fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
   id
@@ -1776,7 +1796,7 @@ export const GetSessionUserDocument = `
 }
     `;
 export const CreateUserDocument = `
-    query createUser($userId: ID!) {
+    query createUser($userId: ID!, $customIncludeOriginDetails: Boolean!) {
   user: createUser(userId: $userId) {
     ...AdminUserInfo
   }
@@ -1806,26 +1826,6 @@ export const GetRolesListDocument = `
   }
 }
     `;
-export const GetUserOriginDocument = `
-    query getUserOrigin($userId: ID!) {
-  user: listUsers(userId: $userId) {
-    origin {
-      details {
-        id
-        displayName
-        description
-        category
-        dataType
-        order
-        value
-        validValues
-        defaultValue
-        features
-      }
-    }
-  }
-}
-    `;
 export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
@@ -1836,7 +1836,7 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($userId: ID) {
+    query getUsersList($userId: ID, $customIncludeOriginDetails: Boolean!) {
   users: listUsers(userId: $userId) {
     ...AdminUserInfo
   }
@@ -1870,19 +1870,19 @@ export const SetUserCredentialsDocument = `
 }
     `;
 export const CreateConnectionConfigurationDocument = `
-    query createConnectionConfiguration($config: ConnectionConfig!) {
+    query createConnectionConfiguration($config: ConnectionConfig!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: createConnectionConfiguration(config: $config) {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }
-    ${AdminConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const CreateConnectionConfigurationFromNodeDocument = `
-    query createConnectionConfigurationFromNode($nodePath: String!, $config: ConnectionConfig) {
+    query createConnectionConfigurationFromNode($nodePath: String!, $config: ConnectionConfig, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: copyConnectionConfiguration(nodePath: $nodePath, config: $config) {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }
-    ${AdminConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const DeleteConnectionConfigurationDocument = `
     query deleteConnectionConfiguration($id: ID!) {
   deleteConnectionConfiguration(id: $id)
@@ -1898,12 +1898,12 @@ export const GetConnectionAccessDocument = `
 }
     `;
 export const GetConnectionsDocument = `
-    query getConnections {
+    query getConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connections: allConnections {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }
-    ${AdminConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const SearchDatabasesDocument = `
     query searchDatabases($hosts: [String!]!) {
   databases: searchConnections(hostNames: $hosts) {
@@ -1921,56 +1921,47 @@ export const SetConnectionAccessDocument = `
 }
     `;
 export const UpdateConnectionConfigurationDocument = `
-    query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
+    query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: updateConnectionConfiguration(id: $id, config: $config) {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }
-    ${AdminConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const CloseConnectionDocument = `
-    mutation closeConnection($id: ID!) {
+    mutation closeConnection($id: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: closeConnection(id: $id) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
-export const ConnectionAuthPropertiesDocument = `
-    query connectionAuthProperties($id: ID!) {
-  connection: connectionInfo(id: $id) {
-    authProperties {
-      ...UserConnectionAuthProperties
-    }
-  }
-}
-    ${UserConnectionAuthPropertiesFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const ConnectionInfoDocument = `
-    query connectionInfo($id: ID!) {
+    query connectionInfo($id: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: connectionInfo(id: $id) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const CreateConnectionDocument = `
-    mutation createConnection($config: ConnectionConfig!) {
+    mutation createConnection($config: ConnectionConfig!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: createConnection(config: $config) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const CreateConnectionFromNodeDocument = `
-    mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig) {
+    mutation createConnectionFromNode($nodePath: String!, $config: ConnectionConfig, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: copyConnectionFromNode(nodePath: $nodePath, config: $config) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const CreateConnectionFromTemplateDocument = `
-    mutation createConnectionFromTemplate($templateId: ID!) {
+    mutation createConnectionFromTemplate($templateId: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: createConnectionFromTemplate(templateId: $templateId) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const DeleteConnectionDocument = `
     mutation deleteConnection($id: ID!) {
   deleteConnection(id: $id)
@@ -2004,71 +1995,37 @@ export const GetAuthModelsDocument = `
   }
 }
     `;
-export const GetConnectionNetworkHandlersDocument = `
-    query getConnectionNetworkHandlers($connectionId: ID!) {
-  connection: connectionInfo(id: $connectionId) {
-    networkHandlersConfig {
-      id
-      enabled
-      userName
-      password
-      savePassword
-      properties
-    }
-  }
-}
-    `;
-export const GetConnectionOriginDetailsDocument = `
-    query getConnectionOriginDetails($connectionId: ID!) {
-  connection: connectionInfo(id: $connectionId) {
-    origin {
-      details {
-        id
-        displayName
-        description
-        category
-        dataType
-        defaultValue
-        validValues
-        value
-        features
-        order
-      }
-    }
-  }
-}
-    `;
 export const GetTemplateConnectionsDocument = `
-    query getTemplateConnections {
+    query getTemplateConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connections: templateConnections {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const InitConnectionDocument = `
-    mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!], $saveCredentials: Boolean) {
+    mutation initConnection($id: ID!, $credentials: Object, $networkCredentials: [NetworkHandlerConfigInput!], $saveCredentials: Boolean, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: initConnection(
     id: $id
     credentials: $credentials
     networkCredentials: $networkCredentials
     saveCredentials: $saveCredentials
   ) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const RefreshSessionConnectionsDocument = `
     mutation refreshSessionConnections {
   refreshSessionConnections
 }
     `;
 export const SetConnectionNavigatorSettingsDocument = `
-    mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!) {
+    mutation setConnectionNavigatorSettings($id: ID!, $settings: NavigatorSettingsInput!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: setConnectionNavigatorSettings(id: $id, settings: $settings) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const TestConnectionDocument = `
     mutation testConnection($config: ConnectionConfig!) {
   testConnection(config: $config) {
@@ -2426,14 +2383,14 @@ export const ChangeSessionLanguageDocument = `
 }
     `;
 export const GetSessionConnectionsDocument = `
-    query getSessionConnections {
+    query getSessionConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   state: sessionState {
     connections {
-      ...UserConnection
+      ...DatabaseConnection
     }
   }
 }
-    ${UserConnectionFragmentDoc}`;
+    ${DatabaseConnectionFragmentDoc}`;
 export const OpenSessionDocument = `
     mutation openSession {
   session: openSession {
@@ -2566,13 +2523,10 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getRolesList(variables?: GetRolesListQueryVariables): Promise<GetRolesListQuery> {
       return withWrapper(() => client.request<GetRolesListQuery>(GetRolesListDocument, variables));
     },
-    getUserOrigin(variables: GetUserOriginQueryVariables): Promise<GetUserOriginQuery> {
-      return withWrapper(() => client.request<GetUserOriginQuery>(GetUserOriginDocument, variables));
-    },
     getUserGrantedConnections(variables?: GetUserGrantedConnectionsQueryVariables): Promise<GetUserGrantedConnectionsQuery> {
       return withWrapper(() => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables));
     },
-    getUsersList(variables?: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
+    getUsersList(variables: GetUsersListQueryVariables): Promise<GetUsersListQuery> {
       return withWrapper(() => client.request<GetUsersListQuery>(GetUsersListDocument, variables));
     },
     grantUserRole(variables: GrantUserRoleQueryVariables): Promise<GrantUserRoleQuery> {
@@ -2599,7 +2553,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getConnectionAccess(variables?: GetConnectionAccessQueryVariables): Promise<GetConnectionAccessQuery> {
       return withWrapper(() => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables));
     },
-    getConnections(variables?: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
+    getConnections(variables: GetConnectionsQueryVariables): Promise<GetConnectionsQuery> {
       return withWrapper(() => client.request<GetConnectionsQuery>(GetConnectionsDocument, variables));
     },
     searchDatabases(variables: SearchDatabasesQueryVariables): Promise<SearchDatabasesQuery> {
@@ -2613,9 +2567,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
       return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));
-    },
-    connectionAuthProperties(variables: ConnectionAuthPropertiesQueryVariables): Promise<ConnectionAuthPropertiesQuery> {
-      return withWrapper(() => client.request<ConnectionAuthPropertiesQuery>(ConnectionAuthPropertiesDocument, variables));
     },
     connectionInfo(variables: ConnectionInfoQueryVariables): Promise<ConnectionInfoQuery> {
       return withWrapper(() => client.request<ConnectionInfoQuery>(ConnectionInfoDocument, variables));
@@ -2638,13 +2589,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthModels(variables?: GetAuthModelsQueryVariables): Promise<GetAuthModelsQuery> {
       return withWrapper(() => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables));
     },
-    getConnectionNetworkHandlers(variables: GetConnectionNetworkHandlersQueryVariables): Promise<GetConnectionNetworkHandlersQuery> {
-      return withWrapper(() => client.request<GetConnectionNetworkHandlersQuery>(GetConnectionNetworkHandlersDocument, variables));
-    },
-    getConnectionOriginDetails(variables: GetConnectionOriginDetailsQueryVariables): Promise<GetConnectionOriginDetailsQuery> {
-      return withWrapper(() => client.request<GetConnectionOriginDetailsQuery>(GetConnectionOriginDetailsDocument, variables));
-    },
-    getTemplateConnections(variables?: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
+    getTemplateConnections(variables: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
     },
     initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
@@ -2731,7 +2676,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
     },
-    getSessionConnections(variables?: GetSessionConnectionsQueryVariables): Promise<GetSessionConnectionsQuery> {
+    getSessionConnections(variables: GetSessionConnectionsQueryVariables): Promise<GetSessionConnectionsQuery> {
       return withWrapper(() => client.request<GetSessionConnectionsQuery>(GetSessionConnectionsDocument, variables));
     },
     openSession(variables?: OpenSessionMutationVariables): Promise<OpenSessionMutation> {

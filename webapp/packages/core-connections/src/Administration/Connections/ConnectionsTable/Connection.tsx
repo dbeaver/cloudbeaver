@@ -16,12 +16,12 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { AdminConnection } from '../../ConnectionsResource';
+import type { DatabaseConnection } from '../../ConnectionsResource';
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import { ConnectionEdit } from './ConnectionEdit';
 
 interface Props {
-  connection: AdminConnection;
+  connection: DatabaseConnection;
 }
 
 const styles = css`

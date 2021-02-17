@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
+import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Table,
   TableHeader,
@@ -20,15 +20,15 @@ import {
   TableItemSelect,
   TextPlaceholder,
   Loader,
-  useTab
+  useTab,
+  TabContainerPanelComponent,
+  useMapResource
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { ConnectionFormController } from '../ConnectionFormController';
-import type { IConnectionFormModel } from '../IConnectionFormModel';
-import { Controller } from './Controller';
+import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import { useConnectionAccessState } from './useConnectionAccessState';
 
 const styles = composes(
   css`
@@ -51,35 +51,30 @@ const styles = composes(
   `
 );
 
-interface Props {
-  tabId: string;
-  model: IConnectionFormModel;
-  controller: ConnectionFormController;
-  className?: string;
-}
-
-export const ConnectionAccess = observer(function ConnectionAccess({
+export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function ConnectionAccess({
   tabId,
-  model,
-  controller: formController,
-  className,
-}: Props) {
+  data,
+}) {
+  const { state, load, select } = useConnectionAccessState(data);
   const style = useStyles(styles);
-  const controller = useController(Controller, model, formController);
-  const { selected } = useTab(tabId, controller.load);
   const translate = useTranslate();
-  const disabled = controller.isLoading;
 
-  const handleSelect = useCallback((item: string, state: boolean) => {
-    controller.select(item, state);
-    controller.change();
-  }, [controller]);
+  const users = useMapResource(UsersResource, null, {
+    onLoad: resource => resource.loadAll(),
+  });
+
+  const roles = useMapResource(RolesResource, null, {
+    onLoad: resource => resource.loadAll(),
+  });
+
+  const { selected } = useTab(tabId, load);
+  const disabled = users.isLoading() || roles.isLoading() || state.loading;
 
   if (!selected) {
     return null;
   }
 
-  if (controller.isLoading) {
+  if (disabled) {
     return styled(style)(
       <box as='div'>
         <Loader key="static" />
@@ -87,7 +82,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
     );
   }
 
-  if (!model.grantedSubjects || (controller.users.length === 0 && controller.roles.length)) {
+  if (users.resource.values.length === 0 && roles.resource.values.length) {
     return styled(style)(
       <box as='div'>
         <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
@@ -97,14 +92,14 @@ export const ConnectionAccess = observer(function ConnectionAccess({
 
   return styled(style)(
     <box as='div'>
-      <Table selectedItems={controller.selectedSubjects} className={className} onSelect={handleSelect}>
+      <Table selectedItems={state.selectedSubjects} onSelect={select}>
         <TableHeader>
           <TableColumnHeader min />
           <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
           <TableColumnHeader />
         </TableHeader>
         <TableBody>
-          {controller.roles.map(role => (
+          {roles.resource.values.map(role => (
             <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex>
                 <TableItemSelect disabled={disabled} />
@@ -113,7 +108,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
               <TableColumnValue />
             </TableItem>
           ))}
-          {controller.users.map(user => (
+          {users.resource.values.map(user => (
             <TableItem key={user.userId} item={user.userId} selectDisabled={disabled}>
               <TableColumnValue centerContent flex>
                 <TableItemSelect disabled={disabled} />
@@ -124,7 +119,7 @@ export const ConnectionAccess = observer(function ConnectionAccess({
           ))}
         </TableBody>
       </Table>
-      <Loader key="overlay" loading={controller.isLoading} overlay />
+      <Loader key="overlay" loading={disabled} overlay />
     </box>
   );
 });

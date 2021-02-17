@@ -1,7 +1,12 @@
-query getSessionConnections {
+query getSessionConnections(
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   state: sessionState {
     connections {
-      ...UserConnection
+      ...DatabaseConnection
     }
   }
 }

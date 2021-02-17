@@ -12,45 +12,43 @@ import { Observable, Subject } from 'rxjs';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
-  AdminConnectionFragment,
   ConnectionConfig,
   CachedMapResource,
   ResourceKey,
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  ObjectPropertyInfo,
   ResourceKeyUtils,
-  ConnectionInfo,
-  NetworkHandlerConfig
+  DatabaseConnectionFragment,
+  GetConnectionsQueryVariables,
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import type { DBDriver } from '../DBDriverResource';
-
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
-export type AdminConnection = AdminConnectionFragment;
-export type NewConnection = AdminConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
+export type DatabaseConnection = DatabaseConnectionFragment;
+export type NewConnection = DatabaseConnectionFragment & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
+
+const allKey = 'all';
 
 @injectable()
-export class ConnectionsResource extends CachedMapResource<string, AdminConnection> {
-  readonly onConnectionCreate: Observable<AdminConnection>;
+export class ConnectionsResource extends CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables> {
+  readonly onConnectionCreate: Observable<DatabaseConnection>;
 
   private changed: boolean;
   private loadedKeyMetadata: MetadataMap<string, boolean>;
-  private connectionCreateSubject: Subject<AdminConnection>;
+  private connectionCreateSubject: Subject<DatabaseConnection>;
 
   constructor(
     private graphQLService: GraphQLService
   ) {
-    super();
+    super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
 
     makeObservable(this, {
       add: action,
     });
 
     this.changed = false;
-    this.connectionCreateSubject = new Subject<AdminConnection>();
+    this.connectionCreateSubject = new Subject<DatabaseConnection>();
     this.onConnectionCreate = this.connectionCreateSubject.asObservable();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
@@ -63,25 +61,23 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return this.data.has(id);
   }
 
-  getEmptyConnection(): AdminConnection {
+  getEmptyConfig(): ConnectionConfig {
     return {
-      id: uuid(),
+      connectionId: uuid(),
       template: false,
       saveCredentials: false,
-      useUrl: false,
-      authProperties: [],
-      properties: {},
-      providerProperties: {},
-      origin: {
-        type: 'local',
-        displayName: 'Local',
-      },
-      networkHandlersConfig: [],
-    } as Partial<AdminConnection> as any;
+    } as Partial<ConnectionConfig> as any;
   }
 
-  async loadAll(): Promise<Map<string, AdminConnection>> {
-    await this.load('all');
+  async refreshAll(): Promise<Map<string, DatabaseConnection>> {
+    this.resetIncludes();
+    await this.refresh(allKey);
+    return this.data;
+  }
+
+  async loadAll(): Promise<Map<string, DatabaseConnection>> {
+    this.resetIncludes();
+    await this.load(allKey);
     return this.data;
   }
 
@@ -91,13 +87,28 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     return databases;
   }
 
-  async create(config: ConnectionConfig): Promise<AdminConnection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({ config });
+  async create(config: ConnectionConfig): Promise<DatabaseConnection> {
+    const { connection } = await this.graphQLService.sdk.createConnectionConfiguration({
+      config,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(config.connectionId),
+    });
 
     return this.add(connection, true);
   }
 
-  add(connection: AdminConnection, isNew = false): AdminConnection {
+  async createConnectionFromNode(nodeId: string, name: string): Promise<DatabaseConnection> {
+    const { connection } = await this.graphQLService.sdk.createConnectionConfigurationFromNode({
+      nodePath: nodeId,
+      config: { name },
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(),
+    });
+
+    return this.add(connection, true);
+  }
+
+  add(connection: DatabaseConnection, isNew = false): DatabaseConnection {
     this.changed = true;
 
     const newConnection: NewConnection = {
@@ -118,14 +129,14 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
     });
   }
 
-  async update(id: string, config: ConnectionConfig): Promise<AdminConnection> {
-    await this.performUpdate(id, () => this.updateConnection(id, config));
+  async update(id: string, config: ConnectionConfig): Promise<DatabaseConnection> {
+    await this.performUpdate(id, [], () => this.updateConnection(id, config));
     this.changed = true;
     return this.get(id)!;
   }
 
   async delete(key: ResourceKey<string>): Promise<void> {
-    await this.performUpdate(key, () => this.deleteConnectionTask(key));
+    await this.performUpdate(key, [], () => this.deleteConnectionTask(key));
     this.changed = true;
   }
 
@@ -140,42 +151,58 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   }
 
   async loadAccessSubjects(connectionId: string): Promise<AdminConnectionGrantInfo[]> {
-    const { subjects } = await this.graphQLService.sdk.getConnectionAccess({ connectionId });
+    const subjects = await this.performUpdate(connectionId, [], async () => {
+      const { subjects } = await this.graphQLService.sdk.getConnectionAccess({
+        connectionId,
+      });
+      return subjects;
+    });
 
     return subjects;
-  }
-
-  async loadNetworkHandlers(connectionId: string): Promise<NetworkHandlerConfig[]> {
-    const { connection } = await this.graphQLService.sdk.getConnectionNetworkHandlers({ connectionId });
-    return connection.networkHandlersConfig;
-  }
-
-  async loadOrigin(connectionId: string): Promise<ObjectPropertyInfo[]> {
-    const { connection } = await this.graphQLService.sdk.getConnectionOriginDetails({ connectionId });
-    return connection.origin.details || [];
   }
 
   async setAccessSubjects(connectionId: string, subjects: string[]): Promise<void> {
     await this.graphQLService.sdk.setConnectionAccess({ connectionId, subjects });
   }
 
-  cleanNewFlags() {
+  cleanNewFlags(): void {
     for (const connection of this.data.values()) {
       (connection as NewConnection)[NEW_CONNECTION_SYMBOL] = false;
     }
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminConnection>> {
-    const { connections } = await this.graphQLService.sdk.getConnections();
-    this.data.clear();
+  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DatabaseConnection>> {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      let connections: DatabaseConnectionFragment[];
+      if (key !== allKey) {
+        const response = await this.graphQLService.sdk.connectionInfo({
+          id: key,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(key, includes),
+        });
+        connections = [response.connection];
+      } else {
+        const response = await this.graphQLService.sdk.getConnections({
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(undefined, includes),
+        });
+        connections = response.connections;
+      }
 
-    for (const connection of connections) {
-      this.set(connection.id, connection);
-    }
+      if (key === allKey) {
+        this.data.clear();
+      }
 
-    // TODO: getConnections must accept connectionId, so we can update some connection or all connections,
-    //       here we should check is it's was a full update
-    this.loadedKeyMetadata.set('all', true);
+      for (const connection of connections) {
+        this.set(connection.id, connection);
+      }
+
+      if (key === allKey) {
+        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
+        //       here we should check is it's was a full update
+        this.loadedKeyMetadata.set(allKey, true);
+      }
+    });
 
     return this.data;
   }
@@ -195,29 +222,39 @@ export class ConnectionsResource extends CachedMapResource<string, AdminConnecti
   }
 
   private async updateConnection(id: string, config: ConnectionConfig) {
-    const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({ id, config });
+    const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({
+      id,
+      config,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(id),
+    });
 
     this.set(id, connection);
   }
+
+  private getDefaultIncludes(): GetConnectionsQueryVariables {
+    return {
+      customIncludeNetworkHandlerCredentials: false,
+      customIncludeOriginDetails: false,
+      includeAuthProperties: false,
+      includeOrigin: false,
+    };
+  }
 }
 
-export function isJDBCConnection(driver?: DBDriver, connection?: ConnectionInfo): boolean {
-  return connection?.useUrl || !driver?.sampleURL || false;
-}
-
-export function isLocalConnection(connection: AdminConnection): boolean {
+export function isLocalConnection(connection: DatabaseConnection): boolean {
   return connection.origin.type === 'local';
 }
 
-export function isCloudConnection(connection: AdminConnection): boolean {
+export function isCloudConnection(connection: DatabaseConnection): boolean {
   return connection.origin.type === 'cloud';
 }
 
-export function isNewConnection(connection: AdminConnection | NewConnection): connection is NewConnection {
+export function isNewConnection(connection: DatabaseConnection | NewConnection): connection is NewConnection {
   return (connection as NewConnection)[NEW_CONNECTION_SYMBOL];
 }
 
-export function compareConnections(a: AdminConnection, b: AdminConnection): number {
+export function compareConnections(a: DatabaseConnection, b: DatabaseConnection): number {
   if (isNewConnection(a) && isNewConnection(b)) {
     return b.timestamp - a.timestamp;
   }

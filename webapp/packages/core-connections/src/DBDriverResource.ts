@@ -12,7 +12,8 @@ import {
   CachedMapResource,
   ResourceKey,
   ResourceKeyUtils,
-  DatabaseDriverFragment
+  DatabaseDriverFragment,
+  DriverListQueryVariables
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -21,7 +22,7 @@ export type DBDriver = DatabaseDriverFragment;
 const allKey = 'all';
 
 @injectable()
-export class DBDriverResource extends CachedMapResource<string, DBDriver> {
+export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(private graphQLService: GraphQLService) {
@@ -50,14 +51,14 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, DBDriver>> {
+  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DBDriver>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { drivers } = await this.graphQLService.sdk.driverList({
         driverId: key === allKey ? undefined : key,
         includeDriverParameters: false,
         includeDriverProperties: false,
         includeProviderProperties: false,
-        ...this.getIncludes(key === allKey ? undefined : key),
+        ...this.getIncludesMap(key === allKey ? undefined : key, includes),
       });
 
       if (key === allKey) {
@@ -65,7 +66,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
       }
 
       for (const driver of drivers) {
-        this.set(driver.id, driver);
+        this.updateDriver(driver);
       }
 
       if (key === allKey) {
@@ -76,5 +77,10 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     });
 
     return this.data;
+  }
+
+  private updateDriver(driver: DBDriver) {
+    const oldDriver = this.get(driver.id) || {};
+    this.set(driver.id, { ...oldDriver, ...driver });
   }
 }

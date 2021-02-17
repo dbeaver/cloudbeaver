@@ -18,6 +18,7 @@ import { loaderStyles, overlayStyles } from './loaderStyles';
 
 type LoaderState = {
   isLoading: () => boolean;
+  isLoaded: () => boolean;
 } | {
   loading: boolean;
 };
@@ -69,7 +70,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
       if ('loading' in element) {
         loading = element.loading;
       } else if ('isLoading' in element) {
-        loading = element.isLoading();
+        loading = element.isLoading() && (overlay || !element.isLoaded());
       }
     }
   }

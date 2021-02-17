@@ -8,6 +8,8 @@
 
 import { computed, observable, makeObservable } from 'mobx';
 
+import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
+
 import type { TabProps } from './Tab/TabProps';
 import type { ITabData } from './TabsContext';
 
@@ -23,6 +25,8 @@ export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends 
 
   tab?: () => TabContainerTabComponent<TProps>;
   panel: () => TabContainerPanelComponent<TProps>;
+
+  stateGetter?: (props: TProps) => MetadataValueGetter<string, any>;
 
   isHidden?: (tabId: string, props?: TProps) => boolean;
   isDisabled?: (tabId: string, props?: TProps) => boolean;

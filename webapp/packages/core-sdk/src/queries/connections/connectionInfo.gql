@@ -1,5 +1,12 @@
-query connectionInfo($id: ID!) {
+query connectionInfo(
+  $id: ID!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: connectionInfo(id: $id) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }

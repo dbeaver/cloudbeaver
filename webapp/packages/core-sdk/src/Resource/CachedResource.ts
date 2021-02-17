@@ -19,7 +19,8 @@ export interface ICachedResourceMetadata {
 export abstract class CachedResource<
   TData,
   TParam,
-  TKey = TParam
+  TKey = TParam,
+  TContext = void
 > {
   data: TData;
 
@@ -33,7 +34,7 @@ export abstract class CachedResource<
   protected scheduler: TaskScheduler<TParam>;
 
   constructor(defaultValue: TData) {
-    makeObservable<CachedResource<TData, TParam, TKey>, 'loading'>(this, {
+    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loading'>(this, {
       data: observable,
       loading: observable,
     });
@@ -48,7 +49,7 @@ export abstract class CachedResource<
     this.onDataUpdate = new Executor();
   }
 
-  abstract isLoaded(param: TParam): boolean;
+  abstract isLoaded(param: TParam, context: TContext): boolean;
 
   waitLoad(): Promise<void> {
     return this.scheduler.wait();
@@ -66,12 +67,12 @@ export abstract class CachedResource<
     return this.metadata.get(param as unknown as TKey).loading;
   }
 
-  markDataLoading(param: TParam): void {
+  markDataLoading(param: TParam, context: TContext): void {
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = true;
   }
 
-  markDataLoaded(param: TParam): void {
+  markDataLoaded(param: TParam, context: TContext): void {
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = false;
   }
@@ -87,13 +88,13 @@ export abstract class CachedResource<
     metadata.outdated = false;
   }
 
-  async refresh(param: TParam): Promise<any> {
-    await this.loadData(param, true);
+  async refresh(param: TParam, context: TContext): Promise<any> {
+    await this.loadData(param, true, context);
     return this.data;
   }
 
-  async load(param: TParam): Promise<any> {
-    await this.loadData(param);
+  async load(param: TParam, context: TContext): Promise<any> {
+    await this.loadData(param, false, context);
     return this.data;
   }
 
@@ -101,28 +102,31 @@ export abstract class CachedResource<
     return param === second;
   }
 
-  protected abstract loader(param: TParam): Promise<TData>;
+  protected abstract loader(param: TParam, context: TContext): Promise<TData>;
 
   protected async performUpdate<T>(
     param: TParam,
-    update: (param: TParam) => Promise<T>,
+    context: TContext,
+    update: (param: TParam, context: TContext) => Promise<T>,
   ): Promise<T>
   protected async performUpdate<T>(
     param: TParam,
-    update: (param: TParam) => Promise<T>,
+    context: TContext,
+    update: (param: TParam, context: TContext) => Promise<T>,
     exitCheck: () => boolean
   ): Promise<T | undefined>;
 
   protected async performUpdate<T>(
     param: TParam,
-    update: (param: TParam) => Promise<T>,
+    context: TContext,
+    update: (param: TParam, context: TContext) => Promise<T>,
     exitCheck?: () => boolean
   ): Promise<T | undefined> {
     if (exitCheck?.()) {
       return;
     }
 
-    this.markDataLoading(param);
+    this.markDataLoading(param, context);
     this.loading = true;
     return this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
@@ -130,43 +134,47 @@ export abstract class CachedResource<
         return;
       }
 
-      return await this.taskWrapper(param, update);
+      return await this.taskWrapper(param, context, update);
     }, () => {
-      this.markDataLoaded(param);
+      this.markDataLoaded(param, context);
       this.loading = false;
     });
   }
 
-  protected async loadData(param: TParam, refresh?: boolean): Promise<void> {
-    if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
+  protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
+    if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
       return;
     }
 
-    this.markDataLoading(param);
+    this.markDataLoading(param, context);
     this.loading = true;
     await this.scheduler.schedule(param, async () => {
       // repeated because previous task maybe has been load requested data
-      if (this.isLoaded(param) && !this.isOutdated(param) && !refresh) {
+      if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
         return;
       }
 
-      await this.taskWrapper(param, this.loadingTask);
+      await this.taskWrapper(param, context, this.loadingTask);
     }, () => {
-      this.markDataLoaded(param);
+      this.markDataLoaded(param, context);
       this.loading = false;
     });
   }
 
-  private async loadingTask(param: TParam) {
-    this.data = await this.loader(param);
+  private async loadingTask(param: TParam, context: TContext) {
+    this.data = await this.loader(param, context);
 
     // TODO: seems should be moved to scheduler `after` callback
     this.onDataUpdate.execute(this.data);
   }
 
-  private async taskWrapper<T>(param: TParam, promise: (param: TParam) => Promise<T>) {
+  private async taskWrapper<T>(
+    param: TParam,
+    context: TContext,
+    promise: (param: TParam, context: TContext) => Promise<T>
+  ) {
     this.markOutdated(param);
-    const value = await promise(param);
+    const value = await promise(param, context);
     this.markUpdated(param);
     return value;
   }

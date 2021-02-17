@@ -13,14 +13,14 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { AdminConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';
+import { DatabaseConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';
 
 @injectable()
 export class ConnectionsAdministrationController {
   isProcessing = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
-  get connections(): AdminConnection[] {
+  get connections(): DatabaseConnection[] {
     return Array.from(this.connectionsResource.data.values()).sort(compareConnections);
   }
 
@@ -47,7 +47,7 @@ export class ConnectionsAdministrationController {
 
   update = async (): Promise<void> => {
     try {
-      await this.connectionsResource.refresh('all');
+      await this.connectionsResource.refreshAll();
     } catch (exception) {
       this.notificationService.logException(exception, 'Connections update failed');
     }

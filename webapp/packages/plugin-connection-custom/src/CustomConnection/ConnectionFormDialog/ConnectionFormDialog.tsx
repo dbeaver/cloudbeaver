@@ -6,23 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, TabPanel, Loader, BORDER_TAB_STYLES
+  SubmittingForm, TabsState, TabList, Loader, BORDER_TAB_STYLES, TabPanelList, useObjectRef
 } from '@cloudbeaver/core-blocks';
-import type { DBDriver } from '@cloudbeaver/core-connections';
-import { useController } from '@cloudbeaver/core-di';
+import { DBDriver, IConnectionFormData, IConnectionFormOptions, ConnectionFormService, useConnectionFormState } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { ConnectionForm } from './ConnectionForm/ConnectionForm';
-import { ConnectionFormDialogController } from './ConnectionFormDialogController';
 import { ConnectionFormDialogFooter } from './ConnectionFormDialogFooter';
-import { DriverProperties } from './DriverProperties/DriverProperties';
 
 const styles = composes(
   css`
@@ -70,59 +69,71 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
   onClose,
   onBack,
 }: ConnectionFormDialogProps) {
-  const translate = useTranslate();
-  const controller = useController(ConnectionFormDialogController, driver, onClose);
-  const [loadProperties, setLoadProperties] = useState(false);
+  const props = useObjectRef({ onClose });
+  const style = useStyles(styles, BORDER_TAB_STYLES);
+  const service = useService(ConnectionFormService);
 
-  return styled(useStyles(styles, BORDER_TAB_STYLES))(
-    <TabsState selectedId='options'>
+  const [data] = useState<IConnectionFormData>({
+    config: observable<ConnectionConfig>({
+      driverId: driver.id,
+    }),
+    availableDrivers: [driver.id],
+    partsState: new MetadataMap<string, any>(),
+  });
+
+  const [options] = useState<IConnectionFormOptions>({
+    mode: 'create',
+    type: 'public',
+  });
+
+  const formState = useConnectionFormState(data, options);
+
+  useEffect(() => {
+    formState.submittingHandlers.addPostHandler((data, contexts) => {
+      const validation = contexts.getContext(service.connectionStatusContext);
+
+      if (validation.saved && data.submitType === 'submit') {
+        props.onClose();
+      }
+    });
+  }, []);
+
+  return styled(style)(
+    <TabsState
+      container={service.tabsContainer}
+      data={data}
+      form={formState}
+      options={options}
+    >
       <CommonDialogWrapper
         title={title}
         icon={driver?.icon}
-        header={(
-          <TabList>
-            <Tab tabId='options'>
-              <TabTitle>{translate('customConnection_options')}</TabTitle>
-            </Tab>
-            <Tab tabId='driver_properties' onOpen={() => setLoadProperties(true)}>
-              <TabTitle>{translate('customConnection_properties')}</TabTitle>
-            </Tab>
-          </TabList>
-        )}
+        header={<TabList style={style} />}
         footer={(
           <ConnectionFormDialogFooter
-            isConnecting={controller.isConnecting}
-            onConnectionTest={controller.onTestConnection}
-            onCreateConnection={controller.onCreateConnection}
+            isConnecting={formState.form.disabled}
+            onConnectionTest={formState.test}
+            onCreateConnection={formState.save}
             onBack={onBack}
           />
         )}
         noBodyPadding
         onReject={onClose}
       >
-        {controller.isLoading
-          ? <Loader />
-          : (
-            <SubmittingForm onSubmit={controller.onCreateConnection}>
-              <TabPanel tabId='options'>
-                <ConnectionForm driver={driver} controller={controller} />
-              </TabPanel>
-              <TabPanel tabId='driver_properties'>
-                <DriverProperties
-                  driver={driver}
-                  state={controller.config.properties!}
-                  loadProperties={loadProperties}
-                />
-              </TabPanel>
+        <Loader loading={formState.form.loading}>
+          {() => styled(style)(
+            <SubmittingForm onSubmit={formState.save}>
+              <TabPanelList style={style} />
             </SubmittingForm>
           )}
-        {controller.error.responseMessage && (
+        </Loader>
+        {/* {controller.error.responseMessage && (
           <ErrorMessage
             text={controller.error.responseMessage}
             hasDetails={controller.error.hasDetails}
             onShowDetails={controller.onShowDetails}
           />
-        )}
+        )} */}
       </CommonDialogWrapper>
     </TabsState>
   );

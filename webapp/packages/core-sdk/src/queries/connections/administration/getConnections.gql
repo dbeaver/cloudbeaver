@@ -1,5 +1,10 @@
-query getConnections {
+query getConnections(
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connections: allConnections {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }

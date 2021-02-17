@@ -47,12 +47,12 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     state.exception = null;
 
     try {
-      const properties = await usersResource.loadOrigin(user.userId);
+      const userOrigin = await usersResource.load(user.userId, ['customIncludeOriginDetails']);
       const propertiesState = {} as Record<string, any>;
-      for (const property of properties) {
+      for (const property of userOrigin.origin.details!) {
         propertiesState[property.id!] = property.value;
       }
-      state.properties = properties;
+      state.properties = userOrigin.origin.details!;
       state.state = propertiesState;
       state.loaded = true;
     } catch (error) {

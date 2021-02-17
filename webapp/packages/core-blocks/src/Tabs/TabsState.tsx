@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import { useObjectRef } from '../useObjectRef';
 import type { TabsContainer } from './TabsContainer';
 import { TabsContext, ITabsContext, ITabData } from './TabsContext';
 
@@ -61,18 +62,20 @@ export function TabsState<T = Record<string, any>>({
     manual,
   });
 
-  const dynamic = useRef({
+  const dynamic = useObjectRef({
     open: onOpen,
     close: onClose,
     props: rest as T,
+    container,
+    state,
     selectedId: selectedId || currentTabId,
+  }, {
+    open: onOpen,
+    close: onClose,
+    props: rest as T,
+    container,
     state,
   });
-
-  dynamic.current.open = onOpen;
-  dynamic.current.close = onClose;
-  dynamic.current.props = rest as T;
-  dynamic.current.state = state;
 
   if (currentTabId) {
     state.selectedId = currentTabId;
@@ -80,15 +83,15 @@ export function TabsState<T = Record<string, any>>({
 
   useEffect(() => {
     const openHandler: IExecutorHandler<ITabData<T>> = (data, contexts) => {
-      dynamic.current.open?.(data);
-      if (dynamic.current.selectedId === data.tabId) {
+      dynamic.open?.(data);
+      if (dynamic.selectedId === data.tabId) {
         ExecutorInterrupter.interrupt(contexts);
         return;
       }
-      dynamic.current.selectedId = data.tabId;
-      dynamic.current.state.setSelectedId(data.tabId);
+      dynamic.selectedId = data.tabId;
+      dynamic.state.setSelectedId(data.tabId);
     };
-    const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.current.close?.(data);
+    const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.close?.(data);
 
     openExecutor.addHandler(openHandler);
     closeExecutor.addHandler(closeHandler);
@@ -109,13 +112,15 @@ export function TabsState<T = Record<string, any>>({
 
   const handleOpen = useCallback((tabId: string) => openExecutor.execute({
     tabId,
-    props: dynamic.current.props,
-  }), [openExecutor]);
+    props: dynamic.props,
+  }), []);
 
   const handleClose = useCallback((tabId: string) => closeExecutor.execute({
     tabId,
-    props: dynamic.current.props,
-  }), [closeExecutor]);
+    props: dynamic.props,
+  }), []);
+
+  const getTabInfo = useCallback((tabId: string) => dynamic.container?.tabInfoMap.get(tabId), []);
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
@@ -125,6 +130,7 @@ export function TabsState<T = Record<string, any>>({
     openExecutor,
     closeExecutor,
     lazy,
+    getTabInfo,
     open: handleOpen,
     close: handleClose,
   }), [
@@ -135,6 +141,7 @@ export function TabsState<T = Record<string, any>>({
     closeExecutor,
     openExecutor,
     lazy,
+    getTabInfo,
     handleClose,
     handleOpen,
   ]);

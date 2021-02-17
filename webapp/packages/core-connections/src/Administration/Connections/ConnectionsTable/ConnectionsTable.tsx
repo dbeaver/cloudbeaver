@@ -15,7 +15,7 @@ import {
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { AdminConnection } from '../../ConnectionsResource';
+import type { DatabaseConnection } from '../../ConnectionsResource';
 import { Connection } from './Connection';
 
 const styles = composes(
@@ -38,7 +38,7 @@ const styles = composes(
 );
 
 interface Props {
-  connections: AdminConnection[];
+  connections: DatabaseConnection[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
 }

@@ -14,40 +14,49 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { CachedResource, ICachedResourceMetadata } from './CachedResource';
 import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
-export type CachedMapValueIncludes<TValue, TKeys extends Array<keyof TValue>> = TValue
-& (TKeys extends Array<infer T> ?
-  {
-    [P in Extract<T, keyof TValue>]-?: Required<TValue>[P] extends undefined ? TValue[P] : NonNullable<TValue[P]>;
-  }
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  : { });
+export type IncludesProps<TValue, TArgs> = {
+  [P in keyof TArgs as P extends CachedMapIncludeKeyTemplated<TValue> ? P : never]?: boolean
+};
+
+export type CachedMapIncludeKeyTemplated<TValue> = `include${Capitalize<string & keyof TValue>}` | `customInclude${Capitalize<string>}`;
+export type CachedMapIncludeList<TValue> = Array<CachedMapIncludeKeyTemplated<TValue>>;
+export type CachedMapIncludeToKey<TKey> = TKey extends Array<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
+export type CachedMapIncludeArgs<TValue, TArguments> = Array<keyof IncludesProps<TValue, TArguments>>;
+
+export type CachedMapValueIncludes<TValue, TKeys> = TValue
+& ({
+  [P in Extract<CachedMapIncludeToKey<TKeys>, keyof TValue>]-?: Required<TValue>[P] extends undefined
+    ? TValue[P]
+    : NonNullable<TValue[P]>;
+});
 
 export type CachedMapResourceGetter<
   TRealKey extends ResourceKey<TKey>,
   TKey,
   TValue,
-  TIncludes extends Array<keyof TValue>
+  TIncludes
 > = TRealKey extends ResourceKeyList<TKey>
   ? Array<CachedMapValueIncludes<TValue, TIncludes> | undefined>
   : CachedMapValueIncludes<TValue, TIncludes> | undefined;
 
-export interface ICachedMapResourceMetadata<TValue> extends ICachedResourceMetadata {
-  includes: Array<keyof TValue>;
-  loadedIncludes: Array<keyof TValue>;
+export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
+  includes: string[];
 }
 
 export abstract class CachedMapResource<
   TKey,
-  TValue
+  TValue,
+  TArguments = Record<string, any>
 > extends CachedResource<
   Map<TKey, TValue>,
   ResourceKey<TKey>,
-  TKey
+  TKey,
+  string[] | undefined
   > {
   readonly onItemAdd: IExecutor<ResourceKey<TKey>>;
   readonly onItemDelete: IExecutor<ResourceKey<TKey>>;
-  protected metadata: MetadataMap<TKey, ICachedMapResourceMetadata<TValue>>;
-  private defaultIncludes: Array<keyof TValue>;
+  protected metadata: MetadataMap<TKey, ICachedMapResourceMetadata>;
+  protected defaultIncludes: string[];
 
   get values(): TValue[] {
     return Array.from(this.data.values());
@@ -57,7 +66,7 @@ export abstract class CachedMapResource<
     return Array.from(this.data.keys());
   }
 
-  constructor(defaultIncludes?: Array<keyof TValue>, defaultValue?: Map<TKey, TValue>) {
+  constructor(defaultIncludes?: CachedMapIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
     this.onItemAdd = new Executor(null, this.includes);
     this.onItemDelete = new Executor(null, this.includes);
@@ -66,8 +75,7 @@ export abstract class CachedMapResource<
     this.metadata = new MetadataMap(() => ({
       outdated: true,
       loading: false,
-      includes: this.defaultIncludes,
-      loadedIncludes: this.defaultIncludes,
+      includes: [...this.defaultIncludes],
     }));
 
     makeObservable(this, {
@@ -76,7 +84,7 @@ export abstract class CachedMapResource<
     });
   }
 
-  isIncludes(key: ResourceKey<TKey>, includes: Array<keyof TValue>): boolean {
+  isIncludes(key: ResourceKey<TKey>, includes: CachedMapIncludeArgs<TValue, TArguments>): boolean {
     return ResourceKeyUtils.every(key, key => {
       const metadata = this.metadata.get(key);
 
@@ -92,15 +100,18 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.some(key, key => this.metadata.get(key).loading);
   }
 
-  markDataLoading(key: ResourceKey<TKey>): void {
+  markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.loading = true;
     });
   }
 
-  markDataLoaded(key: ResourceKey<TKey>): void {
-    this.commitIncludes(key);
+  markDataLoaded(key: ResourceKey<TKey>, includes?: string[]): void {
+    if (includes) {
+      this.commitIncludes(key, includes);
+    }
+
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.loading = false;
@@ -134,24 +145,18 @@ export abstract class CachedMapResource<
     });
   }
 
-  isLoaded(key: ResourceKey<TKey>, includes?: Array<keyof TValue>): boolean {
+  isLoaded(key: ResourceKey<TKey>, includes?: CachedMapIncludeArgs<TValue, TArguments>): boolean {
     return ResourceKeyUtils.every(key, key => {
       if (!this.has(key)) {
         return false;
       }
 
-      const metadata = this.metadata.get(key);
+      if (includes) {
+        const metadata = this.metadata.get(key);
 
-      if (!includes) {
-        includes = metadata.includes;
-      }
-
-      if (includes.length > metadata.loadedIncludes.length) {
-        return false;
-      }
-
-      if (includes.some(include => !metadata.loadedIncludes.includes(include))) {
-        return false;
+        if (includes.some(include => !metadata.includes.includes(include))) {
+          return false;
+        }
       }
       return true;
     });
@@ -187,45 +192,43 @@ export abstract class CachedMapResource<
     this.onItemDelete.execute(key);
   }
 
-  async refresh<T extends Array<keyof TValue> = []>(
+  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedMapValueIncludes<TValue, T>>;
-  async refresh<T extends Array<keyof TValue> = []>(
+  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>>>;
-  async refresh<T extends Array<keyof TValue> = []>(
+  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>>;
-  async refresh<T extends Array<keyof TValue> = []>(
+  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>> {
-    this.setIncludes(key, includes || []);
-    await this.loadData(key, true);
+    await this.loadData(key, true, includes);
     return this.get(key) as Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>;
   }
 
-  async load<T extends Array<keyof TValue> = []>(
+  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedMapValueIncludes<TValue, T>>;
-  async load<T extends Array<keyof TValue> = []>(
+  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>>>;
-  async load<T extends Array<keyof TValue> = []>(
+  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>>;
-  async load<T extends Array<keyof TValue> = []>(
+  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>> {
-    this.setIncludes(key, includes || []);
-    await this.loadData(key);
+    await this.loadData(key, false, includes);
     return this.get(key) as Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>;
   }
 
@@ -237,54 +240,43 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.includes(param, key);
   }
 
-  getIncludes(key?: ResourceKey<TKey>): Record<string, any> {
+  getIncludes(key?: ResourceKey<TKey>): string[] {
     if (!key) {
-      return ['base', ...this.defaultIncludes].reduce<any>((map, key) => {
-        map[this.getIncludeName(key as string)] = true;
-
-        return map;
-      }, {});
+      return this.defaultIncludes;
     }
 
     const metadata = this.metadata.get(ResourceKeyUtils.first(key));
 
-    return ['base', ...metadata.includes].reduce<any>((map, key) => {
-      map[this.getIncludeName(key as string)] = true;
+    return metadata.includes;
+  }
+
+  getIncludesMap(key?: ResourceKey<TKey>, includes: string[] = this.defaultIncludes): Record<string, any> {
+    const keyIncludes = this.getIncludes(key);
+    return ['customIncludeBase', ...includes, ...keyIncludes].reduce<any>((map, key) => {
+      map[key] = true;
 
       return map;
     }, {});
   }
 
-  private setIncludes(key: ResourceKey<TKey>, includes: Array<keyof TValue>) {
-    if (includes.length === 0) {
-      return;
-    }
-
-    ResourceKeyUtils.forEach(key, key => {
+  protected resetIncludes(): void {
+    const keys = resourceKeyList(this.keys);
+    ResourceKeyUtils.forEach(keys, key => {
       const metadata = this.metadata.get(key);
 
-      const newIncludes = [...metadata.loadedIncludes];
+      metadata.includes = [...this.defaultIncludes];
+    });
+  }
+
+  protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
 
       for (const include of includes) {
-        if (!metadata.loadedIncludes.includes(include)) {
-          newIncludes.push(include);
+        if (!metadata.includes.includes(include)) {
+          metadata.includes.push(include);
         }
       }
-
-      if (metadata.loadedIncludes.length < newIncludes.length) {
-        metadata.includes = newIncludes;
-      }
     });
-  }
-
-  private commitIncludes(key: ResourceKey<TKey>) {
-    ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.metadata.get(key);
-      metadata.loadedIncludes = metadata.includes;
-    });
-  }
-
-  private getIncludeName(key: string) {
-    return 'include' + key.charAt(0).toUpperCase() + key.slice(1);
   }
 }

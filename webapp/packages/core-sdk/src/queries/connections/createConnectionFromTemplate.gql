@@ -1,5 +1,12 @@
-mutation createConnectionFromTemplate($templateId: ID!) {
+mutation createConnectionFromTemplate(
+  $templateId: ID!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: createConnectionFromTemplate(templateId: $templateId) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }

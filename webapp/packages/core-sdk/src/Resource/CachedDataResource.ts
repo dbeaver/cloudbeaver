@@ -19,7 +19,7 @@ export abstract class CachedDataResource<
   }
 
   async load(param: TParam): Promise<TData> {
-    await this.loadData(param);
+    await this.loadData(param, false);
     return this.data;
   }
 }
