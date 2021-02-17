@@ -72,7 +72,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDatabaseDriverConfig> getDriverList(WebSession webSession, String driverId) {
+    public List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) {
         List<WebDatabaseDriverConfig> result = new ArrayList<>();
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(WebServiceUtils.makeDriverFullId(driver))) {
@@ -83,15 +83,22 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDatabaseAuthModel> getAuthModels(WebSession webSession) {
+    public List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession) {
         return DataSourceProviderRegistry.getInstance().getAllAuthModels().stream()
             .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
     }
 
     @Override
-    public List<WebNetworkHandlerDescriptor> getNetworkHandlers(WebSession webSession) {
+    public List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession) {
         return NetworkHandlerRegistry.getInstance().getDescriptors().stream()
             .map(d -> new WebNetworkHandlerDescriptor(webSession, d)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) {
+        return webSession.getConnections().stream()
+            .filter(c -> id == null || id.equals(c.getId()))
+            .collect(Collectors.toList());
     }
 
     @Deprecated
@@ -115,7 +122,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException {
+    public List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
         for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
             if (ds.isTemplate() &&
@@ -130,7 +137,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public String[] getSessionPermissions(WebSession webSession) throws DBWebException {
+    public String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException {
         if (CBApplication.getInstance().isConfigurationMode()) {
             return new String[] {
                 DBWConstants.PERMISSION_PUBLIC,
@@ -141,17 +148,17 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebSession openSession(WebSession webSession) {
+    public WebSession openSession(@NotNull WebSession webSession) {
         return webSession;
     }
 
     @Override
-    public WebSession getSessionState(WebSession webSession) {
+    public WebSession getSessionState(@NotNull WebSession webSession) {
         return webSession;
     }
 
     @Override
-    public List<WebServerMessage> readSessionLog(WebSession webSession, Integer maxEntries, Boolean clearEntries) {
+    public List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) {
         return webSession.readLog(maxEntries, clearEntries);
     }
 

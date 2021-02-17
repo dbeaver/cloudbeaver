@@ -31,6 +31,7 @@ const styles = css`
   SubmittingForm, center {
     display: flex;
     flex: 1;
+    margin: auto;
   }
   center {
     box-sizing: border-box;
@@ -46,6 +47,7 @@ const styles = css`
   FormBox {
     align-items: center;
     justify-content: center;
+    width: 450px;
   }
 `;
 

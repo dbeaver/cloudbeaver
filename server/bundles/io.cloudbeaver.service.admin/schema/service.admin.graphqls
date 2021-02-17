@@ -84,7 +84,7 @@ extend type Query {
     #### Connection management
 
     # All connection configurations
-    allConnections: [ ConnectionInfo! ]!
+    allConnections( id: ID ): [ ConnectionInfo! ]!
 
     searchConnections( hostNames: [String!]! ): [AdminConnectionSearchInfo!]!
 

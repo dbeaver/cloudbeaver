@@ -63,6 +63,7 @@ const styles = composes(
     FormBox {
       align-items: center;
       justify-content: center;
+      width: 450px;
     }
     ErrorMessage {
       position: sticky;

@@ -60,7 +60,7 @@ export const Connection = observer(function Connection({ connection }: Props) {
       </TableColumnValue>
       <TableColumnValue expand>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
-      <TableColumnValue>
+      <TableColumnValue flex>
         <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} context={connection} />
       </TableColumnValue>
     </TableItem>
