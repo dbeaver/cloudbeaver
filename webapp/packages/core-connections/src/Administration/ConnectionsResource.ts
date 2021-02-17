@@ -63,10 +63,9 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   getEmptyConfig(): ConnectionConfig {
     return {
-      connectionId: uuid(),
       template: false,
       saveCredentials: false,
-    } as Partial<ConnectionConfig> as any;
+    };
   }
 
   async refreshAll(): Promise<Map<string, DatabaseConnection>> {

@@ -64,6 +64,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
       data.config.providerProperties = {};
     }
 
+    if (!data.availableDrivers) {
+      data.availableDrivers = data.config.driverId ? [data.config.driverId] : [];
+    }
+
     if (!data.info) {
       return;
     }
@@ -74,7 +78,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     data.config.description = data.info.description;
     data.config.template = data.info.template;
     data.config.driverId = data.info.driverId;
-    data.availableDrivers = [data.info.driverId];
+
+    if (data.availableDrivers.length === 0) {
+      data.availableDrivers = [data.info.driverId];
+    }
 
     data.config.host = data.info.host;
     data.config.port = data.info.port;

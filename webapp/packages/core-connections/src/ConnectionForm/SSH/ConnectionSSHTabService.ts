@@ -40,9 +40,6 @@ export class ConnectionSSHTabService extends Bootstrap {
         }
         return true;
       },
-      options: {
-        beforeSubmit: () => {},
-      },
     });
 
     this.connectionFormService.prepareConfigTask
@@ -63,8 +60,19 @@ export class ConnectionSSHTabService extends Bootstrap {
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
-    if (!data.config.name?.length) {
-      validation.error("Field 'name' can't be empty");
+    if (!data.config.networkHandlersConfig) {
+      return;
+    }
+
+    for (const handler of data.config.networkHandlersConfig) {
+      if (handler.enabled && handler.savePassword) {
+        if (!handler.userName?.length) {
+          validation.error("Field SSH 'User' can't be empty");
+        }
+        if (!handler.password?.length) {
+          validation.error("Field SSH 'Password' can't be empty");
+        }
+      }
     }
   }
 
@@ -77,13 +85,16 @@ export class ConnectionSSHTabService extends Bootstrap {
   ) {
     const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
 
-    if (data.config.networkHandlersConfig && data.config.networkHandlersConfig.length > 0) {
-      const configs: NetworkHandlerConfigInput[] = [];
+    if (!data.config.networkHandlersConfig || data.config.networkHandlersConfig.length === 0) {
+      return;
+    }
 
-      for (const handler of data.config.networkHandlersConfig) {
-        const initialConfig = data.info?.networkHandlersConfig.find(h => h.id === handler.id);
+    const configs: NetworkHandlerConfigInput[] = [];
 
-        if (handler.enabled !== initialConfig?.enabled
+    for (const handler of data.config.networkHandlersConfig) {
+      const initialConfig = data.info?.networkHandlersConfig.find(h => h.id === handler.id);
+
+      if (handler.enabled !== initialConfig?.enabled
           || handler.savePassword !== initialConfig?.savePassword
           || handler.userName !== initialConfig?.userName
           || (
@@ -92,13 +103,12 @@ export class ConnectionSSHTabService extends Bootstrap {
           )
           || handler.properties.host !== initialConfig?.properties.host
           || handler.properties.port !== initialConfig?.properties.port) {
-          configs.push(handler);
-        }
+        configs.push(handler);
       }
+    }
 
-      if (configs.length > 0) {
-        config.networkHandlersConfig = configs;
-      }
+    if (configs.length > 0) {
+      config.networkHandlersConfig = configs;
     }
   }
 }

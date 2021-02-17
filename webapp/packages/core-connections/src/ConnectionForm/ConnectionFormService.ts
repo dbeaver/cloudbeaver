@@ -1,5 +1,5 @@
 /*
- * cloudbeaver - Cloud Database Manager
+ * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2021 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
@@ -57,11 +57,6 @@ export interface IConnectionFormTabProps {
   form: IConnectionFormState;
 }
 
-export interface IConnectionFormPartOptions {
-  beforeSubmit?: () => void;
-  afterSubmit?: () => void;
-}
-
 export interface IConnectionFormValidation {
   valid: boolean;
   messages: string[];
@@ -79,7 +74,7 @@ export interface IConnectionFormStatus {
 
 @injectable()
 export class ConnectionFormService {
-  readonly tabsContainer: TabsContainer<IConnectionFormTabProps, IConnectionFormPartOptions>;
+  readonly tabsContainer: TabsContainer<IConnectionFormTabProps>;
   readonly actionsContainer: PlaceholderContainer<IConnectionFormProps>;
   readonly prepareConfigTask: IExecutor<IConnectionFormSubmitData>;
   readonly formValidationTask: IExecutor<IConnectionFormSubmitData>;
