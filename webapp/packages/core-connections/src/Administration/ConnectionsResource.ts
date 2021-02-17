@@ -21,7 +21,7 @@ import {
   DatabaseConnectionFragment,
   GetConnectionsQueryVariables,
 } from '@cloudbeaver/core-sdk';
-import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
@@ -115,7 +115,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
       [NEW_CONNECTION_SYMBOL]: isNew,
       timestamp: Date.now(),
     };
-    this.set(newConnection.id, newConnection);
+    this.updateConnection(newConnection);
 
     const observedConnection = this.get(connection.id)!;
     this.connectionCreateSubject.next(observedConnection);
@@ -129,7 +129,16 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
   }
 
   async update(id: string, config: ConnectionConfig): Promise<DatabaseConnection> {
-    await this.performUpdate(id, [], () => this.updateConnection(id, config));
+    await this.performUpdate(id, [], async () => {
+      const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({
+        id,
+        config,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(id),
+      });
+
+      this.updateConnection(connection);
+    });
     this.changed = true;
     return this.get(id)!;
   }
@@ -183,7 +192,7 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
       }
 
       for (const connection of connections) {
-        this.set(connection.id, connection);
+        this.updateConnection(connection);
       }
 
       if (key === allKey) {
@@ -210,15 +219,9 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     this.data.delete(connectionId);
   }
 
-  private async updateConnection(id: string, config: ConnectionConfig) {
-    const { connection } = await this.graphQLService.sdk.updateConnectionConfiguration({
-      id,
-      config,
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(id),
-    });
-
-    this.set(id, connection);
+  private updateConnection(connection: DatabaseConnection) {
+    const oldConnection = this.get(connection.id) || {};
+    this.set(connection.id, { ...oldConnection, ...connection });
   }
 
   private getDefaultIncludes(): GetConnectionsQueryVariables {
