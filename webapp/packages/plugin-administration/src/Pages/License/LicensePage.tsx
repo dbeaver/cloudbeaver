@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { FormBox, FormBoxElement, FormGroup, InputField, Loader, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { FormBox, FormBoxElement, FormGroup, Loader, SubmittingForm, Textarea, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
@@ -106,9 +106,9 @@ export const LicensePage: AdministrationItemContentComponent = observer(function
                   <FormBox>
                     <FormBoxElement>
                       <FormGroup>
-                        <InputField
-                          type="text"
+                        <Textarea
                           name="license"
+                          rows={7}
                           state={licensePageService.state}
                           mod='surface'
                           minLength={6}
@@ -116,7 +116,7 @@ export const LicensePage: AdministrationItemContentComponent = observer(function
                           long
                         >
                           {translate('administration_configuration_wizard_license_key')}
-                        </InputField>
+                        </Textarea>
                       </FormGroup>
                     </FormBoxElement>
                     <FormBoxElement />
