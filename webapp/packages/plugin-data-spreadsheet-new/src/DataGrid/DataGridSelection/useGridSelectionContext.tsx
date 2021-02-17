@@ -26,6 +26,8 @@ export function useGridSelectionContext(tableData: ITableData) {
     (startPosition: number, lastPosition: number, multiple: boolean, temporary = false) => {
       const columnsLength = tableData.columns?.length || 0;
 
+      temporarySelectedCells.clear();
+
       if (!multiple) {
         selectedCells.clear();
       }
@@ -39,7 +41,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       const lastRowIdx = Math.max(startPosition, lastPosition);
 
       for (let rowIdx = firstRowIdx; rowIdx <= lastRowIdx; rowIdx++) {
-        if (isRowSelected(rowIdx)) {
+        if (selectedCells.get(rowIdx)?.length === columnsLength) {
           selectedCells.delete(rowIdx);
           continue;
         }
@@ -52,14 +54,10 @@ export function useGridSelectionContext(tableData: ITableData) {
       }
     }), [selectedCells, temporarySelectedCells]);
 
-  const isRowSelected = useCallback((rowIdx: number) => {
-    const columnsLength = tableData.columns?.length;
-
-    return selectedCells.get(rowIdx)?.length === columnsLength;
-  }, [tableData, selectedCells]);
-
   const selectRange = useCallback(action(
     (startPosition: number, lastPosition: number, columns: number[], multiple: boolean, temporary = false) => {
+      temporarySelectedCells.clear();
+
       if (!multiple) {
         selectedCells.clear();
       }
@@ -85,8 +83,6 @@ export function useGridSelectionContext(tableData: ITableData) {
       const columnsInRange = tableData.getColumnsInRange(startPosition.idx, lastPosition.idx);
       const isIndexColumnInRange = tableData.isIndexColumnInRange(columnsInRange);
 
-      temporarySelectedCells.clear();
-
       if (isIndexColumnInRange) {
         selectRows(startPosition.rowIdx, lastPosition.rowIdx, multiple, temporary);
       } else {
@@ -98,7 +94,7 @@ export function useGridSelectionContext(tableData: ITableData) {
           temporary
         );
       }
-    }, [selectRange, selectRows, tableData, temporarySelectedCells]);
+    }, [selectRange, selectRows, tableData]);
 
   const isColumnSelected = useCallback((columnIndex: number) => {
     const rowsLength = tableData.rows?.length || 0;

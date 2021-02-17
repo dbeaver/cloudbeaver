@@ -14,11 +14,7 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 export const TableIndexColumnHeader: React.FC<HeaderRendererProps<any>> = function TableIndexColumnHeader(props) {
   const selectionContext = useContext(DataGridSelectionContext);
 
-  const indexClickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    selectionContext?.selectTable();
-  };
-
   return (
-    <div onClick={indexClickHandler}>{props.column.name}</div>
+    <div onClick={() => selectionContext?.selectTable()}>{props.column.name}</div>
   );
 };
