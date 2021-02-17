@@ -83,13 +83,13 @@ export class ServerConfigurationService {
     };
   };
 
-  async save(): Promise<boolean> {
+  async save(): Promise<void> {
     if (!this.state) {
       throw new Error('No state available');
     }
 
     if (!(await this.validate())) {
-      return false;
+      return;
     }
 
     try {
@@ -102,8 +102,6 @@ export class ServerConfigurationService {
       });
       await this.serverConfigResource.update();
       this.usersResource.refreshAllLazy();
-
-      return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
 

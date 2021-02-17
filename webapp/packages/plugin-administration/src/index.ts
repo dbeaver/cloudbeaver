@@ -7,3 +7,4 @@ export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfiguratio
 export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfigurationInfoForm';
 export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfigurationNavigatorViewForm';
 export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfigurationSecurityForm';
+export * from './Pages/License/AdministrationLicensePageService';
