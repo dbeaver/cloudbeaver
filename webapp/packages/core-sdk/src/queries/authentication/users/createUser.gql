@@ -1,4 +1,4 @@
-query createUser($userId: ID!) {
+query createUser($userId: ID!, $customIncludeOriginDetails: Boolean!) {
   user: createUser(userId: $userId) {
     ...AdminUserInfo
   } 

@@ -1,7 +1,0 @@
-query getSessionConnections {
-  state: sessionState {
-    connections {
-      ...UserConnection
-    }
-  }
-}

@@ -19,7 +19,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 export class RolesResource extends CachedMapResource<string, AdminRoleInfo> {
   private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(private graphQLService: GraphQLService) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 

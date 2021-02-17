@@ -34,7 +34,7 @@ export class ConnectionManualService {
   select(driverId: string): void {
     this.createConnectionService.setConnectionTemplate(
       {
-        ...this.connectionsResource.getEmptyConnection(),
+        ...this.connectionsResource.getEmptyConfig(),
         driverId,
       },
       [driverId]

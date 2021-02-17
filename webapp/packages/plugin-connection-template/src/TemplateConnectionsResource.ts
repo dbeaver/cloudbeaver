@@ -43,7 +43,12 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
       this.loaded = true;
       return [];
     }
-    const { connections } = await this.graphQLService.sdk.getTemplateConnections();
+    const { connections } = await this.graphQLService.sdk.getTemplateConnections({
+      customIncludeNetworkHandlerCredentials: false,
+      customIncludeOriginDetails: false,
+      includeAuthProperties: true,
+      includeOrigin: false,
+    });
     this.loaded = true;
     return connections;
   }

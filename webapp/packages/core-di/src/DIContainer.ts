@@ -15,6 +15,7 @@ import { isConstructor } from './isConstructor';
 export class DIContainer implements IServiceInjector, IServiceCollection {
   protected container = new Container({
     defaultScope: 'Singleton',
+    skipBaseClassChecks: true,
   });
 
   private parent: DIContainer | null = null;

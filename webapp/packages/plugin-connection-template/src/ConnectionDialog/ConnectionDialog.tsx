@@ -9,9 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
-  ErrorMessage, SubmittingForm, Loader, useFocus, ObjectPropertyInfoForm
+  ErrorMessage, SubmittingForm, Loader, useFocus, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
+import { SSH_TUNNEL_ID, SSHAuthForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -23,12 +25,13 @@ import { TemplateConnectionSelector } from './TemplateConnectionSelector/Templat
 
 const styles = css`
   CommonDialogWrapper {
-    max-height: 500px;
+    max-height: 600px;
     min-height: 500px;
   }
   SubmittingForm, center {
     display: flex;
     flex: 1;
+    margin: auto;
   }
   center {
     box-sizing: border-box;
@@ -39,6 +42,12 @@ const styles = css`
   ObjectPropertyInfoForm {
     align-items: center;
     justify-content: center;
+    display: inline-flex;
+  }
+  FormBox {
+    align-items: center;
+    justify-content: center;
+    width: 450px;
   }
 `;
 
@@ -48,11 +57,19 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const controller = useController(ConnectionController, rejectDialog);
   const translate = useTranslate();
+  const { credentialsSavingEnabled } = useAdministrationSettings();
+
   let title = translate('basicConnection_connectionDialog_newConnection');
 
   if (controller.step === ConnectionStep.Connection && controller.template?.name) {
     title = controller.template.name;
   }
+
+  const sshConfig = controller.template?.networkHandlersConfig.find(
+    handler => handler.id === SSH_TUNNEL_ID
+  );
+
+  const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig.savePassword;
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
@@ -82,12 +99,38 @@ export const ConnectionDialog = observer(function ConnectionDialog({
         </center>
       ) : (
         <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <ObjectPropertyInfoForm
-            autofillToken={`section-${controller.template?.id || ''} section-auth`}
-            properties={controller.authModel.properties}
-            state={controller.credentials}
-            disabled={controller.isConnecting}
-          />
+          <FormBox>
+            <FormBoxElement>
+              <ObjectPropertyInfoForm
+                autofillToken={`section-${controller.template?.id || ''} section-auth`}
+                properties={controller.authModel.properties}
+                state={controller.config.credentials}
+                disabled={controller.isConnecting}
+              />
+              {credentialsSavingEnabled && (
+                <FormGroup>
+                  <FieldCheckbox
+                    name="saveCredentials"
+                    value={controller.template?.id || 'DBAuthSaveCredentials'}
+                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    disabled={controller.isConnecting}
+                    state={controller.config}
+                    mod='surface'
+                  />
+                </FormGroup>
+              )}
+            </FormBoxElement>
+            {isSSHAuthNeeded && sshConfig && (
+              <FormBoxElement>
+                <SSHAuthForm
+                  sshHandlerId={sshConfig.id}
+                  config={controller.config}
+                  disabled={controller.isConnecting}
+                  allowPasswordSave={credentialsSavingEnabled}
+                />
+              </FormBoxElement>
+            )}
+          </FormBox>
         </SubmittingForm>
       ))}
       {controller.responseMessage && (

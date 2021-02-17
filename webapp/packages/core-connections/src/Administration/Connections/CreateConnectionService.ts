@@ -11,10 +11,11 @@ import { computed, observable, makeObservable } from 'mobx';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import type { AdminConnectionGrantInfo, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import type { IConnectionFormData } from '../../ConnectionForm/ConnectionFormService';
 import { DBDriver, DBDriverResource } from '../../DBDriverResource';
-import type { AdminConnection } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 export interface ICreateMethodOptions {
@@ -27,18 +28,14 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  connection: AdminConnection | null;
-  availableDrivers: string[];
-  credentials: Record<string, string | number>;
-  grantedSubjects: AdminConnectionGrantInfo[] | null;
-  networkHandlersState: NetworkHandlerConfigInput[];
+  data: IConnectionFormData | null;
 
   get driver(): DBDriver | undefined {
-    if (!this.connection?.driverId) {
+    if (!this.data?.config.driverId) {
       return;
     }
 
-    return this.dbDriverResource.get(this.connection.driverId);
+    return this.dbDriverResource.get(this.data?.config.driverId);
   }
 
   readonly tabsContainer: TabsContainer<any, ICreateMethodOptions>;
@@ -49,20 +46,12 @@ export class CreateConnectionService {
     private readonly administrationScreenService: AdministrationScreenService
   ) {
     makeObservable(this, {
+      data: observable,
       disabled: observable,
-      connection: observable,
-      availableDrivers: observable,
-      credentials: observable,
-      grantedSubjects: observable,
-      networkHandlersState: observable,
       driver: computed,
     });
 
-    this.credentials = {};
-    this.availableDrivers = [];
-    this.networkHandlersState = [];
-    this.grantedSubjects = null;
-    this.connection = null;
+    this.data = null;
     this.tabsContainer = new TabsContainer();
 
     this.setConnectionTemplate = this.setConnectionTemplate.bind(this);
@@ -115,17 +104,16 @@ export class CreateConnectionService {
     this.connectionsAdministrationNavService.navToCreate(defaultId);
   }
 
-  setConnectionTemplate(connection: AdminConnection, drivers: string[]): void {
-    this.connection = connection;
-    this.availableDrivers = drivers;
+  setConnectionTemplate(config: ConnectionConfig, availableDrivers: string[]): void {
+    this.data = {
+      config,
+      availableDrivers,
+      partsState: new MetadataMap<string, any>(),
+    };
   }
 
   clearConnectionTemplate(): void {
-    this.connection = null;
-    this.availableDrivers = [];
-    this.networkHandlersState = [];
-    this.credentials = {};
-    this.grantedSubjects = null;
+    this.data = null;
   }
 
   close(): void {

@@ -1,5 +1,12 @@
-mutation createConnection($config: ConnectionConfig!) {
+mutation createConnection(
+  $config: ConnectionConfig!
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: createConnection(config: $config) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }

@@ -56,6 +56,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
             .dataFetcher("networkHandlers", env -> getService(env).getNetworkHandlers(getWebSession(env)))
             .dataFetcher("templateDataSources", env -> getService(env).getTemplateDataSources())
+            .dataFetcher("userConnections", env -> getService(env).getUserConnections(getWebSession(env), env.getArgument("id")))
             .dataFetcher("templateConnections", env -> getService(env).getTemplateConnections(getWebSession(env)))
 
             .dataFetcher("sessionPermissions", env -> getService(env).getSessionPermissions(getWebSession(env)))

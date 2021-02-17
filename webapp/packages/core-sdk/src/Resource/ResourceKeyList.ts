@@ -35,6 +35,7 @@ interface MapFnc {
 }
 
 export interface ResourceKeyUtils {
+  first: <TKey>(key: ResourceKey<TKey>) => TKey;
   forEach: <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => any) => void;
   forEachAsync: <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => Promise<any>) => Promise<void>;
   some: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
@@ -45,6 +46,16 @@ export interface ResourceKeyUtils {
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ResourceKeyUtils: ResourceKeyUtils = {
+  first<TKey>(
+    key: ResourceKey<TKey>
+  ): TKey {
+    if (isResourceKeyList(key)) {
+      return key.list[0];
+    } else {
+      return key;
+    }
+  },
+
   forEach<TKey>(
     key: ResourceKey<TKey>,
     action: (key: TKey, index: number) => any | Promise<any>

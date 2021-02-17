@@ -1,5 +1,12 @@
-query createConnectionConfiguration($config: ConnectionConfig!) {
+query createConnectionConfiguration(
+  $config: ConnectionConfig!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: createConnectionConfiguration(config: $config) {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }

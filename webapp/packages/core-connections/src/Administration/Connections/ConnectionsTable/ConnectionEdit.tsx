@@ -6,17 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useCallback, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TableContext } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { Loader, TableContext, useMapResource } from '@cloudbeaver/core-blocks';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
-import type { IConnectionFormModel } from '../ConnectionForm/IConnectionFormModel';
-import { ConnectionEditController } from './ConnectionEditController';
+import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
+import type { IConnectionFormData, IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
+import { ConnectionsResource } from '../../ConnectionsResource';
 
 const styles = composes(
   css`
@@ -40,13 +42,13 @@ interface Props {
   item: string;
 }
 
-export const ConnectionEdit = observer(function ConnectionEdit({
+export const ConnectionEdit = observer(function ConnectionEditNew({
   item,
 }: Props) {
+  const connection = useMapResource(ConnectionsResource, { key: item, includes: ['customIncludeNetworkHandlerCredentials'] });
   const boxRef = useRef<HTMLDivElement>(null);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
-  const controller = useController(ConnectionEditController, item);
 
   useEffect(() => {
     boxRef.current?.scrollIntoView({
@@ -55,15 +57,32 @@ export const ConnectionEdit = observer(function ConnectionEdit({
     });
   }, []);
 
+  const [data] = useState<IConnectionFormData>(() => ({
+    config: observable({}),
+    get info() {
+      return connection.data;
+    },
+    resource: connection.resource,
+    partsState: new MetadataMap<string, any>(),
+  }));
+
+  const [options] = useState<IConnectionFormOptions>(() => ({
+    mode: 'edit',
+    type: 'admin',
+  }));
+
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>
-      {controller.connection ? (
-        <ConnectionForm
-          model={controller as IConnectionFormModel}
-          onBack={collapse}
-          onCancel={collapse}
-        />
-      ) : <Loader />}
+      <Loader state={connection}>
+        {() => (
+          <ConnectionForm
+            data={data}
+            options={options}
+            onCancel={collapse}
+            onSave={collapse}
+          />
+        )}
+      </Loader>
     </box>
   );
 });

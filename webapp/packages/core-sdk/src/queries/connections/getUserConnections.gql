@@ -1,0 +1,11 @@
+query getUserConnections(
+  $id: ID,
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
+  connections: userConnections(id: $id) {
+    ...DatabaseConnection
+  }
+}

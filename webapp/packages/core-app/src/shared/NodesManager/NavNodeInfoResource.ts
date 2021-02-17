@@ -15,8 +15,8 @@ import {
   ResourceKey,
   isResourceKeyList,
   NavNodeInfoFragment,
-  ICachedResourceMetadata,
-  ResourceKeyUtils
+  ResourceKeyUtils,
+  ICachedMapResourceMetadata
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -26,7 +26,7 @@ type NavNodeInfo = NavNodeInfoFragment;
 
 export const ROOT_NODE_PATH = '';
 
-interface INodeMetadata extends ICachedResourceMetadata {
+interface INodeMetadata extends ICachedMapResourceMetadata {
   withDetails: boolean;
 }
 
@@ -34,7 +34,7 @@ interface INodeMetadata extends ICachedResourceMetadata {
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   protected metadata: MetadataMap<string, INodeMetadata>;
   constructor(private graphQLService: GraphQLService) {
-    super(new Map());
+    super();
 
     makeObservable(this, {
       setDetails: action,
@@ -44,6 +44,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       outdated: true,
       loading: false,
       withDetails: false,
+      includes: [],
     }));
   }
 

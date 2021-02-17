@@ -59,14 +59,17 @@ import {
   ConnectionsAdministrationService,
   ConnectionsResource,
   ConnectionsLocaleService,
-  DriverPropertiesService,
   ConnectionsAdministrationNavService,
   CreateConnectionService,
   ConnectionManualService,
   ConnectionSearchService,
   CreateConnectionBaseBootstrap,
   ConnectionFormService,
-  ConnectionFormBaseBootstrap
+  ConnectionOptionsTabService,
+  ConnectionDriverPropertiesTabService,
+  ConnectionSSHTabService,
+  ConnectionOriginInfoTabService,
+  ConnectionAccessTabService
 } from '@cloudbeaver/core-connections';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
@@ -130,8 +133,12 @@ export const coreManifest: PluginManifest = {
     SessionExpireService,
     SessionExpiredDialogService,
     ConnectionsLocaleService,
-    ConnectionFormBaseBootstrap,
     ConnectionFormService,
+    ConnectionOptionsTabService,
+    ConnectionSSHTabService,
+    ConnectionOriginInfoTabService,
+    ConnectionAccessTabService,
+    ConnectionDriverPropertiesTabService,
     ConnectionDialogsService,
     ConnectionSchemaManagerService,
     ConnectionInfoResource,
@@ -140,7 +147,6 @@ export const coreManifest: PluginManifest = {
     ContainerResource,
     DBDriverResource,
     NetworkHandlerResource,
-    DriverPropertiesService,
     ConnectionsManagerService,
     ScreenService,
     AppScreenService,

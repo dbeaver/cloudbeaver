@@ -34,6 +34,7 @@ module.exports = {
   },
 
   rules: {
+    '@typescript-eslint/no-invalid-void-type': 'off',
     '@typescript-eslint/dot-notation': 'off',
     '@typescript-eslint/no-throw-literal': 'off',
     '@typescript-eslint/no-base-to-string': 'off',

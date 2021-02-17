@@ -6,11 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
-
 import { CachedResource } from './CachedResource';
 
-@injectable()
 export abstract class CachedDataResource<
   TData,
   TParam,
@@ -22,7 +19,7 @@ export abstract class CachedDataResource<
   }
 
   async load(param: TParam): Promise<TData> {
-    await this.loadData(param);
+    await this.loadData(param, false);
     return this.data;
   }
 }

@@ -1,0 +1,47 @@
+fragment DatabaseConnection on ConnectionInfo {
+  id
+  name
+  description
+  driverId
+
+  template
+  connected
+  provided
+  useUrl
+  readOnly
+  saveCredentials
+
+  host
+  port
+  databaseName
+  url
+  properties
+  providerProperties
+
+  features
+  supportedDataFormats
+
+  origin @include(if: $includeOrigin) {
+    ...ObjectOriginInfo
+  }
+
+  authNeeded
+  authModel
+
+  authProperties @include(if: $includeAuthProperties) {
+    ...UserConnectionAuthProperties
+  }
+
+  networkHandlersConfig {
+    id
+    enabled
+    userName @include(if: $customIncludeNetworkHandlerCredentials)
+    password @include(if: $customIncludeNetworkHandlerCredentials)
+    savePassword
+    properties @include(if: $customIncludeNetworkHandlerCredentials)
+  }
+
+  navigatorSettings {
+    ...AllNavigatorSettings
+  }
+}

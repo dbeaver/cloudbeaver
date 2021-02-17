@@ -10,7 +10,8 @@ import styled, { css, use } from 'reshadow';
 
 const styles = css`
   box-element {
-    min-width: 450px;
+    flex-basis: 550px;
+    flex-grow: 1;
 
     &[|max] {
       width: 100%;

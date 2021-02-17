@@ -1,5 +1,12 @@
-mutation closeConnection($id: ID!) {
+mutation closeConnection(
+  $id: ID!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: closeConnection(id: $id) {
-    ...UserConnection
+    ...DatabaseConnection
   }
 }

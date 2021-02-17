@@ -13,8 +13,9 @@ import {
   ResourceKey,
   AdminConnectionGrantInfo,
   AdminUserInfoFragment,
-  ObjectPropertyInfo, AdminUserInfo,
-  ResourceKeyUtils
+  AdminUserInfo,
+  ResourceKeyUtils,
+  GetUsersListQueryVariables
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -26,6 +27,7 @@ const NEW_USER_SYMBOL = Symbol('new-user');
 export type AdminUser = AdminUserInfoFragment;
 
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
+type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId'>;
 
 interface UserCreateOptions {
   userId: string;
@@ -35,14 +37,15 @@ interface UserCreateOptions {
 }
 
 @injectable()
-export class UsersResource extends CachedMapResource<string, AdminUser> {
+export class UsersResource extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
+  static keyAll = 'all';
   private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
@@ -75,12 +78,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
     };
   }
 
-  async loadOrigin(userId: string): Promise<ObjectPropertyInfo[]> {
-    const { user } = await this.graphQLService.sdk.getUserOrigin({ userId });
-
-    return user[0].origin.details || [];
-  }
-
   async loadConnections(userId: string): Promise<AdminConnectionGrantInfo[]> {
     const { grantedConnections } = await this.graphQLService.sdk.getUserGrantedConnections({ userId });
 
@@ -94,7 +91,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
   async create({
     userId, roles, credentials, grantedConnections,
   }: UserCreateOptions): Promise<AdminUser> {
-    const { user } = await this.graphQLService.sdk.createUser({ userId });
+    const { user } = await this.graphQLService.sdk.createUser({
+      userId,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(userId),
+    });
 
     try {
       await this.updateCredentials(userId, credentials);
@@ -153,40 +154,57 @@ export class UsersResource extends CachedMapResource<string, AdminUser> {
   }
 
   async loadAll(): Promise<Map<string, AdminUser>> {
-    await this.load('all');
+    this.resetIncludes();
+    await this.load(UsersResource.keyAll);
     return this.data;
   }
 
   async refreshAll(): Promise<Map<string, AdminUser>> {
-    await this.refresh('all');
+    this.resetIncludes();
+    await this.refresh(UsersResource.keyAll);
     return this.data;
   }
 
   refreshAllLazy(): void {
-    this.markOutdated('all');
-    this.loadedKeyMetadata.set('all', false);
+    this.resetIncludes();
+    this.markOutdated(UsersResource.keyAll);
+    this.loadedKeyMetadata.set(UsersResource.keyAll, false);
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, AdminUser>> {
-    const userId = key === 'all' ? undefined : key as string;
+  protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, AdminUser>> {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const { users } = await this.graphQLService.sdk.getUsersList({
+        userId: key === UsersResource.keyAll ? undefined : key,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(key === UsersResource.keyAll ? undefined : key, includes),
+      });
 
-    const { users } = await this.graphQLService.sdk.getUsersList({ userId });
+      if (key === UsersResource.keyAll) {
+        this.data.clear();
+      }
 
-    if (key === 'all') {
-      this.data.clear();
-      this.loadedKeyMetadata.set('all', true);
-    }
+      for (const user of users) {
+        this.set(user.userId, user);
+      }
 
-    for (const user of users) {
-      this.set(user.userId, user as AdminUser);
-    }
-    this.markUpdated(key);
+      if (key === UsersResource.keyAll) {
+        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
+        //       here we should check is it's was a full update
+        this.loadedKeyMetadata.set(UsersResource.keyAll, true);
+      }
+    });
 
     return this.data;
   }
 
   private isActiveUser(userId: string) {
     return this.authInfoService.userInfo?.userId === userId;
+  }
+
+  private getDefaultIncludes(): UserResourceIncludes {
+    return {
+      customIncludeOriginDetails: false,
+    };
   }
 }
 

@@ -13,21 +13,26 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
-  UserConnectionFragment,
   GraphQLService,
   CachedMapResource,
   ConnectionConfig,
   UserConnectionAuthPropertiesFragment,
-  resourceKeyList
+  resourceKeyList,
+  InitConnectionMutationVariables,
+  GetUserConnectionsQueryVariables,
+  ResourceKey,
+  ResourceKeyUtils,
 } from '@cloudbeaver/core-sdk';
 
-import { ConnectionsResource } from './Administration/ConnectionsResource';
+import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
 
-export type Connection = UserConnectionFragment & { authProperties?: UserConnectionAuthPropertiesFragment[] };
+export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
+export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
+export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 @injectable()
-export class ConnectionInfoResource extends CachedMapResource<string, Connection> {
+export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
   private sessionUpdate: boolean;
@@ -37,7 +42,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     appAuthService: AppAuthService,
     sessionResource: SessionResource
   ) {
-    super(new Map());
+    super();
 
     makeObservable(this, {
       refreshSession: action,
@@ -54,9 +59,9 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
-    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
-    this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
-    this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => !this.sessionUpdate));
+    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
     appAuthService.auth.addHandler(() => this.refreshSession(true));
   }
@@ -65,7 +70,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.sessionUpdate = sessionUpdate === true;
     try {
       const connectionsList = resourceKeyList(Array.from(this.data.keys()));
-      await this.performUpdate(connectionsList, async () => {
+      await this.performUpdate(connectionsList, [], async () => {
         if (!sessionUpdate) {
           const updated = await this.connectionsResource.updateSessionConnections();
 
@@ -74,7 +79,10 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           }
         }
 
-        const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections();
+        const { connections } = await this.graphQLService.sdk.getUserConnections({
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(),
+        });
 
         const restoredConnections = new Set<string>();
 
@@ -95,21 +103,35 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   }
 
   async createFromTemplate(templateId: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({ templateId });
+    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
+      templateId,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(),
+    });
     return this.add(connection);
   }
 
   async createConnection(config: ConnectionConfig): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnection({
       config,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(config.connectionId),
     });
     return this.add(connection);
+  }
+
+  async testConnection(config: ConnectionConfig): Promise<void> {
+    await this.graphQLService.sdk.testConnection({
+      config,
+    });
   }
 
   async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromNode({
       nodePath: nodeId,
       config: { name: nodeName },
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(),
     });
 
     return this.add(connection);
@@ -117,7 +139,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   async add(connection: Connection): Promise<Connection> {
     const exists = this.data.has(connection.id);
-    this.set(connection.id, connection);
+    this.updateConnection(connection);
 
     const observedConnection = this.get(connection.id)!;
 
@@ -128,87 +150,86 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return observedConnection;
   }
 
-  async init(id: string, credentials?: Record<string, any>, saveCredentials?: boolean): Promise<Connection> {
-    await this.performUpdate(id, async () => {
-      const connection = await this.initConnection(id, credentials, saveCredentials);
-      this.set(id, connection);
+  async init(config: ConnectionInitConfig): Promise<Connection> {
+    await this.performUpdate(config.id, [], async () => {
+      const { connection } = await this.graphQLService.sdk.initConnection({
+        ...config,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(),
+      });
+      this.updateConnection(connection);
     });
 
-    return this.get(id)!;
+    return this.get(config.id)!;
   }
 
   async changeConnectionView(id: string, simple: boolean): Promise<Connection> {
-    await this.performUpdate(id, async () => {
+    await this.performUpdate(id, [], async () => {
       const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
 
       const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
         id,
         settings,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(id),
       });
 
-      this.set(id, connection);
+      this.updateConnection(connection);
     });
 
     return this.get(id)!;
   }
 
-  async close(connectionId: string): Promise<Connection> {
-    await this.performUpdate(connectionId, async () => {
-      const connection = await this.closeConnection(connectionId);
-      this.set(connectionId, connection);
+  async close(id: string): Promise<Connection> {
+    await this.performUpdate(id, [], async () => {
+      const { connection } = await this.graphQLService.sdk.closeConnection({
+        id,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(id),
+      });
+
+      this.updateConnection(connection);
     });
 
-    const connection = this.get(connectionId)!;
+    const connection = this.get(id)!;
     await this.onConnectionClose.execute(connection);
     return connection;
   }
 
-  async deleteConnection(connectionId: string): Promise<void> {
-    await this.performUpdate(connectionId, async () => {
-      await this.graphQLService.sdk.deleteConnection({ id: connectionId });
+  async deleteConnection(id: string): Promise<void> {
+    await this.performUpdate(id, [], async () => {
+      await this.graphQLService.sdk.deleteConnection({ id: id });
     });
-    this.delete(connectionId);
+    this.delete(id);
   }
 
-  async loadAuthModel(connectionId: string): Promise<UserConnectionAuthPropertiesFragment[]> {
-    const connection = await this.load(connectionId);
+  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, Connection>> {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const { connections } = await this.graphQLService.sdk.getUserConnections({
+        id: key,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(key, includes),
+      });
 
-    if (connection?.authProperties) {
-      return connection.authProperties;
-    }
-
-    return this.performUpdate(connectionId, async () => {
-      connection.authProperties = await this.getAuthProperties(connectionId);
-      this.set(connectionId, connection);
-
-      return connection.authProperties!;
+      for (const connection of connections) {
+        this.updateConnection(connection);
+      }
     });
-  }
-
-  protected async loader(connectionId: string): Promise<Map<string, Connection>> {
-    const { connection } = await this.graphQLService.sdk.connectionInfo({ id: connectionId });
-
-    const oldConnection = this.get(connectionId) || {};
-    this.set(connectionId, { ...oldConnection, ...connection });
 
     return this.data;
   }
 
-  private async getAuthProperties(id: string): Promise<UserConnectionAuthPropertiesFragment[]> {
-    const { connection: { authProperties } } = await this.graphQLService.sdk.connectionAuthProperties({ id });
-
-    return authProperties;
+  private updateConnection(connection: Connection) {
+    const oldConnection = this.get(connection.id) || {};
+    this.set(connection.id, { ...oldConnection, ...connection });
   }
 
-  private async initConnection(id: string, credentials?: any, saveCredentials?: boolean): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.initConnection({ id, credentials, saveCredentials });
-
-    return connection;
-  }
-
-  private async closeConnection(id: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.closeConnection({ id });
-
-    return connection;
+  private getDefaultIncludes(): ConnectionInfoIncludes {
+    return {
+      customIncludeNetworkHandlerCredentials: false,
+      customIncludeOriginDetails: false,
+      includeAuthProperties: false,
+      includeOrigin: false,
+    };
   }
 }

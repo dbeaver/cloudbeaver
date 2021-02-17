@@ -1,5 +1,13 @@
-query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
+query updateConnectionConfiguration(
+  $id: ID!, 
+  $config: ConnectionConfig!,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
   connection: updateConnectionConfiguration(id: $id, config: $config) {
-    ...AdminConnection
+    ...DatabaseConnection
   }
 }

@@ -13,6 +13,7 @@ import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useObjectRef } from '../useObjectRef';
 import { TableContext, ITableContext } from './TableContext';
 
 type Props = React.PropsWithChildren<{
@@ -26,14 +27,16 @@ type Props = React.PropsWithChildren<{
 export const Table = observer(function Table({
   selectedItems, expandedItems, className, size, children, onSelect,
 }: Props) {
+  const props = useObjectRef({ onSelect });
+
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
   const [expanded] = useState<Map<any, boolean>>(() => expandedItems || observable(new Map()));
   const setItemSelect = useCallback((item: any, state: boolean) => {
     selected.set(item, state);
-    if (onSelect) {
-      onSelect(item, state);
+    if (props.onSelect) {
+      props.onSelect(item, state);
     }
-  }, [onSelect]);
+  }, []);
   const setItemExpand = useCallback((item: any, state: boolean) => expanded.set(item, state), []);
   const clearSelection = useCallback(() => selected.clear(), []);
   const collapse = useCallback(() => expanded.clear(), []);

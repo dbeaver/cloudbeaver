@@ -38,35 +38,38 @@ public interface DBWServiceCore extends DBWService {
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
-    List<WebDatabaseDriverConfig> getDriverList(WebSession webSession, String driverId) throws DBWebException;
+    List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
     @WebAction
-    List<WebDatabaseAuthModel> getAuthModels(WebSession webSession);
+    List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);
 
     @WebAction
-    List<WebNetworkHandlerDescriptor> getNetworkHandlers(WebSession webSession);
+    List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession);
+
+    @WebAction
+    List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
 
     @Deprecated
     @WebAction
     List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
 
     @WebAction
-    List<WebConnectionInfo> getTemplateConnections(WebSession webSession) throws DBWebException;
+    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    String[] getSessionPermissions(WebSession webSession) throws DBWebException;
+    String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
 
     ///////////////////////////////////////////
     // Session
 
     @WebAction(requirePermissions = {})
-    WebSession openSession(WebSession webSession) throws DBWebException;
+    WebSession openSession(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    WebSession getSessionState(WebSession webSession) throws DBWebException;
+    WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction
-    List<WebServerMessage> readSessionLog(WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
+    List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     boolean closeSession(HttpServletRequest request) throws DBWebException;

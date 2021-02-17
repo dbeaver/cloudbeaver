@@ -35,6 +35,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -246,10 +247,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Connection management
 
     @Override
-    public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession) throws DBWebException {
+    public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
         // Get all connections from global configuration
         List<WebConnectionInfo> result = new ArrayList<>();
         for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
+            if (id != null && !id.equals(ds.getId())) {
+                continue;
+            }
             if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }

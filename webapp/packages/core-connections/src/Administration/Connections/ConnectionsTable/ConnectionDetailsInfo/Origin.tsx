@@ -11,17 +11,21 @@ import styled from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
-import type { AdminConnection } from '../../../ConnectionsResource';
+import type { DatabaseConnection } from '../../../ConnectionsResource';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
 interface Props {
-  context: AdminConnection;
+  context: DatabaseConnection;
 }
 
 export const Origin: React.FC<Props> = observer(function Origin({ context }) {
   const isLocal = context.origin.type === 'local';
-  const icon = isLocal ? '/icons/local_connection.svg' : context.origin.icon;
-  const title = isLocal ? 'Local connection' : context.origin.displayName;
+  const icon = context.origin.icon;
+  const title = context.origin.displayName;
+
+  if (isLocal) {
+    return null;
+  }
 
   return styled(CONNECTION_DETAILS_STYLES)(
     <StaticImage icon={icon} title={title} />

@@ -1,5 +1,20 @@
-mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
-  connection: initConnection(id: $id, credentials: $credentials, saveCredentials: $saveCredentials) {
-    ...UserConnection
+mutation initConnection(
+  $id: ID!,
+  $credentials: Object,
+  $networkCredentials: [NetworkHandlerConfigInput!], 
+  $saveCredentials: Boolean,
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
+  connection: initConnection(
+    id: $id,
+    credentials: $credentials,
+    networkCredentials: $networkCredentials,
+    saveCredentials: $saveCredentials
+  ) {
+    ...DatabaseConnection
   }
 }

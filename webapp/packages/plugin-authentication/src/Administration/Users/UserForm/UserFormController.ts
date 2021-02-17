@@ -9,7 +9,7 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { isLocalUser, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { AdminConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { DatabaseConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -34,7 +34,7 @@ export class UserFormController implements IInitializableController, IDestructib
   isLoading: boolean;
   credentials: IUserCredentials;
 
-  get connections(): AdminConnection[] {
+  get connections(): DatabaseConnection[] {
     return Array.from(this.connectionsResource.data.values());
   }
 

@@ -11,11 +11,11 @@ import styled from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
 
-import type { AdminConnection } from '../../../ConnectionsResource';
+import type { DatabaseConnection } from '../../../ConnectionsResource';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
 interface Props {
-  context: AdminConnection;
+  context: DatabaseConnection;
 }
 
 export const Template: React.FC<Props> = observer(function Template({ context }) {

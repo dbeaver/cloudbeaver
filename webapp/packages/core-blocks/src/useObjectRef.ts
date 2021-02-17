@@ -8,20 +8,14 @@
 
 import { useRef } from 'react';
 
-export function useObjectRef<T>(init: T, update?: Partial<T>): React.MutableRefObject<T> {
+export function useObjectRef<T>(init: T, update?: Partial<T>): T {
   const ref = useRef(init);
 
   if (update) {
-    ref.current = {
-      ...ref.current,
-      update,
-    };
+    Object.assign(ref.current, update);
   } else {
-    ref.current = {
-      ...ref.current,
-      ...init,
-    };
+    Object.assign(ref.current, init);
   }
 
-  return ref;
+  return ref.current;
 }

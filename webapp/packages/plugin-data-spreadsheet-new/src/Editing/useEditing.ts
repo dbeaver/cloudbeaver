@@ -35,7 +35,7 @@ export function useEditing(options: IEditingOptions): IEditingContext {
           break;
       }
 
-      if (!optionsRef.current.onEdit(position, key)) {
+      if (!optionsRef.onEdit(position, key)) {
         return;
       }
 

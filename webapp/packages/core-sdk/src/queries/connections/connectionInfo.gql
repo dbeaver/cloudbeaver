@@ -1,5 +1,0 @@
-query connectionInfo($id: ID!) {
-  connection: connectionInfo(id: $id) {
-    ...UserConnection
-  }
-}

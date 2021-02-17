@@ -10,35 +10,23 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
   CachedMapResource,
-  DriverInfo
+  ResourceKey,
+  ResourceKeyUtils,
+  DatabaseDriverFragment,
+  DriverListQueryVariables
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-export type DBDriver = Pick<
-  DriverInfo,
-  | 'id'
-  | 'name'
-  | 'icon'
-  | 'description'
-  | 'defaultPort'
-  | 'defaultDatabase'
-  | 'defaultServer'
-  | 'defaultUser'
-  | 'sampleURL'
-  | 'embedded'
-  | 'anonymousAccess'
-  | 'promotedScore'
-  | 'defaultAuthModel'
-  | 'applicableNetworkHandlers'
-  | 'providerProperties'
->;
+export type DBDriver = DatabaseDriverFragment;
+
+const allKey = 'all';
 
 @injectable()
-export class DBDriverResource extends CachedMapResource<string, DBDriver> {
+export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(private graphQLService: GraphQLService) {
-    super(new Map());
+    super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
   }
 
@@ -51,7 +39,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
   }
 
   async loadAll(): Promise<Map<string, DBDriver>> {
-    await this.load('all');
+    await this.load(allKey);
     return this.data;
   }
 
@@ -63,19 +51,36 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver> {
     return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 
-  protected async loader(key: string): Promise<Map<string, DBDriver>> {
-    const { driverList } = await this.graphQLService.sdk.driverList();
+  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DBDriver>> {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const { drivers } = await this.graphQLService.sdk.driverList({
+        driverId: key === allKey ? undefined : key,
+        includeDriverParameters: false,
+        includeDriverProperties: false,
+        includeProviderProperties: false,
+        ...this.getIncludesMap(key === allKey ? undefined : key, includes),
+      });
 
-    this.data.clear();
+      if (key === allKey) {
+        this.data.clear();
+      }
 
-    for (const driver of driverList) {
-      this.set(driver.id, driver);
-    }
+      for (const driver of drivers) {
+        this.updateDriver(driver);
+      }
 
-    // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
-    //       here we should check is it's was a full update
-    this.loadedKeyMetadata.set('all', true);
+      if (key === allKey) {
+        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
+        //       here we should check is it's was a full update
+        this.loadedKeyMetadata.set(allKey, true);
+      }
+    });
 
     return this.data;
+  }
+
+  private updateDriver(driver: DBDriver) {
+    const oldDriver = this.get(driver.id) || {};
+    this.set(driver.id, { ...oldDriver, ...driver });
   }
 }

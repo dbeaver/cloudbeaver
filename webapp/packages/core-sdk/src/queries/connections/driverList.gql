@@ -1,32 +1,5 @@
-query driverList {
-  driverList {
-    id
-    name
-    icon
-    description
-    defaultPort
-    defaultDatabase
-    defaultServer
-    defaultUser
-    sampleURL
-    embedded
-    anonymousAccess
-    promotedScore
-
-    defaultAuthModel
-    # applicableAuthModel
-
-    providerProperties {
-      id
-      displayName
-      description
-      category
-      dataType
-      defaultValue
-      validValues
-      features
-      order
-    }
-    applicableNetworkHandlers
+query driverList($driverId: ID, $includeProviderProperties: Boolean!, $includeDriverProperties: Boolean!, $includeDriverParameters: Boolean!) {
+  drivers: driverList(id: $driverId) {
+    ...DatabaseDriver
   }
 }
