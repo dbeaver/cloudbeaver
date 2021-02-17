@@ -13,6 +13,7 @@ import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
+import { isLocalConnection } from '../Administration/ConnectionsResource';
 import { IConnectionForm, IConnectionFormData, IConnectionFormOptions, IConnectionFormState, IConnectionFormSubmitData, ConnectionFormService } from './ConnectionFormService';
 
 export function useConnectionFormState(
@@ -26,7 +27,9 @@ export function useConnectionFormState(
   const [form] = useState<IConnectionForm>(() => observable({
     disabled: false,
     loading: false,
-    originLocal: true,
+    get originLocal() {
+      return !props.data.info || isLocalConnection(props.data.info);
+    },
     ...defaultState,
   }));
 

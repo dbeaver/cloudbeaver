@@ -19,7 +19,7 @@ import {
   UserConnectionAuthPropertiesFragment,
   resourceKeyList,
   InitConnectionMutationVariables,
-  ConnectionInfoQueryVariables,
+  GetUserConnectionsQueryVariables,
   ResourceKey,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-sdk';
@@ -29,9 +29,10 @@ import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSet
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
+export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 @injectable()
-export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoQueryVariables> {
+export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
   private sessionUpdate: boolean;
@@ -78,7 +79,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           }
         }
 
-        const { state: { connections } } = await this.graphQLService.sdk.getSessionConnections({
+        const { connections } = await this.graphQLService.sdk.getUserConnections({
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(),
         });
@@ -204,12 +205,15 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
   protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, Connection>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      const { connection } = await this.graphQLService.sdk.connectionInfo({
+      const { connections } = await this.graphQLService.sdk.getUserConnections({
         id: key,
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(key, includes),
       });
-      this.updateConnection(connection);
+
+      for (const connection of connections) {
+        this.updateConnection(connection);
+      }
     });
 
     return this.data;
@@ -220,7 +224,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.set(connection.id, { ...oldConnection, ...connection });
   }
 
-  private getDefaultIncludes(): Omit<ConnectionInfoQueryVariables, 'id'> {
+  private getDefaultIncludes(): ConnectionInfoIncludes {
     return {
       customIncludeNetworkHandlerCredentials: false,
       customIncludeOriginDetails: false,

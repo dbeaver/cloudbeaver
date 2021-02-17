@@ -173,21 +173,11 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 
   protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DatabaseConnection>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      let connections: DatabaseConnectionFragment[];
-      if (key !== allKey) {
-        const response = await this.graphQLService.sdk.connectionInfo({
-          id: key,
-          ...this.getDefaultIncludes(),
-          ...this.getIncludesMap(key, includes),
-        });
-        connections = [response.connection];
-      } else {
-        const response = await this.graphQLService.sdk.getConnections({
-          ...this.getDefaultIncludes(),
-          ...this.getIncludesMap(undefined, includes),
-        });
-        connections = response.connections;
-      }
+      const { connections } = await this.graphQLService.sdk.getConnections({
+        id: key !== allKey ? key : undefined,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(undefined, includes),
+      });
 
       if (key === allKey) {
         this.data.clear();

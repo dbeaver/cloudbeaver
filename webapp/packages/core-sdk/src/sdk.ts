@@ -67,6 +67,11 @@ export interface Query {
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
   templateConnections: ConnectionInfo[];
   updateConnectionConfiguration: ConnectionInfo;
+  userConnections: ConnectionInfo[];
+}
+
+export interface QueryAllConnectionsArgs {
+  id?: Maybe<Scalars['ID']>;
 }
 
 export interface QueryAuthLoginArgs {
@@ -240,6 +245,10 @@ export interface QuerySqlListContextsArgs {
 export interface QueryUpdateConnectionConfigurationArgs {
   id: Scalars['ID'];
   config: ConnectionConfig;
+}
+
+export interface QueryUserConnectionsArgs {
+  id?: Maybe<Scalars['ID']>;
 }
 
 export interface Mutation {
@@ -1049,6 +1058,7 @@ export type GetConnectionAccessQueryVariables = Exact<{
 export interface GetConnectionAccessQuery { subjects: Array<Pick<AdminConnectionGrantInfo, 'connectionId' | 'subjectId' | 'subjectType'>> }
 
 export type GetConnectionsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -1090,16 +1100,6 @@ export type CloseConnectionMutationVariables = Exact<{
 }>;
 
 export interface CloseConnectionMutation { connection: DatabaseConnectionFragment }
-
-export type ConnectionInfoQueryVariables = Exact<{
-  id: Scalars['ID'];
-  includeOrigin: Scalars['Boolean'];
-  customIncludeOriginDetails: Scalars['Boolean'];
-  includeAuthProperties: Scalars['Boolean'];
-  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
-}>;
-
-export interface ConnectionInfoQuery { connection: DatabaseConnectionFragment }
 
 export type CreateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -1164,6 +1164,16 @@ export type GetTemplateConnectionsQueryVariables = Exact<{
 }>;
 
 export interface GetTemplateConnectionsQuery { connections: DatabaseConnectionFragment[] }
+
+export type GetUserConnectionsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
+}>;
+
+export interface GetUserConnectionsQuery { connections: DatabaseConnectionFragment[] }
 
 export type InitConnectionMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -1480,15 +1490,6 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 }>;
 
 export type ChangeSessionLanguageMutation = Pick<Mutation, 'changeSessionLanguage'>;
-
-export type GetSessionConnectionsQueryVariables = Exact<{
-  includeOrigin: Scalars['Boolean'];
-  customIncludeOriginDetails: Scalars['Boolean'];
-  includeAuthProperties: Scalars['Boolean'];
-  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
-}>;
-
-export interface GetSessionConnectionsQuery { state: { connections: DatabaseConnectionFragment[] } }
 
 export type OpenSessionMutationVariables = Exact<{ [key: string]: never }>;
 
@@ -1898,8 +1899,8 @@ export const GetConnectionAccessDocument = `
 }
     `;
 export const GetConnectionsDocument = `
-    query getConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
-  connections: allConnections {
+    query getConnections($id: ID, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
+  connections: allConnections(id: $id) {
     ...DatabaseConnection
   }
 }
@@ -1930,13 +1931,6 @@ export const UpdateConnectionConfigurationDocument = `
 export const CloseConnectionDocument = `
     mutation closeConnection($id: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connection: closeConnection(id: $id) {
-    ...DatabaseConnection
-  }
-}
-    ${DatabaseConnectionFragmentDoc}`;
-export const ConnectionInfoDocument = `
-    query connectionInfo($id: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
-  connection: connectionInfo(id: $id) {
     ...DatabaseConnection
   }
 }
@@ -1998,6 +1992,13 @@ export const GetAuthModelsDocument = `
 export const GetTemplateConnectionsDocument = `
     query getTemplateConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
   connections: templateConnections {
+    ...DatabaseConnection
+  }
+}
+    ${DatabaseConnectionFragmentDoc}`;
+export const GetUserConnectionsDocument = `
+    query getUserConnections($id: ID, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
+  connections: userConnections(id: $id) {
     ...DatabaseConnection
   }
 }
@@ -2382,15 +2383,6 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
-export const GetSessionConnectionsDocument = `
-    query getSessionConnections($includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
-  state: sessionState {
-    connections {
-      ...DatabaseConnection
-    }
-  }
-}
-    ${DatabaseConnectionFragmentDoc}`;
 export const OpenSessionDocument = `
     mutation openSession {
   session: openSession {
@@ -2568,9 +2560,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     closeConnection(variables: CloseConnectionMutationVariables): Promise<CloseConnectionMutation> {
       return withWrapper(() => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables));
     },
-    connectionInfo(variables: ConnectionInfoQueryVariables): Promise<ConnectionInfoQuery> {
-      return withWrapper(() => client.request<ConnectionInfoQuery>(ConnectionInfoDocument, variables));
-    },
     createConnection(variables: CreateConnectionMutationVariables): Promise<CreateConnectionMutation> {
       return withWrapper(() => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables));
     },
@@ -2591,6 +2580,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getTemplateConnections(variables: GetTemplateConnectionsQueryVariables): Promise<GetTemplateConnectionsQuery> {
       return withWrapper(() => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables));
+    },
+    getUserConnections(variables: GetUserConnectionsQueryVariables): Promise<GetUserConnectionsQuery> {
+      return withWrapper(() => client.request<GetUserConnectionsQuery>(GetUserConnectionsDocument, variables));
     },
     initConnection(variables: InitConnectionMutationVariables): Promise<InitConnectionMutation> {
       return withWrapper(() => client.request<InitConnectionMutation>(InitConnectionDocument, variables));
@@ -2675,9 +2667,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables): Promise<ChangeSessionLanguageMutation> {
       return withWrapper(() => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables));
-    },
-    getSessionConnections(variables: GetSessionConnectionsQueryVariables): Promise<GetSessionConnectionsQuery> {
-      return withWrapper(() => client.request<GetSessionConnectionsQuery>(GetSessionConnectionsDocument, variables));
     },
     openSession(variables?: OpenSessionMutationVariables): Promise<OpenSessionMutation> {
       return withWrapper(() => client.request<OpenSessionMutation>(OpenSessionDocument, variables));

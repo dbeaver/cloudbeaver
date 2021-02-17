@@ -1,10 +1,11 @@
 query getConnections(
+  $id: ID,
   $includeOrigin: Boolean!,
   $customIncludeOriginDetails: Boolean!,
   $includeAuthProperties: Boolean!,
   $customIncludeNetworkHandlerCredentials: Boolean!
 ) {
-  connections: allConnections {
+  connections: allConnections(id: $id) {
     ...DatabaseConnection
   }
 }
