@@ -6,23 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataGrid from 'react-data-grid';
-import type { Column, DataGridHandle } from 'react-data-grid';
+import type { DataGridHandle } from 'react-data-grid';
 import type { Position } from 'react-data-grid/lib/types';
 import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
-import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { TextTools } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import { ResultSetTools } from '../ResultSetTools';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
@@ -31,12 +27,10 @@ import { useGridSelectionContext } from './DataGridSelection/useGridSelectionCon
 import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
 import { useGridSortingContext } from './DataGridSorting/useGridSortingContext';
 import { CellFormatter } from './Formatters/CellFormatter';
-import { IndexFormatter } from './Formatters/IndexFormatter';
 import { RowRenderer } from './RowRenderer/RowRenderer';
-import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
-import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
 import { useGridDragging } from './useGridDragging';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
+import { useTableData } from './useTableData';
 
 interface Props {
   model: IDatabaseDataModel<any>;
@@ -49,17 +43,6 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
   return target.clientHeight + target.scrollTop === target.scrollHeight;
 }
 
-export const indexColumn: Column<any[], any> = {
-  key: Number.MAX_SAFE_INTEGER + '',
-  name: '#',
-  minWidth: 60,
-  width: 60,
-  resizable: false,
-  frozen: true,
-  headerRenderer: TableIndexColumnHeader,
-  formatter: IndexFormatter,
-};
-
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
   const dataGridRef = useRef<DataGridHandle>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -68,11 +51,10 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const modelResultData = model?.getResult(resultIndex);
 
+  const tableData = useTableData(modelResultData);
+
   const gridSortingContext = useGridSortingContext(model);
-  const gridSelectionContext = useGridSelectionContext(modelResultData, {
-    // we need idx + 1 to keep our api in sync with react data grid api
-    select: ({ idx, rowIdx }) => dataGridRef.current?.selectCell({ idx: idx + 1, rowIdx }),
-  });
+  const gridSelectionContext = useGridSelectionContext(tableData);
   const editingContext = useEditing({
     onEdit: (position, key) => {
       const editor = model.source.getEditor(resultIndex);
@@ -95,10 +77,15 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const { onKeydownHandler } = useGridSelectedCellsCopy(modelResultData, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
-    onDragOver: (startPosition, currentPosiition, event) =>
-      gridSelectionContext.selectRange(startPosition, currentPosiition, event.ctrlKey, true),
-    onDragEnd: (startPosition, currentPosiition, event) =>
-      gridSelectionContext.selectRange(startPosition, currentPosiition, event.ctrlKey, false),
+    onDragStart: startPosition => {
+      dataGridRef.current?.selectCell({ idx: startPosition.idx, rowIdx: startPosition.rowIdx });
+    },
+    onDragOver: (startPosition, currentPosition, event) => {
+      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey, true);
+    },
+    onDragEnd: (startPosition, currentPosition, event) => {
+      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey, false);
+    },
   });
 
   useEffect(() => {
@@ -137,40 +124,6 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     }
   }, [model, modelResultData]);
 
-  const { columns, rows } = useMemo(() => computed(() => {
-    if (!modelResultData) {
-      return { columns: [], rows: [] };
-    }
-
-    const columnNames = ResultSetTools.getHeaders(modelResultData.data as SqlResultSet);
-    const rowStrings = ResultSetTools.getLongestCells(modelResultData.data as SqlResultSet);
-
-    // TODO: seems better to do not measure container size
-    //       for detecting max columns size, better to use configurable variable
-    const measuredCells = TextTools.getWidth({
-      font: '400 14px Roboto',
-      text: columnNames.map((cell, i) => {
-        if (cell.length > (rowStrings[i] || '').length) {
-          return cell;
-        }
-        return rowStrings[i];
-      }),
-    }).map(v => v + 16 + 32 + 20);
-
-    // TODO: we need some result type specified formatter to common actions with data
-    const rows = (modelResultData.data as SqlResultSet).rows || [];
-
-    const columns = (modelResultData.data as SqlResultSet).columns!.map<Column<any[], any>>((col, columnIndex) => ({
-      key: columnIndex + '',
-      name: col.label!,
-      width: Math.min(300, measuredCells[columnIndex]),
-      headerRenderer: TableColumnHeader,
-    }));
-    columns.unshift(indexColumn);
-
-    return { rows, columns };
-  }), [modelResultData]).get();
-
   const gridContext = useMemo<IDataGridContext>(() => ({
     model,
     columnResize,
@@ -195,13 +148,13 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
               <DataGrid
                 ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
-                columns={columns}
+                columns={tableData.columns}
                 defaultColumnOptions={{
                   minWidth: 40,
                   resizable: true,
                   formatter: CellFormatter,
                 }}
-                rows={rows}
+                rows={tableData.rows}
                 headerRowHeight={28}
                 rowHeight={24}
                 rowRenderer={RowRenderer}

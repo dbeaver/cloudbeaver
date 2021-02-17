@@ -8,12 +8,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
-import { getColumnIdxFromColumnKey, IPosition, isIndexColumn } from './DataGridSelection/useGridSelectionContext';
-
 interface IDraggingPosition {
   idx: number;
   rowIdx: number;
-  isIndexColumn: boolean;
 }
 
 interface IMousePosition {
@@ -22,16 +19,21 @@ interface IMousePosition {
 }
 
 type DraggingCallback = (
-  startPosition: IPosition, currentPosition: IPosition, event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
+  startPosition: IDraggingPosition,
+  currentPosition: IDraggingPosition,
+  event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
 ) => void;
 
 interface IDraggingCallbacks {
-  onDragStart?: (startPosition: IPosition, event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent) => void;
+  onDragStart?: (
+    startPosition: IDraggingPosition,
+    event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
+  ) => void;
   onDragOver?: DraggingCallback;
   onDragEnd?: DraggingCallback;
 }
 
-const THRESHOLD = 20;
+const THRESHOLD = 10;
 
 function getDelta(startPosition: IMousePosition | null, currentPosition: IMousePosition | null) {
   if (!startPosition || !currentPosition) {
@@ -53,16 +55,15 @@ function getCellPositionFromEvent(event: React.MouseEvent<HTMLDivElement, MouseE
   }
 
   const rowIdx = cell.getAttribute('data-rowindex');
-  const columnKey = cell.getAttribute('data-columnkey');
+  const columnIdx = cell.getAttribute('data-columnindex');
 
-  if (!rowIdx || !columnKey) {
+  if (!rowIdx || !columnIdx) {
     return;
   }
 
   return {
     rowIdx: Number(rowIdx),
-    colIdx: getColumnIdxFromColumnKey(columnKey),
-    isIndexColumn: isIndexColumn(columnKey),
+    colIdx: Number(columnIdx),
   };
 }
 
@@ -92,7 +93,7 @@ export function useGridDragging(callbacks: IDraggingCallbacks) {
 
     setMouseDown(true);
     setStartMousePosition({ ...startMousePosition, x: event.pageX, y: event.pageY });
-    setStartDraggingCell({ idx: position.colIdx, rowIdx: position.rowIdx, isIndexColumn: position.isIndexColumn });
+    setStartDraggingCell({ idx: position.colIdx, rowIdx: position.rowIdx });
   };
 
   const onMouseMoveHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -122,23 +123,20 @@ export function useGridDragging(callbacks: IDraggingCallbacks) {
 
     // check if the new cell is equal to the previous cell
     if (position.rowIdx === currentDraggingCell?.rowIdx
-      && position.colIdx === currentDraggingCell.idx
-      && position.isIndexColumn === currentDraggingCell.isIndexColumn) {
+      && position.colIdx === currentDraggingCell.idx) {
       return;
     }
 
-    setCurrentDraggingCell({ idx: position.colIdx, rowIdx: position.rowIdx, isIndexColumn: position.isIndexColumn });
+    setCurrentDraggingCell({ idx: position.colIdx, rowIdx: position.rowIdx });
 
     if (onDragOver) {
       onDragOver(
         {
           idx: startDraggingCell!.idx,
-          isIndexColumn: startDraggingCell!.isIndexColumn,
           rowIdx: startDraggingCell!.rowIdx,
         },
         {
           idx: position.colIdx,
-          isIndexColumn: position.isIndexColumn,
           rowIdx: position.rowIdx,
         },
         event);
@@ -157,12 +155,10 @@ export function useGridDragging(callbacks: IDraggingCallbacks) {
       onDragEnd(
         {
           idx: startDraggingCell.idx,
-          isIndexColumn: startDraggingCell.isIndexColumn,
           rowIdx: startDraggingCell.rowIdx,
         },
         {
           idx: currentDraggingCell.idx,
-          isIndexColumn: currentDraggingCell.isIndexColumn,
           rowIdx: currentDraggingCell.rowIdx,
         },
         event);

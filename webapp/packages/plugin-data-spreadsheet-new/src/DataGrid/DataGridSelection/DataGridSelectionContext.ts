@@ -12,11 +12,13 @@ import type { IPosition } from './useGridSelectionContext';
 
 export interface IDataGridSelectionContext {
   selectedCells: Map<number, number[]>;
-  select: (columnKey: string, rowIdx: number, multiple: boolean, range: boolean) => void;
-  selectRange: (startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary: boolean) => void;
+  select: (columnIndex: number, rowIdx: number, multiple: boolean, range: boolean) => void;
   selectColumn: (columnKey: string, multiple: boolean) => void;
   selectTable: () => void;
   isSelected: (columnKey: string, rowIdx: number) => boolean;
+  updateMultiSelection: (
+    startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary: boolean
+  ) => void;
 }
 
 export const DataGridSelectionContext = createContext<IDataGridSelectionContext | null>(null);

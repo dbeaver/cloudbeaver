@@ -9,110 +9,104 @@
 import { action, observable } from 'mobx';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { SqlResultSet } from '@cloudbeaver/core-sdk';
-import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
-
-import { indexColumn } from '../DataGridTable';
+import type { ITableData } from '../useTableData';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
 export interface IPosition {
   idx: number;
   rowIdx: number;
-  isIndexColumn: boolean;
 }
 
-interface IGridSelectionOptions {
-  select: (position: Pick<IPosition, 'idx' | 'rowIdx'>) => void;
-}
-
-export function isIndexColumn(columnKey: string): boolean {
-  return columnKey === indexColumn.key;
-}
-
-export function getColumnIdxFromColumnKey(columnKey: string): number {
-  return isIndexColumn(columnKey) ? 0 : Number(columnKey);
-}
-
-export function useGridSelectionContext(modelResultData: IDatabaseDataResult | null, options: IGridSelectionOptions) {
+export function useGridSelectionContext(tableData: ITableData) {
   const [selectedCells] = useState(() => observable.map<number, number[]>());
   const [temporarySelectedCells] = useState(() => observable.map<number, number[]>());
   const [lastSelectedCell, setLastSelectedCell] = useState<IPosition | null>(null);
 
-  const selectRow = useCallback(action((rowIdx: number, multiple: boolean, temporary = false) => {
-    if (!modelResultData) {
-      throw new Error('Model result data must be provided');
-    }
+  const selectRows = useCallback(action(
+    (startPosition: number, lastPosition: number, multiple: boolean, temporary = false) => {
+      const columnsLength = tableData.columns?.length || 0;
 
-    const columnsLength = (modelResultData.data as SqlResultSet).columns?.length || 0;
+      if (!multiple) {
+        selectedCells.clear();
+      }
 
-    if (!multiple) {
-      selectedCells.clear();
-    }
+      const rowSelection = [];
+      for (let i = 0; i < columnsLength; i++) {
+        rowSelection.push(i);
+      }
 
-    const rowSelection = [];
-    for (let i = 0; i < columnsLength; i++) {
-      rowSelection.push(i);
-    }
+      const firstRowIdx = Math.min(startPosition, lastPosition);
+      const lastRowIdx = Math.max(startPosition, lastPosition);
 
-    if (temporary) {
-      temporarySelectedCells.set(rowIdx, rowSelection);
-      return;
-    }
-
-    selectedCells.set(rowIdx, rowSelection);
-  }), [selectedCells, modelResultData]);
+      for (let rowIdx = firstRowIdx; rowIdx <= lastRowIdx; rowIdx++) {
+        if (temporary) {
+          temporarySelectedCells.set(rowIdx, rowSelection);
+        } else {
+          selectedCells.set(rowIdx, rowSelection);
+        }
+      }
+    }), [selectedCells, temporarySelectedCells]);
 
   const isRowSelected = useCallback((rowIdx: number) => {
-    if (!modelResultData) {
-      throw new Error('Model result data must be provided');
+    if (!tableData) {
+      throw new Error('Table data must be provided');
     }
 
-    const columnsLength = (modelResultData.data as SqlResultSet).columns?.length;
+    const columnsLength = tableData.columns?.length;
 
     return selectedCells.get(rowIdx)?.length === columnsLength;
-  }, [modelResultData, selectedCells]);
+  }, [tableData, selectedCells]);
 
   const unSelectRow = useCallback((rowIdx: number) => {
     selectedCells.delete(rowIdx);
   }, [selectedCells]);
 
   const selectRange = useCallback(action(
-    (startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary = false) => {
-      temporarySelectedCells.clear();
-
+    (startPosition: number, lastPosition: number, columns: number[], multiple: boolean, temporary = false) => {
       if (!multiple) {
         selectedCells.clear();
       }
 
-      const left = Math.min(startPosition.idx, lastPosition.idx);
-      const right = Math.max(startPosition.idx, lastPosition.idx);
-      const top = Math.min(startPosition.rowIdx, lastPosition.rowIdx);
-      const bottom = Math.max(startPosition.rowIdx, lastPosition.rowIdx);
-
-      const rowSelection = [];
-      for (let colIdx = left; colIdx <= right; colIdx++) {
-        rowSelection.push(colIdx);
-      }
+      const top = Math.min(startPosition, lastPosition);
+      const bottom = Math.max(startPosition, lastPosition);
 
       for (let rowIdx = top; rowIdx <= bottom; rowIdx++) {
-        if (startPosition.isIndexColumn || lastPosition.isIndexColumn) {
-          selectRow(rowIdx, true, temporary);
-          continue;
-        }
         if (temporary) {
-          temporarySelectedCells.set(rowIdx, [...rowSelection]);
-          continue;
+          temporarySelectedCells.set(rowIdx, [...columns]);
+        } else {
+          const currentRowSelection = selectedCells.get(rowIdx) || [];
+          const newRowSelection = [...currentRowSelection, ...columns]
+            .filter((columnIdx, idx, arr) => arr.indexOf(columnIdx) === idx);
+
+          selectedCells.set(rowIdx, newRowSelection);
         }
-
-        const currentRowSelection = selectedCells.get(rowIdx) || [];
-        selectedCells.set(rowIdx, [...new Set([...currentRowSelection, ...rowSelection])]);
       }
-
-      options.select({ idx: lastPosition.idx, rowIdx: lastPosition.rowIdx });
     }), [selectedCells, temporarySelectedCells]);
 
-  const isColumnSelected = useCallback((columnIndex: number, rowsLength: number) => {
+  const updateMultiSelection = useCallback(
+    (startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary: boolean) => {
+      const columnsInRange = tableData.getColumnsInRange(startPosition.idx, lastPosition.idx);
+      const isIndexColumnInRange = tableData.isIndexColumnInRange(columnsInRange);
+
+      temporarySelectedCells.clear();
+
+      if (isIndexColumnInRange) {
+        selectRows(startPosition.rowIdx, lastPosition.rowIdx, multiple, temporary);
+      } else {
+        selectRange(
+          startPosition.rowIdx,
+          lastPosition.rowIdx,
+          columnsInRange.map(column => Number(column.key)),
+          multiple,
+          temporary
+        );
+      }
+    }, [selectRange, selectRows, tableData, temporarySelectedCells]);
+
+  const isColumnSelected = useCallback((columnIndex: number) => {
     let result = true;
+
+    const rowsLength = tableData.rows?.length || 0;
 
     for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
       const rowSelection = selectedCells.get(rowIdx) || [];
@@ -122,45 +116,38 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
       }
     }
     return result;
-  }, [selectedCells]);
+  }, [selectedCells, tableData]);
 
-  const unSelectColumn = useCallback((columnIndex: number, rowsLength: number) => {
+  const unSelectColumn = useCallback((columnIndex: number) => {
+    const rowsLength = tableData.rows?.length || 0;
+
     for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
       const rowSelection = selectedCells.get(rowIdx) || [];
       selectedCells.set(rowIdx, [...rowSelection.filter(colIdx => colIdx !== columnIndex)]);
     }
-  }, [selectedCells]);
+  }, [selectedCells, tableData]);
 
   const selectColumn = useCallback(action((columnKey: string, multiple: boolean) => {
-    if (!modelResultData) {
-      throw new Error('Model result data must be provided');
-    }
-
     if (!multiple) {
       selectedCells.clear();
     }
 
-    const rowsLength = (modelResultData.data as SqlResultSet).rows?.length || 0;
-    const columnIndex = getColumnIdxFromColumnKey(columnKey);
+    const rowsLength = tableData.rows?.length || 0;
+    const columnIndex = Number(columnKey);
 
-    if (isColumnSelected(columnIndex, rowsLength)) {
-      unSelectColumn(columnIndex, rowsLength);
+    if (isColumnSelected(columnIndex)) {
+      unSelectColumn(columnIndex);
     } else {
       for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
         const rowSelection = selectedCells.get(rowIdx) || [];
-
         selectedCells.set(rowIdx, [...rowSelection, columnIndex]);
       }
     }
-  }), [modelResultData, selectedCells, isColumnSelected, unSelectColumn]);
+  }), [tableData, selectedCells, isColumnSelected, unSelectColumn]);
 
   const selectTable = useCallback(() => {
-    if (!modelResultData) {
-      throw new Error('Model result data must be provided');
-    }
-
-    const rowsLength = (modelResultData.data as SqlResultSet).rows?.length || 0;
-    const columnsLength = (modelResultData.data as SqlResultSet).columns?.length || 0;
+    const rowsLength = tableData.rows?.length || 0;
+    const columnsLength = tableData.columns?.length || 0;
 
     const rowSelection = [];
     for (let colIdx = 0; colIdx < columnsLength; colIdx++) {
@@ -170,9 +157,7 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
       selectedCells.set(rowIdx, [...rowSelection]);
     }
-
-    options.select({ idx: -1, rowIdx: 0 });
-  }, [modelResultData, selectedCells, options]);
+  }, [tableData, selectedCells]);
 
   const isSelected = useCallback((columnKey: string, rowIdx: number) => {
     if (!selectedCells.has(rowIdx) && !temporarySelectedCells.has(rowIdx)) {
@@ -204,73 +189,72 @@ export function useGridSelectionContext(modelResultData: IDatabaseDataResult | n
     return false;
   }, [selectedCells]);
 
-  const selectCell = useCallback((idx: number, rowIdx: number) => {
+  const selectCell = useCallback((columnIdx: number, rowIdx: number) => {
     const rowSelection = selectedCells.get(rowIdx);
     if (rowSelection === undefined) {
-      selectedCells.set(rowIdx, [idx]);
+      selectedCells.set(rowIdx, [columnIdx]);
       return;
     }
 
-    rowSelection.push(idx);
+    rowSelection.push(columnIdx);
   }, [selectedCells]);
 
-  const select = useCallback((columnKey: string, rowIdx: number, multiple: boolean, range: boolean) => {
-    const isIndexCol = isIndexColumn(columnKey);
-    const columnIndex = getColumnIdxFromColumnKey(columnKey);
+  const select = useCallback(
+    (columnIndex: number, rowIdx: number, multiple: boolean, range: boolean) => {
+      const columnKey = tableData.getColumnKeyFromColumnIndex(columnIndex);
+      const isIndexColumn = tableData.isIndexColumn(columnKey);
 
-    setLastSelectedCell({ idx: columnIndex, rowIdx, isIndexColumn: isIndexCol });
+      setLastSelectedCell({ idx: columnIndex, rowIdx });
 
-    if (selectedCells.size > 0 && range && lastSelectedCell) {
-      selectRange(
-        {
-          idx: lastSelectedCell.idx,
-          rowIdx: lastSelectedCell.rowIdx,
-          isIndexColumn: lastSelectedCell.isIndexColumn,
-        },
-        { idx: columnIndex, rowIdx, isIndexColumn: isIndexCol },
-        multiple);
-      return;
-    }
-
-    if (isIndexCol) {
-      if (multiple && isRowSelected(rowIdx)) {
-        unSelectRow(rowIdx);
-      } else {
-        selectRow(rowIdx, multiple);
+      if (selectedCells.size > 0 && range && lastSelectedCell) {
+        updateMultiSelection(
+          { idx: lastSelectedCell.idx, rowIdx: lastSelectedCell.rowIdx },
+          { idx: columnIndex, rowIdx },
+          multiple,
+          false);
+        return;
       }
-      return;
-    }
 
-    if (!multiple) {
-      selectedCells.clear();
-    }
+      if (isIndexColumn) {
+        if (multiple && isRowSelected(rowIdx)) {
+          unSelectRow(rowIdx);
+        } else {
+          selectRows(rowIdx, rowIdx, multiple);
+        }
+        return;
+      }
 
-    if (isSelected(columnKey, rowIdx)) {
-      unSelect(columnIndex, rowIdx);
-      return;
-    }
+      if (!multiple) {
+        selectedCells.clear();
+      }
 
-    selectCell(columnIndex, rowIdx);
-  }, [
-    selectedCells,
-    selectRow,
-    selectRange,
-    unSelect,
-    isSelected,
-    selectCell,
-    isRowSelected,
-    unSelectRow,
-    lastSelectedCell,
-  ]);
+      if (isSelected(columnKey, rowIdx)) {
+        unSelect(Number(columnKey), rowIdx);
+        return;
+      }
+
+      selectCell(Number(columnKey), rowIdx);
+    }, [
+      tableData,
+      selectedCells,
+      unSelect,
+      isSelected,
+      selectRows,
+      selectCell,
+      isRowSelected,
+      unSelectRow,
+      lastSelectedCell,
+      updateMultiSelection,
+    ]);
 
   const context: IDataGridSelectionContext = useMemo(() => ({
     selectedCells,
     select,
-    selectRange,
     selectColumn,
     selectTable,
     isSelected,
-  }), [selectedCells, select, isSelected, selectRange, selectColumn, selectTable]);
+    updateMultiSelection,
+  }), [selectedCells, select, isSelected, selectColumn, selectTable, updateMultiSelection]);
 
   return context;
 }

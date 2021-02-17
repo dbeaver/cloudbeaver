@@ -37,7 +37,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }
 
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    selectionContext?.select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
+    selectionContext?.select(column.idx, rowIdx, event.ctrlKey, event.shiftKey);
   }, [column, rowIdx, selectionContext]);
 
   const handleDoubleClick = useCallback(() => {
@@ -50,7 +50,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     <Cell
       className={classes.join(' ')}
       data-rowindex={rowIdx}
-      data-columnkey={column.key}
+      data-columnindex={column.idx}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       {...props}
