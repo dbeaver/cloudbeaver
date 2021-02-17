@@ -19,15 +19,13 @@ package io.cloudbeaver.service;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import io.cloudbeaver.DBWService;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.DBWebExceptionAccessDenied;
-import io.cloudbeaver.WebAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -135,21 +133,30 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
         }
 
-        private void checkPermissions(WebAction webAction) throws DBWebExceptionAccessDenied {
+        private void checkPermissions(WebAction webAction) throws DBWebException {
             String[] reqPermissions = webAction.requirePermissions();
             if (reqPermissions.length == 0) {
                 return;
             }
             WebSession session = findWebSession(env);
             if (session == null) {
-                throw new DBWebExceptionAccessDenied("Anonymous access restricted");
+                throw new DBWebExceptionAccessDenied("No open session - anonymous access restricted");
             }
-            if (!CBApplication.getInstance().isConfigurationMode()) {
-                // Check permissions
+            CBApplication application = CBApplication.getInstance();
+            if (!application.isConfigurationMode()) {
                 Set<String> sessionPermissions = session.getSessionPermissions();
                 if (CommonUtils.isEmpty(sessionPermissions)) {
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
                 }
+
+                // Check license
+                if (application.isLicenseRequired() && !application.isLicenseValid()) {
+                    if (!ArrayUtils.contains(reqPermissions, DBWConstants.PERMISSION_ADMIN)) {
+                        // Only admin permissions are allowed
+                        throw new DBWebExceptionLicenseRequired("Invalid server license");
+                    }
+                }
+                // Check permissions
                 for (String rp : reqPermissions) {
                     if (!sessionPermissions.contains(rp)) {
                         throw new DBWebExceptionAccessDenied("Access denied");

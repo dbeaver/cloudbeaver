@@ -272,11 +272,21 @@ public class CBApplication extends BaseApplicationImpl {
         });
         Runtime.getRuntime().addShutdownHook(shutdownThread);
 
+        try {
+            initializeServer();
+        } catch (DBException e) {
+            log.error("Error initializing server", e);
+            return null;
+        }
         runWebServer();
 
         log.debug("Shutdown");
 
         return null;
+    }
+
+    protected void initializeServer() throws DBException {
+
     }
 
     private void determineLocalAddresses() {

@@ -17,16 +17,16 @@
 package io.cloudbeaver;
 
 /**
- * "Access denied" exception
+ * "License required" exception
  */
-public class DBWebExceptionAccessDenied extends DBWebException {
+public class DBWebExceptionLicenseRequired extends DBWebException {
 
-    public DBWebExceptionAccessDenied(String message) {
-        super(message, ERROR_CODE_ACCESS_DENIED);
+    public DBWebExceptionLicenseRequired(String message) {
+        super(message, ERROR_CODE_LICENSE_DENIED);
     }
 
-    public DBWebExceptionAccessDenied(String message, Throwable cause) {
-        super(message, ERROR_CODE_ACCESS_DENIED, cause);
+    public DBWebExceptionLicenseRequired(String message, Throwable cause) {
+        super(message, ERROR_CODE_LICENSE_DENIED, cause);
 
     }
 }
