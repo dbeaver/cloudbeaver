@@ -47,7 +47,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession);
 
     @WebAction
-    List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id);
+    List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException;
 
     @Deprecated
     @WebAction

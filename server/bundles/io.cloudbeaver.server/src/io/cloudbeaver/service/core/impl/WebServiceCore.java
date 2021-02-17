@@ -55,6 +55,7 @@ import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -95,10 +96,14 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) {
-        return webSession.getConnections().stream()
-            .filter(c -> id == null || id.equals(c.getId()))
-            .collect(Collectors.toList());
+    public List<WebConnectionInfo> getUserConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
+        if (id != null) {
+            WebConnectionInfo connectionInfo = getConnectionState(webSession, id);
+            if (connectionInfo != null) {
+                return Collections.singletonList(connectionInfo);
+            }
+        }
+        return webSession.getConnections();
     }
 
     @Deprecated
