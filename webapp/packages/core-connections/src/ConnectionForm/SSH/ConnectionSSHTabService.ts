@@ -72,6 +72,14 @@ export class ConnectionSSHTabService extends Bootstrap {
         if (!handler.password?.length) {
           validation.error("Field SSH 'Password' can't be empty");
         }
+        if (!handler.properties?.host?.length) {
+          validation.error("Field SSH 'Host' can't be empty");
+        }
+
+        const port = Number(handler.properties?.port);
+        if (Number.isNaN(port) || port < 1) {
+          validation.error("Field SSH 'Port' can't be empty");
+        }
       }
     }
   }
@@ -94,6 +102,8 @@ export class ConnectionSSHTabService extends Bootstrap {
     for (const handler of data.config.networkHandlersConfig) {
       const initialConfig = data.info?.networkHandlersConfig.find(h => h.id === handler.id);
 
+      const port = Number(initialConfig?.properties.port);
+      const formPort = Number(handler.properties.port);
       if (handler.enabled !== initialConfig?.enabled
           || handler.savePassword !== initialConfig?.savePassword
           || handler.userName !== initialConfig?.userName
@@ -102,7 +112,7 @@ export class ConnectionSSHTabService extends Bootstrap {
               || (handler.password?.length || 0) > 0
           )
           || handler.properties.host !== initialConfig?.properties.host
-          || handler.properties.port !== initialConfig?.properties.port) {
+          || port !== formPort) {
         configs.push(handler);
       }
     }

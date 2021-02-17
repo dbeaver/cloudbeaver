@@ -90,9 +90,10 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
 
   useEffect(() => {
     formState.submittingHandlers.addPostHandler((data, contexts) => {
-      const validation = contexts.getContext(service.connectionStatusContext);
+      const validation = contexts.getContext(service.connectionValidationContext);
+      const state = contexts.getContext(service.connectionStatusContext);
 
-      if (validation.saved && data.submitType === 'submit') {
+      if (validation.valid && state.saved && data.submitType === 'submit') {
         props.onClose();
       }
     });
