@@ -103,13 +103,13 @@ export function useGridDragging(props: IDraggingCallbacks) {
       return;
     }
 
-    state.current.mouseDown = true;
-    state.current.startMousePosition = { x: event.pageX, y: event.pageY };
-    state.current.startDraggingCell = { idx: position.colIdx, rowIdx: position.rowIdx };
+    state.mouseDown = true;
+    state.startMousePosition = { x: event.pageX, y: event.pageY };
+    state.startDraggingCell = { idx: position.colIdx, rowIdx: position.rowIdx };
   }, []);
 
   const onMouseMoveHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!state.current.mouseDown) {
+    if (!state.mouseDown) {
       return;
     }
 
@@ -119,33 +119,33 @@ export function useGridDragging(props: IDraggingCallbacks) {
       return;
     }
 
-    if (!state.current.dragging) {
-      const delta = getDelta(state.current.startMousePosition, { x: event.pageX, y: event.pageY });
+    if (!state.dragging) {
+      const delta = getDelta(state.startMousePosition, { x: event.pageX, y: event.pageY });
       if (!isDraggingStarted(delta, THRESHOLD)) {
         return;
       }
 
-      if (callbacks.current.onDragStart && state.current.startDraggingCell) {
-        callbacks.current.onDragStart(state.current.startDraggingCell, event);
+      if (callbacks.onDragStart && state.startDraggingCell) {
+        callbacks.onDragStart(state.startDraggingCell, event);
       }
 
-      state.current.dragging = true;
+      state.dragging = true;
       return;
     }
 
     // check if the new cell is equal to the previous cell
-    if (position.rowIdx === state.current.currentDraggingCell?.rowIdx
-      && position.colIdx === state.current.currentDraggingCell.idx) {
+    if (position.rowIdx === state.currentDraggingCell?.rowIdx
+      && position.colIdx === state.currentDraggingCell.idx) {
       return;
     }
 
-    state.current.currentDraggingCell = { idx: position.colIdx, rowIdx: position.rowIdx };
+    state.currentDraggingCell = { idx: position.colIdx, rowIdx: position.rowIdx };
 
-    if (callbacks.current.onDragOver) {
-      callbacks.current.onDragOver(
+    if (callbacks.onDragOver) {
+      callbacks.onDragOver(
         {
-          idx: state.current.startDraggingCell!.idx,
-          rowIdx: state.current.startDraggingCell!.rowIdx,
+          idx: state.startDraggingCell!.idx,
+          rowIdx: state.startDraggingCell!.rowIdx,
         },
         {
           idx: position.colIdx,
@@ -156,29 +156,29 @@ export function useGridDragging(props: IDraggingCallbacks) {
   }, []);
 
   const onMouseUpHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent) => {
-    state.current.mouseDown = false;
-    state.current.startMousePosition = null;
+    state.mouseDown = false;
+    state.startMousePosition = null;
 
-    if (!state.current.dragging || !state.current.startDraggingCell || !state.current.currentDraggingCell) {
+    if (!state.dragging || !state.startDraggingCell || !state.currentDraggingCell) {
       return;
     }
 
-    if (callbacks.current.onDragEnd) {
-      callbacks.current.onDragEnd(
+    if (callbacks.onDragEnd) {
+      callbacks.onDragEnd(
         {
-          idx: state.current.startDraggingCell.idx,
-          rowIdx: state.current.startDraggingCell.rowIdx,
+          idx: state.startDraggingCell.idx,
+          rowIdx: state.startDraggingCell.rowIdx,
         },
         {
-          idx: state.current.currentDraggingCell.idx,
-          rowIdx: state.current.currentDraggingCell.rowIdx,
+          idx: state.currentDraggingCell.idx,
+          rowIdx: state.currentDraggingCell.rowIdx,
         },
         event);
     }
 
-    state.current.dragging = false;
-    state.current.startMousePosition = null;
-    state.current.currentDraggingCell = null;
+    state.dragging = false;
+    state.startMousePosition = null;
+    state.currentDraggingCell = null;
   }, []);
 
   useEffect(() => {

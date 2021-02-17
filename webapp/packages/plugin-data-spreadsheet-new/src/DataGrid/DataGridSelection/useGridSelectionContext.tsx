@@ -101,29 +101,26 @@ export function useGridSelectionContext(tableData: ITableData) {
     }, [selectRange, selectRows, tableData, temporarySelectedCells]);
 
   const isColumnSelected = useCallback((columnIndex: number) => {
-    let result = true;
-
     const rowsLength = tableData.rows?.length || 0;
 
     for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
       const rowSelection = selectedCells.get(rowIdx) || [];
       if (!rowSelection.includes(columnIndex)) {
-        result = false;
-        break;
+        return false;
       }
     }
-    return result;
+    return true;
   }, [selectedCells, tableData]);
 
   const selectColumn = useCallback(action((columnKey: string, multiple: boolean) => {
+    const columnIndex = Number(columnKey);
+    const isSelected = isColumnSelected(columnIndex);
+
     if (!multiple) {
       selectedCells.clear();
     }
 
     const rowsLength = tableData.rows?.length || 0;
-    const columnIndex = Number(columnKey);
-
-    const isSelected = isColumnSelected(columnIndex);
 
     for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
       const rowSelection = selectedCells.get(rowIdx) || [];
@@ -163,26 +160,17 @@ export function useGridSelectionContext(tableData: ITableData) {
   },
   [selectedCells, temporarySelectedCells]);
 
-  const unSelect = useCallback((idx: number, rowIdx: number) => {
-    if (!selectedCells.has(rowIdx)) {
-      return false;
-    }
-
-    const rowSelection = selectedCells.get(rowIdx)!;
-    const targetIndex = rowSelection.indexOf(idx);
-
-    if (targetIndex !== -1) {
-      rowSelection.splice(targetIndex, 1);
-      return true;
-    }
-
-    return false;
-  }, [selectedCells]);
-
   const selectCell = useCallback((columnIdx: number, rowIdx: number) => {
     const rowSelection = selectedCells.get(rowIdx);
     if (rowSelection === undefined) {
       selectedCells.set(rowIdx, [columnIdx]);
+      return;
+    }
+
+    const targetIndex = rowSelection.indexOf(columnIdx);
+
+    if (targetIndex !== -1) {
+      rowSelection.splice(targetIndex, 1);
       return;
     }
 
@@ -207,7 +195,6 @@ export function useGridSelectionContext(tableData: ITableData) {
 
       if (isIndexColumn) {
         selectRows(rowIdx, rowIdx, multiple);
-
         return;
       }
 
@@ -215,17 +202,10 @@ export function useGridSelectionContext(tableData: ITableData) {
         selectedCells.clear();
       }
 
-      if (isSelected(columnKey, rowIdx)) {
-        unSelect(Number(columnKey), rowIdx);
-        return;
-      }
-
       selectCell(Number(columnKey), rowIdx);
     }, [
       tableData,
       selectedCells,
-      unSelect,
-      isSelected,
       selectRows,
       selectCell,
       lastSelectedCell,
