@@ -10,6 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
+import type { DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
 import { IConnectionFormSubmitData, ConnectionFormService } from '../ConnectionFormService';
@@ -65,7 +66,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
 
     for (const handler of data.config.networkHandlersConfig) {
-      if (handler.enabled && handler.savePassword) {
+      if (handler.enabled && handler.savePassword && this.isChanged(handler, data.info)) {
         if (!handler.userName?.length) {
           validation.error("Field SSH 'User' can't be empty");
         }
@@ -100,19 +101,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     const configs: NetworkHandlerConfigInput[] = [];
 
     for (const handler of data.config.networkHandlersConfig) {
-      const initialConfig = data.info?.networkHandlersConfig.find(h => h.id === handler.id);
-
-      const port = Number(initialConfig?.properties.port);
-      const formPort = Number(handler.properties.port);
-      if (handler.enabled !== initialConfig?.enabled
-          || handler.savePassword !== initialConfig?.savePassword
-          || handler.userName !== initialConfig?.userName
-          || (
-            (initialConfig?.password === null && handler.password !== '')
-              || (handler.password?.length || 0) > 0
-          )
-          || handler.properties.host !== initialConfig?.properties.host
-          || port !== formPort) {
+      if (this.isChanged(handler, data.info)) {
         configs.push(handler);
       }
     }
@@ -120,5 +109,25 @@ export class ConnectionSSHTabService extends Bootstrap {
     if (configs.length > 0) {
       config.networkHandlersConfig = configs;
     }
+  }
+
+  private isChanged(handler: NetworkHandlerConfigInput, info?: DatabaseConnection) {
+    const initialConfig = info?.networkHandlersConfig.find(h => h.id === handler.id);
+
+    const port = Number(initialConfig?.properties.port);
+    const formPort = Number(handler.properties.port);
+    if (handler.enabled !== initialConfig?.enabled
+        || handler.savePassword !== initialConfig?.savePassword
+        || handler.userName !== initialConfig?.userName
+        || (
+          (initialConfig?.password === null && handler.password !== '')
+            || (handler.password?.length || 0) > 0
+        )
+        || handler.properties.host !== initialConfig?.properties.host
+        || port !== formPort) {
+      return true;
+    }
+
+    return false;
   }
 }
