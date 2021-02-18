@@ -17,8 +17,6 @@ import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import type { IExecutionContext } from './IExecutionContext';
-import type { RowDiff } from './TableViewer/TableDataModel/EditedRow';
-import type { IRequestDataResult } from './TableViewer/TableViewerModel';
 
 export interface IDataContainerOptions {
   containerNodePath: string;
@@ -86,22 +84,31 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     );
 
     this.currentFetchTableProcess = fetchTableProcess;
-    const response = await fetchTableProcess.promise;
 
-    this.requestInfo = {
-      requestDuration: response?.duration || 0,
-      requestMessage: response?.statusMessage || '',
-    };
-    if (!response?.results) {
-      return prevResults;
+    try {
+      const response = await fetchTableProcess.promise;
+
+      this.requestInfo = {
+        requestDuration: response?.duration || 0,
+        requestMessage: response?.statusMessage || '',
+      };
+
+      this.clearError();
+
+      if (!response?.results) {
+        return prevResults;
+      }
+
+      return response.results.map<IDatabaseResultSet>(result => ({
+        id: result.resultSet?.id || '0',
+        dataFormat: result.dataFormat!,
+        loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+        data: result.resultSet,
+      }));
+    } catch (exception) {
+      this.error = exception;
+      throw exception;
     }
-
-    return response.results.map<IDatabaseResultSet>(result => ({
-      id: result.resultSet?.id || '0',
-      dataFormat: result.dataFormat!,
-      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
-      data: result.resultSet,
-    }));
   }
 
   async save(
@@ -115,71 +122,48 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       return prevResults;
     }
 
-    for (const update of changes) {
-      const response = await this.graphQLService.sdk.updateResultsDataBatch({
-        connectionId: executionContext.connectionId,
-        contextId: executionContext.contextId,
-        resultsId: update.resultId,
-        updatedRows: Array.from(update.diff.values()).map(diff => ({
-          data: diff.source,
-          updateValues: diff.update.reduce((obj, value, index) => {
-            if (value !== diff.source[index]) {
-              obj[index] = value;
-            }
-            return obj;
-          }, {}),
-        })),
-      });
+    try {
+      for (const update of changes) {
+        const response = await this.graphQLService.sdk.updateResultsDataBatch({
+          connectionId: executionContext.connectionId,
+          contextId: executionContext.contextId,
+          resultsId: update.resultId,
+          updatedRows: Array.from(update.diff.values()).map(diff => ({
+            data: diff.source,
+            updateValues: diff.update.reduce((obj, value, index) => {
+              if (value !== diff.source[index]) {
+                obj[index] = value;
+              }
+              return obj;
+            }, {}),
+          })),
+        });
 
-      this.requestInfo = {
-        requestDuration: response.result?.duration || 0,
-        requestMessage: 'Saved successfully',
-      };
+        this.requestInfo = {
+          requestDuration: response.result?.duration || 0,
+          requestMessage: 'Saved successfully',
+        };
 
-      const result = prevResults.find(result => result.id === update.resultId)!;
-      const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+        const result = prevResults.find(result => result.id === update.resultId)!;
+        const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
 
-      if (responseResult?.resultSet?.rows && result.data?.rows) {
-        let i = 0;
-        for (const row of update.diff.keys()) {
-          result.data.rows[row] = responseResult.resultSet.rows[i];
-          i++;
+        if (responseResult?.resultSet?.rows && result.data?.rows) {
+          let i = 0;
+          for (const row of update.diff.keys()) {
+            result.data.rows[row] = responseResult.resultSet.rows[i];
+            i++;
+          }
         }
-      }
 
-      this.editor?.cancelResultChanges(result);
+        this.editor?.cancelResultChanges(result);
+      }
+      this.clearError();
+    } catch (exception) {
+      this.error = exception;
+      throw exception;
     }
 
     return prevResults;
-  }
-
-  /**
-   * @deprecated will be refactored
-   */
-  async saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
-    const executionContext = await this.ensureContextCreated();
-
-    const response = await this.graphQLService.sdk.updateResultsDataBatch({
-      connectionId: executionContext.connectionId,
-      contextId: executionContext.contextId,
-      resultsId: resultId,
-      updatedRows: rows.map(row => ({ data: row.source, updateValues: row.values })),
-    });
-
-    const dataSet = response.result!.results[0].resultSet!; // we expect only one dataset for a table
-
-    this.requestInfo = {
-      requestDuration: response.result?.duration || 0,
-      requestMessage: 'Saved successfully',
-    };
-
-    return {
-      rows: dataSet.rows!,
-      columns: [], // not in use while saving data
-      duration: response.result!.duration,
-      isFullyLoaded: false, // not in use while saving data
-      statusMessage: 'Saved successfully',
-    };
   }
 
   async dispose(): Promise<void> {

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { PropsWithChildren, useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Button, Loader, TextPlaceholder, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Button, Loader, TextPlaceholder, useErrorDetails, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -91,7 +91,8 @@ export const TableViewer = observer(function TableViewer({
   const dataModel = tableViewerStorageService.get(tableId);
   const result = dataModel?.getResult(resultIndex);
   const translate = useTranslate();
-  const animated = useStateDelay(!!dataModel && dataModel.message.length !== 0, 1);
+  const error = useErrorDetails(dataModel?.source.error || null);
+  const animated = useStateDelay(!!error.details, 1);
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
@@ -136,14 +137,14 @@ export const TableViewer = observer(function TableViewer({
               presentation={presentation}
               resultIndex={resultIndex}
             />
-            <error as="div" hidden={dataModel.message.length === 0} {...use({ animated })}>
-              {dataModel.message}
+            <error as="div" hidden={!error.details} {...use({ animated })}>
+              {error.details?.message}
               <br /><br />
-              <Button type='button' mod={['outlined']} onClick={dataModel.clearErrors}>
+              <Button type='button' mod={['outlined']} onClick={() => dataModel.source.clearError()}>
                 {translate('ui_error_close')}
               </Button>
-              {dataModel.details && (
-                <Button type='button' mod={['unelevated']} onClick={dataModel.showDetails}>
+              {error.details?.hasDetails && (
+                <Button type='button' mod={['unelevated']} onClick={error.open}>
                   {translate('ui_errors_details')}
                 </Button>
               )}

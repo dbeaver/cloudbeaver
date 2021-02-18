@@ -13,7 +13,7 @@ import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@c
 import { EDeferredState } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataEditor,
-  DatabaseDataSource, IDatabaseResultSet, IRequestDataResult, RowDiff
+  DatabaseDataSource, IDatabaseResultSet
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IQueryTabGroup } from './ISqlEditorTabState';
@@ -72,41 +72,46 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       return prevResults;
     }
 
-    for (const update of changes) {
-      const response = await this.graphQLService.sdk.updateResultsDataBatch({
-        connectionId: params.connectionId,
-        contextId: params.contextId,
-        resultsId: update.resultId,
-        updatedRows: Array.from(update.diff.values()).map(diff => ({
-          data: diff.source,
-          updateValues: diff.update.reduce((obj, value, index) => {
-            if (value !== diff.source[index]) {
-              obj[index] = value;
-            }
-            return obj;
-          }, {}),
-        })),
-      });
+    try {
+      for (const update of changes) {
+        const response = await this.graphQLService.sdk.updateResultsDataBatch({
+          connectionId: params.connectionId,
+          contextId: params.contextId,
+          resultsId: update.resultId,
+          updatedRows: Array.from(update.diff.values()).map(diff => ({
+            data: diff.source,
+            updateValues: diff.update.reduce((obj, value, index) => {
+              if (value !== diff.source[index]) {
+                obj[index] = value;
+              }
+              return obj;
+            }, {}),
+          })),
+        });
 
-      this.requestInfo = {
-        requestDuration: response.result?.duration || 0,
-        requestMessage: 'Saved successfully',
-      };
+        this.requestInfo = {
+          requestDuration: response.result?.duration || 0,
+          requestMessage: 'Saved successfully',
+        };
 
-      const result = prevResults.find(result => result.id === update.resultId)!;
-      const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
+        const result = prevResults.find(result => result.id === update.resultId)!;
+        const responseResult = response.result?.results.find(result => result.resultSet?.id === update.resultId);
 
-      if (responseResult?.resultSet?.rows && result.data?.rows) {
-        let i = 0;
-        for (const row of update.diff.keys()) {
-          result.data.rows[row] = responseResult.resultSet.rows[i];
-          i++;
+        if (responseResult?.resultSet?.rows && result.data?.rows) {
+          let i = 0;
+          for (const row of update.diff.keys()) {
+            result.data.rows[row] = responseResult.resultSet.rows[i];
+            i++;
+          }
         }
+
+        this.editor?.cancelResultChanges(result);
       }
-
-      this.editor?.cancelResultChanges(result);
+    } catch (exception) {
+      this.error = exception;
+      throw exception;
     }
-
+    this.clearError();
     return prevResults;
   }
 
@@ -148,59 +153,32 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
 
     sqlExecutionContext.setCurrentlyExecutingQuery(this.queryExecutionProcess);
 
-    await this.queryExecutionProcess.start(
-      this.options.group.sqlQueryParams,
-      {
-        offset: this.offset,
-        limit,
-        constraints: this.options.constraints,
-        where: this.options.whereFilter || undefined,
-      },
-      this.dataFormat
-    );
+    try {
+      await this.queryExecutionProcess.start(
+        this.options.group.sqlQueryParams,
+        {
+          offset: this.offset,
+          limit,
+          constraints: this.options.constraints,
+          where: this.options.whereFilter || undefined,
+        },
+        this.dataFormat
+      );
 
-    const response = await this.queryExecutionProcess.promise;
+      const response = await this.queryExecutionProcess.promise;
 
-    const results = this.getResults(response, limit);
+      const results = this.getResults(response, limit);
+      this.clearError();
 
-    if (!results) {
-      return prevResults;
+      if (!results) {
+        return prevResults;
+      }
+
+      return results;
+    } catch (exception) {
+      this.error = exception;
+      throw exception;
     }
-
-    return results;
-  }
-
-  async saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
-    const params = this.options?.group.sqlQueryParams;
-    if (!params) {
-      throw new Error('sqlQueryParams must be provided');
-    }
-
-    const response = await this.graphQLService.sdk.updateResultsDataBatch({
-      connectionId: params.connectionId,
-      contextId: params.contextId,
-      resultsId: resultId,
-      updatedRows: rows.map(row => ({ data: row.source, updateValues: row.values })),
-    });
-
-    const dataSet = response.result?.results[0].resultSet; // we expect only one dataset for a save
-
-    if (!dataSet) {
-      throw new Error('Response result wasn\'t provided');
-    }
-
-    this.requestInfo = {
-      requestDuration: response.result?.duration || 0,
-      requestMessage: 'Saved successfully',
-    };
-
-    return {
-      rows: dataSet.rows!,
-      columns: [], // not in use while saving data
-      duration: response.result?.duration,
-      isFullyLoaded: false, // not in use while saving data
-      statusMessage: 'Saved successfully',
-    };
   }
 
   async dispose(): Promise<void> {

@@ -6,7 +6,6 @@ import authentication from '@cloudbeaver/plugin-authentication';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import dataExport from '@cloudbeaver/plugin-data-export';
-import spreadsheet from '@cloudbeaver/plugin-data-spreadsheet';
 import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
@@ -18,7 +17,6 @@ import { defaultProductManifest } from './manifest';
 const PLUGINS = [
   core,
   administration,
-  spreadsheet,
   spreadsheetNew,
   authentication,
   connectionCustom,

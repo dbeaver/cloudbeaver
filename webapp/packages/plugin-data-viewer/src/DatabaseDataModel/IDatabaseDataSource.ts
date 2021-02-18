@@ -9,8 +9,6 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionContext } from '../IExecutionContext';
-import type { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
-import type { IRequestDataResult } from '../TableViewer/TableViewerModel';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
@@ -34,10 +32,13 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly count: number;
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
+  readonly error: Error | null;
   readonly executionContext: IExecutionContext | null;
   readonly canCancel: boolean;
 
   isLoading: () => boolean;
+
+  hasResult: (resultIndex: number) => boolean;
 
   getEditor: (resultIndex: number) => IDatabaseDataResultEditor<TResult>;
   getResult: (index: number) => TResult | null;
@@ -53,10 +54,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
-  /**
-   * @deprecated will be refactored
-   */
-  saveDataDeprecated: (resultId: string, rows: RowDiff[]) => Promise<IRequestDataResult>;
   cancel: () => Promise<boolean> | boolean;
+  clearError: () => void;
   dispose: () => Promise<void>;
 }

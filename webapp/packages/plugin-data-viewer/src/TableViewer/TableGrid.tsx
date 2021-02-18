@@ -41,8 +41,8 @@ export const TableGrid = observer(function TableGrid({
   presentation,
   resultIndex,
 }: TableGridProps) {
-  const depModel = model.getOldModel(resultIndex);
   const translate = useTranslate();
+  const result = model.getResult(resultIndex);
 
   if (dataFormat !== presentation.dataFormat) {
     if (model.isLoading()) {
@@ -55,7 +55,7 @@ export const TableGrid = observer(function TableGrid({
 
   const Presentation = presentation.getPresentationComponent();
 
-  if ((depModel?.isFullyLoaded && depModel?.isEmpty)) {
+  if (result?.loadedFully && !result.data) {
     return styled(styles)(<TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>);
   }
 

@@ -38,20 +38,18 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (context.data.model.deprecatedModels.length === 0) {
+        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
           return true;
         }
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return context.data.model.isLoading()
-        || (!context.data.model.getOldModel(context.data.resultIndex)?.isEdited()
-        && !editor.isEdited());
+        return context.data.model.isLoading() || !editor.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
       onClick: context => {
-        this.saveData(context.data.resultIndex, context.data.model);
+        this.saveData(context.data.model);
       },
     });
     this.registerMenuItem({
@@ -60,21 +58,17 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (context.data.model.deprecatedModels.length === 0) {
+        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
           return true;
         }
-
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return !context.data.model.getOldModel(context.data.resultIndex)?.isEdited()
-        && !editor.isEdited();
+        return !editor.isEdited();
       },
       order: 2,
       title: 'ui_processing_cancel',
       icon: 'table-cancel',
       onClick: context => {
-        context.data.model.getOldModel(context.data.resultIndex)?.cancelChanges();
-
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
         editor.cancelChanges();
       },
@@ -95,18 +89,10 @@ export class TableFooterMenuService {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
   }
 
-  private async saveData(resultIndex: number, model: DataModelWrapper) {
-    const editor = model.source.getEditor(resultIndex);
-
+  private async saveData(model: DataModelWrapper) {
     while (true) {
       try {
-        if (model.getOldModel(resultIndex)?.isEdited()) {
-          await model.getOldModel(resultIndex)?.saveChanges();
-        }
-
-        if (editor.isEdited()) {
-          await model.source.saveData();
-        }
+        await model.source.saveData();
         return;
       } catch (exception) {
         let hasDetails = false;

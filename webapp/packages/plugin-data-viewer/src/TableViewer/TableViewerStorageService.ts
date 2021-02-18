@@ -9,7 +9,6 @@
 import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
@@ -20,7 +19,7 @@ import { DataModelWrapper } from './DataModelWrapper';
 export class TableViewerStorageService {
   private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
-  constructor(private commonDialogService: CommonDialogService) {
+  constructor() {
     makeObservable<TableViewerStorageService, 'tableModelMap'>(this, {
       tableModelMap: observable,
     });
@@ -40,10 +39,7 @@ export class TableViewerStorageService {
   create(
     source: IDatabaseDataSource<any, any>
   ): DataModelWrapper {
-    return this.add(new DataModelWrapper(
-      this.commonDialogService,
-      source
-    )) as DataModelWrapper;
+    return this.add(new DataModelWrapper(source)) as DataModelWrapper;
   }
 
   add<TOptions, TResult extends IDatabaseDataResult>(

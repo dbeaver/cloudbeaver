@@ -11,8 +11,6 @@ import { observable, makeObservable } from 'mobx';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionContext } from '../IExecutionContext';
-import type { RowDiff } from '../TableViewer/TableDataModel/EditedRow';
-import type { IRequestDataResult } from '../TableViewer/TableViewerModel';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
@@ -28,6 +26,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   count: number;
   options: TOptions | null;
   requestInfo: IRequestInfo;
+  error: Error | null;
   executionContext: IExecutionContext | null;
   abstract get canCancel(): boolean;
 
@@ -45,6 +44,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       count: observable,
       options: observable,
       requestInfo: observable,
+      error: observable,
       executionContext: observable,
       activeRequest: observable,
       activeSave: observable,
@@ -65,9 +65,14 @@ implements IDatabaseDataSource<TOptions, TResult> {
       requestDuration: 0,
       requestMessage: '',
     };
+    this.error = null;
   }
 
   abstract cancel(): Promise<boolean> | boolean;
+
+  hasResult(resultIndex: number): boolean {
+    return resultIndex < this.results.length;
+  }
 
   getResult(index: number): TResult | null {
     if (this.results.length > index) {
@@ -80,6 +85,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
   getEditor(resultIndex: number): IDatabaseDataResultEditor<TResult> {
     if (!this.editor) {
       throw new Error('Editor was not provided');
+    }
+
+    if (!this.hasResult(resultIndex)) {
+      throw new Error('Result index out of range');
     }
 
     return this.editor.getResultEditor(this.results[resultIndex]);
@@ -181,32 +190,12 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
   }
 
-  async saveDataDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult> {
-    if (this.activeRequest) {
-      try {
-        await this.activeRequest;
-      } finally { }
-    }
-
-    if (this.activeSave) {
-      return this.activeSave as any;
-    }
-
-    try {
-      const promise = this.saveDeprecated(resultId, rows);
-
-      if (promise instanceof Promise) {
-        this.activeSave = promise as any;
-      }
-      return await promise as any;
-    } finally {
-      this.activeSave = null;
-    }
+  clearError(): void {
+    this.error = null;
   }
 
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
-  abstract saveDeprecated(resultId: string, rows: RowDiff[]): Promise<IRequestDataResult>;
 
   abstract dispose(): Promise<void>;
 }
