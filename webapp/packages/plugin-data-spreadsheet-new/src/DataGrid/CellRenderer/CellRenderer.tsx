@@ -36,8 +36,8 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     classes.push('rdg-cell-custom-edited');
   }
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    selectionContext?.select(column.key, rowIdx, event.ctrlKey, event.shiftKey);
+  const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    selectionContext?.select(column.idx, rowIdx, event.ctrlKey, event.shiftKey);
   }, [column, rowIdx, selectionContext]);
 
   const handleDoubleClick = useCallback(() => {
@@ -49,7 +49,9 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   return (
     <Cell
       className={classes.join(' ')}
-      onClick={handleClick}
+      data-rowindex={rowIdx}
+      data-columnindex={column.idx}
+      onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       {...props}
       row={row}

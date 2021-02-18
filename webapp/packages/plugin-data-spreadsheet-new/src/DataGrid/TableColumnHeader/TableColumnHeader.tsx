@@ -16,6 +16,7 @@ import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import type { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
+import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { DataGridSortingContext } from '../DataGridSorting/DataGridSortingContext';
 
 const headerStyles = css`
@@ -24,6 +25,7 @@ const headerStyles = css`
     align-items: center;
     align-content: center;
     width: 100%;
+    cursor: pointer;
   }
   shrink-container {
     display: flex;
@@ -83,9 +85,10 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 }) {
   const dataGridContext = useContext(DataGridContext);
   const gridSortingContext = useContext(DataGridSortingContext);
+  const gridSelectionContext = useContext(DataGridSelectionContext);
 
-  if (!dataGridContext || !gridSortingContext) {
-    throw new Error('Data grid context or sorting context are missed');
+  if (!dataGridContext || !gridSortingContext || !gridSelectionContext) {
+    throw new Error('One of the following contexts are missed(data grid context, grid sorting context, grid selection context)');
   }
 
   const model = dataGridContext.model;
@@ -99,6 +102,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   const currentSortMode = gridSortingContext.getSortMode(columnName);
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     if (loading) {
       return;
     }
@@ -117,8 +121,12 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
     gridSortingContext.setSortMode(columnName, nextSort, e.ctrlKey || e.metaKey);
   };
 
+  const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
+    gridSelectionContext.selectColumn(calculatedColumn.key, e.ctrlKey);
+  };
+
   return styled(headerStyles)(
-    <table-header as="div">
+    <table-header as="div" onClick={handleColumnSelection}>
       <shrink-container as='div'>
         <icon as="div">
           <StaticImage icon={column?.icon} />
