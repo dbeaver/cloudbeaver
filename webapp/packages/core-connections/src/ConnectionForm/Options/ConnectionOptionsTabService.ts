@@ -90,6 +90,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
           }
         } else {
           await this.connectionInfoResource.testConnection(config);
+          status.info('Connection is established');
         }
       }
     } catch (exception) {
