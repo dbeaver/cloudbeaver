@@ -15,7 +15,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -33,7 +33,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
 import { useTableData } from './useTableData';
 
 interface Props {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel<any, IDatabaseResultSet>;
   resultIndex: number;
   className?: string;
 }
@@ -89,10 +89,22 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   });
 
   useEffect(() => {
-    if (model.isLoading()) {
-      editingContext.close();
+    function listener(data: IDatabaseDataEditorActionsData) {
+      const editor = model.source.getEditor(resultIndex);
+      if (data.resultId !== editor.result.id || data.type === 'edit') {
+        return;
+      }
+
+      editingContext.closeEditor({
+        rowIdx: data.row,
+        idx: tableData.getColumnIndexFromKey(data.column),
+      });
     }
-  }, [model.isLoading()]);
+
+    model.source.editor?.actions.addHandler(listener);
+
+    return () => model.source.editor?.actions.removeHandler(listener);
+  }, [model.source, resultIndex]);
 
   const handleFocusChange = (position: Position) => {
     if (!editingContext.isEditing(position)) {

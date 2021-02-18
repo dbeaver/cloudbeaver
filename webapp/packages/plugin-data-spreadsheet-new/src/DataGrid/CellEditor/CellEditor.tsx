@@ -84,6 +84,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   });
 
   const value = row[column.key];
+  const type = typeof value === 'number' ? 'number' : 'text';
 
   const handleSave = () => onClose(false);
   const handleReject = () => {
@@ -93,7 +94,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   };
   const handleChange = (value: string) => {
     context.model.source.getEditor(context.resultIndex)
-      .setCell(rowIdx, Number(column.key), value);
+      .setCell(rowIdx, Number(column.key), type === 'number' ? Number(value) : value);
   };
   const handleUndo = () => {
     context.model.source.getEditor(context.resultIndex)
@@ -107,7 +108,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
         <editor ref={setPopperRef} as="div" style={popper.styles.popper} {...popper.attributes.popper}>
           <InlineEditor
             ref={inputRef}
-            type={typeof value === 'number' ? 'number' : 'text'}
+            type={type}
             value={value}
             edited
             hideSave

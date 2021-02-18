@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function copyToClipboard(data: string) {
+export function copyToClipboard(data: string): void {
+  const activeElement = document.activeElement;
   const shadowElement = document.createElement('textarea');
   shadowElement.value = data;
   shadowElement.style.position = 'absolute';
@@ -20,4 +21,8 @@ export function copyToClipboard(data: string) {
   shadowElement.select();
   document.execCommand('copy');
   document.body.removeChild(shadowElement);
+
+  if (activeElement instanceof HTMLElement) {
+    activeElement.focus();
+  }
 }

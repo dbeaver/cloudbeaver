@@ -9,11 +9,11 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo, SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataEditor,
-  DatabaseDataSource, IDatabaseDataResult, IRequestDataResult, RowDiff
+  DatabaseDataSource, IDatabaseResultSet, IRequestDataResult, RowDiff
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IQueryTabGroup } from './ISqlEditorTabState';
@@ -29,11 +29,7 @@ export interface IDataContainerOptions {
   group: IQueryTabGroup;
 }
 
-export interface IDataContainerResult extends IDatabaseDataResult {
-  data: SqlResultSet | undefined;
-}
-
-export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
+export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
   get canCancel(): boolean {
     return this.queryExecutionProcess?.getState() === EDeferredState.PENDING;
   }
@@ -63,8 +59,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   }
 
   async save(
-    prevResults: IDataContainerResult[]
-  ): Promise<IDataContainerResult[]> {
+    prevResults: IDatabaseResultSet[]
+  ): Promise<IDatabaseResultSet[]> {
     const params = this.options?.group.sqlQueryParams;
     if (!params) {
       throw new Error('sqlQueryParams must be provided');
@@ -119,7 +115,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return this;
   }
 
-  getResults(response: SqlExecuteInfo, limit: number): IDataContainerResult[] | null {
+  getResults(response: SqlExecuteInfo, limit: number): IDatabaseResultSet[] | null {
     this.requestInfo = {
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
@@ -129,7 +125,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       return null;
     }
 
-    return response.results.map<IDataContainerResult>(result => ({
+    return response.results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
@@ -140,8 +136,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   }
 
   async request(
-    prevResults: IDataContainerResult[]
-  ): Promise<IDataContainerResult[]> {
+    prevResults: IDatabaseResultSet[]
+  ): Promise<IDatabaseResultSet[]> {
     if (!this.options) {
       return prevResults;
     }

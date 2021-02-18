@@ -7,12 +7,12 @@
  */
 
 import { computed } from 'mobx';
-import { useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import type { Column } from 'react-data-grid';
 
-import type { SqlResultSet } from '@cloudbeaver/core-sdk';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { TextTools } from '@cloudbeaver/core-utils';
-import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 import { ResultSetTools } from '../ResultSetTools';
 import { IndexFormatter } from './Formatters/IndexFormatter';
@@ -34,19 +34,21 @@ export interface ITableData {
   columns: Array<Column<any[], any>>;
   rows: any[][];
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<Column<any[], any>>;
+  getColumnIndexFromKey: (columnKey: string | number) => number;
   isIndexColumn: (columnKey: string) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;
   getColumnKeyFromColumnIndex: (columnIndex: number) => string;
 }
 
-export function useTableData(modelResultData: IDatabaseDataResult | null): ITableData {
-  const { columns, rows } = useMemo(() => computed(() => {
-    if (!modelResultData) {
+export function useTableData(modelResultData: IDatabaseResultSet | null): ITableData {
+  const props = useObjectRef({ modelResultData }, undefined, true);
+  const [state] = useState(() => computed(() => {
+    if (!props.modelResultData?.data) {
       return { columns: [], rows: [] };
     }
 
-    const columnNames = ResultSetTools.getHeaders(modelResultData.data as SqlResultSet);
-    const rowStrings = ResultSetTools.getLongestCells(modelResultData.data as SqlResultSet);
+    const columnNames = ResultSetTools.getHeaders(props.modelResultData.data);
+    const rowStrings = ResultSetTools.getLongestCells(props.modelResultData.data);
 
     // TODO: seems better to do not measure container size
     //       for detecting max columns size, better to use configurable variable
@@ -61,38 +63,44 @@ export function useTableData(modelResultData: IDatabaseDataResult | null): ITabl
     }).map(v => v + 16 + 32 + 20);
 
     // TODO: we need some result type specified formatter to common actions with data
-    const rows = (modelResultData.data as SqlResultSet).rows || [];
+    const rows = props.modelResultData.data?.rows || [];
 
-    const columns = (modelResultData.data as SqlResultSet).columns!.map<Column<any[], any>>((col, columnIndex) => ({
+    const columns = props.modelResultData.data?.columns!.map<Column<any[], any>>((col, columnIndex) => ({
       key: columnIndex + '',
       name: col.label!,
       width: Math.min(300, measuredCells[columnIndex]),
       headerRenderer: TableColumnHeader,
-    }));
+    })) || [];
     columns.unshift(indexColumn);
 
     return { rows, columns };
-  }), [modelResultData]).get();
+  }));
 
-  const isIndexColumn = useCallback((columnKey: string) => columnKey === indexColumn.key, []);
+  const { columns, rows } = state.get();
 
-  const isIndexColumnInRange = useCallback(
-    (columnsRange: Array<Column<any[], any>>) => columnsRange.some(column => isIndexColumn(column.key)), [isIndexColumn]
-  );
+  return useObjectRef({
+    columns,
+    rows,
+    getColumnIndexFromKey(key: string | number) {
+      return columns.findIndex((column: any) => column.key === String(key));
+    },
+    getColumnsInRange(startIndex: number, endIndex: number) {
+      if (startIndex === endIndex) {
+        return [columns[startIndex]];
+      }
 
-  const getColumnKeyFromColumnIndex = useCallback((columnIndex: number) => columns[columnIndex].key, [columns]);
-
-  const getColumnsInRange = useCallback((startIndex: number, endIndex: number) => {
-    if (startIndex === endIndex) {
-      return [columns[startIndex]];
-    }
-
-    const firstIndex = Math.min(startIndex, endIndex);
-    const lastIndex = Math.max(startIndex, endIndex);
-    return columns.slice(firstIndex, lastIndex + 1);
-  }, [columns]);
-
-  return {
-    columns, rows, getColumnsInRange, isIndexColumn, isIndexColumnInRange, getColumnKeyFromColumnIndex,
-  };
+      const firstIndex = Math.min(startIndex, endIndex);
+      const lastIndex = Math.max(startIndex, endIndex);
+      return columns.slice(firstIndex, lastIndex + 1);
+    },
+    isIndexColumn(columnKey: string) {
+      return columnKey === indexColumn.key;
+    },
+    isIndexColumnInRange(columnsRange: Array<Column<any[], any>>) {
+      return columnsRange.some(column => this.isIndexColumn(column.key));
+    },
+    getColumnKeyFromColumnIndex(columnIndex: number) {
+      return columns[columnIndex].key;
+    },
+  });
 }

@@ -204,7 +204,7 @@ export class DataModelWrapper extends DatabaseDataModel<IDataContainerOptions, I
 
             return await this.source.saveDataDeprecated(result.id, rows);
           },
-        }, this.commonDialogService));
+        }));
       }
     }
 

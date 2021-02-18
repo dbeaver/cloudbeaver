@@ -39,7 +39,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   isLoading: () => boolean;
 
-  getEditor: (resultIndex: number) => IDatabaseDataResultEditor;
+  getEditor: (resultIndex: number) => IDatabaseDataResultEditor<TResult>;
   getResult: (index: number) => TResult | null;
 
   setResults: (results: TResult[]) => this;

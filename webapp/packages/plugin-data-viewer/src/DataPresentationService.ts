@@ -73,7 +73,7 @@ export class DataPresentationService {
     }
 
     for (const presentation of this.dataPresentations.values()) {
-      if (presentation.dataFormat === dataFormat) {
+      if (presentation.dataFormat === dataFormat && !presentation.hidden?.()) {
         return presentation;
       }
     }

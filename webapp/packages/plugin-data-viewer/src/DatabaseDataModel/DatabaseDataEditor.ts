@@ -8,11 +8,23 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+
 import { DataUpdateType, IDatabaseDataEditor, IDatabaseDataResultEditor, IDataUpdate, IResultEditingDiff } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
+export interface IDatabaseDataEditorActionsData {
+  type: 'edit' | 'cancel';
+  resultId: string;
+  row: number;
+  column: number;
+  value: any;
+  prevValue: any;
+}
+
 export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements IDatabaseDataEditor<TResult> {
   readonly editedResults: Map<string, IDataUpdate>;
+  readonly actions: IExecutor<IDatabaseDataEditorActionsData>;
 
   constructor() {
     makeObservable(this, {
@@ -20,6 +32,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     });
 
     this.editedResults = new Map();
+    this.actions = new Executor();
   }
 
   /**
@@ -50,8 +63,9 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     return diff.source[column] !== diff.update[column];
   }
 
-  getResultEditor(result: TResult): IDatabaseDataResultEditor {
+  getResultEditor(result: TResult): IDatabaseDataResultEditor<TResult> {
     return {
+      result,
       set: this.set.bind(this, result),
       setCell: this.setCell.bind(this, result),
       get: this.get.bind(this, result),
@@ -100,6 +114,19 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const diff = this.getOrCreateDiff(result, row);
 
     diff.update = value;
+
+    let column = 0;
+    for (const value of diff.update) {
+      this.actions.execute({
+        type: 'edit',
+        resultId: result.id,
+        column,
+        row,
+        value,
+        prevValue: diff.source[column],
+      });
+      column++;
+    }
   }
 
   /**
@@ -109,6 +136,15 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const diff = this.getOrCreateDiff(result, row);
 
     diff.update[column] = value;
+
+    this.actions.execute({
+      type: 'edit',
+      resultId: result.id,
+      column,
+      row,
+      value,
+      prevValue: diff.source[column],
+    });
   }
 
   /**
@@ -118,6 +154,21 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const update = this.editedResults.get(result.id);
 
     if (update?.diff.has(row)) {
+      const diff = update.diff.get(row)!;
+
+      let column = 0;
+      for (const value of diff.source) {
+        this.actions.execute({
+          type: 'cancel',
+          resultId: result.id,
+          column,
+          row,
+          value,
+          prevValue: diff.update[column],
+        });
+        column++;
+      }
+
       update.diff.delete(row);
     }
 
@@ -134,7 +185,18 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const diff = update?.diff.get(row);
 
     if (diff) {
-      diff.update[column] = diff?.source[column];
+      const prevValue = diff.update[column];
+      const value = diff?.source[column];
+      diff.update[column] = value;
+
+      this.actions.execute({
+        type: 'cancel',
+        resultId: result.id,
+        column,
+        row,
+        value,
+        prevValue,
+      });
     }
 
     if (!this.isRowEdited(result, row)) {
@@ -147,10 +209,42 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
   }
 
   cancelResultChanges(result: TResult): void {
+    for (const update of this.getChanges()) {
+      for (const [row, diff] of update.diff) {
+        let column = 0;
+        for (const value of diff.source) {
+          this.actions.execute({
+            type: 'cancel',
+            resultId: result.id,
+            column,
+            row,
+            value,
+            prevValue: diff.update[column],
+          });
+          column++;
+        }
+      }
+    }
     this.editedResults.delete(result.id);
   }
 
   cancelChanges(): void {
+    for (const update of this.getChanges()) {
+      for (const [row, diff] of update.diff) {
+        let column = 0;
+        for (const value of diff.source) {
+          this.actions.execute({
+            type: 'cancel',
+            resultId: update.resultId,
+            column,
+            row,
+            value,
+            prevValue: diff.update[column],
+          });
+          column++;
+        }
+      }
+    }
     this.editedResults.clear();
   }
 

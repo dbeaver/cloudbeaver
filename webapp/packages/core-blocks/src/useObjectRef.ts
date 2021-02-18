@@ -6,16 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useRef } from 'react';
+import { observable } from 'mobx';
+import { useState } from 'react';
 
-export function useObjectRef<T>(init: T, update?: Partial<T>): T {
-  const ref = useRef(init);
+export function useObjectRef<T>(init: T, update?: Partial<T>, observed?: boolean): T {
+  const [ref] = useState(() => {
+    if (observed) {
+      return observable.object(init, undefined, { deep: false });
+    }
+    return init;
+  });
 
   if (update) {
-    Object.assign(ref.current, update);
+    Object.assign(ref, update);
   } else {
-    Object.assign(ref.current, init);
+    Object.assign(ref, init);
   }
 
-  return ref.current;
+  return ref;
 }

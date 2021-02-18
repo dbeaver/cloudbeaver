@@ -9,13 +9,10 @@
 import { action, observable, makeObservable } from 'mobx';
 import { Subject, Observable } from 'rxjs';
 
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DetailsError, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataSource';
-import { ErrorDialog } from './ErrorDialog';
 import type { RowDiff } from './TableDataModel/EditedRow';
 import type { TableColumn } from './TableDataModel/TableColumn';
 import { TableDataModel } from './TableDataModel/TableDataModel';
@@ -118,8 +115,7 @@ export class TableViewerModel {
   );
 
   constructor(
-    options: ITableViewerModelOptions,
-    private commonDialogService: CommonDialogService
+    options: ITableViewerModelOptions
   ) {
     makeObservable<TableViewerModel, '_hasMoreRows' | '_chunkSize' | 'updateChunkSize' | 'resetData'>(this, {
       access: observable,
@@ -210,35 +206,7 @@ export class TableViewerModel {
       return;
     }
 
-    while (true) {
-      try {
-        await this.trySaveChanges(diffs);
-        return;
-      } catch (exception) {
-        let hasDetails = false;
-        let message = `${exception.name}: ${exception.message}`;
-
-        if (exception instanceof DetailsError) {
-          hasDetails = exception.hasDetails();
-          message = exception.errorMessage;
-        }
-
-        const state = await this.commonDialogService.open(
-          ErrorDialog,
-          {
-            message,
-            title: 'ui_data_saving_error',
-            onShowDetails: hasDetails
-              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
-              : undefined,
-          }
-        );
-
-        if (state === DialogueStateResult.Rejected) {
-          return;
-        }
-      }
-    }
+    await this.trySaveChanges(diffs);
   }
 
   async onRequestData(rowOffset: number, count: number): Promise<IRequestedData> {

@@ -77,7 +77,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return null;
   }
 
-  getEditor(resultIndex: number): IDatabaseDataResultEditor {
+  getEditor(resultIndex: number): IDatabaseDataResultEditor<TResult> {
     if (!this.editor) {
       throw new Error('Editor was not provided');
     }

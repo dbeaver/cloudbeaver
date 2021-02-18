@@ -8,6 +8,7 @@
 
 import { useCallback } from 'react';
 
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
@@ -58,17 +59,18 @@ type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
 export function useGridSelectedCellsCopy(
   modelResultData: IDatabaseDataResult | null,
-  selectionContext: IDataGridSelectionContext | null
+  selectionContext: IDataGridSelectionContext
 ) {
+  const props = useObjectRef({ modelResultData, selectionContext });
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if (!modelResultData || !selectionContext) {
+    if (!props.modelResultData) {
       return;
     }
 
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
-      copyGridSelectedDataToClipboard(modelResultData.data, selectionContext.selectedCells);
+      copyGridSelectedDataToClipboard(props.modelResultData.data, props.selectionContext.selectedCells);
     }
-  }, [modelResultData, selectionContext]);
+  }, []);
 
   return { onKeydownHandler };
 }

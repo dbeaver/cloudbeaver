@@ -10,6 +10,7 @@ export * from './DatabaseDataModel/IDatabaseDataEditor';
 export * from './DatabaseDataModel/IDatabaseDataModel';
 export * from './DatabaseDataModel/IDatabaseDataResult';
 export * from './DatabaseDataModel/IDatabaseDataSource';
+export * from './DatabaseDataModel/IDatabaseResultSet';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';

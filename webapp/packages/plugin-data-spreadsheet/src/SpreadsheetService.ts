@@ -22,6 +22,7 @@ export class SpreadsheetService extends Bootstrap {
     this.dataPresentationService.add({
       id: 'spreadsheet',
       dataFormat: ResultDataFormat.Resultset,
+      hidden: () => true,
       getPresentationComponent: () => Spreadsheet,
       title: 'Table',
       icon: '/icons/grid.png',

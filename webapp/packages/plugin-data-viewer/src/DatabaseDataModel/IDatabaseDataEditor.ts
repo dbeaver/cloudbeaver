@@ -6,6 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IExecutor } from '@cloudbeaver/core-executor';
+
+import type { IDatabaseDataEditorActionsData } from './DatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DataUpdateType {
@@ -26,6 +29,7 @@ export interface IDataUpdate {
 }
 
 export interface IDatabaseDataEditor<TResult extends IDatabaseDataResult> {
+  readonly actions: IExecutor<IDatabaseDataEditorActionsData>;
   isResultEdited: (result: TResult) => boolean;
   isRowEdited: (result: TResult, row: number) => boolean;
   isCellEdited: (result: TResult, row: number, column: number) => boolean;
@@ -36,14 +40,15 @@ export interface IDatabaseDataEditor<TResult extends IDatabaseDataResult> {
   revert: (result: TResult, row: number) => void;
   revertCell: (result: TResult, row: number, column: number) => void;
 
-  getResultEditor: (result: TResult) => IDatabaseDataResultEditor;
+  getResultEditor: (result: TResult) => IDatabaseDataResultEditor<TResult>;
 
   getChanges: () => IDataUpdate[];
   cancelChanges: () => void;
   cancelResultChanges: (result: TResult) => void;
 }
 
-export interface IDatabaseDataResultEditor {
+export interface IDatabaseDataResultEditor<TResult extends IDatabaseDataResult> {
+  readonly result: TResult;
   isEdited: () => boolean;
   isRowEdited: (row: number) => boolean;
   isCellEdited: (row: number, column: number) => boolean;

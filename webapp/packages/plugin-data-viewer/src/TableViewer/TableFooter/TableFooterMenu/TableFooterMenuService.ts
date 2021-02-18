@@ -8,10 +8,13 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
+  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem, CommonDialogService, DialogueStateResult
 } from '@cloudbeaver/core-dialogs';
+import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { DetailsError } from '@cloudbeaver/core-sdk';
 
 import type { DataModelWrapper } from '../../DataModelWrapper';
+import { ErrorDialog } from '../../ErrorDialog';
 
 export interface ITableFooterMenuContext {
   model: DataModelWrapper;
@@ -23,7 +26,10 @@ export class TableFooterMenuService {
   static nodeContextType = 'NodeWithParent';
   private tableFooterMenuToken = 'tableFooterMenu';
 
-  constructor(private contextMenuService: ContextMenuService) {
+  constructor(
+    private contextMenuService: ContextMenuService,
+    private commonDialogService: CommonDialogService
+  ) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
     this.registerMenuItem({
@@ -45,15 +51,7 @@ export class TableFooterMenuService {
       title: 'ui_processing_save',
       icon: 'table-save',
       onClick: context => {
-        const editor = context.data.model.source.getEditor(context.data.resultIndex);
-
-        if (context.data.model.getOldModel(context.data.resultIndex)?.isEdited()) {
-          context.data.model.getOldModel(context.data.resultIndex)?.saveChanges();
-        }
-
-        if (editor.isEdited()) {
-          context.data.model.source.saveData();
-        }
+        this.saveData(context.data.resultIndex, context.data.model);
       },
     });
     this.registerMenuItem({
@@ -95,5 +93,45 @@ export class TableFooterMenuService {
 
   registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
+  }
+
+  private async saveData(resultIndex: number, model: DataModelWrapper) {
+    const editor = model.source.getEditor(resultIndex);
+
+    while (true) {
+      try {
+        if (model.getOldModel(resultIndex)?.isEdited()) {
+          await model.getOldModel(resultIndex)?.saveChanges();
+        }
+
+        if (editor.isEdited()) {
+          await model.source.saveData();
+        }
+        return;
+      } catch (exception) {
+        let hasDetails = false;
+        let message = `${exception.name}: ${exception.message}`;
+
+        if (exception instanceof DetailsError) {
+          hasDetails = exception.hasDetails();
+          message = exception.errorMessage;
+        }
+
+        const state = await this.commonDialogService.open(
+          ErrorDialog,
+          {
+            message,
+            title: 'ui_data_saving_error',
+            onShowDetails: hasDetails
+              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
+              : undefined,
+          }
+        );
+
+        if (state === DialogueStateResult.Rejected) {
+          return;
+        }
+      }
+    }
   }
 }

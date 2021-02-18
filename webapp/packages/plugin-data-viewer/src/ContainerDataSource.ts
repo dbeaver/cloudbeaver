@@ -9,12 +9,12 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint, SqlResultSet } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataEditor } from './DatabaseDataModel/DatabaseDataEditor';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
-import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
+import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
 import type { IExecutionContext } from './IExecutionContext';
 import type { RowDiff } from './TableViewer/TableDataModel/EditedRow';
@@ -28,11 +28,7 @@ export interface IDataContainerOptions {
   constraints: SqlDataFilterConstraint[];
 }
 
-export interface IDataContainerResult extends IDatabaseDataResult {
-  data: SqlResultSet | undefined;
-}
-
-export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDataContainerResult> {
+export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
   currentFetchTableProcess: FetchTableDataAsyncProcess | null;
 
   get canCancel(): boolean {
@@ -62,8 +58,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   async request(
-    prevResults: IDataContainerResult[]
-  ): Promise<IDataContainerResult[]> {
+    prevResults: IDatabaseResultSet[]
+  ): Promise<IDatabaseResultSet[]> {
     if (!this.options?.containerNodePath) {
       throw new Error('containerNodePath must be provided for table');
     }
@@ -100,7 +96,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       return prevResults;
     }
 
-    return response.results.map<IDataContainerResult>(result => ({
+    return response.results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
@@ -109,8 +105,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   async save(
-    prevResults: IDataContainerResult[]
-  ): Promise<IDataContainerResult[]> {
+    prevResults: IDatabaseResultSet[]
+  ): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
     const changes = this.editor?.getChanges();
