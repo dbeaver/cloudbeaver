@@ -93,6 +93,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isLicenseValid() {
+        return application.isLicenseValid();
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }

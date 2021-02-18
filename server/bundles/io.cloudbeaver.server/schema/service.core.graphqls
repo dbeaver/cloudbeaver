@@ -88,7 +88,8 @@ type ServerConfig {
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
 
-    licenseRequired: Boolean
+    licenseRequired: Boolean!
+    licenseValid: Boolean!
 
     sessionExpireTime: Int
     localHostAddress: String
