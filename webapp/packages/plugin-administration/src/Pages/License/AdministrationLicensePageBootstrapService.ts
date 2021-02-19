@@ -23,20 +23,20 @@ export class AdministrationLicensePageBootstrapService extends Bootstrap {
   }
 
   register(): void {
-    this.administrationItemService.create({
-      name: 'license',
-      type: AdministrationItemType.Default,
-      configurationWizardOptions: {
-        description: 'administration_configuration_wizard_license_step_description',
-        order: 1.2,
-        isDone: this.administrationLicensePageService.isDone.bind(this.administrationLicensePageService),
-        onFinish: this.administrationLicensePageService.save.bind(this.administrationLicensePageService),
-      },
-      order: 5,
-      onActivate: this.administrationLicensePageService.loadConfig.bind(this.administrationLicensePageService),
-      getContentComponent: () => LicensePage,
-      getDrawerComponent: () => LicenseDrawerItem,
-    });
+    // this.administrationItemService.create({
+    //   name: 'license',
+    //   type: AdministrationItemType.Default,
+    //   configurationWizardOptions: {
+    //     description: 'administration_configuration_wizard_license_step_description',
+    //     order: 1.2,
+    //     isDone: this.administrationLicensePageService.isDone.bind(this.administrationLicensePageService),
+    //     onFinish: this.administrationLicensePageService.save.bind(this.administrationLicensePageService),
+    //   },
+    //   order: 5,
+    //   onActivate: this.administrationLicensePageService.loadConfig.bind(this.administrationLicensePageService),
+    //   getContentComponent: () => LicensePage,
+    //   getDrawerComponent: () => LicenseDrawerItem,
+    // });
   }
 
   load(): void { }
