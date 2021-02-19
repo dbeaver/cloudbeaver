@@ -200,7 +200,11 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     }
 
     if (!this.isRowEdited(result, row)) {
-      this.editedResults.delete(result.id);
+      update?.diff.delete(row);
+
+      if (update?.diff.size === 0) {
+        this.editedResults.delete(result.id);
+      }
     }
   }
 
