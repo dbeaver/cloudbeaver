@@ -131,12 +131,14 @@ export const TableViewer = observer(function TableViewer({
         />
         <table-data as='div'>
           <table-box as='div'>
-            <TableGrid
-              model={dataModel}
-              dataFormat={dataFormat}
-              presentation={presentation}
-              resultIndex={resultIndex}
-            />
+            {dataModel.source.hasResult(resultIndex) && (
+              <TableGrid
+                model={dataModel}
+                dataFormat={dataFormat}
+                presentation={presentation}
+                resultIndex={resultIndex}
+              />
+            )}
             <error as="div" hidden={!error.details} {...use({ animated })}>
               {error.details?.message}
               <br /><br />

@@ -31,7 +31,7 @@ export class SpreadsheetService extends Bootstrap {
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
       hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
-      title: 'Grid',
+      title: 'Table',
       icon: '/icons/grid.png',
     });
   }
