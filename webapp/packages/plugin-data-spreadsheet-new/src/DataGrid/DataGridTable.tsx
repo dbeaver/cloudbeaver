@@ -40,7 +40,7 @@ interface Props {
 
 function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
   const target = event.target as HTMLDivElement;
-  return target.clientHeight + target.scrollTop === target.scrollHeight;
+  return target.clientHeight + target.scrollTop + 100 > target.scrollHeight;
 }
 
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
