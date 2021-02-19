@@ -320,7 +320,7 @@ public class WebServiceUtils {
         List<WebNetworkHandlerConfigInput> networkCredentials = webConnectionInfo.getSavedNetworkCredentials();
         if (networkCredentials != null) {
             networkCredentials.forEach(c -> {
-                if (c != null && c.isEnabled()) {
+                if (c != null && CommonUtils.toBoolean(c.isEnabled())) {
                     DBWHandlerConfiguration handlerCfg = configuration.getHandler(c.getId());
                     if (handlerCfg != null) {
                         handlerCfg.setUserName(c.getUserName());
