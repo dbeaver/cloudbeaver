@@ -18,6 +18,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   readonly supportedDataFormats: ResultDataFormat[];
   readonly countGain: number;
 
+  isReadonly: () => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
 

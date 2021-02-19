@@ -98,7 +98,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   const loading = model.isLoading();
 
   // TODO we want to get "sortable" property from SqlResultColumn data
-  const sortable = true;
+  const sortable = model.source.results.length === 1;
   const currentSortMode = gridSortingContext.getSortMode(columnName);
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {

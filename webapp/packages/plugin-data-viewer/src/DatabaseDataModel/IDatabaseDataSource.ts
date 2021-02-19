@@ -36,6 +36,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly executionContext: IExecutionContext | null;
   readonly canCancel: boolean;
 
+  isReadonly: () => boolean;
   isLoading: () => boolean;
 
   hasResult: (resultIndex: number) => boolean;

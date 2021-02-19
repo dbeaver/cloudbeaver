@@ -9,7 +9,7 @@
 import { action, observable } from 'mobx';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { ITableData } from '../useTableData';
+import type { ITableData } from '../TableDataContext';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
 export interface IPosition {

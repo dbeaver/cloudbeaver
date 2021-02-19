@@ -43,6 +43,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.isLoading();
   }
 
+  isReadonly(): boolean {
+    return this.source.isReadonly();
+  }
+
   isDataAvailable(offset: number, count: number): boolean {
     return this.source.offset <= offset && this.source.count >= count;
   }

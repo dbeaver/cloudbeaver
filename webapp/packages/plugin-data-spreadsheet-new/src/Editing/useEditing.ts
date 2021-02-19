@@ -19,6 +19,7 @@ function findPosition(position: Position): (position: Position) => boolean {
 }
 
 interface IEditingOptions {
+  readonly?: boolean;
   onEdit: (position: Position, key?: string) => boolean;
 }
 
@@ -28,6 +29,9 @@ export function useEditing(options: IEditingOptions): IEditingContext {
 
   const [context] = useState<IEditingContext>({
     edit(position: Position, key?: string) {
+      if (optionsRef.readonly) {
+        return;
+      }
       // TODO: not works yet
       switch (key) {
         case 'Escape':

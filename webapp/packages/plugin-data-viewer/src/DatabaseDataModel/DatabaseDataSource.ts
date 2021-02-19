@@ -100,6 +100,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
+  isReadonly(): boolean {
+    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1;
+  }
+
   isLoading(): boolean {
     return !!this.activeRequest || !!this.activeSave;
   }

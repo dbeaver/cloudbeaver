@@ -41,6 +41,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }, [column, rowIdx, selectionContext]);
 
   const handleDoubleClick = useCallback(() => {
+    if (!column.editable) {
+      return;
+    }
+
     editingContext?.edit({ idx: column.idx, rowIdx });
   }, [column, rowIdx]);
 
