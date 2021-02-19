@@ -81,10 +81,10 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
       dataGridRef.current?.selectCell({ idx: startPosition.idx, rowIdx: startPosition.rowIdx });
     },
     onDragOver: (startPosition, currentPosition, event) => {
-      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey, true);
+      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
     },
     onDragEnd: (startPosition, currentPosition, event) => {
-      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey, false);
+      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
   });
 
