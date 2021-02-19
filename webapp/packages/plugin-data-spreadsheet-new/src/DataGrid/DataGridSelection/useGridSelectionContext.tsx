@@ -22,14 +22,27 @@ export function useGridSelectionContext(tableData: ITableData) {
   const [temporarySelectedCells] = useState(() => observable.map<number, number[]>());
   const [lastSelectedCell, setLastSelectedCell] = useState<IPosition | null>(null);
 
+  const clear = useCallback(() => {
+    selectedCells.clear();
+  }, [selectedCells]);
+
   const selectRows = useCallback(action(
     (startPosition: number, lastPosition: number, multiple: boolean, temporary = false) => {
-      const columnsLength = tableData.columns?.length || 0;
+      const columnsLength = tableData.getColumnsWithoutIndex().length;
 
       temporarySelectedCells.clear();
 
+      if (startPosition === lastPosition && selectedCells.get(startPosition)?.length === columnsLength) {
+        if (!multiple) {
+          clear();
+        } else {
+          selectedCells.delete(startPosition);
+        }
+        return;
+      }
+
       if (!multiple) {
-        selectedCells.clear();
+        clear();
       }
 
       const rowSelection = [];
@@ -59,7 +72,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       temporarySelectedCells.clear();
 
       if (!multiple) {
-        selectedCells.clear();
+        clear();
       }
 
       const top = Math.min(startPosition, lastPosition);
@@ -113,7 +126,7 @@ export function useGridSelectionContext(tableData: ITableData) {
     const isSelected = isColumnSelected(columnIndex);
 
     if (!multiple) {
-      selectedCells.clear();
+      clear();
     }
 
     const rowsLength = tableData.rows?.length || 0;
@@ -122,7 +135,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       const rowSelection = selectedCells.get(rowIdx) || [];
       if (isSelected) {
         selectedCells.set(rowIdx, [...rowSelection.filter(colIdx => colIdx !== columnIndex)]);
-      } else {
+      } else if (!rowSelection.includes(columnIndex)) {
         selectedCells.set(rowIdx, [...rowSelection, columnIndex]);
       }
     }
@@ -130,7 +143,7 @@ export function useGridSelectionContext(tableData: ITableData) {
 
   const selectTable = useCallback(() => {
     const rowsLength = tableData.rows?.length || 0;
-    const columnsLength = tableData.columns?.length || 0;
+    const columnsLength = tableData.getColumnsWithoutIndex().length;
 
     const rowSelection = [];
     for (let colIdx = 0; colIdx < columnsLength; colIdx++) {
@@ -195,7 +208,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       }
 
       if (!multiple) {
-        selectedCells.clear();
+        clear();
       }
 
       selectCell(Number(columnKey), rowIdx);
@@ -206,6 +219,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       selectCell,
       lastSelectedCell,
       updateMultiSelection,
+      clear,
     ]);
 
   const context: IDataGridSelectionContext = useMemo(() => ({

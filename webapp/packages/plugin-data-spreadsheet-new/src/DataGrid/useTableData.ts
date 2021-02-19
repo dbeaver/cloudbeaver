@@ -98,6 +98,9 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
     getColumnKeyFromColumnIndex(columnIndex: number) {
       return this.columns[columnIndex].key;
     },
+    getColumnsWithoutIndex() {
+      return this.columns.filter(column => !this.isIndexColumn(column.key));
+    },
   }, {
     columns,
     rows,

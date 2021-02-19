@@ -20,6 +20,7 @@ export interface ITableData {
   isIndexColumn: (columnKey: string) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;
   getColumnKeyFromColumnIndex: (columnIndex: number) => string;
+  getColumnsWithoutIndex: () => Array<Column<any[], any>>;
 }
 
 export const TableDataContext = createContext<ITableData | null>(null);
