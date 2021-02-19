@@ -272,20 +272,23 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.setSavedCredentials(null, null);
         }
+        // Mark all specified network configs as saved
+        if (networkCredentials != null) {
+            networkCredentials.forEach(c -> {
+                if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
+                    DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
+                    if (handlerCfg != null) {
+                        handlerCfg.setUserName(c.getUserName());
+                        handlerCfg.setPassword(c.getPassword());
+                        handlerCfg.setSavePassword(true);
+                        dataSourceContainer.persistConfiguration();
+                    }
+                }
+            });
+        }
         if (saveCredentials != null && saveCredentials) {
             // Save all passed credentials in the datasource container
             WebServiceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
-            // Mark all specified network configs as saved
-            if (networkCredentials != null) {
-                networkCredentials.forEach(c -> {
-                    if (c.isEnabled() && !CommonUtils.isEmpty(c.getUserName())) {
-                        DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
-                        if (handlerCfg != null) {
-                            handlerCfg.setSavePassword(true);
-                        }
-                    }
-                });
-            }
             dataSourceContainer.setSavePassword(true);
             dataSourceContainer.persistConfiguration();
         }
