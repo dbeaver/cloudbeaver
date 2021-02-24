@@ -16,6 +16,18 @@ export interface ICachedResourceMetadata {
   loading: boolean;
 }
 
+export type CachedResourceData<
+  TResource extends CachedResource<any, any, any, any>
+> = TResource extends CachedResource<infer T, any, any> ? T : never;
+
+export type CachedResourceParam<
+  TResource extends CachedResource<any, any, any, any>
+> = TResource extends CachedResource<any, infer T, any> ? T : never;
+
+export type CachedResourceKey<
+  TResource extends CachedResource<any, any, any, any>
+> = TResource extends CachedResource<any, any, infer T> ? T : never;
+
 export abstract class CachedResource<
   TData,
   TParam,

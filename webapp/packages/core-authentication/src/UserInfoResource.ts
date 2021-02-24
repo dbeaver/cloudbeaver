@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GraphQLService, UserAuthInfo } from '@cloudbeaver/core-sdk';
@@ -16,8 +14,6 @@ import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, void> {
-  private loaded: boolean;
-
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
@@ -25,21 +21,12 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
   ) {
     super(null);
 
-    makeObservable<UserInfoResource, 'loaded'>(this, {
-      loaded: observable,
-    });
-
-    this.loaded = false;
     this.sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
     this.sessionResource.onDataUpdate.addHandler(async () => { await this.load(); });
   }
 
   getId(): string {
     return this.data?.userId || 'anonymous';
-  }
-
-  isLoaded(): boolean {
-    return this.loaded;
   }
 
   async login(provider: string, credentials: Record<string, string>): Promise<UserAuthInfo> {
@@ -70,7 +57,6 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
   protected async loader(): Promise<UserAuthInfo | null> {
     await this.sessionResource.load();
     const { user } = await this.graphQLService.sdk.getSessionUser();
-    this.loaded = true;
 
     return (user as UserAuthInfo | null) ?? null;
   }

@@ -465,6 +465,8 @@ export interface ServerConfig {
   supportsWorkspaces?: Maybe<Scalars['Boolean']>;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  licenseRequired: Scalars['Boolean'];
+  licenseValid: Scalars['Boolean'];
   sessionExpireTime?: Maybe<Scalars['Int']>;
   localHostAddress?: Maybe<Scalars['String']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
@@ -1506,7 +1508,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'configurationMode' | 'developmentMode'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment }
   );
 }
@@ -2414,6 +2416,8 @@ export const ServerConfigDocument = `
     authenticationEnabled
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
+    licenseRequired
+    licenseValid
     configurationMode
     developmentMode
     supportedLanguages {

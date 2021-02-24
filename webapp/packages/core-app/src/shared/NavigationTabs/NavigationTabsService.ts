@@ -255,7 +255,7 @@ export class NavigationTabsService {
   }
 
   private async unloadTabs() {
-    if (this.administrationScreenService.isConfigurationMode) {
+    if (this.administrationScreenService.publicDisabled) {
       return;
     }
     for (const tab of this.tabsMap.values()) {
@@ -270,7 +270,7 @@ export class NavigationTabsService {
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
   private async restoreTabs(): Promise<void> {
-    if (this.administrationScreenService.isConfigurationMode) {
+    if (this.administrationScreenService.publicDisabled) {
       return;
     }
 

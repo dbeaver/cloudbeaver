@@ -10,31 +10,22 @@ import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, isResourceKeyList, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResourceData, CachedResourceParam, isResourceKeyList, ResourceKey } from '@cloudbeaver/core-sdk';
 
 import { useObjectRef } from './useObjectRef';
 
-interface IActions<TResource extends CachedMapResource<any, any, any>> {
+interface IActions<TResource extends CachedDataResource<any, any, any>> {
   onLoad?: (resource: TResource) => Promise<any> | any;
   onData?: (
-    data: CachedMapResourceValue<TResource>,
+    data: CachedResourceData<TResource>,
     resource: TResource,
-    prevData: CachedMapResourceValue<TResource> | undefined,
+    prevData: CachedResourceData<TResource> | undefined,
   ) => Promise<any> | any;
   onError?: (exception: Error) => void;
 }
 
-interface KeyWithIncludes<TKey, TIncludes> {
-  key: TKey | null;
-  includes: TIncludes;
-}
-
-interface IMapResourceResult<
-  TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
-  TResource extends CachedMapResource<any, any, any>,
-  TIncludes
-> {
-  data: CachedMapResourceGetter<TKeyArg, CachedMapResourceKey<TResource>, CachedMapResourceValue<TResource>, TIncludes>;
+interface IMapResourceResult<TResource extends CachedDataResource<any, any, any>> {
+  data: CachedResourceData<TResource>;
   resource: TResource;
   exception: Error | null;
   isLoading: () => boolean;
@@ -42,20 +33,16 @@ interface IMapResourceResult<
   reload: () => void;
 }
 
-export function useMapResource<
-  TResource extends CachedMapResource<any, any, any>,
-  TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
-  TIncludes extends CachedResourceIncludeArgs<
-  CachedMapResourceValue<TResource>,
-  CachedMapResourceArguments<TResource>
-  > = []
+export function useDataResource<
+  TResource extends CachedDataResource<any, any, any>,
+  TKeyArg extends ResourceKey<CachedResourceParam<TResource>>
 >(
   ctor: IServiceConstructor<TResource> | TResource,
-  keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
+  keyObj: TResource extends any ? TKeyArg | null : never,
   actions?: IActions<TResource>
-): IMapResourceResult<TKeyArg, TResource, TIncludes> {
+): IMapResourceResult<TResource> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
+  const resource = ctor instanceof CachedDataResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
@@ -67,7 +54,7 @@ export function useMapResource<
     exception,
     includes,
     actions,
-    prevData: (isResourceKeyList(key) ? [] : undefined) as CachedMapResourceValue<TResource> | undefined,
+    prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
     load: () => {},
   }, {
     resource,
@@ -105,7 +92,7 @@ export function useMapResource<
     }
   };
 
-  const [result] = useState<IMapResourceResult<TKeyArg, TResource, TIncludes>>(() => ({
+  const [result] = useState<IMapResourceResult<TResource>>(() => ({
     get resource() {
       return refObj.resource;
     },
@@ -113,11 +100,7 @@ export function useMapResource<
       return refObj.exception;
     },
     get data() {
-      if (refObj.key === null) {
-        return undefined;
-      }
-
-      return resource.get(refObj.key);
+      return resource.data;
     },
     isLoaded: () => {
       if (refObj.key === null) {

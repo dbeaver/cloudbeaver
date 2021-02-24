@@ -6,27 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>, void> {
-  private loaded = false;
-
   constructor(
     private graphQLService: GraphQLService
   ) {
     super(new Map());
-
-    makeObservable<DataTransferProcessorsResource, 'loaded'>(this, {
-      loaded: observable,
-    });
-  }
-
-  isLoaded(): boolean {
-    return this.loaded;
   }
 
   protected async loader(): Promise<Map<string, DataTransferProcessorInfo>> {
@@ -37,7 +25,6 @@ export class DataTransferProcessorsResource extends CachedDataResource<Map<strin
     for (const processor of processors) {
       this.data.set(processor.id, processor);
     }
-    this.loaded = true;
 
     return this.data;
   }

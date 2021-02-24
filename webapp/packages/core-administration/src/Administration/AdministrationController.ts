@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
+import { AdministrationItemService, filterHiddenAdministrationItem } from '../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../AdministrationItem/filterConfigurationWizard';
 import type { IAdministrationItem } from '../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../AdministrationItem/orderAdministrationItems';
@@ -18,7 +18,10 @@ export class AdministrationController {
   getItems(configurationWizard: boolean): IAdministrationItem[] {
     return this.administrationItemService
       .items
-      .filter(filterConfigurationWizard(configurationWizard))
+      .filter(item =>
+        filterHiddenAdministrationItem(item)
+        && filterConfigurationWizard(configurationWizard)(item)
+      )
       .sort(orderAdministrationItems(configurationWizard));
   }
 

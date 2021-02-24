@@ -80,6 +80,7 @@ export interface IAdministrationItemOptions {
   configurationWizardOptions?: IConfigurationWizardItemOptions;
   order?: number;
   sub?: IAdministrationItemSubItem[];
+  isHidden?: (() => boolean) | boolean;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;

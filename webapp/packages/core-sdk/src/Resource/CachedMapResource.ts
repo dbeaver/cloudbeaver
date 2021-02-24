@@ -12,23 +12,20 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResource, ICachedResourceMetadata } from './CachedResource';
+import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
 import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
-export type IncludesProps<TValue, TArgs> = {
-  [P in keyof TArgs as P extends CachedMapIncludeKeyTemplated<TValue> ? P : never]?: boolean
-};
+export type CachedMapResourceKey<
+  TResource extends CachedMapResource<any, any, any>
+> = TResource extends CachedMapResource<infer T, any, any> ? T : never;
 
-export type CachedMapIncludeKeyTemplated<TValue> = `include${Capitalize<string & keyof TValue>}` | `customInclude${Capitalize<string>}`;
-export type CachedMapIncludeList<TValue> = Array<CachedMapIncludeKeyTemplated<TValue>>;
-export type CachedMapIncludeToKey<TKey> = TKey extends Array<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
-export type CachedMapIncludeArgs<TValue, TArguments> = Array<keyof IncludesProps<TValue, TArguments>>;
+export type CachedMapResourceValue<
+  TResource extends CachedMapResource<any, any, any>
+> = TResource extends CachedMapResource<any, infer T, any> ? T : never;
 
-export type CachedMapValueIncludes<TValue, TKeys> = TValue
-& ({
-  [P in Extract<CachedMapIncludeToKey<TKeys>, keyof TValue>]-?: Required<TValue>[P] extends undefined
-    ? TValue[P]
-    : NonNullable<TValue[P]>;
-});
+export type CachedMapResourceArguments<
+  TResource extends CachedMapResource<any, any, any>
+> = TResource extends CachedMapResource<any, any, infer T> ? T : never;
 
 export type CachedMapResourceGetter<
   TRealKey extends ResourceKey<TKey>,
@@ -36,8 +33,8 @@ export type CachedMapResourceGetter<
   TValue,
   TIncludes
 > = TRealKey extends ResourceKeyList<TKey>
-  ? Array<CachedMapValueIncludes<TValue, TIncludes> | undefined>
-  : CachedMapValueIncludes<TValue, TIncludes> | undefined;
+  ? Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>
+  : CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
   includes: string[];
@@ -66,7 +63,7 @@ export abstract class CachedMapResource<
     return Array.from(this.data.keys());
   }
 
-  constructor(defaultIncludes?: CachedMapIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
+  constructor(defaultIncludes?: CachedResourceIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
     super(defaultValue || new Map());
     this.onItemAdd = new Executor(null, this.includes);
     this.onItemDelete = new Executor(null, this.includes);
@@ -84,7 +81,7 @@ export abstract class CachedMapResource<
     });
   }
 
-  isIncludes(key: ResourceKey<TKey>, includes: CachedMapIncludeArgs<TValue, TArguments>): boolean {
+  isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     return ResourceKeyUtils.every(key, key => {
       const metadata = this.metadata.get(key);
 
@@ -145,7 +142,7 @@ export abstract class CachedMapResource<
     });
   }
 
-  isLoaded(key: ResourceKey<TKey>, includes?: CachedMapIncludeArgs<TValue, TArguments>): boolean {
+  isLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
     return ResourceKeyUtils.every(key, key => {
       if (!this.has(key)) {
         return false;
@@ -192,44 +189,44 @@ export abstract class CachedMapResource<
     this.onItemDelete.execute(key);
   }
 
-  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: TKey,
     includes?: T
-  ): Promise<CachedMapValueIncludes<TValue, T>>;
-  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<CachedResourceValueIncludes<TValue, T>>;
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>>>;
-  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>>;
-  async refresh<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>> {
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     await this.loadData(key, true, includes);
-    return this.get(key) as Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>;
+    return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: TKey,
     includes?: T
-  ): Promise<CachedMapValueIncludes<TValue, T>>;
-  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<CachedResourceValueIncludes<TValue, T>>;
+  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>>>;
-  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
+  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>>;
-  async load<T extends CachedMapIncludeArgs<TValue, TArguments> = []>(
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
+  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
     key: ResourceKey<TKey>,
     includes?: T
-  ): Promise<Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>> {
+  ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     await this.loadData(key, false, includes);
-    return this.get(key) as Array<CachedMapValueIncludes<TValue, T>> | CachedMapValueIncludes<TValue, T>;
+    return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
   has(key: TKey): boolean {

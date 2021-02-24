@@ -29,7 +29,10 @@ export class AdministrationItemService {
   }
 
   getDefaultItem(configurationWizard: boolean): string | null {
-    const items = this.items.filter(filterConfigurationWizard(configurationWizard));
+    const items = this.items.filter(item =>
+      filterHiddenAdministrationItem(item)
+      && filterConfigurationWizard(configurationWizard)(item)
+    );
 
     if (items.length === 0) {
       return null;
@@ -48,7 +51,8 @@ export class AdministrationItemService {
 
   getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {
     const item = this.items.find(item => (
-      filterConfigurationWizard(configurationWizard)(item)
+      filterHiddenAdministrationItem(item)
+      && filterConfigurationWizard(configurationWizard)(item)
       && item.name === name
     ));
 
@@ -104,6 +108,10 @@ export class AdministrationItemService {
       return;
     }
 
+    if (!filterHiddenAdministrationItem(item)) {
+      return;
+    }
+
     await item.onActivate?.(configurationWizard, outside);
 
     if (screen.sub) {
@@ -118,6 +126,10 @@ export class AdministrationItemService {
   ): Promise<void> {
     const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
+      return;
+    }
+
+    if (!filterHiddenAdministrationItem(item)) {
       return;
     }
 
@@ -138,6 +150,10 @@ export class AdministrationItemService {
       return false;
     }
 
+    if (!filterHiddenAdministrationItem(item)) {
+      return false;
+    }
+
     if (item.canActivate && !(await item.canActivate(configurationWizard, outside))) {
       return false;
     }
@@ -151,4 +167,12 @@ export class AdministrationItemService {
 
     return true;
   }
+}
+
+export function filterHiddenAdministrationItem(item: IAdministrationItem): boolean {
+  if (typeof item.isHidden === 'function') {
+    return !item.isHidden();
+  }
+
+  return !item.isHidden;
 }

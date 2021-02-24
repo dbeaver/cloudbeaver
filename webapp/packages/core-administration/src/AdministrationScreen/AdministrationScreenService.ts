@@ -49,6 +49,15 @@ export class AdministrationScreenService {
     return !!this.serverConfigResource.data?.configurationMode;
   }
 
+  get publicDisabled(): boolean {
+    if (this.serverConfigResource.data?.configurationMode
+    || (this.serverConfigResource.data?.licenseRequired && !this.serverConfigResource.data?.licenseValid)) {
+      return true;
+    }
+
+    return false;
+  }
+
   readonly ensurePermissions: IExecutor<void>;
   readonly activationEvent: IExecutor<boolean>;
 

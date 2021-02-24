@@ -47,6 +47,7 @@ export * from './IconOrImage';
 export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './useClipboard';
+export * from './useDataResource';
 export * from './useFocus';
 export * from './useMapResource';
 export * from './useObjectRef';
