@@ -30,19 +30,20 @@ export function useGridSelectionContext(tableData: ITableData) {
     (startPosition: number, lastPosition: number, multiple: boolean, temporary = false) => {
       const columnsLength = tableData.getColumnsWithoutIndex().length;
 
-      temporarySelectedCells.clear();
+      const firstRowIdx = Math.min(startPosition, lastPosition);
+      const lastRowIdx = Math.max(startPosition, lastPosition);
 
-      if (startPosition === lastPosition && selectedCells.get(startPosition)?.length === columnsLength) {
-        if (!multiple) {
-          clear();
-        } else {
-          selectedCells.delete(startPosition);
-        }
-        return;
-      }
+      const isSelected = selectedCells.get(firstRowIdx)?.length === columnsLength;
+
+      temporarySelectedCells.clear();
 
       if (!multiple) {
         clear();
+      }
+
+      if (!temporary && firstRowIdx === lastRowIdx && isSelected) {
+        selectedCells.delete(firstRowIdx);
+        return;
       }
 
       const rowSelection = [];
@@ -50,15 +51,7 @@ export function useGridSelectionContext(tableData: ITableData) {
         rowSelection.push(i);
       }
 
-      const firstRowIdx = Math.min(startPosition, lastPosition);
-      const lastRowIdx = Math.max(startPosition, lastPosition);
-
       for (let rowIdx = firstRowIdx; rowIdx <= lastRowIdx; rowIdx++) {
-        if (selectedCells.get(rowIdx)?.length === columnsLength) {
-          selectedCells.delete(rowIdx);
-          continue;
-        }
-
         if (temporary) {
           temporarySelectedCells.set(rowIdx, rowSelection);
         } else {
@@ -203,7 +196,7 @@ export function useGridSelectionContext(tableData: ITableData) {
       }
 
       if (isIndexColumn) {
-        selectRows(rowIdx, rowIdx, multiple);
+        selectRows(rowIdx, rowIdx, multiple, false);
         return;
       }
 

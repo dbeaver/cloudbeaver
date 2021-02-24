@@ -10,6 +10,12 @@
 
 @mixin base-react-grid() {
   :global {
+    .cb-react-grid-container {
+      &:focus-within .rdg-cell-custom-selected {
+        background-color: rgba(0, 145, 234, 0.3);
+      }
+    }
+
     .cb-react-grid-theme {
       @include mdc-theme-prop(color, on-surface, false);
 
@@ -40,7 +46,7 @@
       }
 
       .rdg-cell-custom-selected {
-        background-color: rgba(0, 145, 234, 0.3);
+        background-color: rgba(0, 145, 234, 0.2);
         box-shadow: none;
       }
 
