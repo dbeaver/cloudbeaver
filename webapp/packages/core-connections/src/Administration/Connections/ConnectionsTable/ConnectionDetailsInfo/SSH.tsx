@@ -30,6 +30,6 @@ export const SSH: React.FC<Props> = observer(function SSH({ context }) {
   }
 
   return styled(CONNECTION_DETAILS_STYLES)(
-    <StaticImage icon='/icons/tunnel.png' title={translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')} />
+    <StaticImage icon='/icons/ssh_tunnel.png' title={translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')} />
   );
 });
