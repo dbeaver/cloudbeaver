@@ -18,6 +18,7 @@ import { DatabaseConnection, ConnectionsResource } from '../ConnectionsResource'
 import { ConnectionsAdministration } from './ConnectionsAdministration';
 import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
 import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
+import { SSH } from './ConnectionsTable/ConnectionDetailsInfo/SSH';
 import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
 
@@ -65,6 +66,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
     this.connectionDetailsPlaceholder.add(Template, 1);
+    this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
   load(): void | Promise<void> { }
