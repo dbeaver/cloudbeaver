@@ -37,7 +37,6 @@ export const ObjectProperty = observer(function ObjectProperty({
           <InputFieldNew
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
-            mod='surface'
             readOnly
             {...additionalProps(objectProperty)}
           >{objectProperty.displayName}

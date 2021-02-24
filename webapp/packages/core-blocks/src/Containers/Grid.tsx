@@ -10,9 +10,10 @@ import type { ISize } from './BASE_CONTAINERS_STYLES';
 
 interface Props extends ISize {
   className?: string;
+  horizontal?: boolean;
 }
 
-export const GroupContainer: React.FC<Props> = function GroupContainer({ children, className }) {
+export const Grid: React.FC<Props> = function Grid({ children, className }) {
   return (
     <div className={className}>
       {children}

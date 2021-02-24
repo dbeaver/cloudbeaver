@@ -18,7 +18,7 @@ export interface ISize {
 
 export const BASE_CONTAINERS_STYLES = composes(
   css`
-    GroupContainer {
+    Group {
       composes: theme-background-surface from global;
     }
     ColoredContainer {
@@ -38,14 +38,14 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
     }
 
-    GroupContainer {
+    Group {
       box-sizing: border-box;
       margin: 10px;
       padding: 10px;
       border-radius: 4px;
     }
 
-    Group {
+    Grid {
       display: grid;
       grid-template-columns: minmax(min-content, 1fr);
       grid-auto-rows: max-content; 
@@ -62,7 +62,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       opacity: 0.9;
     }
 
-    Container, ColoredContainer, GroupContainer, Group {
+    Container, ColoredContainer, Group, Grid {
       flex-grow: 1;
       &[small] {
         max-width: 250px;

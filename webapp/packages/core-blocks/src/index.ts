@@ -29,7 +29,7 @@ export * from './FormControls/Checkboxes/CheckboxMarkup';
 export * from './FormControls/FormBox';
 export * from './Containers/BASE_CONTAINERS_STYLES';
 export * from './Containers/Container';
-export * from './Containers/GroupContainer';
+export * from './Containers/Grid';
 export * from './Containers/Group';
 export * from './Containers/GroupTitle';
 export * from './Containers/ColoredContainer';
