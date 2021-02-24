@@ -17,8 +17,14 @@ $mdc-theme-background: #dedede;
 $color-positive: #01cca3;
 $color-on-positive: #fff;
 $color-negative: #fd1d48;
-$input-border-color: #dedede;
 
-$theme-name: 'light';
+$input-border: #dedede;
+$input-border-disabled: transparent;
+$input-border-readonly: transparent;
+$input-background: transparent;
+$input-background-disabled: $mdc-theme-secondary;
+$input-background-readonly: $mdc-theme-secondary;
 
-@import 'mixins';
+$theme-name: "light";
+
+@import "mixins";

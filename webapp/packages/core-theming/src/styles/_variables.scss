@@ -10,7 +10,12 @@ $mdc-theme-extra-property-values: (
   positive: $color-positive,
   on-positive: $color-on-positive,
   negative: $color-negative,
-  input-border-color: $input-border-color,
+  input-border: $input-border,
+  input-border-readonly: $input-border-readonly,
+  input-border-disabled: $input-border-disabled,
+  input-background: $input-background,
+  input-background-disabled: $input-background-disabled,
+  input-background-readonly: $input-background-readonly,
 );
 
 $mdc-theme-property-values: map-merge($mdc-theme-property-values, $mdc-theme-extra-property-values);

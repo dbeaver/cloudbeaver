@@ -7,42 +7,42 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import {
-  ObjectPropertyCheckbox,
-  ObjectPropertyInput,
-  ObjectPropertyProps
-} from '../formControls';
-import { filterProperty, matchType } from '../helpers';
+import { FieldCheckboxNew, InputFieldNew } from '@cloudbeaver/core-blocks';
 
-const propertyStyles = css`
-  property {
-    composes: theme-typography--body2 from global;
-    display: flex;
-    box-sizing: border-box;
-    padding: 8px 8px;
-    width: 600px;
-  }
-`;
+import type { ObjectPropertyProps } from '../formControls';
+import { additionalProps, filterProperty, getValue, matchType } from '../helpers';
 
 export const ObjectProperty = observer(function ObjectProperty({
   objectProperty,
-  className,
 }: ObjectPropertyProps) {
   if (!objectProperty || !filterProperty(objectProperty)) {
     return null;
   }
 
-  return styled(propertyStyles)(
-    <property
-      className={className}
-      as="div"
-      {...use({ checkbox: matchType(objectProperty.dataType) === 'checkbox' })}
-    >
+  return (
+    <>
       {matchType(objectProperty.dataType) === 'checkbox'
-        ? <ObjectPropertyCheckbox objectProperty={objectProperty} />
-        : <ObjectPropertyInput objectProperty={objectProperty} />}
-    </property>
+        ? (
+          <FieldCheckboxNew
+            name={objectProperty.id}
+            value={getValue(objectProperty.value)}
+            readOnly
+            {...additionalProps(objectProperty)}
+          >
+            {objectProperty.displayName}
+          </FieldCheckboxNew>
+        )
+        : (
+          <InputFieldNew
+            name={objectProperty.id}
+            value={getValue(objectProperty.value)}
+            mod='surface'
+            readOnly
+            {...additionalProps(objectProperty)}
+          >{objectProperty.displayName}
+          </InputFieldNew>
+        )}
+    </>
   );
 });
