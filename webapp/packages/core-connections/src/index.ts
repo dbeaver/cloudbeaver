@@ -5,6 +5,7 @@ export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
 export * from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
 export * from './ConnectionForm/ConnectionFormService';
 export * from './ConnectionForm/useConnectionFormState';
+export * from './ConnectionForm/ConnectionForm';
 export * from './Administration/Connections/ConnectionsAdministration';
 export * from './Administration/Connections/ConnectionsAdministrationNavService';
 export * from './Administration/Connections/ConnectionsAdministrationService';

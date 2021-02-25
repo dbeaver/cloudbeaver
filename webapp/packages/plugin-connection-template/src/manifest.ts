@@ -14,7 +14,7 @@ import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
 export const connectionTemplate: PluginManifest = {
   info: {
-    name: 'Connection template plugin',
+    name: 'Connections plugin',
   },
 
   providers: [

@@ -13,7 +13,7 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { TabContext } from '../TabContext';
-import type { ITabData } from '../TabsContext';
+import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { Tab } from './Tab';
 import { TabIcon } from './TabIcon';
 import type { TabProps } from './TabProps';

@@ -1,0 +1,12 @@
+mutation updateConnection(
+  $config: ConnectionConfig!
+
+  $includeOrigin: Boolean!,
+  $customIncludeOriginDetails: Boolean!,
+  $includeAuthProperties: Boolean!,
+  $customIncludeNetworkHandlerCredentials: Boolean!
+) {
+  connection: updateConnection(config: $config) {
+    ...DatabaseConnection
+  }
+}

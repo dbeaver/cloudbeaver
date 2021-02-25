@@ -235,6 +235,9 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
 }
 
 export function isLocalConnection(connection: DatabaseConnection): boolean {
+  if (!connection.origin) {
+    return true;
+  }
   return connection.origin.type === 'local';
 }
 

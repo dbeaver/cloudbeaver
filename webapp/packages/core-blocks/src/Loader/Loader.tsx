@@ -70,7 +70,12 @@ export const Loader: React.FC<Props> = observer(function Loader({
       if ('loading' in element) {
         loading = element.loading;
       } else if ('isLoading' in element) {
-        loading = element.isLoading() && (overlay || !element.isLoaded());
+        const loaded = element.isLoaded();
+        loading = element.isLoading() || !loaded;
+
+        if (!loaded) {
+          overlay = false;
+        }
       }
     }
   }

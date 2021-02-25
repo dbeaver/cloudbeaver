@@ -12,18 +12,13 @@ import type { TabStateReturn } from 'reakit/Tab';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { ITabInfo, TabsContainer } from './TabsContainer';
-
-export interface ITabData<T = Record<string, any>> {
-  tabId: string;
-  props: T;
-}
+import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 
 export interface ITabsContext<T = Record<string, any>> {
   state: TabStateReturn;
   tabsState: MetadataMap<string, any>;
   props: T;
-  container?: TabsContainer<T>;
+  container?: ITabsContainer<T>;
   openExecutor: IExecutor<ITabData<T>>;
   closeExecutor: IExecutor<ITabData<T>>;
   lazy: boolean;

@@ -42,7 +42,7 @@ const mainStyles = composes(
   `
 );
 
-export function Main() {
+export const Main: React.FC = function Main() {
   return styled(useStyles(mainStyles, splitStyles))(
     <space as="main">
       <Split sticky={30}>
@@ -56,4 +56,4 @@ export function Main() {
       </Split>
     </space>
   );
-}
+};

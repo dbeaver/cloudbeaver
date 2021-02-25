@@ -279,6 +279,7 @@ export interface Mutation {
   testConnection: ConnectionInfo;
   testNetworkHandler: NetworkEndpointInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
+  updateConnection: ConnectionInfo;
   updateResultsData?: Maybe<SqlExecuteInfo>;
   updateResultsDataBatch?: Maybe<SqlExecuteInfo>;
 }
@@ -387,6 +388,10 @@ export interface MutationTestConnectionArgs {
 
 export interface MutationTestNetworkHandlerArgs {
   config: NetworkHandlerConfigInput;
+}
+
+export interface MutationUpdateConnectionArgs {
+  config: ConnectionConfig;
 }
 
 export interface MutationUpdateResultsDataArgs {
@@ -1217,6 +1222,16 @@ export type TestNetworkHandlerMutationVariables = Exact<{
 
 export interface TestNetworkHandlerMutation { testNetworkHandler: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
 
+export type UpdateConnectionMutationVariables = Exact<{
+  config: ConnectionConfig;
+  includeOrigin: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+  includeAuthProperties: Scalars['Boolean'];
+  customIncludeNetworkHandlerCredentials: Scalars['Boolean'];
+}>;
+
+export interface UpdateConnectionMutation { connection: DatabaseConnectionFragment }
+
 export type ExportDataFromContainerQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
@@ -2045,6 +2060,13 @@ export const TestNetworkHandlerDocument = `
   }
 }
     `;
+export const UpdateConnectionDocument = `
+    mutation updateConnection($config: ConnectionConfig!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
+  connection: updateConnection(config: $config) {
+    ...DatabaseConnection
+  }
+}
+    ${DatabaseConnectionFragmentDoc}`;
 export const ExportDataFromContainerDocument = `
     query exportDataFromContainer($connectionId: ID!, $containerNodePath: ID!, $parameters: DataTransferParameters!) {
   taskInfo: dataTransferExportDataFromContainer(
@@ -2602,6 +2624,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     testNetworkHandler(variables: TestNetworkHandlerMutationVariables): Promise<TestNetworkHandlerMutation> {
       return withWrapper(() => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables));
+    },
+    updateConnection(variables: UpdateConnectionMutationVariables): Promise<UpdateConnectionMutation> {
+      return withWrapper(() => client.request<UpdateConnectionMutation>(UpdateConnectionDocument, variables));
     },
     exportDataFromContainer(variables: ExportDataFromContainerQueryVariables): Promise<ExportDataFromContainerQuery> {
       return withWrapper(() => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables));

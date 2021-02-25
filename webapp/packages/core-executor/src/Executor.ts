@@ -14,7 +14,7 @@ import type { IExecutorHandler } from './IExecutorHandler';
 import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 import { BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler';
 
-export class Executor<T = unknown> implements IExecutor<T> {
+export class Executor<T = void> implements IExecutor<T> {
   private collection: ExecutorHandlersCollection<T>;
   private scheduler: TaskScheduler<T>;
 

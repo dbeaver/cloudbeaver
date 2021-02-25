@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, makeObservable } from 'mobx';
-
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
-import type { TabProps } from './Tab/TabProps';
-import type { ITabData } from './TabsContext';
+import type { TabProps } from '../Tab/TabProps';
+
+export interface ITabData<T = Record<string, any>> {
+  tabId: string;
+  props: T;
+}
 
 export type TabContainerTabComponent<TProps = Record<string, any>> = React.FC<TabProps & TProps>;
 export type TabContainerPanelComponent<TProps = Record<string, any>> = React.FC<{ tabId: string } & TProps>;
@@ -42,35 +44,8 @@ export interface ITabInfo<
   order: number;
 }
 
-export class TabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
-  readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
-
-  get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
-    return Array.from(this.tabInfoMap.values())
-      .sort((a, b) => a.order - b.order);
-  }
-
-  constructor() {
-    makeObservable(this, {
-      tabInfoMap: observable.shallow,
-      tabInfoList: computed,
-    });
-
-    this.tabInfoMap = new Map();
-  }
-
-  getDisplayed(props?: TProps): Array<ITabInfo<TProps, TOptions>> {
-    return this.tabInfoList.filter(tabInfo => !tabInfo.isHidden?.(tabInfo.key, props));
-  }
-
-  add(tabInfo: ITabInfoOptions<TProps, TOptions>): void {
-    if (this.tabInfoMap.has(tabInfo.key)) {
-      throw new Error('Tab with same key already exists');
-    }
-
-    this.tabInfoMap.set(tabInfo.key, {
-      ...tabInfo,
-      order: tabInfo.order ?? Number.MAX_SAFE_INTEGER,
-    });
-  }
+export interface ITabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
+  tabInfoList: Array<ITabInfo<TProps, TOptions>>;
+  getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
+  getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
 }

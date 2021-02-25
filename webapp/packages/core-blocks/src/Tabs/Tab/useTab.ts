@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect } from 'react';
 
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 
 import { useObjectRef } from '../../useObjectRef';
-import { ITabData, TabsContext } from '../TabsContext';
+import type { ITabData } from '../TabsContainer/ITabsContainer';
+import { TabsContext } from '../TabsContext';
 
 export function useTab(
   tabId: string,

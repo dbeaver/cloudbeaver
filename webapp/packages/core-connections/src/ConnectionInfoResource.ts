@@ -180,6 +180,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.get(id)!;
   }
 
+  async update(config: ConnectionConfig): Promise<DatabaseConnection> {
+    await this.performUpdate(config.connectionId!, [], async () => {
+      const { connection } = await this.graphQLService.sdk.updateConnection({
+        config,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(config.connectionId!),
+      });
+
+      this.updateConnection(connection);
+    });
+    return this.get(config.connectionId!)!;
+  }
+
   async close(id: string): Promise<Connection> {
     await this.performUpdate(id, [], async () => {
       const { connection } = await this.graphQLService.sdk.closeConnection({

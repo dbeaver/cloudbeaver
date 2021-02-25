@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles
+  Pane, ResizerControls, SlideBox, SlideElement, slideBoxStyles, Split, splitHorizontalStyles, splitStyles
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
 import { LogViewTab } from '../shared/ToolsPanel/LogViewTab/LogViewTab';
@@ -34,21 +35,36 @@ const styles = composes(
     Pane:last-child {
       flex: 0 0 30%;
     }
+    SlideBox {
+      flex: 1;
+    }
+    SlideElement {
+      display: flex;
+    }
   `
 );
 
 export const RightArea = observer(function RightArea() {
   const controller = useController(LogViewTabController);
+  const optionsPanelService = useService(OptionsPanelService);
+  const OptionsPanel = optionsPanelService.getPanelComponent();
 
-  return styled(useStyles(styles, splitStyles, splitHorizontalStyles))(
-    <Split sticky={30} split="horizontal" mode={controller.isActive ? undefined : 'minimize'} keepRatio>
-      <Pane>
-        <NavigationTabsBar />
-      </Pane>
-      {controller.isActive && <ResizerControls />}
-      <Pane main>
-        <LogViewTab />
-      </Pane>
-    </Split>
+  return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
+    <SlideBox open={optionsPanelService.active}>
+      <SlideElement>
+        <OptionsPanel />
+      </SlideElement>
+      <SlideElement>
+        <Split sticky={30} split="horizontal" mode={controller.isActive ? undefined : 'minimize'} keepRatio>
+          <Pane>
+            <NavigationTabsBar />
+          </Pane>
+          {controller.isActive && <ResizerControls />}
+          <Pane main>
+            <LogViewTab />
+          </Pane>
+        </Split>
+      </SlideElement>
+    </SlideBox>
   );
 });

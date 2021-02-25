@@ -13,14 +13,14 @@ import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/co
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { useObjectRef } from '../useObjectRef';
-import type { TabsContainer } from './TabsContainer';
-import { TabsContext, ITabsContext, ITabData } from './TabsContext';
+import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
+import { TabsContext, ITabsContext } from './TabsContext';
 
 type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   selectedId?: string;
   orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
-  container?: TabsContainer<T, any>;
+  container?: ITabsContainer<T, any>;
   localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
@@ -120,7 +120,7 @@ export function TabsState<T = Record<string, any>>({
     props: dynamic.props,
   }), []);
 
-  const getTabInfo = useCallback((tabId: string) => dynamic.container?.tabInfoMap.get(tabId), []);
+  const getTabInfo = useCallback((tabId: string) => dynamic.container?.getTabInfo(tabId), []);
 
   const value = useMemo<ITabsContext<T>>(() => ({
     state,

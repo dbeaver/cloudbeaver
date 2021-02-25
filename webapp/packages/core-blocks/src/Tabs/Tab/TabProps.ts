@@ -10,7 +10,7 @@ import type { PropsWithChildren } from 'react';
 
 import type { DynamicStyle } from '@cloudbeaver/core-theming';
 
-import type { ITabData } from '../TabsContext';
+import type { ITabData } from '../TabsContainer/ITabsContainer';
 
 export type TabProps = PropsWithChildren<{
   tabId: string;

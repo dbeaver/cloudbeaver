@@ -10,7 +10,7 @@ import type { IExecutionContext, IExecutionContextProvider } from './IExecutionC
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export interface IExecutor<T = unknown> {
+export interface IExecutor<T = void> {
   before: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   next: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   execute: (
