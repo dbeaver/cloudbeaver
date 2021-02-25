@@ -8,27 +8,15 @@
 
 import { observer } from 'mobx-react-lite';
 import type { PropsWithChildren } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Grid, Group, Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ObjectProperty } from './ObjectProperty';
-
-const tabStyles = css`
-  properties {
-    display: flex;
-    flex: 1;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    padding-top: 8px;
-  }
-`;
 
 type ObjectPropertiesProps = PropsWithChildren<{
   objectId: string;
@@ -38,8 +26,8 @@ export const ObjectProperties = observer(function ObjectProperties({
   objectId,
 }: ObjectPropertiesProps) {
   const translate = useTranslate();
-  const style = useStyles(tabStyles);
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
+  const styles = useStyles(BASE_CONTAINERS_STYLES);
 
   if (!dbObject?.properties && isLoading) {
     return <Loader />;
@@ -49,13 +37,15 @@ export const ObjectProperties = observer(function ObjectProperties({
     return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <properties as="div">
-      <container as="div">
-        {dbObject.properties.map(v => (
-          <ObjectProperty key={v.id} objectProperty={v} />
-        ))}
-      </container>
-    </properties>
+  return styled(styles)(
+    <ColoredContainer overflow>
+      <Group>
+        <Grid large>
+          {dbObject.properties.map(v => (
+            <ObjectProperty key={v.id} objectProperty={v} />
+          ))}
+        </Grid>
+      </Group>
+    </ColoredContainer>
   );
 });
