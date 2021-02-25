@@ -38,7 +38,7 @@ export const ObjectProperties = observer(function ObjectProperties({
   }
 
   return styled(styles)(
-    <ColoredContainer>
+    <ColoredContainer overflow>
       <Group>
         <Grid large>
           {dbObject.properties.map(v => (

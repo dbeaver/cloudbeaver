@@ -29,12 +29,14 @@ export const BASE_CONTAINERS_STYLES = composes(
     Container, ColoredContainer {
       display: flex;
       flex-direction: column;
-      overflow: auto;
       &[horizontal] {
         flex-direction: row;
       }
       &[wrap] {
         flex-wrap: wrap;
+      }
+      &[overflow] {
+        overflow: auto;
       }
     }
 
@@ -50,7 +52,10 @@ export const BASE_CONTAINERS_STYLES = composes(
       grid-template-columns: minmax(min-content, 1fr);
       grid-auto-rows: max-content; 
       &[horizontal] {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      &[center] {
+        margin: 0 auto;
       }
     }
 

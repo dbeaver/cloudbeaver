@@ -11,6 +11,7 @@ import type { ISize } from './BASE_CONTAINERS_STYLES';
 interface Props extends ISize {
   className?: string;
   horizontal?: boolean;
+  center?: boolean;
 }
 
 export const Grid: React.FC<Props> = function Grid({ children, className }) {

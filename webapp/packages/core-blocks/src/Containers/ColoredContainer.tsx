@@ -12,6 +12,7 @@ interface Props extends ISize {
   className?: string;
   horizontal?: boolean;
   wrap?: boolean;
+  overflow?: boolean;
 }
 
 export const ColoredContainer: React.FC<Props> = function ColoredContainer({ children, className }) {

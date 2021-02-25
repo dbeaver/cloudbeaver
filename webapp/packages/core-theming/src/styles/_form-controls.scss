@@ -34,7 +34,12 @@
     }
   }
 
-  input[role="new"] {
+  textarea[role="new"] {
+    resize: vertical;
+  }
+
+  input[role="new"],
+  textarea[role="new"] {
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, input-background, false);
     box-sizing: border-box;

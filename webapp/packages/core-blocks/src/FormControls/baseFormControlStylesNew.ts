@@ -15,13 +15,13 @@ export const baseFormControlStylesNew = css`
     min-height: 54px;
     max-width: 100%;
     &[|small] {
-      max-width: 240px;
+      grid-column: 1/-4;
     }
     &[|medium] {
-      max-width: 440px;
+      grid-column: 1/-3
     }
     &[|large] {
-      max-width: 640px;
+      grid-column: 1/-2;
     }
     &[|full] {
       grid-column: 1/-1;
