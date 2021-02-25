@@ -30,6 +30,6 @@ export class PublicConnectionFormService {
 
   async close(): Promise<void> {
     this.connectionId = null;
-    await this.optionsPanelService.close(formGetter);
+    await this.optionsPanelService.close();
   }
 }
