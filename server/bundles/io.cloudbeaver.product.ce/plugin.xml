@@ -18,6 +18,7 @@
     <extension point="org.jkiss.dbeaver.application">
         <application
             id="cloudbeaver-ce"
+            family="CB"
             name="CloudBeaver CE Server"
             description="CloudBeaver Web UI"
             server="true"/>
