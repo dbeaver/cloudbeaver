@@ -21,7 +21,7 @@ $color-negative: #fd1d48;
 $input-border: #dedede;
 $input-border-disabled: transparent;
 $input-border-readonly: transparent;
-$input-background: transparent;
+$input-background: $mdc-theme-surface;
 $input-background-disabled: $mdc-theme-secondary;
 $input-background-readonly: $mdc-theme-secondary;
 

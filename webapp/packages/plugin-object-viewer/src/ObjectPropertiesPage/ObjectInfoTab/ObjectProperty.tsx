@@ -15,6 +15,7 @@ import { additionalProps, filterProperty, getValue, matchType } from '../helpers
 
 export const ObjectProperty = observer(function ObjectProperty({
   objectProperty,
+  className,
 }: ObjectPropertyProps) {
   if (!objectProperty || !filterProperty(objectProperty)) {
     return null;
@@ -25,6 +26,7 @@ export const ObjectProperty = observer(function ObjectProperty({
       {matchType(objectProperty.dataType) === 'checkbox'
         ? (
           <FieldCheckboxNew
+            className={className}
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
             readOnly
@@ -35,6 +37,7 @@ export const ObjectProperty = observer(function ObjectProperty({
         )
         : (
           <InputFieldNew
+            className={className}
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
             readOnly

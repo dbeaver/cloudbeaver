@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FormGroup, Grid, Group, InputField, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Grid, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -21,12 +21,6 @@ interface ParametersFormProps {
   readOnly?: boolean;
 }
 
-const parametersFormStyles = css`
-  sub-label {
-    composes: theme-typography--caption from global;
-    line-height: 14px;
-  }`;
-
 export const ParametersFormNew = observer(function ParametersFormNew({
   config,
   embedded,
@@ -35,7 +29,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
 }: ParametersFormProps) {
   const translate = useTranslate();
 
-  return styled(useStyles(parametersFormStyles, BASE_CONTAINERS_STYLES))(
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Grid>
       {!embedded && (
         <Grid horizontal>

@@ -10,12 +10,6 @@ import { css } from 'reshadow';
 
 import { composes } from '@cloudbeaver/core-theming';
 
-export interface ISize {
-  small?: boolean;
-  medium?: boolean;
-  large?: boolean;
-}
-
 export const BASE_CONTAINERS_STYLES = composes(
   css`
     Group {
@@ -56,6 +50,12 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
       &[center] {
         margin: 0 auto;
+      }
+    }
+
+    Grid {
+      & > [itemMax] {
+        grid-column: 1/-1;
       }
     }
 

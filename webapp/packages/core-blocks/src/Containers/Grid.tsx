@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ISize } from './BASE_CONTAINERS_STYLES';
+import type { ILayoutSizeProps } from './ILayoutContainerProps';
 
-interface Props extends ISize {
+interface Props extends ILayoutSizeProps {
   className?: string;
   horizontal?: boolean;
   center?: boolean;

@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ISize } from '../Containers/BASE_CONTAINERS_STYLES';
+import type { ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 
@@ -26,16 +26,14 @@ const styles = css`
   }
 `;
 
-type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & ISize & {
+type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & ILayoutSizeProps & {
   mod?: 'surface';
-  long?: boolean;
 };
 
 type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   onChange?: (value: string, name?: string) => any;
-
   state?: never;
 };
 
@@ -43,7 +41,6 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: string, name: TKey) => any;
-
   value?: never;
 };
 
@@ -58,8 +55,10 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
   state,
   children,
   className,
+  small,
+  medium,
+  large,
   mod,
-  long,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -80,12 +79,11 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
   const value = state ? state[name] : controlledValue;
 
   return styled(useStyles(baseFormControlStylesNew, styles))(
-    <field as="div" className={className} {...use({ long })}>
+    <field as="div" className={className} {...use({ small, medium, large })}>
       <field-label as='label'>{children}</field-label>
       <textarea
         {...rest}
         role='new'
-
         value={value ?? ''}
         name={name}
         onChange={handleChange}

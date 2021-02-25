@@ -8,12 +8,11 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { use } from 'reshadow';
-import { css } from 'reshadow';
+import styled, { use, css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ISize } from '../Containers/BASE_CONTAINERS_STYLES';
+import type { ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
@@ -25,10 +24,9 @@ const INPUT_FIELD_STYLES = css`
   }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ISize & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
   mod?: 'surface';
-  full?: boolean;
 };
 
 type ControlledProps = BaseProps & {
@@ -64,7 +62,6 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   small,
   medium,
   large,
-  full,
   autoHide,
   onChange,
   ...rest
@@ -91,7 +88,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   }
 
   return styled(styles)(
-    <field as="div" className={className} {...use({ small, medium, large, full })}>
+    <field as="div" className={className} {...use({ small, medium, large })}>
       <field-label as='label'>{children} {required && '*'}</field-label>
       <input
         role='new'
