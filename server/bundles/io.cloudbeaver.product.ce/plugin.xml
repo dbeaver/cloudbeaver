@@ -16,7 +16,11 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.application">
-        <application id="cloudbeaver-server" name="CloudBeaver CE Server" description="CloudBeaver Web UI"/>
+        <application
+            id="cloudbeaver-ce"
+            name="CloudBeaver CE Server"
+            description="CloudBeaver Web UI"
+            server="true"/>
     </extension>
 
 </plugin>
