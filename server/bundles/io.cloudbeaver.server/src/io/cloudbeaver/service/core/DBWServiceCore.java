@@ -110,6 +110,14 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
     @WebAction
+    WebConnectionInfo updateConnection(
+        @NotNull WebSession webSession,
+        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+
+    @WebAction
+    boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException;
+
+    @WebAction
     WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException;
     @WebAction()
     WebConnectionInfo copyConnectionFromNode(@NotNull WebSession webSession, @NotNull String nodePath, @NotNull WebConnectionConfig config) throws DBWebException;
@@ -122,9 +130,6 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException;
-
-    @WebAction
-    boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException;
 
     ///////////////////////////////////////////
     // Navigator settings

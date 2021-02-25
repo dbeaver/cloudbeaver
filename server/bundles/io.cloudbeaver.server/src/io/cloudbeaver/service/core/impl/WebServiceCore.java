@@ -298,6 +298,9 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo createConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException {
+        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
+            throw new DBWebException("New connection create is restricted by server configuration");
+        }
         DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
 
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
@@ -311,6 +314,39 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addConnection(connectionInfo);
 
         return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo updateConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
+        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
+            throw new DBWebException("Connection edit is restricted by server configuration");
+        }
+        DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
+
+        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(config.getConnectionId());
+        DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
+
+        if (CommonUtils.isEmpty(config.getName())) {
+            dataSource.setName(config.getName());
+        }
+        if (CommonUtils.isEmpty(config.getDescription())) {
+            dataSource.setDescription(config.getDescription());
+        }
+        WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
+        WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
+
+        sessionRegistry.updateDataSource(dataSource);
+
+        return connectionInfo;
+    }
+
+    @Override
+    public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
+        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
+            throw new DBWebException("Connection delete is restricted by server configuration");
+        }
+        closeAndDeleteConnection(webSession, connectionId, true);
+        return true;
     }
 
     @Override
@@ -460,12 +496,6 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException {
         return closeAndDeleteConnection(webSession, connectionId, false);
-    }
-
-    @Override
-    public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
-        closeAndDeleteConnection(webSession, connectionId, true);
-        return true;
     }
 
     @NotNull

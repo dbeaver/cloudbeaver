@@ -416,6 +416,10 @@ extend type Mutation {
     # Create new custom connection. Custom connections exist only within the current session.
     createConnection( config: ConnectionConfig! ): ConnectionInfo!
 
+    updateConnection( config: ConnectionConfig! ): ConnectionInfo!
+
+    deleteConnection( id: ID! ): Boolean!
+
     createConnectionFromTemplate( templateId: ID! ): ConnectionInfo!
 
     # Copies connection configuration from node
