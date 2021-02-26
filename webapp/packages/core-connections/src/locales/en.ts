@@ -23,7 +23,7 @@ export default [
   ['connections_connection_edit_search', 'Search'],
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Address'],
-  ['connections_connection_name', 'Name'],
+  ['connections_connection_name', 'Connection name'],
   ['connections_connection_description', 'Description'],
   ['connections_connection_driver', 'Driver'],
   ['connections_connection_host', 'Host'],

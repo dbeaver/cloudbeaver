@@ -30,16 +30,16 @@ export const ParametersFormNew = observer(function ParametersFormNew({
   const translate = useTranslate();
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
-    <Grid>
+    <Grid horizontal>
       {!embedded && (
-        <Grid horizontal>
+        <>
           <InputFieldNew
             type="text"
             name="host"
             state={config}
             disabled={disabled}
             readOnly={readOnly}
-            large
+            gridItemMedium
             required
           >
             {translate('customConnection_custom_host')}
@@ -53,7 +53,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
           >
             {translate('customConnection_custom_port')}
           </InputFieldNew>
-        </Grid>
+        </>
       )}
       <InputFieldNew
         type="text"
@@ -61,7 +61,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
         state={config}
         disabled={disabled}
         readOnly={readOnly}
-        full
+        gridItemMax
       >
         {translate('customConnection_custom_database')}
       </InputFieldNew>

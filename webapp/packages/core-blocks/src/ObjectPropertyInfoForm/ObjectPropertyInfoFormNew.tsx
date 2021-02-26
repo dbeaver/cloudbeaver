@@ -13,14 +13,15 @@ import styled from 'reshadow';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { BASE_CONTAINERS_STYLES } from '../Containers/BASE_CONTAINERS_STYLES';
+import { Container } from '../Containers/Container';
 import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../FormControls/ComboboxNew';
-import { FormFieldDescription } from '../FormControls/FormFieldDescription';
+import { FormFieldDescriptionNew } from '../FormControls/FormFieldDescriptionNew';
 import { InputFieldNew } from '../FormControls/InputFieldNew';
 import { isControlPresented } from '../FormControls/isControlPresented';
 import { Link } from '../Link';
 import { TextPlaceholder } from '../TextPlaceholder';
-import { formStyles } from './formStyles';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -55,9 +56,9 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 
   if (href) {
     return (
-      <FormFieldDescription label={property.displayName} raw>
+      <FormFieldDescriptionNew label={property.displayName}>
         <Link href={state[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
-      </FormFieldDescription>
+      </FormFieldDescriptionNew>
     );
   }
 
@@ -66,9 +67,9 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       return null;
     }
     return (
-      <FormFieldDescription label={property.displayName} raw>
+      <FormFieldDescriptionNew label={property.displayName}>
         {state[property.id!]}
-      </FormFieldDescription>
+      </FormFieldDescriptionNew>
     );
   }
 
@@ -83,7 +84,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         state={state}
         checkboxLabel={property.displayName}
         title={property.description}
-        disabled={disabled}
+        disabled={disabled || readOnly}
         mod='surface'
       />
     );
@@ -149,7 +150,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
   showRememberTip,
   onFocus,
 }) {
-  const style = useStyles(formStyles);
+  const styles = useStyles(BASE_CONTAINERS_STYLES);
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     if (onFocus) {
@@ -161,8 +162,8 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <form-body as='div' className={className}>
+  return styled(styles)(
+    <Container className={className}>
       {properties.map(property => (
         <RenderField
           key={property.id}
@@ -177,6 +178,6 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
           onFocus={handleFocus}
         />
       ))}
-    </form-body>
+    </Container>
   );
 });

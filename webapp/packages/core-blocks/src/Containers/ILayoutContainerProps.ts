@@ -5,5 +5,6 @@ export interface ILayoutSizeProps {
 }
 
 export interface IGridItemsLayoutProps {
-  itemMax?: boolean;
+  gridItemMedium?: boolean;
+  gridItemMax?: boolean;
 }

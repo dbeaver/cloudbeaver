@@ -10,6 +10,7 @@ import type { ILayoutSizeProps } from './ILayoutContainerProps';
 
 interface Props extends ILayoutSizeProps {
   className?: string;
+  form?: boolean;
 }
 
 export const Group: React.FC<Props> = function Group({ children, className }) {

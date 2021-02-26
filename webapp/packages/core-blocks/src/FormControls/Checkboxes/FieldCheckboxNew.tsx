@@ -21,6 +21,7 @@ const fieldCheckboxStyles = css`
   field {
     display: flex;
     align-items: center;
+    white-space: pre-wrap;
   }
   field-label {
     padding-left: 10px;

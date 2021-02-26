@@ -32,6 +32,9 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[overflow] {
         overflow: auto;
       }
+      &[parent] {
+        padding: 8px;
+      }
     }
 
     Group {
@@ -39,6 +42,14 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 10px;
       padding: 10px;
       border-radius: 4px;
+      &[form] {
+        padding-right: 30%;
+      }
+    }
+
+    GroupItem {
+      padding: 12px;
+      min-width: min-content;
     }
 
     Grid {
@@ -46,7 +57,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       grid-template-columns: minmax(min-content, 1fr);
       grid-auto-rows: max-content; 
       &[horizontal] {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       }
       &[center] {
         margin: 0 auto;
@@ -54,8 +65,11 @@ export const BASE_CONTAINERS_STYLES = composes(
     }
 
     Grid {
-      & > [itemMax] {
+      & > [gridItemMax] {
         grid-column: 1/-1;
+      }
+      & > [gridItemMedium] {
+        grid-column: 1/-2;
       }
     }
 
