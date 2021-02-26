@@ -326,10 +326,10 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
 
-        if (CommonUtils.isEmpty(config.getName())) {
+        if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
-        if (CommonUtils.isEmpty(config.getDescription())) {
+        if (!CommonUtils.isEmpty(config.getDescription())) {
             dataSource.setDescription(config.getDescription());
         }
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
