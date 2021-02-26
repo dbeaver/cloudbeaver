@@ -19,6 +19,7 @@ export interface IConnectionForm {
   originLocal: boolean; // connection specific, maybe should be in another place
   disabled: boolean;
   loading: boolean;
+  readonly: boolean;
 }
 
 export interface IConnectionFormData {

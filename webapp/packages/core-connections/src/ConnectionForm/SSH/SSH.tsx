@@ -90,6 +90,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               state={state}
               mod={['primary']}
               disabled={disabled}
+              readOnly={form.form.readonly}
             >
               {translate('connections_network_handler_ssh_tunnel_enable')}
             </Switch>
@@ -102,6 +103,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="host"
               state={state.properties}
               disabled={disabled || !enabled}
+              readOnly={form.form.readonly}
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_host')}
@@ -113,6 +115,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="port"
               state={state.properties}
               disabled={disabled || !enabled}
+              readOnly={form.form.readonly}
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_port')}
@@ -126,6 +129,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               name="userName"
               state={state}
               disabled={disabled || !enabled}
+              readOnly={form.form.readonly}
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
@@ -138,6 +142,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               placeholder={passwordHint}
               state={state}
               disabled={disabled || !enabled}
+              readOnly={form.form.readonly}
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_password')}
@@ -151,6 +156,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
                 state={state}
                 checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
                 disabled={disabled || !enabled}
+                readOnly={form.form.readonly}
                 mod='surface'
               />
             </FormGroup>

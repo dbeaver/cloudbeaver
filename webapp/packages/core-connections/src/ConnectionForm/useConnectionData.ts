@@ -10,11 +10,26 @@ import { useRef } from 'react';
 
 import type { IConnectionFormData } from './ConnectionFormService';
 
-export function useConnectionData(data: IConnectionFormData, fill: (data: IConnectionFormData) => void): void {
-  const firstRenderRef = useRef(true);
+interface IState {
+  connectionId: string | undefined;
+  driverId: string | undefined;
+}
 
-  if (firstRenderRef.current) {
+export function useConnectionData(data: IConnectionFormData, fill: (data: IConnectionFormData) => void): void {
+  const connectionId = data.info?.id || data.config.connectionId;
+  const driverId = data.info?.driverId || data.config.driverId;
+
+  const firstRenderRef = useRef<IState>({
+    connectionId: undefined,
+    driverId: undefined,
+  });
+
+  if (
+    firstRenderRef.current.connectionId !== connectionId
+    || firstRenderRef.current.driverId !== driverId
+  ) {
     fill(data);
-    firstRenderRef.current = false;
+    firstRenderRef.current.connectionId = connectionId;
+    firstRenderRef.current.driverId = driverId;
   }
 }

@@ -128,7 +128,7 @@ export const ConnectionForm = observer(function ConnectionForm({
           </Button>
           <Button
             type="button"
-            disabled={formState.form.disabled}
+            disabled={formState.form.disabled || formState.form.readonly}
             mod={['unelevated']}
             onClick={formState.save}
           >

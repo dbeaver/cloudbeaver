@@ -96,7 +96,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
     return () => clearTimeout(id);
   }, [loading]);
 
-  if (!isVisible) {
+  if (!isVisible && !loading) {
     return children?.() || null;
   }
 

@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { AnnotationsMap, observable } from 'mobx';
 import { useState } from 'react';
 
-export function useObjectRef<T>(init: T, update?: Partial<T>, observed?: boolean): T {
+export function useObjectRef<T>(init: T, update?: Partial<T>, observed?: boolean | AnnotationsMap<T, never>): T {
   const [ref] = useState(() => {
     if (observed) {
-      return observable.object(init, undefined, { deep: false });
+      return observable.object(init, typeof observed === 'object' ? observed : undefined, { deep: false });
     }
     return init;
   });

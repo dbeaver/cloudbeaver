@@ -155,7 +155,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 items={drivers}
                 keySelector={driver => driver.id}
                 valueSelector={driver => driver?.name ?? ''}
-                readOnly={edit || drivers.length < 2}
+                readOnly={form.form.readonly || edit || drivers.length < 2}
                 mod="surface"
                 disabled={form.form.disabled}
               >
@@ -170,6 +170,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
               minLength={1}
               state={data.config}
               disabled={form.form.disabled}
+              readOnly={form.form.readonly}
               mod='surface'
               required
             >
@@ -182,6 +183,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
               rows={3}
               state={data.config}
               disabled={form.form.disabled}
+              readOnly={form.form.readonly}
               mod='surface'
             >
               {translate('connections_connection_description')}
@@ -195,6 +197,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 state={data.config}
                 checkboxLabel={translate('connections_connection_template')}
                 disabled={edit || form.form.disabled}
+                readOnly={form.form.readonly}
                 // autoHide={} // maybe better to use autoHide
                 mod='surface'
               />
@@ -210,6 +213,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                   name="url"
                   state={data.config}
                   disabled={form.form.disabled}
+                  readOnly={form.form.readonly}
                   autoComplete={`section-${data.config.driverId || 'driver'} section-jdbc`}
                   mod='surface'
                 >
@@ -221,7 +225,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 config={data.config}
                 embedded={driver.data?.embedded}
                 disabled={form.form.disabled}
-                readOnly={!form.form.originLocal}
+                readOnly={form.form.readonly || !form.form.originLocal}
               />
             )}
           </parameters-type-container>
@@ -236,6 +240,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 properties={properties}
                 state={data.config.credentials}
                 disabled={form.form.disabled}
+                readOnly={form.form.readonly}
                 showRememberTip
               />
               {credentialsSavingEnabled && (
@@ -246,6 +251,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                     state={data.config}
                     checkboxLabel={translate('connections_connection_edit_save_credentials')}
                     disabled={form.form.disabled}
+                    readOnly={form.form.readonly}
                     mod='surface'
                   />
                 </FormGroup>
@@ -263,6 +269,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 properties={driver.data.providerProperties}
                 state={data.config.providerProperties}
                 disabled={form.form.disabled}
+                readOnly={form.form.readonly}
               />
             </>
           )}

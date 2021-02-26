@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
@@ -20,6 +22,10 @@ export class PublicConnectionFormService {
   constructor(
     private readonly optionsPanelService: OptionsPanelService
   ) {
+    makeObservable(this, {
+      connectionId: observable,
+    });
+
     this.connectionId = null;
   }
 

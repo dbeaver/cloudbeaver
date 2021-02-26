@@ -52,6 +52,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
     <Loader state={connection}>
       {() => (
         <ConnectionForm
+          key={service.connectionId}
           data={data}
           options={options}
           onCancel={close}

@@ -14,6 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { isLocalConnection } from '../Administration/ConnectionsResource';
+import { EConnectionFeature } from '../EConnectionFeature';
 import { IConnectionForm, IConnectionFormData, IConnectionFormOptions, IConnectionFormState, IConnectionFormSubmitData, ConnectionFormService } from './ConnectionFormService';
 
 export function useConnectionFormState(
@@ -27,6 +28,17 @@ export function useConnectionFormState(
   const [form] = useState<IConnectionForm>(() => observable({
     disabled: false,
     loading: false,
+    get readonly() {
+      if (options.type === 'admin') {
+        return false;
+      }
+
+      if (props.data.info?.features && !props.data.info.features.includes(EConnectionFeature.manageable)) {
+        return true;
+      }
+
+      return false;
+    },
     get originLocal() {
       return !props.data.info || isLocalConnection(props.data.info);
     },
