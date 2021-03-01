@@ -10,23 +10,28 @@ import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
 
+import { filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
 import type { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
 import { ConfigurationWizardService } from '../AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 
 export const DrawerItem = observer(function DrawerItem({
-  item, onSelect, style, configurationWizard,
+  item, onSelect, style, configurationWizard, disabled,
 }: AdministrationItemDrawerProps) {
   const configurationWizardService = useService(ConfigurationWizardService);
   const Component = item.getDrawerComponent();
 
-  const disabled = configurationWizard && !configurationWizardService.isStepAvailable(item.name);
+  if (configurationWizard) {
+    disabled = !configurationWizardService.isStepAvailable(item.name);
+  }
+
+  const onlyActive = filterOnlyActive(item) ? false : disabled;
 
   return (
     <Component
       item={item}
       configurationWizard={configurationWizard}
       style={style}
-      disabled={disabled}
+      disabled={onlyActive}
       onSelect={onSelect}
     />
   );

@@ -127,6 +127,7 @@ export function useMapResource<
       return resource.isLoaded(refObj.key, refObj.includes);
     },
     reload: () => {
+      setException(null);
       refObj.load();
     },
     isLoading: () => {
@@ -139,7 +140,9 @@ export function useMapResource<
   }));
 
   useEffect(() => {
-    refObj.load();
+    if (exception === null) {
+      refObj.load();
+    }
   }, [key, includes]);
 
   return result;

@@ -81,6 +81,7 @@ export interface IAdministrationItemOptions {
   order?: number;
   sub?: IAdministrationItemSubItem[];
   isHidden?: (() => boolean) | boolean;
+  isOnlyActive?: (() => boolean) | boolean;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;

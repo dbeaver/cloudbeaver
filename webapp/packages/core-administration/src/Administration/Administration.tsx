@@ -11,11 +11,11 @@ import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabsState, TabList, verticalTabStyles } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
-import { AdministrationController } from './AdministrationController';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 
@@ -77,8 +77,9 @@ export const Administration: React.FC<Props> = observer(function Administration(
   configurationWizard, activeScreen, onItemSelect, children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const controller = useController(AdministrationController);
-  const items = controller.getItems(configurationWizard);
+  const administrationItemService = useService(AdministrationItemService);
+  const items = administrationItemService.getActiveItems(configurationWizard);
+  const hasOnlyActive = items.some(filterOnlyActive);
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });
@@ -95,6 +96,7 @@ export const Administration: React.FC<Props> = observer(function Administration(
                 item={item}
                 configurationWizard={configurationWizard}
                 style={[verticalTabStyles, tabsStyles]}
+                disabled={hasOnlyActive}
                 onSelect={onItemSelect}
               />
             ))}

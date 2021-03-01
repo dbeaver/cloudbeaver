@@ -28,17 +28,27 @@ export class AdministrationItemService {
     });
   }
 
-  getDefaultItem(configurationWizard: boolean): string | null {
-    const items = this.items.filter(item =>
+  getActiveItems(configurationWizard: boolean): IAdministrationItem[] {
+    return this.items.filter(item =>
       filterHiddenAdministrationItem(item)
       && filterConfigurationWizard(configurationWizard)(item)
-    );
+    ).sort(orderAdministrationItems(configurationWizard));
+  }
+
+  getDefaultItem(configurationWizard: boolean): string | null {
+    const items = this.getActiveItems(configurationWizard);
 
     if (items.length === 0) {
       return null;
     }
 
-    return items.sort(orderAdministrationItems(configurationWizard))[0].name;
+    const onlyActive = items.find(filterOnlyActive);
+
+    if (onlyActive) {
+      return onlyActive.name;
+    }
+
+    return items[0].name;
   }
 
   getAdministrationItemRoute(state: RouterState, configurationMode = false): IAdministrationItemRoute {
@@ -175,4 +185,12 @@ export function filterHiddenAdministrationItem(item: IAdministrationItem): boole
   }
 
   return !item.isHidden;
+}
+
+export function filterOnlyActive(item: IAdministrationItem): boolean {
+  if (typeof item.isOnlyActive === 'function') {
+    return item.isOnlyActive();
+  }
+
+  return item.isOnlyActive === true;
 }

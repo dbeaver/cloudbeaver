@@ -119,6 +119,14 @@ export class ConfigurationWizardService {
         return false;
       }
     }
+
+    if (step.configurationWizardOptions?.isDone) {
+      const isDone = step.configurationWizardOptions.isDone();
+      if (!isDone) {
+        return false;
+      }
+    }
+
     return true;
   }
 
