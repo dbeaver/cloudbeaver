@@ -7,10 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
-import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage, useMapResource } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoFormNew, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IConnectionFormTabProps } from '../ConnectionFormService';
 
@@ -21,6 +23,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
   const tab = useTab(tabId);
   const translate = useTranslate();
   const state = useTabState<Record<string, any>>(() => ({}));
+  const styles = useStyles(BASE_CONTAINERS_STYLES);
 
   const connection = useMapResource(data.resource!, {
     key: tab.selected ? data.info!.id : null,
@@ -46,41 +49,41 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
   );
 
   if (connection.isLoading()) {
-    return (
-      <FormBox>
+    return styled(styles)(
+      <ColoredContainer>
         <Loader key="static" />
-      </FormBox>
+      </ColoredContainer>
     );
   }
 
   if (connection.exception) {
-    return (
-      <FormBox>
+    return styled(styles)(
+      <ColoredContainer>
         <ExceptionMessage exception={connection.exception} onRetry={connection.reload} />
-      </FormBox>
+      </ColoredContainer>
     );
   }
 
   if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
-    return (
-      <FormBox>
+    return styled(styles)(
+      <ColoredContainer>
         <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
-      </FormBox>
+      </ColoredContainer>
     );
   }
 
-  return (
-    <FormBox>
-      <FormBoxElement>
-        <FormGroup><br /></FormGroup>
-        <ObjectPropertyInfoForm
+  return styled(styles)(
+    <ColoredContainer>
+      <Group form>
+        <br />
+        <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}
           editable={false}
           autoHide
         />
-      </FormBoxElement>
+      </Group>
       <Loader key="overlay" loading={connection.isLoading()} overlay />
-    </FormBox>
+    </ColoredContainer>
   );
 });

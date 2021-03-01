@@ -12,12 +12,20 @@ import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
-  InputField,
-  ObjectPropertyInfoForm,
-  Textarea,
-  InputGroup,
-  Combobox,
-  SubmittingForm, FieldCheckbox, FormBox, FormBoxElement, FormGroup, TabContainerPanelComponent, useMapResource
+  InputFieldNew,
+  SubmittingForm,
+  TabContainerPanelComponent,
+  useMapResource,
+  ColoredContainer,
+  BASE_CONTAINERS_STYLES,
+  Group,
+  GroupTitle,
+  FieldCheckboxNew,
+  ObjectPropertyInfoFormNew,
+  TextareaNew,
+  ComboboxNew,
+  Container,
+  Grid
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
@@ -30,7 +38,7 @@ import { DBDriverResource } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
 import { IConnectionFormTabProps, ConnectionFormService } from '../ConnectionFormService';
 import { useConnectionData } from '../useConnectionData';
-import { ParametersForm } from './ParametersForm';
+import { ParametersFormNew } from './ParametersFormNew';
 import { useOptions } from './useOptions';
 
 const styles = css`
@@ -38,8 +46,6 @@ const styles = css`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding-top: 16px;
-    padding-bottom: 16px;
     overflow: auto;
   }
 `;
@@ -143,55 +149,60 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     properties = data.info.authProperties;
   }
 
-  return styled(useStyles(styles))(
+  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
-      <FormBox>
-        <FormBoxElement>
-          {(admin || edit) && (
-            <FormGroup>
-              <Combobox
-                name='driverId'
+      <ColoredContainer wrap horizontal overflow parent>
+        <Container>
+          <Group form>
+            <Grid horizontal>
+              {(admin || edit) && (
+                <ComboboxNew
+                  name='driverId'
+                  state={data.config}
+                  items={drivers}
+                  keySelector={driver => driver.id}
+                  valueSelector={driver => driver?.name ?? ''}
+                  readOnly={form.form.readonly || edit || drivers.length < 2}
+                  disabled={form.form.disabled}
+                >
+                  {translate('connections_connection_driver')}
+                </ComboboxNew>
+              )}
+              <InputFieldNew
+                type="text"
+                name="name"
+                minLength={1}
                 state={data.config}
-                items={drivers}
-                keySelector={driver => driver.id}
-                valueSelector={driver => driver?.name ?? ''}
-                readOnly={form.form.readonly || edit || drivers.length < 2}
-                mod="surface"
                 disabled={form.form.disabled}
+                readOnly={form.form.readonly}
+                mod='surface'
+                required
               >
-                {translate('connections_connection_driver')}
-              </Combobox>
-            </FormGroup>
-          )}
-          <FormGroup>
-            <InputField
-              type="text"
-              name="name"
-              minLength={1}
-              state={data.config}
-              disabled={form.form.disabled}
-              readOnly={form.form.readonly}
-              mod='surface'
-              required
-            >
-              {translate('connections_connection_name')}
-            </InputField>
-          </FormGroup>
-          <FormGroup>
-            <Textarea
-              name="description"
-              rows={3}
-              state={data.config}
-              disabled={form.form.disabled}
-              readOnly={form.form.readonly}
-              mod='surface'
-            >
-              {translate('connections_connection_description')}
-            </Textarea>
-          </FormGroup>
-          {admin && form.form.originLocal && (
-            <FormGroup>
-              <FieldCheckbox
+                {translate('connections_connection_name')}
+              </InputFieldNew>
+            </Grid>
+            {JDBC ? (
+              <InputFieldNew
+                type="text"
+                name="url"
+                state={data.config}
+                disabled={form.form.disabled}
+                readOnly={form.form.readonly}
+                autoComplete={`section-${data.config.driverId || 'driver'} section-jdbc`}
+                mod='surface'
+              >
+                {translate('customConnection_url_JDBC')}
+              </InputFieldNew>
+            ) : (
+              <ParametersFormNew
+                config={data.config}
+                embedded={driver.data?.embedded}
+                disabled={form.form.disabled}
+                readOnly={form.form.readonly || !form.form.originLocal}
+              />
+            )}
+            {admin && form.form.originLocal && (
+              <FieldCheckboxNew
                 name="template"
                 value={data.config.connectionId}
                 state={data.config}
@@ -201,80 +212,59 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 // autoHide={} // maybe better to use autoHide
                 mod='surface'
               />
-            </FormGroup>
-          )}
-        </FormBoxElement>
-        <FormBoxElement>
-          <parameters-type-container as='div'>
-            {JDBC ? (
-              <FormGroup>
-                <InputField
-                  type="text"
-                  name="url"
-                  state={data.config}
+            )}
+            <TextareaNew
+              name="description"
+              rows={3}
+              state={data.config}
+              disabled={form.form.disabled}
+              readOnly={form.form.readonly}
+            >
+              {translate('connections_connection_description')}
+            </TextareaNew>
+          </Group>
+        </Container>
+        <Container>
+          {(authModel && !driver.data?.anonymousAccess) && (
+            <Group form>
+              <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
+              <Grid horizontal>
+                <ObjectPropertyInfoFormNew
+                  autofillToken='new-password'
+                  properties={properties}
+                  state={data.config.credentials}
                   disabled={form.form.disabled}
                   readOnly={form.form.readonly}
-                  autoComplete={`section-${data.config.driverId || 'driver'} section-jdbc`}
-                  mod='surface'
-                >
-                  {translate('customConnection_url_JDBC')}
-                </InputField>
-              </FormGroup>
-            ) : (
-              <ParametersForm
-                config={data.config}
-                embedded={driver.data?.embedded}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly || !form.form.originLocal}
-              />
-            )}
-          </parameters-type-container>
-
-          {(authModel && !driver.data?.anonymousAccess) && (
-            <>
-              <FormGroup>
-                <InputGroup>{translate('connections_connection_edit_authentication')}</InputGroup>
-              </FormGroup>
-              <ObjectPropertyInfoForm
-                autofillToken='new-password'
-                properties={properties}
-                state={data.config.credentials}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
-                showRememberTip
-              />
+                  showRememberTip
+                />
+              </Grid>
               {credentialsSavingEnabled && (
-                <FormGroup>
-                  <FieldCheckbox
-                    name="saveCredentials"
-                    value={data.config.connectionId + 'authNeeded'}
-                    state={data.config}
-                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
-                    disabled={form.form.disabled}
-                    readOnly={form.form.readonly}
-                    mod='surface'
-                  />
-                </FormGroup>
+                <FieldCheckboxNew
+                  name="saveCredentials"
+                  value={data.config.connectionId + 'authNeeded'}
+                  state={data.config}
+                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                  disabled={form.form.disabled || form.form.readonly}
+                  mod='surface'
+                />
               )}
-            </>
+            </Group>
           )}
-        </FormBoxElement>
-        <FormBoxElement>
           {driver.isLoaded() && driver.data && driver.data.providerProperties.length > 0 && (
-            <>
-              <FormGroup>
-                <InputGroup>{translate('connections_connection_edit_settings')}</InputGroup>
-              </FormGroup>
-              <ObjectPropertyInfoForm
-                properties={driver.data.providerProperties}
-                state={data.config.providerProperties}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
-              />
-            </>
+            <Group form>
+              <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
+              <Grid>
+                <ObjectPropertyInfoFormNew
+                  properties={driver.data.providerProperties}
+                  state={data.config.providerProperties}
+                  disabled={form.form.disabled}
+                  readOnly={form.form.readonly}
+                />
+              </Grid>
+            </Group>
           )}
-        </FormBoxElement>
-      </FormBox>
+        </Container>
+      </ColoredContainer>
     </SubmittingForm>
   );
 });

@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
@@ -38,10 +38,15 @@ const switchStyles = composes(
   }
   `,
   css`
-   field-label {
-     display: block;
-     padding-bottom: 10px;
-   }
+    switch-body {
+      display: flex;
+    }
+    field-label {
+      display: block;
+      padding-right: 17px;
+      min-width: 50px;
+      white-space: pre-wrap;
+    }
   `
 );
 
@@ -74,7 +79,6 @@ const switchState = {
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
   mod?: Array<keyof typeof switchMod>;
-  label?: string;
   description?: string;
 };
 
@@ -103,7 +107,6 @@ interface SwitchType {
 export const SwitchNew: SwitchType = observer(function SwitchNew({
   name,
   id,
-  label,
   description,
   state,
   checked: checkedControlled,
@@ -143,25 +146,26 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
 
   return styled(styles)(
     <field as="div" className={className}>
-      <field-label as="div">{children}</field-label>
-      <switch-control as='div'>
-        <switch-control-track as='div' />
-        <switch-control-underlay as='div'>
-          <switch-control-thumb as='div' />
-          <switch-input
-            as='input'
-            {...rest}
-            type="checkbox"
-            id={id}
-            role="switch"
-            aria-checked={checked}
-            checked={checked}
-            disabled={disabled}
-            onChange={handleChange}
-          />
-        </switch-control-underlay>
-      </switch-control>
-      <label htmlFor={id}>{label}</label>
+      <switch-body as='div'>
+        <field-label as="div">{children}</field-label>
+        <switch-control as='div'>
+          <switch-control-track as='div' />
+          <switch-control-underlay as='div'>
+            <switch-control-thumb as='div' />
+            <switch-input
+              as='input'
+              {...rest}
+              type="checkbox"
+              id={id}
+              role="switch"
+              aria-checked={checked}
+              checked={checked}
+              disabled={disabled}
+              onChange={handleChange}
+            />
+          </switch-control-underlay>
+        </switch-control>
+      </switch-body>
       <field-description as='div'>{description}</field-description>
     </field>
   );

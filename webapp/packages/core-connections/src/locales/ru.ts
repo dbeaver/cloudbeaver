@@ -22,7 +22,7 @@ export default [
   ['connections_connection_edit_search', 'Поиск'],
   ['connections_connection_edit_search_hosts', 'Названия хостов'],
   ['connections_connection_address', 'Адрес'],
-  ['connections_connection_name', 'Название'],
+  ['connections_connection_name', 'Название подключения'],
   ['connections_connection_description', 'Описание'],
   ['connections_connection_driver', 'Драйвер'],
   ['connections_connection_host', 'Хост'],

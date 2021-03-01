@@ -8,15 +8,29 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
+import styled from 'reshadow';
+import { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { FormBox, FormBoxElement, FormGroup, SubmittingForm, InputField, useMapResource, FieldCheckbox, Switch, FormFieldDescription, Button } from '@cloudbeaver/core-blocks';
+import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
 import type { IConnectionFormTabProps } from '../ConnectionFormService';
 import { useConnectionData } from '../useConnectionData';
+
+const SSH_STYLES = css`
+  SubmittingForm {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    overflow: auto;
+  }
+`;
 
 export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function SSH({
   data,
@@ -69,6 +83,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
     setLoading(false);
   };
 
+  const styles = useStyles(SSH_STYLES, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const disabled = form.form.disabled || loading;
   const enabled = state.enabled || false;
@@ -79,38 +94,32 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
     passwordHint = '••••••';
   }
 
-  return (
+  return styled(styles)(
     <SubmittingForm onSubmit={form.save}>
-      <FormBox>
-        <FormBoxElement max>
-          <FormGroup><br /></FormGroup>
-          <FormGroup>
-            <Switch
-              name="enabled"
-              state={state}
-              mod={['primary']}
-              disabled={disabled}
-              readOnly={form.form.readonly}
-            >
-              {translate('connections_network_handler_ssh_tunnel_enable')}
-            </Switch>
-          </FormGroup>
-        </FormBoxElement>
-        <FormBoxElement>
-          <FormGroup>
-            <InputField
+      <ColoredContainer>
+        <Group form>
+          <SwitchNew
+            name="enabled"
+            state={state}
+            mod={['primary']}
+            disabled={disabled || form.form.readonly}
+          >
+            {translate('connections_network_handler_ssh_tunnel_enable')}
+          </SwitchNew>
+          <br />
+          <Grid horizontal large>
+            <InputFieldNew
               type="text"
               name="host"
               state={state.properties}
               disabled={disabled || !enabled}
               readOnly={form.form.readonly}
               mod='surface'
+              gridItemMedium
             >
               {translate('connections_network_handler_ssh_tunnel_host')}
-            </InputField>
-          </FormGroup>
-          <FormGroup>
-            <InputField
+            </InputFieldNew>
+            <InputFieldNew
               type="number"
               name="port"
               state={state.properties}
@@ -119,12 +128,10 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_port')}
-            </InputField>
-          </FormGroup>
-        </FormBoxElement>
-        <FormBoxElement>
-          <FormGroup>
-            <InputField
+            </InputFieldNew>
+          </Grid>
+          <Grid horizontal medium>
+            <InputFieldNew
               type="text"
               name="userName"
               state={state}
@@ -133,10 +140,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
-            </InputField>
-          </FormGroup>
-          <FormGroup>
-            <InputField
+            </InputFieldNew>
+            <InputFieldNew
               type="password"
               name="password"
               placeholder={passwordHint}
@@ -146,35 +151,30 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               mod='surface'
             >
               {translate('connections_network_handler_ssh_tunnel_password')}
-            </InputField>
-          </FormGroup>
+            </InputFieldNew>
+          </Grid>
           {credentialsSavingEnabled && (
-            <FormGroup>
-              <FieldCheckbox
-                name="savePassword"
-                value={SSH_TUNNEL_ID + ' savePassword'}
-                state={state}
-                checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
-                disabled={disabled || !enabled}
-                readOnly={form.form.readonly}
-                mod='surface'
-              />
-            </FormGroup>
+            <FieldCheckboxNew
+              name="savePassword"
+              value={SSH_TUNNEL_ID + ' savePassword'}
+              state={state}
+              checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
+              disabled={disabled || !enabled || form.form.readonly}
+              mod='surface'
+            />
           )}
-          <FormGroup>
-            <FormFieldDescription>
-              <Button
-                type='button'
-                mod={['outlined']}
-                disabled={disabled || !enabled || !passwordFilled}
-                onClick={testConnection}
-              >
-                {translate('connections_network_handler_test')}
-              </Button>
-            </FormFieldDescription>
-          </FormGroup>
-        </FormBoxElement>
-      </FormBox>
+          <GroupItem>
+            <Button
+              type='button'
+              mod={['outlined']}
+              disabled={disabled || !enabled || !passwordFilled}
+              onClick={testConnection}
+            >
+              {translate('connections_network_handler_test')}
+            </Button>
+          </GroupItem>
+        </Group>
+      </ColoredContainer>
     </SubmittingForm>
   );
 });

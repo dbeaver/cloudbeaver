@@ -13,6 +13,7 @@ interface Props extends ILayoutSizeProps {
   horizontal?: boolean;
   wrap?: boolean;
   overflow?: boolean;
+  parent?: boolean;
 }
 
 export const ColoredContainer: React.FC<Props> = function ColoredContainer({ children, className }) {

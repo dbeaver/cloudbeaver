@@ -6,17 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ILayoutSizeProps } from './ILayoutContainerProps';
-
-interface Props extends ILayoutSizeProps {
+interface Props {
   className?: string;
-  horizontal?: boolean;
-  wrap?: boolean;
-  overflow?: boolean;
-  parent?: boolean;
 }
 
-export const Container: React.FC<Props> = function Container({ children, className }) {
+export const GroupItem: React.FC<Props> = function GroupItem({ children, className }) {
   return (
     <div className={className}>
       {children}

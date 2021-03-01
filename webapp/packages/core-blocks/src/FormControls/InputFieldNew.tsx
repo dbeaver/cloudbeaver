@@ -12,7 +12,7 @@ import styled, { use, css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
+import type { IGridItemsLayoutProps, ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
@@ -22,9 +22,12 @@ const INPUT_FIELD_STYLES = css`
     display: block;
     padding-bottom: 5px;
   }
+  input {
+    height: 35px;
+  }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & IGridItemsLayoutProps & {
   description?: string;
   mod?: 'surface';
 };
