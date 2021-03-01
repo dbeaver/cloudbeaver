@@ -68,7 +68,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormTabProp
   });
 
   const { selected } = useTab(tabId, load);
-  const disabled = users.isLoading() || roles.isLoading() || state.loading;
+  const disabled = users.isLoading() || roles.isLoading() || state.loading || !state.loaded;
 
   if (!selected) {
     return null;

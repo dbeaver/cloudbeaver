@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useAppLoadingSreen } from '@cloudbeaver/core-blocks';
+import { useAppLoadingScreen } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -23,12 +23,13 @@ const bodyStyles = css`
   theme {
     height: 100vh;
     display: flex;
+    padding: 0 !important; /* fix additional padding with modal reakit menu */
     flex-direction: column;
   }
 `;
 
 export const Body = observer(function Body() {
-  useAppLoadingSreen();
+  useAppLoadingScreen();
   const ref = useRef<HTMLDivElement>(null);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;

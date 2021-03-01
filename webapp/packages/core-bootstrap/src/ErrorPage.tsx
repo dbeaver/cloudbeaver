@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import styled, { css } from 'reshadow';
 
-import { useAppLoadingSreen } from '@cloudbeaver/core-blocks';
+import { useAppLoadingScreen } from '@cloudbeaver/core-blocks';
 
 interface IRefreshProps {
   className?: string;
@@ -51,7 +51,7 @@ const ERROR_PAGE_STYLES = css`
 `;
 
 function Refresh({ className }: IRefreshProps) {
-  useAppLoadingSreen();
+  useAppLoadingScreen();
 
   const handleRefresh = useCallback(() => window.location.reload(), []);
   return <button className={className} onClick={handleRefresh}>Refresh</button>;

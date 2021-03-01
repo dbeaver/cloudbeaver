@@ -52,6 +52,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     return () => ({
       selectedSubjects: new Map(),
       loading: false,
+      loaded: false,
       grantedSubjects: [],
     });
   }

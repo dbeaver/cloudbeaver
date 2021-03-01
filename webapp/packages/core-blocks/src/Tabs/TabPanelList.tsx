@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
@@ -19,7 +20,7 @@ interface Props {
   style?: DynamicStyle[] | DynamicStyle;
 }
 
-export const TabPanelList: React.FC<Props> = function TabPanelList({
+export const TabPanelList: React.FC<Props> = observer(function TabPanelList({
   style,
   children,
 }) {
@@ -54,4 +55,4 @@ export const TabPanelList: React.FC<Props> = function TabPanelList({
       {children}
     </>
   );
-};
+});

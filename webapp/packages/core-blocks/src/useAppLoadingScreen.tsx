@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export function useAppLoadingSreen() {
+export function useAppLoadingScreen() {
   useEffect(() => {
     const appLoadingScreen = document.getElementById('app-loading-screen');
     if (!appLoadingScreen) {

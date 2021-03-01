@@ -43,7 +43,7 @@ export function useConnectionAccessState(data: IConnectionFormData): IConnection
   };
 
   const load = async () => {
-    if (state.grantedSubjects.length > 0) {
+    if (state.loaded) {
       return;
     }
 
@@ -57,6 +57,7 @@ export function useConnectionAccessState(data: IConnectionFormData): IConnection
       for (const subject of state.grantedSubjects) {
         state.selectedSubjects.set(subject.subjectId, true);
       }
+      state.loaded = true;
     } catch (exception) {
       notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
     }

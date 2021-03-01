@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
@@ -19,7 +20,7 @@ type Props = React.PropsWithChildren<Omit<TabListOptions, keyof TabStateReturn>>
   childrenFirst?: boolean;
 };
 
-export const TabList: React.FC<Props> = function TabList({
+export const TabList: React.FC<Props> = observer(function TabList({
   style,
   children,
   childrenFirst,
@@ -56,4 +57,4 @@ export const TabList: React.FC<Props> = function TabList({
   }
 
   return <BaseTabList {...props} {...state.state}>{children}</BaseTabList>;
-};
+});

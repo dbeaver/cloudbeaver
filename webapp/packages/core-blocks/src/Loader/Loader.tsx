@@ -63,6 +63,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
   children,
   onCancel,
 }) {
+  let loaded = true;
   if (state) {
     state = Array.isArray(state) ? state : [state];
 
@@ -70,12 +71,8 @@ export const Loader: React.FC<Props> = observer(function Loader({
       if ('loading' in element) {
         loading = element.loading;
       } else if ('isLoading' in element) {
-        const loaded = element.isLoaded();
+        loaded = element.isLoaded();
         loading = element.isLoading() || !loaded;
-
-        if (!loaded) {
-          overlay = false;
-        }
       }
     }
   }
@@ -96,8 +93,12 @@ export const Loader: React.FC<Props> = observer(function Loader({
     return () => clearTimeout(id);
   }, [loading]);
 
-  if (!isVisible && !loading) {
-    return children?.() || null;
+  if (children && loaded) {
+    return children();
+  }
+
+  if (!isVisible && overlay) {
+    return null;
   }
 
   return styled(style)(

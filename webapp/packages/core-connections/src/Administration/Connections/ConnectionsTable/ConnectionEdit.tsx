@@ -58,7 +58,9 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
   }, []);
 
   const [data] = useState<IConnectionFormData>(() => ({
-    config: observable({}),
+    config: observable({
+      driverId: connection.data?.driverId,
+    }),
     get info() {
       return connection.data;
     },

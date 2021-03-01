@@ -10,6 +10,7 @@ import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 
 export interface IConnectionAccessTabState {
   loading: boolean;
+  loaded: boolean;
   selectedSubjects: Map<string, boolean>;
   grantedSubjects: AdminConnectionGrantInfo[];
 }

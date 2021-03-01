@@ -250,7 +250,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
               )}
             </Group>
           )}
-          {driver.isLoaded() && driver.data && driver.data.providerProperties.length > 0 && (
+          {driver.isLoaded() && driver.data?.providerProperties && driver.data.providerProperties.length > 0 && (
             <Group form>
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
               <Grid>
