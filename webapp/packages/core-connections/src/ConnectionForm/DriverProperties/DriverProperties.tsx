@@ -107,7 +107,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
           <PropertiesTable
             properties={joinedProperties.get()}
             propertiesState={data.config.properties}
-            readOnly={form.form.readonly || !form.form.originLocal}
+            readOnly={form.form.readonly}
             onAdd={state.add}
           />
         )}
