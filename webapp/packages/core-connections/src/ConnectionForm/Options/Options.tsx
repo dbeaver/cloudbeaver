@@ -199,6 +199,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 embedded={driver.data?.embedded}
                 disabled={form.form.disabled}
                 readOnly={form.form.readonly}
+                originLocal={form.form.originLocal}
               />
             )}
             {admin && form.form.originLocal && (

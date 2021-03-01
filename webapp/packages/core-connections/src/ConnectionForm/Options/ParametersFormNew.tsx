@@ -19,6 +19,7 @@ interface ParametersFormProps {
   disabled?: boolean;
   embedded?: boolean;
   readOnly?: boolean;
+  originLocal?: boolean;
 }
 
 export const ParametersFormNew = observer(function ParametersFormNew({
@@ -26,6 +27,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
   embedded,
   disabled,
   readOnly,
+  originLocal,
 }: ParametersFormProps) {
   const translate = useTranslate();
 
@@ -38,7 +40,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
             name="host"
             state={config}
             disabled={disabled}
-            readOnly={readOnly}
+            readOnly={readOnly || !originLocal}
             gridItemMedium
             required
           >
@@ -49,7 +51,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
             name="port"
             state={config}
             disabled={disabled}
-            readOnly={readOnly}
+            readOnly={readOnly || !originLocal}
           >
             {translate('customConnection_custom_port')}
           </InputFieldNew>
