@@ -26,70 +26,83 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[horizontal] {
         flex-direction: row;
       }
+
       &[wrap] {
         flex-wrap: wrap;
       }
+
       &[overflow] {
         overflow: auto;
       }
+
       &[parent] {
-        padding: 8px;
+        padding: 10px;
+      }
+    }
+
+    Grid, Group {
+      display: grid;
+      grid-gap: 24px;
+      align-content: baseline;
+      grid-template-columns: minmax(min-content, 1fr);
+      grid-auto-rows: max-content;
+
+      &[noGap] {
+        grid-gap: 0;
+      }
+
+      &[horizontal] {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      &[center] {
+        margin: 0 auto;
+      }
+
+      & > [gridItemMax] {
+        grid-column: 1/-1;
+      }
+
+      & > [gridItemMedium] {
+        grid-column: 1/-2;
       }
     }
 
     Group {
       box-sizing: border-box;
       margin: 10px;
-      padding: 10px;
+      padding: 24px;
       border-radius: 4px;
+
       &[form] {
         padding-right: 30%;
       }
     }
 
     GroupItem {
-      padding: 12px;
       min-width: min-content;
-    }
-
-    Grid {
-      display: grid;
-      grid-template-columns: minmax(min-content, 1fr);
-      grid-auto-rows: max-content; 
-      &[horizontal] {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      }
-      &[center] {
-        margin: 0 auto;
-      }
-    }
-
-    Grid {
-      & > [gridItemMax] {
-        grid-column: 1/-1;
-      }
-      & > [gridItemMedium] {
-        grid-column: 1/-2;
-      }
     }
 
     GroupTitle {
       composes: theme-typography--body1 from global;
       font-weight: 400;
-      padding-left: 12px;
+      margin: 0;
       text-transform: uppercase;
       opacity: 0.9;
     }
 
     Container, ColoredContainer, Group, Grid {
       flex-grow: 1;
-      &[small] {
+      &[flexFixed], & > [flexFixed] {
+        flex-grow: 0;
+      }
+      &[small], & > [small] {
         max-width: 250px;
       }
-      &[medium] {
+      &[medium], & > [medium] {
         max-width: 450px;
       }
-      &[large] {
+      &[large], & > [large] {
         max-width: 650px;
       }
     }      

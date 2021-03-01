@@ -20,10 +20,7 @@ import { isControlPresented } from './isControlPresented';
 const INPUT_FIELD_STYLES = css`
   field-label {
     display: block;
-    padding-bottom: 5px;
-  }
-  input {
-    height: 35px;
+    padding-bottom: 12px;
   }
 `;
 

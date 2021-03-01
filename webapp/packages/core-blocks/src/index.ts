@@ -39,6 +39,7 @@ export * from './Containers/Group';
 export * from './Containers/GroupItem';
 export * from './Containers/GroupTitle';
 export * from './Containers/ColoredContainer';
+export * from './Containers/ILayoutContainerProps';
 export * from './FormControls/FormBoxElement';
 export * from './FormControls/Combobox';
 export * from './FormControls/ComboboxNew';

@@ -151,7 +151,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
-      <ColoredContainer wrap horizontal overflow parent>
+      <ColoredContainer wrap horizontal overflow parent flexFixed>
         <Container>
           <Group form>
             <Grid horizontal>
@@ -229,16 +229,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
           {(authModel && !driver.data?.anonymousAccess) && (
             <Group form>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              <Grid horizontal>
-                <ObjectPropertyInfoFormNew
-                  autofillToken='new-password'
-                  properties={properties}
-                  state={data.config.credentials}
-                  disabled={form.form.disabled}
-                  readOnly={form.form.readonly}
-                  showRememberTip
-                />
-              </Grid>
+              <ObjectPropertyInfoFormNew
+                autofillToken='new-password'
+                properties={properties}
+                state={data.config.credentials}
+                disabled={form.form.disabled}
+                readOnly={form.form.readonly}
+                showRememberTip
+              />
               {credentialsSavingEnabled && (
                 <FieldCheckboxNew
                   name="saveCredentials"

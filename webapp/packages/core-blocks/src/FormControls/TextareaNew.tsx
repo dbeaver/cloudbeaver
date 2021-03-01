@@ -22,7 +22,7 @@ const styles = css`
   }
   field-label {
     display: block;
-    padding-bottom: 5px;
+    padding-bottom: 12px;
   }
 `;
 

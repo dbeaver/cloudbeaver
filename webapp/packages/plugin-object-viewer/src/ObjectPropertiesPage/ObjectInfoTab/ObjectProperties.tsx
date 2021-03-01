@@ -11,7 +11,7 @@ import type { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { ColoredContainer, Grid, Group, Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -38,13 +38,11 @@ export const ObjectProperties = observer(function ObjectProperties({
   }
 
   return styled(styles)(
-    <ColoredContainer overflow>
+    <ColoredContainer overflow parent>
       <Group>
-        <Grid large>
-          {dbObject.properties.map(v => (
-            <ObjectProperty key={v.id} objectProperty={v} />
-          ))}
-        </Grid>
+        {dbObject.properties.map(v => (
+          <ObjectProperty key={v.id} objectProperty={v} large />
+        ))}
       </Group>
     </ColoredContainer>
   );

@@ -14,7 +14,6 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { BASE_CONTAINERS_STYLES } from '../Containers/BASE_CONTAINERS_STYLES';
-import { Container } from '../Containers/Container';
 import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../FormControls/ComboboxNew';
 import { FormFieldDescriptionNew } from '../FormControls/FormFieldDescriptionNew';
@@ -163,7 +162,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
   }
 
   return styled(styles)(
-    <Container className={className}>
+    <>
       {properties.map(property => (
         <RenderField
           key={property.id}
@@ -178,6 +177,6 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
           onFocus={handleFocus}
         />
       ))}
-    </Container>
+    </>
   );
 });

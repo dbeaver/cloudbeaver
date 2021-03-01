@@ -16,11 +16,11 @@ import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } 
 
 const fieldCheckboxStyles = css`
   Checkbox {
-    margin: -10px;
+    margin: -5px -10px;
   }
   field {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     white-space: pre-wrap;
   }
   field-label {

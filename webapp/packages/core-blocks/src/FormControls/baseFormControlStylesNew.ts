@@ -11,8 +11,6 @@ import { css } from 'reshadow';
 export const baseFormControlStylesNew = css`
   field {
     box-sizing: border-box;
-    padding: 12px;
-    min-height: 54px;
     max-width: 100%;
     &[|small] {
       max-width: 250px;

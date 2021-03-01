@@ -8,9 +8,10 @@
 
 import type { PropsWithChildren } from 'react';
 
+import type { IGridItemsLayoutProps, ILayoutSizeProps } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export type ObjectPropertyProps = PropsWithChildren<{
   objectProperty?: ObjectPropertyInfo;
   className?: string;
-}>;
+}> & ILayoutSizeProps & IGridItemsLayoutProps;

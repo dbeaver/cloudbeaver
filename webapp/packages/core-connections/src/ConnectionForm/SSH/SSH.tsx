@@ -106,7 +106,6 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
           >
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </SwitchNew>
-          <br />
           <Grid horizontal large>
             <InputFieldNew
               type="text"
@@ -152,17 +151,17 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
             >
               {translate('connections_network_handler_ssh_tunnel_password')}
             </InputFieldNew>
+            {credentialsSavingEnabled && (
+              <FieldCheckboxNew
+                name="savePassword"
+                value={SSH_TUNNEL_ID + ' savePassword'}
+                state={state}
+                checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
+                disabled={disabled || !enabled || form.form.readonly}
+                mod='surface'
+              />
+            )}
           </Grid>
-          {credentialsSavingEnabled && (
-            <FieldCheckboxNew
-              name="savePassword"
-              value={SSH_TUNNEL_ID + ' savePassword'}
-              state={state}
-              checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
-              disabled={disabled || !enabled || form.form.readonly}
-              mod='surface'
-            />
-          )}
           <GroupItem>
             <Button
               type='button'

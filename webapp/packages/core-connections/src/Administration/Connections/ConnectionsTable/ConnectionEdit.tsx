@@ -29,9 +29,7 @@ const styles = composes(
   css`
     box {
       box-sizing: border-box;
-      padding: 24px;
-      min-height: 440px;
-      max-height: 500px;
+      padding: 24px 0;
       display: flex;
       flex-direction: column;
     }
