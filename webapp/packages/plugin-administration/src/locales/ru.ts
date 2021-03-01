@@ -1,8 +1,4 @@
 export default [
-  ['administration_configuration_wizard_license', 'Лицензия'],
-  ['administration_configuration_wizard_license_step_description', 'Настройка лицензии'],
-  ['administration_configuration_wizard_license_title', 'Пожалуйста укажите лицензию...'],
-  ['administration_configuration_wizard_license_key', 'Ключ'],
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Время сессии'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Разрешить пользовательские подключения'],
