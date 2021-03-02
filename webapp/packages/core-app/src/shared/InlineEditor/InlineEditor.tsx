@@ -108,6 +108,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
         <input
           ref={inputRef}
           name={name}
+          lang="en"
           type={type}
           value={value}
           tabIndex={tabIndex}
