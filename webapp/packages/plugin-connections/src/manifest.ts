@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { PublicConnectionFormBootstrap } from './PublicConnectionForm/PublicConnectionFormBootstrap';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
 
@@ -19,5 +20,6 @@ export const connectionPlugin: PluginManifest = {
   providers: [
     PublicConnectionFormBootstrap,
     PublicConnectionFormService,
+    LocaleService,
   ],
 };

@@ -19,6 +19,7 @@ import {
 import {
   GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
+import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { ENodeFeature } from './ENodeFeature';
 import type { NavNodeInfo, NavNode } from './EntityTypes';
@@ -100,7 +101,8 @@ export class NavNodeManagerService extends Bootstrap {
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
     private serverService: ServerService,
-    private appAuthService: AppAuthService
+    private appAuthService: AppAuthService,
+    navigationService: NavigationService
   ) {
     super();
     this.navigator = new Executor(
@@ -111,6 +113,7 @@ export class NavNodeManagerService extends Bootstrap {
       },
       (active, current) => active.nodeId === current.nodeId
     )
+      .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
   }
 

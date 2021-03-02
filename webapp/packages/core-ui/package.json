@@ -17,6 +17,7 @@
   "peerDependencies": {
     "@cloudbeaver/core-di": "^0.1.0",
     "@cloudbeaver/core-executor": "^0.1.0",
+    "@cloudbeaver/core-dialogs": "^0.1.0",
     "mobx": "^5.x.x"
   }
 }

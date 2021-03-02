@@ -21,7 +21,6 @@
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-sdk": "^0.1.0",
     "@cloudbeaver/core-theming": "^0.1.0",
-    "@cloudbeaver/core-dialogs": "^0.1.0",
     "@cloudbeaver/core-utils": "^0.1.0",
     "reakit": "^1.x.x",
     "react": "^16.x.x",

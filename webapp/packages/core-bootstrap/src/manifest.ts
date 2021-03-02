@@ -92,7 +92,7 @@ import { RouterService, ScreenService } from '@cloudbeaver/core-routing';
 import { EnvironmentService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService, SettingsService } from '@cloudbeaver/core-settings';
 import { ThemeService } from '@cloudbeaver/core-theming';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { NavigationService, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ActiveViewService } from '@cloudbeaver/core-view';
 
 export const coreManifest: PluginManifest = {
@@ -155,6 +155,7 @@ export const coreManifest: PluginManifest = {
     EnvironmentService,
     ExceptionsCatcherService,
     EventsSettingsService,
+    NavigationService,
     OptionsPanelService,
     GraphQLService,
     LocalStorageSaveService,
