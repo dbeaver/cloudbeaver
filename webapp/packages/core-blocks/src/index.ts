@@ -14,6 +14,7 @@ export * from './SanitizedHTML/SanitizedHTML';
 export * from './Slide/SlideBox';
 export * from './Slide/SlideBoxStyles';
 export * from './Slide/SlideElement';
+export * from './Slide/SlideOverlay';
 export * from './Split';
 export * from './Table';
 export * from './Tabs';

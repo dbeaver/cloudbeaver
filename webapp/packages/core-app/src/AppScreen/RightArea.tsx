@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Pane, ResizerControls, SlideBox, SlideElement, slideBoxStyles, Split, splitHorizontalStyles, splitStyles
+  Pane, ResizerControls, SlideBox, SlideElement, slideBoxStyles, Split, splitHorizontalStyles, splitStyles, SlideOverlay
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -64,6 +64,7 @@ export const RightArea = observer(function RightArea() {
             <LogViewTab />
           </Pane>
         </Split>
+        <SlideOverlay onClick={() => optionsPanelService.close()} />
       </SlideElement>
     </SlideBox>
   );
