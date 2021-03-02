@@ -56,7 +56,6 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
           data={data}
           options={options}
           onCancel={close}
-          onSave={close}
         />
       )}
     </Loader>

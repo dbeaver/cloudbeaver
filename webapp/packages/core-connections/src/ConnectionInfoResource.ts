@@ -35,6 +35,7 @@ export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'
 export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
+  readonly onSessionUpdate: IExecutor<Connection[]>;
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
@@ -54,6 +55,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
     this.onConnectionCreate = new Executor();
     this.onConnectionClose = new Executor();
+    this.onSessionUpdate = new Executor();
     this.sessionUpdate = false;
 
     // in case when session was refreshed all data depended on connection info
@@ -96,6 +98,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           .filter(connectionId => !restoredConnections.has(connectionId));
 
         this.delete(resourceKeyList(unrestoredConnectionIdList));
+
+        await this.onSessionUpdate.execute(connections);
       });
     } finally {
       this.sessionUpdate = false;
