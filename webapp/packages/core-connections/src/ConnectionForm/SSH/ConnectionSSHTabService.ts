@@ -114,8 +114,8 @@ export class ConnectionSSHTabService extends Bootstrap {
   private isChanged(handler: NetworkHandlerConfigInput, info?: DatabaseConnection) {
     const initialConfig = info?.networkHandlersConfig.find(h => h.id === handler.id);
 
-    const port = Number(initialConfig?.properties.port);
-    const formPort = Number(handler.properties.port);
+    const port = Number(initialConfig?.properties?.port);
+    const formPort = Number(handler.properties?.port);
     if (handler.enabled !== initialConfig?.enabled
         || handler.savePassword !== initialConfig?.savePassword
         || handler.userName !== initialConfig?.userName
@@ -123,7 +123,7 @@ export class ConnectionSSHTabService extends Bootstrap {
           (initialConfig?.password === null && handler.password !== '')
             || (handler.password?.length || 0) > 0
         )
-        || handler.properties.host !== initialConfig?.properties.host
+        || handler.properties?.host !== initialConfig?.properties?.host
         || port !== formPort) {
       return true;
     }
