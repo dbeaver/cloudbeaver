@@ -29,11 +29,11 @@ export class NavigationTreeContextMenuService {
     private connectionInfoResource: ConnectionInfoResource
   ) { }
 
-  getMenuToken() {
+  getMenuToken(): string {
     return NavigationTreeContextMenuService.menuToken;
   }
 
-  getNodeViewMenuItemToken() {
+  getNodeViewMenuItemToken(): string {
     return NavigationTreeContextMenuService.nodeViewMenuItemToken;
   }
 

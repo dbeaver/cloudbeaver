@@ -10,6 +10,7 @@ import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
+import { NavigationTreeService } from '../NavigationTree/NavigationTreeService';
 import { ROOT_NODE_PATH } from './NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
 
@@ -21,8 +22,9 @@ interface Hook {
 }
 
 export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
+  const navTreeService = useService(NavigationTreeService);
   const navTreeResource = useService(NavTreeResource);
-  const children = navTreeResource.get(navNodeId);
+  const children = navTreeService.getChildren(navNodeId);
 
   const deps = [navNodeId];
 

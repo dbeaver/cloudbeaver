@@ -22,10 +22,12 @@ const styles = css`
 `;
 
 interface Props {
+  disabled?: boolean;
   className?: string;
 }
 
 export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
+  disabled,
   className,
 }) {
   const context = useContext(TreeNodeContext);
@@ -45,7 +47,7 @@ export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
 
   return styled(styles)(
     <div className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
-      <Checkbox checked={context.selected} onChange={() => context.select(true)} />
+      <Checkbox checked={context.selected} disabled={disabled} onChange={() => context.select(true)} />
     </div>
   );
 };

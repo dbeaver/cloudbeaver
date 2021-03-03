@@ -43,7 +43,8 @@ export const TreeNodeExpand: React.FC<Props> = function TreeNodeExpand({
     throw new Error('Context not provided');
   }
 
-  const handleExpand = () => {
+  const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
     if (!context.leaf && !leaf) {
       context.expand();
     }

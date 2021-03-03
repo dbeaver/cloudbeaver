@@ -13,7 +13,7 @@ export interface ITreeNodeContext {
   loading: boolean;
   selected: boolean;
   leaf: boolean;
-  select: (multiple?: boolean) => boolean;
+  select: (multiple?: boolean) => void;
   expand: () => void;
   open: () => void;
 }

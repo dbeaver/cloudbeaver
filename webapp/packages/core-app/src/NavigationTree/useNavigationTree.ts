@@ -16,7 +16,7 @@ import { NavigationTreeService } from './NavigationTreeService';
 interface INavigationTree {
   isSelected: (node: NavNode) => boolean;
   handleOpen: (node: NavNode) => Promise<void>;
-  handleSelect: (node: NavNode, isMultiple: boolean) => boolean;
+  handleSelect: (node: NavNode, isMultiple: boolean) => void;
 }
 
 export function useNavigationTree(): INavigationTree {

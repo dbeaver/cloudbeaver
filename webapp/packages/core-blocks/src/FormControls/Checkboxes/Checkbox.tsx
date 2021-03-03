@@ -7,8 +7,8 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
-import styled, { use } from 'reshadow';
+import { useCallback, useContext, useState } from 'react';
+import { use } from 'reshadow';
 
 import { FormContext } from '../FormContext';
 import { isControlPresented } from '../isControlPresented';
@@ -61,6 +61,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
+  const [count, refresh] = useState(0);
   const context = useContext(FormContext);
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (state) {
@@ -83,7 +84,8 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     if (context) {
       context.onChange(event.target.checked, name);
     }
-  }, [state, name, value, onChange, context]);
+    refresh(count + 1);
+  }, [state, name, value, onChange, context, count]);
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
@@ -103,7 +105,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     checked = checked.includes(value);
   }
 
-  return styled()(
+  return (
     <CheckboxMarkup
       {...rest}
       name={name}
