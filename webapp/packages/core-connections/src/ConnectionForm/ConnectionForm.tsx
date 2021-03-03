@@ -16,6 +16,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionFormService, IConnectionFormData, IConnectionFormOptions } from './ConnectionFormService';
@@ -72,7 +73,7 @@ interface Props {
   data: IConnectionFormData;
   options: IConnectionFormOptions;
   onCancel?: () => void;
-  onSave?: () => void;
+  onSave?: (config: ConnectionConfig) => void;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
@@ -91,9 +92,10 @@ export const ConnectionForm = observer(function ConnectionForm({
     formState.submittingHandlers.addPostHandler((data, contexts) => {
       const validation = contexts.getContext(service.connectionValidationContext);
       const state = contexts.getContext(service.connectionStatusContext);
+      const config = contexts.getContext(service.connectionConfigContext);
 
       if (validation.valid && state.saved && data.submitType === 'submit') {
-        props.onSave();
+        props.onSave(config);
       }
     });
   }, []);

@@ -6,20 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
   SubmittingForm, TabsState, TabList, Loader, BORDER_TAB_STYLES, TabPanelList, useObjectRef
 } from '@cloudbeaver/core-blocks';
-import { DBDriver, IConnectionFormData, IConnectionFormOptions, ConnectionFormService, useConnectionFormState } from '@cloudbeaver/core-connections';
+import { DBDriver, IConnectionFormOptions, ConnectionFormService, useConnectionFormState, useConnectionFormData } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ConnectionFormDialogFooter } from './ConnectionFormDialogFooter';
 
@@ -74,12 +72,10 @@ export const ConnectionFormDialog = observer(function ConnectionFormDialog({
   const style = useStyles(styles, BORDER_TAB_STYLES);
   const service = useService(ConnectionFormService);
 
-  const [data] = useState<IConnectionFormData>({
-    config: observable<ConnectionConfig>({
-      driverId: driver.id,
-    }),
-    availableDrivers: [driver.id],
-    partsState: new MetadataMap<string, any>(),
+  const config = useMemo<ConnectionConfig>(() => ({ driverId: driver.id }), [driver.id]);
+
+  const data = useConnectionFormData({
+    config,
   });
 
   const [options] = useState<IConnectionFormOptions>({

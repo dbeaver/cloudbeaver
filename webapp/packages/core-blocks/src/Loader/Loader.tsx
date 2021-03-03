@@ -63,7 +63,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
   children,
   onCancel,
 }) {
-  let loaded = true;
+  let loaded = loading;
   if (state) {
     state = Array.isArray(state) ? state : [state];
 

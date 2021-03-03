@@ -6,16 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, makeObservable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormData } from '../../ConnectionForm/ConnectionFormService';
-import { DBDriver, DBDriverResource } from '../../DBDriverResource';
+import type { IConnectionFormDataOptions } from '../../ConnectionForm/useConnectionFormData';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 export interface ICreateMethodOptions {
@@ -28,27 +26,17 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  data: IConnectionFormData | null;
-
-  get driver(): DBDriver | undefined {
-    if (!this.data?.config.driverId) {
-      return;
-    }
-
-    return this.dbDriverResource.get(this.data?.config.driverId);
-  }
+  data: IConnectionFormDataOptions | null;
 
   readonly tabsContainer: TabsContainer<any, ICreateMethodOptions>;
 
   constructor(
-    private readonly dbDriverResource: DBDriverResource,
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService
   ) {
     makeObservable(this, {
       data: observable,
       disabled: observable,
-      driver: computed,
     });
 
     this.data = null;
@@ -108,7 +96,6 @@ export class CreateConnectionService {
     this.data = {
       config,
       availableDrivers,
-      partsState: new MetadataMap<string, any>(),
     };
   }
 

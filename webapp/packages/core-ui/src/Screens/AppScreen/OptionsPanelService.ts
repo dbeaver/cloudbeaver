@@ -40,17 +40,14 @@ export class OptionsPanelService {
     return this.panelComponent();
   }
 
-  async open(component: () => React.FC): Promise<void> {
-    if (component === this.panelComponent) {
-      return;
-    }
-
+  async open(component: () => React.FC): Promise<boolean> {
     if (!(await this.close())) {
-      return;
+      return false;
     }
 
     this.panelComponent = component;
     this.active = true;
+    return true;
   }
 
   async close(): Promise<boolean> {

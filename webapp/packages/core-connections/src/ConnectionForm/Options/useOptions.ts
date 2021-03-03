@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action } from 'mobx';
+
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
@@ -107,5 +109,9 @@ export function useOptions(props: IConnectionFormProps) {
 
       // config.credentials = {};
     },
+  }, undefined, {
+    updateNameTemplate: action,
+    setDefaults: action,
+    setAuthModel: action,
   });
 }

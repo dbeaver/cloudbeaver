@@ -121,7 +121,7 @@ export function useMapResource<
     },
     isLoaded: () => {
       if (refObj.key === null) {
-        return false;
+        return true;
       }
 
       return resource.isLoaded(refObj.key, refObj.includes);

@@ -165,6 +165,14 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
     }
   }
 
+  const selectedItem = items.find(item => keySelector(item) === value);
+
+  let inputValue = selectedItem ? valueSelector(selectedItem) : searchValue;
+
+  if (searchValue && selectedItem && valueSelector(selectedItem) !== searchValue) {
+    inputValue = searchValue;
+  }
+
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -204,20 +212,20 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
       if (context) {
         context.onChange(id, name);
       }
+      setSearchValue('');
     },
     [value, state, name, menu, context, onSelect]
   );
 
-  useLayoutEffect(() => onSwitch?.(menu.visible), [onSwitch, menu.visible]);
-
-  const selectedItem = items.find(item => keySelector(item) === value);
-  const filteredItems = items.filter(
-    item => selectedItem || !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
-  );
-
-  if (ref.current === document.activeElement && !selectedItem && searchValue) {
+  if (ref.current === document.activeElement && inputValue === searchValue) {
     menu.show();
   }
+
+  useLayoutEffect(() => onSwitch?.(menu.visible), [onSwitch, menu.visible]);
+
+  const filteredItems = items.filter(
+    item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase())
+  );
 
   return styled(useStyles(baseFormControlStylesNew, styles))(
     <field as="div" className={className}>
@@ -226,9 +234,10 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
         <input
           ref={ref}
           role='new'
+          autoComplete="off"
           name={name}
           title={title}
-          value={selectedItem ? valueSelector(selectedItem) : searchValue}
+          value={inputValue}
           readOnly={readOnly}
           onChange={handleChange}
           {...rest}

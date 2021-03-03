@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, IConnectionFormDataOptions, IConnectionFormOptions } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { PublicConnectionForm } from './PublicConnectionForm';
@@ -21,7 +21,8 @@ const formGetter = () => PublicConnectionForm;
 
 @injectable()
 export class PublicConnectionFormService {
-  connectionId: string | null;
+  options: IConnectionFormOptions;
+  dataOptions: IConnectionFormDataOptions | null;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
@@ -29,42 +30,70 @@ export class PublicConnectionFormService {
     private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     makeObservable(this, {
-      connectionId: observable,
+      dataOptions: observable,
+      options: observable,
+      open: action,
+      close: action,
     });
 
-    this.connectionId = null;
+    this.options = {
+      mode: 'create',
+      type: 'public',
+    };
+    this.dataOptions = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.closeDeleted);
   }
 
-  async open(connectionId: string): Promise<void> {
-    this.connectionId = connectionId;
-    await this.optionsPanelService.open(formGetter);
+  change(config: ConnectionConfig, availableDrivers?: string[]): void {
+    this.dataOptions = {
+      config: { ...config },
+      availableDrivers: availableDrivers,
+      resource: this.connectionInfoResource,
+    };
+    this.options.mode = config.connectionId ? 'edit' : 'create';
   }
 
-  async close(): Promise<void> {
+  async open(config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
+    const state = await this.optionsPanelService.open(formGetter);
+
+    if (state) {
+      this.change(config, availableDrivers);
+    }
+
+    return state;
+  }
+
+  async close(saved?: boolean): Promise<void> {
+    if (saved) {
+      this.dataOptions = null;
+    }
+
     const state = await this.optionsPanelService.close();
 
     if (state) {
-      this.connectionId = null;
+      this.dataOptions = null;
     }
   }
 
   private closeDeleted: IExecutorHandler<ResourceKey<string>> = async (data, contexts) => {
-    if (!this.connectionId) {
+    if (!this.dataOptions) {
       return;
     }
 
-    if (ResourceKeyUtils.includes(data, this.connectionId)) {
+    if (ResourceKeyUtils.includes(data, this.dataOptions.config.connectionId)) {
       this.close();
     }
   };
 
   private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (
-      !this.connectionId
+      !this.dataOptions
       || this.optionsPanelService.panelComponent !== formGetter
-      || !this.connectionInfoResource.has(this.connectionId)
+      || (
+        this.dataOptions.config.connectionId
+        && !this.connectionInfoResource.has(this.dataOptions.config.connectionId)
+      )
     ) {
       return;
     }

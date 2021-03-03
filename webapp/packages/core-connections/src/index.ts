@@ -4,6 +4,7 @@ export * from './ConnectionForm/SSH/ConnectionSSHTabService';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
 export * from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
 export * from './ConnectionForm/ConnectionFormService';
+export * from './ConnectionForm/useConnectionFormData';
 export * from './ConnectionForm/useConnectionFormState';
 export * from './ConnectionForm/ConnectionForm';
 export * from './Administration/Connections/ConnectionsAdministration';

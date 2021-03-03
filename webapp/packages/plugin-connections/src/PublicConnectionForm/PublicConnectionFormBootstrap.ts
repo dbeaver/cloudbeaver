@@ -38,7 +38,7 @@ export class PublicConnectionFormBootstrap extends Bootstrap {
       onClick: context => {
         const node = context.data;
         const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(node.id);
-        this.publicConnectionFormService.open(connectionId);
+        this.publicConnectionFormService.open({ connectionId });
       },
     });
   }

@@ -7,19 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TabsState, TabList, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES, TabPanelList
+  TabsState, TabList, IconButton, Loader, StaticImage, Icon, BORDER_TAB_STYLES, TabPanelList, useMapResource
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
-import type { IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
+import { DBDriverResource } from '../../../DBDriverResource';
 import { CreateConnectionService } from '../CreateConnectionService';
+import { CreateConnectionForm } from './CreateConnectionForm';
 
 const styles = composes(
   css`
@@ -43,7 +42,7 @@ const styles = composes(
     connection-create {
       display: flex;
       flex-direction: column;
-      height: 556px;
+      height: 980px;
       overflow: hidden;
     }
 
@@ -118,31 +117,25 @@ interface Props {
 
 export const CreateConnection = observer(function CreateConnection({
   method,
-  configurationWizard,
 }: Props) {
   const style = useStyles(styles);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
-
-  const [options] = useState<IConnectionFormOptions>({
-    mode: 'create',
-    type: 'admin',
-  });
+  const driver = useMapResource(DBDriverResource, createConnectionService.data?.config.driverId || null);
 
   if (createConnectionService.data) {
     return styled(style)(
       <connection-create as='div'>
         <title-bar as='div'>
           <back-button as='div'><Icon name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} /></back-button>
-          {createConnectionService.driver?.icon && <StaticImage icon={createConnectionService.driver.icon} />}
-          {createConnectionService.driver?.name ?? translate('connections_administration_connection_create')}
+          {driver.data?.icon && <StaticImage icon={driver.data.icon} />}
+          {driver.data?.name ?? translate('connections_administration_connection_create')}
           <fill as="div" />
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <connection-create-content as='div'>
-          <ConnectionForm
-            data={createConnectionService.data}
-            options={options}
+          <CreateConnectionForm
+            dataOptions={createConnectionService.data}
             onCancel={createConnectionService.clearConnectionTemplate}
             onSave={createConnectionService.clearConnectionTemplate}
           />

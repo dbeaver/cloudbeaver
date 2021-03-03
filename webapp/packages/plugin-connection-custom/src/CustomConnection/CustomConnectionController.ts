@@ -11,48 +11,43 @@ import { observable, computed, makeObservable } from 'mobx';
 import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-
-export enum ConnectionStep {
-  Driver,
-  Connection
-}
+import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
 @injectable()
 export class CustomConnectionController implements IInitializableController {
-  step = ConnectionStep.Driver;
   isLoading = true;
-  driver: DBDriver | null = null;
+  onClose!: () => void;
 
   get drivers(): DBDriver[] {
-    return Array
-      .from(this.dbDriverResource.data.values())
-      .sort((a, b) => this.sortDrivers(a, b));
+    return this.dbDriverResource.values
+      .sort(this.dbDriverResource.compare);
   }
 
   constructor(
     private dbDriverResource: DBDriverResource,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private readonly publicConnectionFormService: PublicConnectionFormService
   ) {
     makeObservable(this, {
-      step: observable,
       isLoading: observable,
-      driver: observable,
       drivers: computed,
     });
   }
 
-  init() {
+  init(onClose: () => void) {
     this.loadDBDrivers();
+    this.onClose = onClose;
   }
 
-  onStep = (step: ConnectionStep) => {
-    this.step = step;
-  };
+  onDriverSelect = async (driverId: string) => {
+    const state = await this.publicConnectionFormService.open(
+      { driverId },
+      this.dbDriverResource.values.map(driver => driver.id)
+    );
 
-  onDriverSelect = (driverId: string) => {
-    this.driver = this.dbDriverResource.get(driverId)!;
-
-    this.step = ConnectionStep.Connection;
+    if (state) {
+      this.onClose();
+    }
   };
 
   private async loadDBDrivers() {
@@ -63,13 +58,5 @@ export class CustomConnectionController implements IInitializableController {
     } finally {
       this.isLoading = false;
     }
-  }
-
-  private sortDrivers(driverA: DBDriver, driverB: DBDriver): number {
-    if (driverA.promotedScore === driverB.promotedScore) {
-      return (driverA.name || '').localeCompare((driverB.name || ''));
-    }
-
-    return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 }

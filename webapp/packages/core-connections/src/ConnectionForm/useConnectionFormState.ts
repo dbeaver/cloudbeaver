@@ -29,7 +29,7 @@ export function useConnectionFormState(
     disabled: false,
     loading: false,
     get readonly() {
-      if (options.type === 'admin') {
+      if (options.type === 'admin' || options.mode === 'create') {
         return false;
       }
 

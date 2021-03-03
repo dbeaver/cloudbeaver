@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
@@ -61,17 +62,18 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
   const translate = useTranslate();
 
   useFormValidator(form.submittingHandlers.for(service.formValidationTask), formRef);
-  useConnectionData(data, data => {
-    if (!data.config.credentials) {
+  useConnectionData(data, action((data, update) => {
+    if (!data.config.credentials || update) {
       data.config.credentials = {};
+      data.config.saveCredentials = false;
     }
 
-    if (!data.config.providerProperties) {
+    if (!data.config.providerProperties || update) {
       data.config.providerProperties = {};
     }
 
-    if (!data.availableDrivers) {
-      data.availableDrivers = data.config.driverId ? [data.config.driverId] : [];
+    if ((!data.availableDrivers || data.availableDrivers.length === 0) && data.config.driverId) {
+      data.availableDrivers = [data.config.driverId];
     }
 
     if (!data.info) {
@@ -85,7 +87,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     data.config.template = data.info.template;
     data.config.driverId = data.info.driverId;
 
-    if (data.availableDrivers.length === 0) {
+    if (!data.availableDrivers || data.availableDrivers.length === 0) {
       data.availableDrivers = [data.info.driverId];
     }
 
@@ -104,7 +106,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     }
 
     data.config.providerProperties = { ...data.info.providerProperties };
-  });
+  }));
   const optionsHook = useOptions({ data, form: form.form, options });
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
@@ -142,6 +144,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
   const JDBC = isJDBCConnection(driver.data, data.info);
   const admin = options.type === 'admin';
   const edit = options.mode === 'edit';
+
   const drivers = driver.resource.values.filter(({ id }) => data.availableDrivers?.includes(id));
   let properties = authModel?.properties;
 
@@ -155,19 +158,17 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
         <Container>
           <Group form>
             <Grid horizontal>
-              {(admin || edit) && (
-                <ComboboxNew
-                  name='driverId'
-                  state={data.config}
-                  items={drivers}
-                  keySelector={driver => driver.id}
-                  valueSelector={driver => driver?.name ?? ''}
-                  readOnly={form.form.readonly || edit || drivers.length < 2}
-                  disabled={form.form.disabled}
-                >
-                  {translate('connections_connection_driver')}
-                </ComboboxNew>
-              )}
+              <ComboboxNew
+                name='driverId'
+                state={data.config}
+                items={drivers}
+                keySelector={driver => driver.id}
+                valueSelector={driver => driver?.name ?? ''}
+                readOnly={form.form.readonly || edit || drivers.length < 2}
+                disabled={form.form.disabled}
+              >
+                {translate('connections_connection_driver')}
+              </ComboboxNew>
               <InputFieldNew
                 type="text"
                 name="name"

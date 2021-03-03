@@ -24,10 +24,11 @@ export interface IConnectionForm {
 
 export interface IConnectionFormData {
   config: ConnectionConfig;
-  resource?: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
-  info?: DatabaseConnection;
-  partsState: MetadataMap<string, any>;
   availableDrivers?: string[];
+
+  info: DatabaseConnection | undefined;
+  resource?: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
+  partsState: MetadataMap<string, any>;
 }
 
 export interface IConnectionFormOptions {

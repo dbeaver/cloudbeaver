@@ -6,16 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, IConnectionFormData, IConnectionFormOptions, ConnectionForm } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionForm, useConnectionFormData, IConnectionFormDataOptions, IConnectionFormOptions, IConnectionFormSubmitData } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import { PublicConnectionFormService } from './PublicConnectionFormService';
 
@@ -25,36 +24,59 @@ const styles = css`
   }
 `;
 
-export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
-  const service = useService(PublicConnectionFormService);
+interface Props {
+  options: IConnectionFormOptions;
+  dataOptions: IConnectionFormDataOptions;
+  onCancel: () => void;
+  onSave: (config: ConnectionConfig) => void;
+}
+
+const PublicConnectionFormRenderer: React.FC<Props> = observer(function PublicConnectionForm({
+  options,
+  dataOptions,
+  onCancel,
+  onSave,
+}) {
   const connection = useMapResource(ConnectionInfoResource, {
-    key: service.connectionId,
+    key: dataOptions.config.connectionId || null,
     includes: ['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties', 'customIncludeNetworkHandlerCredentials'],
   });
 
-  const [data] = useState<IConnectionFormData>(() => ({
-    config: observable({}),
-    get info() {
-      return connection.data;
-    },
-    resource: connection.resource,
-    partsState: new MetadataMap<string, any>(),
-  }));
-
-  const [options] = useState<IConnectionFormOptions>(() => ({
-    mode: 'edit',
-    type: 'public',
-  }));
-
-  const close = useCallback(() => service.close(), []);
+  const data = useConnectionFormData(dataOptions);
 
   return styled(styles)(
     <Loader state={connection}>
       {() => (
         <ConnectionForm
-          key={service.connectionId}
           data={data}
           options={options}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
+      )}
+    </Loader>
+  );
+});
+
+export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
+  const service = useService(PublicConnectionFormService);
+
+  const close = useCallback(() => service.close(), []);
+  const save = useCallback((config: ConnectionConfig) => {
+    if (config.connectionId) {
+      service.change({ connectionId: config.connectionId });
+    } else {
+      service.close(true);
+    }
+  }, []);
+
+  return styled(styles)(
+    <Loader loading={service.dataOptions !== null}>
+      {() => (
+        <PublicConnectionFormRenderer
+          dataOptions={service.dataOptions!}
+          options={service.options}
+          onSave={save}
           onCancel={close}
         />
       )}

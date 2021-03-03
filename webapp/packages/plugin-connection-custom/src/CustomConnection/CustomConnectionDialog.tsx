@@ -12,35 +12,18 @@ import { useController } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-import { ConnectionFormDialog } from './ConnectionFormDialog/ConnectionFormDialog';
-import { CustomConnectionController, ConnectionStep } from './CustomConnectionController';
+import { CustomConnectionController } from './CustomConnectionController';
 import { DriverSelectorDialog } from './DriverSelectorDialog/DriverSelectorDialog';
 
 export const CustomConnectionDialog = observer(function CustomConnectionDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
-  const controller = useController(CustomConnectionController);
+  const controller = useController(CustomConnectionController, rejectDialog);
   const translate = useTranslate();
-  let title = translate('basicConnection_connectionDialog_newConnection');
-
-  if (controller.step === ConnectionStep.Connection && controller.driver?.name) {
-    title = controller.driver.name;
-  }
-
-  if (controller.step === ConnectionStep.Connection && controller.driver) {
-    return (
-      <ConnectionFormDialog
-        title={title}
-        driver={controller.driver}
-        onBack={() => controller.onStep(ConnectionStep.Driver)}
-        onClose={rejectDialog}
-      />
-    );
-  }
 
   return (
     <DriverSelectorDialog
-      title={title}
+      title={translate('basicConnection_connectionDialog_newConnection')}
       drivers={controller.drivers}
       isLoading={controller.isLoading}
       onSelect={controller.onDriverSelect}

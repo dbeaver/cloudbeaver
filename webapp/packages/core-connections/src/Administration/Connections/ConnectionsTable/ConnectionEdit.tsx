@@ -8,16 +8,17 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useRef, useEffect } from 'react';
+import { useContext, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, TableContext, useMapResource } from '@cloudbeaver/core-blocks';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
-import type { IConnectionFormData, IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
+import type { IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
+import { useConnectionFormData } from '../../../ConnectionForm/useConnectionFormData';
 import { ConnectionsResource } from '../../ConnectionsResource';
 
 const styles = composes(
@@ -32,6 +33,8 @@ const styles = composes(
       padding: 24px 0;
       display: flex;
       flex-direction: column;
+      min-height: 450px;
+      max-height: 980px;
     }
   `
 );
@@ -55,16 +58,12 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
     });
   }, []);
 
-  const [data] = useState<IConnectionFormData>(() => ({
-    config: observable({
-      driverId: connection.data?.driverId,
-    }),
-    get info() {
-      return connection.data;
-    },
+  const config = useMemo<ConnectionConfig>(() => observable({ connectionId: item }), [item]);
+
+  const data = useConnectionFormData({
+    config,
     resource: connection.resource,
-    partsState: new MetadataMap<string, any>(),
-  }));
+  });
 
   const [options] = useState<IConnectionFormOptions>(() => ({
     mode: 'edit',
@@ -79,7 +78,7 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
             data={data}
             options={options}
             onCancel={collapse}
-            onSave={collapse}
+            // onSave={collapse}
           />
         )}
       </Loader>
