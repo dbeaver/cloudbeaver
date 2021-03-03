@@ -72,7 +72,7 @@ export class PublicConnectionFormService {
     const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'connections_public_connection_edit_cancel_title',
       message: 'connections_public_connection_edit_cancel_message',
-      confirmActionText: 'ui_error_close',
+      confirmActionText: 'ui_processing_ok',
     });
 
     if (result === DialogueStateResult.Rejected) {

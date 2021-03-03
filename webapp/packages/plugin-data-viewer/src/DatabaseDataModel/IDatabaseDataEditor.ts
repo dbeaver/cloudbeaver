@@ -33,16 +33,17 @@ export interface IDatabaseDataEditor<TResult extends IDatabaseDataResult> {
   isResultEdited: (result: TResult) => boolean;
   isRowEdited: (result: TResult, row: number) => boolean;
   isCellEdited: (result: TResult, row: number, column: number) => boolean;
-  get: (result: TResult, row: number) => void;
+  get: (result: TResult, row: number) => any[];
   set: (result: TResult, row: number, value: any) => void;
-  getCell: (result: TResult, row: number, column: number) => void;
+  getCell: (result: TResult, row: number, column: number) => any;
   setCell: (result: TResult, row: number, column: number, value: any) => void;
   revert: (result: TResult, row: number) => void;
   revertCell: (result: TResult, row: number, column: number) => void;
 
   getResultEditor: (result: TResult) => IDatabaseDataResultEditor<TResult>;
 
-  getChanges: () => IDataUpdate[];
+  formatChanges: () => this;
+  getChanges: (format?: boolean) => IDataUpdate[];
   cancelChanges: () => void;
   cancelResultChanges: (result: TResult) => void;
 }
@@ -52,9 +53,9 @@ export interface IDatabaseDataResultEditor<TResult extends IDatabaseDataResult> 
   isEdited: () => boolean;
   isRowEdited: (row: number) => boolean;
   isCellEdited: (row: number, column: number) => boolean;
-  get: (row: number) => void;
+  get: (row: number) => any[];
   set: (row: number, value: any) => void;
-  getCell: (row: number, column: number) => void;
+  getCell: (row: number, column: number) => any;
   setCell: (row: number, column: number, value: any) => void;
   revert: (row: number) => void;
   revertCell: (row: number, column: number) => void;

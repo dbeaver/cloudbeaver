@@ -16,6 +16,7 @@ import styled, { css } from 'reshadow';
 import { InlineEditor } from '@cloudbeaver/core-app';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
+import { TableDataContext } from '../TableDataContext';
 
 const styles = css`
   editor {
@@ -44,7 +45,8 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   column,
   onClose,
 }, ref) {
-  const context = useContext(DataGridContext);
+  const dataGridContext = useContext(DataGridContext);
+  const tableDataContext = useContext(TableDataContext);
   const inputRef = useRef<HTMLInputElement>(null);
   const [elementRef, setElementRef] = useState<HTMLDivElement | null>(null);
   const [popperRef, setPopperRef] = useState<HTMLDivElement | null>(null);
@@ -52,7 +54,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
     placement: 'right',
   });
 
-  if (!context) {
+  if (!dataGridContext || !tableDataContext) {
     throw new Error('DataGridContext should be provided');
   }
 
@@ -67,9 +69,9 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
       }
     }
 
-    context.columnResize.addHandler(resize);
+    dataGridContext.columnResize.addHandler(resize);
 
-    return () => context.columnResize.removeHandler(resize);
+    return () => dataGridContext.columnResize.removeHandler(resize);
   }, [elementRef, popperRef, column]);
 
   useLayoutEffect(() => {
@@ -84,20 +86,24 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   });
 
   const value = row[column.key];
-  const type = typeof value === 'number' ? 'number' : 'text';
+  const type = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number' ? 'number' : 'text';
 
-  const handleSave = () => onClose(false);
+  const handleSave = () => {
+    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
+      .setCell(rowIdx, Number(column.key), Number(value));
+    onClose(false);
+  };
   const handleReject = () => {
-    context.model.source.getEditor(context.resultIndex)
+    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
       .revertCell(rowIdx, Number(column.key));
     onClose(false);
   };
   const handleChange = (value: string) => {
-    context.model.source.getEditor(context.resultIndex)
-      .setCell(rowIdx, Number(column.key), type === 'number' ? Number(value) : value);
+    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
+      .setCell(rowIdx, Number(column.key), value);
   };
   const handleUndo = () => {
-    context.model.source.getEditor(context.resultIndex)
+    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
       .revertCell(rowIdx, Number(column.key));
     onClose(false);
   };
@@ -121,7 +127,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
             onUndo={handleUndo}
           />
         </editor>
-      ), context.getEditorPortal()!)}
+      ), dataGridContext.getEditorPortal()!)}
     </box>
   );
 }, { forwardRef: true });

@@ -42,7 +42,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const update = this.editedResults.get(result.id);
     const diff = update?.diff.get(row);
 
-    return !!diff?.source.some((value, index) => value !== diff.update[index]);
+    return !!diff?.source.some((value, index) => !this.compareCellValue(value, diff.update[index]));
   }
 
   isResultEdited(result: TResult): boolean {
@@ -60,7 +60,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       return false;
     }
 
-    return diff.source[column] !== diff.update[column];
+    return !this.compareCellValue(diff.source[column], diff.update[column]);
   }
 
   getResultEditor(result: TResult): IDatabaseDataResultEditor<TResult> {
@@ -127,6 +127,8 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       });
       column++;
     }
+
+    this.removeUnchangedRow(result, row);
   }
 
   /**
@@ -145,6 +147,8 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       value,
       prevValue: diff.source[column],
     });
+
+    this.removeUnchangedRow(result, row);
   }
 
   /**
@@ -172,9 +176,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       update.diff.delete(row);
     }
 
-    if (update?.diff.size === 0) {
-      this.editedResults.delete(result.id);
-    }
+    this.removeUnchangedRow(result, row);
   }
 
   /**
@@ -199,17 +201,19 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       });
     }
 
-    if (!this.isRowEdited(result, row)) {
-      update?.diff.delete(row);
-
-      if (update?.diff.size === 0) {
-        this.editedResults.delete(result.id);
-      }
-    }
+    this.removeUnchangedRow(result, row);
   }
 
-  getChanges(): IDataUpdate[] {
+  getChanges(format?: boolean): IDataUpdate[] {
+    if (format) {
+      this.formatResults();
+    }
     return Array.from(this.editedResults.values());
+  }
+
+  formatChanges(): this {
+    this.formatResults();
+    return this;
   }
 
   cancelResultChanges(result: TResult): void {
@@ -250,6 +254,40 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       }
     }
     this.editedResults.clear();
+  }
+
+  private formatResults() {
+    for (const update of this.editedResults.values()) {
+      for (const [row, diff] of update.diff) {
+        let column = 0;
+        for (const value of diff.source) {
+          if (typeof value === 'number') {
+            diff.update[column] = Number(diff.update[column]);
+          }
+          column++;
+        }
+      }
+    }
+  }
+
+  private removeUnchangedRow(result: TResult, row: number) {
+    const update = this.editedResults.get(result.id);
+
+    if (!this.isRowEdited(result, row)) {
+      update?.diff.delete(row);
+
+      if (update?.diff.size === 0) {
+        this.editedResults.delete(result.id);
+      }
+    }
+  }
+
+  private compareCellValue(valueA: any, valueB: any) {
+    if (typeof valueA === 'number' || typeof valueB === 'number') {
+      return Number(valueA) === Number(valueB);
+    }
+
+    return valueA === valueB;
   }
 
   private getOrCreateUpdate(resultId: string): IDataUpdate {

@@ -116,7 +116,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   ): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
-    const changes = this.editor?.getChanges();
+    const changes = this.editor?.getChanges(true);
 
     if (!changes) {
       return prevResults;

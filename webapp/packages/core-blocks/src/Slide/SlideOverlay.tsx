@@ -26,7 +26,7 @@ const styles = composes(
   css`
     icon-btn {
       box-sizing: border-box;
-      margin-left: 26px;
+      margin-left: 36px;
       width: 48px;
       height: 48px;
       padding: 16px;

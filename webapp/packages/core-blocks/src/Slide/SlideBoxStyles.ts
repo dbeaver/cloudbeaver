@@ -23,10 +23,10 @@ export const slideBoxStyles = composes(
         display: inline-block;
         vertical-align:top;
         transition: transform cubic-bezier(0.4, 0.0, 0.2, 1) 0.6s;
-        transform: translateX(calc(-100% + 100px));
+        transform: translateX(calc(-100% + 120px));
 
         &:first-child {
-          width: calc(100% - 100px);
+          width: calc(100% - 120px);
         }
       }
 

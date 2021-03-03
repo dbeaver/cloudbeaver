@@ -45,8 +45,14 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       return;
     }
 
+    const cellValue = props.row[column.key];
+
+    if (cellValue !== null && typeof cellValue === 'object') {
+      return;
+    }
+
     editingContext?.edit({ idx: column.idx, rowIdx });
-  }, [column, rowIdx]);
+  }, [column, rowIdx, props.row]);
 
   const row = editor?.get(rowIdx) || props.row;
 

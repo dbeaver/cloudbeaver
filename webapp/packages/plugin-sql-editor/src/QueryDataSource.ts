@@ -66,7 +66,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
       throw new Error('sqlQueryParams must be provided');
     }
 
-    const changes = this.editor?.getChanges();
+    const changes = this.editor?.getChanges(true);
 
     if (!changes) {
       return prevResults;
