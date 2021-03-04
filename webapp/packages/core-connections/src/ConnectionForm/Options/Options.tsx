@@ -158,7 +158,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
-      <ColoredContainer wrap horizontal overflow parent flexFixed>
+      <ColoredContainer wrap horizontal overflow parent>
         <Container limitWidth>
           <Group form>
             <Grid horizontal>
