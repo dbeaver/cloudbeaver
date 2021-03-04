@@ -7,6 +7,16 @@
  */
 
 @mixin form-controls() {
+  :global(fieldset) {
+    padding: 0;
+    border: none;
+    margin: 0;
+
+    &:global([disabled]) {
+      opacity: 1;
+    }
+  }
+
   input:not([role="new"]) {
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, secondary, false);
