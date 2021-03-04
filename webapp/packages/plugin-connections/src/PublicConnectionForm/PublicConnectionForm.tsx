@@ -62,13 +62,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   const service = useService(PublicConnectionFormService);
 
   const close = useCallback(() => service.close(), []);
-  const save = useCallback((config: ConnectionConfig) => {
-    if (config.connectionId) {
-      service.change({ connectionId: config.connectionId });
-    } else {
-      service.close(true);
-    }
-  }, []);
+  const save = useCallback(() => service.close(true), []);
 
   return styled(styles)(
     <Loader loading={service.dataOptions !== null}>
