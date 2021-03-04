@@ -12,7 +12,7 @@ import styled, { use, css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { IGridItemsLayoutProps, ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
+import type { IFlexItemsLayoutProps, IGridItemsLayoutProps, ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
@@ -20,11 +20,11 @@ import { isControlPresented } from './isControlPresented';
 const INPUT_FIELD_STYLES = css`
   field-label {
     display: block;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
   }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & IGridItemsLayoutProps & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & IGridItemsLayoutProps & IFlexItemsLayoutProps & {
   description?: string;
   mod?: 'surface';
 };

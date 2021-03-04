@@ -23,6 +23,8 @@ export const BASE_CONTAINERS_STYLES = composes(
     Container, ColoredContainer {
       display: flex;
       flex-direction: column;
+      flex-basis: 0;
+      align-content: baseline;
       &[horizontal] {
         flex-direction: row;
       }
@@ -38,6 +40,14 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[parent] {
         padding: 10px;
       }
+
+      &[limitWidth] {
+        max-width: 800px;
+      }
+
+      &[gap] {
+        gap: 24px;
+      }
     }
 
     Grid, Group {
@@ -46,7 +56,6 @@ export const BASE_CONTAINERS_STYLES = composes(
       align-content: baseline;
       grid-template-columns: minmax(min-content, 1fr);
       grid-auto-rows: max-content;
-
       &[noGap] {
         grid-gap: 0;
       }
@@ -73,29 +82,31 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 10px;
       padding: 24px;
       border-radius: 4px;
-
       &[form] {
         padding-right: 30%;
       }
     }
 
-    GroupItem {
-      min-width: min-content;
-    }
-
-    GroupTitle {
-      composes: theme-typography--body1 from global;
-      font-weight: 400;
-      margin: 0;
-      text-transform: uppercase;
-      opacity: 0.9;
+    Container, ColoredContainer {
+      & > [flexItemGrow] {
+        flex-grow: 1;
+      }
+      & > [flexItemTiny] {
+        flex-basis: 100px;
+      }
+      & > [flexItemSmall] {
+        flex-basis: 182px;
+      }
+      & > [flexItemMedium] {
+        flex-basis: 300px;
+      }
+      & > [flexItemLarge] {
+        flex-basis: 400px;
+      }
     }
 
     Container, ColoredContainer, Group, Grid {
       flex-grow: 1;
-      &[flexFixed], & > [flexFixed] {
-        flex-grow: 0;
-      }
       &[small], & > [small] {
         max-width: 250px;
       }
@@ -105,5 +116,16 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[large], & > [large] {
         max-width: 650px;
       }
-    }      
+    }
+    GroupItem {
+      min-width: min-content;
+    }
+
+    GroupTitle {
+      composes: theme-typography--body2 from global;
+      font-weight: 400;
+      margin: 0;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }  
   `);

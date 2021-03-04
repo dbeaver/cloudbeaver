@@ -13,7 +13,6 @@ import styled from 'reshadow';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { BASE_CONTAINERS_STYLES } from '../Containers/BASE_CONTAINERS_STYLES';
 import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../FormControls/ComboboxNew';
 import { FormFieldDescriptionNew } from '../FormControls/FormFieldDescriptionNew';
@@ -142,15 +141,12 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
   state,
   editable = true,
   autofillToken = '',
-  className,
   disabled,
   readOnly,
   autoHide,
   showRememberTip,
   onFocus,
 }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
-
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     if (onFocus) {
       onFocus(e.target.name);
@@ -161,7 +157,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 
-  return styled(styles)(
+  return (
     <>
       {properties.map(property => (
         <RenderField

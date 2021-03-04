@@ -40,7 +40,7 @@ const styles = composes(
     }
     field-label {
       display: block;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
     }
     input {
       padding-right: 20px;

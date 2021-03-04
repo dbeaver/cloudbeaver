@@ -7,7 +7,7 @@
  */
 
 @mixin form-controls() {
-  input:not([role="new"]) {
+  input {
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, secondary, false);
     box-sizing: border-box;
@@ -48,7 +48,7 @@
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, input-background, false);
     box-sizing: border-box;
-    padding: 4px 8px;
+    padding: 7px 11px;
     font-size: 12px;
     width: 100%;
     border: 2px solid;

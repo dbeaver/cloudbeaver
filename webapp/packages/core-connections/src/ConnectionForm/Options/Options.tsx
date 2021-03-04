@@ -152,10 +152,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     properties = data.info.authProperties;
   }
 
+  // TODO we need to get these values other way
+  const providerPropertiesWithoutBoolean = driver.data?.providerProperties?.slice().filter(property => property.dataType !== 'Boolean');
+  const booleanProviderProperties = driver.data?.providerProperties?.slice().filter(property => property.dataType === 'Boolean');
+
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
       <ColoredContainer wrap horizontal overflow parent flexFixed>
-        <Container>
+        <Container limitWidth>
           <Group form>
             <Grid horizontal>
               <ComboboxNew
@@ -226,10 +230,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
             </TextareaNew>
           </Group>
         </Container>
-        <Container>
+        <Container limitWidth>
           {(authModel && !driver.data?.anonymousAccess) && (
-            <Group form>
-              <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
+            <Group form horizontal>
+              <GroupTitle gridItemMax>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <ObjectPropertyInfoFormNew
                 autofillToken='new-password'
                 properties={properties}
@@ -246,6 +250,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                   checkboxLabel={translate('connections_connection_edit_save_credentials')}
                   disabled={form.form.disabled || form.form.readonly}
                   mod='surface'
+                  gridItemMax
+
                 />
               )}
             </Group>
@@ -253,14 +259,26 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
           {driver.isLoaded() && driver.data?.providerProperties && driver.data.providerProperties.length > 0 && (
             <Group form>
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
-              <Grid>
-                <ObjectPropertyInfoFormNew
-                  properties={driver.data.providerProperties}
-                  state={data.config.providerProperties}
-                  disabled={form.form.disabled}
-                  readOnly={form.form.readonly}
-                />
-              </Grid>
+              {booleanProviderProperties && booleanProviderProperties.length > 0 && (
+                <Container horizontal gridItemMax gap wrap>
+                  <ObjectPropertyInfoFormNew
+                    properties={booleanProviderProperties}
+                    state={data.config.providerProperties}
+                    disabled={form.form.disabled}
+                    readOnly={form.form.readonly}
+                  />
+                </Container>
+              )}
+              {providerPropertiesWithoutBoolean && (
+                <Grid horizontal small>
+                  <ObjectPropertyInfoFormNew
+                    properties={providerPropertiesWithoutBoolean}
+                    state={data.config.providerProperties}
+                    disabled={form.form.disabled}
+                    readOnly={form.form.readonly}
+                  />
+                </Grid>
+              )}
             </Group>
           )}
         </Container>

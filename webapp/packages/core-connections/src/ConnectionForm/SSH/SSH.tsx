@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem } from '@cloudbeaver/core-blocks';
+import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem, Container } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -96,7 +96,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
 
   return styled(styles)(
     <SubmittingForm onSubmit={form.save}>
-      <ColoredContainer>
+      <ColoredContainer limitWidth>
         <Group form>
           <SwitchNew
             name="enabled"
@@ -106,7 +106,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
           >
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </SwitchNew>
-          <Grid horizontal large>
+          <Container horizontal wrap gap gridItemMax>
             <InputFieldNew
               type="text"
               name="host"
@@ -114,7 +114,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               disabled={disabled || !enabled}
               readOnly={form.form.readonly}
               mod='surface'
-              gridItemMedium
+              flexItemSmall
+              flexItemGrow
             >
               {translate('connections_network_handler_ssh_tunnel_host')}
             </InputFieldNew>
@@ -125,11 +126,13 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               disabled={disabled || !enabled}
               readOnly={form.form.readonly}
               mod='surface'
+              flexItemTiny
+              flexItemGrow
             >
               {translate('connections_network_handler_ssh_tunnel_port')}
             </InputFieldNew>
-          </Grid>
-          <Grid horizontal medium>
+          </Container>
+          <Container horizontal wrap gap gridItemMax>
             <InputFieldNew
               type="text"
               name="userName"
@@ -137,6 +140,8 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               disabled={disabled || !enabled}
               readOnly={form.form.readonly}
               mod='surface'
+              flexItemSmall
+              flexItemGrow
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
             </InputFieldNew>
@@ -148,20 +153,22 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               disabled={disabled || !enabled}
               readOnly={form.form.readonly}
               mod='surface'
+              flexItemSmall
+              flexItemGrow
             >
               {translate('connections_network_handler_ssh_tunnel_password')}
             </InputFieldNew>
-            {credentialsSavingEnabled && (
-              <FieldCheckboxNew
-                name="savePassword"
-                value={SSH_TUNNEL_ID + ' savePassword'}
-                state={state}
-                checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
-                disabled={disabled || !enabled || form.form.readonly}
-                mod='surface'
-              />
-            )}
-          </Grid>
+          </Container>
+          {credentialsSavingEnabled && (
+            <FieldCheckboxNew
+              name="savePassword"
+              value={SSH_TUNNEL_ID + ' savePassword'}
+              state={state}
+              checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
+              disabled={disabled || !enabled || form.form.readonly}
+              mod='surface'
+            />
+          )}
           <GroupItem>
             <Button
               type='button'
