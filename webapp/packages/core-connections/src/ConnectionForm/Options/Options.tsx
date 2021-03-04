@@ -118,11 +118,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     DBDriverResource,
     { key: data.config.driverId || null, includes: ['includeProviderProperties'] },
     {
-      onLoad: async resource => {
-        if (data.availableDrivers && data.availableDrivers.length > 1) {
-          await resource.load(resourceKeyList(data.availableDrivers), ['includeProviderProperties']);
-        }
-
+      onLoad: async () => {
         if (!data.config.driverId && data.info) {
           data.info.authModel = undefined;
         }
