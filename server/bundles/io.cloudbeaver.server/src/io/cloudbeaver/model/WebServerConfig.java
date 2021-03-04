@@ -146,4 +146,9 @@ public class WebServerConfig {
         return application.getAppConfiguration().getDefaultNavigatorSettings();
     }
 
+    @Property
+    public WebProductInfo getProductInfo() {
+        return new WebProductInfo();
+    }
+
 }
