@@ -78,8 +78,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
             status.info(`Connection ${connection.name} created`);
           }
         } else {
-          await this.connectionsResource.test(config);
+          const info = await this.connectionsResource.test(config);
           status.info('Connection is established');
+          status.info('Client version: ' + info.clientVersion);
+          status.info('Server version: ' + info.serverVersion);
+          status.info('Connection time: ' + info.connectTime);
         }
       } else {
         if (submitType === 'submit') {
@@ -92,8 +95,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
             status.info(`Connection ${connection.name} created`);
           }
         } else {
-          await this.connectionInfoResource.testConnection(config);
+          const info = await this.connectionInfoResource.testConnection(config);
           status.info('Connection is established');
+          status.info('Client version: ' + info.clientVersion);
+          status.info('Server version: ' + info.serverVersion);
+          status.info('Connection time: ' + info.connectTime);
         }
       }
     } catch (exception) {

@@ -460,6 +460,16 @@ export interface WebServiceConfig {
   bundleVersion: Scalars['String'];
 }
 
+export interface ProductInfo {
+  id: Scalars['ID'];
+  version: Scalars['String'];
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  buildTime: Scalars['String'];
+  releaseTime: Scalars['String'];
+  licenseInfo?: Maybe<Scalars['String']>;
+}
+
 export interface ServerConfig {
   name: Scalars['String'];
   version: Scalars['String'];
@@ -479,6 +489,7 @@ export interface ServerConfig {
   supportedLanguages: ServerLanguage[];
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
   productConfiguration: Scalars['Object'];
+  productInfo: ProductInfo;
   defaultNavigatorSettings: NavigatorSettings;
 }
 
@@ -1214,13 +1225,18 @@ export type TestConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
 }>;
 
-export interface TestConnectionMutation { testConnection: Pick<ConnectionInfo, 'id'> }
+export interface TestConnectionMutation {
+  connection: (
+    Pick<ConnectionInfo, 'id' | 'connectTime' | 'serverVersion' | 'clientVersion'>
+    & { connectionError?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  );
+}
 
 export type TestNetworkHandlerMutationVariables = Exact<{
   config: NetworkHandlerConfigInput;
 }>;
 
-export interface TestNetworkHandlerMutation { testNetworkHandler: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
+export interface TestNetworkHandlerMutation { info: Pick<NetworkEndpointInfo, 'message' | 'clientVersion' | 'serverVersion'> }
 
 export type UpdateConnectionMutationVariables = Exact<{
   config: ConnectionConfig;
@@ -2046,14 +2062,22 @@ export const SetConnectionNavigatorSettingsDocument = `
     ${DatabaseConnectionFragmentDoc}`;
 export const TestConnectionDocument = `
     mutation testConnection($config: ConnectionConfig!) {
-  testConnection(config: $config) {
+  connection: testConnection(config: $config) {
     id
+    connectTime
+    connectionError {
+      message
+      errorCode
+      stackTrace
+    }
+    serverVersion
+    clientVersion
   }
 }
     `;
 export const TestNetworkHandlerDocument = `
     mutation testNetworkHandler($config: NetworkHandlerConfigInput!) {
-  testNetworkHandler(config: $config) {
+  info: testNetworkHandler(config: $config) {
     message
     clientVersion
     serverVersion

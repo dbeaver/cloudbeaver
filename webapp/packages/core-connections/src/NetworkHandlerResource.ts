@@ -41,9 +41,10 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
 
   async test(config: NetworkHandlerConfigInput): Promise<void> {
     try {
-      await this.graphQLService.sdk.testNetworkHandler({ config });
+      const { info } = await this.graphQLService.sdk.testNetworkHandler({ config });
       this.notificationService.logSuccess({
         title: 'connections_network_handler_test_success',
+        message: 'Client version: ' + info.clientVersion + '\nServer version: ' + info.serverVersion,
       });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_network_handler_test_fail');
