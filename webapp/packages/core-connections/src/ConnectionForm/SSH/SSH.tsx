@@ -26,8 +26,6 @@ const SSH_STYLES = css`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding-top: 16px;
-    padding-bottom: 16px;
     overflow: auto;
   }
 `;
@@ -96,7 +94,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
 
   return styled(styles)(
     <SubmittingForm onSubmit={form.save}>
-      <ColoredContainer>
+      <ColoredContainer parent>
         <Container limitWidth>
           <Group form keepSize>
             <SwitchNew
