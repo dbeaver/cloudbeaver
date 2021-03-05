@@ -262,7 +262,13 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
         let column = 0;
         for (const value of diff.source) {
           if (typeof value === 'number') {
-            diff.update[column] = Number(diff.update[column]);
+            let value = diff.update[column];
+
+            if (typeof value === 'string') {
+              value = value.replace(',', '.');
+            }
+
+            diff.update[column] = Number(value);
           }
           column++;
         }
