@@ -26,8 +26,6 @@ const SSH_STYLES = css`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding-top: 16px;
-    padding-bottom: 16px;
     overflow: auto;
   }
 `;
