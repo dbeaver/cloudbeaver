@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescriptionNew, Group, IconOrImage } from '@cloudbeaver/core-blocks';
-import { Link } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescriptionNew, Group, IconOrImage, Link } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfig } from '@cloudbeaver/core-sdk';
