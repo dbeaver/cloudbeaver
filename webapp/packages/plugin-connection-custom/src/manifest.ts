@@ -9,7 +9,6 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { CustomConnectionPluginBootstrap } from './CustomConnectionPluginBootstrap';
-import { CustomConnectionService } from './CustomConnectionService';
 import { LocaleService } from './LocaleService';
 
 export const customConnectionPluginManifest: PluginManifest = {
@@ -18,7 +17,6 @@ export const customConnectionPluginManifest: PluginManifest = {
   },
 
   providers: [
-    CustomConnectionService,
     LocaleService,
     CustomConnectionPluginBootstrap,
   ],

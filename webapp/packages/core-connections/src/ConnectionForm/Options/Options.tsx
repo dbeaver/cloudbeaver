@@ -82,7 +82,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
     data.config.connectionId = data.info.id;
 
-    data.config.name = data.info.name.trim();
+    data.config.name = data.info.name;
     data.config.description = data.info.description;
     data.config.template = data.info.template;
     data.config.driverId = data.info.driverId;
@@ -99,13 +99,17 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     data.config.authModelId = data.info.authModel;
     data.config.saveCredentials = data.info.saveCredentials;
 
-    for (const property of data.info.authProperties) {
-      if (!property.features.includes('password')) {
-        data.config.credentials[property.id!] = property.value;
+    if (data.info.authProperties) {
+      for (const property of data.info.authProperties) {
+        if (!property.features.includes('password')) {
+          data.config.credentials[property.id!] = property.value;
+        }
       }
     }
 
-    data.config.providerProperties = { ...data.info.providerProperties };
+    if (data.info.providerProperties) {
+      data.config.providerProperties = { ...data.info.providerProperties };
+    }
   }));
   const optionsHook = useOptions({ data, form: form.form, options });
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -114,11 +118,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     DBDriverResource,
     { key: data.config.driverId || null, includes: ['includeProviderProperties'] },
     {
-      onLoad: async resource => {
-        if (data.availableDrivers && data.availableDrivers.length > 1) {
-          await resource.load(resourceKeyList(data.availableDrivers), ['includeProviderProperties']);
-        }
-
+      onLoad: async () => {
         if (!data.config.driverId && data.info) {
           data.info.authModel = undefined;
         }

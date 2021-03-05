@@ -21,7 +21,7 @@ interface Props {
   leaf?: boolean;
   className?: string;
   onExpand?: () => void;
-  onSelect?: (multiple?: boolean) => boolean;
+  onSelect?: (multiple?: boolean) => void;
   onOpen?: () => void;
 }
 
@@ -42,7 +42,7 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
   }, []);
 
   const handleSelect = useCallback(
-    (multiple?: boolean): boolean => handlersRef.current.onSelect?.(multiple) || false,
+    (multiple?: boolean): void => handlersRef.current.onSelect?.(multiple),
     []
   );
 

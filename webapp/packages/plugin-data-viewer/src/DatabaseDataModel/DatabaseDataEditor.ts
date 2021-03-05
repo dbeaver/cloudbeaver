@@ -69,7 +69,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       set: this.set.bind(this, result),
       setCell: this.setCell.bind(this, result),
       get: this.get.bind(this, result),
-      getCell: this.get.bind(this, result),
+      getCell: this.getCell.bind(this, result),
       isCellEdited: this.isCellEdited.bind(this, result),
       isEdited: this.isResultEdited.bind(this, result),
       isRowEdited: this.isRowEdited.bind(this, result),

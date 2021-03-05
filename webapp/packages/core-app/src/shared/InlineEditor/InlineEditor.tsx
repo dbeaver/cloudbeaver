@@ -13,9 +13,9 @@ import {
 import { useImperativeHandle } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Icon, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { EditorDialog } from './EditorDialog';
@@ -64,33 +64,39 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement | null>
   onReject,
   className,
 }, ref) {
+  const props = useObjectRef({
+    onChange,
+    onReject,
+    onSave,
+    value,
+  });
+
   const commonDialogService = useService(CommonDialogService);
 
-  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>| string) => {
-    const newValue = typeof event === 'string' ? event : event.target.value;
-    onChange(newValue);
-  }, [onChange]);
+  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    props.onChange(event.target.value);
+  }, []);
 
   const handlePopup = useCallback(async () => {
-    const newValue = await commonDialogService.open(EditorDialog, value);
-    if (typeof newValue === 'string') {
-      handleChange(newValue);
-      onSave();
-    } else if (onReject) {
-      onReject();
+    const newValue = await commonDialogService.open(EditorDialog, props.value);
+    if (newValue === DialogueStateResult.Rejected || newValue === DialogueStateResult.Resolved) {
+      props.onReject?.();
+    } else {
+      props.onChange(newValue);
+      props.onSave();
     }
-  }, [value, commonDialogService, onSave, onReject, handleChange]);
+  }, []);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case 'Enter':
-        onSave();
+        props.onSave();
         break;
       case 'Escape':
-        onReject?.();
+        props.onReject?.();
         break;
     }
-  }, [onSave, onReject]);
+  }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import type { IExecutor } from './IExecutor';
 import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
@@ -17,24 +17,28 @@ export function useFormValidator(
   ref: React.RefObject<HTMLFormElement>,
   callback?: () => void
 ): void {
-  const callbackRef = useRef(callback);
-  callbackRef.current = callback;
-
-  const validate = useCallback(() => {
-    ref.current?.checkValidity();
-    ref.current?.reportValidity();
-
-    if (callbackRef.current) {
-      callbackRef.current();
-    }
-  }, [ref]);
+  const callbackRef = useRef({
+    callback,
+    ref,
+  });
+  callbackRef.current.callback = callback;
+  callbackRef.current.ref = ref;
 
   useEffect(() => {
     if (!validationTask) {
       return;
     }
+
+    function validate() {
+      if (callbackRef.current) {
+        callbackRef.current.ref.current?.checkValidity();
+        callbackRef.current.ref.current?.reportValidity();
+
+        callbackRef.current.callback?.();
+      }
+    }
     validationTask.addHandler(validate);
 
     return () => validationTask.removeHandler(validate);
-  }, [validationTask, validate]);
+  }, [validationTask]);
 }

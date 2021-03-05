@@ -89,8 +89,10 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   const type = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number' ? 'number' : 'text';
 
   const handleSave = () => {
-    dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
-      .setCell(rowIdx, Number(column.key), Number(value));
+    if (type === 'number') {
+      const editor = dataGridContext.model.source.getEditor(dataGridContext.resultIndex);
+      editor.setCell(rowIdx, Number(column.key), Number(editor.getCell(rowIdx, Number(column.key))));
+    }
     onClose(false);
   };
   const handleReject = () => {

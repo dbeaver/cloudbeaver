@@ -7,10 +7,11 @@
  */
 
 import { NavigationTabsService } from '@cloudbeaver/core-app';
-import { ConnectionsManagerService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { NavigationService } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorTabService, isSQLEditorTab } from './SqlEditorTabService';
@@ -49,13 +50,14 @@ export class SqlEditorNavigatorService {
     private navigationTabsService: NavigationTabsService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
-    private connectionInfoResource: ConnectionInfoResource,
-    private sqlEditorTabService: SqlEditorTabService
+    private sqlEditorTabService: SqlEditorTabService,
+    navigationService: NavigationService
   ) {
     this.navigator = new Executor<SQLCreateAction | SQLEditorAction>(
       null,
       (active, current) => active.type === current.type
     )
+      .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
     this.connectionsManagerService.onCloseConnection.subscribe(this.handleConnectionClose.bind(this));
   }

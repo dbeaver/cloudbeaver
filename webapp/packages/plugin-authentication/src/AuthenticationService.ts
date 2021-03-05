@@ -60,7 +60,8 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async requireAuthentication() {
-    if (!await this.appAuthService.isAuthNeeded()) {
+    const authNeeded = await this.appAuthService.isAuthNeeded();
+    if (!authNeeded) {
       return;
     }
 

@@ -15,7 +15,7 @@ export interface ITreeContext {
     node: NavNode;
   }>;
   onOpen?: (node: NavNode) => Promise<void> | void;
-  onSelect?: (node: NavNode, multiple: boolean) => boolean;
+  onSelect?: (node: NavNode, multiple: boolean) => void;
   isSelected?: (node: NavNode) => boolean;
 }
 

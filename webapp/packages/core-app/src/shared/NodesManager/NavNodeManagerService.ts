@@ -332,20 +332,23 @@ export class NavNodeManagerService extends Bootstrap {
   };
 
   async updateRoot(): Promise<void> {
-    if (await this.isNavTreeEnabled()) {
+    const enabled = await this.isNavTreeEnabled();
+    if (enabled) {
       await this.navTree.refresh(ROOT_NODE_PATH);
     }
   }
 
   async refreshRoot(): Promise<void> {
     this.navTree.delete(ROOT_NODE_PATH);
-    if (await this.isNavTreeEnabled()) {
+    const enabled = await this.isNavTreeEnabled();
+    if (enabled) {
       await this.navTree.refresh(ROOT_NODE_PATH);
     }
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    if (!await this.isNavTreeEnabled()) {
+    const enabled = await this.isNavTreeEnabled();
+    if (!enabled) {
       return;
     }
 
@@ -360,7 +363,8 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async connectionRefreshHandler(connections: Connection[]) {
-    if (!await this.isNavTreeEnabled()) {
+    const enabled = await this.isNavTreeEnabled();
+    if (!enabled) {
       return;
     }
 
@@ -368,7 +372,8 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
-    if (!await this.isNavTreeEnabled()) {
+    const enabled = await this.isNavTreeEnabled();
+    if (!enabled) {
       return;
     }
 
@@ -430,7 +435,8 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   private async isNavTreeEnabled() {
-    if (!await this.permissionsService.hasAsync(EPermission.public)) {
+    const active = await this.permissionsService.hasAsync(EPermission.public);
+    if (!active) {
       return false;
     }
 

@@ -16,6 +16,10 @@
   .theme-button {
     composes: mdc-button;
     height: 28px;
+
+    &[disabled] {
+      opacity: 1;
+    }
   }
   .theme-button_ripple {
     composes: mdc-button__ripple;

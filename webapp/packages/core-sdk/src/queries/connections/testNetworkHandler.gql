@@ -1,5 +1,5 @@
 mutation testNetworkHandler($config: NetworkHandlerConfigInput!) {
-  testNetworkHandler(config: $config) {
+  info: testNetworkHandler(config: $config) {
     message
     clientVersion
     serverVersion

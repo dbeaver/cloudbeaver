@@ -27,18 +27,18 @@ interface INavigationNode {
   leaf: boolean;
   handleExpand: () => void;
   handleOpen: () => void;
-  handleSelect: (isMultiple?: boolean) => boolean;
+  handleSelect: (isMultiple?: boolean) => void;
 }
 
 export function useNavigationNode(node: NavNode): INavigationNode {
   const context = useContext(TreeContext);
   const navigationTreeService = useService(NavigationTreeService);
   const [processing, setProcessing] = useState(false);
-  const [isExpanded, switchExpand] = useState(false);
   const { isLoading, isOutdated } = useNode(node.id);
   const children = useChildren(node.id);
   const loading = isLoading() || children.isLoading() || processing;
 
+  const isExpanded = navigationTreeService.isNodeExpanded(node.id);
   let leaf = isLeaf(node) || (children.children?.length === 0 && !children.isOutdated());
   let expanded = isExpanded && !leaf;
 
@@ -60,11 +60,11 @@ export function useNavigationNode(node: NavNode): INavigationNode {
       clearTimeout(timeout);
       setProcessing(false);
       if (!state) {
-        switchExpand(false);
+        navigationTreeService.expandNode(node.id, false);
         return;
       }
     }
-    switchExpand(!expanded);
+    navigationTreeService.expandNode(node.id, !expanded);
   };
 
   const handleOpen = async () => {
@@ -76,7 +76,9 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     }
   };
 
-  const handleSelect = (multiple = false) => context?.onSelect?.(node, multiple) || false;
+  const handleSelect = (multiple = false) => {
+    context?.onSelect?.(node, multiple);
+  };
 
   // TODO: probably should be refactored
   useEffect(() => {
@@ -87,7 +89,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
         .then(state => {
           setProcessing(false);
           if (!state) {
-            switchExpand(false);
+            navigationTreeService.expandNode(node.id, false);
           }
         });
     }
@@ -97,7 +99,12 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     if (node && context?.isSelected?.(node)) {
       context.onSelect?.(node, true);
     }
-  }, [context, node]);
+  }, [context, node.id]);
+
+  useEffect(() => () => {
+    // TODO: seems like selection & expand should be specific for separate tree definitions
+    navigationTreeService.expandNode(node.id, false);
+  }, [node.id]);
 
   return {
     control: context?.control,
