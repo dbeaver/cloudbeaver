@@ -8,11 +8,13 @@
 
 import { EAdminPermission, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { IComputedMenuItemOptions, IMenuPanel, StaticMenu } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, IComputedMenuItemOptions, IMenuPanel, StaticMenu } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ServerConfigResource, PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService } from '@cloudbeaver/core-theming';
+
+import { ProductInfoDialog } from '../../ProductInfoDialog';
 
 @injectable()
 export class SettingsMenuService extends Bootstrap {
@@ -21,6 +23,7 @@ export class SettingsMenuService extends Bootstrap {
   private menu = new StaticMenu();
   private langMenuToken = 'langMenu';
   private themeMenuToken = 'themeMenu';
+  private productInfoMenuToken = 'productInfoMenuToken';
 
   constructor(
     private localizationService: LocalizationService,
@@ -28,7 +31,8 @@ export class SettingsMenuService extends Bootstrap {
     private permissionsService: PermissionsService,
     private serverConfigResource: ServerConfigResource,
     private screenService: ScreenService,
-    private administrationScreenService: AdministrationScreenService
+    private administrationScreenService: AdministrationScreenService,
+    private commonDialogService: CommonDialogService
   ) {
     super();
   }
@@ -41,6 +45,7 @@ export class SettingsMenuService extends Bootstrap {
     this.addAdministration();
     this.addThemes();
     await this.addLocales();
+    await this.addProductInfo();
   }
 
   getMenu(): IMenuPanel {
@@ -127,5 +132,23 @@ export class SettingsMenuService extends Bootstrap {
         }
       );
     });
+  }
+
+  private async addProductInfo() {
+    const config = await this.serverConfigResource.load();
+
+    if (!config) {
+      return;
+    }
+
+    this.addMenuItem(
+      SettingsMenuService.settingsMenuToken,
+      {
+        id: this.productInfoMenuToken,
+        order: 3,
+        title: 'app_product_info',
+        onClick: async () => await this.commonDialogService.open(ProductInfoDialog, config),
+      }
+    );
   }
 }

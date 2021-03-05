@@ -61,6 +61,7 @@ export * from './FormControls/Switch';
 export * from './FormControls/SwitchNew';
 export * from './FormControls/Textarea';
 export * from './FormControls/TextareaNew';
+export * from './Link';
 export * from './ErrorMessage';
 export * from './ExceptionMessage';
 export * from './IconButton';
