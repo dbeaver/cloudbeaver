@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
+import type { ILayoutSizeProps } from '../Containers/LayoutProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 

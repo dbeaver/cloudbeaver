@@ -6,18 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridItemsLayoutProps, ILayoutSizeProps } from './ILayoutContainerProps';
-interface Props extends ILayoutSizeProps, IGridItemsLayoutProps {
-  className?: string;
-  horizontal?: boolean;
-  wrap?: boolean;
-  overflow?: boolean;
-  parent?: boolean;
-  limitWidth?: boolean;
-  gap?: boolean;
-}
+import type { IContainerProps } from './IContainerProps';
 
-export const ColoredContainer: React.FC<Props> = function ColoredContainer({ children, className }) {
+export const ColoredContainer: React.FC<IContainerProps> = function ColoredContainer({ children, className }) {
   return (
     <div className={className}>
       {children}

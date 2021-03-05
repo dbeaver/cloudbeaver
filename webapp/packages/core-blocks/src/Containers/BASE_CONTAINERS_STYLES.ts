@@ -25,18 +25,23 @@ export const BASE_CONTAINERS_STYLES = composes(
       flex-direction: column;
       flex-basis: 0;
       align-content: baseline;
+
       &[horizontal] {
         flex-direction: row;
       }
+
       &[wrap] {
         flex-wrap: wrap;
       }
+
       &[overflow] {
         overflow: auto;
       }
+
       &[parent] {
         padding: 10px;
       }
+
       &[gap] {
         gap: 24px;
       }
@@ -44,18 +49,23 @@ export const BASE_CONTAINERS_STYLES = composes(
       & > * {
         flex-grow: 1;
       }
+
       & > [flexItemKeepSize] {
         flex-grow: 0;
       }
+
       & > [flexItemTiny] {
         flex-basis: 100px;
       }
+
       & > [flexItemSmall] {
         flex-basis: 240px;
       }
+
       & > [flexItemMedium] {
         flex-basis: 340px;
       }
+
       & > [flexItemLarge] {
         flex-basis: 540px;
       }
@@ -67,6 +77,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       align-content: baseline;
       grid-template-columns: minmax(min-content, 1fr);
       grid-auto-rows: max-content;
+
       &[noGap] {
         grid-gap: 0;
       }
@@ -89,32 +100,36 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 10px;
       padding: 24px;
       border-radius: 4px;
+
       &[form] {
         padding-right: 30%;
       }
     }
 
-    Container, ColoredContainer, Grid {
-      &[limitWidth] {
-        max-width: 800px;
-      }
-    }
-
     Container, ColoredContainer, Group, Grid {
       flex-grow: 1;
+
       &[keepSize] {
         flex-grow: 0;
       }
+
+      &[limitWidth] {
+        max-width: 800px;
+      }
+
       &[small], & > [small] {
         max-width: 250px;
       }
+
       &[medium], & > [medium] {
         max-width: 450px;
       }
+
       &[large], & > [large] {
         max-width: 650px;
       }
     }
+
     GroupItem {
       min-width: min-content;
     }
