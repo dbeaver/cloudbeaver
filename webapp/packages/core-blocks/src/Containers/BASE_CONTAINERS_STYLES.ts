@@ -28,25 +28,36 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[horizontal] {
         flex-direction: row;
       }
-
       &[wrap] {
         flex-wrap: wrap;
       }
-
       &[overflow] {
         overflow: auto;
       }
-
       &[parent] {
         padding: 10px;
       }
-
-      &[limitWidth] {
-        max-width: 800px;
-      }
-
       &[gap] {
         gap: 24px;
+      }
+
+      & > * {
+        flex-grow: 1;
+      }
+      & > [flexItemKeepSize] {
+        flex-grow: 0;
+      }
+      & > [flexItemTiny] {
+        flex-basis: 100px;
+      }
+      & > [flexItemSmall] {
+        flex-basis: 240px;
+      }
+      & > [flexItemMedium] {
+        flex-basis: 340px;
+      }
+      & > [flexItemLarge] {
+        flex-basis: 540px;
       }
     }
 
@@ -71,10 +82,6 @@ export const BASE_CONTAINERS_STYLES = composes(
       & > [gridItemMax] {
         grid-column: 1/-1;
       }
-
-      & > [gridItemMedium] {
-        grid-column: 1/-2;
-      }
     }
 
     Group {
@@ -87,26 +94,17 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
     }
 
-    Container, ColoredContainer {
-      & > [flexItemGrow] {
-        flex-grow: 1;
-      }
-      & > [flexItemTiny] {
-        flex-basis: 100px;
-      }
-      & > [flexItemSmall] {
-        flex-basis: 182px;
-      }
-      & > [flexItemMedium] {
-        flex-basis: 300px;
-      }
-      & > [flexItemLarge] {
-        flex-basis: 400px;
+    Container, ColoredContainer, Grid {
+      &[limitWidth] {
+        max-width: 800px;
       }
     }
 
     Container, ColoredContainer, Group, Grid {
       flex-grow: 1;
+      &[keepSize] {
+        flex-grow: 0;
+      }
       &[small], & > [small] {
         max-width: 250px;
       }

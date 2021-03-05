@@ -212,12 +212,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 name="template"
                 value={data.config.connectionId}
                 state={data.config}
-                checkboxLabel={translate('connections_connection_template')}
                 disabled={edit || form.form.disabled}
                 readOnly={form.form.readonly}
                 // autoHide={} // maybe better to use autoHide
                 mod='surface'
-              />
+              >{translate('connections_connection_template')}
+              </FieldCheckboxNew>
             )}
             <TextareaNew
               name="description"
@@ -247,12 +247,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                   name="saveCredentials"
                   value={data.config.connectionId + 'authNeeded'}
                   state={data.config}
-                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
                   disabled={form.form.disabled || form.form.readonly}
                   mod='surface'
                   gridItemMax
-
-                />
+                >{translate('connections_connection_edit_save_credentials')}
+                </FieldCheckboxNew>
               )}
             </Group>
           )}

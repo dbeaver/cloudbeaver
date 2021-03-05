@@ -6,12 +6,11 @@ export interface ILayoutSizeProps {
 }
 
 export interface IGridItemsLayoutProps {
-  gridItemMedium?: boolean;
   gridItemMax?: boolean;
 }
 
 export interface IFlexItemsLayoutProps {
-  flexItemGrow?: boolean;
+  flexItemKeepSize?: boolean;
   flexItemTiny?: boolean;
   flexItemSmall?: boolean;
   flexItemMedium?: boolean;

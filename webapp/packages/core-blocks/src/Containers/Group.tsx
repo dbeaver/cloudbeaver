@@ -11,6 +11,7 @@ import type { IGridOptions, ILayoutSizeProps } from './ILayoutContainerProps';
 interface Props extends ILayoutSizeProps, IGridOptions {
   className?: string;
   form?: boolean;
+  keepSize?: boolean;
 }
 
 export const Group: React.FC<Props> = function Group({ children, className }) {

@@ -21,6 +21,8 @@ const INPUT_FIELD_STYLES = css`
   field-label {
     display: block;
     padding-bottom: 10px;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
   }
 `;
 

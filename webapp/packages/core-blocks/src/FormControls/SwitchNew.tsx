@@ -46,6 +46,8 @@ const switchStyles = composes(
       padding-right: 17px;
       min-width: 50px;
       white-space: pre-wrap;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
     }
   `
 );

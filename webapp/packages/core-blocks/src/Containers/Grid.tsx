@@ -10,6 +10,7 @@ import type { IGridOptions, ILayoutSizeProps } from './ILayoutContainerProps';
 
 interface Props extends ILayoutSizeProps, IGridOptions {
   className?: string;
+  limitWidth?: boolean;
 }
 
 export const Grid: React.FC<Props> = function Grid({ children, className }) {

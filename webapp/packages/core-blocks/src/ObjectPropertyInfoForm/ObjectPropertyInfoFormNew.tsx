@@ -8,10 +8,8 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled from 'reshadow';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../FormControls/ComboboxNew';
@@ -80,11 +78,10 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       <FieldCheckboxNew
         name={property.id!}
         state={state}
-        checkboxLabel={property.displayName}
         title={property.description}
         disabled={disabled || readOnly}
-        mod='surface'
-      />
+      >{property.displayName ?? ''}
+      </FieldCheckboxNew>
     );
   }
 

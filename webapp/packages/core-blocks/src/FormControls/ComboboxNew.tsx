@@ -41,6 +41,8 @@ const styles = composes(
     field-label {
       display: block;
       padding-bottom: 10px;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
     }
     input {
       padding-right: 20px;

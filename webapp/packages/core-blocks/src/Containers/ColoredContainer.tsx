@@ -7,8 +7,7 @@
  */
 
 import type { IGridItemsLayoutProps, ILayoutSizeProps } from './ILayoutContainerProps';
-
-type Props = ILayoutSizeProps & IGridItemsLayoutProps & {
+interface Props extends ILayoutSizeProps, IGridItemsLayoutProps {
   className?: string;
   horizontal?: boolean;
   wrap?: boolean;
@@ -16,7 +15,7 @@ type Props = ILayoutSizeProps & IGridItemsLayoutProps & {
   parent?: boolean;
   limitWidth?: boolean;
   gap?: boolean;
-};
+}
 
 export const ColoredContainer: React.FC<Props> = function ColoredContainer({ children, className }) {
   return (

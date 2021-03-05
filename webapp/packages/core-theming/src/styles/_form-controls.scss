@@ -36,11 +36,13 @@
 
   textarea[role="new"] {
     resize: vertical;
+    min-height: 40px;
   }
 
   input[role="new"] {
     overflow: hidden;
     text-overflow: ellipsis;
+    min-height: 25px;
   }
 
   input[role="new"],

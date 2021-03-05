@@ -42,7 +42,6 @@ export const ParametersFormNew = observer(function ParametersFormNew({
             disabled={disabled}
             readOnly={readOnly || !originLocal}
             flexItemSmall
-            flexItemGrow
             required
           >
             {translate('customConnection_custom_host')}
@@ -54,7 +53,6 @@ export const ParametersFormNew = observer(function ParametersFormNew({
             disabled={disabled}
             readOnly={readOnly || !originLocal}
             flexItemTiny
-            flexItemGrow
           >
             {translate('customConnection_custom_port')}
           </InputFieldNew>
