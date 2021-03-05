@@ -17,7 +17,7 @@
     }
   }
 
-  input:not([role="new"]) {
+  input {
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, secondary, false);
     box-sizing: border-box;

@@ -40,6 +40,7 @@ const switchStyles = composes(
   css`
     switch-body {
       display: flex;
+      align-items: center;
     }
     field-label {
       display: block;
