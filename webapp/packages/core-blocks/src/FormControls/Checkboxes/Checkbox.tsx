@@ -10,11 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useState } from 'react';
 import { use } from 'reshadow';
 
+import type { IGridItemsLayoutProps } from '../../Containers/ILayoutContainerProps';
 import { FormContext } from '../FormContext';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
-export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
+export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & IGridItemsLayoutProps & {
   value?: string;
   checkboxLabel?: string;
   mod?: 'surface';

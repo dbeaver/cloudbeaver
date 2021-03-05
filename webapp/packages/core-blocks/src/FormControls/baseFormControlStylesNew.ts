@@ -24,13 +24,10 @@ export const baseFormControlStylesNew = css`
   }
 
   field-label {
-    composes: theme-typography--body2 from global;
     box-sizing: border-box;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    line-height: 16px;
-    font-weight: 500;
   }
 
   field-description {

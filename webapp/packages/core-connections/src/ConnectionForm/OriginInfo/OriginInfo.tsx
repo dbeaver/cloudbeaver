@@ -74,8 +74,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
 
   return styled(styles)(
     <ColoredContainer>
-      <Group form>
-        <br />
+      <Group keepSize>
         <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}

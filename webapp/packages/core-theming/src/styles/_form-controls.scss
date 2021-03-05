@@ -17,7 +17,7 @@
     }
   }
 
-  input:not([role="new"]) {
+  input {
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, secondary, false);
     box-sizing: border-box;
@@ -46,11 +46,13 @@
 
   textarea[role="new"] {
     resize: vertical;
+    min-height: 40px;
   }
 
   input[role="new"] {
     overflow: hidden;
     text-overflow: ellipsis;
+    min-height: 25px;
   }
 
   input[role="new"],
@@ -58,7 +60,7 @@
     @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(background-color, input-background, false);
     box-sizing: border-box;
-    padding: 4px 8px;
+    padding: 7px 11px;
     font-size: 12px;
     width: 100%;
     border: 2px solid;

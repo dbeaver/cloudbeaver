@@ -22,7 +22,9 @@ const styles = css`
   }
   field-label {
     display: block;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
   }
 `;
 
