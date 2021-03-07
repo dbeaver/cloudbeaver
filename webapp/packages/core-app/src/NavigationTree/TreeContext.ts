@@ -11,6 +11,7 @@ import { createContext } from 'react';
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 
 export interface ITreeContext {
+  selectionTree: boolean;
   control?: React.FC<{
     node: NavNode;
   }>;

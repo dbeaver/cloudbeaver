@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTabState } from 'reakit/Tab';
 
@@ -28,7 +29,7 @@ type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
   onClose?: (tab: ITabData<T>) => void;
 }>;
 
-export function TabsState<T = Record<string, any>>({
+export const TabsState = observer(function TabsState<T = Record<string, any>>({
   selectedId,
   orientation,
   currentTabId,
@@ -151,4 +152,4 @@ export function TabsState<T = Record<string, any>>({
       {children}
     </TabsContext.Provider>
   );
-}
+});

@@ -33,6 +33,7 @@ const styles = css`
 
 interface Props {
   root?: string;
+  selectionTree?: boolean;
   control?: React.FC<{
     node: NavNode;
   }>;
@@ -46,6 +47,7 @@ interface Props {
 export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   root,
   control,
+  selectionTree = false,
   emptyPlaceholder,
   className,
   onOpen,
@@ -56,8 +58,14 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   const Placeholder = emptyPlaceholder;
 
   const context = useMemo<ITreeContext>(
-    () => ({ control, onOpen, onSelect, isSelected }),
-    [control, onOpen, onSelect, isSelected]
+    () => ({
+      selectionTree,
+      control,
+      onOpen,
+      onSelect,
+      isSelected,
+    }),
+    [control, selectionTree, onOpen, onSelect, isSelected]
   );
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
