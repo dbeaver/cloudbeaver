@@ -7,8 +7,18 @@
  */
 
 import styled from 'reshadow';
+import { css } from 'reshadow';
+
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
+
+const formFieldDescriptionNewStyles = css`
+  field-label {
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
+  }
+`;
 
 interface Props {
   label?: string;
@@ -20,7 +30,9 @@ export const FormFieldDescriptionNew: React.FC<Props> = function FormFieldDescri
   children,
   className,
 }) {
-  return styled(baseFormControlStylesNew)(
+  const styles = useStyles(baseFormControlStylesNew, formFieldDescriptionNewStyles);
+
+  return styled(styles)(
     <field as='div' className={className}>
       {label && <field-label as='label'>{label}</field-label>}
       <field-description as='div'>

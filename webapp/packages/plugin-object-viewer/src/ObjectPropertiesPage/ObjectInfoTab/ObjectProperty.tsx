@@ -29,7 +29,7 @@ export const ObjectProperty = observer(function ObjectProperty({
             className={className}
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
-            readOnly
+            disabled
             {...additionalProps(objectProperty)}
           >
             {objectProperty.displayName}

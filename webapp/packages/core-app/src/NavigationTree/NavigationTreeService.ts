@@ -69,6 +69,11 @@ export class NavigationTreeService {
         this.navigationTreeMetadata.delete(key);
       });
     });
+    this.navTreeResource.onItemDelete.addHandler(key => {
+      ResourceKeyUtils.forEach(key, key => {
+        this.expandNode(key, false);
+      });
+    });
   }
 
   getChildren(id: string): string[] | undefined {

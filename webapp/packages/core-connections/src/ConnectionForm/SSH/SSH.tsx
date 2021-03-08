@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem } from '@cloudbeaver/core-blocks';
+import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem, Container } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -26,8 +26,6 @@ const SSH_STYLES = css`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding-top: 16px;
-    padding-bottom: 16px;
     overflow: auto;
   }
 `;
@@ -96,83 +94,88 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
 
   return styled(styles)(
     <SubmittingForm onSubmit={form.save}>
-      <ColoredContainer>
-        <Group form>
-          <SwitchNew
-            name="enabled"
-            state={state}
-            mod={['primary']}
-            disabled={disabled || form.form.readonly}
-          >
-            {translate('connections_network_handler_ssh_tunnel_enable')}
-          </SwitchNew>
-          <Grid horizontal large>
-            <InputFieldNew
-              type="text"
-              name="host"
-              state={state.properties}
-              disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
-              mod='surface'
-              gridItemMedium
-            >
-              {translate('connections_network_handler_ssh_tunnel_host')}
-            </InputFieldNew>
-            <InputFieldNew
-              type="number"
-              name="port"
-              state={state.properties}
-              disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
-              mod='surface'
-            >
-              {translate('connections_network_handler_ssh_tunnel_port')}
-            </InputFieldNew>
-          </Grid>
-          <Grid horizontal medium>
-            <InputFieldNew
-              type="text"
-              name="userName"
+      <ColoredContainer parent>
+        <Container limitWidth>
+          <Group form keepSize>
+            <SwitchNew
+              name="enabled"
               state={state}
-              disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
-              mod='surface'
+              mod={['primary']}
+              disabled={disabled || form.form.readonly}
             >
-              {translate('connections_network_handler_ssh_tunnel_user')}
-            </InputFieldNew>
-            <InputFieldNew
-              type="password"
-              name="password"
-              placeholder={passwordHint}
-              state={state}
-              disabled={disabled || !enabled}
-              readOnly={form.form.readonly}
-              mod='surface'
-            >
-              {translate('connections_network_handler_ssh_tunnel_password')}
-            </InputFieldNew>
+              {translate('connections_network_handler_ssh_tunnel_enable')}
+            </SwitchNew>
+            <Container horizontal wrap gap gridItemMax>
+              <InputFieldNew
+                type="text"
+                name="host"
+                state={state.properties}
+                disabled={disabled || !enabled}
+                readOnly={form.form.readonly}
+                mod='surface'
+                flexItemSmall
+              >
+                {translate('connections_network_handler_ssh_tunnel_host')}
+              </InputFieldNew>
+              <InputFieldNew
+                type="number"
+                name="port"
+                state={state.properties}
+                disabled={disabled || !enabled}
+                readOnly={form.form.readonly}
+                mod='surface'
+                flexItemTiny
+              >
+                {translate('connections_network_handler_ssh_tunnel_port')}
+              </InputFieldNew>
+            </Container>
+            <Container horizontal wrap gap gridItemMax>
+              <InputFieldNew
+                type="text"
+                name="userName"
+                state={state}
+                disabled={disabled || !enabled}
+                readOnly={form.form.readonly}
+                mod='surface'
+                flexItemSmall
+              >
+                {translate('connections_network_handler_ssh_tunnel_user')}
+              </InputFieldNew>
+              <InputFieldNew
+                type="password"
+                name="password"
+                placeholder={passwordHint}
+                state={state}
+                disabled={disabled || !enabled}
+                readOnly={form.form.readonly}
+                mod='surface'
+                flexItemSmall
+              >
+                {translate('connections_network_handler_ssh_tunnel_password')}
+              </InputFieldNew>
+            </Container>
             {credentialsSavingEnabled && (
               <FieldCheckboxNew
                 name="savePassword"
                 value={SSH_TUNNEL_ID + ' savePassword'}
                 state={state}
-                checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
                 disabled={disabled || !enabled || form.form.readonly}
                 mod='surface'
-              />
+              >{translate('connections_network_handler_ssh_tunnel_save_password')}
+              </FieldCheckboxNew>
             )}
-          </Grid>
-          <GroupItem>
-            <Button
-              type='button'
-              mod={['outlined']}
-              disabled={disabled || !enabled || !passwordFilled}
-              onClick={testConnection}
-            >
-              {translate('connections_network_handler_test')}
-            </Button>
-          </GroupItem>
-        </Group>
+            <GroupItem>
+              <Button
+                type='button'
+                mod={['outlined']}
+                disabled={disabled || !enabled || !passwordFilled}
+                onClick={testConnection}
+              >
+                {translate('connections_network_handler_test')}
+              </Button>
+            </GroupItem>
+          </Group>
+        </Container>
       </ColoredContainer>
     </SubmittingForm>
   );

@@ -75,6 +75,16 @@ type WebServiceConfig {
     bundleVersion: String!
 }
 
+type ProductInfo {
+    id: ID!
+    version: String!
+    name: String!
+    description: String
+    buildTime: String!
+    releaseTime: String!
+    licenseInfo: String
+}
+
 type ServerConfig {
     name: String!
     version: String!
@@ -100,6 +110,7 @@ type ServerConfig {
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
+    productInfo: ProductInfo!
     defaultNavigatorSettings: NavigatorSettings!
 }
 

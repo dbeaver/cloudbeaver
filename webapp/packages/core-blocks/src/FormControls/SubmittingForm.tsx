@@ -11,11 +11,13 @@ import { useCallback, forwardRef, useMemo } from 'react';
 import { FormContext } from './FormContext';
 
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange'> & {
+  disabled?: boolean;
   onChange?: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
 };
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
   {
+    disabled,
     children,
     onSubmit,
     onChange = () => {},
@@ -34,9 +36,11 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
 
   return (
     <form {...rest} ref={ref} onSubmit={handleSubmit}>
-      <FormContext.Provider value={context}>
-        {children}
-      </FormContext.Provider>
+      <fieldset disabled={disabled} className={rest.className}>
+        <FormContext.Provider value={context}>
+          {children}
+        </FormContext.Provider>
+      </fieldset>
       <button type="submit" hidden />
     </form>
   );

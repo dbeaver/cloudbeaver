@@ -465,7 +465,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     @Override
     public String getInfoDetails() {
-        return serverName;
+        return "";
     }
 
     @Override

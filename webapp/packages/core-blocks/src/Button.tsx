@@ -7,8 +7,11 @@
  */
 
 import styled, { css } from 'reshadow';
+import { use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
+
+import { Loader } from './Loader/Loader';
 
 const buttonStyles = composes(
   css`
@@ -22,7 +25,31 @@ const buttonStyles = composes(
   css`
     Button {
       display: flex;
+
+      & Loader, & button-label {
+        transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
+      }
+
+      & Loader {
+        position: absolute;
+        opacity: 0;
+      }
+
+      & button-label {
+        opacity: 1;
+      }
+
+      &[|loading] {
+        & Loader {
+          opacity: 1;
+        }
+
+        & button-label {
+          opacity: 0;
+        }
+      }
     }
+    
   `
 );
 
@@ -61,6 +88,7 @@ type ButtonProps = (
   React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
   & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
 ) & {
+  loading?: boolean;
   mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
@@ -72,10 +100,20 @@ export const Button: React.FC<ButtonProps> = function Button({
   children,
   mod,
   tag = 'button',
+  disabled = false,
+  loading,
   ...rest
 }) {
+  if (loading) {
+    disabled = true;
+  }
+
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest}><ripple as="div" />{children}</Button>
+    <Button {...rest} disabled={disabled} {...use({ loading })}>
+      <ripple as="div" />
+      <button-label as='div'>{children}</button-label>
+      <Loader small />
+    </Button>
   );
 };

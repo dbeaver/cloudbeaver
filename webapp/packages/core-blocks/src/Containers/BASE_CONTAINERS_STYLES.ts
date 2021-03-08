@@ -23,6 +23,9 @@ export const BASE_CONTAINERS_STYLES = composes(
     Container, ColoredContainer {
       display: flex;
       flex-direction: column;
+      flex-basis: 0;
+      align-content: baseline;
+
       &[horizontal] {
         flex-direction: row;
       }
@@ -37,6 +40,34 @@ export const BASE_CONTAINERS_STYLES = composes(
 
       &[parent] {
         padding: 10px;
+      }
+
+      &[gap] {
+        gap: 24px;
+      }
+
+      & > * {
+        flex-grow: 1;
+      }
+
+      & > [flexItemKeepSize] {
+        flex-grow: 0;
+      }
+
+      & > [flexItemTiny] {
+        flex-basis: 100px;
+      }
+
+      & > [flexItemSmall] {
+        flex-basis: 240px;
+      }
+
+      & > [flexItemMedium] {
+        flex-basis: 340px;
+      }
+
+      & > [flexItemLarge] {
+        flex-basis: 540px;
       }
     }
 
@@ -62,10 +93,6 @@ export const BASE_CONTAINERS_STYLES = composes(
       & > [gridItemMax] {
         grid-column: 1/-1;
       }
-
-      & > [gridItemMedium] {
-        grid-column: 1/-2;
-      }
     }
 
     Group {
@@ -79,31 +106,39 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
     }
 
+    Container, ColoredContainer, Group, Grid {
+      flex-grow: 1;
+
+      &[keepSize] {
+        flex-grow: 0;
+      }
+
+      &[limitWidth] {
+        max-width: 800px;
+      }
+
+      &[small], & > [small] {
+        max-width: 250px;
+      }
+
+      &[medium], & > [medium] {
+        max-width: 450px;
+      }
+
+      &[large], & > [large] {
+        max-width: 650px;
+      }
+    }
+
     GroupItem {
       min-width: min-content;
     }
 
     GroupTitle {
-      composes: theme-typography--body1 from global;
+      composes: theme-typography--body2 from global;
       font-weight: 400;
       margin: 0;
       text-transform: uppercase;
       opacity: 0.9;
-    }
-
-    Container, ColoredContainer, Group, Grid {
-      flex-grow: 1;
-      &[flexFixed], & > [flexFixed] {
-        flex-grow: 0;
-      }
-      &[small], & > [small] {
-        max-width: 250px;
-      }
-      &[medium], & > [medium] {
-        max-width: 450px;
-      }
-      &[large], & > [large] {
-        max-width: 650px;
-      }
-    }      
+    }  
   `);

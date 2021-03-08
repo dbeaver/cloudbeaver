@@ -22,6 +22,7 @@ import {
   GetUserConnectionsQueryVariables,
   ResourceKey,
   ResourceKeyUtils,
+  TestConnectionMutation,
   NavigatorSettingsInput,
 } from '@cloudbeaver/core-sdk';
 
@@ -124,10 +125,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.add(connection);
   }
 
-  async testConnection(config: ConnectionConfig): Promise<void> {
-    await this.graphQLService.sdk.testConnection({
+  async testConnection(config: ConnectionConfig): Promise<TestConnectionMutation['connection']> {
+    const { connection } = await this.graphQLService.sdk.testConnection({
       config,
     });
+
+    return connection;
   }
 
   async createFromNode(nodeId: string, nodeName: string): Promise<Connection> {

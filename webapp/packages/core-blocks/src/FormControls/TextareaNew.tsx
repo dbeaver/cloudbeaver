@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ILayoutSizeProps } from '../Containers/ILayoutContainerProps';
+import type { ILayoutSizeProps } from '../Containers/LayoutProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 
@@ -22,7 +22,9 @@ const styles = css`
   }
   field-label {
     display: block;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
   }
 `;
 

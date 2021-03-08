@@ -16,6 +16,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
+import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
@@ -45,17 +46,26 @@ export class ConnectionSelectorController {
   }
 
   get isConnectionSelectorVisible(): boolean {
-    return this.connectionSelectorService.currentConnectionId !== null
-     || (this.connectionSelectorService.currentConnectionId === null
-        && this.connectionSelectorService.isConnectionChangeable);
+    return (
+      !this.optionsPanelService.active
+      && (
+        this.connectionSelectorService.currentConnectionId !== null
+        || (
+          this.connectionSelectorService.currentConnectionId === null
+          && this.connectionSelectorService.isConnectionChangeable
+        )
+      )
+    );
   }
 
   get isObjectContainerSelectorVisible(): boolean {
-    return !!this.currentConnection?.connected
+    return (
+      !!this.currentConnection?.connected
       && (
         this.connectionSelectorService.currentObjectSchemaId !== undefined
         || this.connectionSelectorService.currentObjectCatalogId !== undefined
-      );
+      )
+    );
   }
 
   get objectContainerSelectionDisabled(): boolean {
@@ -99,6 +109,7 @@ export class ConnectionSelectorController {
     private dbDriverResource: DBDriverResource,
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
+    private optionsPanelService: OptionsPanelService,
   ) {
     makeObservable<ConnectionSelectorController, 'currentObjectContainerIcon'>(this, {
       currentConnection: computed,

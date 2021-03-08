@@ -16,7 +16,7 @@ import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } 
 
 const fieldCheckboxStyles = css`
   Checkbox {
-    margin: -5px -10px;
+    margin: -10px;
   }
   field {
     display: flex;
@@ -25,6 +25,8 @@ const fieldCheckboxStyles = css`
   }
   field-label {
     padding-left: 10px;
+    composes: theme-typography--body2 from global;
+    line-height: 16px;
   }
 `;
 
@@ -47,7 +49,7 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
         {...rest}
         checked={checkedControlled}
       />
-      <field-label as="div">{children}</field-label>
+      <field-label htmlFor={rest.value || rest.name} as="label">{children}</field-label>
     </field>
   );
 };

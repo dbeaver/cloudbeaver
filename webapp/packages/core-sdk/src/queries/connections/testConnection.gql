@@ -1,5 +1,13 @@
 mutation testConnection($config: ConnectionConfig!) {
-  testConnection(config: $config) {
+  connection: testConnection(config: $config) {
     id
+    connectTime
+    connectionError {
+      message
+      errorCode
+      stackTrace
+    }
+    serverVersion
+    clientVersion
   }
 }

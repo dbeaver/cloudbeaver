@@ -82,7 +82,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
     data.config.connectionId = data.info.id;
 
-    data.config.name = data.info.name.trim();
+    data.config.name = data.info.name;
     data.config.description = data.info.description;
     data.config.template = data.info.template;
     data.config.driverId = data.info.driverId;
@@ -99,13 +99,17 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     data.config.authModelId = data.info.authModel;
     data.config.saveCredentials = data.info.saveCredentials;
 
-    for (const property of data.info.authProperties) {
-      if (!property.features.includes('password')) {
-        data.config.credentials[property.id!] = property.value;
+    if (data.info.authProperties) {
+      for (const property of data.info.authProperties) {
+        if (!property.features.includes('password')) {
+          data.config.credentials[property.id!] = property.value;
+        }
       }
     }
 
-    data.config.providerProperties = { ...data.info.providerProperties };
+    if (data.info.providerProperties) {
+      data.config.providerProperties = { ...data.info.providerProperties };
+    }
   }));
   const optionsHook = useOptions({ data, form: form.form, options });
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -114,11 +118,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     DBDriverResource,
     { key: data.config.driverId || null, includes: ['includeProviderProperties'] },
     {
-      onLoad: async resource => {
-        if (data.availableDrivers && data.availableDrivers.length > 1) {
-          await resource.load(resourceKeyList(data.availableDrivers), ['includeProviderProperties']);
-        }
-
+      onLoad: async () => {
         if (!data.config.driverId && data.info) {
           data.info.authModel = undefined;
         }
@@ -152,10 +152,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
     properties = data.info.authProperties;
   }
 
+  // TODO we need to get these values other way
+  const providerPropertiesWithoutBoolean = driver.data?.providerProperties?.slice().filter(property => property.dataType !== 'Boolean');
+  const booleanProviderProperties = driver.data?.providerProperties?.slice().filter(property => property.dataType === 'Boolean');
+
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
-      <ColoredContainer wrap horizontal overflow parent flexFixed>
-        <Container>
+      <ColoredContainer wrap horizontal overflow parent>
+        <Container limitWidth>
           <Group form>
             <Grid horizontal>
               <ComboboxNew
@@ -208,12 +212,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 name="template"
                 value={data.config.connectionId}
                 state={data.config}
-                checkboxLabel={translate('connections_connection_template')}
                 disabled={edit || form.form.disabled}
                 readOnly={form.form.readonly}
                 // autoHide={} // maybe better to use autoHide
                 mod='surface'
-              />
+              >{translate('connections_connection_template')}
+              </FieldCheckboxNew>
             )}
             <TextareaNew
               name="description"
@@ -226,10 +230,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
             </TextareaNew>
           </Group>
         </Container>
-        <Container>
+        <Container limitWidth>
           {(authModel && !driver.data?.anonymousAccess) && (
-            <Group form>
-              <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
+            <Group form horizontal>
+              <GroupTitle gridItemMax>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <ObjectPropertyInfoFormNew
                 autofillToken='new-password'
                 properties={properties}
@@ -243,24 +247,37 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                   name="saveCredentials"
                   value={data.config.connectionId + 'authNeeded'}
                   state={data.config}
-                  checkboxLabel={translate('connections_connection_edit_save_credentials')}
                   disabled={form.form.disabled || form.form.readonly}
                   mod='surface'
-                />
+                  gridItemMax
+                >{translate('connections_connection_edit_save_credentials')}
+                </FieldCheckboxNew>
               )}
             </Group>
           )}
           {driver.isLoaded() && driver.data?.providerProperties && driver.data.providerProperties.length > 0 && (
             <Group form>
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
-              <Grid>
-                <ObjectPropertyInfoFormNew
-                  properties={driver.data.providerProperties}
-                  state={data.config.providerProperties}
-                  disabled={form.form.disabled}
-                  readOnly={form.form.readonly}
-                />
-              </Grid>
+              {booleanProviderProperties && booleanProviderProperties.length > 0 && (
+                <Container horizontal gridItemMax gap wrap>
+                  <ObjectPropertyInfoFormNew
+                    properties={booleanProviderProperties}
+                    state={data.config.providerProperties}
+                    disabled={form.form.disabled}
+                    readOnly={form.form.readonly}
+                  />
+                </Container>
+              )}
+              {providerPropertiesWithoutBoolean && (
+                <Grid horizontal small>
+                  <ObjectPropertyInfoFormNew
+                    properties={providerPropertiesWithoutBoolean}
+                    state={data.config.providerProperties}
+                    disabled={form.form.disabled}
+                    readOnly={form.form.readonly}
+                  />
+                </Grid>
+              )}
             </Group>
           )}
         </Container>

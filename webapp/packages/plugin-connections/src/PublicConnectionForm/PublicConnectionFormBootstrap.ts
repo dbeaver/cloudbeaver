@@ -33,7 +33,7 @@ export class PublicConnectionFormBootstrap extends Bootstrap {
         return context.contextType === NavigationTreeContextMenuService.nodeContextType
           && context.data.objectFeatures.includes(EObjectFeature.dataSource);
       },
-      title: 'Edit',
+      title: 'connections_public_connection_edit_menu_item_title',
       order: 2,
       onClick: context => {
         const node = context.data;

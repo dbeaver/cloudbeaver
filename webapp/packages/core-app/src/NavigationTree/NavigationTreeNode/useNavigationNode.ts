@@ -99,7 +99,12 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     if (node && context?.isSelected?.(node)) {
       context.onSelect?.(node, true);
     }
-  }, [context, node]);
+  }, [context, node.id]);
+
+  useEffect(() => () => {
+    // TODO: seems like selection & expand should be specific for separate tree definitions
+    navigationTreeService.expandNode(node.id, false);
+  }, [node.id]);
 
   return {
     control: context?.control,

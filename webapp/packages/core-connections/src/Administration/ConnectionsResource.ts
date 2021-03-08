@@ -20,6 +20,7 @@ import {
   ResourceKeyUtils,
   DatabaseConnectionFragment,
   GetConnectionsQueryVariables,
+  TestConnectionMutation,
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -122,10 +123,12 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
     return observedConnection;
   }
 
-  async test(config: ConnectionConfig): Promise<void> {
-    await this.graphQLService.sdk.testConnection({
+  async test(config: ConnectionConfig): Promise<TestConnectionMutation['connection']> {
+    const { connection } = await this.graphQLService.sdk.testConnection({
       config,
     });
+
+    return connection;
   }
 
   async update(id: string, config: ConnectionConfig): Promise<DatabaseConnection> {

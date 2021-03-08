@@ -40,12 +40,15 @@ const switchStyles = composes(
   css`
     switch-body {
       display: flex;
+      align-items: center;
     }
     field-label {
       display: block;
       padding-right: 17px;
       min-width: 50px;
       white-space: pre-wrap;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
     }
   `
 );
