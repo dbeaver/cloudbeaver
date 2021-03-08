@@ -12,6 +12,8 @@ import type { MenuInitialState } from 'reakit/Menu';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { Style } from '@cloudbeaver/core-theming';
 
+import type { MenuItemControlType } from './models/MenuOptionsStore';
+
 export type MenuMod = 'primary' | 'surface' | 'secondary';
 
 export interface IMenuPanel {
@@ -28,6 +30,8 @@ export interface IMenuItem {
   isHidden?: boolean;
   icon?: string; // path to icon or svg icon name
   panel?: IMenuPanel; // if menu has sub-items
+  type?: MenuItemControlType;
+  isChecked?: boolean;
 }
 
 export type MenuTriggerProps = PropsWithChildren<{

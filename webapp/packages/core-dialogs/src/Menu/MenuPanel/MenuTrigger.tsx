@@ -12,7 +12,7 @@ import {
 } from 'react';
 import {
   MenuButton,
-  Menu, MenuItem, MenuStateReturn, useMenuState
+  Menu, MenuItem, MenuStateReturn, useMenuState, MenuItemCheckbox, MenuItemRadio
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
@@ -114,6 +114,40 @@ const MenuPanelElement = observer(function MenuPanelElement({
         onClick={onClick}
         {...{ as: MenuInnerTrigger }}
       />
+    );
+  }
+
+  if (item.isChecked !== undefined) {
+    if (item.type === 'radio') {
+      return styled(styles)(
+        <MenuItemRadio
+          {...menu}
+          {...use({ hidden: item.isHidden })}
+          aria-label={item.id}
+          disabled={item.isDisabled}
+          name={item.id}
+          value={item.title}
+          checked={item.isChecked}
+          onClick={onClick}
+        >
+          <MenuPanelItem menuItem={item} style={style} />
+        </MenuItemRadio>
+
+      );
+    }
+    return styled(styles)(
+      <MenuItemCheckbox
+        {...menu}
+        {...use({ hidden: item.isHidden })}
+        aria-label={item.id}
+        disabled={item.isDisabled}
+        name={item.id}
+        value={item.title}
+        checked={item.isChecked}
+        onClick={onClick}
+      >
+        <MenuPanelItem menuItem={item} style={style} />
+      </MenuItemCheckbox>
     );
   }
 

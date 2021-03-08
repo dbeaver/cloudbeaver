@@ -8,9 +8,12 @@
 
 import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
-type NavigatorView = 'simple' | 'advanced';
+export type NavigatorView = 'simple' | 'advanced' | 'custom';
+export type NavigatorViewSettingsKeys = keyof NavigatorSettingsInput;
 
-export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorSettingsInput> = {
+type NavigatorViewSettings = Record<Exclude<NavigatorView, 'custom'>, NavigatorSettingsInput>;
+
+export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: NavigatorViewSettings = {
   simple: {
     showOnlyEntities: true,
     hideFolders: true,
@@ -31,8 +34,34 @@ export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, Navigator
   },
 };
 
-export function isSimpleNavigatorView(settings: NavigatorSettingsInput): boolean {
-  const simple = CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple;
-  return !Object.keys(simple)
-    .some(key => settings[key as keyof NavigatorSettingsInput] !== simple[key as keyof NavigatorSettingsInput]);
+export function getNavigatorView(settings: NavigatorSettingsInput): NavigatorView {
+  const isSimple = isNavigatorViewSettingsEqual(settings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+  const isAdvanced = isNavigatorViewSettingsEqual(settings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
+
+  if (isSimple) {
+    return 'simple';
+  }
+
+  if (isAdvanced) {
+    return 'advanced';
+  }
+
+  return 'custom';
+}
+
+export function isNavigatorSettingEnabled(
+  setting: NavigatorViewSettingsKeys, settings: NavigatorSettingsInput
+): boolean {
+  return settings[setting];
+}
+
+function isNavigatorViewSettingsEqual(settings: NavigatorSettingsInput, settingsToCompare: NavigatorSettingsInput) {
+  return !(Object.keys(settingsToCompare) as NavigatorViewSettingsKeys[])
+    .some(key => {
+      // we need to exclude it for now, cause we haven't implement custom navigator view logic yet
+      if (key === 'showSystemObjects') {
+        return false;
+      }
+      return settings[key] !== settingsToCompare[key];
+    });
 }

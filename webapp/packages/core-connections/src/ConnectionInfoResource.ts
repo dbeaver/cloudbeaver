@@ -22,10 +22,10 @@ import {
   GetUserConnectionsQueryVariables,
   ResourceKey,
   ResourceKeyUtils,
+  NavigatorSettingsInput,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
@@ -167,10 +167,8 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.get(config.id)!;
   }
 
-  async changeConnectionView(id: string, simple: boolean): Promise<Connection> {
+  async changeConnectionView(id: string, settings: NavigatorSettingsInput): Promise<Connection> {
     await this.performUpdate(id, [], async () => {
-      const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
-
       const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
         id,
         settings,

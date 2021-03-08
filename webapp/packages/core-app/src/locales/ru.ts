@@ -16,6 +16,8 @@ export default [
   ['app_navigationTree_connection_view', 'Отображение'],
   ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],
   ['app_navigationTree_connection_view_option_advanced', 'Продвинутое'],
+  ['app_navigationTree_connection_view_option_custom', 'Комбинированное'],
+  ['app_navigationTree_connection_view_option_showSystemObjects', 'Показывать системные объекты'],
   ['app_navigationTree_refreshNode', 'Обновить'],
   ['app_navigationTree_context_disconnect', 'Отключить'],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],

@@ -11,7 +11,7 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IMenuPanel } from '../IMenuPanel';
 import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
-import { MenuOptionsStore } from '../models/MenuOptionsStore';
+import { MenuItemControlType, MenuOptionsStore } from '../models/MenuOptionsStore';
 import type { IContextMenuItem } from './IContextMenuItem';
 import type { IMenuContext } from './IMenuContext';
 
@@ -89,6 +89,8 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   isHidden?: () => boolean;
   // set icon or getter
   icon?: string;
+  isChecked?: () => boolean;
+  type?: MenuItemControlType;
   iconGetter?: () => string | undefined;
 
   constructor(private options: IContextMenuItem<T>,
@@ -97,6 +99,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     this.title = options.title;
     this.titleGetter = options.titleGetter;
     this.icon = options.icon;
+    this.type = options.type;
     this.iconGetter = options.iconGetter;
 
     this.id = `${options.id}-${context.contextId!}`;
@@ -109,6 +112,9 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     }
     if (options.isHidden) {
       this.isHidden = () => options.isHidden!(this.context);
+    }
+    if (options.isChecked) {
+      this.isChecked = () => options.isChecked!(this.context);
     }
   }
 }

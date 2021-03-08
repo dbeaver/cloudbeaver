@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, isSimpleNavigatorView } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, CONNECTION_NAVIGATOR_VIEW_SETTINGS, getNavigatorView, isNavigatorSettingEnabled, NavigatorViewSettingsKeys } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
@@ -46,23 +47,43 @@ export class NavigationTreeContextMenuService {
     });
   }
 
-  private isConnectionSimpleView(nodeId: string): boolean {
+  private getConnectionViewSettings(nodeId: string) {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
 
     const connection = this.connectionInfoResource.get(connectionId);
 
     if (!connection) {
+      return null;
+    }
+
+    return connection.navigatorSettings;
+  }
+
+  private getConnectionNavigatorView(nodeId: string) {
+    const connectionViewSettings = this.getConnectionViewSettings(nodeId);
+
+    if (!connectionViewSettings) {
+      return null;
+    }
+
+    return getNavigatorView(connectionViewSettings);
+  }
+
+  private isConnectionViewSettingEnabled(nodeId: string, setting: NavigatorViewSettingsKeys) {
+    const connectionViewSettings = this.getConnectionViewSettings(nodeId);
+
+    if (!connectionViewSettings) {
       return false;
     }
 
-    return isSimpleNavigatorView(connection.navigatorSettings);
+    return isNavigatorSettingEnabled(setting, connectionViewSettings);
   }
 
-  private async changeConnectionView(nodeId: string, simple: boolean) {
+  private async changeConnectionView(nodeId: string, settings: NavigatorSettingsInput) {
     const connectionId = NodeManagerUtils.connectionNodeIdToConnectionId(nodeId);
 
     try {
-      await this.connectionInfoResource.changeConnectionView(connectionId, simple);
+      await this.connectionInfoResource.changeConnectionView(connectionId, settings);
       await this.navNodeManagerService.refreshTree(nodeId);
     } catch (exception) {
       this.notificationService.logException(exception);
@@ -88,12 +109,17 @@ export class NavigationTreeContextMenuService {
       {
         id: 'simple',
         title: 'app_navigationTree_connection_view_option_simple',
-        isDisabled: context => this.isConnectionSimpleView(context.data.id),
+        type: 'radio',
+        isChecked: context => this.getConnectionNavigatorView(context.data.id) === 'simple',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        onClick: async context => await this.changeConnectionView(context.data.id, true),
+        onClick: async context =>
+          await this.changeConnectionView(context.data.id, {
+            ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple,
+            showSystemObjects: this.isConnectionViewSettingEnabled(context.data.id, 'showSystemObjects'),
+          }),
       }
     );
     this.contextMenuService.addMenuItem<NavNode>(
@@ -101,12 +127,39 @@ export class NavigationTreeContextMenuService {
       {
         id: 'advanced',
         title: 'app_navigationTree_connection_view_option_advanced',
-        isDisabled: context => !this.isConnectionSimpleView(context.data.id),
+        type: 'radio',
+        isChecked: context => this.getConnectionNavigatorView(context.data.id) === 'advanced',
         isPresent(context) {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
-        onClick: async context => await this.changeConnectionView(context.data.id, false),
+        onClick: async context =>
+          await this.changeConnectionView(context.data.id, {
+            ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced,
+            showSystemObjects: this.isConnectionViewSettingEnabled(context.data.id, 'showSystemObjects'),
+          }),
+      }
+    );
+    this.contextMenuService.addMenuItem<NavNode>(
+      this.getNodeViewMenuItemToken(),
+      {
+        id: 'systemObjects',
+        title: 'app_navigationTree_connection_view_option_showSystemObjects',
+        isChecked: context => this.isConnectionViewSettingEnabled(context.data.id, 'showSystemObjects'),
+        isPresent(context) {
+          return context.contextType === NavigationTreeContextMenuService.nodeContextType
+            && context.data.objectFeatures.includes(EObjectFeature.dataSource);
+        },
+        onClick: async context => {
+          const currentSettings = this.getConnectionViewSettings(context.data.id);
+          if (!currentSettings) {
+            return;
+          }
+          return await this.changeConnectionView(context.data.id, {
+            ...currentSettings,
+            showSystemObjects: !currentSettings['showSystemObjects'],
+          });
+        },
       }
     );
   }

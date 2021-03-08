@@ -13,6 +13,8 @@ export default [
   ['app_navigationTree_connection_view', 'Connection view'],
   ['app_navigationTree_connection_view_option_simple', 'Simple'],
   ['app_navigationTree_connection_view_option_advanced', 'Advanced'],
+  ['app_navigationTree_connection_view_option_custom', 'Custom'],
+  ['app_navigationTree_connection_view_option_showSystemObjects', 'Show system objects'],
   ['app_navigationTree_refreshNode', 'Refresh'],
   ['app_navigationTree_context_disconnect', 'Disconnect'],
   ['app_shared_inlineEditor_dialog_title', 'Edit mode'],

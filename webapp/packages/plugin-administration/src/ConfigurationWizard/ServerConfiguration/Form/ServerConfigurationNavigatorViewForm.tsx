@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 
 import { FormGroup, Switch } from '@cloudbeaver/core-blocks';
-import { isSimpleNavigatorView, CONNECTION_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, getNavigatorView } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
@@ -24,7 +24,7 @@ export const ServerConfigurationNavigatorViewForm: React.FC<Props> = observer(fu
 }) {
   const translate = useTranslate();
 
-  const isSimpleView = isSimpleNavigatorView(configs.navigatorConfig);
+  const isSimpleView = getNavigatorView(configs.navigatorConfig) === 'simple';
 
   const onNavigatorViewChangeHandler = useCallback((value: boolean) => {
     if (value) {

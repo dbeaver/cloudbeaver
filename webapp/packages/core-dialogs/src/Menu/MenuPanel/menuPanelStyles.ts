@@ -52,11 +52,11 @@ export const menuPanelStyles = composes(
         margin-top: -12px;
       }
     }
-    MenuItem {
+    MenuItem, MenuItemCheckbox, MenuItemRadio {
       display: flex;
       border: none;
       background: none;
-      padding: 6px 16px;
+      padding: 6px 16px 6px 20px;
       text-align: left;
       outline: none;
       color: inherit;
@@ -75,6 +75,27 @@ export const menuPanelStyles = composes(
         }
       }
     }
+    MenuItemCheckbox:global([aria-checked="true"]) {
+      position: relative;
+      &:before {
+        content: "✓";
+        position: absolute;
+        left: 6px;
+        top: 4px;
+      }
+    }
+
+    MenuItemRadio:global([aria-checked="true"]) {
+      position: relative;
+      &:before {
+        content: "•";
+        position: absolute;
+        left: 6px;
+        top: -3px;
+        font-size: 2em;
+      }
+    }
+
     menu-panel-item {
       flex: 1;
       display: flex;
