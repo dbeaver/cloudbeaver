@@ -42,6 +42,7 @@ export * from './shared/NavigationTabs/NavigationTabsBar/Tabs/useTab';
 export * from './shared/NodesManager/useDatabaseObjectInfo';
 export * from './shared/NodesManager/useNode';
 export * from './shared/InlineEditor/InlineEditor';
+export * from './useAppVersion';
 
 // components
 export * from './Body';
