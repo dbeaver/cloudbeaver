@@ -96,7 +96,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   }, [expanded, children.isOutdated(), children.isLoading(), children.isLoaded(), isOutdated(), node]);
 
   useEffect(() => () => {
-    if (node && context?.isSelected?.(node)) {
+    if (!context?.selectionTree && node && context?.isSelected?.(node)) {
       context.onSelect?.(node, true);
     }
   }, [context, node.id]);

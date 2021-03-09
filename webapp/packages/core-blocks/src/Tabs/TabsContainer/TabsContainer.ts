@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, makeObservable } from 'mobx';
+import { observable, makeObservable } from 'mobx';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer';
 
@@ -22,7 +22,6 @@ implements ITabsContainer<TProps, TOptions> {
   constructor() {
     makeObservable(this, {
       tabInfoMap: observable.shallow,
-      tabInfoList: computed,
     });
 
     this.tabInfoMap = new Map();
