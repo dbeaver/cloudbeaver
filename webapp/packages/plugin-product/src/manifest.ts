@@ -9,9 +9,9 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
-import { ProductInfoService } from './ProductInfoService';
+import { ProductBootstrap } from './ProductBootstrap';
 
-export const productInfoPlugin: PluginManifest = {
-  info: { name: 'Product information' },
-  providers: [ProductInfoService, LocaleService],
+export const productPlugin: PluginManifest = {
+  info: { name: 'Product plugin' },
+  providers: [ProductBootstrap, LocaleService],
 };

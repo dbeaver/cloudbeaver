@@ -14,7 +14,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ProductInfoDialog } from './ProductInfoDialog';
 
 @injectable()
-export class ProductInfoService extends Bootstrap {
+export class ProductBootstrap extends Bootstrap {
   private productInfoMenuToken = 'productInfoMenu';
 
   constructor(

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-product-info",
+  "name": "@cloudbeaver/plugin-product",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",
