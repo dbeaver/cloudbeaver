@@ -30,7 +30,7 @@ const PLUGINS = [
   sqlEditor,
   defaultProductManifest,
   connectionPlugin,
-  // productPlugin,
+  productPlugin,
 ];
 
 bootstrap(PLUGINS);
