@@ -29,5 +29,14 @@ query serverConfig {
     defaultNavigatorSettings {
       ...AllNavigatorSettings
     }
+    productInfo {
+      id
+      version
+      name
+      description
+      buildTime
+      releaseTime
+      licenseInfo
+    }
   }
 }

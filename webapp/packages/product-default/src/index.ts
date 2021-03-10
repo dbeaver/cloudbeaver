@@ -11,6 +11,7 @@ import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
+import productPlugin from '@cloudbeaver/plugin-product';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 
 import { defaultProductManifest } from './manifest';
@@ -29,6 +30,7 @@ const PLUGINS = [
   sqlEditor,
   defaultProductManifest,
   connectionPlugin,
+  productPlugin,
 ];
 
 bootstrap(PLUGINS);
