@@ -38,7 +38,5 @@ export class ProductBootstrap extends Bootstrap {
     );
   }
 
-  async load(): Promise<void> {
-    await this.serverConfigResource.load();
-  }
+  load(): void | Promise<void> { }
 }

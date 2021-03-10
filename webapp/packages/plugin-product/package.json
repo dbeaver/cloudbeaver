@@ -14,12 +14,7 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
-  "dependencies": {
-    "react-data-grid": "^7.0.0-canary.30",
-    "react-popper": "^2.2.4"
-  },
   "peerDependencies": {
-    "@cloudbeaver/plugin-data-viewer": "^0.1.0",
     "@cloudbeaver/core-app": "^0.1.0",
     "@cloudbeaver/core-blocks": "^0.1.0",
     "@cloudbeaver/core-di": "^0.1.0",
