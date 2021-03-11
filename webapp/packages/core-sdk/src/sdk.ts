@@ -1540,7 +1540,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 export interface ServerConfigQuery {
   serverConfig: (
     Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode'>
-    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment }
+    & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
 
@@ -2474,6 +2474,15 @@ export const ServerConfigDocument = `
     productConfiguration
     defaultNavigatorSettings {
       ...AllNavigatorSettings
+    }
+    productInfo {
+      id
+      version
+      name
+      description
+      buildTime
+      releaseTime
+      licenseInfo
     }
   }
 }

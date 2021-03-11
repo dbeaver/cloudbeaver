@@ -42,7 +42,7 @@ const styles = composes(
     connection-create {
       display: flex;
       flex-direction: column;
-      height: 980px;
+      height: 680px;
       overflow: hidden;
     }
 

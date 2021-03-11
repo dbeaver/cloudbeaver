@@ -33,8 +33,7 @@ const styles = composes(
       padding: 24px 0;
       display: flex;
       flex-direction: column;
-      min-height: 450px;
-      max-height: 980px;
+      height: 570px;
     }
   `
 );

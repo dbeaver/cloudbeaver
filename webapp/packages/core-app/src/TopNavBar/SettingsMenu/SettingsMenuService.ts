@@ -28,7 +28,7 @@ export class SettingsMenuService extends Bootstrap {
     private permissionsService: PermissionsService,
     private serverConfigResource: ServerConfigResource,
     private screenService: ScreenService,
-    private administrationScreenService: AdministrationScreenService
+    private administrationScreenService: AdministrationScreenService,
   ) {
     super();
   }

@@ -31,7 +31,6 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
@@ -44,8 +43,6 @@ import { useOptions } from './useOptions';
 
 const styles = css`
   SubmittingForm {
-    display: flex;
-    flex-direction: column;
     flex: 1;
     overflow: auto;
   }
