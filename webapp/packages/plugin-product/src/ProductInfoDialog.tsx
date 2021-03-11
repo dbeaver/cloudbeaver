@@ -26,7 +26,6 @@ const productInfoDialogStyles = composes(
   css`
     CommonDialogWrapper {
       min-width: 600px;
-      min-height: 90vh;
     }
     controls {
       display: flex;
