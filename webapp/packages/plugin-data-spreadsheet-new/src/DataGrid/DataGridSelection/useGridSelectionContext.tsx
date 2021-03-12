@@ -89,8 +89,10 @@ export function useGridSelectionContext(
 
       let i = 0;
       for (let rowIdx = firstRow; rowIdx <= lastRow; rowIdx++) {
+        const newElements = rowSelection.filter(element => !rowsSelection[i].includes(element));
+
         temporarySelection.set(rowIdx,
-          [...rowsSelection[i], ...rowSelection]
+          [...rowsSelection[i], ...newElements]
             .filter(column => {
               if (selected) {
                 return !rowSelection.includes(column);
@@ -159,7 +161,7 @@ export function useGridSelectionContext(
       if (column === undefined) {
         return (temporaryRowSelection || []).length === props.tableData.dataColumns.length;
       }
-      return temporaryRowSelection?.includes(column) || false;
+      return temporaryRowSelection.includes(column) || false;
     }
 
     return props.selectionAction.isElementSelected({ row: rowIdx, column });
@@ -187,6 +189,9 @@ export function useGridSelectionContext(
         rowIdx,
         [...selectedColumns, columnIdx]
           .filter(column => {
+            if (!multiple) {
+              return column === columnIdx;
+            }
             if (selected) {
               return column !== columnIdx;
             }
@@ -194,7 +199,7 @@ export function useGridSelectionContext(
           })
       );
     } else {
-      selectionAction.set(key, multiple ? !selected : true);
+      selectionAction.set(key, !selected);
     }
   }
 
