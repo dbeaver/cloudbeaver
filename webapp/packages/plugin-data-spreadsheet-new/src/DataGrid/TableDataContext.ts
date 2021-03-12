@@ -14,6 +14,8 @@ import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 export interface ITableData {
   columns: Array<Column<any[], any>>;
   rows: any[][];
+  dataColumns: SqlResultColumn[];
+  dataRows: any[][];
   getCellValue: (rowIndex: number, key: string | number) => any;
   getColumnInfo: (key: string | number) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<Column<any[], any>>;

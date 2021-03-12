@@ -74,6 +74,12 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
   return useObjectRef({
     columns,
     rows,
+    get dataColumns() {
+      return props.modelResultData?.data?.columns || [];
+    },
+    get dataRows() {
+      return props.modelResultData?.data?.rows || [];
+    },
     getCellValue(rowIndex: number, key: string | number): any {
       return this.rows[rowIndex][key as number];
     },
