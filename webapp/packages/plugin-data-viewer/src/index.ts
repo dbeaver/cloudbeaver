@@ -2,10 +2,16 @@ import { manifest } from './manifest';
 
 export default manifest;
 
+export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
+export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
+export * from './DatabaseDataModel/Actions/ResultSetSelectAction';
+export * from './DatabaseDataModel/DatabaseDataActions';
 export * from './DatabaseDataModel/DatabaseDataEditor';
 export * from './DatabaseDataModel/DatabaseDataFormat';
 export * from './DatabaseDataModel/DatabaseDataModel';
 export * from './DatabaseDataModel/DatabaseDataSource';
+export * from './DatabaseDataModel/IDatabaseDataAction';
+export * from './DatabaseDataModel/IDatabaseDataActions';
 export * from './DatabaseDataModel/IDatabaseDataEditor';
 export * from './DatabaseDataModel/IDatabaseDataModel';
 export * from './DatabaseDataModel/IDatabaseDataResult';

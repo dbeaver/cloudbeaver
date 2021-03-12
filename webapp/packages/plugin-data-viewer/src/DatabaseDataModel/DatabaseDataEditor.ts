@@ -10,17 +10,8 @@ import { makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
-import { DataUpdateType, IDatabaseDataEditor, IDatabaseDataResultEditor, IDataUpdate, IResultEditingDiff } from './IDatabaseDataEditor';
+import { DataUpdateType, IDatabaseDataEditor, IDatabaseDataEditorActionsData, IDatabaseDataResultEditor, IDataUpdate, IResultEditingDiff } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-
-export interface IDatabaseDataEditorActionsData {
-  type: 'edit' | 'cancel';
-  resultId: string;
-  row: number;
-  column: number;
-  value: any;
-  prevValue: any;
-}
 
 export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements IDatabaseDataEditor<TResult> {
   readonly editedResults: Map<string, IDataUpdate>;

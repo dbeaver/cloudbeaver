@@ -86,10 +86,10 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   });
 
   const value = row[column.key];
-  const type = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number' ? 'number' : 'text';
+  const numericCell = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number';
 
   const handleSave = () => {
-    if (type === 'number') {
+    if (numericCell) {
       const editor = dataGridContext.model.source.getEditor(dataGridContext.resultIndex);
       let value = editor.getCell(rowIdx, Number(column.key));
 
@@ -122,7 +122,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
         <editor ref={setPopperRef} as="div" style={popper.styles.popper} {...popper.attributes.popper}>
           <InlineEditor
             ref={inputRef}
-            type={type}
+            type="text"
             value={value}
             edited
             hideSave

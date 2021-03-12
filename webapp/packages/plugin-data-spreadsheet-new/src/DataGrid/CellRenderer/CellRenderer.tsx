@@ -24,7 +24,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const classes: string[] = [];
   const { rowIdx, column } = props;
 
-  if (selectionContext?.isSelected(column.key, rowIdx)) {
+  if (selectionContext?.isSelected(rowIdx, column.idx)) {
     classes.push('rdg-cell-custom-selected');
   }
 
@@ -37,7 +37,27 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }
 
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    selectionContext?.select(column.idx, rowIdx, event.ctrlKey || event.metaKey, event.shiftKey);
+    selectionContext?.select(
+      {
+        colIdx: column.idx,
+        rowIdx,
+      },
+      event.ctrlKey || event.metaKey,
+      event.shiftKey,
+      true
+    );
+  }, [column, rowIdx, selectionContext]);
+
+  const handleMouseUp = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    selectionContext?.select(
+      {
+        colIdx: column.idx,
+        rowIdx,
+      },
+      event.ctrlKey || event.metaKey,
+      event.shiftKey,
+      false
+    );
   }, [column, rowIdx, selectionContext]);
 
   const handleDoubleClick = useCallback(() => {
@@ -59,9 +79,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   return (
     <Cell
       className={classes.join(' ')}
-      data-rowindex={rowIdx}
-      data-columnindex={column.idx}
+      data-row-index={rowIdx}
+      data-column-index={column.idx}
       onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onDoubleClick={handleDoubleClick}
       {...props}
       row={row}

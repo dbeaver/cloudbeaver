@@ -11,6 +11,9 @@ import { observable, makeObservable } from 'mobx';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionContext } from '../IExecutionContext';
+import { DatabaseDataActions } from './DatabaseDataActions';
+import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
@@ -21,6 +24,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
   editor: IDatabaseDataEditor<TResult> | null;
+  actions: IDatabaseDataActions<TResult>;
   results: TResult[];
   offset: number;
   count: number;
@@ -50,6 +54,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       activeSave: observable,
     });
 
+    this.actions = new DatabaseDataActions();
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
     this.editor = null;
@@ -66,6 +71,17 @@ implements IDatabaseDataSource<TOptions, TResult> {
       requestMessage: '',
     };
     this.error = null;
+  }
+
+  getAction<T extends IDatabaseDataAction<TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionClass<TResult, T>
+  ): T {
+    if (!this.hasResult(resultIndex)) {
+      throw new Error('Result index out of range');
+    }
+
+    return this.actions.get(this.results[resultIndex], action);
   }
 
   abstract cancel(): Promise<boolean> | boolean;

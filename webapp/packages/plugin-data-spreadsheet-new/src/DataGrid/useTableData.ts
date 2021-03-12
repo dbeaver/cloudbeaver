@@ -22,7 +22,7 @@ import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHead
 import type { ITableData } from './TableDataContext';
 
 export const indexColumn: Column<any[], any> = {
-  key: Number.MAX_SAFE_INTEGER + '',
+  key: String(Number.MAX_SAFE_INTEGER),
   name: '#',
   minWidth: 60,
   width: 60,
@@ -74,6 +74,12 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
   return useObjectRef({
     columns,
     rows,
+    get dataColumns() {
+      return props.modelResultData?.data?.columns || [];
+    },
+    get dataRows() {
+      return props.modelResultData?.data?.rows || [];
+    },
     getCellValue(rowIndex: number, key: string | number): any {
       return this.rows[rowIndex][key as number];
     },
@@ -92,14 +98,14 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
       const lastIndex = Math.max(startIndex, endIndex);
       return this.columns.slice(firstIndex, lastIndex + 1);
     },
-    isIndexColumn(columnKey: string) {
-      return columnKey === indexColumn.key;
+    isIndexColumn(columnKey: string | number) {
+      return String(columnKey) === indexColumn.key;
     },
     isIndexColumnInRange(columnsRange: Array<Column<any[], any>>) {
       return columnsRange.some(column => this.isIndexColumn(column.key));
     },
     getColumnKeyFromColumnIndex(columnIndex: number) {
-      return this.columns[columnIndex].key;
+      return Number(this.columns[columnIndex].key);
     },
   }, {
     columns,

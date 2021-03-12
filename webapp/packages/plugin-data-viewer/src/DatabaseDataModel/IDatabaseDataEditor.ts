@@ -8,7 +8,6 @@
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
 
-import type { IDatabaseDataEditorActionsData } from './DatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DataUpdateType {
@@ -26,6 +25,15 @@ export interface IResultEditingDiff {
 export interface IDataUpdate {
   resultId: string;
   diff: Map<number, IResultEditingDiff>;
+}
+
+export interface IDatabaseDataEditorActionsData {
+  type: 'edit' | 'cancel';
+  resultId: string;
+  row: number;
+  column: number;
+  value: any;
+  prevValue: any;
 }
 
 export interface IDatabaseDataEditor<TResult extends IDatabaseDataResult> {

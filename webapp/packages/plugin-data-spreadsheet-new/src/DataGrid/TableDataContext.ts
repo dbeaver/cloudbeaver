@@ -14,13 +14,15 @@ import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 export interface ITableData {
   columns: Array<Column<any[], any>>;
   rows: any[][];
+  dataColumns: SqlResultColumn[];
+  dataRows: any[][];
   getCellValue: (rowIndex: number, key: string | number) => any;
   getColumnInfo: (key: string | number) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<Column<any[], any>>;
   getColumnIndexFromKey: (columnKey: string | number) => number;
-  isIndexColumn: (columnKey: string) => boolean;
+  isIndexColumn: (columnKey: string | number) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;
-  getColumnKeyFromColumnIndex: (columnIndex: number) => string;
+  getColumnKeyFromColumnIndex: (columnIndex: number) => number;
 }
 
 export const TableDataContext = createContext<ITableData | null>(null);

@@ -7,215 +7,236 @@
  */
 
 import { action, observable } from 'mobx';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
+
+import { useObjectRef } from '@cloudbeaver/core-blocks';
+import type { IResultSetSelectKey, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from '../TableDataContext';
+import type { IDraggingPosition } from '../useGridDragging';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
-export interface IPosition {
-  idx: number;
-  rowIdx: number;
+interface IGridSelectionState {
+  range: boolean;
+  temporarySelection: Map<number, number[]>;
+  lastSelectedCell: IDraggingPosition | null;
 }
 
-export function useGridSelectionContext(tableData: ITableData) {
-  const [selectedCells] = useState(() => observable.map<number, number[]>());
-  const [temporarySelectedCells] = useState(() => observable.map<number, number[]>());
-  const [lastSelectedCell, setLastSelectedCell] = useState<IPosition | null>(null);
+export function useGridSelectionContext(
+  tableData: ITableData,
+  selectionAction: ResultSetSelectAction
+): IDataGridSelectionContext {
+  const props = useObjectRef({ tableData, selectionAction });
 
-  const selectRows = useCallback(action(
-    (startPosition: number, lastPosition: number, multiple: boolean, temporary = false) => {
-      const columnsLength = tableData.columns?.length || 0;
+  const [state] = useState<IGridSelectionState>(() => observable({
+    range: false,
+    temporarySelection: new Map<number, number[]>(),
+    lastSelectedCell: null,
+  }));
 
-      temporarySelectedCells.clear();
+  function getRealColumnIndex(colIdx: number) {
+    let column: number | undefined = props.tableData.getColumnKeyFromColumnIndex(colIdx);
 
-      if (!multiple) {
-        selectedCells.clear();
-      }
-
-      const rowSelection = [];
-      for (let i = 0; i < columnsLength; i++) {
-        rowSelection.push(i);
-      }
-
-      const firstRowIdx = Math.min(startPosition, lastPosition);
-      const lastRowIdx = Math.max(startPosition, lastPosition);
-
-      for (let rowIdx = firstRowIdx; rowIdx <= lastRowIdx; rowIdx++) {
-        if (selectedCells.get(rowIdx)?.length === columnsLength) {
-          selectedCells.delete(rowIdx);
-          continue;
-        }
-
-        if (temporary) {
-          temporarySelectedCells.set(rowIdx, rowSelection);
-        } else {
-          selectedCells.set(rowIdx, rowSelection);
-        }
-      }
-    }), [selectedCells, temporarySelectedCells]);
-
-  const selectRange = useCallback(action(
-    (startPosition: number, lastPosition: number, columns: number[], multiple: boolean, temporary = false) => {
-      temporarySelectedCells.clear();
-
-      if (!multiple) {
-        selectedCells.clear();
-      }
-
-      const top = Math.min(startPosition, lastPosition);
-      const bottom = Math.max(startPosition, lastPosition);
-
-      for (let rowIdx = top; rowIdx <= bottom; rowIdx++) {
-        if (temporary) {
-          temporarySelectedCells.set(rowIdx, [...columns]);
-        } else {
-          const currentRowSelection = selectedCells.get(rowIdx) || [];
-          const newRowSelection = [...currentRowSelection, ...columns]
-            .filter((columnIdx, idx, arr) => arr.indexOf(columnIdx) === idx);
-
-          selectedCells.set(rowIdx, newRowSelection);
-        }
-      }
-    }), [selectedCells, temporarySelectedCells]);
-
-  const updateMultiSelection = useCallback(
-    (startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary: boolean) => {
-      const columnsInRange = tableData.getColumnsInRange(startPosition.idx, lastPosition.idx);
-      const isIndexColumnInRange = tableData.isIndexColumnInRange(columnsInRange);
-
-      if (isIndexColumnInRange) {
-        selectRows(startPosition.rowIdx, lastPosition.rowIdx, multiple, temporary);
-      } else {
-        selectRange(
-          startPosition.rowIdx,
-          lastPosition.rowIdx,
-          columnsInRange.map(column => Number(column.key)),
-          multiple,
-          temporary
-        );
-      }
-    }, [selectRange, selectRows, tableData]);
-
-  const isColumnSelected = useCallback((columnIndex: number) => {
-    const rowsLength = tableData.rows?.length || 0;
-
-    for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
-      const rowSelection = selectedCells.get(rowIdx) || [];
-      if (!rowSelection.includes(columnIndex)) {
-        return false;
-      }
+    if (props.tableData.isIndexColumn(column)) {
+      column = undefined;
     }
-    return true;
-  }, [selectedCells, tableData]);
 
-  const selectColumn = useCallback(action((columnKey: string, multiple: boolean) => {
-    const columnIndex = Number(columnKey);
-    const isSelected = isColumnSelected(columnIndex);
+    return column;
+  }
+
+  const selectRows = action(function selectRows(
+    startPosition: number,
+    lastPosition: number,
+    columns: number[] = [],
+    multiple = false,
+    temporary = false
+  ) {
+    const { selectionAction } = props;
+    const { temporarySelection } = state;
+
+    const columnsLength = props.tableData.dataColumns.length;
+    const firstRow = Math.min(startPosition, lastPosition);
+    const lastRow = Math.max(startPosition, lastPosition);
+
+    let selected = true;
+    const rowsSelection: number[][] = [];
+    const columnsToSelect: Array<number| undefined> = columns.length > 0 ? columns : [undefined];
+
+    for (let row = firstRow; row <= lastRow; row++) {
+      for (const column of columnsToSelect) {
+        if (!selectionAction.isElementSelected({ row, column })) {
+          selected = false;
+          break;
+        }
+      }
+      rowsSelection.push(selectionAction.getRowSelection(row));
+    }
+
+    temporarySelection.clear();
 
     if (!multiple) {
-      selectedCells.clear();
+      selectionAction.clear();
     }
 
-    const rowsLength = tableData.rows?.length || 0;
+    if (temporary) {
+      const rowSelection = columns;
 
-    for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
-      const rowSelection = selectedCells.get(rowIdx) || [];
-      if (isSelected) {
-        selectedCells.set(rowIdx, [...rowSelection.filter(colIdx => colIdx !== columnIndex)]);
-      } else {
-        selectedCells.set(rowIdx, [...rowSelection, columnIndex]);
+      if (columns.length === 0) {
+        for (let i = 0; i < columnsLength; i++) {
+          rowSelection.push(i);
+        }
       }
-    }
-  }), [tableData, selectedCells, isColumnSelected]);
 
-  const selectTable = useCallback(() => {
-    const rowsLength = tableData.rows?.length || 0;
-    const columnsLength = tableData.columns?.length || 0;
+      let i = 0;
+      for (let rowIdx = firstRow; rowIdx <= lastRow; rowIdx++) {
+        const newElements = rowSelection.filter(element => !rowsSelection[i].includes(element));
 
-    const rowSelection = [];
-    for (let colIdx = 0; colIdx < columnsLength; colIdx++) {
-      rowSelection.push(colIdx);
-    }
-
-    for (let rowIdx = 0; rowIdx < rowsLength; rowIdx++) {
-      selectedCells.set(rowIdx, [...rowSelection]);
-    }
-  }, [tableData, selectedCells]);
-
-  const isSelected = useCallback((columnKey: string, rowIdx: number) => {
-    if (!selectedCells.has(rowIdx) && !temporarySelectedCells.has(rowIdx)) {
-      return false;
-    }
-
-    const rowSelection = selectedCells.get(rowIdx);
-    const temporaryRowSelection = temporarySelectedCells.get(rowIdx);
-
-    const idx = Number(columnKey);
-
-    return !!(rowSelection?.includes(idx) || temporaryRowSelection?.includes(idx));
-  },
-  [selectedCells, temporarySelectedCells]);
-
-  const selectCell = useCallback((columnIdx: number, rowIdx: number) => {
-    const rowSelection = selectedCells.get(rowIdx);
-    if (rowSelection === undefined) {
-      selectedCells.set(rowIdx, [columnIdx]);
+        temporarySelection.set(rowIdx,
+          [...rowsSelection[i], ...newElements]
+            .filter(column => {
+              if (selected) {
+                return !rowSelection.includes(column);
+              }
+              return true;
+            }));
+        i++;
+      }
       return;
     }
 
-    const targetIndex = rowSelection.indexOf(columnIdx);
+    for (let row = firstRow; row <= lastRow; row++) {
+      for (const column of columnsToSelect) {
+        selectionAction.set({ row, column }, !selected);
+      }
+    }
+  });
 
-    if (targetIndex !== -1) {
-      rowSelection.splice(targetIndex, 1);
+  function selectRange(
+    startPosition: IDraggingPosition,
+    lastPosition: IDraggingPosition,
+    multiple: boolean,
+    temporary = false
+  ) {
+    state.range = temporary;
+    const columnsInRange = props.tableData.getColumnsInRange(startPosition.colIdx, lastPosition.colIdx);
+    const isIndexColumnInRange = props.tableData.isIndexColumnInRange(columnsInRange);
+
+    selectRows(
+      startPosition.rowIdx,
+      lastPosition.rowIdx,
+      isIndexColumnInRange ? undefined : columnsInRange.map(column => Number(column.key)),
+      multiple,
+      temporary
+    );
+  }
+
+  const selectColumn = action(function selectColumn(
+    colIdx: number,
+    multiple: boolean
+  ) {
+    state.temporarySelection.clear();
+    const column = getRealColumnIndex(colIdx);
+
+    const { selectionAction } = props;
+    const selected = selectionAction.isElementSelected({ column });
+
+    if (!multiple) {
+      selectionAction.clear();
+    }
+
+    selectionAction.set({ column }, !selected);
+  });
+
+  function selectTable() {
+    state.temporarySelection.clear();
+    props.selectionAction.set({}, true);
+  }
+
+  function isSelected(rowIdx: number, colIdx: number) {
+    const column = getRealColumnIndex(colIdx);
+
+    const temporaryRowSelection = state.temporarySelection.get(rowIdx);
+
+    if (temporaryRowSelection) {
+      if (column === undefined) {
+        return (temporaryRowSelection || []).length === props.tableData.dataColumns.length;
+      }
+      return temporaryRowSelection.includes(column) || false;
+    }
+
+    return props.selectionAction.isElementSelected({ row: rowIdx, column });
+  }
+
+  function selectCell(rowIdx: number, columnIdx: number, multiple: boolean, temporary: boolean) {
+    const { temporarySelection } = state;
+    const { selectionAction } = props;
+    temporarySelection.clear();
+
+    const key: IResultSetSelectKey = {
+      column: columnIdx,
+      row: rowIdx,
+    };
+
+    const selectedColumns = selectionAction.getRowSelection(rowIdx);
+    const selected = selectionAction.isElementSelected(key);
+
+    if (!multiple) {
+      selectionAction.clear();
+    }
+
+    if (temporary) {
+      temporarySelection.set(
+        rowIdx,
+        [...selectedColumns, columnIdx]
+          .filter(column => {
+            if (!multiple) {
+              return column === columnIdx;
+            }
+            if (selected) {
+              return column !== columnIdx;
+            }
+            return true;
+          })
+      );
+    } else {
+      selectionAction.set(key, !selected);
+    }
+  }
+
+  function select(cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) {
+    const { lastSelectedCell } = state;
+    const columnKey = props.tableData.getColumnKeyFromColumnIndex(cell.colIdx);
+    const isIndexColumn = props.tableData.isIndexColumn(columnKey);
+
+    if (!temporary) {
+      state.lastSelectedCell = cell;
+    }
+
+    if (range && lastSelectedCell) {
+      selectRange(lastSelectedCell, cell, multiple, temporary);
       return;
     }
 
-    rowSelection.push(columnIdx);
-  }, [selectedCells]);
+    if (state.range) {
+      return;
+    }
 
-  const select = useCallback(
-    (columnIndex: number, rowIdx: number, multiple: boolean, range: boolean) => {
-      const columnKey = tableData.getColumnKeyFromColumnIndex(columnIndex);
-      const isIndexColumn = tableData.isIndexColumn(columnKey);
+    if (isIndexColumn) {
+      selectRows(cell.rowIdx, cell.rowIdx, undefined, multiple, temporary);
+      return;
+    }
 
-      setLastSelectedCell({ idx: columnIndex, rowIdx });
+    selectCell(cell.rowIdx, columnKey, multiple, temporary);
+  }
 
-      if (selectedCells.size > 0 && range && lastSelectedCell) {
-        updateMultiSelection(
-          { idx: lastSelectedCell.idx, rowIdx: lastSelectedCell.rowIdx },
-          { idx: columnIndex, rowIdx },
-          multiple,
-          false);
-        return;
-      }
-
-      if (isIndexColumn) {
-        selectRows(rowIdx, rowIdx, multiple);
-        return;
-      }
-
-      if (!multiple) {
-        selectedCells.clear();
-      }
-
-      selectCell(Number(columnKey), rowIdx);
-    }, [
-      tableData,
-      selectedCells,
-      selectRows,
-      selectCell,
-      lastSelectedCell,
-      updateMultiSelection,
-    ]);
-
-  const context: IDataGridSelectionContext = useMemo(() => ({
-    selectedCells,
+  return useObjectRef<IDataGridSelectionContext>({
+    get selectedCells() {
+      return props.selectionAction.selectedElements;
+    },
     select,
     selectColumn,
     selectTable,
     isSelected,
-    updateMultiSelection,
-  }), [selectedCells, select, isSelected, selectColumn, selectTable, updateMultiSelection]);
-
-  return context;
+    selectRange,
+  }, {});
 }

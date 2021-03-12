@@ -9,6 +9,8 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionContext } from '../IExecutionContext';
+import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
+import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
@@ -26,6 +28,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
+  readonly actions: IDatabaseDataActions<TResult>;
   readonly editor: IDatabaseDataEditor<TResult> | null;
   readonly results: TResult[];
   readonly offset: number;
@@ -41,6 +44,12 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   hasResult: (resultIndex: number) => boolean;
 
+  getAction: <T extends IDatabaseDataAction<TResult>>(
+    resultIndex: number,
+    action: IDatabaseDataActionClass<TResult, T>
+  ) => T;
+
+  /** @deprecated will be moved to getAction */
   getEditor: (resultIndex: number) => IDatabaseDataResultEditor<TResult>;
   getResult: (index: number) => TResult | null;
 
