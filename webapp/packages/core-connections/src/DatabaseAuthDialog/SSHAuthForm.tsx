@@ -81,7 +81,6 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
             state={state}
             checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
             disabled={disabled}
-            mod='surface'
           />
         </FormGroup>
       )}

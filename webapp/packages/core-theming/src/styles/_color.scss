@@ -52,7 +52,7 @@
       }
       .theme-border-color-#{$style} {
         @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(border-color, $style);
+          @include mdc-theme-prop(border-color, $style, true);
         }
       }
     }

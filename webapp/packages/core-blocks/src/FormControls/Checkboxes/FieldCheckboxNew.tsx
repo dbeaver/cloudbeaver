@@ -49,7 +49,7 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
         {...rest}
         checked={checkedControlled}
       />
-      <field-label htmlFor={rest.value || rest.name} as="label">{children}</field-label>
+      <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
     </field>
   );
 };

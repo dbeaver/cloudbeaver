@@ -117,24 +117,25 @@ const MenuPanelElement = observer(function MenuPanelElement({
     );
   }
 
-  if (item.isChecked !== undefined) {
-    if (item.type === 'radio') {
-      return styled(styles)(
-        <MenuItemRadio
-          {...menu}
-          {...use({ hidden: item.isHidden })}
-          aria-label={item.id}
-          disabled={item.isDisabled}
-          name={item.id}
-          value={item.title}
-          checked={item.isChecked}
-          onClick={onClick}
-        >
-          <MenuPanelItem menuItem={item} style={style} />
-        </MenuItemRadio>
+  if (item.type === 'radio') {
+    return styled(styles)(
+      <MenuItemRadio
+        {...menu}
+        {...use({ hidden: item.isHidden })}
+        aria-label={item.id}
+        disabled={item.isDisabled}
+        name={item.id}
+        value={item.title}
+        checked={item.isChecked}
+        onClick={onClick}
+      >
+        <MenuPanelItem menuItem={item} style={style} />
+      </MenuItemRadio>
 
-      );
-    }
+    );
+  }
+
+  if (item.type === 'checkbox') {
     return styled(styles)(
       <MenuItemCheckbox
         {...menu}
@@ -146,6 +147,7 @@ const MenuPanelElement = observer(function MenuPanelElement({
         checked={item.isChecked}
         onClick={onClick}
       >
+
         <MenuPanelItem menuItem={item} style={style} />
       </MenuItemCheckbox>
     );

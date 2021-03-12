@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, Grid, GroupItem, Container } from '@cloudbeaver/core-blocks';
+import { Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputFieldNew, FieldCheckboxNew, BASE_CONTAINERS_STYLES, SwitchNew, GroupItem, Container } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -160,7 +160,6 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
                 value={SSH_TUNNEL_ID + ' savePassword'}
                 state={state}
                 disabled={disabled || !enabled || form.form.readonly}
-                mod='surface'
               >{translate('connections_network_handler_ssh_tunnel_save_password')}
               </FieldCheckboxNew>
             )}

@@ -8,19 +8,16 @@
 
 import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
-export type NavigatorView = 'simple' | 'advanced' | 'custom';
-export type NavigatorViewSettingsKeys = keyof NavigatorSettingsInput;
+export type NavigatorView = 'simple' | 'advanced';
+export type NavigatorViewSettings = Partial<NavigatorSettingsInput>;
 
-type NavigatorViewSettings = Record<Exclude<NavigatorView, 'custom'>, NavigatorSettingsInput>;
-
-export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: NavigatorViewSettings = {
+export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorViewSettings> = {
   simple: {
     showOnlyEntities: true,
     hideFolders: true,
     hideVirtualModel: true,
     hideSchemas: false,
     mergeEntities: false,
-    showSystemObjects: false,
     showUtilityObjects: false,
   },
   advanced: {
@@ -29,39 +26,13 @@ export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: NavigatorViewSettings = {
     hideVirtualModel: false,
     hideSchemas: false,
     mergeEntities: false,
-    showSystemObjects: false,
     showUtilityObjects: false,
   },
 };
 
-export function getNavigatorView(settings: NavigatorSettingsInput): NavigatorView {
-  const isSimple = isNavigatorViewSettingsEqual(settings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
-  const isAdvanced = isNavigatorViewSettingsEqual(settings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
-
-  if (isSimple) {
-    return 'simple';
-  }
-
-  if (isAdvanced) {
-    return 'advanced';
-  }
-
-  return 'custom';
-}
-
-export function isNavigatorSettingEnabled(
-  setting: NavigatorViewSettingsKeys, settings: NavigatorSettingsInput
+export function isNavigatorViewSettingsEqual(
+  settings: NavigatorSettingsInput, settingsToCompare: NavigatorViewSettings
 ): boolean {
-  return settings[setting];
-}
-
-function isNavigatorViewSettingsEqual(settings: NavigatorSettingsInput, settingsToCompare: NavigatorSettingsInput) {
-  return !(Object.keys(settingsToCompare) as NavigatorViewSettingsKeys[])
-    .some(key => {
-      // we need to exclude it for now, cause we haven't implement custom navigator view logic yet
-      if (key === 'showSystemObjects') {
-        return false;
-      }
-      return settings[key] !== settingsToCompare[key];
-    });
+  return !(Object.keys(settingsToCompare) as Array<keyof NavigatorSettingsInput>)
+    .some(key => settings[key] !== settingsToCompare[key]);
 }

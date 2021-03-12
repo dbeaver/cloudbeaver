@@ -10,7 +10,7 @@ import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UsersResource } from '@cloudbeaver/core-authentication';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
+import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
@@ -152,7 +152,7 @@ export class ServerConfigurationService {
           customConnectionsEnabled: true,
           sessionExpireTime: 30,
         },
-        navigatorConfig: { ...CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced },
+        navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
       };
     }
 

@@ -16,11 +16,16 @@ export const menuPanelStyles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
     MenuItem,
+    MenuItemCheckbox,
+    MenuItemRadio,
     MenuButton {
       composes: theme-ripple from global;
     }
     MenuItemElement {
       composes: theme-ripple from global;
+    }
+    menu-panel-item {
+      composes: theme-border-color-background from global;
     }
   `,
   css`
@@ -30,8 +35,6 @@ export const menuPanelStyles = composes(
       outline: none !important;
       color: inherit;
       cursor: pointer;
-      padding: 12px 0;
-
       & box {
         display: flex;
         align-items: center;
@@ -54,9 +57,10 @@ export const menuPanelStyles = composes(
     }
     MenuItem, MenuItemCheckbox, MenuItemRadio {
       display: flex;
+      align-items: center;
       border: none;
+      padding: 0;
       background: none;
-      padding: 6px 16px 6px 20px;
       text-align: left;
       outline: none;
       color: inherit;
@@ -69,30 +73,9 @@ export const menuPanelStyles = composes(
 
       &:hover, &:global([aria-expanded="true"]) {
         font-weight: 600;
-
         & Icon {
           opacity: 1;
         }
-      }
-    }
-    MenuItemCheckbox:global([aria-checked="true"]) {
-      position: relative;
-      &:before {
-        content: "✓";
-        position: absolute;
-        left: 6px;
-        top: 4px;
-      }
-    }
-
-    MenuItemRadio:global([aria-checked="true"]) {
-      position: relative;
-      &:before {
-        content: "•";
-        position: absolute;
-        left: 6px;
-        top: -3px;
-        font-size: 2em;
       }
     }
 
@@ -100,16 +83,33 @@ export const menuPanelStyles = composes(
       flex: 1;
       display: flex;
       align-items: center;
-      
+      height: 30px;
+      padding: 0 5px;
+      &[|separator] {
+        border-bottom: 1px solid;
+      }
       & menu-item-text  {
         display: block;
+        padding: 0 5px;
         flex: 1;
+      }
+      & menu-item-content {
+        min-width: 25px;
+        min-height: 25px;
+        max-width: 25px;
+        max-height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       & Icon {
         width: 16px;
         height: 16px;
         opacity: 0.5;
-        padding-left: 16px;
+      }
+      & IconOrImage {
+        width: 14px;
+        height: 14px;
       }
     }
   `

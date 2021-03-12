@@ -55,6 +55,30 @@ const radioMod = {
       }
     `
   ),
+  menu: composes(
+    css`
+      radio {
+        composes: radio_menu from global;
+      }
+    `,
+    css`
+      field {
+        padding: 0;
+        & radio {
+          width: 14px;
+          height: 14px;
+          padding: 0;
+        }
+        & radio-background {
+          width: 14px;
+          height: 14px;
+        }
+        & radio-inner-circle {
+          border-width: 7px;
+        }
+      }
+   `
+  ),
 };
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {

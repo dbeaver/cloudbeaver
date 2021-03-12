@@ -9,10 +9,11 @@
 import { useObserver } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Checkbox, Icon, IconOrImage, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { use } from '@reshadow/react';
 
 import { menuPanelStyles } from './menuPanelStyles';
 
@@ -25,17 +26,38 @@ export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelIte
   menuItem,
   style = [],
 }) {
-  const { title, panel } = useObserver(() => ({ // TODO: provide title and panel via props
+  const { title, panel, icon, isChecked, controlType, separator } = useObserver(() => ({ // TODO: provide title and panel via props
     title: menuItem.title,
     panel: menuItem.panel,
+    icon: menuItem.icon,
+    isChecked: menuItem.isChecked,
+    controlType: menuItem.type,
+    separator: menuItem.separator,
   }));
 
+  let control = null;
+
+  if (controlType === 'radio') {
+    control = <Radio checked={isChecked} mod={['primary', 'menu']} />;
+  } else if (controlType === 'checkbox') {
+    control = <Checkbox checked={isChecked} mod={['primary', 'menu']} showRipple={false} />;
+  }
+
   return styled(useStyles(menuPanelStyles, ...style))(
-    <menu-panel-item as="div">
-      <menu-item-text as="span">
+    <menu-panel-item as="div" {...use({ separator })}>
+      <menu-item-content as='div'>
+        {icon && (
+          <IconOrImage icon={icon} />
+        )}
+        {control}
+      </menu-item-content>
+      <menu-item-text as="div">
         <Translate token={title} />
       </menu-item-text>
-      {panel && <Icon name="arrow" viewBox="0 0 16 16" />}
+      <menu-item-content as='div'>
+        {panel && <Icon name="arrow" viewBox="0 0 16 16" />}
+      </menu-item-content>
     </menu-panel-item>
+
   );
 };

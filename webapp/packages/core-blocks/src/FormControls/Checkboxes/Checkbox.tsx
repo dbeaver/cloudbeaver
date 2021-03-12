@@ -8,18 +8,20 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useState } from 'react';
-import { use } from 'reshadow';
 
 import type { IGridItemsLayoutProps } from '../../Containers/LayoutProps';
 import { FormContext } from '../FormContext';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
+export type CheckboxMod = 'primary' | 'menu';
+
 export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & IGridItemsLayoutProps & {
   value?: string;
   checkboxLabel?: string;
-  mod?: 'surface';
   long?: boolean;
+  mod?: CheckboxMod[];
+  showRipple?: boolean;
 };
 
 type CheckboxOnChangeEvent<T> =
@@ -55,8 +57,9 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   checkboxLabel,
   checked: checkedControlled,
   children,
-  className,
   mod,
+  showRipple,
+  className,
   long,
   autoHide,
   onChange,
@@ -114,8 +117,9 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       checked={checked}
       label={checkboxLabel}
       className={className}
+      mod={mod}
+      showRipple={showRipple}
       onChange={handleChange}
-      {...use({ mod })}
     />
   );
 });

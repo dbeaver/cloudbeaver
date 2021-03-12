@@ -85,7 +85,6 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         checkboxLabel={property.displayName}
         title={property.description}
         disabled={disabled}
-        mod='surface'
       />
     );
   }

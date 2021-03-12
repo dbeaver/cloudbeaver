@@ -212,7 +212,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 disabled={edit || form.form.disabled}
                 readOnly={form.form.readonly}
                 // autoHide={} // maybe better to use autoHide
-                mod='surface'
               >{translate('connections_connection_template')}
               </FieldCheckboxNew>
             )}
@@ -245,7 +244,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                   value={data.config.connectionId + 'authNeeded'}
                   state={data.config}
                   disabled={form.form.disabled || form.form.readonly}
-                  mod='surface'
                   gridItemMax
                 >{translate('connections_connection_edit_save_credentials')}
                 </FieldCheckboxNew>

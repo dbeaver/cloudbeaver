@@ -11,7 +11,7 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IMenuPanel } from '../IMenuPanel';
 import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
-import { MenuItemControlType, MenuOptionsStore } from '../models/MenuOptionsStore';
+import { MenuItemType, MenuOptionsStore } from '../models/MenuOptionsStore';
 import type { IContextMenuItem } from './IContextMenuItem';
 import type { IMenuContext } from './IMenuContext';
 
@@ -90,7 +90,8 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   // set icon or getter
   icon?: string;
   isChecked?: () => boolean;
-  type?: MenuItemControlType;
+  type?: MenuItemType;
+  separator?: boolean;
   iconGetter?: () => string | undefined;
 
   constructor(private options: IContextMenuItem<T>,
@@ -100,6 +101,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     this.titleGetter = options.titleGetter;
     this.icon = options.icon;
     this.type = options.type;
+    this.separator = options.separator;
     this.iconGetter = options.iconGetter;
 
     this.id = `${options.id}-${context.contextId!}`;

@@ -8,7 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { Composes, composes, useStyles } from '@cloudbeaver/core-theming';
+
+import type { CheckboxMod } from './Checkbox';
 
 const checkboxStyles = composes(
   css`
@@ -46,11 +48,31 @@ const checkboxStyles = composes(
   `
 );
 
-const checkboxMod = {
+const checkboxMod: Record<CheckboxMod, Composes> = {
   primary: composes(
     css`
       checkbox {
         composes: theme-checkbox_primary from global;
+      }
+    `
+  ),
+  menu: composes(
+    css`
+      checkbox {
+        composes: checkbox_menu from global;
+      }  
+    `,
+    css`
+      checkbox-container {
+        & checkbox {
+          width: 14px;
+          height: 14px;
+          margin: -6px;
+        }
+        & checkbox-background {
+          width: 14px;
+          height: 14px;
+        }
       }
     `
   ),
@@ -76,12 +98,14 @@ const checkboxState = {
 interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   indeterminate?: boolean;
+  showRipple?: boolean;
+  mod?: CheckboxMod[];
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  label, className, title, ...rest
+  label, className, title, mod = ['primary'], showRipple = true, ...rest
 }) {
-  return styled(useStyles(checkboxStyles, checkboxMod.primary, rest.disabled
+  return styled(useStyles(checkboxStyles, ...(mod || []).map(mod => checkboxMod[mod]), rest.disabled
     && checkboxState.disabled, rest.checked && checkboxState.checked))(
     <checkbox-container className={className} title={title} as='div'>
       <checkbox as='div'>
@@ -92,7 +116,9 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
           </checkbox-checkmark>
           <checkbox-mixedmark as='div' />
         </checkbox-background>
-        <checkbox-ripple as='div' />
+        {showRipple && (
+          <checkbox-ripple as='div' />
+        )}
       </checkbox>
       {label && rest.id && <checkbox-label as='label' htmlFor={rest.id}>{label}</checkbox-label>}
     </checkbox-container>
