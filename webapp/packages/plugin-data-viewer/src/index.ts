@@ -3,7 +3,8 @@ import { manifest } from './manifest';
 export default manifest;
 
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
-export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
+export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
+export * from './DatabaseDataModel/Actions/ResultSetSelectAction';
 export * from './DatabaseDataModel/DatabaseDataActions';
 export * from './DatabaseDataModel/DatabaseDataEditor';
 export * from './DatabaseDataModel/DatabaseDataFormat';

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -14,7 +16,7 @@ import { databaseDataAction } from './DatabaseDataActionDecorator';
 import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from './IDatabaseDataSelectAction';
 
 export interface IResultSetSelectKey {
-  row: number;
+  row?: number;
   column?: number;
 }
 
@@ -25,12 +27,16 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
   result: IDatabaseResultSet;
 
   readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetSelectKey>>;
-  private selectedElements: Map<number, number[]>;
+  readonly selectedElements: Map<number, number[]>;
 
   constructor(result: IDatabaseResultSet) {
     this.result = result;
     this.actions = new Executor();
     this.selectedElements = new Map();
+
+    makeObservable(this, {
+      selectedElements: observable,
+    });
   }
 
   updateResult(result: IDatabaseResultSet): void {
@@ -42,6 +48,17 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
   }
 
   isElementSelected(key: IResultSetSelectKey): boolean {
+    if (key.row === undefined) {
+      const rows = this.result.data?.rows?.length || 0;
+      for (let row = 0; row < rows; row++) {
+        if (!this.isElementSelected({ row, column: key.column })) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     const row = this.selectedElements.get(key.row);
 
     if (!row) {
@@ -55,7 +72,26 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     return row.length === this.result.data?.columns?.length;
   }
 
+  getRowSelection(row: number): number[] {
+    return this.selectedElements.get(row) || [];
+  }
+
   set(key: IResultSetSelectKey, selected: boolean): void {
+    if (key.row === undefined) {
+      for (let row = 0; row < (this.result.data?.rows?.length || 0); row++) {
+        this.set({ row, column: key.column }, selected);
+      }
+
+      return;
+    }
+
+    if (key.column === undefined) {
+      for (let column = 0; column < (this.result.data?.columns?.length || 0); column++) {
+        this.set({ row: key.row, column }, selected);
+      }
+      return;
+    }
+
     try {
       if (!this.selectedElements.has(key.row)) {
         if (!selected) {
@@ -66,29 +102,20 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
 
       const columns = this.selectedElements.get(key.row)!;
 
-      if (key.column) {
-        if (selected) {
-          if (!columns.includes(key.column)) {
-            columns.push(key.column);
-          }
-        } else {
-          const index = columns.indexOf(key.column);
-
-          if (index >= 0) {
-            columns.splice(index, 1);
-          }
-
-          if (columns.length === 0) {
-            this.selectedElements.delete(key.row);
-          }
-        }
-        return;
-      }
-
       if (selected) {
-        columns.push(...(this.result.data?.columns?.map((c, i) => i) || []));
+        if (!columns.includes(key.column)) {
+          columns.push(key.column);
+        }
       } else {
-        this.selectedElements.delete(key.row);
+        const index = columns.indexOf(key.column);
+
+        if (index >= 0) {
+          columns.splice(index, 1);
+        }
+
+        if (columns.length === 0) {
+          this.selectedElements.delete(key.row);
+        }
       }
     } finally {
       this.actions.execute({
@@ -101,6 +128,7 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
   }
 
   clear(): void {
+    this.selectedElements.clear();
     this.actions.execute({
       type: 'clear',
       resultId: this.result.id,

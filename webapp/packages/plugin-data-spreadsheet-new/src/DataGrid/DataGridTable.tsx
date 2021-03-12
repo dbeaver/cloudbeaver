@@ -15,7 +15,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import type { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -50,12 +50,13 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
+  const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
   const modelResultData = model?.getResult(resultIndex);
 
   const tableData = useTableData(modelResultData);
 
   const gridSortingContext = useGridSortingContext(model);
-  const gridSelectionContext = useGridSelectionContext(tableData);
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
   const editingContext = useEditing({
     readonly: model.isReadonly(),
     onEdit: (position, key) => {
@@ -80,13 +81,13 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   const { onKeydownHandler } = useGridSelectedCellsCopy(modelResultData, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
-      dataGridRef.current?.selectCell({ idx: startPosition.idx, rowIdx: startPosition.rowIdx });
+      dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
     },
     onDragOver: (startPosition, currentPosition, event) => {
-      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
+      gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
     },
     onDragEnd: (startPosition, currentPosition, event) => {
-      gridSelectionContext.updateMultiSelection(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
+      gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
   });
 

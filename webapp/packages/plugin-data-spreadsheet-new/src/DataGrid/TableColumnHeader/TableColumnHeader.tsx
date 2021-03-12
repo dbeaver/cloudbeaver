@@ -122,7 +122,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   };
 
   const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
-    gridSelectionContext.selectColumn(calculatedColumn.key, e.ctrlKey);
+    gridSelectionContext.selectColumn(calculatedColumn.idx, e.ctrlKey);
   };
 
   return styled(headerStyles)(

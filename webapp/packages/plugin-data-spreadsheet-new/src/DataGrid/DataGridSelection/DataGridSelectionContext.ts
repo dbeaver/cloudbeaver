@@ -8,16 +8,19 @@
 
 import { createContext } from 'react';
 
-import type { IPosition } from './useGridSelectionContext';
+import type { IDraggingPosition } from '../useGridDragging';
 
 export interface IDataGridSelectionContext {
   selectedCells: Map<number, number[]>;
-  select: (columnIndex: number, rowIdx: number, multiple: boolean, range: boolean) => void;
-  selectColumn: (columnKey: string, multiple: boolean) => void;
+  select: (cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) => void;
+  selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;
-  isSelected: (columnKey: string, rowIdx: number) => boolean;
-  updateMultiSelection: (
-    startPosition: IPosition, lastPosition: IPosition, multiple: boolean, temporary: boolean
+  isSelected: (rowIdx: number, colIdx: number) => boolean;
+  selectRange: (
+    startPosition: IDraggingPosition,
+    lastPosition: IDraggingPosition,
+    multiple: boolean,
+    temporary: boolean
   ) => void;
 }
 
