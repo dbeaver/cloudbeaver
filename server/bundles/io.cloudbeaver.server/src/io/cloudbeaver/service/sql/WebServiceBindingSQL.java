@@ -20,9 +20,13 @@ import graphql.schema.DataFetchingEnvironment;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
+import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
@@ -34,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Web service implementation
  */
-public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
+public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> implements DBWServiceBindingServlet {
 
     public WebServiceBindingSQL() {
         super(DBWServiceSQL.class, new WebServiceSQL(), "schema/service.sql.graphqls");
@@ -131,6 +135,13 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> {
             throw new DBWebException("SQL context '" + contextId + "' not found");
         }
         return context;
+    }
+
+    @Override
+    public void addServlets(CBApplication application, ServletContextHandler servletContextHandler) {
+        servletContextHandler.addServlet(
+            new ServletHolder("sqlResultValueViewer", new WebSQLResultServlet(application, getServiceImpl())),
+            application.getServicesURI() + "sql-result-value/*");
     }
 
     private static class WebSQLConfiguration {

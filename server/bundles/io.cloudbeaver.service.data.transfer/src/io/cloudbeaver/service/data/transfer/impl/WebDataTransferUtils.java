@@ -6,9 +6,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServlet;
-
-public class WebDataTransferUtils extends HttpServlet {
+class WebDataTransferUtils {
 
     private static final Log log = Log.getLog(WebDataTransferUtils.class);
 
