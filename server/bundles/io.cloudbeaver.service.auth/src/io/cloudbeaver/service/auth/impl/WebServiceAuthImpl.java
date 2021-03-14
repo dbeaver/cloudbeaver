@@ -26,6 +26,8 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
@@ -44,7 +46,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
 
     @Override
-    public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
+    public WebAuthInfo authLogin(@NotNull WebSession webSession, @NotNull String providerId, @NotNull Map<String, Object> authParameters) throws DBWebException {
         DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
@@ -109,7 +111,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authInfo.setAuthProvider(authProvider);
             authInfo.setAuthSession(authSession);
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
-            webSession.setAuthInfo(authInfo);
+            webSession.addAuthInfo(authInfo);
 
             return authInfo;
         } catch (DBException e) {
@@ -118,23 +120,23 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public void authLogout(WebSession webSession) throws DBWebException {
+    public void authLogout(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
         if (webSession.getUser() == null) {
             throw new DBWebException("Not logged in");
         }
-        webSession.setAuthInfo(null);
+        webSession.removeAuthInfo(providerId);
     }
 
     @Override
-    public WebAuthInfo sessionUser(WebSession webSession) throws DBWebException {
+    public WebAuthInfo sessionUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
             return null;
         }
-        return webSession.getAuthInfo();
+        return webSession.getAuthInfo(null);
     }
 
     @Override
-    public WebAuthProviderInfo[] getAuthProviders(WebSession webSession) {
+    public WebAuthProviderInfo[] getAuthProviders(@NotNull WebSession webSession) {
         return WebServiceRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);

@@ -97,7 +97,8 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
     private final Map<String, Function<Object,Object>> attributeDisposers = new HashMap<>();
-    private WebAuthInfo authInfo;
+    // Map of auth tokens. Key is authentication provdier
+    private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
     private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
@@ -477,15 +478,22 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         } catch (Throwable e) {
             log.error(e);
         }
-        if (this.authInfo != null) {
-            this.authInfo.closeAuth();
-            this.authInfo = null;
-        }
+        clearAuthTokens();
         this.user = null;
 
         if (this.sessionProject != null) {
             this.sessionProject.dispose();
             this.sessionProject = null;
+        }
+    }
+
+    private void clearAuthTokens() {
+        ArrayList<WebAuthInfo> tokensCopy;
+        synchronized (authTokens) {
+            tokensCopy = new ArrayList<>(this.authTokens);
+        }
+        for (WebAuthInfo ai : tokensCopy) {
+            removeAuthInfo(ai);
         }
     }
 
@@ -622,30 +630,63 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
-    public WebAuthInfo getAuthInfo() {
-        return authInfo;
+    public WebAuthInfo getAuthInfo(@Nullable String providerID) {
+        synchronized (authTokens) {
+
+            if (providerID != null) {
+                for (WebAuthInfo ai : authTokens) {
+                    if (ai.getAuthProvider().getId().equals(providerID)) {
+                        return ai;
+                    }
+                }
+                return null;
+            }
+            return authTokens.isEmpty() ? null : authTokens.get(0);
+        }
     }
 
-    public void setAuthInfo(@Nullable WebAuthInfo authInfo) {
-        WebUser newUser = authInfo == null ? null : authInfo.getUser();
-        if (CommonUtils.equalObjects(this.user, newUser)) {
-            return;
+    public void addAuthInfo(@NotNull WebAuthInfo authInfo) throws DBException {
+        WebUser newUser = authInfo.getUser();
+        if (this.user == null && newUser != null) {
+            forceUserRefresh(newUser);
+        } else if (!CommonUtils.equalObjects(this.user, newUser)) {
+            throw new DBException("Can't authorize different users in the single session");
         }
-        forceUserRefresh(newUser);
 
-        if (this.authInfo != null) {
-            DBASession oldAuthSession = this.authInfo.getAuthSession();
-            if (oldAuthSession != null) {
-                sessionProject.getSessionContext().removeSession(oldAuthSession);
-            }
-            this.authInfo.closeAuth();
+
+        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProvider().getId());
+        if (oldAuthInfo != null) {
+            removeAuthInfo(oldAuthInfo);
         }
-        this.authInfo = authInfo;
-        if (authInfo != null) {
-            DBASession authSession = authInfo.getAuthSession();
-            if (authSession != null) {
-                this.sessionProject.getSessionContext().addSession(authSession);
-            }
+
+        synchronized (authTokens) {
+            authTokens.add(authInfo);
+        }
+        DBASession authSession = authInfo.getAuthSession();
+        if (authSession != null) {
+            this.sessionProject.getSessionContext().addSession(authSession);
+        }
+    }
+
+    private void removeAuthInfo(WebAuthInfo oldAuthInfo) {
+        DBASession oldAuthSession = oldAuthInfo.getAuthSession();
+        if (oldAuthSession != null && sessionProject != null) {
+            sessionProject.getSessionContext().removeSession(oldAuthSession);
+        }
+        oldAuthInfo.closeAuth();
+        synchronized (authTokens) {
+            authTokens.remove(oldAuthInfo);
+        }
+    }
+
+    public void removeAuthInfo(String providerId) {
+        if (providerId == null) {
+            clearAuthTokens();
+        } else {
+            removeAuthInfo(getAuthInfo(providerId));
+        }
+        if (authTokens.isEmpty()) {
+            forceUserRefresh(null);
         }
     }
 
@@ -705,9 +746,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     // May be called to extract auth information from session
     @Override
     public <T> T getAdapter(Class<T> adapter) {
-        if (authInfo != null && authInfo.getAuthSession() != null) {
-            if (adapter.isInstance(authInfo.getAuthSession())) {
-                return adapter.cast(authInfo.getAuthSession());
+        synchronized (authTokens) {
+            for (WebAuthInfo authInfo : authTokens) {
+                if (authInfo != null && authInfo.getAuthSession() != null) {
+                    if (adapter.isInstance(authInfo.getAuthSession())) {
+                        return adapter.cast(authInfo.getAuthSession());
+                    }
+                }
             }
         }
         return null;

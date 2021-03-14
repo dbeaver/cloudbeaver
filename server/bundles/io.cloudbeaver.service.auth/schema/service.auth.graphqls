@@ -48,9 +48,10 @@ type UserAuthInfo {
 
 extend type Query {
 
+    # Authorize user using specified auth provider
     authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
-
-    authLogout: Boolean
+    # Logouts user. If provider not specified then all authorizations are revoked from session.
+    authLogout(provider: ID): Boolean
 
     sessionUser: UserAuthInfo
 
