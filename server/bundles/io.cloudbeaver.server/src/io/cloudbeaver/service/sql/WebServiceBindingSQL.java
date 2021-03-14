@@ -27,6 +27,7 @@ import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.impl.WebServiceSQL;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
@@ -113,23 +114,37 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 ));
     }
 
+    @NotNull
     private WebDataFormat getDataFormat(DataFetchingEnvironment env) {
         String dataFormat = env.getArgument("dataFormat");
         return CommonUtils.valueOf(WebDataFormat.class, dataFormat, WebDataFormat.resultset);
     }
 
+    @NotNull
     public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {
         return webSession.getAttribute("sqlConfiguration", cfg -> new WebSQLConfiguration(), WebSQLConfiguration::dispose);
     }
 
+    @NotNull
     public static WebSQLProcessor getSQLProcessor(DataFetchingEnvironment env) throws DBWebException {
         WebConnectionInfo connectionInfo = getWebConnection(env);
+        return getSQLProcessor(connectionInfo);
+    }
+
+    @NotNull
+    public static WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo) throws DBWebException {
         return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo);
     }
 
+    @NotNull
     public static WebSQLContextInfo getSQLContext(DataFetchingEnvironment env) throws DBWebException {
         WebSQLProcessor processor = getSQLProcessor(env);
         String contextId = env.getArgument("contextId");
+        return getSQLContext(processor, contextId);
+    }
+
+    @NotNull
+    public static WebSQLContextInfo getSQLContext(WebSQLProcessor processor, String contextId) throws DBWebException {
         WebSQLContextInfo context = processor.getContext(contextId);
         if (context == null) {
             throw new DBWebException("SQL context '" + contextId + "' not found");

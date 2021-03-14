@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import org.jkiss.code.NotNull;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -107,8 +108,14 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env));
     }
 
+    @NotNull
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
-        return getWebSession(env).getWebConnectionInfo(env.getArgument("connectionId"));
+        return getWebConnection(getWebSession(env), env.getArgument("connectionId"));
+    }
+
+    @NotNull
+    public static WebConnectionInfo getWebConnection(WebSession session, String connectionId) throws DBWebException {
+        return session.getWebConnectionInfo(connectionId);
     }
 
     private class ServiceInvocationHandler implements InvocationHandler {
