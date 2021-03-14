@@ -645,6 +645,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
+    public List<WebAuthInfo> getAllAuthInfo() {
+        synchronized (authTokens) {
+            return new ArrayList<>(authTokens);
+        }
+    }
+
     public void addAuthInfo(@NotNull WebAuthInfo authInfo) throws DBException {
         WebUser newUser = authInfo.getUser();
         if (this.user == null && newUser != null) {

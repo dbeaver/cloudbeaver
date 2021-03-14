@@ -26,6 +26,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
+import io.cloudbeaver.service.auth.WebUserInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -125,6 +126,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         webSession.removeAuthInfo(providerId);
+    }
+
+    @Override
+    public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
+        if (webSession.getUser() == null) {
+            return null;
+        }
+        return new WebUserInfo(webSession, webSession.getUser());
     }
 
     @Override
