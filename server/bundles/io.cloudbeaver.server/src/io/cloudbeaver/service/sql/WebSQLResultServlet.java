@@ -1,7 +1,6 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
@@ -47,8 +46,8 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         String rowNum = urlMatcher.group(4);
         String attrName = urlMatcher.group(5);
 
-        WebConnectionInfo webConnection = WebServiceBindingSQL.getWebConnection(session, connectionId);
-        WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnection);
+        WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(
+            WebServiceBindingSQL.getWebConnection(session, connectionId));
         WebSQLContextInfo sqlContext = WebServiceBindingSQL.getSQLContext(sqlProcessor, contextId);
         WebSQLResultsInfo sqlResults = sqlContext.getResults(resultsId);
 

@@ -27,6 +27,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.utils.CommonUtils;
@@ -39,6 +40,8 @@ import java.util.Map;
  * Web service implementation
  */
 public class WebServiceAuthImpl implements DBWServiceAuth {
+
+    private static final Log log = Log.getLog(WebServiceAuthImpl.class);
 
     @Override
     public WebAuthInfo authLogin(WebSession webSession, String providerId, Map<String, Object> authParameters) throws DBWebException {
@@ -61,18 +64,22 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 authParameters = authProviderExternal.readExternalCredentials(webSession.getProgressMonitor(), providerConfig, authParameters);
             }
 
-            WebUser user = null;
+            WebUser user = webSession.getUser();
             String userId = serverController.getUserByCredentials(authProvider, authParameters);
             if (userId == null) {
                 // User doesn't exist. We can create new user automatically if auth provider supports this
                 if (authProviderExternal != null) {
-                    user = authProviderExternal.registerNewUser(webSession.getProgressMonitor(), serverController, providerConfig, authParameters);
+                    user = authProviderExternal.registerNewUser(webSession.getProgressMonitor(), serverController, providerConfig, authParameters, user);
                     userId = user.getUserId();
                 }
 
                 if (userId == null) {
                     throw new DBCException("Invalid user credentials");
                 }
+            }
+            if (user != null && !user.getUserId().equals(userId)) {
+                log.debug("Attempt to authorize user '" + userId + "' while user '" + user.getUserId() + "' already authorized");
+                throw new DBCException("You cannot authorize with different users credentials");
             }
 
             // Check for auth enabled. Auth is always enabled for admins

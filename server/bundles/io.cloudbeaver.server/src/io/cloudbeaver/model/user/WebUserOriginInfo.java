@@ -97,7 +97,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
                 if (!isValidSessionType(authSession, authProvider)) {
                     return new WebPropertyInfo[0];
                 }
-                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), authSession, user);
+                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), session, authSession, user);
                 if (userDetails != null) {
                     return WebServiceUtils.getObjectProperties(session, userDetails);
                 }
