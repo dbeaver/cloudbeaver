@@ -78,7 +78,7 @@ export class ObjectViewerTabService {
     contexts: IExecutionContextProvider<INodeNavigationData>,
     data: INodeNavigationData
   ): Promise<IObjectViewerTabContext> => {
-    const tabInfo = await contexts.getContext(this.navigationTabsService.navigationTabContext);
+    const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
     const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
 
     // check if tab already exist for object
@@ -100,7 +100,7 @@ export class ObjectViewerTabService {
           parents: await nodeInfo.getParents(),
           folderId: nodeInfo.folderId,
           pageId: '',
-          pagesState: new Map(),
+          pagesState: {},
           tabIcon: nodeInfo.icon,
           tabTitle: nodeInfo.name,
         },
@@ -291,7 +291,7 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
-      tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
+      // tab.handlerState.pagesState = observable.map(tab.handlerState.pagesState);
       if (tab.handlerState.connectionId) {
         if (!this.connectionInfo.has(tab.handlerState.connectionId)) {
           return false;

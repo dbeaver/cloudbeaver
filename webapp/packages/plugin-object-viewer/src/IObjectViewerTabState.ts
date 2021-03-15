@@ -16,5 +16,5 @@ export interface IObjectViewerTabState {
   tabIcon?: string;
   tabTitle?: string;
   pageId: string;
-  pagesState: Map<string, any>;
+  pagesState: Record<string, any>;
 }

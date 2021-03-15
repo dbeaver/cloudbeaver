@@ -44,7 +44,7 @@ export class DBObjectPageService {
   getPageState<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>| string): T | undefined {
     const pageKey = typeof page === 'string' ? page : page.key;
 
-    return tab.handlerState.pagesState.get(pageKey);
+    return tab.handlerState.pagesState[pageKey];
   }
 
   trySwitchPage<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T): boolean {
@@ -60,14 +60,14 @@ export class DBObjectPageService {
   selectPage = async <T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T) => {
     tab.handlerState.pageId = page.key;
     if (state !== undefined) {
-      tab.handlerState.pagesState.set(page.key, state);
+      tab.handlerState.pagesState[page.key] = state;
     }
     await this.callHandlerCallback(tab, page => page.onSelect);
   };
 
   async restorePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
     for (const page of this.pages.values()) {
-      if (page.onRestore && !page.onRestore(tab, this.getPageState(tab, page))) {
+      if (page.onRestore && !(await page.onRestore(tab, this.getPageState(tab, page)))) {
         return false;
       }
     }

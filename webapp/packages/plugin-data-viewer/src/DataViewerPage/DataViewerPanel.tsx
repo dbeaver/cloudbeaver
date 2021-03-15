@@ -28,9 +28,24 @@ export const DataViewerPanel = observer(function DataViewerPanel({
       page.setState(tab, {
         presentationId,
         resultIndex: 0,
+        valuePresentationId: null,
       });
     } else {
       pageState.presentationId = presentationId;
+    }
+  }, [page, tab]);
+
+  const handleValuePresentationChange = useCallback((valuePresentationId: string | null) => {
+    const pageState = page.getState(tab);
+
+    if (!pageState) {
+      page.setState(tab, {
+        presentationId: '',
+        resultIndex: 0,
+        valuePresentationId,
+      });
+    } else {
+      pageState.valuePresentationId = valuePresentationId;
     }
   }, [page, tab]);
 
@@ -43,7 +58,9 @@ export const DataViewerPanel = observer(function DataViewerPanel({
       tableId={tab.handlerState.tableId}
       resultIndex={pageState?.resultIndex}
       presentationId={pageState?.presentationId}
+      valuePresentationId={pageState?.valuePresentationId}
       onPresentationChange={handlePresentationChange}
+      onValuePresentationChange={handleValuePresentationChange}
     />
   );
 });

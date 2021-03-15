@@ -8,7 +8,7 @@
 
 import type { PropsWithChildren } from 'react';
 
-import type { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 
@@ -16,7 +16,7 @@ export type TabProps = PropsWithChildren<{
   tabId: string;
   disabled?: boolean;
   className?: string;
-  style?: DynamicStyle[] | DynamicStyle;
+  style?: ComponentStyle;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
 }>;

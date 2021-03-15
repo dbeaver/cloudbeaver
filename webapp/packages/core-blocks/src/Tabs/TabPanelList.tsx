@@ -10,14 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 
 interface Props {
-  style?: DynamicStyle[] | DynamicStyle;
+  style?: ComponentStyle;
 }
 
 export const TabPanelList: React.FC<Props> = observer(function TabPanelList({

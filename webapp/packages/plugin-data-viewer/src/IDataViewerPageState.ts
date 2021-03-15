@@ -9,4 +9,5 @@
 export interface IDataViewerPageState {
   resultIndex: number;
   presentationId: string;
+  valuePresentationId: string | null;
 }

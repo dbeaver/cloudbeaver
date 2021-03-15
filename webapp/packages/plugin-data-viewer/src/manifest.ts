@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { TextValuePresentationBootstrap } from './DataPresentation/TextValuePresentation/TextValuePresentationBootstrap';
 import { DataPresentationService } from './DataPresentationService';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
@@ -23,6 +24,7 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
+    DataViewerBootstrap,
     DataViewerTabService,
     DataViewerTableService,
     DataPresentationService,
@@ -30,11 +32,6 @@ export const manifest: PluginManifest = {
     TableFooterMenuService,
     TableHeaderService,
     LocaleService,
+    TextValuePresentationBootstrap,
   ],
-
-  async initialize(services: IServiceInjector) {
-    services
-      .resolveServiceByClass(DataViewerBootstrap)
-      .bootstrap();
-  },
 };

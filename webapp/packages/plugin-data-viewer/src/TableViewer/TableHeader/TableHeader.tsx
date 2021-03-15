@@ -24,7 +24,7 @@ const styles = composes(
   `,
   css`
     table-header {
-      height: 40px;
+      padding: 8px 0;
       flex: 0 0 auto;
       display: flex;
       align-items: center;

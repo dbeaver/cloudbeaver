@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import styled from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-localization';
-import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -25,7 +25,7 @@ interface Props<T = Record<string, any>> {
   name?: string;
   component?: React.FC<TabProps & T>;
   className?: string;
-  style?: DynamicStyle[] | DynamicStyle;
+  style?: ComponentStyle;
   disabled?: boolean;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;

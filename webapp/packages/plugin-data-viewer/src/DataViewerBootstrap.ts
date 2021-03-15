@@ -6,15 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { DataViewerTabService } from './DataViewerTabService';
 
 @injectable()
-export class DataViewerBootstrap {
-  constructor(private dataViewerTabService: DataViewerTabService) { }
+export class DataViewerBootstrap extends Bootstrap {
+  constructor(private dataViewerTabService: DataViewerTabService) {
+    super();
+  }
 
-  bootstrap() {
+  register(): void | Promise<void> {
     this.dataViewerTabService.registerTabHandler();
   }
+
+  load(): void { }
 }
