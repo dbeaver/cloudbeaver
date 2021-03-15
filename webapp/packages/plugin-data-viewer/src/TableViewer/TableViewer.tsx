@@ -173,8 +173,8 @@ export const TableViewer = observer(function TableViewer({
         <table-data as='div'>
           <table-box as='div'>
             {(overlay || !loading) && (
-              <Split sticky={30} mode={valuePresentation?.dataFormat === dataFormat ? undefined : 'maximize'} keepRatio>
-                <Pane main>
+              <Split sticky={30} mode={valuePresentation?.dataFormat === dataFormat ? undefined : 'minimize'} keepRatio>
+                <Pane>
                   {dataModel.source.hasResult(resultIndex) && (
                     <TableGrid
                       model={dataModel}
@@ -197,7 +197,7 @@ export const TableViewer = observer(function TableViewer({
                   </error>
                 </Pane>
                 {valuePresentation?.dataFormat === dataFormat && <ResizerControls />}
-                <Pane>
+                <Pane main>
                   <ValuePanel
                     model={dataModel}
                     dataFormat={dataFormat}
