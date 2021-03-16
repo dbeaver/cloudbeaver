@@ -127,7 +127,6 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                         checkboxLabel={translate('connections_connection_edit_save_credentials')}
                         disabled={controller.isAuthenticating}
                         state={controller.config}
-                        mod='surface'
                       />
                     </FormGroup>
                   )}

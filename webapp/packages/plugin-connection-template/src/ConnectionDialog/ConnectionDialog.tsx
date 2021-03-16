@@ -115,7 +115,6 @@ export const ConnectionDialog = observer(function ConnectionDialog({
                     checkboxLabel={translate('connections_connection_edit_save_credentials')}
                     disabled={controller.isConnecting}
                     state={controller.config}
-                    mod='surface'
                   />
                 </FormGroup>
               )}

@@ -16,11 +16,16 @@ export const menuPanelStyles = composes(
       composes: theme-background-surface theme-text-on-surface from global;
     }
     MenuItem,
+    MenuItemCheckbox,
+    MenuItemRadio,
     MenuButton {
       composes: theme-ripple from global;
     }
     MenuItemElement {
       composes: theme-ripple from global;
+    }
+    menu-panel-item {
+      composes: theme-border-color-background from global;
     }
   `,
   css`
@@ -30,8 +35,6 @@ export const menuPanelStyles = composes(
       outline: none !important;
       color: inherit;
       cursor: pointer;
-      padding: 12px 0;
-
       & box {
         display: flex;
         align-items: center;
@@ -52,11 +55,12 @@ export const menuPanelStyles = composes(
         margin-top: -12px;
       }
     }
-    MenuItem {
+    MenuItem, MenuItemCheckbox, MenuItemRadio {
       display: flex;
+      align-items: center;
       border: none;
+      padding: 0;
       background: none;
-      padding: 6px 16px;
       text-align: left;
       outline: none;
       color: inherit;
@@ -69,26 +73,42 @@ export const menuPanelStyles = composes(
 
       &:hover, &:global([aria-expanded="true"]) {
         font-weight: 600;
-
         & Icon {
           opacity: 1;
         }
       }
     }
+
     menu-panel-item {
       flex: 1;
       display: flex;
       align-items: center;
-      
+      height: 30px;
+      padding: 0 4px;
+      &[|separator] {
+        border-bottom: 1px solid;
+      }
       & menu-item-text  {
         display: block;
+        padding: 0 4px;
         flex: 1;
+      }
+      & menu-item-content {
+        width: 24px;
+        height: 24px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       & Icon {
         width: 16px;
         height: 16px;
         opacity: 0.5;
-        padding-left: 16px;
+      }
+      & IconOrImage {
+        width: 14px;
+        height: 14px;
       }
     }
   `

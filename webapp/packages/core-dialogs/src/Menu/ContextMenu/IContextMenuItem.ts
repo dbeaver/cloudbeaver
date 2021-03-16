@@ -19,4 +19,5 @@ export interface IContextMenuItem<T> extends IMenuItemOptions {
   isDisabled?: (context: IMenuContext<T>) => boolean;
   // When the item is present in menu it can be hidden based on certain conditions
   isHidden?: (context: IMenuContext<T>) => boolean;
+  isChecked?: (context: IMenuContext<T>) => boolean;
 }

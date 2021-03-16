@@ -8,16 +8,16 @@
 
 import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
-type NavigatorView = 'simple' | 'advanced';
+export type NavigatorView = 'simple' | 'advanced';
+export type NavigatorViewSettings = Partial<NavigatorSettingsInput>;
 
-export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorSettingsInput> = {
+export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorViewSettings> = {
   simple: {
     showOnlyEntities: true,
     hideFolders: true,
     hideVirtualModel: true,
     hideSchemas: false,
     mergeEntities: false,
-    showSystemObjects: false,
     showUtilityObjects: false,
   },
   advanced: {
@@ -26,13 +26,13 @@ export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, Navigator
     hideVirtualModel: false,
     hideSchemas: false,
     mergeEntities: false,
-    showSystemObjects: false,
     showUtilityObjects: false,
   },
 };
 
-export function isSimpleNavigatorView(settings: NavigatorSettingsInput): boolean {
-  const simple = CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple;
-  return !Object.keys(simple)
-    .some(key => settings[key as keyof NavigatorSettingsInput] !== simple[key as keyof NavigatorSettingsInput]);
+export function isNavigatorViewSettingsEqual(
+  settings: NavigatorSettingsInput, settingsToCompare: NavigatorViewSettings
+): boolean {
+  return !(Object.keys(settingsToCompare) as Array<keyof NavigatorSettingsInput>)
+    .some(key => settings[key] !== settingsToCompare[key]);
 }

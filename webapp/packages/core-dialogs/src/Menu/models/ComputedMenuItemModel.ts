@@ -11,18 +11,21 @@ import { computed, makeObservable } from 'mobx';
 import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import type { IMenuItemOptions } from './MenuOptionsStore';
+import type { IMenuItemOptions, MenuItemType } from './MenuOptionsStore';
 
 export interface IComputedMenuItemOptions extends IMenuItemOptions {
   onClick?: () => void;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
+  isChecked?: () => boolean;
 }
 
 export class ComputedMenuItemModel implements IMenuItem {
   id: string;
   onClick?: () => void;
   panel?: IMenuPanel;
+  type?: MenuItemType;
+  separator?: boolean;
   rtl?: boolean;
 
   get title(): TLocalizationToken {
@@ -47,15 +50,22 @@ export class ComputedMenuItemModel implements IMenuItem {
     return this.options.isHidden ? this.options.isHidden() : false;
   }
 
+  get isChecked() {
+    return this.options.isChecked ? this.options.isChecked() : false;
+  }
+
   constructor(private options: IComputedMenuItemOptions) {
     makeObservable(this, {
       title: computed,
       isDisabled: computed,
       icon: computed,
       isHidden: computed,
+      isChecked: computed,
     });
 
     this.id = options.id;
+    this.type = options.type;
+    this.separator = options.separator;
     this.rtl = options.rtl;
     this.panel = options.panel;
     this.onClick = this.options.onClick;

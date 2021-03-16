@@ -13,6 +13,7 @@ import type { IMenuPanel } from '../IMenuPanel';
 
 const DEFAULT_ITEM_ORDER = 100;
 
+export type MenuItemType = 'checkbox' | 'radio';
 export interface IMenuItemOptions {
   id: string;
   // set title or getter
@@ -24,6 +25,8 @@ export interface IMenuItemOptions {
   order?: number;
   isPanel?: boolean;
   panel?: IMenuPanel;
+  type?: MenuItemType;
+  separator?: boolean;
   rtl?: boolean;
 }
 

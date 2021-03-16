@@ -23,14 +23,25 @@ import {
   ResourceKey,
   ResourceKeyUtils,
   TestConnectionMutation,
+  NavigatorSettingsInput,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS } from './ConnectionNavigatorViewSettings';
+import type { NavigatorViewSettings } from './ConnectionNavigatorViewSettings';
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
+
+export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
+  showOnlyEntities: false,
+  hideFolders: false,
+  hideVirtualModel: false,
+  hideSchemas: false,
+  mergeEntities: false,
+  showSystemObjects: false,
+  showUtilityObjects: false,
+};
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
@@ -170,13 +181,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     return this.get(config.id)!;
   }
 
-  async changeConnectionView(id: string, simple: boolean): Promise<Connection> {
+  async changeConnectionView(id: string, settings: NavigatorViewSettings): Promise<Connection> {
     await this.performUpdate(id, [], async () => {
-      const settings = simple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple : CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced;
-
+      const connectionNavigatorViewSettings = this.get(id)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
       const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
         id,
-        settings,
+        settings: { ...connectionNavigatorViewSettings, ...settings },
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(id),
       });
