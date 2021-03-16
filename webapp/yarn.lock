@@ -6842,7 +6842,7 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
-go-split@^2.0.1:
+go-split@^2.x.x:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/go-split/-/go-split-2.0.1.tgz#a7cae7d738c6b8b72fae98056aca64dbf6ad05fc"
   integrity sha512-BeGVZ35Aez2frAE8yGUyr0R88r6im23N97ex1WzPWYpQoOJAmhcHalVuvlBTL8yfH6TUC/HFhB81fcuXjSeQbg==
