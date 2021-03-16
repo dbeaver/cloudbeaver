@@ -87,7 +87,8 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
       return props.modelResultData?.data?.columns?.[Number(key)];
     },
     getColumnIndexFromKey(key: string | number) {
-      return this.columns.findIndex((column: any) => column.key === String(key));
+      const index = this.columns.findIndex((column: any) => column.key === String(key));
+      return index === -1 ? null : index;
     },
     getColumnsInRange(startIndex: number, endIndex: number) {
       if (startIndex === endIndex) {

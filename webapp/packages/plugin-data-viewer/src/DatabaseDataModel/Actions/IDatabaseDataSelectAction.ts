@@ -26,8 +26,10 @@ export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataRe
   readonly actions: IExecutor<DatabaseDataEditorActionsData<TKey>>;
   isSelected: () => boolean;
   isElementSelected: (key: TKey) => boolean;
+  getFocusedElement: () => TKey | null;
   getSelectedElements: () => TKey[];
   getRowSelection: (row: number) => number[];
   set: (key: TKey, selected: boolean) => void;
+  focus: (key: TKey | null) => void;
   clear: () => void;
 }

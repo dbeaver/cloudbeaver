@@ -98,9 +98,15 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
         return;
       }
 
+      const idx = tableData.getColumnIndexFromKey(data.column);
+
+      if (idx === null) {
+        return;
+      }
+
       editingContext.closeEditor({
         rowIdx: data.row,
-        idx: tableData.getColumnIndexFromKey(data.column),
+        idx,
       });
     }
 
@@ -110,6 +116,18 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   }, [model.source, resultIndex]);
 
   const handleFocusChange = (position: Position) => {
+    const key = tableData.getColumnKeyFromColumnIndex(position.idx);
+    const column = tableData.getColumnInfo(key);
+
+    if (column) {
+      selectionAction.focus({
+        row: position.rowIdx,
+        column: key,
+      });
+    } else {
+      selectionAction.focus(null);
+    }
+
     if (!editingContext.isEditing(position)) {
       editingContext.close();
     }

@@ -29,13 +29,17 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
   readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetSelectKey>>;
   readonly selectedElements: Map<number, number[]>;
 
+  private focusedElement: IResultSetSelectKey | null;
+
   constructor(result: IDatabaseResultSet) {
     this.result = result;
     this.actions = new Executor();
     this.selectedElements = new Map();
+    this.focusedElement = null;
 
-    makeObservable(this, {
+    makeObservable<ResultSetSelectAction, 'focusedElement'>(this, {
       selectedElements: observable,
+      focusedElement: observable,
     });
   }
 
@@ -70,6 +74,10 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     }
 
     return row.length === this.result.data?.columns?.length;
+  }
+
+  getFocusedElement(): IResultSetSelectKey | null {
+    return this.focusedElement;
   }
 
   getSelectedElements(): Array<Required<IResultSetSelectKey>> {
@@ -135,6 +143,10 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
         selected,
       });
     }
+  }
+
+  focus(key: IResultSetSelectKey | null): void {
+    this.focusedElement = key;
   }
 
   clear(): void {
