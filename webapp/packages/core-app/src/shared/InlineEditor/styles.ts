@@ -39,7 +39,7 @@ export const InlineEditorStyles = composes(
   }
 
   editor:focus-within, editor[|active] {
-    border-color: #52c41a;
+    border-color: #52c41a !important;
   }
 
   editor-container {
@@ -75,9 +75,9 @@ export const InlineEditorStyles = composes(
 
   editor:focus-within, editor[|active] {
     & editor-actions {
-      border-top-color:  #52c41a;
-      border-right-color: #52c41a;
-      border-bottom-color: #52c41a;
+      border-top-color:  #52c41a !important;
+      border-right-color: #52c41a !important;
+      border-bottom-color: #52c41a !important;
     }
   }
 
@@ -98,7 +98,7 @@ export const InlineEditorStyles = composes(
   editor:focus-within, editor[|active] {
     & editor-actions[|position=bottom],
     & editor-actions[|position=top] {
-      border-left-color: #52c41a;
+      border-left-color: #52c41a !important;
     }
   }
 
