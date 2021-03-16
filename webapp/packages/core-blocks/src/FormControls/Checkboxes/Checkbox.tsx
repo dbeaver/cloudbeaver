@@ -14,14 +14,14 @@ import { FormContext } from '../FormContext';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup } from './CheckboxMarkup';
 
-export type CheckboxMod = 'primary' | 'menu';
+export type CheckboxMod = 'primary' | 'small';
 
 export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & IGridItemsLayoutProps & {
   value?: string;
   checkboxLabel?: string;
   long?: boolean;
   mod?: CheckboxMod[];
-  showRipple?: boolean;
+  ripple?: boolean;
 };
 
 type CheckboxOnChangeEvent<T> =
@@ -58,7 +58,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   checked: checkedControlled,
   children,
   mod,
-  showRipple,
+  ripple,
   className,
   long,
   autoHide,
@@ -118,7 +118,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       label={checkboxLabel}
       className={className}
       mod={mod}
-      showRipple={showRipple}
+      ripple={ripple}
       onChange={handleChange}
     />
   );

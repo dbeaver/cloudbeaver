@@ -84,20 +84,19 @@ export const menuPanelStyles = composes(
       display: flex;
       align-items: center;
       height: 30px;
-      padding: 0 5px;
+      padding: 0 4px;
       &[|separator] {
         border-bottom: 1px solid;
       }
       & menu-item-text  {
         display: block;
-        padding: 0 5px;
+        padding: 0 4px;
         flex: 1;
       }
       & menu-item-content {
-        min-width: 25px;
-        min-height: 25px;
-        max-width: 25px;
-        max-height: 25px;
+        width: 24px;
+        height: 24px;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;

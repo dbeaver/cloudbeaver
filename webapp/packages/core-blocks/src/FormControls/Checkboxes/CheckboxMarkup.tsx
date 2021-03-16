@@ -56,25 +56,24 @@ const checkboxMod: Record<CheckboxMod, Composes> = {
       }
     `
   ),
-  menu: composes(
+  small: composes(
     css`
       checkbox {
-        composes: checkbox_menu from global;
-      }  
+        composes: theme-checkbox_small from global;
+      }
     `,
     css`
       checkbox-container {
         & checkbox {
           width: 14px;
           height: 14px;
-          margin: -6px;
         }
         & checkbox-background {
           width: 14px;
           height: 14px;
         }
       }
-    `
+    `,
   ),
 };
 
@@ -98,12 +97,12 @@ const checkboxState = {
 interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   indeterminate?: boolean;
-  showRipple?: boolean;
+  ripple?: boolean;
   mod?: CheckboxMod[];
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  label, className, title, mod = ['primary'], showRipple = true, ...rest
+  label, className, title, mod = ['primary'], ripple = true, ...rest
 }) {
   return styled(useStyles(checkboxStyles, ...(mod || []).map(mod => checkboxMod[mod]), rest.disabled
     && checkboxState.disabled, rest.checked && checkboxState.checked))(
@@ -116,7 +115,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
           </checkbox-checkmark>
           <checkbox-mixedmark as='div' />
         </checkbox-background>
-        {showRipple && (
+        {ripple && (
           <checkbox-ripple as='div' />
         )}
       </checkbox>

@@ -17,24 +17,24 @@ import { RadioGroupContext } from './RadioGroupContext';
 
 const radioStyles = composes(
   css`
-  radio {
-    composes: theme-radio from global;
-  }
-  radio-background {
-    composes: theme-radio_background from global;
-  }
-  input {
-    composes: theme-radio_native-control from global;
-  }
-  radio-outer-circle {
-    composes: theme-radio_outer-circle from global;
-  }
-  radio-inner-circle {
-    composes: theme-radio_inner-circle from global;
-  }
-  radio-ripple {
-    composes: theme-radio_ripple from global;
-  }
+    radio {
+      composes: theme-radio from global;
+    }
+    radio-background {
+      composes: theme-radio_background from global;
+    }
+    input {
+      composes: theme-radio_native-control from global;
+    }
+    radio-outer-circle {
+      composes: theme-radio_outer-circle from global;
+    }
+    radio-inner-circle {
+      composes: theme-radio_inner-circle from global;
+    }
+    radio-ripple {
+      composes: theme-radio_ripple from global;
+    }
   `,
   css`
     field {
@@ -55,19 +55,17 @@ const radioMod = {
       }
     `
   ),
-  menu: composes(
+  small: composes(
     css`
       radio {
-        composes: radio_menu from global;
+        composes: theme-radio_small from global;
       }
     `,
     css`
       field {
-        padding: 0;
         & radio {
           width: 14px;
           height: 14px;
-          padding: 0;
         }
         & radio-background {
           width: 14px;
@@ -81,8 +79,17 @@ const radioMod = {
   ),
 };
 
+const noRippleStyles = composes(
+  css`
+    radio {
+      composes: theme-radio_no-ripple from global;
+    }
+  `
+);
+
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> & {
   mod?: Array<keyof typeof radioMod>;
+  ripple?: boolean;
 };
 
 type ControlledProps = BaseProps & {
@@ -115,6 +122,7 @@ export const Radio: RadioType = observer(function Radio({
   checked: controlledChecked,
   onChange,
   mod,
+  ripple = true,
   className,
   children,
   ...rest
@@ -155,7 +163,7 @@ export const Radio: RadioType = observer(function Radio({
     checked = state[name] === value;
   }
 
-  return styled(useStyles(radioStyles, ...(mod || []).map(mod => radioMod[mod])))(
+  return styled(useStyles(radioStyles, ...(mod || []).map(mod => radioMod[mod]), !ripple && noRippleStyles))(
     <field as="div" className={className}>
       <radio as="div">
         <input
@@ -171,7 +179,7 @@ export const Radio: RadioType = observer(function Radio({
           <radio-outer-circle as="div" />
           <radio-inner-circle as="div" />
         </radio-background>
-        <radio-ripple as="div" />
+        {ripple && <radio-ripple as="div" />}
       </radio>
       <label htmlFor={id}>{children}</label>
     </field>

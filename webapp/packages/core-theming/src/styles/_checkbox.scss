@@ -52,7 +52,7 @@ $mdc-checkbox-icon-size: 16px;
     );
   }
 
-  .checkbox_menu {
+  .theme-checkbox_small {
     @include mdc-checkbox-density(-3);
   }
 }

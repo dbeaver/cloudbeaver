@@ -38,18 +38,17 @@ export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelIte
   let control = null;
 
   if (controlType === 'radio') {
-    control = <Radio checked={isChecked} mod={['primary', 'menu']} />;
+    control = <Radio checked={isChecked} mod={['primary', 'small']} ripple={false} />;
   } else if (controlType === 'checkbox') {
-    control = <Checkbox checked={isChecked} mod={['primary', 'menu']} showRipple={false} />;
+    control = <Checkbox checked={isChecked} mod={['primary', 'small']} ripple={false} />;
   }
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <menu-panel-item as="div" {...use({ separator })}>
       <menu-item-content as='div'>
-        {icon && (
+        {icon ? (
           <IconOrImage icon={icon} />
-        )}
-        {control}
+        ) : control}
       </menu-item-content>
       <menu-item-text as="div">
         <Translate token={title} />

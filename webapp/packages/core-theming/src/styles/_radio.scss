@@ -44,8 +44,11 @@
     @include mdc-radio-focus-indicator-color($mdc-radio-baseline-theme-color, $query: $query);
   }
 
-  .radio_menu {
+  .theme-radio_small {
     @include mdc-radio-density(-3);
-    @include mdc-radio-ripple-size(0px);
+  }
+
+  .theme-radio_no-ripple {
+    @include mdc-radio-ripple-size(0);
   }
 }
