@@ -23,7 +23,15 @@ export class ResultSetFormatAction implements IDatabaseDataFormatAction<IDatabas
 
   get(value: any): any {
     if (value !== null && typeof value === 'object') {
-      return value.text;
+      if ('text' in value) {
+        return value.text;
+      } else if ('value' in value) {
+        if (typeof value.value === 'object') {
+          return JSON.stringify(value.value);
+        }
+        return value.value;
+      }
+      return JSON.stringify(value);
     }
 
     return value;
