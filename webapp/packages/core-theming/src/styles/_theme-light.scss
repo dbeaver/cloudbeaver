@@ -8,15 +8,18 @@
 
 $mdc-theme-primary: #2a7cb4; // main menu background
 $mdc-theme-on-primary: #ffffff; // main text color
-$mdc-theme-secondary: #f1f1f1;
+$mdc-theme-secondary: #f2f2f2;
 $mdc-theme-on-secondary: #6d6d6d;
 $mdc-theme-surface: #ffffff;
-$mdc-theme-on-surface: #6d6d6d;
+$mdc-theme-on-surface: #353535;
 $mdc-theme-background: #dedede;
 
-$color-positive: #01cca3;
+$color-positive: #52c41a;
 $color-on-positive: #fff;
-$color-negative: #fd1d48;
+$color-negative: #e73e52;
+
+$link-color: $mdc-theme-primary;
+$link-color-focus: #3f96d1;
 
 $input-border: #dedede;
 $input-border-disabled: transparent;

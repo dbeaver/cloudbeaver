@@ -11,13 +11,16 @@ $mdc-theme-on-primary: #ffffff;
 $mdc-theme-secondary: #1b1b1d;
 $mdc-theme-on-secondary: #cbcbcb;
 $mdc-theme-surface: #2b2a32;
-$mdc-theme-on-surface: #cbcbcb;
+$mdc-theme-on-surface: #ffffff;
 $mdc-theme-background: #474551;
 $mdc-theme-error: #e94948;
 
-$color-positive: #01cca3;
+$color-positive: #52c41a;
 $color-on-positive: #fff;
-$color-negative: #fd1d48;
+$color-negative: #e73e52;
+
+$link-color: $mdc-theme-primary;
+$link-color-focus: #3f96d1;
 
 $input-border: #585958;
 $input-border-disabled: darken($input-border, 10%);

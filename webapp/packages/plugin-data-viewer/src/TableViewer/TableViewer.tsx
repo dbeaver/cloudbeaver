@@ -27,10 +27,10 @@ import { ValuePanel } from './ValuePanel';
 const viewerStyles = composes(
   css`
     error, Split {
-      composes: theme-background-surface from global;
+      composes: theme-background-surface theme-text-on-surface from global;
     }
     table-viewer {
-      composes: theme-background-secondary from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
   css`
@@ -214,7 +214,6 @@ export const TableViewer = observer(function TableViewer({
               onCancel={() => dataModel.source.cancel()}
             />
           </table-box>
-          <TableFooter model={dataModel} resultIndex={resultIndex} />
         </table-data>
         <TablePresentationBar
           type={DataPresentationType.value}
@@ -224,6 +223,7 @@ export const TableViewer = observer(function TableViewer({
           onPresentationChange={handleValuePresentationChange}
         />
       </table-content>
+      <TableFooter model={dataModel} resultIndex={resultIndex} />
     </table-viewer>
   );
 });

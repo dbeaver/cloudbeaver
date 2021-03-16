@@ -11,26 +11,18 @@ import styled, { css } from 'reshadow';
 
 import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { DataModelWrapper } from '../DataModelWrapper';
 import { TableHeaderService } from './TableHeaderService';
 
-const styles = composes(
-  css`
-    table-header {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `,
-  css`
-    table-header {
-      padding: 8px 0;
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-    }
-  `
-);
+const styles = css`
+  table-header {
+    padding: 8px 0;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+`;
 
 interface Props {
   model: DataModelWrapper;
@@ -41,7 +33,7 @@ export const TableHeader = observer(function TableHeader({
 }: Props) {
   const service = useService(TableHeaderService);
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <table-header as="div">
       <Placeholder container={service.tableHeaderPlaceholder} context={model} />
     </table-header>

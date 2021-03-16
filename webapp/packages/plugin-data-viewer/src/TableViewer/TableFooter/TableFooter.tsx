@@ -18,9 +18,6 @@ import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(
   css`
-    table-footer {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
     reload {
       composes: theme-text-primary theme-ripple from global;
     }
