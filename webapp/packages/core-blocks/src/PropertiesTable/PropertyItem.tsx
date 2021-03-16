@@ -25,7 +25,7 @@ const styles = composes(
       composes: theme-ripple from global;
     }
     ShadowInput {
-      composes: theme-background-surface from global;
+      composes: theme-background-surface theme-border-color-positive from global;
     }
     [|error] {
       composes: theme-text-error from global;
@@ -77,14 +77,14 @@ const styles = composes(
       color: inherit;
       width: 100%;
       outline: none;
-      border: solid 1px #01cca3;
+      border: solid 1px;
 
       &[|edited] {
         font-weight: 600;
       }
       &:global([readonly]), &:not(:focus):not([|focus]) {
         background: transparent;
-        border: solid 1px transparent;
+        border: solid 1px transparent !important;
       }
     }
     Icon {

@@ -13,10 +13,10 @@ import { composes } from '@cloudbeaver/core-theming';
 export const BASE_CONTAINERS_STYLES = composes(
   css`
     Group {
-      composes: theme-background-surface from global;
+      composes: theme-background-surface theme-text-on-surface from global;
     }
     ColoredContainer {
-      composes: theme-background-secondary from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
   css`
