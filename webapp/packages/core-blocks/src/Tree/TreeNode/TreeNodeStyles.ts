@@ -86,6 +86,14 @@ export const TREE_NODE_STYLES = composes(
       padding-right: 16px;
     }
 
+    TreeNodeFilter {
+      position: relative;
+      min-width: 24px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
     TreeNodeNested {
       box-sizing: border-box;
       padding: 2px 0;

@@ -29,6 +29,7 @@ const INPUT_FIELD_STYLES = css`
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & IGridItemsLayoutProps & IFlexItemsLayoutProps & {
   description?: string;
   mod?: 'surface';
+  ref?: React.Ref<HTMLInputElement>;
 };
 
 type ControlledProps = BaseProps & {
@@ -67,7 +68,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   autoHide,
   onChange,
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
+}: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES);
   const context = useContext(FormContext);
 
@@ -93,6 +94,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     <field as="div" className={className} {...use({ small, medium, large })}>
       <field-label as='label'>{children} {required && '*'}</field-label>
       <input
+        ref={ref}
         role='new'
         {...rest}
         name={name}
@@ -108,4 +110,4 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
       )}
     </field>
   );
-});
+}, { forwardRef: true });

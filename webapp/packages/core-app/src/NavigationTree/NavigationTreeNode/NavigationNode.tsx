@@ -7,8 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
-import { TreeNode } from '@cloudbeaver/core-blocks';
+import { TreeNode, TreeNodeContext } from '@cloudbeaver/core-blocks';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
@@ -26,6 +27,8 @@ export const NavigationNode: React.FC<Props> = observer(function NavigationNode(
   node,
   component,
 }) {
+  const context = useContext(TreeNodeContext);
+
   const {
     control,
     selected,
@@ -35,9 +38,15 @@ export const NavigationNode: React.FC<Props> = observer(function NavigationNode(
     handleExpand,
     handleOpen,
     handleSelect,
+    handleFilter,
+    filterValue,
   } = useNavigationNode(node);
 
   const Control = control || NavigationNodeControl;
+
+  if (!!context?.filterValue && !node.name?.toLowerCase().includes(context.filterValue.toLowerCase())) {
+    return null;
+  }
 
   return (
     <TreeNode
@@ -45,9 +54,11 @@ export const NavigationNode: React.FC<Props> = observer(function NavigationNode(
       selected={selected}
       expanded={expanded}
       leaf={leaf}
+      filterValue={filterValue}
       onExpand={handleExpand}
       onOpen={handleOpen}
       onSelect={handleSelect}
+      onFilter={handleFilter}
     >
       <Control node={node} />
       <NavigationNodeNested nodeId={node.id} component={component} />
