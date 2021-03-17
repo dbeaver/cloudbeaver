@@ -27,6 +27,7 @@ export const verticalRotatedTabStyles = css`
     }
   }
   TabList {
+    outline: none;
     max-width: 32px;
     flex-direction: column;
   }

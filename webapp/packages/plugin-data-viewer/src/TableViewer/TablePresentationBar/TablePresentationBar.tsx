@@ -8,6 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
+import { use } from 'reshadow';
 
 import { ITabData, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -15,16 +16,8 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DataPresentationService } from '../../DataPresentationService';
+import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
-
-interface Props {
-  presentationId: string;
-  supportedDataFormat: ResultDataFormat[];
-  model: IDatabaseDataModel<any>;
-  className?: string;
-  onPresentationChange: (id: string) => void;
-}
 
 const styles = composes(
   css`
@@ -48,13 +41,23 @@ const styles = composes(
         font-weight: normal !important;
       }
     }
-    tab-outer:only-child {
+    TabList[|flexible] tab-outer:only-child {
       display: none;
     }
   `
 );
 
-export const TableLeftBar = observer(function TableLeftBar({
+interface Props {
+  type: DataPresentationType;
+  presentationId: string | null | undefined;
+  supportedDataFormat: ResultDataFormat[];
+  model: IDatabaseDataModel<any>;
+  className?: string;
+  onPresentationChange: (id: string) => void;
+}
+
+export const TablePresentationBar = observer(function TablePresentationBar({
+  type,
   presentationId,
   supportedDataFormat,
   model,
@@ -62,14 +65,14 @@ export const TableLeftBar = observer(function TableLeftBar({
   onPresentationChange,
 }: Props) {
   const dataPresentationService = useService(DataPresentationService);
-  const presentations = dataPresentationService.getSupportedList(supportedDataFormat);
+  const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat);
   const Tab = PresentationTab; // alias for styles matching
   const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
 
   return styled(useStyles(styles, verticalRotatedTabStyles))(
     <table-left-bar as="div" className={className}>
       <TabsState currentTabId={presentationId} onChange={changePresentation}>
-        <TabList>
+        <TabList {...use({ flexible: type === DataPresentationType.main })}>
           {presentations.map(presentation => (
             <Tab
               key={presentation.id}

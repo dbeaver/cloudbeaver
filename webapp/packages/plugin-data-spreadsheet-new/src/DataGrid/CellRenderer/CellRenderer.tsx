@@ -85,7 +85,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       onMouseUp={handleMouseUp}
       onDoubleClick={handleDoubleClick}
       {...props}
-      row={row}
+      row={[...row]}
     />
   );
 });

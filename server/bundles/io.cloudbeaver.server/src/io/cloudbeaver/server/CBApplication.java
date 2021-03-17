@@ -224,7 +224,7 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("\tContent root: " + new File(contentRoot).getAbsolutePath());
         log.debug("\tDrivers storage: " + new File(driversLocation).getAbsolutePath());
         //log.debug("\tDrivers root: " + driversLocation);
-        log.debug("\tProduct details: " + application.getInfoDetails());
+        //log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tBase port: " + serverPort);
         log.debug("\tBase URI: " + servicesURI);
         if (develMode) {

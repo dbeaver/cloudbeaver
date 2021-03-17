@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/LayoutProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
@@ -20,16 +20,33 @@ const styles = css`
   textarea {
     line-height: 19px;
   }
+  field[|embedded] {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    & textarea {
+      border-radius: 0 !important;
+      height: 100%;
+      resize: none !important;
+    }
+  }
   field-label {
     display: block;
     padding-bottom: 10px;
     composes: theme-typography--body1 from global;
     font-weight: 500;
+
+    &:empty {
+      display: none;
+    }
   }
 `;
 
-type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & ILayoutSizeProps & {
+type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> & ILayoutSizeProps & {
   mod?: 'surface';
+  style?: ComponentStyle;
+  embedded?: boolean;
 };
 
 type ControlledProps = BaseProps & {
@@ -53,6 +70,7 @@ interface TextareaType {
 
 export const TextareaNew: TextareaType = observer(function TextareaNew({
   name,
+  style,
   value: controlledValue,
   state,
   children,
@@ -61,6 +79,7 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
   medium,
   large,
   mod,
+  embedded,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -80,8 +99,8 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStylesNew, styles))(
-    <field as="div" className={className} {...use({ small, medium, large })}>
+  return styled(useStyles(baseFormControlStylesNew, styles, style))(
+    <field as="div" className={className} {...use({ small, medium, large, embedded })}>
       <field-label as='label'>{children}</field-label>
       <textarea
         {...rest}

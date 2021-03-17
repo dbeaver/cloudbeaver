@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -49,7 +50,8 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBWSecurityController securityController,
         @NotNull Map<String, Object> providerConfig,
-        @NotNull Map<String, Object> credentials) throws DBException;
+        @NotNull Map<String, Object> credentials,
+        @Nullable WebUser activeUser) throws DBException;
 
     @Nullable
     String getUserDisplayName(
@@ -60,7 +62,8 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
     @Nullable
     DBPObject getUserDetails(
         @NotNull DBRProgressMonitor monitor,
-        AUTH_SESSION session,
+        @NotNull WebSession webSession,
+        @NotNull AUTH_SESSION session,
         @NotNull WebUser user) throws DBException;
 
 }

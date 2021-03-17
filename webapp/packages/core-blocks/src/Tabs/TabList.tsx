@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
-import type { DynamicStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { TabDefault } from './Tab/TabDefault';
 import { TabsContext } from './TabsContext';
 
 type Props = React.PropsWithChildren<Omit<TabListOptions, keyof TabStateReturn>> & {
-  style?: DynamicStyle[] | DynamicStyle;
+  style?: ComponentStyle;
   childrenFirst?: boolean;
 };
 

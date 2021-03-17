@@ -23,10 +23,12 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBASession;
@@ -91,13 +93,18 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             return new WebPropertyInfo[0];
         }
         try {
-            DBASession authSession = session.getAuthInfo().getAuthSession();
+            WebAuthInfo authInfo = session.getAuthInfo(
+                LocalAuthProvider.PROVIDER_ID.equals(authProvider.getId()) ? null : authProvider.getId());
+            if (authInfo == null) {
+                throw new DBException("Session not authorized in auth provider '" + authProvider.getId() + "'");
+            }
+            DBASession authSession = authInfo.getAuthSession();
             DBWAuthProvider<?> authProvider = this.authProvider.getInstance();
             if (authSession != null && authProvider instanceof DBWAuthProviderExternal) {
                 if (!isValidSessionType(authSession, authProvider)) {
                     return new WebPropertyInfo[0];
                 }
-                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), authSession, user);
+                DBPObject userDetails = ((DBWAuthProviderExternal) authProvider).getUserDetails(session.getProgressMonitor(), session, authSession, user);
                 if (userDetails != null) {
                     return WebServiceUtils.getObjectProperties(session, userDetails);
                 }

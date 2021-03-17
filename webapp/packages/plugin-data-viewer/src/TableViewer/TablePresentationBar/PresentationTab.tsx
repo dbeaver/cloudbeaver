@@ -12,16 +12,17 @@ import styled from 'reshadow';
 import {
   verticalRotatedTabStyles, Tab, TabIcon, TabTitle
 } from '@cloudbeaver/core-blocks';
-import { DynamicStyle, useStyles } from '@cloudbeaver/core-theming';
+import { useTranslate } from '@cloudbeaver/core-localization';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { DataPresentationOptions } from '../../DataPresentationService';
+import type { IDataPresentationOptions } from '../../DataPresentationService';
 
 interface Props {
   model: IDatabaseDataModel<any>;
-  presentation: DataPresentationOptions;
+  presentation: IDataPresentationOptions;
   className?: string;
-  style?: DynamicStyle[] | DynamicStyle;
+  style?: ComponentStyle;
 }
 
 export const PresentationTab = observer(function PresentationTab({
@@ -30,6 +31,7 @@ export const PresentationTab = observer(function PresentationTab({
   className,
   style,
 }: Props) {
+  const translate = useTranslate();
   const styles = useStyles(verticalRotatedTabStyles, style);
 
   if (presentation.getTabComponent) {
@@ -46,14 +48,15 @@ export const PresentationTab = observer(function PresentationTab({
       />
     );
   }
+
   return styled(styles)(
     <Tab
       tabId={presentation.id}
       style={[verticalRotatedTabStyles, style]}
       disabled={model.isLoading()}
     >
-      <TabIcon icon={presentation.icon} />
-      <TabTitle>{presentation.title}</TabTitle>
+      {presentation.icon && <TabIcon icon={presentation.icon} />}
+      {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
     </Tab>
   );
 });

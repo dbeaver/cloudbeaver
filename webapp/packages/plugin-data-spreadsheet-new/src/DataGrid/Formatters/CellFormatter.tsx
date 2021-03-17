@@ -9,30 +9,11 @@
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 
+import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+
 import { EditingContext } from '../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
-
-function valueGetter(rawValue: any) {
-  if (rawValue !== null && typeof rawValue === 'object') {
-    return JSON.stringify(rawValue);
-  }
-
-  return rawValue;
-}
-
-function formatValue(rawValue: any) {
-  const value = valueGetter(rawValue);
-
-  if (typeof value === 'string' && value.length > 1000) {
-    return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
-  }
-
-  if (value === null) {
-    return '[null]';
-  }
-
-  return String(value);
-}
+import { DataGridContext } from '../DataGridContext';
 
 function getClasses(rawValue: any) {
   const classes = [];
@@ -45,10 +26,12 @@ function getClasses(rawValue: any) {
 export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ rowIdx, row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const cellRef = useRef<HTMLDivElement>(null);
+  const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
+  const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
   const rawValue = row[column.key];
   const classes = getClasses(rawValue);
-  const value = formatValue(rawValue);
+  const value = formatter?.toString(rawValue) ?? String(rawValue);
 
   const handleClose = useCallback(() => {
     editingContext?.closeEditor({ idx: column.idx, rowIdx });
@@ -60,7 +43,7 @@ export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ 
         editorRef.current?.focus();
       }
     }
-  });
+  }, [isCellSelected]);
 
   if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
     return (

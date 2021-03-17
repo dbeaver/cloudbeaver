@@ -23,16 +23,9 @@ const styles = composes(
     }
   `,
   css`
-    SubmittingForm {
-      height: 40px;
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
     InlineEditor {
       flex: 1;
       height: 24px;
-      margin: 0 12px;
     }
   `
 );

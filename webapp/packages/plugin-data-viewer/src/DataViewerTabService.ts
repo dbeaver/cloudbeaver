@@ -19,6 +19,7 @@ import {
   DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState
 } from '@cloudbeaver/plugin-object-viewer';
 
+import { DataPresentationService } from './DataPresentationService';
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
 import { DataViewerTableService } from './DataViewerTableService';
@@ -26,14 +27,15 @@ import type { IDataViewerPageState } from './IDataViewerPageState';
 
 @injectable()
 export class DataViewerTabService {
-  page: ObjectPage<IDataViewerPageState>;
+  readonly page: ObjectPage<IDataViewerPageState>;
 
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private dataViewerTableService: DataViewerTableService,
     private objectViewerTabService: ObjectViewerTabService,
     private dbObjectPageService: DBObjectPageService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dataPresentationService: DataPresentationService
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -105,6 +107,14 @@ export class DataViewerTabService {
         tab.handlerState.objectId
       );
       tab.handlerState.tableId = model.id;
+
+      const pageState = this.page.getState(tab);
+      if (pageState) {
+        const presentation = this.dataPresentationService.get(pageState?.presentationId);
+        if (presentation) {
+          model.setDataFormat(presentation.dataFormat);
+        }
+      }
     }
 
     // TODO: used for initial data fetch, but can repeat request each time data tab is selected,

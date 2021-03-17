@@ -30,29 +30,56 @@ type AuthProviderInfo {
     credentialParameters: [AuthCredentialInfo!]!
 }
 
-type UserAuthInfo {
-    # User unique identifier
-    userId: String!
-    # Human readable display name. May be null
-    displayName: String
-    # Auth provider ID
-    authProvider: String!
+type UserAuthToken {
+    # Auth provider used for autgorization
+    provider: ID!
 
+    # Authorization time
     loginTime: DateTime!
 
     # Optional login message
     message: String
 
+    # Auth origin
     origin: ObjectOrigin!
+}
+
+type UserAuthInfo {
+    # User unique identifier
+    userId: String! @deprecated
+    # Human readable display name. May be null
+    displayName: String @deprecated
+    # Auth provider ID
+    authProvider: String! @deprecated
+
+    loginTime: DateTime! @deprecated
+
+    # Optional login message
+    message: String @deprecated
+
+    origin: ObjectOrigin! @deprecated
+}
+
+type UserInfo {
+    # User unique identifier
+    userId: String!
+    # Human readable display name. May be null
+    displayName: String
+
+    authTokens: [UserAuthToken!]!
 }
 
 extend type Query {
 
+    # Authorize user using specified auth provider
+
     authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
+    # Logouts user. If provider not specified then all authorizations are revoked from session.
+    authLogout(provider: ID): Boolean
 
-    authLogout: Boolean
+    activeUser: UserInfo
 
-    sessionUser: UserAuthInfo
+    sessionUser: UserAuthInfo @deprecated
 
     authProviders: [AuthProviderInfo!]!
 

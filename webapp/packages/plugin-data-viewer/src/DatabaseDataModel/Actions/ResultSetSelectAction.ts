@@ -16,8 +16,8 @@ import { databaseDataAction } from './DatabaseDataActionDecorator';
 import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from './IDatabaseDataSelectAction';
 
 export interface IResultSetSelectKey {
-  row?: number;
-  column?: number;
+  readonly row?: number;
+  readonly column?: number;
 }
 
 @databaseDataAction()
@@ -70,6 +70,16 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     }
 
     return row.length === this.result.data?.columns?.length;
+  }
+
+  getSelectedElements(): Array<Required<IResultSetSelectKey>> {
+    const selectedKeys: Array<Required<IResultSetSelectKey>> = [];
+
+    for (const [row, value] of this.selectedElements) {
+      selectedKeys.push(...value.map(column => ({ row, column })));
+    }
+
+    return selectedKeys;
   }
 
   getRowSelection(row: number): number[] {

@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -25,14 +26,12 @@ import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Web SQL utils.
@@ -40,6 +39,8 @@ import java.util.Map;
 public class WebSQLUtils {
 
     private static final Log log = Log.getLog(WebSQLUtils.class);
+
+    public static final int BINARY_PREVIEW_LENGTH = 255;
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
@@ -51,11 +52,7 @@ public class WebSQLUtils {
                 return null;
             }
             else if (dbValue instanceof DBDDocument) {
-                if (dataFormat != WebDataFormat.document) {
-                    return serializeDocumentValue((DBDDocument) dbValue);
-                } else {
-                    return serializeDocumentValue(session, (DBDDocument) dbValue);
-                }
+                return serializeDocumentValue(session, (DBDDocument) dbValue);
             } else if (dbValue instanceof DBDComplexValue) {
                 return serializeComplexValue(session, (DBDComplexValue)dbValue, dataFormat);
             } else if (dbValue instanceof DBGeometry) {
@@ -75,16 +72,29 @@ public class WebSQLUtils {
             for (int i = 0; i < size; i++) {
                 items[i] = makeWebCellValue(session, collection.getComponentType(), collection.getItem(i), dataFormat);
             }
-            return items;
+
+            Map<String, Object> map = createMapOfType("collection");
+            map.put("value", items);
+            return map;
         } else if (value instanceof DBDComposite) {
             DBDComposite composite = (DBDComposite)value;
-            Map<String, Object> map = new LinkedHashMap<>();
+            Map<String, Object> struct = new LinkedHashMap<>();
             for (DBSAttributeBase attr : composite.getAttributes()) {
-                map.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
+                struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
             }
+
+            Map<String, Object> map = createMapOfType("map");
+            map.put("value", struct);
             return map;
         }
         return value.toString();
+    }
+
+    @NotNull
+    private static Map<String, Object> createMapOfType(String type) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("$type", type);
+        return map;
     }
 
     private static Map<String, Object> serializeDocumentValue(WebSession session, DBDDocument document) throws DBCException {
@@ -97,7 +107,7 @@ public class WebSQLUtils {
             throw new DBCException("Error serializing document", e);
         }
 
-        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> map = createMapOfType("document");
         map.put("id", CommonUtils.toString(document.getDocumentId()));
         map.put("contentType", document.getDocumentContentType());
         map.put("properties", Collections.emptyMap());
@@ -106,15 +116,34 @@ public class WebSQLUtils {
     }
 
     private static Object serializeContentValue(WebSession session, DBDContent value) throws DBCException {
-        return ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
-    }
 
-    private static Object serializeDocumentValue(DBDDocument value) {
-        return value;
+        Map<String, Object> map = createMapOfType("content");
+        if (ContentUtils.isTextContent(value)) {
+            String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
+            map.put("text", stringValue);
+        } else {
+            map.put("binary", true);
+            byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
+            if (binaryValue != null) {
+                if (binaryValue.length > BINARY_PREVIEW_LENGTH) {
+                    binaryValue = Arrays.copyOf(binaryValue, BINARY_PREVIEW_LENGTH);
+                }
+                map.put("text", GeneralUtils.convertToString(binaryValue, 0, binaryValue.length));
+            } else {
+                map.put("text", null);
+            }
+        }
+        map.put("contentType", value.getContentType());
+        map.put("contentLength", value.getContentLength());
+        return map;
     }
 
     private static Object serializeGeometryValue(DBGeometry value) {
-        return value.toString();
+        Map<String, Object> map = createMapOfType("geometry");
+        map.put("srid", value.getSRID());
+        map.put("text", value.toString());
+        map.put("properties", value.getProperties());
+        return map;
     }
 
 }

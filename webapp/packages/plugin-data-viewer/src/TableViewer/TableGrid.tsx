@@ -10,28 +10,24 @@ import { observer } from 'mobx-react-lite';
 import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { DataPresentationOptions } from '../DataPresentationService';
+import type { IDataPresentationOptions } from '../DataPresentationService';
 import type { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
   model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
   dataFormat: ResultDataFormat;
-  presentation: DataPresentationOptions;
+  presentation: IDataPresentationOptions;
   resultIndex: number;
 }>;
 
 const styles = css`
-  Presentation, error {
+  Presentation {
     flex: 1;
     overflow: auto;
-  }
-  error {
-    white-space: pre-wrap;
-    padding: 16px;
   }
 `;
 
@@ -56,7 +52,7 @@ export const TableGrid = observer(function TableGrid({
   const Presentation = presentation.getPresentationComponent();
 
   if (result?.loadedFully && !result.data) {
-    return styled(styles)(<TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>);
+    return <TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>;
   }
 
   return styled(styles)(

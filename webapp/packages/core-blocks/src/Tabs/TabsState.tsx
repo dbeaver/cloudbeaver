@@ -44,16 +44,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 }: Props<T>): React.ReactElement | null {
   if (
     !selectedId
-    && !currentTabId
+    && currentTabId === undefined
     && container
     && container.tabInfoList.length > 0
   ) {
     selectedId = container.tabInfoList[0].key;
   }
 
-  // TODO: according react documentation fallback local state should be placed in another useState
-  //       to avoid memory release from useMemo()
-  const tabsState = useMemo(() => localState || new MetadataMap<string, any>(), [localState]);
+  const [localTabsState] = useState(() => new MetadataMap<string, any>());
+  const tabsState = localState || localTabsState;
   const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
@@ -78,8 +77,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     state,
   });
 
-  if (currentTabId) {
+  if (currentTabId !== undefined) {
     state.selectedId = currentTabId;
+    state.setSelectedId(currentTabId);
+    dynamic.selectedId = currentTabId;
   }
 
   useEffect(() => {
@@ -105,6 +106,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, []);
 
   useEffect(() => {
+    if (currentTabId !== undefined) {
+      return;
+    }
+
     openExecutor.execute({
       tabId: state.selectedId!,
       props: rest as T,

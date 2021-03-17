@@ -70,10 +70,10 @@ export class ObjectPage<T = unknown> {
   }
 
   getState(tab: ITab<IObjectViewerTabState>): T | undefined {
-    return tab.handlerState.pagesState.get(this.key);
+    return tab.handlerState.pagesState[this.key];
   }
 
   setState(tab: ITab<IObjectViewerTabState>, state: T): void {
-    tab.handlerState.pagesState.set(this.key, state);
+    tab.handlerState.pagesState[this.key] = state;
   }
 }

@@ -43,6 +43,22 @@ $mdc-theme-text-colors: (
   ),
 );
 
+$mdc-ripple-dark-ink-opacities: (
+  hover: .04,
+  focus: .12,
+  press: .12,
+  selected: .08,
+  activated: .12
+) !default;
+
+$mdc-ripple-light-ink-opacities: (
+  hover: .04,
+  focus: .12,
+  press: .12,
+  selected: .08,
+  activated: .12
+) !default;
+
 $theme-name: "dark";
 
 @import "mixins";

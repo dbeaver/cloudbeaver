@@ -29,6 +29,7 @@ interface SqlResultPanelProps {
 
 export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit }: SqlResultPanelProps) {
   const [presentationId, setPresentation] = useState('');
+  const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
   const group = tab.handlerState.queryTabGroups.find(group => group.groupId === panelInit.groupId)!;
 
   return styled(style)(
@@ -37,7 +38,9 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
         tableId={group.modelId}
         resultIndex={panelInit.indexInResultSet}
         presentationId={presentationId}
+        valuePresentationId={valuePresentationId}
         onPresentationChange={setPresentation}
+        onValuePresentationChange={setValuePresentation}
       />
     </result-panel>
   );
