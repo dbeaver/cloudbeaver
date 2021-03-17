@@ -17,6 +17,7 @@ export interface IDataPresentationProps<
   TOptions = any,
   TResult extends IDatabaseDataResult = IDatabaseDataResult
 > {
+  dataFormat: ResultDataFormat;
   model: IDatabaseDataModel<TOptions, TResult>;
   resultIndex: number;
   className?: string;
@@ -24,7 +25,7 @@ export interface IDataPresentationProps<
 
 export enum DataPresentationType {
   main,
-  value
+  toolsPanel
 }
 
 export type DataPresentationComponent<
@@ -41,11 +42,15 @@ export type PresentationTabComponent = React.FunctionComponent<PresentationTabPr
 
 export interface IDataPresentationOptions {
   id: string;
-  dataFormat: ResultDataFormat;
+  dataFormat?: ResultDataFormat;
   type?: DataPresentationType;
   title?: string;
   icon?: string;
-  hidden?: () => boolean;
+  hidden?: (
+    dataFormat: ResultDataFormat | null,
+    model: IDatabaseDataModel<any>,
+    resultIndex: number
+  ) => boolean;
   getPresentationComponent: () => DataPresentationComponent;
   getTabComponent?: () => PresentationTabComponent;
   onActivate?: () => void;
@@ -69,21 +74,26 @@ export class DataPresentationService {
 
   getSupportedList(
     type: DataPresentationType,
-    dataFormat: ResultDataFormat | ResultDataFormat[]
+    dataFormat: ResultDataFormat[],
+    model: IDatabaseDataModel<any>,
+    resultIndex: number,
   ): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
-      if (presentation.type !== type || presentation.hidden?.()) {
+      if (presentation.type !== type || presentation.hidden?.(null, model, resultIndex)) {
         return false;
       }
 
-      return presentation.dataFormat === dataFormat || dataFormat.includes(presentation.dataFormat);
+      return presentation.dataFormat === undefined
+        || dataFormat.includes(presentation.dataFormat);
     });
   }
 
   getSupported(
     type: DataPresentationType,
     dataFormat: ResultDataFormat,
-    presentationId: string | undefined
+    presentationId: string | undefined,
+    model: IDatabaseDataModel<any>,
+    resultIndex: number,
   ): IDataPresentation | null {
     if (presentationId) {
       const presentation = this.dataPresentations.get(presentationId);
@@ -95,9 +105,9 @@ export class DataPresentationService {
 
     for (const presentation of this.dataPresentations.values()) {
       if (
-        presentation.dataFormat === dataFormat
+        (presentation.dataFormat === undefined || presentation.dataFormat === dataFormat)
         && presentation.type === type
-        && !presentation.hidden?.()
+        && !presentation.hidden?.(dataFormat, model, resultIndex)
       ) {
         return presentation;
       }

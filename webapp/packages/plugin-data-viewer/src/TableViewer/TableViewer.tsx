@@ -21,8 +21,8 @@ import { TableFooter } from './TableFooter/TableFooter';
 import { TableGrid } from './TableGrid';
 import { TableHeader } from './TableHeader/TableHeader';
 import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar';
+import { TableToolsPanel } from './TableToolsPanel';
 import { TableViewerStorageService } from './TableViewerStorageService';
-import { ValuePanel } from './ValuePanel';
 
 const viewerStyles = composes(
   css`
@@ -113,7 +113,10 @@ export const TableViewer = observer(function TableViewer({
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
     if (presentation) {
-      if (presentation.dataFormat !== dataModel?.source.dataFormat) {
+      if (
+        presentation.dataFormat !== undefined
+        && presentation.dataFormat !== dataModel?.source.dataFormat
+      ) {
         dataModel?.setDataFormat(presentation.dataFormat)
           .reload();
       }
@@ -141,21 +144,28 @@ export const TableViewer = observer(function TableViewer({
   const presentation = dataPresentationService.getSupported(
     DataPresentationType.main,
     dataFormat,
-    presentationId
+    presentationId,
+    dataModel,
+    resultIndex
   );
-
-  const valuePresentation = valuePresentationId
-    ? dataPresentationService.getSupported(
-      DataPresentationType.value,
-      dataFormat,
-      valuePresentationId
-    )
-    : null;
 
   if (!presentation) {
     return <TextPlaceholder>There are no available presentation for data format: {dataFormat}</TextPlaceholder>;
   }
 
+  const valuePresentation = valuePresentationId
+    ? dataPresentationService.getSupported(
+      DataPresentationType.toolsPanel,
+      dataFormat,
+      valuePresentationId,
+      dataModel,
+      resultIndex
+    )
+    : null;
+
+  const valuePanelDisplayed = valuePresentation
+  && (valuePresentation.dataFormat === undefined
+    || valuePresentation?.dataFormat === dataFormat);
   const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
   const loading = dataModel.isLoading();
 
@@ -168,12 +178,13 @@ export const TableViewer = observer(function TableViewer({
           presentationId={presentation.id}
           supportedDataFormat={dataModel.supportedDataFormats}
           model={dataModel}
+          resultIndex={resultIndex}
           onPresentationChange={handlePresentationChange}
         />
         <table-data as='div'>
           <table-box as='div'>
             {(overlay || !loading) && (
-              <Split sticky={30} mode={valuePresentation?.dataFormat === dataFormat ? undefined : 'minimize'} keepRatio>
+              <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
                 <Pane>
                   {dataModel.source.hasResult(resultIndex) && (
                     <TableGrid
@@ -196,12 +207,12 @@ export const TableViewer = observer(function TableViewer({
                     )}
                   </error>
                 </Pane>
-                {valuePresentation?.dataFormat === dataFormat && <ResizerControls />}
+                {valuePanelDisplayed && <ResizerControls />}
                 <Pane main>
-                  <ValuePanel
+                  <TableToolsPanel
                     model={dataModel}
                     dataFormat={dataFormat}
-                    presentationId={valuePresentationId ?? null}
+                    presentation={valuePresentation}
                     resultIndex={resultIndex}
                   />
                 </Pane>
@@ -216,10 +227,11 @@ export const TableViewer = observer(function TableViewer({
           </table-box>
         </table-data>
         <TablePresentationBar
-          type={DataPresentationType.value}
+          type={DataPresentationType.toolsPanel}
           presentationId={valuePresentationId ?? null}
           supportedDataFormat={[dataFormat]}
           model={dataModel}
+          resultIndex={resultIndex}
           onPresentationChange={handleValuePresentationChange}
         />
       </table-content>

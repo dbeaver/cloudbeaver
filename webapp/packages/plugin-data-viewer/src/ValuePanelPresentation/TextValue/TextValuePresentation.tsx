@@ -9,19 +9,25 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, TextareaNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TextareaNew } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { css } from '@reshadow/react';
 
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSetFormatAction';
 import { IResultSetSelectKey, ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import type { DataPresentationComponent } from '../../DataPresentationService';
+import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 
-export const TextValuePresentation: DataPresentationComponent<any, IDatabaseResultSet> = observer(function TextValuePresentation({
+const styles = css`
+  TextareaNew {
+    flex: 1;
+  }
+`;
+
+export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function TextValuePresentation({
   model,
   resultIndex,
 }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
   const result = model.getResult(resultIndex);
@@ -50,7 +56,7 @@ export const TextValuePresentation: DataPresentationComponent<any, IDatabaseResu
     }
   };
 
-  return styled(styles)(
+  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <TextareaNew
       name="value"
       rows={3}

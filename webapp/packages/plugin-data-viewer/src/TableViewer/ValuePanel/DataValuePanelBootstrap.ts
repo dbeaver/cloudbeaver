@@ -7,25 +7,32 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
-import { TextValuePresentation } from './TextValuePresentation';
+import { DataValuePanelService } from './DataValuePanelService';
+import { ValuePanel } from './ValuePanel';
 
 @injectable()
-export class TextValuePresentationBootstrap extends Bootstrap {
-  constructor(private readonly dataPresentationService: DataPresentationService) {
+export class DataValuePanelBootstrap extends Bootstrap {
+  constructor(
+    private readonly dataPresentationService: DataPresentationService,
+    private readonly dataValuePanelService: DataValuePanelService
+  ) {
     super();
   }
 
   register(): void | Promise<void> {
     this.dataPresentationService.add({
       id: 'value-text-presentation',
-      dataFormat: ResultDataFormat.Resultset,
-      type: DataPresentationType.value,
+      type: DataPresentationType.toolsPanel,
       title: 'data_viewer_presentation_value_title',
       icon: '/icons/text_value_presentation.png',
-      getPresentationComponent: () => TextValuePresentation,
+      hidden: (
+        dataFormat,
+        model,
+        resultIndex
+      ) => this.dataValuePanelService.getDisplayed({ model, resultIndex, dataFormat }).length === 0,
+      getPresentationComponent: () => ValuePanel,
     });
   }
 

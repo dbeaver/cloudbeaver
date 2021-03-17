@@ -40,7 +40,7 @@ export const TableGrid = observer(function TableGrid({
   const translate = useTranslate();
   const result = model.getResult(resultIndex);
 
-  if (dataFormat !== presentation.dataFormat) {
+  if (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat) {
     if (model.isLoading()) {
       return null;
     }
@@ -56,6 +56,6 @@ export const TableGrid = observer(function TableGrid({
   }
 
   return styled(styles)(
-    <Presentation model={model} resultIndex={resultIndex} />
+    <Presentation dataFormat={dataFormat} model={model} resultIndex={resultIndex} />
   );
 });

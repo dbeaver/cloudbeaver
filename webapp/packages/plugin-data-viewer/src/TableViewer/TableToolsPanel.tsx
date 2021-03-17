@@ -11,17 +11,16 @@ import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
+import type { IDataPresentationOptions } from '../DataPresentationService';
 import type { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
   model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
   dataFormat: ResultDataFormat;
-  presentationId: string | null;
+  presentation: IDataPresentationOptions | null;
   resultIndex: number;
 }>;
 
@@ -32,27 +31,17 @@ const styles = css`
   }
 `;
 
-export const ValuePanel = observer(function ValuePanel({
+export const TableToolsPanel = observer(function TableToolsPanel({
   model,
   dataFormat,
-  presentationId,
+  presentation,
   resultIndex,
 }: TableGridProps) {
   const translate = useTranslate();
-  const dataPresentationService = useService(DataPresentationService);
 
-  if (!presentationId) {
-    return null;
-  }
-
-  const presentation = dataPresentationService.getSupported(
-    DataPresentationType.value,
-    dataFormat,
-    presentationId
-  );
   const result = model.getResult(resultIndex);
 
-  if (!presentation || dataFormat !== presentation.dataFormat) {
+  if (!presentation || (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)) {
     if (model.isLoading()) {
       return null;
     }
@@ -68,6 +57,6 @@ export const ValuePanel = observer(function ValuePanel({
   }
 
   return styled(styles)(
-    <Presentation model={model} resultIndex={resultIndex} />
+    <Presentation dataFormat={dataFormat} model={model} resultIndex={resultIndex} />
   );
 });

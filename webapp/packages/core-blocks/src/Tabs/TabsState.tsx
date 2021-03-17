@@ -46,9 +46,12 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     !selectedId
     && currentTabId === undefined
     && container
-    && container.tabInfoList.length > 0
   ) {
-    selectedId = container.tabInfoList[0].key;
+    const displayed = container.getDisplayed(rest as T);
+
+    if (displayed.length > 0) {
+      selectedId = displayed[0].key;
+    }
   }
 
   const [localTabsState] = useState(() => new MetadataMap<string, any>());
@@ -79,7 +82,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   if (currentTabId !== undefined) {
     state.selectedId = currentTabId;
-    state.setSelectedId(currentTabId);
     dynamic.selectedId = currentTabId;
   }
 

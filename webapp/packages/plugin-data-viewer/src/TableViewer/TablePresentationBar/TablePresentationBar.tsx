@@ -52,6 +52,7 @@ interface Props {
   presentationId: string | null | undefined;
   supportedDataFormat: ResultDataFormat[];
   model: IDatabaseDataModel<any>;
+  resultIndex: number;
   className?: string;
   onPresentationChange: (id: string) => void;
 }
@@ -61,11 +62,12 @@ export const TablePresentationBar = observer(function TablePresentationBar({
   presentationId,
   supportedDataFormat,
   model,
+  resultIndex,
   className,
   onPresentationChange,
 }: Props) {
   const dataPresentationService = useService(DataPresentationService);
-  const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat);
+  const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching
   const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
 

@@ -8,7 +8,6 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { TextValuePresentationBootstrap } from './DataPresentation/TextValuePresentation/TextValuePresentationBootstrap';
 import { DataPresentationService } from './DataPresentationService';
 import { DataViewerBootstrap } from './DataViewerBootstrap';
 import { DataViewerTableService } from './DataViewerTableService';
@@ -17,6 +16,9 @@ import { LocaleService } from './LocaleService';
 import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { DataValuePanelBootstrap } from './TableViewer/ValuePanel/DataValuePanelBootstrap';
+import { DataValuePanelService } from './TableViewer/ValuePanel/DataValuePanelService';
+import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap';
 
 export const manifest: PluginManifest = {
   info: {
@@ -32,6 +34,8 @@ export const manifest: PluginManifest = {
     TableFooterMenuService,
     TableHeaderService,
     LocaleService,
+    DataValuePanelService,
     TextValuePresentationBootstrap,
+    DataValuePanelBootstrap,
   ],
 };

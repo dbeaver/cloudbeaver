@@ -111,7 +111,7 @@ export class DataViewerTabService {
       const pageState = this.page.getState(tab);
       if (pageState) {
         const presentation = this.dataPresentationService.get(pageState?.presentationId);
-        if (presentation) {
+        if (presentation?.dataFormat !== undefined) {
           model.setDataFormat(presentation.dataFormat);
         }
       }
