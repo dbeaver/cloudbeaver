@@ -12,8 +12,8 @@ export const Link: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = fun
   ...rest
 }) {
   return (
-    <link className={className} as='div'>
+    <div className={className}>
       <a {...rest}>{children}</a>
-    </link>
+    </div>
   );
 };
