@@ -92,7 +92,6 @@ export const TREE_NODE_STYLES = composes(
       min-height: 24px;
       display: flex;
       align-items: center;
-      height: 100%;
     }
 
     TreeNodeNested {
