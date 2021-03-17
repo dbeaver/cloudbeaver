@@ -26,7 +26,7 @@ import { TableViewerStorageService } from './TableViewerStorageService';
 
 const viewerStyles = composes(
   css`
-    error, Split {
+    error, pane-content {
       composes: theme-background-surface theme-text-on-surface from global;
     }
     table-viewer {
@@ -47,19 +47,40 @@ const viewerStyles = composes(
       flex: 1;
       overflow: hidden;
     }
-    table-data, table-box, Pane {
+    table-data, Pane, pane-content {
       position: relative;
       display: flex;
       flex: 1;
       flex-direction: column;
       overflow: hidden;
     }
-    Pane:first-child {
-      position: relative;
-      flex: 1;
+    Pane {
+      &:first-child {
+        position: relative;
+        flex: 1;
+
+        & pane-content {
+          margin-right: 4px;
+        }
+      }
+      &:last-child {
+        flex: 0 0 30%;
+
+        & pane-content {
+          margin-left: 4px;
+        }
+      }
     }
-    Pane:last-child {
-      flex: 0 0 30%;
+    Pane:global([data-mode='maximize']) pane-content {
+      margin: 0;
+    }
+    TablePresentationBar {
+      &:first-child {
+        margin-right: 4px;
+      }
+      &:last-child {
+        margin-left: 4px;
+      }
     }
     error {
       position: absolute;
@@ -182,10 +203,10 @@ export const TableViewer = observer(function TableViewer({
           onPresentationChange={handlePresentationChange}
         />
         <table-data as='div'>
-          <table-box as='div'>
-            {(overlay || !loading) && (
-              <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
-                <Pane>
+          {(overlay || !loading) && (
+            <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
+              <Pane>
+                <pane-content as='div'>
                   {dataModel.source.hasResult(resultIndex) && (
                     <TableGrid
                       model={dataModel}
@@ -206,25 +227,27 @@ export const TableViewer = observer(function TableViewer({
                       </Button>
                     )}
                   </error>
-                </Pane>
-                {valuePanelDisplayed && <ResizerControls />}
-                <Pane main>
+                </pane-content>
+              </Pane>
+              {valuePanelDisplayed && <ResizerControls />}
+              <Pane main>
+                <pane-content as='div'>
                   <TableToolsPanel
                     model={dataModel}
                     dataFormat={dataFormat}
                     presentation={valuePresentation}
                     resultIndex={resultIndex}
                   />
-                </Pane>
-              </Split>
-            )}
-            <Loader
-              loading={loading}
-              cancelDisabled={!dataModel.source.canCancel}
-              overlay={overlay}
-              onCancel={() => dataModel.source.cancel()}
-            />
-          </table-box>
+                </pane-content>
+              </Pane>
+            </Split>
+          )}
+          <Loader
+            loading={loading}
+            cancelDisabled={!dataModel.source.canCancel}
+            overlay={overlay}
+            onCancel={() => dataModel.source.cancel()}
+          />
         </table-data>
         <TablePresentationBar
           type={DataPresentationType.toolsPanel}

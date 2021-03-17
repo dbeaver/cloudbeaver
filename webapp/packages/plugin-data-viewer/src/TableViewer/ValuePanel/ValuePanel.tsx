@@ -23,7 +23,10 @@ const styles = composes(
       composes: theme-ripple from global;
     }
     TabList {
-      composes: theme-background-surface theme-text-on-surface from global;
+      composes: theme-border-color-background from global;
+    }
+    TabList, TabPanel {
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
   `,
   css`
@@ -39,8 +42,23 @@ const styles = composes(
         font-weight: normal !important;
       }
     }
+    TabList {
+      position: relative;
+      
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-bottom: solid 2px;
+        border-color: inherit;
+      }
+    }
     TabList tab-outer:only-child {
       display: none;
+    }
+    TabPanel {
+      padding: 16px;
     }
   `
 );

@@ -66,12 +66,17 @@ export const TablePresentationBar = observer(function TablePresentationBar({
   className,
   onPresentationChange,
 }: Props) {
+  const style = useStyles(styles, verticalRotatedTabStyles);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching
   const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
 
-  return styled(useStyles(styles, verticalRotatedTabStyles))(
+  if (presentations.length <= 1 && type === DataPresentationType.main) {
+    return null;
+  }
+
+  return styled(style)(
     <table-left-bar as="div" className={className}>
       <TabsState currentTabId={presentationId} onChange={changePresentation}>
         <TabList {...use({ flexible: type === DataPresentationType.main })}>
