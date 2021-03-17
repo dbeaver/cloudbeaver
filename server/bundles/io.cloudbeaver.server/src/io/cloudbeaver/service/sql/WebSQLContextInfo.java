@@ -26,8 +26,10 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.struct.ContextDefaultObjectsReader;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
@@ -79,6 +81,7 @@ public class WebSQLContextInfo {
         DBPDataSource dataSource = this.processor.getConnection().getDataSource();
 
         DBSObject defaultObject = null;
+        DBRProgressMonitor monitor = this.processor.getWebSession().getProgressMonitor();
         if (CommonUtils.isEmpty(catalogName) && CommonUtils.isEmpty(schemaName)) {
             ContextDefaultObjectsReader defaultObjectsReader = new ContextDefaultObjectsReader(
                 dataSource,
@@ -86,7 +89,7 @@ public class WebSQLContextInfo {
             );
             defaultObjectsReader.setReadNodes(false);
             try {
-                defaultObjectsReader.run(this.processor.getWebSession().getProgressMonitor());
+                defaultObjectsReader.run(monitor);
             } catch (InvocationTargetException e) {
                 log.error("Error reading context defaults", e.getTargetException());
             } catch (InterruptedException e) {
@@ -95,6 +98,11 @@ public class WebSQLContextInfo {
 
             catalogName = defaultObjectsReader.getDefaultCatalogName();
             defaultObject = defaultObjectsReader.getDefaultObject();
+        } else {
+            DBCExecutionContextDefaults contextDefaults = processor.getExecutionContext().getContextDefaults();
+            if (contextDefaults != null) {
+                defaultCatalog = contextDefaults.getDefaultCatalog();
+            }
         }
 
         if (defaultObject instanceof DBSCatalog) {
@@ -108,7 +116,12 @@ public class WebSQLContextInfo {
                 DBSObjectContainer objectContainer = DBUtils.getAdapter(DBSObjectContainer.class, dataSource);
                 if (objectContainer != null) {
                     try {
-                        DBSObject childObject = objectContainer.getChild(this.processor.getWebSession().getProgressMonitor(), childObjectName);
+                        DBSObject childObject = null;
+                        if (schemaName != null && defaultCatalog != null) {
+                            childObject = defaultCatalog.getChild(monitor, schemaName);
+                        } else {
+                            childObject = objectContainer.getChild(monitor, childObjectName);
+                        }
                         if (childObject == null) {
                             log.debug("Can't find child '" + childObjectName + "'");
                         } else if (childObject instanceof DBSCatalog) {
