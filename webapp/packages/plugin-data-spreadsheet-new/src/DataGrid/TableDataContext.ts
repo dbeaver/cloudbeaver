@@ -19,6 +19,7 @@ export interface ITableData {
   getCellValue: (rowIndex: number, key: string | number) => any;
   getColumnInfo: (key: string | number) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<Column<any[], any>>;
+  getDataColumnIndexFromKey: (columnKey: string | number) => number | null;
   getColumnIndexFromKey: (columnKey: string | number) => number | null;
   isIndexColumn: (columnKey: string | number) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;

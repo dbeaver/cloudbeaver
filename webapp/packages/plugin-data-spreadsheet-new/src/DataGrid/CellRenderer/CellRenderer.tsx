@@ -11,15 +11,19 @@ import { useCallback, useContext } from 'react';
 import type { CellRendererProps } from 'react-data-grid';
 import { Cell } from 'react-data-grid';
 
+import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
+import { TableDataContext } from '../TableDataContext';
 
 export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function CellRenderer(props) {
-  const context = useContext(DataGridContext);
+  const dataGridContext = useContext(DataGridContext);
+  const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
-  const editor = context?.model.source.getEditor(context.resultIndex);
+  const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
 
   const classes: string[] = [];
   const { rowIdx, column } = props;
@@ -64,10 +68,16 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     if (!column.editable) {
       return;
     }
+    const format = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
+    const columnIndex = tableDataContext?.getDataColumnIndexFromKey(column.key);
 
-    const cellValue = props.row[column.key];
-
-    if (cellValue !== null && typeof cellValue === 'object') {
+    if (
+      !columnIndex
+      || format?.isReadOnly({
+        row: rowIdx,
+        column: columnIndex,
+      })
+    ) {
       return;
     }
 

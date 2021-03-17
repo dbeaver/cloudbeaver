@@ -13,7 +13,7 @@ import type { Column } from 'react-data-grid';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { TextTools } from '@cloudbeaver/core-utils';
-import type { IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { ResultSetTools } from '../ResultSetTools';
 import { IndexFormatter } from './Formatters/IndexFormatter';
@@ -32,13 +32,17 @@ export const indexColumn: Column<any[], any> = {
   formatter: IndexFormatter,
 };
 
-export function useTableData(modelResultData: IDatabaseResultSet | null): ITableData {
-  const props = useObjectRef({ modelResultData }, undefined, true);
+export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): ITableData {
+  const modelResultData = model.getResult(resultIndex);
+  const props = useObjectRef({ modelResultData, model, resultIndex }, undefined, true);
   const [state] = useState(() => computed(() => {
     if (!props.modelResultData?.data) {
       return { columns: [], rows: [] };
     }
 
+    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+
+    // TODO: seems it must be moved to ResultSetFormatAction
     const columnNames = ResultSetTools.getHeaders(props.modelResultData.data);
     const rowStrings = ResultSetTools.getLongestCells(props.modelResultData.data);
 
@@ -60,7 +64,7 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
     const columns = props.modelResultData.data?.columns!.map<Column<any[], any>>((col, columnIndex) => ({
       key: columnIndex + '',
       name: col.label!,
-      editable: !col.readOnly,
+      editable: !format.isReadOnly({ column: columnIndex }),
       width: Math.min(300, measuredCells[columnIndex]),
       headerRenderer: TableColumnHeader,
     })) || [];
@@ -84,7 +88,16 @@ export function useTableData(modelResultData: IDatabaseResultSet | null): ITable
       return this.rows[rowIndex][key as number];
     },
     getColumnInfo(key: string | number): SqlResultColumn | undefined {
-      return props.modelResultData?.data?.columns?.[Number(key)];
+      return this.dataColumns[Number(key)];
+    },
+    getDataColumnIndexFromKey(key: string | number) {
+      const info = this.getColumnInfo(key);
+
+      if (!info) {
+        return null;
+      }
+
+      return Number(key);
     },
     getColumnIndexFromKey(key: string | number) {
       const index = this.columns.findIndex((column: any) => column.key === String(key));

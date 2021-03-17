@@ -11,25 +11,21 @@ import { makeObservable, observable } from 'mobx';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseResultSet } from '../IDatabaseResultSet';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from './IDatabaseDataSelectAction';
-
-export interface IResultSetSelectKey {
-  readonly row?: number;
-  readonly column?: number;
-}
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
+import { databaseDataAction } from '../DatabaseDataActionDecorator';
+import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
+import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
-export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultSetSelectKey, IDatabaseResultSet> {
+export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
   result: IDatabaseResultSet;
 
-  readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetSelectKey>>;
+  readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetElementKey>>;
   readonly selectedElements: Map<number, number[]>;
 
-  private focusedElement: IResultSetSelectKey | null;
+  private focusedElement: IResultSetElementKey | null;
 
   constructor(result: IDatabaseResultSet) {
     this.result = result;
@@ -51,7 +47,7 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     return this.selectedElements.size > 0;
   }
 
-  isElementSelected(key: IResultSetSelectKey): boolean {
+  isElementSelected(key: IResultSetElementKey): boolean {
     if (key.row === undefined) {
       const rows = this.result.data?.rows?.length || 0;
       for (let row = 0; row < rows; row++) {
@@ -76,12 +72,12 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     return row.length === this.result.data?.columns?.length;
   }
 
-  getFocusedElement(): IResultSetSelectKey | null {
+  getFocusedElement(): IResultSetElementKey | null {
     return this.focusedElement;
   }
 
-  getSelectedElements(): Array<Required<IResultSetSelectKey>> {
-    const selectedKeys: Array<Required<IResultSetSelectKey>> = [];
+  getSelectedElements(): Array<Required<IResultSetElementKey>> {
+    const selectedKeys: Array<Required<IResultSetElementKey>> = [];
 
     for (const [row, value] of this.selectedElements) {
       selectedKeys.push(...value.map(column => ({ row, column })));
@@ -94,7 +90,7 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     return this.selectedElements.get(row) || [];
   }
 
-  set(key: IResultSetSelectKey, selected: boolean): void {
+  set(key: IResultSetElementKey, selected: boolean): void {
     if (key.row === undefined) {
       for (let row = 0; row < (this.result.data?.rows?.length || 0); row++) {
         this.set({ row, column: key.column }, selected);
@@ -145,7 +141,7 @@ export class ResultSetSelectAction implements IDatabaseDataSelectAction<IResultS
     }
   }
 
-  focus(key: IResultSetSelectKey | null): void {
+  focus(key: IResultSetElementKey | null): void {
     this.focusedElement = key;
   }
 

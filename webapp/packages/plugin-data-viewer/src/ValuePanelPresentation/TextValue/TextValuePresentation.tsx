@@ -13,8 +13,9 @@ import { BASE_CONTAINERS_STYLES, TabContainerPanelComponent, TextareaNew } from 
 import { useStyles } from '@cloudbeaver/core-theming';
 import { css } from '@reshadow/react';
 
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSetFormatAction';
-import { IResultSetSelectKey, ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSetSelectAction';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 
@@ -35,17 +36,19 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   let value: any;
   let stringValue: string | undefined;
-  let firstSelectedCell: Required<IResultSetSelectKey> | undefined;
+  let firstSelectedCell: Required<IResultSetElementKey> | undefined;
+  let readonly = true;
 
   if (result?.data?.rows && selectedCells.length > 0) {
+    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+
     firstSelectedCell = selectedCells[0];
     value = model.source
       .getEditor(resultIndex)
       .getCell(firstSelectedCell.row, firstSelectedCell.column);
 
-    stringValue = model.source
-      .getAction(resultIndex, ResultSetFormatAction)
-      .get(value);
+    stringValue = format.get(value);
+    readonly = format.isReadOnly(firstSelectedCell);
   }
 
   const handleChange = (value: string) => {
@@ -62,7 +65,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       rows={3}
       value={stringValue}
       disabled={stringValue === undefined}
-      readOnly={model.isReadonly() || (value !== null && typeof value === 'object')}
+      readOnly={model.isReadonly() || readonly}
       embedded
       onChange={handleChange}
     />

@@ -10,7 +10,7 @@ import { action, observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import type { IResultSetSelectKey, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import type { IResultSetElementKey, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from '../TableDataContext';
 import type { IDraggingPosition } from '../useGridDragging';
@@ -172,7 +172,7 @@ export function useGridSelectionContext(
     const { selectionAction } = props;
     temporarySelection.clear();
 
-    const key: IResultSetSelectKey = {
+    const key: IResultSetElementKey = {
       column: columnIdx,
       row: rowIdx,
     };

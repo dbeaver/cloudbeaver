@@ -51,9 +51,9 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const modelResultData = model?.getResult(resultIndex);
+  const modelResultData = model.getResult(resultIndex);
 
-  const tableData = useTableData(modelResultData);
+  const tableData = useTableData(model, resultIndex);
 
   const gridSortingContext = useGridSortingContext(model);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);

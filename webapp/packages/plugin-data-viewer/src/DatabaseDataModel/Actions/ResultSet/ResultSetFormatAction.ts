@@ -8,17 +8,38 @@
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseResultSet } from '../IDatabaseResultSet';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IDatabaseDataFormatAction } from './IDatabaseDataFormatAction';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
+import { databaseDataAction } from '../DatabaseDataActionDecorator';
+import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
+import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
-export class ResultSetFormatAction implements IDatabaseDataFormatAction<IDatabaseResultSet> {
+export class ResultSetFormatAction implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
   result: IDatabaseResultSet;
 
   constructor(result: IDatabaseResultSet) {
     this.result = result;
+  }
+
+  isReadOnly(key: IResultSetElementKey): boolean {
+    let columnReadonly = true;
+    let cellReadonly = true;
+
+    if (key.column && this.result.data?.columns) {
+      columnReadonly = this.result.data.columns[key.column].readOnly;
+    }
+
+    if (key.row && key.column && this.result.data?.rows) {
+      const value = this.result.data.rows[key.row][key.column];
+      cellReadonly = this.isValueReadonly(value);
+    }
+
+    return columnReadonly || cellReadonly;
+  }
+
+  isValueReadonly(value: any): boolean {
+    return value !== null && typeof value === 'object';
   }
 
   get(value: any): any {
