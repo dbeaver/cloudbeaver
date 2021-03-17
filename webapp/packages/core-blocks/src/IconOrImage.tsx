@@ -14,18 +14,19 @@ import { StaticImage } from './StaticImage';
 export interface IconOrImageProps {
   icon: string;
   className?: string;
+  onClick?: () => void;
   viewBox?: string;
 }
 
-export const IconOrImage = function IconOrImage({ icon, className, viewBox }: IconOrImageProps) {
+export const IconOrImage = function IconOrImage({ icon, className, onClick, viewBox }: IconOrImageProps) {
   const isStaticIcon = useMemo(
     () => icon && (icon.startsWith('platform:') || icon.startsWith('/')),
     [icon]
   );
 
   if (isStaticIcon) {
-    return <StaticImage icon={icon} className={className} />;
+    return <StaticImage icon={icon} className={className} onClick={onClick} />;
   }
 
-  return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} />;
+  return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} onClick={onClick} />;
 };

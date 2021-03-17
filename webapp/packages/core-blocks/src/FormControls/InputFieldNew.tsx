@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IFlexItemsLayoutProps, IGridItemsLayoutProps, ILayoutSizeProps } from '../Containers/LayoutProps';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
@@ -20,15 +20,19 @@ import { isControlPresented } from './isControlPresented';
 const INPUT_FIELD_STYLES = css`
   field-label {
     display: block;
-    padding-bottom: 10px;
     composes: theme-typography--body1 from global;
     font-weight: 500;
+  }
+  field-label:not(:empty) {
+    padding-bottom: 10px;
   }
 `;
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & IGridItemsLayoutProps & IFlexItemsLayoutProps & {
   description?: string;
   mod?: 'surface';
+  ref?: React.Ref<HTMLInputElement>;
+  style?: ComponentStyle;
 };
 
 type ControlledProps = BaseProps & {
@@ -54,6 +58,7 @@ interface InputFieldType {
 
 export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   name,
+  style,
   value: valueControlled,
   required,
   state,
@@ -67,8 +72,8 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   autoHide,
   onChange,
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
-  const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES);
+}: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
+  const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +96,9 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
 
   return styled(styles)(
     <field as="div" className={className} {...use({ small, medium, large })}>
-      <field-label as='label'>{children} {required && '*'}</field-label>
+      <field-label as='label'>{children}{required && ' *'}</field-label>
       <input
+        ref={ref}
         role='new'
         {...rest}
         name={name}
@@ -108,4 +114,4 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
       )}
     </field>
   );
-});
+}, { forwardRef: true });

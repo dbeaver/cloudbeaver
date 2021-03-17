@@ -28,6 +28,8 @@ interface INavigationNode {
   handleExpand: () => void;
   handleOpen: () => void;
   handleSelect: (isMultiple?: boolean) => void;
+  handleFilter: (value: string) => void;
+  filterValue: string;
 }
 
 export function useNavigationNode(node: NavNode): INavigationNode {
@@ -80,6 +82,10 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     context?.onSelect?.(node, multiple);
   };
 
+  const handleFilter = (value: string) => {
+    context?.onFilter?.(node, value);
+  };
+
   // TODO: probably should be refactored
   useEffect(() => {
     if (expanded && children.isOutdated() && !children.isLoading() && children.isLoaded() && !isOutdated()) {
@@ -104,6 +110,8 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   useEffect(() => () => {
     // TODO: seems like selection & expand should be specific for separate tree definitions
     navigationTreeService.expandNode(node.id, false);
+
+    context?.treeNodesState?.delete(node.id);
   }, [node.id]);
 
   return {
@@ -115,6 +123,8 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     handleExpand,
     handleOpen,
     handleSelect,
+    handleFilter,
+    filterValue: context?.treeNodesState?.get(node.id).filter || '',
   };
 }
 

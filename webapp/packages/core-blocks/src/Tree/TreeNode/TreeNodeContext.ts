@@ -14,6 +14,8 @@ export interface ITreeNodeContext {
   selected: boolean;
   leaf: boolean;
   select: (multiple?: boolean) => void;
+  filter: (value: string) => void;
+  filterValue: string;
   expand: () => void;
   open: () => void;
 }

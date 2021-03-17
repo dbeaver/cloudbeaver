@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { useChildren } from '../shared/useChildren';
@@ -31,9 +32,14 @@ const styles = css`
   }
 `;
 
+export interface ITreeNodeState {
+  filter: string;
+}
+
 interface Props {
   root?: string;
   selectionTree?: boolean;
+  localState?: MetadataMap<string, ITreeNodeState>;
   control?: React.FC<{
     node: NavNode;
   }>;
@@ -42,30 +48,51 @@ interface Props {
   onOpen?: (node: NavNode) => Promise<void> | void;
   onSelect?: (node: NavNode, multiple: boolean) => void;
   isSelected?: (node: NavNode) => boolean;
+  onFilter?: (node: NavNode, value: string) => void;
 }
 
 export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   root,
   control,
+  localState,
   selectionTree = false,
   emptyPlaceholder,
   className,
   onOpen,
   onSelect,
   isSelected,
+  onFilter,
 }) {
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
+  const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({ filter: '' })));
+
+  const treeNodesState = localState || localTreeNodesState;
+
+  const getTreeNodeState = useCallback((node: NavNode) =>
+    treeNodesState.get(node.id), [treeNodesState]);
+
+  const onFilterHandler = useCallback((node: NavNode, value: string) => {
+    const treeNodeState = treeNodesState.get(node.id);
+    treeNodeState.filter = value;
+
+    if (onFilter) {
+      onFilter(node, value);
+    }
+  }, [treeNodesState, onFilter]);
 
   const context = useMemo<ITreeContext>(
     () => ({
+      treeNodesState,
+      getTreeNodeState,
       selectionTree,
       control,
       onOpen,
       onSelect,
       isSelected,
+      onFilter: onFilterHandler,
     }),
-    [control, selectionTree, onOpen, onSelect, isSelected]
+    [control, selectionTree, onOpen, onSelect, isSelected, onFilterHandler, treeNodesState, getTreeNodeState]
   );
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
