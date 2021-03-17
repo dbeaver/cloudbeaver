@@ -84,6 +84,10 @@ export class DataViewerTabService {
       parentId: tab.handlerState.parentId,
     });
 
+    if (tab.handlerState.pageId !== this.page.key) {
+      return;
+    }
+
     if (!this.navNodeManagerService.isNodeHasData(node)) {
       return;
     }
@@ -120,7 +124,7 @@ export class DataViewerTabService {
     // TODO: used for initial data fetch, but can repeat request each time data tab is selected,
     //       so probably should be refactored and managed by presentation
     if (model.source.results.length === 0) {
-      await model.requestData();
+      model.requestData();
     }
   }
 

@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-
 import {
   NavigationTabsService,
   INodeNavigationData,
@@ -43,7 +41,7 @@ export class ObjectViewerTabService {
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService,
     private navigationTabsService: NavigationTabsService,
-    private connectionInfo: ConnectionInfoResource
+    private connectionInfo: ConnectionInfoResource,
   ) {
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<IObjectViewerTabState>({
@@ -64,6 +62,7 @@ export class ObjectViewerTabService {
 
   registerTabHandler(): void {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
+    this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
@@ -85,6 +84,10 @@ export class ObjectViewerTabService {
     const tab = this.navigationTabsService.findTab(
       isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId)
     );
+    let tabToSwitch: {
+      page: ObjectPage<any>;
+      state: any;
+    } | null = null;
 
     if (tab) {
       tab.handlerState.tabIcon = nodeInfo.icon;
@@ -117,12 +120,40 @@ export class ObjectViewerTabService {
       return this.dbObjectPageService.getPage(pageId);
     };
 
+    const canSwitchPage = (page: ObjectPage<any>) => {
+      if (!tabInfo.tab) {
+        return false;
+      }
+
+      return this.dbObjectPageService.canSwitchPage(tabInfo.tab, page);
+    };
+
     const trySwitchPage = <T>(page: ObjectPage<T>, state?: T) => {
       if (!tabInfo.tab) {
         return false;
       }
 
-      return this.dbObjectPageService.trySwitchPage(tabInfo.tab, page, state);
+      if (this.dbObjectPageService.canSwitchPage(tabInfo.tab, page)) {
+        tabToSwitch = {
+          page,
+          state,
+        };
+        return true;
+      }
+
+      return false;
+    };
+
+    const switchPage = <T>(page?: ObjectPage<T>, state?: T) => {
+      if (!tabInfo.tab || (!page && !tabToSwitch)) {
+        return false;
+      }
+
+      return this.dbObjectPageService.trySwitchPage(
+        tabInfo.tab,
+        page || tabToSwitch!.page,
+        state || tabToSwitch?.state
+      );
     };
 
     const isPageActive = (page: ObjectPage) => page === getPage();
@@ -134,10 +165,12 @@ export class ObjectViewerTabService {
       get page() {
         return getPage();
       },
-      isPageActive,
-      trySwitchPage,
       tabInfo,
       nodeInfo,
+      isPageActive,
+      trySwitchPage,
+      canSwitchPage,
+      switchPage,
     };
   };
 
@@ -317,6 +350,19 @@ export class ObjectViewerTabService {
         }
         this.navigationTabsService.selectTab(tab.id);
       }
+    } catch (exception) {
+      this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
+    }
+  }
+
+  private async navigationPostHandler(
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
+  ) {
+    try {
+      const { switchPage } = await contexts.getContext(this.objectViewerTabContext);
+
+      switchPage();
     } catch (exception) {
       this.notificationService.logException(exception, 'Object Viewer Error', 'Error in Object Viewer while processing action with database node');
     }

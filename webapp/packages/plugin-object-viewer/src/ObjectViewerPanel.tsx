@@ -96,7 +96,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
       style={stylesArray}
     >
       {pages.map(page => (
-        <TabPanel key={page.key} tabId={page.key}>
+        <TabPanel key={page.key} tabId={page.key} lazy>
           <DBObjectPagePanel tab={tab} page={page} />
         </TabPanel>
       ))}

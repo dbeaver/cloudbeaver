@@ -97,7 +97,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
     return children();
   }
 
-  if (!isVisible && overlay) {
+  if ((!isVisible && overlay) || !loading) {
     return null;
   }
 

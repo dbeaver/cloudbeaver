@@ -29,9 +29,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   model,
   resultIndex,
 }) {
+  const result = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
-  const result = model.getResult(resultIndex);
   const selectedCells = selection.getSelectedElements();
 
   let value: any;

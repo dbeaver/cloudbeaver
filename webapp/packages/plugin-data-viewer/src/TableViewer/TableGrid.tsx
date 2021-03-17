@@ -38,9 +38,11 @@ export const TableGrid = observer(function TableGrid({
   resultIndex,
 }: TableGridProps) {
   const translate = useTranslate();
-  const result = model.getResult(resultIndex);
 
-  if (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat) {
+  if (
+    (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)
+    || !model.source.hasResult(resultIndex)
+  ) {
     if (model.isLoading()) {
       return null;
     }
@@ -48,6 +50,8 @@ export const TableGrid = observer(function TableGrid({
     // eslint-disable-next-line react/no-unescaped-entities
     return <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>;
   }
+
+  const result = model.getResult(resultIndex);
 
   const Presentation = presentation.getPresentationComponent();
 

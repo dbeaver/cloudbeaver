@@ -100,6 +100,11 @@ const viewerStyles = composes(
     Button {
       margin-right: 16px;
     }
+    Loader {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
   `
 );
 
@@ -184,9 +189,11 @@ export const TableViewer = observer(function TableViewer({
     )
     : null;
 
+  const resultExist = dataModel.source.hasResult(resultIndex);
   const valuePanelDisplayed = valuePresentation
   && (valuePresentation.dataFormat === undefined
-    || valuePresentation?.dataFormat === dataFormat);
+    || valuePresentation?.dataFormat === dataFormat)
+  && resultExist;
   const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
   const loading = dataModel.isLoading();
 
@@ -203,45 +210,43 @@ export const TableViewer = observer(function TableViewer({
           onPresentationChange={handlePresentationChange}
         />
         <table-data as='div'>
-          {(overlay || !loading) && (
-            <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
-              <Pane>
-                <pane-content as='div'>
-                  {dataModel.source.hasResult(resultIndex) && (
-                    <TableGrid
-                      model={dataModel}
-                      dataFormat={dataFormat}
-                      presentation={presentation}
-                      resultIndex={resultIndex}
-                    />
-                  )}
-                  <error as="div" hidden={!error.details} {...use({ animated })}>
-                    {error.details?.message}
-                    <br /><br />
-                    <Button type='button' mod={['outlined']} onClick={() => dataModel.source.clearError()}>
-                      {translate('ui_error_close')}
-                    </Button>
-                    {error.details?.hasDetails && (
-                      <Button type='button' mod={['unelevated']} onClick={error.open}>
-                        {translate('ui_errors_details')}
-                      </Button>
-                    )}
-                  </error>
-                </pane-content>
-              </Pane>
-              {valuePanelDisplayed && <ResizerControls />}
-              <Pane main>
-                <pane-content as='div'>
+          <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
+            <Pane>
+              <pane-content as='div'>
+                <TableGrid
+                  model={dataModel}
+                  dataFormat={dataFormat}
+                  presentation={presentation}
+                  resultIndex={resultIndex}
+                />
+              </pane-content>
+            </Pane>
+            {valuePanelDisplayed && <ResizerControls />}
+            <Pane main>
+              <pane-content as='div'>
+                {resultExist && (
                   <TableToolsPanel
                     model={dataModel}
                     dataFormat={dataFormat}
                     presentation={valuePresentation}
                     resultIndex={resultIndex}
                   />
-                </pane-content>
-              </Pane>
-            </Split>
-          )}
+                )}
+              </pane-content>
+            </Pane>
+          </Split>
+          <error as="div" hidden={!error.details} {...use({ animated })}>
+            {error.details?.message}
+            <br /><br />
+            <Button type='button' mod={['outlined']} onClick={() => dataModel.source.clearError()}>
+              {translate('ui_error_close')}
+            </Button>
+            {error.details?.hasDetails && (
+              <Button type='button' mod={['unelevated']} onClick={error.open}>
+                {translate('ui_errors_details')}
+              </Button>
+            )}
+          </error>
           <Loader
             loading={loading}
             cancelDisabled={!dataModel.source.canCancel}

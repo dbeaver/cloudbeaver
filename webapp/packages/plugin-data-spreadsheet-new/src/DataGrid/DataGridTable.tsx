@@ -149,14 +149,6 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     [model, resultIndex]
   );
 
-  useEffect(() => {
-    if (!modelResultData) {
-      model
-        .setSlice(0, model.countGain + model.source.count)
-        .requestData();
-    }
-  }, [model, modelResultData]);
-
   const gridContext = useMemo<IDataGridContext>(() => ({
     model,
     columnResize,
