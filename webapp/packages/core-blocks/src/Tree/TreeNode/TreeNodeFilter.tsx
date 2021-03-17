@@ -16,54 +16,44 @@ import { IconButton } from '../../IconButton';
 import { useFocus } from '../../useFocus';
 import { TreeNodeContext } from './TreeNodeContext';
 
-const styles = css`
+const styles = composes(
+  css`
+    IconButton {
+      composes: theme-background-primary theme-text-on-primary from global;
+    }
+  `,
+  css`
+    filter-container {
+      min-width: 24px;
+      min-height: 24px;
+    }
     InputFieldNew {
       display: none;
       width: 300px;
-      max-width: 300px;
-      &[|filterMode] {
+      &[|filterEnabled] {
         display: block;
-        & > :global(input) {
-          height: 28px;
-          padding-right: 24px !important;
-        }
-        & > :global(label) {
-          padding-bottom: 0;
-        }
       }
     }
-
     IconButton {
       position: absolute;
-      left: 0;
+      right: 2px;
       margin: 0;
-      background: #cccccc;
       width: 24px;
       height: 24px;
       cursor: pointer;
-      &[|filterMode] {
-        /* 24px icon width + 2px input border */
-        left: calc(100% - 26px);
+      border-radius: 2px;
+      &[|filterEnabled] {
+        border-radius: unset;
       }
     }
-  `;
+`);
 
-const filterButtonMode = {
-  filter: composes(
-    css`
-      IconButton {
-        composes: theme-background-primary theme-text-on-primary from global;
-      }
-    `),
-  passive:
-    css`
-      IconButton {
-        color: #398fca;
-        background-color: #cccccc;
-        border-radius: 2px;
-      }
-  `,
-};
+const innerInputStyle = css`
+  input {
+    height: 28px;
+    padding-right: 24px !important;
+  }
+`;
 
 interface Props {
   disabled?: boolean;
@@ -74,9 +64,9 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
   disabled,
   className,
 }) {
-  const [focusedRef] = useFocus<HTMLInputElement>({});
+  const [inputRef] = useFocus<HTMLInputElement>({});
   const context = useContext(TreeNodeContext);
-  const [filterMode, setFilterMode] = useState(!!context?.filterValue);
+  const [filterEnabled, setFilterEnabled] = useState(!!context?.filterValue);
 
   if (!context) {
     throw new Error('Context not provided');
@@ -92,21 +82,22 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
   };
 
   useEffect(() => {
-    if (filterMode) {
-      focusedRef.current?.focus();
+    if (filterEnabled) {
+      inputRef.current?.focus();
     }
-  }, [filterMode]);
+  }, [filterEnabled]);
 
-  return styled(useStyles(styles, filterMode ? filterButtonMode.filter : filterButtonMode.passive))(
+  return styled(useStyles(styles))(
     <filter-container as='div' className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
       <InputFieldNew
-        ref={focusedRef}
+        ref={inputRef}
+        style={innerInputStyle}
         disabled={disabled}
         value={context.filterValue}
-        {...use({ filterMode })}
+        {...use({ filterEnabled })}
         onChange={value => context.filter(value.trim())}
       />
-      <IconButton name='search' disabled={disabled} onClick={() => setFilterMode(!filterMode)} {...use({ filterMode })} />
+      <IconButton name='search' disabled={disabled} onClick={() => setFilterEnabled(!filterEnabled)} {...use({ filterEnabled })} />
     </filter-container>
   );
 };

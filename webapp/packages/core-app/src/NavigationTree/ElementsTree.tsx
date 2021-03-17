@@ -32,14 +32,14 @@ const styles = css`
   }
 `;
 
-export interface INodeState {
+export interface ITreeNodeState {
   filter: string;
 }
 
 interface Props {
   root?: string;
   selectionTree?: boolean;
-  localState?: MetadataMap<string, INodeState>;
+  localState?: MetadataMap<string, ITreeNodeState>;
   control?: React.FC<{
     node: NavNode;
   }>;
@@ -65,24 +65,26 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
 }) {
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
-  const [state] = useState(() => new MetadataMap<string, INodeState>(() => ({ filter: '' })));
+  const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({ filter: '' })));
 
-  const elementsTreeState = localState || state;
+  const treeNodesState = localState || localTreeNodesState;
 
-  const getMetadata = useCallback((node: NavNode) => elementsTreeState.get(node.id), [elementsTreeState]);
+  const getTreeNodeState = useCallback((node: NavNode) =>
+    treeNodesState.get(node.id), [treeNodesState]);
 
   const onFilterHandler = useCallback((node: NavNode, value: string) => {
-    elementsTreeState.get(node.id).filter = value;
+    const treeNodeState = treeNodesState.get(node.id);
+    treeNodeState.filter = value;
 
     if (onFilter) {
       onFilter(node, value);
     }
-  }, [elementsTreeState, onFilter]);
+  }, [treeNodesState, onFilter]);
 
   const context = useMemo<ITreeContext>(
     () => ({
-      state: elementsTreeState,
-      getMetadata,
+      treeNodesState,
+      getTreeNodeState,
       selectionTree,
       control,
       onOpen,
@@ -90,7 +92,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
       isSelected,
       onFilter: onFilterHandler,
     }),
-    [control, selectionTree, onOpen, onSelect, isSelected, onFilterHandler, elementsTreeState, getMetadata]
+    [control, selectionTree, onOpen, onSelect, isSelected, onFilterHandler, treeNodesState, getTreeNodeState]
   );
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {

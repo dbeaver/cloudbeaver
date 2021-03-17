@@ -111,7 +111,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     // TODO: seems like selection & expand should be specific for separate tree definitions
     navigationTreeService.expandNode(node.id, false);
 
-    context?.state?.delete(node.id);
+    context?.treeNodesState?.delete(node.id);
   }, [node.id]);
 
   return {
@@ -124,7 +124,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     handleOpen,
     handleSelect,
     handleFilter,
-    filterValue: context?.state?.get(node.id).filter || '',
+    filterValue: context?.treeNodesState?.get(node.id).filter || '',
   };
 }
 

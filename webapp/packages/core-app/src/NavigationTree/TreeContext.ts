@@ -11,11 +11,11 @@ import { createContext } from 'react';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import type { INodeState } from './ElementsTree';
+import type { ITreeNodeState } from './ElementsTree';
 
 export interface ITreeContext {
-  state?: MetadataMap<string, INodeState>;
-  getMetadata?: (node: NavNode) => INodeState;
+  treeNodesState?: MetadataMap<string, ITreeNodeState>;
+  getTreeNodeState?: (node: NavNode) => ITreeNodeState;
   selectionTree: boolean;
   control?: React.FC<{
     node: NavNode;
