@@ -23,10 +23,6 @@ const styles = composes(
     }
   `,
   css`
-    filter-container {
-      min-width: 24px;
-      min-height: 24px;
-    }
     InputFieldNew {
       display: none;
       width: 300px;

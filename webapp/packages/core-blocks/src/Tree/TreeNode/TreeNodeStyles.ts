@@ -89,6 +89,7 @@ export const TREE_NODE_STYLES = composes(
     TreeNodeFilter {
       position: relative;
       min-width: 24px;
+      min-height: 24px;
       display: flex;
       align-items: center;
       height: 100%;
