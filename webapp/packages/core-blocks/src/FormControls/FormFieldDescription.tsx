@@ -8,6 +8,8 @@
 
 import styled, { use } from 'reshadow';
 
+import { useStyles } from '@cloudbeaver/core-theming';
+
 import { baseFormControlStyles } from './baseFormControlStyles';
 
 interface Props {
@@ -26,7 +28,7 @@ export const FormFieldDescription: React.FC<Props> = function FormFieldDescripti
   children,
   className,
 }) {
-  return styled(baseFormControlStyles)(
+  return styled(useStyles(baseFormControlStyles))(
     <field as='div' className={className} {...use({ long, short, raw })}>
       {label && <field-label as='label'>{label}</field-label>}
       <field-description as='div'>

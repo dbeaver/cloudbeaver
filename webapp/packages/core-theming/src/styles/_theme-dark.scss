@@ -33,15 +33,15 @@ $mdc-theme-text-colors: (
   dark: (
     primary: white,
     secondary: rgba(white, 0.7),
-    hint: rgba(white, 0.5),
-    disabled: rgba(white, 0.5),
-    icon: rgba(white, 0.5),
+    hint: rgba(white, 0.45),
+    disabled: rgba(white, 0.45),
+    icon: rgba(white, 0.45),
   ),
   light: (
     primary: rgba(black, 0.87),
-    secondary: rgba(black, 0.54),
-    hint: rgba(black, 0.38),
-    disabled: rgba(black, 0.38),
+    secondary: rgba(black, 0.45),
+    hint: rgba(black, 0.45),
+    disabled: rgba(black, 0.20),
     icon: rgba(black, 0.38),
   ),
 );

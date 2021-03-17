@@ -19,9 +19,6 @@ export const UNDERLINE_TAB_STYLES = composes(
   css`
     TabList {
       display: flex;
-      & tab-outer:not(:last-child) {
-        margin-right: 16px;
-      }
     }
     Tab {
       composes: theme-typography--body2 from global;
@@ -32,7 +29,7 @@ export const UNDERLINE_TAB_STYLES = composes(
       outline: none;
       opacity: 1;
       height: 30px !important;
-      padding: 0 5px !important;
+      padding: 0 14px !important;
       border-top: none !important;
       font-weight: normal !important;
       &:global([aria-selected="false"]) {

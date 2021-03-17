@@ -8,30 +8,39 @@
 
 import { css } from 'reshadow';
 
-export const baseFormControlStylesNew = css`
-  field {
-    box-sizing: border-box;
-    max-width: 100%;
-    &[|small] {
-      max-width: 250px;
-    }
-    &[|medium] {
-      max-width: 450px;
-    }
-    &[|large] {
-      max-width: 650px;
-    }
-  }
+import { composes } from '@cloudbeaver/core-theming';
 
-  field-label {
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+export const baseFormControlStylesNew = composes(
+  css`
+    field-description {
+      composes: theme-text-text-hint-on-light from global;
+    }
+  `,
+  css`
+    field {
+      box-sizing: border-box;
+      max-width: 100%;
+      &[|small] {
+        max-width: 250px;
+      }
+      &[|medium] {
+        max-width: 450px;
+      }
+      &[|large] {
+        max-width: 650px;
+      }
+    }
 
-  field-description {
-    composes: theme-typography--caption from global;
-    padding-top: 8px;
-  }
-`;
+    field-label {
+      box-sizing: border-box;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    field-description {
+      composes: theme-typography--caption from global;
+      padding-top: 4px;
+    }
+  `
+);

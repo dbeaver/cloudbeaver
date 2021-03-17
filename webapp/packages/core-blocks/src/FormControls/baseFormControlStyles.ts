@@ -8,67 +8,76 @@
 
 import { css } from 'reshadow';
 
-export const baseFormControlStyles = css`
-  field {
-    display: flex;
-    flex-wrap: wrap;
-    flex: auto;
-    box-sizing: border-box;
-    align-items: center;
-    padding: 12px;
-    min-height: 54px;
+import { composes } from '@cloudbeaver/core-theming';
 
-    & input, 
-    & textarea {
-      flex: 1;
-      min-height: 26px;
+export const baseFormControlStyles = composes(
+  css`
+    field-description {
+      composes: theme-text-text-hint-on-light from global;
     }
-  }
+  `,
+  css`
+    field {
+      display: flex;
+      flex-wrap: wrap;
+      flex: auto;
+      box-sizing: border-box;
+      align-items: center;
+      padding: 12px;
+      min-height: 54px;
 
-  field-label {
-    composes: theme-typography--body1 from global;
-    box-sizing: border-box;
-    width: 180px;
-    text-align: right;
-    padding: 0 16px;
-    line-height: 16px;
-    font-weight: 500;
-  }
+      & input, 
+      & textarea {
+        flex: 1;
+        min-height: 26px;
+      }
+    }
 
-  field-description {
-    composes: theme-typography--caption from global;
-    flex-basis: 100%;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 180px;
-  }
+    field-label {
+      composes: theme-typography--body1 from global;
+      box-sizing: border-box;
+      width: 180px;
+      text-align: right;
+      padding: 0 16px;
+      line-height: 16px;
+      font-weight: 500;
+    }
+
+    field-description {
+      composes: theme-typography--caption from global;
+      flex-basis: 100%;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      padding-left: 180px;
+    }
   
-  field[|raw] {
-    & field-description {
-      padding: 0;
+    field[|raw] {
+      & field-description {
+        padding: 0;
+      }
     }
-  }
   
-  field[|long] {
-    & field-label {
-      width: 200px;
+    field[|long] {
+      & field-label {
+        width: 200px;
+      }
+      & field-description {
+        padding-left: 200px;
+      }
     }
-    & field-description {
-      padding-left: 200px;
-    }
-  }
 
-  field[|short] {
-    & field-label {
-      width: auto;
+    field[|short] {
+      & field-label {
+        width: auto;
+      }
+      & field-description {
+        padding-left: auto;
+      }
     }
-    & field-description {
-      padding-left: auto;
-    }
-  }
   
-  field-label + field-description {
-    padding-left: 0!important;
-    flex-basis: auto;
-  }
-`;
+    field-label + field-description {
+      padding-left: 0!important;
+      flex-basis: auto;
+    }
+  `
+);
