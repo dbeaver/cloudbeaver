@@ -190,11 +190,12 @@ export const TableViewer = observer(function TableViewer({
     : null;
 
   const resultExist = dataModel.source.hasResult(resultIndex);
+  const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
   const valuePanelDisplayed = valuePresentation
   && (valuePresentation.dataFormat === undefined
     || valuePresentation?.dataFormat === dataFormat)
+  && overlay
   && resultExist;
-  const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
   const loading = dataModel.isLoading();
 
   return styled(styles)(

@@ -69,10 +69,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       return;
     }
     const format = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
-    const columnIndex = tableDataContext?.getDataColumnIndexFromKey(column.key);
+    const columnIndex = tableDataContext?.getDataColumnIndexFromKey(column.key) ?? null;
 
     if (
-      !columnIndex
+      columnIndex === null
       || format?.isReadOnly({
         row: rowIdx,
         column: columnIndex,

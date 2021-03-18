@@ -23,14 +23,14 @@ export class ResultSetFormatAction implements IDatabaseDataFormatAction<IResultS
   }
 
   isReadOnly(key: IResultSetElementKey): boolean {
-    let columnReadonly = true;
-    let cellReadonly = true;
+    let columnReadonly = false;
+    let cellReadonly = false;
 
-    if (key.column && this.result.data?.columns) {
+    if (key.column !== undefined && this.result.data?.columns) {
       columnReadonly = this.result.data.columns[key.column].readOnly;
     }
 
-    if (key.row && key.column && this.result.data?.rows) {
+    if (key.row !== undefined && key.column !== undefined && this.result.data?.rows) {
       const value = this.result.data.rows[key.row][key.column];
       cellReadonly = this.isValueReadonly(value);
     }

@@ -84,10 +84,6 @@ export class ObjectViewerTabService {
     const tab = this.navigationTabsService.findTab(
       isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId)
     );
-    let tabToSwitch: {
-      page: ObjectPage<any>;
-      state: any;
-    } | null = null;
 
     if (tab) {
       tab.handlerState.tabIcon = nodeInfo.icon;
@@ -120,20 +116,19 @@ export class ObjectViewerTabService {
       return this.dbObjectPageService.getPage(pageId);
     };
 
-    const canSwitchPage = (page: ObjectPage<any>) => {
-      if (!tabInfo.tab) {
-        return false;
-      }
-
-      return this.dbObjectPageService.canSwitchPage(tabInfo.tab, page);
+    let tabToSwitch: {
+      page: ObjectPage<any> | undefined;
+      state?: any;
+    } = {
+      page: getPage(),
     };
 
-    const trySwitchPage = <T>(page: ObjectPage<T>, state?: T) => {
-      if (!tabInfo.tab) {
-        return false;
-      }
+    const canSwitchPage = (
+      page: ObjectPage<any>
+    ) => !tabToSwitch.page || this.dbObjectPageService.canSwitchPage(tabToSwitch.page, page);
 
-      if (this.dbObjectPageService.canSwitchPage(tabInfo.tab, page)) {
+    const trySwitchPage = <T>(page: ObjectPage<T>, state?: T) => {
+      if (!tabToSwitch.page || this.dbObjectPageService.canSwitchPage(tabToSwitch.page, page)) {
         tabToSwitch = {
           page,
           state,
@@ -145,14 +140,14 @@ export class ObjectViewerTabService {
     };
 
     const switchPage = <T>(page?: ObjectPage<T>, state?: T) => {
-      if (!tabInfo.tab || (!page && !tabToSwitch)) {
+      if (!tabInfo.tab || (!page && !tabToSwitch.page)) {
         return false;
       }
 
       return this.dbObjectPageService.trySwitchPage(
         tabInfo.tab,
-        page || tabToSwitch!.page,
-        state || tabToSwitch?.state
+        page || tabToSwitch.page!,
+        state || tabToSwitch.state
       );
     };
 

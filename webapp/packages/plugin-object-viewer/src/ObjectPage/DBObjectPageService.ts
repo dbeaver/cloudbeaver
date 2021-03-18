@@ -47,9 +47,7 @@ export class DBObjectPageService {
     return tab.handlerState.pagesState[pageKey];
   }
 
-  canSwitchPage(tab: ITab<IObjectViewerTabState>, page: ObjectPage<any>): boolean {
-    const currentPage = this.getPage(tab.handlerState.pageId);
-
+  canSwitchPage(currentPage: ObjectPage<any>, page: ObjectPage<any>): boolean {
     if ((currentPage?.priority || 0) < page.priority) {
       return true;
     }
@@ -57,7 +55,9 @@ export class DBObjectPageService {
   }
 
   trySwitchPage<T>(tab: ITab<IObjectViewerTabState>, page: ObjectPage<T>, state?: T): boolean {
-    const canSwitch = this.canSwitchPage(tab, page);
+    const currentPage = this.getPage(tab.handlerState.pageId);
+
+    const canSwitch = !currentPage || this.canSwitchPage(currentPage, page);
 
     if (canSwitch) {
       this.selectPage(tab, page, state);
