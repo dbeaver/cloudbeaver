@@ -22,6 +22,16 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 20.0.5 - 2021-03-18
+
+- New design for the connection form
+- Possibility to edit connections created manually in the public part of the application
+- SSH support for connections in public part of the application
+- Possibility to deny credentials saving
+- Drivers for SQL Server, Oracle, DB2 LUW, Derby, Trino
+- Performance improvements for data grid
+- A lot of minor UI fixes and improvements
+
 ### CloudBeaver 20.0.3 - 2021-02-10
 
 - New drivers are included in CloudBeaver CE: Oracle, MS SQL Server, DB2 LUW, Derby, Trino (Presto SQL) 
