@@ -44,10 +44,6 @@ export const NavigationNode: React.FC<Props> = observer(function NavigationNode(
 
   const Control = control || NavigationNodeControl;
 
-  if (!!context?.filterValue && !node.name?.toLowerCase().includes(context.filterValue.toLowerCase())) {
-    return null;
-  }
-
   return (
     <TreeNode
       loading={loading}
