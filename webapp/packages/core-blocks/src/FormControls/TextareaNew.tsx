@@ -107,6 +107,7 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
         role='new'
         value={value ?? ''}
         name={name}
+        data-embedded={embedded}
         onChange={handleChange}
         {...use({ mod })}
       />

@@ -33,16 +33,17 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
   const selectedCells = selection.getSelectedElements();
+  const focusCell = selection.getFocusedElement();
 
   let value: any;
   let stringValue: string | undefined;
   let firstSelectedCell: Required<IResultSetElementKey> | undefined;
   let readonly = true;
 
-  if (result?.data?.rows && selectedCells.length > 0) {
+  if (result?.data?.rows && (selectedCells.length > 0 || focusCell)) {
     const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
-    firstSelectedCell = selectedCells[0];
+    firstSelectedCell = selectedCells[0] || focusCell;
     value = model.source
       .getEditor(resultIndex)
       .getCell(firstSelectedCell.row, firstSelectedCell.column);

@@ -119,14 +119,10 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     const key = tableData.getColumnKeyFromColumnIndex(position.idx);
     const column = tableData.getColumnInfo(key);
 
-    if (column) {
-      selectionAction.focus({
-        row: position.rowIdx,
-        column: key,
-      });
-    } else {
-      selectionAction.focus(null);
-    }
+    selectionAction.focus({
+      row: position.rowIdx,
+      column: column ? key : 0,
+    });
 
     if (!editingContext.isEditing(position)) {
       editingContext.close();
