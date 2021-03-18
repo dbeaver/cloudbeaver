@@ -57,9 +57,6 @@
 
   input[role="new"],
   textarea[role="new"] {
-    @include mdc-theme-prop(color, on-secondary, false);
-    @include mdc-theme-prop(border-color, background, false);
-    @include mdc-theme-prop(background-color, input-background, false);
     box-sizing: border-box;
     padding: 7px 11px;
     font-size: 12px;
@@ -67,6 +64,11 @@
     border: 2px solid;
     outline: none;
     border-radius: 3px;
+
+    @include mdc-theme-prop(color, on-secondary, false);
+    @include mdc-theme-prop(border-color, background, false);
+    @include mdc-theme-prop(background-color, input-background, false);
+
     &:focus {
       @include mdc-theme-prop(border-color, primary, false);
     }
@@ -87,8 +89,11 @@
       opacity: 0.7;
     }
     &:global([data-embedded]) {
-      @include mdc-theme-prop(border-color, background, false);
-      @include mdc-theme-prop(background-color, input-background, false);
+      &:global([disabled]),
+      &:global([readonly]) {
+        @include mdc-theme-prop(border-color, background, false);
+        @include mdc-theme-prop(background-color, input-background, false);
+      }
     }
   }
 
