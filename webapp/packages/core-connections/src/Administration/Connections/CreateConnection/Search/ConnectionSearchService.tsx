@@ -52,7 +52,7 @@ export class ConnectionSearchService {
   }
 
   async load(): Promise<void> {
-    if (this.administrationScreenService.isConfigurationMode) {
+    if (this.administrationScreenService.isConfigurationMode && this.databases.length === 0) {
       await this.search();
     }
   }

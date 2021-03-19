@@ -10,7 +10,7 @@ import { observable, makeObservable } from 'mobx';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer';
 
-export class TabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never>
+export class TabsContainer<TProps = void, TOptions extends Record<string, any> = never>
 implements ITabsContainer<TProps, TOptions> {
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
 
@@ -19,12 +19,40 @@ implements ITabsContainer<TProps, TOptions> {
       .sort((a, b) => a.order - b.order);
   }
 
+  get selectedId(): string | null {
+    return this.currentTabId;
+  }
+
+  private currentTabId: string | null;
+
   constructor() {
-    makeObservable(this, {
+    makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,
+      currentTabId: observable,
     });
 
     this.tabInfoMap = new Map();
+    this.currentTabId = null;
+  }
+
+  select(tabId: string | null, props: TProps): void {
+    if (tabId === null) {
+      this.currentTabId = tabId;
+      return;
+    }
+
+    const info = this.getTabInfo(tabId);
+
+    if (!info) {
+      return;
+    }
+
+    info.onOpen?.({
+      tabId,
+      props,
+    });
+
+    this.currentTabId = tabId;
   }
 
   getTabInfo(tabId: string): ITabInfo<TProps, TOptions> | undefined {

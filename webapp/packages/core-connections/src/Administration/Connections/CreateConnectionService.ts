@@ -28,7 +28,7 @@ export class CreateConnectionService {
   disabled = false;
   data: IConnectionFormDataOptions | null;
 
-  readonly tabsContainer: TabsContainer<any, ICreateMethodOptions>;
+  readonly tabsContainer: TabsContainer<void, ICreateMethodOptions>;
 
   constructor(
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
@@ -66,7 +66,7 @@ export class CreateConnectionService {
     return this.tabsContainer.tabInfoList[0].key;
   }
 
-  setCreateMethod(method?: string): void {
+  setCreateMethod(method?: string | null): void {
     if (!method) {
       const id = this.getDefault();
 
@@ -75,7 +75,7 @@ export class CreateConnectionService {
       }
       method = id;
     }
-    this.connectionsAdministrationNavService.navToCreate(method);
+    this.activateMethod(method);
   }
 
   cancelCreate(): void {
@@ -89,7 +89,7 @@ export class CreateConnectionService {
       return;
     }
 
-    this.connectionsAdministrationNavService.navToCreate(defaultId);
+    this.activateMethod(defaultId);
   }
 
   setConnectionTemplate(config: ConnectionConfig, availableDrivers: string[]): void {
@@ -108,5 +108,10 @@ export class CreateConnectionService {
     for (const method of this.tabsContainer.tabInfoList) {
       method.options?.close?.();
     }
+  }
+
+  private activateMethod(method: string) {
+    this.tabsContainer.select(method);
+    this.connectionsAdministrationNavService.navToCreate(method);
   }
 }

@@ -17,7 +17,9 @@ import { useObjectRef } from '../useObjectRef';
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { TabsContext, ITabsContext } from './TabsContext';
 
-type Props<T = Record<string, any>> = T & React.PropsWithChildren<{
+type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
+
+type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWithChildren<{
   selectedId?: string;
   orientation?: 'horizontal' | 'vertical';
   currentTabId?: string | null;
@@ -42,12 +44,13 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   onClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
+  const props = rest as any as T;
   if (
     !selectedId
     && currentTabId === undefined
     && container
   ) {
-    const displayed = container.getDisplayed(rest as T);
+    const displayed = container.getDisplayed(props);
 
     if (displayed.length > 0) {
       selectedId = displayed[0].key;
@@ -68,14 +71,14 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const dynamic = useObjectRef({
     open: onOpen,
     close: onClose,
-    props: rest as T,
+    props,
     container,
     state,
     selectedId: selectedId || currentTabId,
   }, {
     open: onOpen,
     close: onClose,
-    props: rest as T,
+    props,
     container,
     state,
   });
@@ -114,7 +117,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
     openExecutor.execute({
       tabId: state.selectedId!,
-      props: rest as T,
+      props,
     });
   }, [state.selectedId]);
 
@@ -133,7 +136,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const value = useMemo<ITabsContext<T>>(() => ({
     state,
     tabsState,
-    props: rest as T,
+    props,
     container,
     openExecutor,
     closeExecutor,

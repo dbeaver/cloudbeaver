@@ -75,6 +75,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     if (!param) {
       this.createConnectionService.setCreateMethod();
     }
+    this.createConnectionService.setCreateMethod(param);
   }
 
   private async deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {

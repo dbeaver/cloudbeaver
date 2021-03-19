@@ -45,7 +45,8 @@ export interface ITabInfo<
 }
 
 export interface ITabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
-  tabInfoList: Array<ITabInfo<TProps, TOptions>>;
+  readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
+  readonly selectedId: string | null;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
 }
