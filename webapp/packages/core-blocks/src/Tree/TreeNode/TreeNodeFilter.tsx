@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -60,13 +60,29 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
   disabled,
   className,
 }) {
-  const [inputRef] = useFocus<HTMLInputElement>({});
   const context = useContext(TreeNodeContext);
-  const [filterEnabled, setFilterEnabled] = useState(!!context?.filterValue);
+  const [inputRef] = useFocus<HTMLInputElement>({});
+  const [filterEnabled, setFilterEnabled] = useState(false);
 
   if (!context) {
     throw new Error('Context not provided');
   }
+
+  const onFilterEnabledChange = useCallback(() => {
+    setFilterEnabled(prev => {
+      if (prev) {
+        context.filter('');
+      }
+
+      return !prev;
+    });
+  }, [context]);
+
+  const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+      event.stopPropagation();
+    }
+  }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -83,6 +99,8 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
     }
   }, [filterEnabled]);
 
+  useEffect(() => () => context.filter(''), []);
+
   return styled(useStyles(styles))(
     <filter-container as='div' className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
       <InputFieldNew
@@ -91,9 +109,10 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
         disabled={disabled}
         value={context.filterValue}
         {...use({ filterEnabled })}
+        onKeyDown={onKeyDown}
         onChange={value => context.filter(value.trim())}
       />
-      <IconButton name='search' disabled={disabled} onClick={() => setFilterEnabled(!filterEnabled)} {...use({ filterEnabled })} />
+      <IconButton name='search' disabled={disabled} onClick={onFilterEnabledChange} {...use({ filterEnabled })} />
     </filter-container>
   );
 };
