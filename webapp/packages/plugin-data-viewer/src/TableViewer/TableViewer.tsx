@@ -205,6 +205,7 @@ export const TableViewer = observer(function TableViewer({
         <TablePresentationBar
           type={DataPresentationType.main}
           presentationId={presentation.id}
+          dataFormat={dataFormat}
           supportedDataFormat={dataModel.supportedDataFormats}
           model={dataModel}
           resultIndex={resultIndex}
@@ -258,6 +259,7 @@ export const TableViewer = observer(function TableViewer({
         <TablePresentationBar
           type={DataPresentationType.toolsPanel}
           presentationId={valuePresentationId ?? null}
+          dataFormat={dataFormat}
           supportedDataFormat={[dataFormat]}
           model={dataModel}
           resultIndex={resultIndex}

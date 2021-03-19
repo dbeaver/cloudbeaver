@@ -50,6 +50,7 @@ const styles = composes(
 interface Props {
   type: DataPresentationType;
   presentationId: string | null | undefined;
+  dataFormat: ResultDataFormat;
   supportedDataFormat: ResultDataFormat[];
   model: IDatabaseDataModel<any>;
   resultIndex: number;
@@ -61,6 +62,7 @@ export const TablePresentationBar = observer(function TablePresentationBar({
   type,
   presentationId,
   supportedDataFormat,
+  dataFormat,
   model,
   resultIndex,
   className,
@@ -68,7 +70,13 @@ export const TablePresentationBar = observer(function TablePresentationBar({
 }: Props) {
   const style = useStyles(styles, verticalRotatedTabStyles);
   const dataPresentationService = useService(DataPresentationService);
-  const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, model, resultIndex);
+  const presentations = dataPresentationService.getSupportedList(
+    type,
+    supportedDataFormat,
+    dataFormat,
+    model,
+    resultIndex
+  );
   const Tab = PresentationTab; // alias for styles matching
   const changePresentation = ({ tabId }: ITabData<any>) => onPresentationChange(tabId);
 

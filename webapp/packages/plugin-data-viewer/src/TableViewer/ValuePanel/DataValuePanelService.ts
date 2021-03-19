@@ -36,7 +36,12 @@ export class DataValuePanelService {
   }
 
   getDisplayed(props?: IDataValuePanelProps<any>): Array<ITabInfo<IDataValuePanelProps<any>, IDataValuePanelOptions>> {
-    return this.tabs.getDisplayed(props);
+    return this.tabs.getDisplayed(props).filter(
+      info => (
+        (props?.dataFormat === undefined || props.dataFormat === null)
+        || info.options?.dataFormat.includes(props.dataFormat)
+      )
+    );
   }
 
   add(tabInfo: ITabInfoOptions<IDataValuePanelProps<any>, IDataValuePanelOptions>): void {

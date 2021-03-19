@@ -74,17 +74,18 @@ export class DataPresentationService {
 
   getSupportedList(
     type: DataPresentationType,
-    dataFormat: ResultDataFormat[],
+    supportedDataFormats: ResultDataFormat[],
+    dataFormat: ResultDataFormat,
     model: IDatabaseDataModel<any>,
     resultIndex: number,
   ): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
-      if (presentation.type !== type || presentation.hidden?.(null, model, resultIndex)) {
+      if (presentation.type !== type || presentation.hidden?.(dataFormat, model, resultIndex)) {
         return false;
       }
 
       return presentation.dataFormat === undefined
-        || dataFormat.includes(presentation.dataFormat);
+        || supportedDataFormats.includes(presentation.dataFormat);
     });
   }
 
@@ -99,6 +100,9 @@ export class DataPresentationService {
       const presentation = this.dataPresentations.get(presentationId);
 
       if (presentation) {
+        if (presentation.hidden?.(dataFormat, model, resultIndex)) {
+          return null;
+        }
         return presentation;
       }
     }
