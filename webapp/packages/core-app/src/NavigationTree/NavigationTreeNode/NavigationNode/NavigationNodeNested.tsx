@@ -44,7 +44,7 @@ export const NavigationNodeNested: React.FC<Props> = observer(function Navigatio
       return [];
     }
 
-    const childrenEntities = navNodeInfo.get(resourceKeyList(childrenInfo.children)).slice().filter(isDefined);
+    const childrenEntities = navNodeInfo.get(resourceKeyList(childrenInfo.children)).filter(isDefined);
 
     if (!context?.filterValue) {
       return childrenEntities;
