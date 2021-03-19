@@ -20,6 +20,8 @@ import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,7 @@ public class AdminServerConfig {
     private boolean customConnectionsEnabled;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
+    private final List<String> enabledAuthProviders;
 
     private long sessionExpireTime;
 
@@ -51,6 +54,11 @@ public class AdminServerConfig {
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
         this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
         this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+        if (params.containsKey("enabledAuthProviders")) {
+            this.enabledAuthProviders = JSONUtils.getStringList(params, "enabledAuthProviders");
+        } else {
+            this.enabledAuthProviders = Arrays.asList(appConfig.getEnabledAuthProviders());
+        }
 
         this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
     }
@@ -105,5 +113,9 @@ public class AdminServerConfig {
 
     public void setSessionExpireTime(long sessionExpireTime) {
         this.sessionExpireTime = sessionExpireTime;
+    }
+
+    public List<String> getEnabledAuthProviders() {
+        return enabledAuthProviders;
     }
 }

@@ -42,6 +42,7 @@ public class CBAppConfig {
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
     private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
+    private String[] enabledAuthProviders = new String[0];
     private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
 
@@ -111,6 +112,18 @@ public class CBAppConfig {
 
     public String getDefaultAuthProvider() {
         return defaultAuthProvider;
+    }
+
+    public void setDefaultAuthProvider(String defaultAuthProvider) {
+        this.defaultAuthProvider = defaultAuthProvider;
+    }
+
+    public String[] getEnabledAuthProviders() {
+        return enabledAuthProviders;
+    }
+
+    public void setEnabledAuthProviders(String[] enabledAuthProviders) {
+        this.enabledAuthProviders = enabledAuthProviders;
     }
 
     public DBNBrowseSettings getDefaultNavigatorSettings() {

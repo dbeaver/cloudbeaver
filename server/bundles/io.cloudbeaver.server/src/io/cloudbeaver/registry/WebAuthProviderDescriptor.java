@@ -38,8 +38,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     private final IConfigurationElement cfg;
 
-    private ObjectType implType;
-    private DBWAuthProvider instance;
+    private final ObjectType implType;
+    private DBWAuthProvider<?> instance;
     private final DBPImage icon;
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
     private final Map<String, WebAuthProviderPropertyDescriptor> credentialParameters = new LinkedHashMap<>();
