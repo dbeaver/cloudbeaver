@@ -21,7 +21,7 @@ const styles = composes(
     wizard-stepper {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     }
-    actions, wizard-step {
+    actions {
       composes: theme-border-color-background from global;
     }
   `,
@@ -38,7 +38,7 @@ const styles = composes(
       flex-shrink: 0;
     }
 
-    actions, wizard-step {
+    actions {
       border-right: solid 1px;
     }
 
@@ -48,13 +48,13 @@ const styles = composes(
       }
     }
 
-    actions, wizard-text, wizard-step {
+    actions, wizard-text {
       display: flex;
       align-items: center;
       height: 28px;
     }
 
-    wizard-text, wizard-step {
+    wizard-text {
       padding: 0 16px;
     }
   `
@@ -83,7 +83,6 @@ export const WizardStepper = observer(function WizardStepper() {
           {translate(service.currentStepIndex === service.steps.length - 1 ? 'ui_stepper_finish' : 'ui_stepper_next')}
         </Button>
       </actions>
-      {service.stepsToFinish.length > 1 && <wizard-step as='div'>{service.finishedSteps.length} / {service.stepsToFinish.length}</wizard-step>}
       <wizard-text as='div'>{translate(service.currentStep?.configurationWizardOptions?.description || '')}</wizard-text>
     </wizard-stepper>
   );
