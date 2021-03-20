@@ -410,9 +410,11 @@ public class CBApplication extends BaseApplicationImpl {
 
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
 
+            // App config
             gson.fromJson(
                 gson.toJsonTree(JSONUtils.getObject(configProps, "app")), CBAppConfig.class);
 
+            // Database config
             gson.fromJson(
                 gson.toJsonTree(JSONUtils.getObject(serverConfig, "database")), CBDatabaseConfig.class);
 

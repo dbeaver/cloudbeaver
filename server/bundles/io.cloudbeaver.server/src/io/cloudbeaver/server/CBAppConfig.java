@@ -17,6 +17,8 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
@@ -42,7 +44,7 @@ public class CBAppConfig {
     private String[] enabledDrivers = new String[0];
     private String[] disabledDrivers = new String[0];
     private String defaultAuthProvider = LocalAuthProvider.PROVIDER_ID;
-    private String[] enabledAuthProviders = new String[0];
+    private String[] enabledAuthProviders = null;
     private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
 
@@ -119,6 +121,11 @@ public class CBAppConfig {
     }
 
     public String[] getEnabledAuthProviders() {
+        if (enabledAuthProviders == null) {
+            // No config - enable all providers (+backward compatibility)
+            return WebServiceRegistry.getInstance().getAuthProviders()
+                .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
+        }
         return enabledAuthProviders;
     }
 

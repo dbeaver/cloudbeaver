@@ -356,6 +356,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
             appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
+            if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
+                // All of them
+                appConfig.setEnabledAuthProviders(new String[0]);
+            } else {
+                appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
+            }
 
             appConfig.setDefaultNavigatorSettings(
                 CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());

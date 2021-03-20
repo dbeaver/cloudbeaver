@@ -151,4 +151,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             .toArray(WebAuthProviderInfo[]::new);
     }
 
+    @Override
+    public String[] getEnabledAuthProviders(@NotNull WebSession webSession) {
+        return CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
+    }
+
 }
