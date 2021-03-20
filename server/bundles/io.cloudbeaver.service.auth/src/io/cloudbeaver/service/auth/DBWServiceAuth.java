@@ -48,6 +48,4 @@ public interface DBWServiceAuth extends DBWService {
     @WebAction(requirePermissions = {})
     WebAuthProviderInfo[] getAuthProviders(@NotNull WebSession webSession);
 
-    @WebAction(requirePermissions = {})
-    String[] getEnabledAuthProviders(@NotNull WebSession webSession);
 }

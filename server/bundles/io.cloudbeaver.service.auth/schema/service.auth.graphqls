@@ -83,6 +83,4 @@ extend type Query {
 
     authProviders: [AuthProviderInfo!]!
 
-    enabledAuthProviders: [ID!]!
-
 }

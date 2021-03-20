@@ -16,10 +16,12 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
@@ -115,6 +117,11 @@ public class WebServerConfig {
     @Property
     public String getLocalHostAddress() {
         return application.getLocalHostAddress();
+    }
+
+    @Property
+    public String[] getEnabledAuthProviders(@NotNull WebSession webSession) {
+        return application.getAppConfiguration().getEnabledAuthProviders();
     }
 
     @Property

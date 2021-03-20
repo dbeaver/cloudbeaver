@@ -107,6 +107,7 @@ type ServerConfig {
     configurationMode: Boolean
     developmentMode: Boolean
 
+    enabledAuthProviders: [ID!]!
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
