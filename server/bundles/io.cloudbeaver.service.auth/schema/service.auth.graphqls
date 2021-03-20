@@ -32,7 +32,7 @@ type AuthProviderInfo {
 
 type UserAuthToken {
     # Auth provider used for autgorization
-    provider: ID!
+    authProvider: ID!
 
     # Authorization time
     loginTime: DateTime!
