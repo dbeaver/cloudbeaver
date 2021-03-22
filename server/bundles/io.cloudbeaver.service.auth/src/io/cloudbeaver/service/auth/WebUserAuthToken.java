@@ -16,40 +16,42 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
-import org.jkiss.dbeaver.Log;
+import io.cloudbeaver.model.user.WebUserOriginInfo;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.OffsetDateTime;
 
 /**
  * WebUserInfo
  */
-public class WebUserInfo {
-
-    private static final Log log = Log.getLog(WebUserInfo.class);
+public class WebUserAuthToken {
 
     private final WebSession session;
     private final WebUser user;
+    private final WebAuthInfo authInfo;
 
-    public WebUserInfo(WebSession session, WebUser user) {
+    public WebUserAuthToken(WebSession session, WebUser user, WebAuthInfo authInfo) {
         this.session = session;
         this.user = user;
+        this.authInfo = authInfo;
     }
 
-    public String getUserId() {
-        return user.getUserId();
+    public String getAuthProvider() {
+        return authInfo.getAuthProvider().getId();
     }
 
-    public String getDisplayName() {
-        return user.getDisplayName();
+    public OffsetDateTime getLoginTime() {
+        return authInfo.getLoginTime();
     }
 
-    public List<WebUserAuthToken> getAuthTokens() {
-        return session.getAllAuthInfo().stream()
-            .map(ai -> new WebUserAuthToken(session, user, ai))
-            .collect(Collectors.toList());
+    public String getMessage() {
+        return authInfo.getMessage();
+    }
+
+    public WebUserOriginInfo getOrigin() {
+        return new WebUserOriginInfo(session, user, authInfo.getAuthProvider());
     }
 
 }
