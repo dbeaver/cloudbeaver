@@ -297,6 +297,11 @@ public class WebConnectionInfo {
         this.savedNetworkCredentials = networkCredentials;
     }
 
+    public void clearSavedCredentials() {
+        this.savedAuthProperties = null;
+        this.savedNetworkCredentials = null;
+    }
+
     @Property
     public Map<String, String> getProviderProperties() {
         return dataSourceContainer.getConnectionConfiguration().getProviderProperties();

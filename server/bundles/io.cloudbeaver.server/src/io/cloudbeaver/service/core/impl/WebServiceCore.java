@@ -260,8 +260,6 @@ public class WebServiceCore implements DBWServiceCore {
         if (dataSourceContainer.isConnected()) {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
         }
-//
-//        WebServiceUtils.initAuthProperties(dataSourceContainer, authProperties);
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
@@ -270,7 +268,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
-            connectionInfo.setSavedCredentials(null, null);
+            connectionInfo.clearSavedCredentials();
         }
         // Mark all specified network configs as saved
         if (networkCredentials != null) {
@@ -288,8 +286,13 @@ public class WebServiceCore implements DBWServiceCore {
         }
         if (saveCredentials != null && saveCredentials) {
             // Save all passed credentials in the datasource container
+            WebServiceUtils.saveAuthProperties(
+                dataSourceContainer,
+                dataSourceContainer.getConnectionConfiguration(),
+                authProperties,
+                true);
+
             WebServiceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
-            dataSourceContainer.setSavePassword(true);
             dataSourceContainer.persistConfiguration();
         }
 
@@ -519,7 +522,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
-            connectionInfo.setSavedCredentials(null, null);
+            connectionInfo.clearSavedCredentials();
         }
 
         return connectionInfo;
