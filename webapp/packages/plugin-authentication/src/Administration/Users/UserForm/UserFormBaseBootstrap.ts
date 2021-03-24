@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { ConnectionAccess } from './ConnectionAccess';
@@ -32,7 +33,7 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'origin',
       order: 2,
-      isHidden: (tabId, props) => props?.user.origin.type === 'local',
+      isHidden: (tabId, props) => props?.user.origin.type === AUTH_PROVIDER_LOCAL_ID,
       panel: () => OriginInfo,
       tab: () => OriginInfoTab,
     });

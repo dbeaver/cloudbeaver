@@ -63,13 +63,14 @@ export const Loader: React.FC<Props> = observer(function Loader({
   children,
   onCancel,
 }) {
-  let loaded = loading;
+  let loaded = !loading;
   if (state) {
     state = Array.isArray(state) ? state : [state];
 
     for (const element of state) {
       if ('loading' in element) {
         loading = element.loading;
+        loaded = !loading;
       } else if ('isLoading' in element) {
         loaded = element.isLoaded();
         loading = element.isLoading() || !loaded;

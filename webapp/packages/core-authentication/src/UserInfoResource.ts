@@ -30,10 +30,6 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
   }
 
   async login(provider: string, credentials: Record<string, string>): Promise<UserAuthInfo> {
-    if (this.data) {
-      throw new Error('User already logged in');
-    }
-
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
     const { user } = await this.graphQLService.sdk.authLogin({

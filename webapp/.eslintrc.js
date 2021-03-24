@@ -85,7 +85,7 @@ module.exports = {
         ignoreTrailingComments: true,
         ignoreStrings: true,
         ignoreTemplateLiterals: true,
-        ignorePattern: "^export\\s(const\\s\\w+:?.+=.+function\\s|function\\s)\\w+\\s*\\(\\s*\\{$"
+        ignorePattern: "^export\\s(const\\s\\w+:?.+=.+function\\s|function\s)\\w+\\s*\\(.*\\{$"
       }
     ],
     'import-helpers/order-imports': [
