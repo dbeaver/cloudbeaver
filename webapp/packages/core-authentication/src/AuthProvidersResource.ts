@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsResource } from '@cloudbeaver/core-root';
+import { PermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
@@ -20,11 +20,20 @@ export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>;
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], void> {
   constructor(
     private graphQLService: GraphQLService,
-    private permissionsResource: PermissionsResource
+    private permissionsResource: PermissionsResource,
+    private serverConfigResource: ServerConfigResource
   ) {
     super([]);
 
     this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
+  }
+
+  getEnabledProviders(): string[] {
+    return this.serverConfigResource.data?.enabledAuthProviders ?? [];
+  }
+
+  isEnabled(id: string): boolean {
+    return this.serverConfigResource.data?.enabledAuthProviders.includes(id) ?? false;
   }
 
   protected async loader(): Promise<AuthProvider[]> {

@@ -28,9 +28,33 @@ export class AdministrationItemService {
     });
   }
 
+  getUniqueItems(configurationWizard: boolean): IAdministrationItem[] {
+    const items: IAdministrationItem[] = [];
+
+    const orderedByPriority = this.items.slice()
+      .sort((a, b) => {
+        if (a.replace && b.replace) {
+          return (b.replace.priority ?? Number.MIN_SAFE_INTEGER) - (a.replace.priority ?? Number.MIN_SAFE_INTEGER);
+        }
+        return 0;
+      })
+      .filter(item => !item.replace?.condition || item.replace.condition(configurationWizard));
+
+    let lastItem: IAdministrationItem | null = null;
+    for (const item of orderedByPriority) {
+      if (lastItem?.name === item.name) {
+        continue;
+      }
+      items.push(item);
+      lastItem = item;
+    }
+
+    return items;
+  }
+
   getActiveItems(configurationWizard: boolean): IAdministrationItem[] {
-    return this.items.filter(item =>
-      filterHiddenAdministrationItem(item)
+    return this.getUniqueItems(configurationWizard).filter(item =>
+      filterHiddenAdministrationItem(configurationWizard)(item)
       && filterConfigurationWizard(configurationWizard)(item)
     ).sort(orderAdministrationItems(configurationWizard));
   }
@@ -42,7 +66,7 @@ export class AdministrationItemService {
       return null;
     }
 
-    const onlyActive = items.find(filterOnlyActive);
+    const onlyActive = items.find(filterOnlyActive(configurationWizard));
 
     if (onlyActive) {
       return onlyActive.name;
@@ -60,11 +84,7 @@ export class AdministrationItemService {
   }
 
   getItem(name: string, configurationWizard: boolean): IAdministrationItem | null {
-    const item = this.items.find(item => (
-      filterHiddenAdministrationItem(item)
-      && filterConfigurationWizard(configurationWizard)(item)
-      && item.name === name
-    ));
+    const item = this.getActiveItems(configurationWizard).find(item => item.name === name);
 
     if (!item) {
       return null;
@@ -82,7 +102,7 @@ export class AdministrationItemService {
     return sub;
   }
 
-  create(options: IAdministrationItemOptions, replace?: boolean): void {
+  create(options: IAdministrationItemOptions): void {
     const type = options.type ?? AdministrationItemType.Administration;
 
     const existedIndex = this.items.findIndex(item => item.name === options.name && (
@@ -91,7 +111,7 @@ export class AdministrationItemService {
       || type === AdministrationItemType.Default
     ));
 
-    if (!replace && existedIndex !== -1) {
+    if (!options.replace && existedIndex !== -1) {
       throw new Error(`Administration item "${options.name}" already exists in the same visibility scope`);
     }
 
@@ -101,11 +121,7 @@ export class AdministrationItemService {
       sub: options.sub ?? [],
       order: options.order ?? Number.MAX_SAFE_INTEGER,
     };
-    if (replace && existedIndex !== -1) {
-      this.items.splice(existedIndex, 1, item);
-    } else {
-      this.items.push(item);
-    }
+    this.items.push(item);
   }
 
   async activate(
@@ -113,12 +129,16 @@ export class AdministrationItemService {
     configurationWizard: boolean,
     outside: boolean
   ): Promise<void> {
-    const item = this.getItem(screen.item, configurationWizard);
-    if (!item) {
-      return;
+    if (configurationWizard) {
+      const items = this.getActiveItems(configurationWizard);
+
+      for (const item of items) {
+        await item.configurationWizardOptions?.onLoad?.();
+      }
     }
 
-    if (!filterHiddenAdministrationItem(item)) {
+    const item = this.getItem(screen.item, configurationWizard);
+    if (!item) {
       return;
     }
 
@@ -139,10 +159,6 @@ export class AdministrationItemService {
       return;
     }
 
-    if (!filterHiddenAdministrationItem(item)) {
-      return;
-    }
-
     await item.onDeActivate?.(configurationWizard, outside);
 
     if (screen.sub) {
@@ -157,10 +173,6 @@ export class AdministrationItemService {
   ): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
-      return false;
-    }
-
-    if (!filterHiddenAdministrationItem(item)) {
       return false;
     }
 
@@ -179,18 +191,22 @@ export class AdministrationItemService {
   }
 }
 
-export function filterHiddenAdministrationItem(item: IAdministrationItem): boolean {
-  if (typeof item.isHidden === 'function') {
-    return !item.isHidden();
-  }
+export function filterHiddenAdministrationItem(configurationWizard: boolean): (item: IAdministrationItem) => boolean {
+  return function filterHiddenAdministrationItem(item: IAdministrationItem) {
+    if (typeof item.isHidden === 'function') {
+      return !item.isHidden(configurationWizard);
+    }
 
-  return !item.isHidden;
+    return !item.isHidden;
+  };
 }
 
-export function filterOnlyActive(item: IAdministrationItem): boolean {
-  if (typeof item.isOnlyActive === 'function') {
-    return item.isOnlyActive();
-  }
+export function filterOnlyActive(configurationWizard: boolean): (item: IAdministrationItem) => boolean {
+  return function filterOnlyActive(item: IAdministrationItem) {
+    if (typeof item.isOnlyActive === 'function') {
+      return item.isOnlyActive(configurationWizard);
+    }
 
-  return item.isOnlyActive === true;
+    return item.isOnlyActive === true;
+  };
 }
