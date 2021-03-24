@@ -46,6 +46,6 @@ public interface DBWServiceAuth extends DBWService {
     WebAuthInfo sessionUser(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    WebAuthProviderInfo[] getAuthProviders(@NotNull WebSession webSession);
+    WebAuthProviderInfo[] getAuthProviders();
 
 }

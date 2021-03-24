@@ -45,7 +45,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             })
             .dataFetcher("activeUser", env -> getService(env).activeUser(getWebSession(env, false)))
             .dataFetcher("sessionUser", env -> getService(env).sessionUser(getWebSession(env, false)))
-            .dataFetcher("authProviders", env -> getService(env).getAuthProviders(getWebSession(env)))
+            .dataFetcher("authProviders", env -> getService(env).getAuthProviders())
         ;
 
     }
