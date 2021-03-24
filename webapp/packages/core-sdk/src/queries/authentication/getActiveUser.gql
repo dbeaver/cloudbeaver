@@ -1,0 +1,14 @@
+query getActiveUser($customIncludeOriginDetails: Boolean!) {
+  user: activeUser {
+    userId
+    displayName
+    authTokens {
+      authProvider
+      loginTime
+      message
+      origin {
+        ...ObjectOriginInfo
+      }
+    }
+  } 
+}

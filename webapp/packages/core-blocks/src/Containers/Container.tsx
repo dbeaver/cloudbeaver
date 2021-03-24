@@ -8,9 +8,9 @@
 
 import type { IContainerProps } from './IContainerProps';
 
-export const Container: React.FC<IContainerProps> = function Container({ children, className }) {
+export const Container: React.FC<IContainerProps> = function Container({ children, ...rest }) {
   return (
-    <div className={className}>
+    <div {...rest}>
       {children}
     </div>
   );

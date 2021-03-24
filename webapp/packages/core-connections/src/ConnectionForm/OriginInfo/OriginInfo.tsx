@@ -13,8 +13,15 @@ import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, useMapR
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { css } from '@reshadow/react';
 
 import type { IConnectionFormTabProps } from '../ConnectionFormService';
+
+const style = css`
+  Loader {
+    height: 100%;
+  }
+`;
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function OriginInfo({
   tabId,
@@ -23,7 +30,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
   const tab = useTab(tabId);
   const translate = useTranslate();
   const state = useTabState<Record<string, any>>(() => ({}));
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
+  const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
   const connection = useMapResource(data.resource!, {
     key: tab.selected ? data.info!.id : null,
@@ -66,15 +73,15 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
 
   if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
     return styled(styles)(
-      <ColoredContainer>
+      <ColoredContainer parent>
         <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
       </ColoredContainer>
     );
   }
 
   return styled(styles)(
-    <ColoredContainer>
-      <Group keepSize>
+    <ColoredContainer parent>
+      <Group large gap>
         <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}

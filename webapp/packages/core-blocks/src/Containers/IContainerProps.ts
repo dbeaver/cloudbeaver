@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridItemsLayoutProps, ILayoutSizeProps } from './LayoutProps';
+import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
-export interface IContainerProps extends ILayoutSizeProps, IGridItemsLayoutProps {
-  className?: string;
-  horizontal?: boolean;
+export interface IContainerProps extends ILayoutSizeProps, React.HTMLAttributes<HTMLDivElement> {
+  baseline?: boolean;
+  vertical?: boolean;
   wrap?: boolean;
   overflow?: boolean;
   parent?: boolean;

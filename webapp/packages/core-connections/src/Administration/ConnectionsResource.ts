@@ -9,6 +9,7 @@
 import { action, makeObservable } from 'mobx';
 import { Observable, Subject } from 'rxjs';
 
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   GraphQLService,
@@ -241,7 +242,7 @@ export function isLocalConnection(connection: DatabaseConnection): boolean {
   if (!connection.origin) {
     return true;
   }
-  return connection.origin.type === 'local';
+  return connection.origin.type === AUTH_PROVIDER_LOCAL_ID;
 }
 
 export function isCloudConnection(connection: DatabaseConnection): boolean {

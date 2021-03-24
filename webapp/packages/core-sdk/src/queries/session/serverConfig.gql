@@ -20,6 +20,7 @@ query serverConfig {
     configurationMode
     developmentMode
 
+    enabledAuthProviders
     supportedLanguages {
       isoCode
       displayName

@@ -66,7 +66,7 @@ export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
         onReject={props.rejectDialog}
       >
         <ColoredContainer>
-          <Group>
+          <Group gap>
             {!productInfo ? (
               <TextPlaceholder>{translate('app_product_info_placeholder')}</TextPlaceholder>
             ) : (

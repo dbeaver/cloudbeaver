@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { FormBox, FormBoxElement, IconButton, Loader, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ServerConfigurationAdminForm } from './Form/ServerConfigurationAdminForm';
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
@@ -24,106 +23,81 @@ import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecur
 import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
-const styles = composes(
-  css`
-  layout-grid-cell {
-    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+const styles = css`
+  Loader {
+    height: 400px;
   }
 
-  layout-grid-cell, message-box {
-    composes: theme-border-color-background from global;
+  SubmittingForm {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
   }
-  `,
-  css`
-    layout-grid {
-      width: 100%;
-      flex: 1;
-    }
 
-    layout-grid-inner {
-      min-height: 100%;
-    }
+  FormBox {
+    flex: 0;
+  }
 
-    layout-grid-cell {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      border: solid 1px;
-    }
+  p {
+    white-space: pre-wrap;
+    line-height: 2;
+  }
+`;
 
-    message-box {
-      border-bottom: solid 1px;
-    }
-
-    message-box, SubmittingForm {
-      padding: 16px 24px;
-    }
-
-    SubmittingForm {
-      flex: 1;
-      display: flex;
-      overflow: auto;
-      flex-direction: column;
-    }
-
-    FormBox {
-      flex: 0;
-    }
-
-    p {
-      line-height: 2;
-    }
-  `
-);
-
-export const ServerConfigurationPage = observer(function ServerConfigurationPage() {
+export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({
+  configurationWizard,
+}) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES, BASE_CONTAINERS_STYLES);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const controller = useController(ServerConfigurationPageController);
   useFormValidator(service.validationTask, focusedRef);
 
   return styled(style)(
-    <layout-grid as="div">
-      <layout-grid-inner as="div">
-        <layout-grid-cell as='div' {...use({ span: 12 })}>
-          {!controller.editing ? (
-            <message-box as='div'>
+    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
+      {controller.editing && (
+        <AdministrationTools>
+          <IconButton name="admin-save" viewBox="0 0 28 28" onClick={controller.save} />
+          <IconButton name="admin-cancel" viewBox="0 0 28 28" onClick={controller.reset} />
+        </AdministrationTools>
+      )}
+      <ColoredContainer wrap gap overflow parent>
+        {!controller.editing && (
+          <Group form>
+            <GroupItem>
               <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
+            </GroupItem>
+            <GroupItem>
               <p>{translate('administration_configuration_wizard_configuration_message')}</p>
-            </message-box>
-          ) : (
-            <AdministrationTools>
-              <IconButton name="admin-save" viewBox="0 0 28 28" onClick={controller.save} />
-              <IconButton name="admin-cancel" viewBox="0 0 28 28" onClick={controller.reset} />
-            </AdministrationTools>
-          )}
-          <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
-            {service.loading ? (
-              <Loader />
-            ) : (
+            </GroupItem>
+          </Group>
+        )}
+
+        <Container wrap gap>
+          <Loader state={service}>
+            {() => styled(style)(
               <>
-                <FormBox>
-                  <FormBoxElement>
-                    <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
-                    {!controller.editing && (
-                      <ServerConfigurationAdminForm serverConfig={controller.state.serverConfig} />
-                    )}
-                  </FormBoxElement>
-                  <FormBoxElement>
-                    <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
-                    <ServerConfigurationNavigatorViewForm configs={controller.state} />
-                  </FormBoxElement>
-                  <FormBoxElement>
-                    <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
-                  </FormBoxElement>
-                </FormBox>
+                <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
+                <Group form gap medium>
+                  <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
+                  <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
+                  <ServerConfigurationNavigatorViewForm configs={controller.state} />
+                  <Placeholder container={service.pluginsContainer} />
+                </Group>
+                <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
+                <Placeholder
+                  container={service.configurationContainer}
+                  configurationWizard={configurationWizard}
+                  serverConfig={controller.state.serverConfig}
+                  navigatorConfig={controller.state.navigatorConfig}
+                />
               </>
             )}
-          </SubmittingForm>
-        </layout-grid-cell>
-      </layout-grid-inner>
-    </layout-grid>
+          </Loader>
+        </Container>
+      </ColoredContainer>
+    </SubmittingForm>
   );
 });

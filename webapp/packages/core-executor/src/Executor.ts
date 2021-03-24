@@ -26,12 +26,12 @@ export class Executor<T = void> implements IExecutor<T> {
     this.collection = new ExecutorHandlersCollection();
   }
 
-  before<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  before<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
     this.collection.before(executor, map);
     return this;
   }
 
-  next<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  next<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
     this.collection.next(executor, map);
     return this;
   }

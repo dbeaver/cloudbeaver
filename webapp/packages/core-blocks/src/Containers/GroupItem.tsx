@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-interface Props {
+import type { ILayoutSizeProps } from './ILayoutSizeProps';
+
+interface Props extends ILayoutSizeProps {
   className?: string;
 }
 

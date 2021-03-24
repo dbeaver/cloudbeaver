@@ -8,12 +8,12 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, UserAuthInfo } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
-export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, void> {
+export class UserInfoResource extends CachedDataResource<UserInfo | null, void> {
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
@@ -29,18 +29,14 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
     return this.data?.userId || 'anonymous';
   }
 
-  async login(provider: string, credentials: Record<string, string>): Promise<UserAuthInfo> {
-    if (this.data) {
-      throw new Error('User already logged in');
-    }
-
+  async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
     const { user } = await this.graphQLService.sdk.authLogin({
       provider,
       credentials: processedCredentials,
     });
-    this.data = user as UserAuthInfo;
+    // this.data = user as any as UserInfo;
 
     await this.updateSession();
     return this.data;
@@ -54,11 +50,13 @@ export class UserInfoResource extends CachedDataResource<UserAuthInfo | null, vo
     }
   }
 
-  protected async loader(): Promise<UserAuthInfo | null> {
+  protected async loader(): Promise<UserInfo | null> {
     await this.sessionResource.load();
-    const { user } = await this.graphQLService.sdk.getSessionUser();
+    const { user } = await this.graphQLService.sdk.getActiveUser({
+      customIncludeOriginDetails: true,
+    });
 
-    return (user as UserAuthInfo | null) ?? null;
+    return (user as UserInfo | null) ?? null;
   }
 
   private async updateSession() {

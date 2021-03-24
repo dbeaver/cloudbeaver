@@ -8,10 +8,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
-import { FormGroup, InputGroup, Switch } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, SwitchNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   serverConfig: ServerConfigInput;
@@ -21,48 +23,18 @@ export const ServerConfigurationConfigurationForm: React.FC<Props> = observer(fu
   serverConfig,
 }) {
   const translate = useTranslate();
-  return (
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <FormGroup>
-        <InputGroup long>{translate('administration_configuration_wizard_configuration_plugins')}</InputGroup>
-      </FormGroup>
-      <FormGroup>
-        <Switch
-          name="anonymousAccessEnabled"
-          state={serverConfig}
-          description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
-          mod={['primary']}
-          disabled={!serverConfig.authenticationEnabled}
-          long
-          autoHide
-        >
-          {translate('administration_configuration_wizard_configuration_anonymous_access')}
-        </Switch>
-      </FormGroup>
-      <FormGroup>
-        <Switch
-          name="authenticationEnabled"
-          state={serverConfig}
-          description={translate('administration_configuration_wizard_configuration_authentication_description')}
-          mod={['primary']}
-          long
-          autoHide
-        >
-          {translate('administration_configuration_wizard_configuration_authentication')}
-        </Switch>
-      </FormGroup>
-      <FormGroup>
-        <Switch
-          name="customConnectionsEnabled"
-          state={serverConfig}
-          description={translate('administration_configuration_wizard_configuration_custom_connections_description')}
-          mod={['primary']}
-          long
-          autoHide
-        >
-          {translate('administration_configuration_wizard_configuration_custom_connections')}
-        </Switch>
-      </FormGroup>
+      <SwitchNew
+        name="customConnectionsEnabled"
+        state={serverConfig}
+        description={translate('administration_configuration_wizard_configuration_custom_connections_description')}
+        mod={['primary']}
+        small
+        autoHide
+      >
+        {translate('administration_configuration_wizard_configuration_custom_connections')}
+      </SwitchNew>
     </>
   );
 });

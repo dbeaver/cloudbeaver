@@ -16,6 +16,11 @@ export enum AdministrationItemType {
   ConfigurationWizard
 }
 
+export interface IAdministrationItemReplaceOptions {
+  priority: number;
+  condition?: (configurationWizard: boolean) => boolean;
+}
+
 export interface AdministrationItemDrawerProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
@@ -69,8 +74,9 @@ export interface IConfigurationWizardItemOptions {
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
   isDone?: () => boolean;
+  onLoad?: () => Promise<void> | void;
   onFinish?: () => Promise<boolean> | boolean;
-  onConfigurationFinish?: () => Promise<void> | void;
+  onConfigurationFinish?: () => Promise<any> | any;
 }
 
 export interface IAdministrationItemOptions {
@@ -80,8 +86,9 @@ export interface IAdministrationItemOptions {
   configurationWizardOptions?: IConfigurationWizardItemOptions;
   order?: number;
   sub?: IAdministrationItemSubItem[];
-  isHidden?: (() => boolean) | boolean;
-  isOnlyActive?: (() => boolean) | boolean;
+  isHidden?: ((configurationWizard: boolean) => boolean) | boolean;
+  isOnlyActive?: ((configurationWizard: boolean) => boolean) | boolean;
+  replace?: IAdministrationItemReplaceOptions;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onActivate?: AdministrationItemEvent;

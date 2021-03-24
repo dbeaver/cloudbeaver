@@ -20,14 +20,22 @@ export const BASE_CONTAINERS_STYLES = composes(
     }
   `,
   css`
-    Container, ColoredContainer {
+    Container, ColoredContainer, Group {
       display: flex;
-      flex-direction: column;
-      flex-basis: 0;
+      flex-direction: row;
       align-content: baseline;
 
-      &[horizontal] {
-        flex-direction: row;
+      &[vertical] {
+        flex-direction: column;
+        align-content: stretch;
+
+        & > :global(*) {
+          flex-basis: 0 !important;
+        }
+      }
+
+      &[baseline] {
+        align-items: baseline;
       }
 
       &[wrap] {
@@ -39,94 +47,64 @@ export const BASE_CONTAINERS_STYLES = composes(
       }
 
       &[parent] {
-        padding: 10px;
+        padding: 24px;
       }
 
       &[gap] {
         gap: 24px;
       }
-
-      & > * {
-        flex-grow: 1;
-      }
-
-      & > [flexItemKeepSize] {
-        flex-grow: 0;
-      }
-
-      & > [flexItemTiny] {
-        flex-basis: 100px;
-      }
-
-      & > [flexItemSmall] {
-        flex-basis: 240px;
-      }
-
-      & > [flexItemMedium] {
-        flex-basis: 340px;
-      }
-
-      & > [flexItemLarge] {
-        flex-basis: 540px;
-      }
     }
 
-    Grid, Group {
-      display: grid;
-      grid-gap: 24px;
+    Group {
       align-content: baseline;
-      grid-template-columns: minmax(min-content, 1fr);
-      grid-auto-rows: max-content;
+      box-sizing: border-box;
+      padding: 24px;
+      border-radius: 4px;
 
-      &[noGap] {
-        grid-gap: 0;
-      }
-
-      &[horizontal] {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      &[form] > :global(*) {
+        margin-right: 25%;
       }
 
       &[center] {
         margin: 0 auto;
       }
-
-      & > [gridItemMax] {
-        grid-column: 1/-1;
-      }
     }
 
-    Group {
-      box-sizing: border-box;
-      margin: 10px;
-      padding: 24px;
-      border-radius: 4px;
+    Container, ColoredContainer, Group {
+      flex-wrap: wrap;
+      flex: 1 1 100%;
 
-      &[form] {
-        padding-right: 30%;
+      & > :global(*) {
+        flex: 1 1 100%;
       }
-    }
 
-    Container, ColoredContainer, Group, Grid {
-      flex-grow: 1;
-
-      &[keepSize] {
+      &[keepSize], & > [keepSize] {
         flex-grow: 0;
+        flex-basis: 0;
       }
 
-      &[limitWidth] {
-        max-width: 800px;
+      &[tiny], & > [tiny] {
+        flex-basis: 140px;
+        max-width: 210px;
       }
 
       &[small], & > [small] {
-        max-width: 250px;
+        flex-basis: 260px;
+        max-width: 390px;
       }
 
       &[medium], & > [medium] {
-        max-width: 450px;
+        flex-basis: 460px;
+        max-width: 640px;
       }
 
       &[large], & > [large] {
-        max-width: 650px;
+        flex-basis: 800px;
+        max-width: 800px;
+      }
+
+      &[fill], & > [fill] {
+        max-width: none;
       }
     }
 

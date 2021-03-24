@@ -79,7 +79,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
             name="savePassword"
             value={sshHandlerId + ' savePassword'}
             state={state}
-            checkboxLabel={translate('connections_network_handler_ssh_tunnel_save_password')}
+            label={translate('connections_network_handler_ssh_tunnel_save_password')}
             disabled={disabled}
           />
         </FormGroup>

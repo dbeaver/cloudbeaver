@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import type { UserAuthInfo } from '@cloudbeaver/core-sdk';
+import type { UserInfo } from '@cloudbeaver/core-sdk';
 
 import { UserInfoResource } from './UserInfoResource';
 
@@ -17,11 +17,11 @@ export class AuthInfoService {
     private userInfoResource: UserInfoResource,
   ) { }
 
-  get userInfo(): UserAuthInfo | null {
+  get userInfo(): UserInfo | null {
     return this.userInfoResource.data;
   }
 
-  async login(provider: string, credentials: Record<string, string>): Promise<UserAuthInfo> {
+  async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
     return this.userInfoResource.login(provider, credentials);
   }
 

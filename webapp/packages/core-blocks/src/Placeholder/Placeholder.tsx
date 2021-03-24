@@ -10,18 +10,17 @@ import { observer } from 'mobx-react-lite';
 
 import type { PlaceholderContainer } from './PlaceholderContainer';
 
-type Props<T> = {
+type Props<T extends Record<string, any>> = T & {
   container: PlaceholderContainer<T>;
-} & (T extends undefined ? {
-  context?: undefined;
-} : {
-  context: T;
-});
+};
 
-export const Placeholder = observer(function Placeholder<T>({ container, context }: Props<T>) {
+export const Placeholder = observer(function Placeholder<T extends Record<string, any>>({
+  container,
+  ...rest
+}: Props<T>) {
   return (
     <>
-      {container.get().map(({ id, component: Component }) => <Component key={id} context={context!} />)}
+      {container.get().map(({ id, component: Component }) => <Component key={id} {...(rest as any as T)} />)}
     </>
   );
 });

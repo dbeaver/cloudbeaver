@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../FormControls/ComboboxNew';
 import { FormFieldDescriptionNew } from '../FormControls/FormFieldDescriptionNew';
@@ -31,6 +32,7 @@ interface RenderFieldProps {
   autoHide?: boolean;
   showRememberTip?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  className?: string;
 }
 
 const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
@@ -43,6 +45,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   autoHide,
   showRememberTip,
   onFocus,
+  className,
 }) {
   const href = property.features.includes('href');
   const password = property.features.includes('password');
@@ -52,7 +55,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
 
   if (href) {
     return (
-      <FormFieldDescriptionNew label={property.displayName}>
+      <FormFieldDescriptionNew label={property.displayName} className={className}>
         <Link href={state[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
       </FormFieldDescriptionNew>
     );
@@ -63,7 +66,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       return null;
     }
     return (
-      <FormFieldDescriptionNew label={property.displayName}>
+      <FormFieldDescriptionNew label={property.displayName} className={className}>
         {state[property.id!]}
       </FormFieldDescriptionNew>
     );
@@ -80,7 +83,9 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         state={state}
         title={property.description}
         disabled={disabled || readOnly}
-      >{property.displayName ?? ''}
+        className={className}
+      >
+        {property.displayName ?? ''}
       </FieldCheckboxNew>
     );
   }
@@ -96,6 +101,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         defaultValue={property.defaultValue}
         title={property.description}
         disabled={disabled}
+        className={className}
       >
         {property.displayName ?? ''}
       </ComboboxNew>
@@ -113,6 +119,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       autoHide={autoHide}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
+      className={className}
       onFocus={onFocus}
     >
       {property.displayName}
@@ -120,7 +127,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   );
 });
 
-interface ObjectPropertyFormProps {
+interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ObjectPropertyInfo[] | undefined;
   state: Record<string, string | number>;
   editable?: boolean;
@@ -137,6 +144,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
   properties,
   state,
   editable = true,
+  className,
   autofillToken = '',
   disabled,
   readOnly,
@@ -159,6 +167,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
       {properties.map(property => (
         <RenderField
           key={property.id}
+          className={className}
           property={property}
           state={state}
           editable={editable}

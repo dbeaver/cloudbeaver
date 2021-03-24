@@ -124,7 +124,7 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
                       <FieldCheckbox
                         name="saveCredentials"
                         value={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
-                        checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                        label={translate('connections_connection_edit_save_credentials')}
                         disabled={controller.isAuthenticating}
                         state={controller.config}
                       />

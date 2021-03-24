@@ -7,14 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { baseFormControlStylesNew } from './baseFormControlStylesNew';
-import { FormContext } from './FormContext';
-import { isControlPresented } from './isControlPresented';
+import { baseFormControlStylesNew } from '../baseFormControlStylesNew';
+import { isControlPresented } from '../isControlPresented';
+import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
+import { useCheckboxState } from './useCheckboxState';
 
 const switchStyles = composes(
   css`
@@ -43,11 +43,13 @@ const switchStyles = composes(
       align-items: center;
     }
     field-label {
+      composes: theme-typography--body1 from global;
+      cursor: pointer;
+      user-select: none;
       display: block;
-      padding-right: 17px;
+      padding-left: 18px;
       min-width: 50px;
       white-space: pre-wrap;
-      composes: theme-typography--body1 from global;
       font-weight: 500;
     }
   `
@@ -80,39 +82,22 @@ const switchState = {
   ),
 };
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & {
+interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
   description?: string;
-};
-
-type ControlledProps = BaseProps & {
-  checked?: boolean;
-  onChange?: (value: boolean, name?: string) => any;
-
-  state?: never;
-  autoHide?: never;
-};
-
-type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
-  name: TKey;
-  state: TState;
-  onChange?: (value: boolean, name: TKey) => any;
-  autoHide?: boolean;
-
-  checked?: never;
-};
+}
 
 interface SwitchType {
-  (props: ControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
+  (props: IBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: IBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
 }
 
 export const SwitchNew: SwitchType = observer(function SwitchNew({
   name,
-  id,
+  value,
   description,
   state,
-  checked: checkedControlled,
+  checked,
   className,
   children,
   onChange,
@@ -120,28 +105,15 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
   autoHide,
   disabled,
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
-  const context = useContext(FormContext);
-  const checked = state ? state[name] : checkedControlled;
+}: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
+  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
   const styles = useStyles(
     baseFormControlStylesNew,
     switchStyles,
     ...mod.map(mod => switchMod[mod]),
     disabled && switchState.disabled,
-    checked && switchState.checked
+    checkboxState.checked && switchState.checked
   );
-
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (state) {
-      state[name] = event.target.checked;
-    }
-    if (onChange) {
-      onChange(event.target.checked, name);
-    }
-    if (context) {
-      context.onChange(event.target.checked, name);
-    }
-  }, [state, name, context, onChange]);
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
@@ -150,7 +122,6 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
   return styled(styles)(
     <field as="div" className={className}>
       <switch-body as='div'>
-        <field-label as="div">{children}</field-label>
         <switch-control as='div'>
           <switch-control-track as='div' />
           <switch-control-underlay as='div'>
@@ -159,15 +130,16 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
               as='input'
               {...rest}
               type="checkbox"
-              id={id}
+              id={value || name}
               role="switch"
-              aria-checked={checked}
-              checked={checked}
+              aria-checked={checkboxState.checked}
+              checked={checkboxState.checked}
               disabled={disabled}
-              onChange={handleChange}
+              onChange={checkboxState.change}
             />
           </switch-control-underlay>
         </switch-control>
+        <field-label as="label" htmlFor={value || name}>{children}</field-label>
       </switch-body>
       <field-description as='div'>{description}</field-description>
     </field>

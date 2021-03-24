@@ -11,7 +11,15 @@ import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
-  ErrorMessage, SubmittingForm, Loader, useFocus, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, FieldCheckbox
+  ErrorMessage,
+  SubmittingForm,
+  Loader,
+  useFocus,
+  ObjectPropertyInfoForm,
+  FormBox,
+  FormBoxElement,
+  FormGroup,
+  FieldCheckbox
 } from '@cloudbeaver/core-blocks';
 import { SSH_TUNNEL_ID, SSHAuthForm } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
@@ -112,7 +120,7 @@ export const ConnectionDialog = observer(function ConnectionDialog({
                   <FieldCheckbox
                     name="saveCredentials"
                     value={controller.template?.id || 'DBAuthSaveCredentials'}
-                    checkboxLabel={translate('connections_connection_edit_save_credentials')}
+                    label={translate('connections_connection_edit_save_credentials')}
                     disabled={controller.isConnecting}
                     state={controller.config}
                   />

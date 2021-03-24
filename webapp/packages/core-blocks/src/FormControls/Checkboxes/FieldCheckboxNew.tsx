@@ -12,7 +12,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStylesNew } from '../baseFormControlStylesNew';
 import { isControlPresented } from '../isControlPresented';
-import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
+import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 
 const fieldCheckboxStyles = css`
   Checkbox {
@@ -24,31 +24,28 @@ const fieldCheckboxStyles = css`
     white-space: pre-wrap;
   }
   field-label {
-    padding-left: 10px;
     composes: theme-typography--body2 from global;
+    cursor: pointer;
+    user-select: none;
+    padding-left: 10px;
     line-height: 16px;
   }
 `;
 
 export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
-  checked: checkedControlled,
   children,
   className,
-  autoHide,
   ...rest
-}: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
+}: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const styles = useStyles(baseFormControlStylesNew, fieldCheckboxStyles);
 
-  if (autoHide && !isControlPresented(rest.name, rest.state)) {
+  if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;
   }
 
   return styled(styles)(
     <field className={className} as="div">
-      <Checkbox
-        {...rest}
-        checked={checkedControlled}
-      />
+      <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
       <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
     </field>
   );
