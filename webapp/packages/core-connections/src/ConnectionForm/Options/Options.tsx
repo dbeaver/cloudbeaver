@@ -26,7 +26,6 @@ import {
   TextareaNew,
   ComboboxNew,
   Container,
-  Grid
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useFormValidator } from '@cloudbeaver/core-executor';
@@ -155,10 +154,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
-      <ColoredContainer wrap horizontal overflow parent>
-        <Container limitWidth>
-          <Group form>
-            <Grid horizontal>
+      <ColoredContainer wrap overflow parent gap>
+        <Container large gap>
+          <Group form gap>
+            <Container wrap gap>
               <ComboboxNew
                 name='driverId'
                 state={data.config}
@@ -167,6 +166,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 valueSelector={driver => driver?.name ?? ''}
                 readOnly={form.form.readonly || edit || drivers.length < 2}
                 disabled={form.form.disabled}
+                tiny
               >
                 {translate('connections_connection_driver')}
               </ComboboxNew>
@@ -178,11 +178,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 disabled={form.form.disabled}
                 readOnly={form.form.readonly}
                 mod='surface'
+                tiny
                 required
               >
                 {translate('connections_connection_name')}
               </InputFieldNew>
-            </Grid>
+            </Container>
             {JDBC ? (
               <InputFieldNew
                 type="text"
@@ -212,7 +213,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 disabled={edit || form.form.disabled}
                 readOnly={form.form.readonly}
                 // autoHide={} // maybe better to use autoHide
-              >{translate('connections_connection_template')}
+              >
+                {translate('connections_connection_template')}
               </FieldCheckboxNew>
             )}
             <TextareaNew
@@ -226,52 +228,56 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
             </TextareaNew>
           </Group>
         </Container>
-        <Container limitWidth>
+        <Container large gap>
           {(authModel && !driver.data?.anonymousAccess) && (
-            <Group form horizontal>
-              <GroupTitle gridItemMax>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              <ObjectPropertyInfoFormNew
-                autofillToken='new-password'
-                properties={properties}
-                state={data.config.credentials}
-                disabled={form.form.disabled}
-                readOnly={form.form.readonly}
-                showRememberTip
-              />
+            <Group form gap>
+              <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
+              <Container wrap gap>
+                <ObjectPropertyInfoFormNew
+                  autofillToken='new-password'
+                  properties={properties}
+                  state={data.config.credentials}
+                  disabled={form.form.disabled}
+                  readOnly={form.form.readonly}
+                  showRememberTip
+                  tiny
+                />
+              </Container>
               {credentialsSavingEnabled && (
                 <FieldCheckboxNew
                   name="saveCredentials"
                   value={data.config.connectionId + 'authNeeded'}
                   state={data.config}
                   disabled={form.form.disabled || form.form.readonly}
-                  gridItemMax
                 >{translate('connections_connection_edit_save_credentials')}
                 </FieldCheckboxNew>
               )}
             </Group>
           )}
           {driver.isLoaded() && driver.data?.providerProperties && driver.data.providerProperties.length > 0 && (
-            <Group form>
+            <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_settings')}</GroupTitle>
               {booleanProviderProperties && booleanProviderProperties.length > 0 && (
-                <Container horizontal gridItemMax gap wrap>
+                <Container gap wrap>
                   <ObjectPropertyInfoFormNew
                     properties={booleanProviderProperties}
                     state={data.config.providerProperties}
                     disabled={form.form.disabled}
                     readOnly={form.form.readonly}
+                    keepSize
                   />
                 </Container>
               )}
               {providerPropertiesWithoutBoolean && (
-                <Grid horizontal small>
+                <Container wrap gap>
                   <ObjectPropertyInfoFormNew
                     properties={providerPropertiesWithoutBoolean}
                     state={data.config.providerProperties}
                     disabled={form.form.disabled}
                     readOnly={form.form.readonly}
+                    tiny
                   />
-                </Grid>
+                </Container>
               )}
             </Group>
           )}

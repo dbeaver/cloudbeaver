@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridItemsLayoutProps } from './LayoutProps';
+import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
-interface Props extends IGridItemsLayoutProps {
+interface Props extends ILayoutSizeProps {
   className?: string;
 }
 

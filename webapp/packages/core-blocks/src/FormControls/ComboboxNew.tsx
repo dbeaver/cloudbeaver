@@ -20,6 +20,7 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { IconButton } from '../IconButton';
 import { Icon } from '../Icons/Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
@@ -100,7 +101,7 @@ const styles = composes(
   `
 );
 
-type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value'> & {
+type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value'> & ILayoutSizeProps & {
   propertyName?: string;
   items: TValue[];
   searchable?: boolean;

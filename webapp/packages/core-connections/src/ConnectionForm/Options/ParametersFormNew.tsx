@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, Grid, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -32,16 +32,16 @@ export const ParametersFormNew = observer(function ParametersFormNew({
   const translate = useTranslate();
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
-    <Grid>
+    <Container gap>
       {!embedded && (
-        <Container horizontal wrap gap gridItemMax>
+        <Container wrap gap>
           <InputFieldNew
             type="text"
             name="host"
             state={config}
             disabled={disabled}
             readOnly={readOnly || !originLocal}
-            flexItemSmall
+            small
             required
           >
             {translate('customConnection_custom_host')}
@@ -52,7 +52,7 @@ export const ParametersFormNew = observer(function ParametersFormNew({
             state={config}
             disabled={disabled}
             readOnly={readOnly || !originLocal}
-            flexItemTiny
+            tiny
           >
             {translate('customConnection_custom_port')}
           </InputFieldNew>
@@ -64,10 +64,9 @@ export const ParametersFormNew = observer(function ParametersFormNew({
         state={config}
         disabled={disabled}
         readOnly={readOnly}
-        gridItemMax
       >
         {translate('customConnection_custom_database')}
       </InputFieldNew>
-    </Grid>
+    </Container>
   );
 });
