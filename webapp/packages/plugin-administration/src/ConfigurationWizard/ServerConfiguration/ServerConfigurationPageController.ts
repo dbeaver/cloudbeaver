@@ -36,6 +36,11 @@ export class ServerConfigurationPageController {
   };
 
   change = (): void => {
+    this.serverConfigurationService.changed();
+    if (this.state.serverConfig.enabledAuthProviders.length === 0) {
+      this.state.serverConfig.authenticationEnabled = false;
+    }
+
     if (!this.state.serverConfig.authenticationEnabled) {
       this.state.serverConfig.anonymousAccessEnabled = true;
     }
@@ -62,7 +67,7 @@ export class ServerConfigurationPageController {
     if (result === DialogueStateResult.Rejected) {
       return;
     }
-    await this.serverConfigurationService.save();
+    await this.serverConfigurationService.saveConfiguration(true);
   }
 
   private async finishConfiguration(): Promise<void> {

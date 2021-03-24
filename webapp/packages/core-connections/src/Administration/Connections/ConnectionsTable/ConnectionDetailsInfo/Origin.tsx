@@ -9,19 +9,18 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { StaticImage } from '@cloudbeaver/core-blocks';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { PlaceholderComponent, StaticImage } from '@cloudbeaver/core-blocks';
 
-import type { DatabaseConnection } from '../../../ConnectionsResource';
+import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
-interface Props {
-  context: DatabaseConnection;
-}
-
-export const Origin: React.FC<Props> = observer(function Origin({ context }) {
-  const isLocal = context.origin.type === 'local';
-  const icon = context.origin.icon;
-  const title = context.origin.displayName;
+export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Origin({
+  connection,
+}) {
+  const isLocal = connection.origin.type === AUTH_PROVIDER_LOCAL_ID;
+  const icon = connection.origin.icon;
+  const title = connection.origin.displayName;
 
   if (isLocal) {
     return null;

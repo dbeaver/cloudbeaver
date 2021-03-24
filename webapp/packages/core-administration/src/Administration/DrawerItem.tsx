@@ -24,7 +24,7 @@ export const DrawerItem = observer(function DrawerItem({
     disabled = !configurationWizardService.isStepAvailable(item.name);
   }
 
-  const onlyActive = filterOnlyActive(item) ? false : disabled;
+  const onlyActive = filterOnlyActive(configurationWizard)(item) ? false : disabled;
 
   return (
     <Component

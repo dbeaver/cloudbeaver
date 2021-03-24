@@ -18,9 +18,13 @@ import { UsersAdministrationNavigationService } from './UsersAdministrationNavig
 import { UsersDrawerItem } from './UsersDrawerItem';
 import { Origin } from './UsersTable/UserDetailsInfo/Origin';
 
+export interface IUserDetailsInfoProps {
+  user: AdminUser;
+}
+
 @injectable()
 export class UsersAdministrationService extends Bootstrap {
-  readonly userDetailsInfoPlaceholder = new PlaceholderContainer<AdminUser>();
+  readonly userDetailsInfoPlaceholder = new PlaceholderContainer<IUserDetailsInfoProps>();
 
   constructor(
     private administrationItemService: AdministrationItemService,

@@ -79,7 +79,7 @@ export const Administration: React.FC<Props> = observer(function Administration(
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationItemService = useService(AdministrationItemService);
   const items = administrationItemService.getActiveItems(configurationWizard);
-  const hasOnlyActive = items.some(filterOnlyActive);
+  const hasOnlyActive = items.some(filterOnlyActive(configurationWizard));
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });
