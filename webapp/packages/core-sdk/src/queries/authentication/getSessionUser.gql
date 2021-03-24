@@ -1,9 +1,0 @@
-query getSessionUser {
-  user: sessionUser {
-    userId
-    displayName
-    authProvider
-    loginTime
-    message
-  } 
-}

@@ -9,6 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { RouterState } from '@cloudbeaver/core-routing';
 
 import { filterConfigurationWizard } from './filterConfigurationWizard';
@@ -18,14 +19,43 @@ import {
 import type { IAdministrationItemRoute } from './IAdministrationItemRoute';
 import { orderAdministrationItems } from './orderAdministrationItems';
 
+interface IActivationData {
+  screen: IAdministrationItemRoute;
+  configurationWizard: boolean;
+  outside: boolean;
+}
+
 @injectable()
 export class AdministrationItemService {
   items: IAdministrationItem[] = [];
 
+  itemActivating: boolean;
+  itemDeactivating: boolean;
+
+  private activationTask: IExecutor<IActivationData>;
+  private deActivationTask: IExecutor<IActivationData>;
+
   constructor() {
     makeObservable(this, {
       items: observable,
+      itemActivating: observable,
+      itemDeactivating: observable,
     });
+
+    this.itemActivating = false;
+    this.itemDeactivating = false;
+    this.activationTask = new Executor();
+    this.deActivationTask = new Executor();
+
+    this.activationTask
+      .addHandler(() => { this.itemActivating = true; })
+      .addHandler(this.activateHandler)
+      .addPostHandler(() => { this.itemActivating = false; });
+
+    this.deActivationTask
+      .addHandler(() => { this.itemDeactivating = true; })
+      .addHandler(this.deActivateHandler)
+      .addPostHandler(() => { this.itemDeactivating = false; });
   }
 
   getUniqueItems(configurationWizard: boolean): IAdministrationItem[] {
@@ -33,6 +63,10 @@ export class AdministrationItemService {
 
     const orderedByPriority = this.items.slice()
       .sort((a, b) => {
+        if (a.name !== b.name) {
+          return a.name.localeCompare(b.name);
+        }
+
         if (a.replace && b.replace) {
           return (b.replace.priority ?? Number.MIN_SAFE_INTEGER) - (a.replace.priority ?? Number.MIN_SAFE_INTEGER);
         }
@@ -129,24 +163,7 @@ export class AdministrationItemService {
     configurationWizard: boolean,
     outside: boolean
   ): Promise<void> {
-    if (configurationWizard) {
-      const items = this.getActiveItems(configurationWizard);
-
-      for (const item of items) {
-        await item.configurationWizardOptions?.onLoad?.();
-      }
-    }
-
-    const item = this.getItem(screen.item, configurationWizard);
-    if (!item) {
-      return;
-    }
-
-    await item.onActivate?.(configurationWizard, outside);
-
-    if (screen.sub) {
-      await this.getItemSub(item, screen.sub)?.onActivate?.(screen.param, configurationWizard, outside);
-    }
+    await this.activationTask.execute({ screen, configurationWizard, outside });
   }
 
   async deActivate(
@@ -154,16 +171,7 @@ export class AdministrationItemService {
     configurationWizard: boolean,
     outside: boolean
   ): Promise<void> {
-    const item = this.getItem(screen.item, configurationWizard);
-    if (!item) {
-      return;
-    }
-
-    await item.onDeActivate?.(configurationWizard, outside);
-
-    if (screen.sub) {
-      await this.getItemSub(item, screen.sub)?.onDeActivate?.(screen.param, configurationWizard, outside);
-    }
+    await this.deActivationTask.execute({ screen, configurationWizard, outside });
   }
 
   async canActivate(
@@ -189,6 +197,44 @@ export class AdministrationItemService {
 
     return true;
   }
+
+  private activateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside }) => {
+    if (configurationWizard) {
+      let item = 0;
+      while (true) {
+        const items = this.getActiveItems(configurationWizard);
+        if (item === items.length) {
+          break;
+        }
+        await items[item].configurationWizardOptions?.onLoad?.();
+        item++;
+      }
+    }
+
+    const item = this.getItem(screen.item, configurationWizard);
+    if (!item) {
+      return;
+    }
+
+    await item.onActivate?.(configurationWizard, outside);
+
+    if (screen.sub) {
+      await this.getItemSub(item, screen.sub)?.onActivate?.(screen.param, configurationWizard, outside);
+    }
+  };
+
+  private deActivateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside }) => {
+    const item = this.getItem(screen.item, configurationWizard);
+    if (!item) {
+      return;
+    }
+
+    await item.onDeActivate?.(configurationWizard, outside);
+
+    if (screen.sub) {
+      await this.getItemSub(item, screen.sub)?.onDeActivate?.(screen.param, configurationWizard, outside);
+    }
+  };
 }
 
 export function filterHiddenAdministrationItem(configurationWizard: boolean): (item: IAdministrationItem) => boolean {

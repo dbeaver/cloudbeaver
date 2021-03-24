@@ -14,7 +14,7 @@ import {
   AuthProviderInfo
 } from '@cloudbeaver/core-sdk';
 
-export type AuthProvider = Omit<AuthProviderInfo, 'configurationParameters'>;
+export type AuthProvider = AuthProviderInfo;
 
 @injectable()
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], void> {
@@ -26,6 +26,10 @@ export class AuthProvidersResource extends CachedDataResource<AuthProvider[], vo
     super([]);
 
     this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
+  }
+
+  has(id: string): boolean {
+    return this.data.some(provider => provider.id === id);
   }
 
   getEnabledProviders(): string[] {

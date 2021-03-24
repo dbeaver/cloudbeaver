@@ -17,6 +17,7 @@ export interface Scalars {
 }
 
 export interface Query {
+  activeUser?: Maybe<UserInfo>;
   allConnections: ConnectionInfo[];
   authLogin: UserAuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -56,6 +57,7 @@ export interface Query {
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
+  /** @deprecated Field no longer supported */
   sessionUser?: Maybe<UserAuthInfo>;
   setConnectionSubjectAccess?: Maybe<Scalars['Boolean']>;
   setDefaultNavigatorSettings: Scalars['Boolean'];
@@ -77,6 +79,10 @@ export interface QueryAllConnectionsArgs {
 export interface QueryAuthLoginArgs {
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+}
+
+export interface QueryAuthLogoutArgs {
+  provider?: Maybe<Scalars['ID']>;
 }
 
 export interface QueryConfigureServerArgs {
@@ -486,6 +492,7 @@ export interface ServerConfig {
   localHostAddress?: Maybe<Scalars['String']>;
   configurationMode?: Maybe<Scalars['Boolean']>;
   developmentMode?: Maybe<Scalars['Boolean']>;
+  enabledAuthProviders: Array<Scalars['ID']>;
   supportedLanguages: ServerLanguage[];
   services?: Maybe<Array<Maybe<WebServiceConfig>>>;
   productConfiguration: Scalars['Object'];
@@ -887,6 +894,7 @@ export interface ServerConfigInput {
   customConnectionsEnabled?: Maybe<Scalars['Boolean']>;
   publicCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
   adminCredentialsSaveEnabled?: Maybe<Scalars['Boolean']>;
+  enabledAuthProviders?: Maybe<Array<Scalars['ID']>>;
   sessionExpireTime?: Maybe<Scalars['Int']>;
 }
 
@@ -915,13 +923,32 @@ export interface AuthProviderInfo {
   credentialParameters: AuthCredentialInfo[];
 }
 
-export interface UserAuthInfo {
-  userId: Scalars['String'];
-  displayName?: Maybe<Scalars['String']>;
-  authProvider: Scalars['String'];
+export interface UserAuthToken {
+  authProvider: Scalars['ID'];
   loginTime: Scalars['DateTime'];
   message?: Maybe<Scalars['String']>;
   origin: ObjectOrigin;
+}
+
+export interface UserAuthInfo {
+  /** @deprecated Field no longer supported */
+  userId: Scalars['String'];
+  /** @deprecated Field no longer supported */
+  displayName?: Maybe<Scalars['String']>;
+  /** @deprecated Field no longer supported */
+  authProvider: Scalars['String'];
+  /** @deprecated Field no longer supported */
+  loginTime: Scalars['DateTime'];
+  /** @deprecated Field no longer supported */
+  message?: Maybe<Scalars['String']>;
+  /** @deprecated Field no longer supported */
+  origin: ObjectOrigin;
+}
+
+export interface UserInfo {
+  userId: Scalars['String'];
+  displayName?: Maybe<Scalars['String']>;
+  authTokens: UserAuthToken[];
 }
 
 export interface DataTransferProcessorInfo {
@@ -962,6 +989,20 @@ export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AuthLogoutQuery = Pick<Query, 'authLogout'>;
 
+export type GetActiveUserQueryVariables = Exact<{
+  customIncludeOriginDetails: Scalars['Boolean'];
+}>;
+
+export interface GetActiveUserQuery {
+  user?: Maybe<(
+    Pick<UserInfo, 'userId' | 'displayName'>
+    & { authTokens: Array<(
+      Pick<UserAuthToken, 'authProvider' | 'loginTime' | 'message'>
+      & { origin: ObjectOriginInfoFragment }
+    )>; }
+  )>;
+}
+
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface GetAuthProvidersQuery {
@@ -970,10 +1011,6 @@ export interface GetAuthProvidersQuery {
     & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
   )>;
 }
-
-export type GetSessionUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export interface GetSessionUserQuery { user?: Maybe<Pick<UserAuthInfo, 'userId' | 'displayName' | 'authProvider' | 'loginTime' | 'message'>> }
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1539,7 +1576,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode'>
+    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -1798,6 +1835,22 @@ export const AuthLogoutDocument = `
   authLogout
 }
     `;
+export const GetActiveUserDocument = `
+    query getActiveUser($customIncludeOriginDetails: Boolean!) {
+  user: activeUser {
+    userId
+    displayName
+    authTokens {
+      authProvider
+      loginTime
+      message
+      origin {
+        ...ObjectOriginInfo
+      }
+    }
+  }
+}
+    ${ObjectOriginInfoFragmentDoc}`;
 export const GetAuthProvidersDocument = `
     query getAuthProviders {
   providers: authProviders {
@@ -1815,17 +1868,6 @@ export const GetAuthProvidersDocument = `
       possibleValues
       encryption
     }
-  }
-}
-    `;
-export const GetSessionUserDocument = `
-    query getSessionUser {
-  user: sessionUser {
-    userId
-    displayName
-    authProvider
-    loginTime
-    message
   }
 }
     `;
@@ -2466,6 +2508,7 @@ export const ServerConfigDocument = `
     licenseValid
     configurationMode
     developmentMode
+    enabledAuthProviders
     supportedLanguages {
       isoCode
       displayName
@@ -2556,11 +2599,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     authLogout(variables?: AuthLogoutQueryVariables): Promise<AuthLogoutQuery> {
       return withWrapper(() => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables));
     },
+    getActiveUser(variables: GetActiveUserQueryVariables): Promise<GetActiveUserQuery> {
+      return withWrapper(() => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables));
+    },
     getAuthProviders(variables?: GetAuthProvidersQueryVariables): Promise<GetAuthProvidersQuery> {
       return withWrapper(() => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables));
-    },
-    getSessionUser(variables?: GetSessionUserQueryVariables): Promise<GetSessionUserQuery> {
-      return withWrapper(() => client.request<GetSessionUserQuery>(GetSessionUserDocument, variables));
     },
     createUser(variables: CreateUserQueryVariables): Promise<CreateUserQuery> {
       return withWrapper(() => client.request<CreateUserQuery>(CreateUserDocument, variables));

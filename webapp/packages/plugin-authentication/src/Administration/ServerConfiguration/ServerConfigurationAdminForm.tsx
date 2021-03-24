@@ -10,7 +10,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputFieldNew } from '@cloudbeaver/core-blocks';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -19,32 +20,40 @@ interface Props {
   serverConfig: ServerConfigInput;
 }
 
-export const ServerConfigurationInfoForm: React.FC<Props> = observer(function ServerConfigurationInfoForm({
+export const ServerConfigurationAdminForm: React.FC<Props> = observer(function ServerConfigurationAdminForm({
   serverConfig,
 }) {
   const translate = useTranslate();
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  const style = useStyles(BASE_CONTAINERS_STYLES);
+
+  if (!serverConfig.enabledAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID)) {
+    return null;
+  }
+
+  return styled(style)(
     <Group form gap medium>
-      <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
+      <GroupTitle>{translate('administration_configuration_wizard_configuration_admin')}</GroupTitle>
       <InputFieldNew
         type="text"
-        name="serverName"
+        name="adminName"
         state={serverConfig}
+        minLength={6}
         mod='surface'
         required
         tiny
       >
-        {translate('administration_configuration_wizard_configuration_server_name')}
+        {translate('administration_configuration_wizard_configuration_admin_name')}
       </InputFieldNew>
       <InputFieldNew
-        type="number"
-        name="sessionExpireTime"
+        type="password"
+        name="adminPassword"
         state={serverConfig}
+        autoComplete='new-password'
         mod='surface'
         required
         tiny
       >
-        {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
+        {translate('administration_configuration_wizard_configuration_admin_password')}
       </InputFieldNew>
     </Group>
   );

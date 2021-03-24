@@ -39,9 +39,9 @@ export const ObjectProperties = observer(function ObjectProperties({
 
   return styled(styles)(
     <ColoredContainer overflow parent>
-      <Group>
+      <Group gap large>
         {dbObject.properties.map(v => (
-          <ObjectProperty key={v.id} objectProperty={v} large />
+          <ObjectProperty key={v.id} objectProperty={v} small />
         ))}
       </Group>
     </ColoredContainer>
