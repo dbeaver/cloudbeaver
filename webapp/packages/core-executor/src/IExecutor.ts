@@ -11,8 +11,8 @@ import type { IExecutorHandler } from './IExecutorHandler';
 import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
 export interface IExecutor<T = void> {
-  before: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
-  next: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
+  before: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
+  next: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   execute: (
     data: T,
     context?: IExecutionContext<T>,

@@ -23,8 +23,8 @@ export interface IExecutorHandlersCollection<T = unknown> {
   readonly postHandlers: Array<IExecutorHandler<T>>;
   readonly chain: Array<IChainLink<T>>;
 
-  before: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
-  next: <TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
+  before: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
+  next: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
   execute: (
     data: T,
     context: IExecutionContext<T>,
