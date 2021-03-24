@@ -47,7 +47,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             state={serverConfig}
             description={translate('administration_configuration_wizard_configuration_authentication_description')}
             mod={['primary']}
-            disabled={serverConfig.enabledAuthProviders.length === 0}
+            disabled={serverConfig.enabledAuthProviders?.length === 0}
             small
             autoHide
           >

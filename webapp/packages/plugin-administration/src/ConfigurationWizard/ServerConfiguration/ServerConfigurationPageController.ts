@@ -37,7 +37,7 @@ export class ServerConfigurationPageController {
 
   change = (): void => {
     this.serverConfigurationService.changed();
-    if (this.state.serverConfig.enabledAuthProviders.length === 0) {
+    if (this.state.serverConfig.enabledAuthProviders?.length === 0) {
       this.state.serverConfig.authenticationEnabled = false;
     }
 

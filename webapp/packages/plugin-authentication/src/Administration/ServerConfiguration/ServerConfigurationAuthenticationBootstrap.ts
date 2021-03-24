@@ -87,7 +87,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
 
     if (
       data.configurationWizard
-      && state.serverConfig.enabledAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID)
+      && state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
     ) {
       state.serverConfig.adminName = data.state.serverConfig.adminName;
       state.serverConfig.adminPassword = data.state.serverConfig.adminPassword;
@@ -99,7 +99,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
 
     if (
       data.configurationWizard
-      && data.state.serverConfig.enabledAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID)
+      && data.state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
     ) {
       if (!data.state.serverConfig.adminName
         || data.state.serverConfig.adminName.length < 6
