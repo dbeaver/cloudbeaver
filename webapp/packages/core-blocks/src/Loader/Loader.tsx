@@ -40,7 +40,7 @@ interface Props {
   className?: string;
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
-  children?: () => React.ReactElement<any, any> | null;
+  children?: () => React.ReactNode;
   onCancel?: () => void;
 }
 
@@ -49,6 +49,7 @@ const spinnerType = {
   secondary: '/icons/spinner.svg',
 };
 
+// @ts-expect-error wtf error
 export const Loader: React.FC<Props> = observer(function Loader({
   cancelDisabled,
   overlay,

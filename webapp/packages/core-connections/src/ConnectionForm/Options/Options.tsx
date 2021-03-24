@@ -167,6 +167,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 readOnly={form.form.readonly || edit || drivers.length < 2}
                 disabled={form.form.disabled}
                 tiny
+                fill
               >
                 {translate('connections_connection_driver')}
               </ComboboxNew>
@@ -178,8 +179,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
                 disabled={form.form.disabled}
                 readOnly={form.form.readonly}
                 mod='surface'
-                tiny
                 required
+                tiny
+                fill
               >
                 {translate('connections_connection_name')}
               </InputFieldNew>

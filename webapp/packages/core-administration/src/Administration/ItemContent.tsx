@@ -8,6 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
+import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
@@ -32,6 +33,10 @@ export const ItemContent: React.FC<Props> = observer(function ItemContent({
 
   if (!item) {
     return null;
+  }
+
+  if (administrationItemService.itemActivating) {
+    return <Loader />;
   }
 
   if (activeScreen.sub) {

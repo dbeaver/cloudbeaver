@@ -117,12 +117,18 @@ export function useDataResource<
         return false;
       }
 
+      if (refObj.key === undefined) {
+        return resource.isLoading();
+      }
+
       return resource.isDataLoading(refObj.key);
     },
   }));
 
   useEffect(() => {
-    refObj.load();
+    if (exception === null) {
+      refObj.load();
+    }
   }, [key, includes]);
 
   return result;
