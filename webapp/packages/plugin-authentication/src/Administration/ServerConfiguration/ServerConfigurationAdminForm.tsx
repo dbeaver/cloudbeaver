@@ -26,7 +26,7 @@ export const ServerConfigurationAdminForm: React.FC<Props> = observer(function S
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES);
 
-  if (!serverConfig.enabledAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID)) {
+  if (!serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)) {
     return null;
   }
 
