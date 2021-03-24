@@ -19,6 +19,7 @@ package io.cloudbeaver.auth.provider.local;
 import io.cloudbeaver.DBWAuthProvider;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderPropertyEncryption;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -35,7 +36,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
     public static final String CRED_PASSWORD = "password";
 
     @Override
-    public LocalAuthSession openSession(WebSession mainSession, Map<String, Object> providerConfig, Map<String, Object> userCredentials, Map<String, Object> authParameters) throws DBException {
+    public LocalAuthSession openSession(@NotNull WebSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials, @NotNull Map<String, Object> authParameters) throws DBException {
         String userName = CommonUtils.toString(authParameters.get(CRED_USER), null);
         String storedPasswordHash = CommonUtils.toString(userCredentials.get(CRED_PASSWORD), null);
         if (CommonUtils.isEmpty(storedPasswordHash)) {
