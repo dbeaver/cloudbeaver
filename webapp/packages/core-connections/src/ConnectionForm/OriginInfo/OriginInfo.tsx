@@ -81,7 +81,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
 
   return styled(styles)(
     <ColoredContainer parent>
-      <Group keepSize gap>
+      <Group large gap>
         <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}
