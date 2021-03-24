@@ -22,9 +22,13 @@ import { SSH } from './ConnectionsTable/ConnectionDetailsInfo/SSH';
 import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
 
+export interface IConnectionDetailsPlaceholderProps {
+  connection: DatabaseConnection;
+}
+
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
-  readonly connectionDetailsPlaceholder = new PlaceholderContainer<DatabaseConnection>();
+  readonly connectionDetailsPlaceholder = new PlaceholderContainer<IConnectionDetailsPlaceholderProps>();
 
   constructor(
     private administrationItemService: AdministrationItemService,

@@ -35,7 +35,7 @@ export const TableHeader = observer(function TableHeader({
 
   return styled(styles)(
     <table-header as="div">
-      <Placeholder container={service.tableHeaderPlaceholder} context={model} />
+      <Placeholder container={service.tableHeaderPlaceholder} model={model} />
     </table-header>
   );
 });

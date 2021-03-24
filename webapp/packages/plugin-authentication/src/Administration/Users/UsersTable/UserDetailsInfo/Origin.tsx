@@ -10,12 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 import { css } from 'reshadow';
 
-import type { AdminUser } from '@cloudbeaver/core-authentication';
-import { StaticImage } from '@cloudbeaver/core-blocks';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { PlaceholderComponent, StaticImage } from '@cloudbeaver/core-blocks';
 
-interface Props {
-  context: AdminUser;
-}
+import type { IUserDetailsInfoProps } from '../../UsersAdministrationService';
 
 const USER_DETAILS_STYLES = css`
   StaticImage {
@@ -24,10 +22,10 @@ const USER_DETAILS_STYLES = css`
   }
 `;
 
-export const Origin: React.FC<Props> = observer(function Origin({ context }) {
-  const isLocal = context.origin.type === 'local';
-  const icon = isLocal ? '/icons/local_connection.svg' : context.origin.icon;
-  const title = isLocal ? 'Local user' : context.origin.displayName;
+export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(function Origin({ user }) {
+  const isLocal = user.origin.type === AUTH_PROVIDER_LOCAL_ID;
+  const icon = isLocal ? '/icons/local_connection.svg' : user.origin.icon;
+  const title = isLocal ? 'Local user' : user.origin.displayName;
 
   return styled(USER_DETAILS_STYLES)(
     <StaticImage icon={icon} title={title} />
