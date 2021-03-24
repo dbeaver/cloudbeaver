@@ -58,14 +58,14 @@
   input[role="new"],
   textarea[role="new"] {
     box-sizing: border-box;
-    padding: 7px 11px;
+    padding: 7px 12px;
     font-size: 12px;
     width: 100%;
     border: 2px solid;
     outline: none;
     border-radius: 3px;
 
-    @include mdc-theme-prop(color, on-secondary, false);
+    @include mdc-theme-prop(color, text-primary-on-light, false);
     @include mdc-theme-prop(border-color, background, false);
     @include mdc-theme-prop(background-color, input-background, false);
 
@@ -81,12 +81,12 @@
     &:global([readonly]) {
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
-      opacity: 0.8;
+      @include mdc-theme-prop(color, text-secondary-on-light, false);
     }
     &:global([disabled]) {
       @include mdc-theme-prop(border-color, input-border-disabled, false);
       @include mdc-theme-prop(background-color, input-background-disabled, false);
-      opacity: 0.7;
+      @include mdc-theme-prop(color, text-hint-on-light, false);
     }
     &:global([data-embedded]) {
       &:global([disabled]),
