@@ -146,7 +146,7 @@ public class WebSQLUtils {
         map.put("text", value.toString());
         map.put("properties", value.getProperties());
 
-        DBGeometry xValue = GisTransformUtils.transformToSRID(value, GisConstants.SRID_3857);
+        DBGeometry xValue = GisTransformUtils.transformToSRID(value, GisConstants.SRID_4326);
         if (xValue != null && xValue != value) {
             map.put("mapText", xValue.toString());
         }
