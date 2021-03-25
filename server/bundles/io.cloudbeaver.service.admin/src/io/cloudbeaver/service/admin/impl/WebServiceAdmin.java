@@ -22,6 +22,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
@@ -366,6 +367,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             appConfig.setDefaultNavigatorSettings(
                 CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
+            List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
+
             String adminName = config.getAdminName();
             String adminPassword = config.getAdminPassword();
             if (CommonUtils.isEmpty(adminName)) {
@@ -373,6 +376,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 WebUser curUser = webSession.getUser();
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
+            }
+            if (CommonUtils.isEmpty(adminName)) {
+                // Try to get admin name from existing authentications (first one)
+                if (!authInfoList.isEmpty()) {
+                    adminName = authInfoList.get(0).getUserId();
+                }
             }
 
             // Patch configuration by services
@@ -388,6 +397,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 config.getServerName(),
                 adminName,
                 adminPassword,
+                authInfoList,
                 config.getSessionExpireTime(),
                 appConfig);
 

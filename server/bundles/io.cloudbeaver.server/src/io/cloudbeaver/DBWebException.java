@@ -147,6 +147,9 @@ public class DBWebException extends DBException implements GraphQLError {
             }
             return "Unknown internal error";
         }
+        if (CommonUtils.equalObjects(message, cause.getMessage())) {
+            return message;
+        }
         return message + ":\n" + cause.getMessage();
     }
 

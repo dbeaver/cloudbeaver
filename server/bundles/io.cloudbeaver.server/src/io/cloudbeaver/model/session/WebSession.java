@@ -202,6 +202,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     public void forceUserRefresh(WebUser user) {
         if (!CommonUtils.equalObjects(this.user, user)) {
             // User has changed. We need to reset all session attributes
+            clearAuthTokens();
             try {
                 resetSessionCache();
             } catch (DBCException e) {
@@ -416,8 +417,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     DBWSecurityController.getInstance().createSession(this);
                     this.persisted = true;
                 } else {
-                    // Update record
-                    DBWSecurityController.getInstance().updateSession(this);
+                    if (!CBApplication.getInstance().isConfigurationMode()) {
+                        // Update record
+                        DBWSecurityController.getInstance().updateSession(this);
+                    }
                 }
             } catch (Exception e) {
                 log.error("Error persisting web session", e);

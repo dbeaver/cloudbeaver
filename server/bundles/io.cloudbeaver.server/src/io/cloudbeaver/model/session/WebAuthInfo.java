@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * WebAuthInfo
@@ -38,6 +39,8 @@ public class WebAuthInfo {
     private DBASession authSession;
     private OffsetDateTime loginTime;
     private String message;
+
+    private transient Map<String, Object> userCredentials;
 
     public WebAuthInfo(WebSession session, WebUser user) {
         this.session = session;
@@ -103,5 +106,14 @@ public class WebAuthInfo {
                 authSession = null;
             }
         }
+    }
+
+    // Used to keep user credentials during server configuration
+    public Map<String, Object> getUserCredentials() {
+        return userCredentials;
+    }
+
+    public void setUserCredentials(Map<String, Object> userCredentials) {
+        this.userCredentials = userCredentials;
     }
 }

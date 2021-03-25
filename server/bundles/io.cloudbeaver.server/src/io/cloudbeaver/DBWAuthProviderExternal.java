@@ -39,18 +39,23 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
      * Returns new identifying credentials which can be used to find/create user in database
      */
     @NotNull
-    Map<String, Object> readExternalCredentials(
+    Map<String, Object> authExternalUser(
         @NotNull DBRProgressMonitor monitor,
         @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException;
 
+    /**
+     * Validates that external user may be associated with local user
+     * @param userCredentials credentials from authExternalUser
+     * @return new user ID. If activeUser is not null then it must be the same as activeUser ID.
+     */
     @NotNull
-    WebUser registerNewUser(
+    String validateLocalAuth(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBWSecurityController securityController,
         @NotNull Map<String, Object> providerConfig,
-        @NotNull Map<String, Object> credentials,
+        @NotNull Map<String, Object> userCredentials,
         @Nullable WebUser activeUser) throws DBException;
 
     @Nullable

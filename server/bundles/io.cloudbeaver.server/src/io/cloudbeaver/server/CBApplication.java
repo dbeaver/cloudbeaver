@@ -23,6 +23,7 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConnectionGrant;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
@@ -501,18 +503,19 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     public synchronized void finishConfiguration(
-        String newServerName,
-        String adminName,
-        String adminPassword,
+        @NotNull String newServerName,
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList,
         long sessionExpireTime,
-        CBAppConfig appConfig) throws DBException
+        @NotNull CBAppConfig appConfig) throws DBException
     {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
 
         if (isConfigurationMode()) {
-            database.finishConfiguration(adminName, adminPassword);
+            database.finishConfiguration(adminName, adminPassword, authInfoList);
         }
 
         // Save runtime configuration
