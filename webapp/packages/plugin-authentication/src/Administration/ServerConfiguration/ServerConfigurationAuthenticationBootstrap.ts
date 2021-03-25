@@ -56,7 +56,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
         data.state.serverConfig.adminName = 'cbadmin';
         data.state.serverConfig.adminPassword = '';
 
-        data.state.serverConfig.anonymousAccessEnabled = true;
+        data.state.serverConfig.anonymousAccessEnabled = false;
         data.state.serverConfig.authenticationEnabled = true;
       } else {
         data.state.serverConfig.anonymousAccessEnabled = config.anonymousAccessEnabled;
