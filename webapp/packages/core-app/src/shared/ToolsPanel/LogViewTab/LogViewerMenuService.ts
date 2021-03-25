@@ -23,6 +23,8 @@ export class LogViewerMenuService {
       {
         id: 'openLogViewer',
         order: 1,
+        type: 'checkbox',
+        isChecked: () => this.logViewerService.isActive,
         title: 'app_shared_toolsMenu_logViewer',
         onClick: () => this.toggleLogViewer(),
       }

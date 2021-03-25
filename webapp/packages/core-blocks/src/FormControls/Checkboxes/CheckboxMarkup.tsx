@@ -8,9 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { Composes, composes, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, Composes, composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { CheckboxMod } from './Checkbox';
+export type CheckboxMod = 'primary' | 'surface' | 'small';
 
 const checkboxStyles = composes(
   css`
@@ -56,6 +56,13 @@ const checkboxMod: Record<CheckboxMod, Composes> = {
       }
     `
   ),
+  surface: composes(
+    css`
+      checkbox {
+        composes: theme-checkbox_surface from global;
+      }
+    `
+  ),
   small: composes(
     css`
       checkbox {
@@ -94,18 +101,26 @@ const checkboxState = {
   ),
 };
 
-interface ICheckboxMarkupProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style'> {
   label?: string;
   indeterminate?: boolean;
   ripple?: boolean;
   mod?: CheckboxMod[];
+  style?: ComponentStyle;
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  label, className, title, mod = ['primary'], ripple = true, ...rest
+  label, className, title, mod = ['primary'], ripple = true, style, ...rest
 }) {
-  return styled(useStyles(checkboxStyles, ...(mod || []).map(mod => checkboxMod[mod]), rest.disabled
-    && checkboxState.disabled, rest.checked && checkboxState.checked))(
+  return styled(
+    useStyles(
+      checkboxStyles,
+      ...(mod || []).map(mod => checkboxMod[mod]),
+      rest.disabled && checkboxState.disabled,
+      rest.checked && checkboxState.checked,
+      style
+    )
+  )(
     <checkbox-container className={className} title={title} as='div'>
       <checkbox as='div'>
         <checkbox-input as='input' type='checkbox' {...rest} />

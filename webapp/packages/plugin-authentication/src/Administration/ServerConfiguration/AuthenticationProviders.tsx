@@ -76,9 +76,12 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           )}
         </Loader>
       </Group>
-      {configurationWizard && (
+      {configurationWizard ? (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
+      ) : (
+        <Container medium />
       )}
+      <Container medium />
     </Container>
   );
 });

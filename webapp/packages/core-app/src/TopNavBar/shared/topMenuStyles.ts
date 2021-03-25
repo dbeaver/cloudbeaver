@@ -15,6 +15,10 @@ export const topMenuStyles = composes(
     Menu {
       composes: theme-text-on-primary from global;
     }
+    
+    checkbox {
+      composes: theme-checkbox_surface from global;
+    }
   `,
   css`
     Menu {

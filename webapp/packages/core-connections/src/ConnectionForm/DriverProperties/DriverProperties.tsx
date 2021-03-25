@@ -73,7 +73,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
     {
       onData: driver => {
         for (const key of Object.keys(data.config.properties)) {
-          if (driver.driverProperties.some(property => property.id === key)
+          if (driver.driverProperties?.some(property => property.id === key)
            || state.propertiesList.some(property => property.key === key)) {
             continue;
           }

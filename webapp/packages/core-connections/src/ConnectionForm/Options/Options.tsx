@@ -155,7 +155,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <SubmittingForm ref={formRef} onChange={handleFormChange} onSubmit={form.save}>
       <ColoredContainer wrap overflow parent gap>
-        <Container large gap>
+        <Container medium gap>
           <Group form gap>
             <Container wrap gap>
               <ComboboxNew
@@ -230,7 +230,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormTabProps> = obse
             </TextareaNew>
           </Group>
         </Container>
-        <Container large gap>
+        <Container medium gap>
           {(authModel && !driver.data?.anonymousAccess) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>

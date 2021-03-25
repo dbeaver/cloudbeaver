@@ -8,21 +8,22 @@
 
 import { observer } from 'mobx-react-lite';
 
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { isControlPresented } from '../isControlPresented';
-import { CheckboxMarkup } from './CheckboxMarkup';
+import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
-
-export type CheckboxMod = 'primary' | 'small';
 
 export interface CheckboxBaseProps {
   label?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;
+  style?: ComponentStyle;
 }
 
-export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked' | 'id'> & ILayoutSizeProps;
+export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked' | 'id' | 'style'> & ILayoutSizeProps;
 
 export interface ICheckboxControlledProps extends CheckboxInputProps {
   value?: string;
