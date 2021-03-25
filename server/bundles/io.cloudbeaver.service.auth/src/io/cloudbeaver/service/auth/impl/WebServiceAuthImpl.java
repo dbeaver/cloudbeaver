@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.OffsetDateTime;
@@ -52,6 +53,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
+        }
+        String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
+        if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
+            throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
         }
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
