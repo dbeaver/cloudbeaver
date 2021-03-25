@@ -259,7 +259,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       customIncludeNetworkHandlerCredentials: false,
       customIncludeOriginDetails: false,
       includeAuthProperties: false,
-      includeOrigin: false,
+      includeOrigin: true,
     };
   }
 }

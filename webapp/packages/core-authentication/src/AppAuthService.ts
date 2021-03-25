@@ -24,6 +24,7 @@ export class AppAuthService extends Bootstrap {
   }
 
   readonly auth: IExecutor<boolean>;
+
   constructor(
     private serverService: ServerService,
     private sessionService: SessionService,

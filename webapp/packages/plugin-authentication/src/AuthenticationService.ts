@@ -8,10 +8,12 @@
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ScreenService } from '@cloudbeaver/core-routing';
+import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
@@ -25,7 +27,9 @@ export class AuthenticationService extends Bootstrap {
     private authDialogService: AuthDialogService,
     private userInfoResource: UserInfoResource,
     private notificationService: NotificationService,
-    private readonly administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly authProviderService: AuthProviderService,
+    private readonly authProvidersResource: AuthProvidersResource
   ) {
     super();
     this.authPromise = null;
@@ -83,7 +87,26 @@ export class AuthenticationService extends Bootstrap {
 
       await this.auth(false);
     });
+    this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
 
   load(): void { }
+
+  private requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
+    await this.authProvidersResource.load();
+    await this.userInfoResource.load();
+
+    if (!this.authProvidersResource.has(data.subType ?? data.type)) {
+      return;
+    }
+
+    if (!this.userInfoResource.hasToken(data.type, data.subType)) {
+      await this.auth(false, data.subType ?? data.type);
+    }
+
+    if (this.userInfoResource.hasToken(data.type, data.subType)) {
+      const provider = contexts.getContext(AuthProviderContext);
+      provider.auth();
+    }
+  };
 }

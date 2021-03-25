@@ -420,7 +420,7 @@ export class NavNodeManagerService extends Bootstrap {
     const nodeInfo = await contexts.getContext(this.navigationNavNodeContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeInfo.nodeId) && nodeInfo.connection) {
-      let connection: Connection | undefined;
+      let connection: Connection | null;
       try {
         connection = await this.connectionAuthService.auth(nodeInfo.connection.id);
       } catch (exception) {

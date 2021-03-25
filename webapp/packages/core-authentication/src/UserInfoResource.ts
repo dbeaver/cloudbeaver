@@ -29,16 +29,28 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data?.userId || 'anonymous';
   }
 
+  hasToken(type: string, subType?: string): boolean {
+    if (!this.data) {
+      return false;
+    }
+
+    // TODO: will be changed due wrong origin in authTokens
+    return this.data.authTokens.some(token => token.origin.type === (subType ?? type))
+    || this.data.authTokens.some(token => token.origin.type === type && token.origin.subType === subType);
+  }
+
   async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
     const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
+    // TODO: will be replaced with another function
     const { user } = await this.graphQLService.sdk.authLogin({
       provider,
       credentials: processedCredentials,
     });
-    // this.data = user as any as UserInfo;
 
+    await this.refresh();
     await this.updateSession();
+
     return this.data;
   }
 

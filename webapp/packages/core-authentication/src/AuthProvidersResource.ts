@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { PermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
@@ -20,12 +20,12 @@ export type AuthProvider = AuthProviderInfo;
 export class AuthProvidersResource extends CachedDataResource<AuthProvider[], void> {
   constructor(
     private graphQLService: GraphQLService,
-    private permissionsResource: PermissionsResource,
     private serverConfigResource: ServerConfigResource
   ) {
     super([]);
 
-    this.permissionsResource.onDataUpdate.addHandler(() => this.markOutdated());
+    this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
+    this.serverConfigResource.onDataUpdate.addHandler(async () => { await this.load(); });
   }
 
   has(id: string): boolean {
