@@ -22,10 +22,10 @@ export default [
   ['administration_configuration_wizard_configuration_navigation_tree_view_description', "By default, all user's new connections will contain only basic information in navigation tree"],
 
   ['administration_configuration_wizard_configuration_security', 'Security'],
-  ['administration_configuration_wizard_configuration_security_admin_credentials', 'Credentials saving'],
-  ['administration_configuration_wizard_configuration_security_admin_credentials_description', 'Allow to save credentials'],
-  ['administration_configuration_wizard_configuration_security_public_credentials', 'Users credentials saving'],
-  ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Allow to save credentials for regular users'],
+  ['administration_configuration_wizard_configuration_security_admin_credentials', 'Save credentials'],
+  ['administration_configuration_wizard_configuration_security_admin_credentials_description', 'Allow to save credentials for pre-configured database'],
+  ['administration_configuration_wizard_configuration_security_public_credentials', 'Save users credentials'],
+  ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Allow to save credentials for non-admin users'],
 
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Hide Folders'],
