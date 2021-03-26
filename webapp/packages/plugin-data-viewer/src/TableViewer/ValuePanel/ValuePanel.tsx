@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useRef, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-blocks';
@@ -69,9 +70,29 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
   resultIndex,
 }) {
   const service = useService(DataValuePanelService);
+  const [currentTabId, setCurrentTabId] = useState('');
+  const lastTabId = useRef('');
+
+  const displayed = service.getDisplayed({ dataFormat, model, resultIndex });
+
+  if (displayed.length > 0) {
+    const firstTabId = displayed[0].key;
+    if (firstTabId !== lastTabId.current) {
+      setCurrentTabId(firstTabId);
+      lastTabId.current = firstTabId;
+    }
+  }
 
   return styled(useStyles(styles, UNDERLINE_TAB_STYLES))(
-    <TabsState container={service.tabs} dataFormat={dataFormat} model={model} resultIndex={resultIndex} lazy>
+    <TabsState
+      currentTabId={currentTabId}
+      container={service.tabs}
+      dataFormat={dataFormat}
+      model={model}
+      resultIndex={resultIndex}
+      lazy
+      onChange={tab => setCurrentTabId(tab.tabId)}
+    >
       <TabList style={[styles, UNDERLINE_TAB_STYLES]} />
       <TabPanelList style={[styles, UNDERLINE_TAB_STYLES]} />
     </TabsState>

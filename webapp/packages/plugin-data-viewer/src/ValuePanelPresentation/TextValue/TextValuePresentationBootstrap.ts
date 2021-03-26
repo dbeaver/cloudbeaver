@@ -23,9 +23,10 @@ export class TextValuePresentationBootstrap extends Bootstrap {
       key: 'text-presentation',
       options: { dataFormat: [ResultDataFormat.Resultset] },
       name: 'data_viewer_presentation_value_text_title',
+      order: Number.MAX_SAFE_INTEGER,
       panel: () => TextValuePresentation,
     });
   }
 
-  load(): void {}
+  load(): void { }
 }
