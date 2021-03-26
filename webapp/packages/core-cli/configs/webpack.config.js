@@ -1,5 +1,5 @@
 const { resolve, join } = require('path');
-const ModuleDependencyWarning = require("webpack/lib/ModuleDependencyWarning");
+const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 // const ESLintPlugin = require('eslint-webpack-plugin');
@@ -8,7 +8,7 @@ class IgnoreNotFoundExportPlugin {
   apply(compiler) {
     const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/
     function doneHook(stats) {
-      stats.compilation.warnings = stats.compilation.warnings.filter(function (warn) {
+      stats.compilation.warnings = stats.compilation.warnings.filter(warn => {
         if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
           return false
         }
@@ -16,9 +16,9 @@ class IgnoreNotFoundExportPlugin {
       })
     }
     if (compiler.hooks) {
-      compiler.hooks.done.tap("IgnoreNotFoundExportPlugin", doneHook)
+      compiler.hooks.done.tap('IgnoreNotFoundExportPlugin', doneHook)
     } else {
-      compiler.plugin("done", doneHook)
+      compiler.plugin('done', doneHook)
     }
   }
 }
@@ -26,7 +26,7 @@ class IgnoreNotFoundExportPlugin {
 const nodeModules = [
   resolve('node_modules'), // product
   resolve('../../node_modules'), // workspace
-  resolve('../../node_modules/@cloudbeaver/core-cli/node_modules') // core-cli
+  resolve('../../node_modules/@cloudbeaver/core-cli/node_modules'), // core-cli
 ]
 
 module.exports = (env, argv) => {
@@ -37,10 +37,10 @@ module.exports = (env, argv) => {
     const loaders = [];
 
     // Broke styles order in dev mode
-    // if(devMode) {
-      // loaders.push('style-loader')
-    // }else{
-      loaders.push(MiniCssExtractPlugin.loader);
+    // if (devMode) {
+    //  loaders.push('style-loader');
+    // } else {
+    loaders.push(MiniCssExtractPlugin.loader);
     // }
 
     return loaders;
@@ -56,7 +56,7 @@ module.exports = (env, argv) => {
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
       // require('postcss-discard-comments'),
-      require('reshadow/postcss')({ scopeBehaviour: moduleScope })
+      require('reshadow/postcss')({ scopeBehaviour: moduleScope }),
     ];
 
     return [
@@ -66,15 +66,16 @@ module.exports = (env, argv) => {
         options: {
           modules: modules,
           sourceMap: true,
-        }
+        },
       },
+
       {
         loader: 'postcss-loader',
         options: {
           postcssOptions: {
             plugins: postCssPlugins,
             sourceMap: true,
-          }
+          },
         },
       },
       {
@@ -83,10 +84,10 @@ module.exports = (env, argv) => {
           sourceMap: true,
           sassOptions: {
             implementation: require('node-sass'),
-            includePaths: nodeModules
+            includePaths: nodeModules,
           },
-        }
-      }
+        },
+      },
     ];
   }
 
@@ -111,7 +112,7 @@ module.exports = (env, argv) => {
       },
     },
     resolveLoader: {
-      modules: nodeModules
+      modules: nodeModules,
     },
     module: {
       rules: [
@@ -124,8 +125,8 @@ module.exports = (env, argv) => {
           test: /\.(ts|js)x?$/,
           exclude: /node_modules/,
           use: [
-            babelLoader
-          ]
+            babelLoader,
+          ],
         },
         {
           test: /\.(css|s[ac]ss)$/,
@@ -139,15 +140,23 @@ module.exports = (env, argv) => {
               use: [
                 ...getBaseStyleLoaders(),
                 'css-loader',
-                'sass-loader'
-              ]
+                'sass-loader',
+              ],
             },
             {
               use: generateStyleLoaders({ hasModule: false }),
-            }
-          ]
+            },
+          ],
         },
-      ]
+        {
+          test: /\.png$/,
+          use: [
+            {
+              loader: 'url-loader',
+            },
+          ],
+        },
+      ],
     },
     devtool: devTool,
     plugins: [
@@ -168,6 +177,6 @@ module.exports = (env, argv) => {
         chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
         ignoreOrder: false, // Enable to remove warnings about conflicting order
       }),
-    ]
+    ],
   };
-};
+}
