@@ -12,7 +12,7 @@
 import 'leaflet/dist/leaflet.css';
 
 import leaflet from 'leaflet';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MapContainer, GeoJSON, LayersControl, TileLayer } from 'react-leaflet';
 import type { TileLayerProps } from 'react-leaflet';
 import styled, { css } from 'reshadow';

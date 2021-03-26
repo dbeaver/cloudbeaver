@@ -39,23 +39,19 @@ export function useParseGISValues(
   resultIndex: number,
   values: Array<Required<IResultSetElementKey>>
 ) {
-  const modelResultData = model.getResult(resultIndex);
-
   const geoJSON = useMemo(() => {
     const result: IGeoJSONFeature[] = [];
-
-    if (!modelResultData) {
-      return result;
-    }
-
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
 
-    for (let i = 0; i <= values.length; i++) {
+    for (let i = 0; i < values.length; i++) {
       try {
         const cell = values[i];
-        const cellValue = data.getCellValue(cell) as GISType;
-        const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
+        const cellValue = data.getCellValue(cell) as GISType | undefined;
+        if (!cellValue) {
+          continue;
+        }
 
+        const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
         result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
       } catch {
         continue;
@@ -63,7 +59,7 @@ export function useParseGISValues(
     }
 
     return result;
-  }, [model, resultIndex, values, modelResultData]);
+  }, [model, resultIndex, values]);
 
   return geoJSON;
 }
