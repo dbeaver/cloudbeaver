@@ -5,6 +5,7 @@ export default manifest;
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
 export * from './DatabaseDataModel/Actions/IDatabaseDataFormatAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
@@ -23,6 +24,7 @@ export * from './DatabaseDataModel/IDatabaseResultSet';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';
+export * from './TableViewer/ValuePanel/DataValuePanelService';
 
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';

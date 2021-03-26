@@ -24,6 +24,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
   const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
+  const dataGridApi = dataGridContext?.getDataGridApi();
 
   const classes: string[] = [];
   const { rowIdx, column } = props;
@@ -41,6 +42,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }
 
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (dataGridApi) {
+      dataGridApi.selectCell({ idx: column.idx, rowIdx });
+    }
+
     selectionContext?.select(
       {
         colIdx: column.idx,
