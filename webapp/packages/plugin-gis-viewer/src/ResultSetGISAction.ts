@@ -6,28 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { databaseDataAction, IResultSetElementKey, IDatabaseResultSet, DatabaseDataEditorActionsData } from '@cloudbeaver/plugin-data-viewer';
+import { databaseDataAction, IResultSetElementKey, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction';
 
+export interface IGISType {
+  $type: string;
+  srid: number;
+  text: string;
+  mapText: string | null;
+  properties: Record<string, any> | null;
+}
 @databaseDataAction()
 export class ResultSetGISAction implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet> {
-  GISValueType = 'geometry';
+  private readonly GISValueType = 'geometry';
 
   static dataFormat = ResultDataFormat.Resultset;
   result: IDatabaseResultSet;
 
-  readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetElementKey>>;
-
   constructor(
     result: IDatabaseResultSet) {
     this.result = result;
-    this.actions = new Executor();
   }
 
-  isGISFormat(value: any): boolean {
+  isGISFormat(cell: IResultSetElementKey): boolean {
+    if (cell.row === undefined || cell.column === undefined) {
+      return false;
+    }
+
+    const value = this.result?.data?.rows?.[cell.row][cell.column];
+
     if (value !== null && typeof value === 'object' && '$type' in value) {
       return value.$type === this.GISValueType;
     }
@@ -43,12 +52,19 @@ export class ResultSetGISAction implements IDatabaseDataGISAction<IResultSetElem
 
     for (let i = 0; i < cells.length; i++) {
       const cell = cells[i];
-      const cellValue = this.result.data?.rows[cell.row][cell.column];
-      if (this.isGISFormat(cellValue)) {
+      if (this.isGISFormat(cell)) {
         result.push(cell);
       }
     }
     return result;
+  }
+
+  getCellValue(cell: IResultSetElementKey): IGISType | undefined {
+    if (cell.row === undefined || cell.column === undefined || !this.result.data?.rows || !this.isGISFormat(cell)) {
+      return undefined;
+    }
+
+    return this.result.data.rows[cell.row][cell.column];
   }
 
   updateResult(result: IDatabaseResultSet) {

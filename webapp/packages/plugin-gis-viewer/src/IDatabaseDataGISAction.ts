@@ -8,8 +8,11 @@
 
 import type { IDatabaseDataResult, IDatabaseDataAction, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
+import type { IGISType } from './ResultSetGISAction';
+
 export interface IDatabaseDataGISAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<TResult> {
   getGISDataFor: (selectedCells: Array<Required<IResultSetElementKey>>) => Array<Required<IResultSetElementKey>>;
-  isGISFormat: (value: any) => boolean;
+  getCellValue: (cell: IResultSetElementKey) => IGISType | undefined;
+  isGISFormat: (cell: IResultSetElementKey) => boolean;
 }

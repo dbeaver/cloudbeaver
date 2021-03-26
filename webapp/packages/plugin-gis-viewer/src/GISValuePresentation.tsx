@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import wkt from 'terraformer-wkt-parser';
 
 import { TabContainerPanelComponent, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { IDataValuePanelProps, IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { LeafletMap } from './LeafletMap';
+import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
-import { useParseGISValues } from './useParseGISValues';
-import type { AssociatedValue } from './useParseGISValues';
 
 export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function GISValuePresentation({
   model,
@@ -26,7 +25,7 @@ export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelPro
 
   const modelResultData = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const GIS = model.source.getAction(resultIndex, ResultSetGISAction);
+  const gis = model.source.getAction(resultIndex, ResultSetGISAction);
 
   const focusedCell = selection.getFocusedElement() as Required<IResultSetElementKey> | null;
   const selectedCells = selection.getSelectedElements();
@@ -35,18 +34,36 @@ export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelPro
     selectedCells.push(focusedCell);
   }
 
-  const geoJSON = useParseGISValues(
-    model, resultIndex, GIS.getGISDataFor(selectedCells)
-  );
+  const parsedGISData = useMemo(() => {
+    const result: IGeoJSONFeature[] = [];
 
-  const getAssociatedValues = useCallback((cell: Required<IResultSetElementKey>): AssociatedValue[] => {
+    for (let i = 0; i < selectedCells.length; i++) {
+      try {
+        const cell = selectedCells[i];
+        const cellValue = gis.getCellValue(cell);
+
+        if (!cellValue) {
+          continue;
+        }
+
+        const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
+        result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
+      } catch {
+        continue;
+      }
+    }
+
+    return result;
+  }, [selectedCells, gis]);
+
+  const getAssociatedValues = useCallback((cell: Required<IResultSetElementKey>): IAssociatedValue[] => {
     if (!modelResultData?.data?.columns || !modelResultData?.data?.rows) {
       return [];
     }
 
     const { column: columnIndex, row: rowIndex } = cell;
 
-    return modelResultData.data.columns.reduce((result: AssociatedValue[], column, i) => {
+    return modelResultData.data.columns.reduce((result: IAssociatedValue[], column, i) => {
       if (i !== columnIndex) {
         result.push({
           key: column.name!,
@@ -60,11 +77,11 @@ export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelPro
     }, []);
   }, [modelResultData, model, resultIndex]);
 
-  if (!geoJSON.length) {
+  if (!parsedGISData.length) {
     return <TextPlaceholder>{translate('gis_presentation_placeholder')}</TextPlaceholder>;
   }
 
   return (
-    <LeafletMap geoJSON={geoJSON} getAssociatedValues={getAssociatedValues} />
+    <LeafletMap geoJSON={parsedGISData} getAssociatedValues={getAssociatedValues} />
   );
 });

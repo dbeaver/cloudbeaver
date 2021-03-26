@@ -11,6 +11,7 @@
 
 import 'leaflet/dist/leaflet.css';
 
+import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
 import { MapContainer, GeoJSON, LayersControl, TileLayer } from 'react-leaflet';
@@ -21,16 +22,29 @@ import { useSplit } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import type { AssociatedValue, IGeoJSONFeature } from './useParseGISValues';
+export interface IAssociatedValue {
+  key: string;
+  value: any;
+}
 
-export interface IBaseTile extends TileLayerProps {
+interface IFeatureProperties {
+  srid: number;
+  associatedCell: Required<IResultSetElementKey>;
+}
+
+export interface IGeoJSONFeature extends GeoJSON.Feature<GeoJSON.GeometryObject, IFeatureProperties> {
+  type: 'Feature';
+  bbox?: geojson.BBox;
+}
+
+interface IBaseTile extends TileLayerProps {
   name: string;
   checked?: boolean;
 }
 
 interface Props {
   geoJSON: IGeoJSONFeature[];
-  getAssociatedValues: (cell: Required<IResultSetElementKey>) => AssociatedValue[];
+  getAssociatedValues: (cell: Required<IResultSetElementKey>) => IAssociatedValue[];
 }
 
 const baseTiles: Record<'street' | 'topography', IBaseTile> = {
@@ -90,7 +104,7 @@ function getCRS(feature?: IGeoJSONFeature): leaflet.CRS {
   }
 }
 
-const LEAFLET_STYLES = css`
+const styles = css`
   MapContainer {
     width: 100%;
     height: 100%;
@@ -160,7 +174,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
     }
   }, [splitContext.isResizing, splitContext.mode, mapRef, geoJSONLayerRef, crs, geoJSON]);
 
-  return styled(LEAFLET_STYLES)(
+  return styled(styles)(
     <MapContainer crs={crs} whenCreated={setMapRef} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts

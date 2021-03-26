@@ -1,24 +1,24 @@
-const { resolve, join } = require('path');
-const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { resolve, join } = require('path')
+const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
-  apply(compiler) {
-    const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/
-    function doneHook(stats) {
+  apply (compiler) {
+    const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/;
+    function doneHook (stats) {
       stats.compilation.warnings = stats.compilation.warnings.filter(warn => {
         if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
-          return false
+          return false;
         }
-        return true;
-      })
+        return true
+      });
     }
     if (compiler.hooks) {
-      compiler.hooks.done.tap('IgnoreNotFoundExportPlugin', doneHook)
+      compiler.hooks.done.tap('IgnoreNotFoundExportPlugin', doneHook);
     } else {
-      compiler.plugin('done', doneHook)
+      compiler.plugin('done', doneHook);
     }
   }
 }
@@ -27,37 +27,37 @@ const nodeModules = [
   resolve('node_modules'), // product
   resolve('../../node_modules'), // workspace
   resolve('../../node_modules/@cloudbeaver/core-cli/node_modules'), // core-cli
-]
+];
 
 module.exports = (env, argv) => {
-  process.env.NODE_ENV = argv.mode;
-  const devTool = 'source-map' in env && 'source-map';
-  const devMode = argv.mode !== 'production';
-  function getBaseStyleLoaders() {
-    const loaders = [];
+  process.env.NODE_ENV = argv.mode
+  const devTool = 'source-map' in env && 'source-map'
+  const devMode = argv.mode !== 'production'
+  function getBaseStyleLoaders () {
+    const loaders = []
 
     // Broke styles order in dev mode
     // if (devMode) {
     //  loaders.push('style-loader');
     // } else {
-    loaders.push(MiniCssExtractPlugin.loader);
+    loaders.push(MiniCssExtractPlugin.loader)
     // }
 
-    return loaders;
+    return loaders
   }
 
-  function generateStyleLoaders(options = { hasModule: false }) {
-    const moduleScope = options.hasModule ? 'local' : 'global';
+  function generateStyleLoaders (options = { hasModule: false }) {
+    const moduleScope = options.hasModule ? 'local' : 'global'
     const modules = {
       mode: moduleScope,
       localIdentName: '[local]___[hash:base64:5]',
-    };
+    }
 
     const postCssPlugins = [
       require('postcss-preset-env')({ stage: 0 }),
       // require('postcss-discard-comments'),
       require('reshadow/postcss')({ scopeBehaviour: moduleScope }),
-    ];
+    ]
 
     return [
       ...getBaseStyleLoaders(),
@@ -88,7 +88,7 @@ module.exports = (env, argv) => {
           },
         },
       },
-    ];
+    ]
   }
 
   var babelLoader = {
@@ -96,7 +96,7 @@ module.exports = (env, argv) => {
     options: {
       configFile: join(__dirname, 'babel.config.js'),
     },
-  }
+  };
 
   return {
     // target: !devMode ? "web" : "browserslist",
@@ -149,7 +149,7 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          test: /\.png$/,
+          test: /\.(png|jpg|gif)$/i,
           use: [
             {
               loader: 'url-loader',
@@ -178,5 +178,5 @@ module.exports = (env, argv) => {
         ignoreOrder: false, // Enable to remove warnings about conflicting order
       }),
     ],
-  };
+  }
 }

@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { DataValuePanelService, ResultSetDataAction, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { DataValuePanelService, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { GISValuePresentation } from './GISValuePresentation';
 import { ResultSetGISAction } from './ResultSetGISAction';
@@ -32,23 +32,20 @@ export class GISViewerBootstrap extends Bootstrap {
         }
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
-        const GIS = context.model.source.getAction(context.resultIndex, ResultSetGISAction);
-        const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
+        const gis = context.model.source.getAction(context.resultIndex, ResultSetGISAction);
 
         const focusedElement = selection.getFocusedElement();
 
         if (focusedElement) {
-          const focusedElementValue = data.getCellValue(focusedElement);
-          return !GIS.isGISFormat(focusedElementValue);
+          return !gis.isGISFormat(focusedElement);
         }
 
         const selectedCells = selection.getSelectedElements();
 
         if (selectedCells.length > 0) {
           const firstSelectedCell = selectedCells[0];
-          const firstSelectedCellValue = data.getCellValue(firstSelectedCell);
 
-          return !GIS.isGISFormat(firstSelectedCellValue);
+          return !gis.isGISFormat(firstSelectedCell);
         }
 
         return true;
