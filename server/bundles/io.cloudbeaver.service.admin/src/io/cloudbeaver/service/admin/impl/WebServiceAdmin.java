@@ -32,6 +32,7 @@ import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
@@ -382,6 +383,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 if (!authInfoList.isEmpty()) {
                     adminName = authInfoList.get(0).getUserId();
                 }
+            }
+            if (CommonUtils.isEmpty(adminName)) {
+                adminName = CBConstants.DEFAULT_ADMIN_NAME;
             }
 
             // Patch configuration by services

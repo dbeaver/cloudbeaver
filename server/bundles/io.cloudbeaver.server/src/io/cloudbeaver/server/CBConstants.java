@@ -57,6 +57,7 @@ public class CBConstants {
     public static final String DEFAULT_DRIVERS_LOCATION = DEFAULT_DEPLOY_LOCATION + "/drivers";
     public static final String DEFAULT_WORKSPACE_LOCATION = DEFAULT_DEPLOY_LOCATION + "/workspace";
     public static final String DEFAULT_PRODUCT_CONFIGURATION = "conf/product.conf";
+    public static final String DEFAULT_ADMIN_NAME = "cbadmin";
 
     // Default max idle time (10 minutes)
     public static final long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;
@@ -69,4 +70,5 @@ public class CBConstants {
 
 
     public static final String VAR_HOST_DOCKER_INTERNAL = "host.docker.internal";
+
 }
