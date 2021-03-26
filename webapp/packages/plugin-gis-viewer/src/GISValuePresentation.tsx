@@ -37,20 +37,15 @@ export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelPro
   const parsedGISData = useMemo(() => {
     const result: IGeoJSONFeature[] = [];
 
-    for (let i = 0; i < selectedCells.length; i++) {
-      try {
-        const cell = selectedCells[i];
-        const cellValue = gis.getCellValue(cell);
+    for (const cell of selectedCells) {
+      const cellValue = gis.getCellValue(cell);
 
-        if (!cellValue) {
-          continue;
-        }
-
-        const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
-        result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
-      } catch {
+      if (!cellValue) {
         continue;
       }
+
+      const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
+      result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
     }
 
     return result;

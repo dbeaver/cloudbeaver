@@ -50,8 +50,7 @@ export class ResultSetGISAction implements IDatabaseDataGISAction<IResultSetElem
       return result;
     }
 
-    for (let i = 0; i < cells.length; i++) {
-      const cell = cells[i];
+    for (const cell of cells) {
       if (this.isGISFormat(cell)) {
         result.push(cell);
       }
