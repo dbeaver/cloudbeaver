@@ -54,7 +54,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
-        if (!CBApplication.getInstance().isConfigurationMode()) {
+        boolean configMode = CBApplication.getInstance().isConfigurationMode();
+
+        if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            // Admin can authorize in any providers
+        } else {
+            // Check enabled auth providers
             String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
             if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
                 throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
@@ -64,7 +69,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
-        boolean configMode = CBApplication.getInstance().isConfigurationMode();
         try {
             Map<String, Object> providerConfig = Collections.emptyMap();
 
