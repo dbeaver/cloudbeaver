@@ -8,7 +8,7 @@
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -93,6 +93,12 @@ export class AuthenticationService extends Bootstrap {
   load(): void { }
 
   private requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
+    if (data.type === AUTH_PROVIDER_LOCAL_ID) {
+      const provider = contexts.getContext(AuthProviderContext);
+      provider.auth();
+      return;
+    }
+
     await this.authProvidersResource.load();
     await this.userInfoResource.load();
 
