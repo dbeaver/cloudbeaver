@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -50,6 +51,11 @@ public class WebServerConfig {
     @Property
     public String getVersion() {
         return GeneralUtils.getProductVersion().toString();
+    }
+
+    @Property
+    public String getWorkspaceId() {
+        return DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
     }
 
     @Property

@@ -88,6 +88,7 @@ type ProductInfo {
 type ServerConfig {
     name: String!
     version: String!
+    workspaceId: ID!
 
     anonymousAccessEnabled: Boolean
     authenticationEnabled: Boolean
