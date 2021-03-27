@@ -28,14 +28,17 @@ import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
  */
 public class CBWorkspace extends BaseWorkspaceImpl {
 
+    private final String workspaceId;
+
     public CBWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
         super(platform, eclipseWorkspace);
+        workspaceId = readWorkspaceId();
     }
 
     @NotNull
     @Override
     public String getWorkspaceId() {
-        return "web-workspace";
+        return workspaceId;
     }
 
 }
