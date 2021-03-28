@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutionContextProvider } from './IExecutionContext';
+declare const _VERSION_: string | undefined;
 
-export type IExecutorHandler<T> = (
-  data: T,
-  contexts: IExecutionContextProvider<T>
-) => any | Promise<any>;
+export const BuildVersion = {
+  get version(): string | undefined {
+    return _VERSION_;
+  },
+};

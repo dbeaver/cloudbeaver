@@ -19,7 +19,7 @@ export interface Scalars {
 export interface Query {
   activeUser?: Maybe<UserInfo>;
   allConnections: ConnectionInfo[];
-  authLogin: UserAuthInfo;
+  authLogin: UserAuthToken;
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: DatabaseAuthModel[];
   authProviders: AuthProviderInfo[];
@@ -57,8 +57,6 @@ export interface Query {
   serverConfig: ServerConfig;
   sessionPermissions: Array<Maybe<Scalars['ID']>>;
   sessionState: SessionInfo;
-  /** @deprecated Field no longer supported */
-  sessionUser?: Maybe<UserAuthInfo>;
   setConnectionSubjectAccess?: Maybe<Scalars['Boolean']>;
   setDefaultNavigatorSettings: Scalars['Boolean'];
   setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
@@ -479,6 +477,7 @@ export interface ProductInfo {
 export interface ServerConfig {
   name: Scalars['String'];
   version: Scalars['String'];
+  workspaceId: Scalars['ID'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
@@ -926,22 +925,9 @@ export interface AuthProviderInfo {
 export interface UserAuthToken {
   authProvider: Scalars['ID'];
   loginTime: Scalars['DateTime'];
-  message?: Maybe<Scalars['String']>;
-  origin: ObjectOrigin;
-}
-
-export interface UserAuthInfo {
-  /** @deprecated Field no longer supported */
   userId: Scalars['String'];
-  /** @deprecated Field no longer supported */
-  displayName?: Maybe<Scalars['String']>;
-  /** @deprecated Field no longer supported */
-  authProvider: Scalars['String'];
-  /** @deprecated Field no longer supported */
-  loginTime: Scalars['DateTime'];
-  /** @deprecated Field no longer supported */
+  displayName: Scalars['String'];
   message?: Maybe<Scalars['String']>;
-  /** @deprecated Field no longer supported */
   origin: ObjectOrigin;
 }
 
@@ -981,9 +967,10 @@ export interface AsyncTaskCancelMutation { result: Mutation['asyncTaskCancel'] }
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+  customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export interface AuthLoginQuery { user: Pick<UserAuthInfo, 'userId' | 'displayName' | 'authProvider' | 'loginTime' | 'message'> }
+export interface AuthLoginQuery { authToken: AuthTokenFragment }
 
 export type AuthLogoutQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -996,10 +983,7 @@ export type GetActiveUserQueryVariables = Exact<{
 export interface GetActiveUserQuery {
   user?: Maybe<(
     Pick<UserInfo, 'userId' | 'displayName'>
-    & { authTokens: Array<(
-      Pick<UserAuthToken, 'authProvider' | 'loginTime' | 'message'>
-      & { origin: ObjectOriginInfoFragment }
-    )>; }
+    & { authTokens: AuthTokenFragment[] }
   )>;
 }
 
@@ -1341,6 +1325,11 @@ export type AdminUserInfoFragment = (
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
 
+export type AuthTokenFragment = (
+  Pick<UserAuthToken, 'authProvider' | 'loginTime' | 'message'>
+  & { origin: ObjectOriginInfoFragment }
+);
+
 export type DatabaseConnectionFragment = (
   Pick<ConnectionInfo, 'id' | 'name' | 'description' | 'driverId' | 'template' | 'connected' | 'provided' | 'useUrl' | 'readOnly' | 'saveCredentials' | 'host' | 'port' | 'databaseName' | 'url' | 'properties' | 'providerProperties' | 'features' | 'supportedDataFormats' | 'authNeeded' | 'authModel'>
   & { origin: ObjectOriginInfoFragment; authProperties: UserConnectionAuthPropertiesFragment[]; networkHandlersConfig: Array<MakeOptional<Pick<NetworkHandlerConfig, 'id' | 'enabled' | 'userName' | 'password' | 'savePassword' | 'properties'>, 'userName' | 'password' | 'properties'>>; navigatorSettings: AllNavigatorSettingsFragment }
@@ -1576,7 +1565,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -1649,6 +1638,16 @@ export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
+  origin {
+    ...ObjectOriginInfo
+  }
+}
+    ${ObjectOriginInfoFragmentDoc}`;
+export const AuthTokenFragmentDoc = `
+    fragment AuthToken on UserAuthToken {
+  authProvider
+  loginTime
+  message
   origin {
     ...ObjectOriginInfo
   }
@@ -1820,16 +1819,12 @@ export const AsyncTaskCancelDocument = `
 }
     `;
 export const AuthLoginDocument = `
-    query authLogin($provider: ID!, $credentials: Object!) {
-  user: authLogin(provider: $provider, credentials: $credentials) {
-    userId
-    displayName
-    authProvider
-    loginTime
-    message
+    query authLogin($provider: ID!, $credentials: Object!, $customIncludeOriginDetails: Boolean!) {
+  authToken: authLogin(provider: $provider, credentials: $credentials) {
+    ...AuthToken
   }
 }
-    `;
+    ${AuthTokenFragmentDoc}`;
 export const AuthLogoutDocument = `
     query authLogout {
   authLogout
@@ -1841,16 +1836,11 @@ export const GetActiveUserDocument = `
     userId
     displayName
     authTokens {
-      authProvider
-      loginTime
-      message
-      origin {
-        ...ObjectOriginInfo
-      }
+      ...AuthToken
     }
   }
 }
-    ${ObjectOriginInfoFragmentDoc}`;
+    ${AuthTokenFragmentDoc}`;
 export const GetAuthProvidersDocument = `
     query getAuthProviders {
   providers: authProviders {
@@ -2495,6 +2485,7 @@ export const ServerConfigDocument = `
   serverConfig {
     name
     version
+    workspaceId
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

@@ -24,19 +24,11 @@ import { ServerConfigurationPageController } from './ServerConfigurationPageCont
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = css`
-  Loader {
-    height: 400px;
-  }
-
   SubmittingForm {
     flex: 1;
     display: flex;
     overflow: auto;
     flex-direction: column;
-  }
-
-  FormBox {
-    flex: 0;
   }
 
   p {
@@ -75,28 +67,25 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           </Group>
         )}
 
-        <Container wrap gap>
-          <Loader state={service}>
-            {() => styled(style)(
-              <>
-                <ServerConfigurationInfoForm serverConfig={controller.state.serverConfig} />
-                <Group form gap medium>
-                  <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
-                  <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
-                  <ServerConfigurationNavigatorViewForm configs={controller.state} />
-                  <Placeholder container={service.pluginsContainer} />
-                </Group>
-                <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
-                <Placeholder
-                  container={service.configurationContainer}
-                  configurationWizard={configurationWizard}
-                  serverConfig={controller.state.serverConfig}
-                  navigatorConfig={controller.state.navigatorConfig}
-                />
-              </>
-            )}
-          </Loader>
-        </Container>
+        <Loader state={service}>
+          {() => styled(style)(
+            <Container wrap gap>
+              <ServerConfigurationInfoForm state={controller.state} />
+              <Group form gap medium>
+                <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
+                <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
+                <ServerConfigurationNavigatorViewForm configs={controller.state} />
+                <Placeholder container={service.pluginsContainer} />
+              </Group>
+              <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
+              <Placeholder
+                container={service.configurationContainer}
+                configurationWizard={configurationWizard}
+                state={controller.state}
+              />
+            </Container>
+          )}
+        </Loader>
       </ColoredContainer>
     </SubmittingForm>
   );

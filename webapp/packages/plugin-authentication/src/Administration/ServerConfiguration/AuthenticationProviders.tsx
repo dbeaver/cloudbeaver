@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useDataResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
@@ -18,12 +18,13 @@ import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-adminis
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm';
 
 export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function AuthenticationProviders({
-  serverConfig,
+  state: { serverConfig },
   configurationWizard,
 }) {
-  const providers = useDataResource(AuthProvidersResource, undefined);
+  const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
+
   const disabled = providers.data.length === 1 && !providers.resource.has(AUTH_PROVIDER_LOCAL_ID);
 
   return styled(styles)(
@@ -58,7 +59,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           {() => !disabled && styled(styles)(
             <>
               <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_provider')}</GroupTitle>
-              {providers.data.map(provider => (
+              {providers.data.map(provider => provider && (
                 <SwitchNew
                   key={provider.id}
                   value={provider.id}

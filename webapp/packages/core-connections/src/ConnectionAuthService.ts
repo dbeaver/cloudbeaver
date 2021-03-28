@@ -44,6 +44,7 @@ export class ConnectionAuthService {
       return connection;
     }
 
+    await this.connectionInfoResource.waitLoad();
     connection = this.connectionInfoResource.get(connectionId);
 
     if (!connection) {

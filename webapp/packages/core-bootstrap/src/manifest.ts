@@ -85,6 +85,7 @@ import {
   ServerSettingsService,
   ServerConfigResource,
   PermissionsResource,
+  SessionDataResource,
   SessionResource,
   SessionExpireService
 } from '@cloudbeaver/core-root';
@@ -127,6 +128,7 @@ export const coreManifest: PluginManifest = {
     ServerConfigResource,
     PermissionsResource,
     SessionResource,
+    SessionDataResource,
     SessionSettingsService,
     PermissionsService,
     CoreSettingsService,
@@ -188,9 +190,4 @@ export const coreManifest: PluginManifest = {
     ThemeService,
     ServerService,
   ],
-
-  async initialize() {
-    // Note that the initialization of the core occurs in AppBootstrap
-    // and it is called before the initialization phase of all manifests
-  },
 };

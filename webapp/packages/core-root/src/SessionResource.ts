@@ -25,17 +25,10 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
   ) {
     super(null);
 
-    this.serverConfiguration.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.serverConfiguration.onDataUpdate.addHandler(() => { this.load(); });
-  }
-
-  async update(): Promise<void> {
-    await this.refresh();
+    this.sync(this.serverConfiguration);
   }
 
   protected async loader(): Promise<SessionState> {
-    await this.serverConfiguration.load();
-
     const { session } = await this.graphQLService.sdk.openSession();
 
     return session;

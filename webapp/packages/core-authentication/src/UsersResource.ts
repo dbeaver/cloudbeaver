@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -43,11 +44,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
+    private serverConfigResource: ServerConfigResource,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
     super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
+    this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
   }
 
   isNew(id: string): boolean {
@@ -188,8 +191,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       }
 
       if (key === UsersResource.keyAll) {
-        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
-        //       here we should check is it's was a full update
         this.loadedKeyMetadata.set(UsersResource.keyAll, true);
       }
     });

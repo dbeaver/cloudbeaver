@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DdlViewerBootstrap } from './DdlViewerBootstrap';
 import { DdlViewerService } from './DdlViewerService';
@@ -18,12 +18,8 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
+    DdlViewerBootstrap,
     DdlViewerTabService,
     DdlViewerService,
   ],
-
-  initialize(services: IServiceInjector): void {
-    const service = services.resolveServiceByClass(DdlViewerBootstrap);
-    service.bootstrap();
-  },
 };

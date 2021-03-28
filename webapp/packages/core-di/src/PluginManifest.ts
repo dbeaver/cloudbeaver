@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type {
-  IServiceConstructor, IServiceCollection, IServiceInjector
-} from './IApp';
+import type { IServiceConstructor } from './IApp';
 
 export interface PluginManifest {
   info: {
@@ -16,23 +14,7 @@ export interface PluginManifest {
     defaultSettings?: Record<string, any>;
   };
 
-  /**
-   * First phase, only register services in DI here
-   */
-  registerServices?: (services: IServiceCollection) => void;
-
   providers: Array<IServiceConstructor<any>>;
-
-  /**
-   * Second phase.
-   * You can be sure that all services of all plugins are already registered here and you can use any service
-   */
-  initialize?: (services: IServiceInjector) => Promise<void> | void;
-
-  /**
-   * Third phase but we still don't know what is it :)
-   */
-  load?: () => Promise<void> | void;
 
   /**
    * The list of plugins which your plugin depends on

@@ -44,9 +44,6 @@ export class App {
   // first phase register all dependencies
   registerServices(): void {
     for (const plugin of this.plugins) {
-      if (plugin.registerServices) {
-        plugin.registerServices(this.getServiceCollection());
-      }
       if (plugin.providers?.length) {
         plugin.providers.forEach(provider => {
           // console.log('provider', provider.name);
@@ -80,25 +77,6 @@ export class App {
             await serviceInstance.load();
           }
         }
-      }
-    }
-  }
-
-  // second phase - run init scripts todo run it based on dependency tree
-  async initializePlugins(): Promise<void> {
-    for (const plugin of this.plugins) {
-      if (plugin.initialize) {
-        await plugin.initialize(this.getServiceInjector());
-      }
-    }
-  }
-
-  // third initialization phase? (never called)
-  async load(): Promise<void> {
-    for (const plugin of this.plugins) {
-      if (plugin.load) {
-        // todo run it based on dependency tree
-        await plugin.load();
       }
     }
   }

@@ -3,12 +3,7 @@ query getActiveUser($customIncludeOriginDetails: Boolean!) {
     userId
     displayName
     authTokens {
-      authProvider
-      loginTime
-      message
-      origin {
-        ...ObjectOriginInfo
-      }
+      ...AuthToken
     }
   } 
 }

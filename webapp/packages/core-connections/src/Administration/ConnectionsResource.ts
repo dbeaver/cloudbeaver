@@ -11,6 +11,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ConnectionConfig,
@@ -41,13 +42,16 @@ export class ConnectionsResource extends CachedMapResource<string, DatabaseConne
   private connectionCreateSubject: Subject<DatabaseConnection>;
 
   constructor(
-    private graphQLService: GraphQLService
+    private graphQLService: GraphQLService,
+    sessionDataResource: SessionDataResource
   ) {
     super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
 
     makeObservable(this, {
       add: action,
     });
+
+    sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
 
     this.changed = false;
     this.connectionCreateSubject = new Subject<DatabaseConnection>();

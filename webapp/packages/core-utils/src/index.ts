@@ -1,3 +1,4 @@
+export * from './BuildVersion';
 export * from './flat';
 export * from './MetadataMap';
 export * from './OrderedMap';

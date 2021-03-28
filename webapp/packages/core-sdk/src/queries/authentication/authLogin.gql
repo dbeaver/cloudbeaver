@@ -1,12 +1,9 @@
 query authLogin(
   $provider: ID!
   $credentials: Object!
+  $customIncludeOriginDetails: Boolean!
 ) {
-  user: authLogin(provider: $provider, credentials: $credentials) {
-    userId
-    displayName
-    authProvider
-    loginTime
-    message
+  authToken: authLogin(provider: $provider, credentials: $credentials) {
+    ...AuthToken
   } 
 }

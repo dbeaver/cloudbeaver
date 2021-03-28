@@ -7,7 +7,7 @@
  */
 
 import { ConnectionInfoResource, ConnectionsManagerService, EConnectionFeature } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
@@ -17,15 +17,17 @@ import { EObjectFeature } from './EObjectFeature';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
-export class ConnectionDialogsService {
+export class ConnectionDialogsService extends Bootstrap {
   constructor(
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
     private connectionsManagerService: ConnectionsManagerService,
     private connectionInfoResource: ConnectionInfoResource
-  ) {}
+  ) {
+    super();
+  }
 
-  registerMenuItems(): void {
+  register(): void {
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuConnectionsPanel,
       {
@@ -83,4 +85,6 @@ export class ConnectionDialogsService {
       }
     );
   }
+
+  load(): void {}
 }

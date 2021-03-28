@@ -7,7 +7,7 @@
  */
 
 import { ConnectionInfoResource, CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -17,7 +17,7 @@ import { NavNodeManagerService } from '../shared/NodesManager/NavNodeManagerServ
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 
 @injectable()
-export class NavigationTreeContextMenuService {
+export class NavigationTreeContextMenuService extends Bootstrap {
   static nodeContextType = 'NodeWithParent';
   private static nodeViewMenuItemToken = 'nodeView';
   private static menuToken = 'navTreeMenu';
@@ -27,7 +27,9 @@ export class NavigationTreeContextMenuService {
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
     private connectionInfoResource: ConnectionInfoResource
-  ) { }
+  ) {
+    super();
+  }
 
   getMenuToken(): string {
     return NavigationTreeContextMenuService.menuToken;
@@ -144,7 +146,7 @@ export class NavigationTreeContextMenuService {
     );
   }
 
-  registerMenuItems() {
+  register(): void {
     this.contextMenuService.addMenuItem<NavNode>(
       this.contextMenuService.getRootMenuToken(),
       {
@@ -179,4 +181,6 @@ export class NavigationTreeContextMenuService {
 
     this.registerNodeViewMenuItem();
   }
+
+  load(): void {}
 }

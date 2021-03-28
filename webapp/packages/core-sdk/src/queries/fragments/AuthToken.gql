@@ -1,0 +1,8 @@
+fragment AuthToken on UserAuthToken {
+  authProvider
+  loginTime
+  message
+  origin {
+    ...ObjectOriginInfo
+  }
+}

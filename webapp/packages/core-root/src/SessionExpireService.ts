@@ -8,7 +8,7 @@
 
 import { Subject } from 'rxjs';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import {
   GQLError, GraphQLService, EServerErrorCode
 } from '@cloudbeaver/core-sdk';
@@ -16,18 +16,21 @@ import {
 import { SessionError } from './SessionError';
 
 @injectable()
-export class SessionExpireService {
+export class SessionExpireService extends Bootstrap {
   private isNotifiedAboutExpiredSession = false;
 
   onSessionExpire = new Subject();
   constructor(
     private graphQLService: GraphQLService
   ) {
+    super();
   }
 
-  subscribe(): void {
+  register(): void {
     this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
   }
+
+  load(): void {}
 
   private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
     try {

@@ -9,27 +9,29 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
-import { SessionResource } from './SessionResource';
+import { SessionDataResource } from './SessionDataResource';
 
 @injectable()
 export class PermissionsResource extends CachedDataResource<Set<string>, void> {
   constructor(
     private graphQLService: GraphQLService,
-    private sessionResource: SessionResource
+    sessionDataResource: SessionDataResource
   ) {
     super(new Set());
 
-    this.sessionResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.sessionResource.onDataUpdate.addHandler(() => { this.load(); });
+    this.sync(sessionDataResource);
   }
 
   has(id: string): boolean {
     return this.data.has(id);
   }
 
-  protected async loader(): Promise<Set<string>> {
-    await this.sessionResource.load();
+  async hasAsync(id: string): Promise<boolean> {
+    await this.load();
+    return this.has(id);
+  }
 
+  protected async loader(): Promise<Set<string>> {
     const { permissions } = await this.graphQLService.sdk.sessionPermissions();
 
     this.data.clear();

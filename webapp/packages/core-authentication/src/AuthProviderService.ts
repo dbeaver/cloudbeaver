@@ -22,7 +22,17 @@ export class AuthProviderService {
     this.requestAuthProvider = new Executor();
   }
 
-  async requireProvider(origin: ObjectOrigin): Promise<boolean> {
+  async requireProvider(type: string, subType?: string): Promise<boolean>
+  async requireProvider(origin: ObjectOrigin): Promise<boolean>
+  async requireProvider(origin: ObjectOrigin | string, subType?: string): Promise<boolean> {
+    if (typeof origin === 'string') {
+      origin = {
+        displayName: '',
+        type: origin,
+        subType,
+      };
+    }
+
     const contexts = await this.requestAuthProvider.execute(origin);
     const provider = contexts.getContext(AuthProviderContext);
 
@@ -30,8 +40,7 @@ export class AuthProviderService {
   }
 
   async processCredentials(providerId: string, credentials: Record<string, any>): Promise<Record<string, any>> {
-    const providers = await this.authProvidersResource.load();
-    const provider = providers.find(provider => provider.id === providerId);
+    const provider = await this.authProvidersResource.load(providerId);
 
     if (!provider) {
       return credentials;

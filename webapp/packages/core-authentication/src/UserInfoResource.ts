@@ -7,8 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
+import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
+import { CachedDataResource, GraphQLService, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AuthProviderService } from './AuthProviderService';
 
@@ -17,12 +17,13 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   constructor(
     private graphQLService: GraphQLService,
     private authProviderService: AuthProviderService,
-    private sessionResource: SessionResource
+    private sessionResource: SessionResource,
+    private sessionDataResource: SessionDataResource
   ) {
     super(null);
 
-    this.sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.sessionResource.onDataUpdate.addHandler(async () => { await this.load(); });
+    this.sync(this.sessionResource);
+    this.onDataOutdated.addHandler(() => this.sessionDataResource.markOutdated());
   }
 
   getId(): string {
@@ -40,38 +41,42 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   }
 
   async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
-    const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
+    await this.performUpdate(undefined, undefined, async () => {
+      const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
-    // TODO: will be replaced with another function
-    const { user } = await this.graphQLService.sdk.authLogin({
-      provider,
-      credentials: processedCredentials,
+      // TODO: will be replaced with another function
+      const { authToken } = await this.graphQLService.sdk.authLogin({
+        provider,
+        credentials: processedCredentials,
+        customIncludeOriginDetails: true,
+      });
+
+      if (this.data === null) {
+        this.data = await this.loader();
+      } else {
+        this.data.authTokens.push(authToken as UserAuthToken);
+      }
     });
-
-    await this.refresh();
-    await this.updateSession();
+    await this.sessionDataResource.refresh();
 
     return this.data;
   }
 
   async logout(): Promise<void> {
-    if (this.data) {
-      await this.graphQLService.sdk.authLogout();
-      this.data = null;
-      await this.updateSession();
-    }
+    await this.performUpdate(undefined, undefined, async () => {
+      if (this.data) {
+        await this.graphQLService.sdk.authLogout();
+        this.data = null;
+        this.sessionDataResource.refresh();
+      }
+    });
   }
 
   protected async loader(): Promise<UserInfo | null> {
-    await this.sessionResource.load();
     const { user } = await this.graphQLService.sdk.getActiveUser({
       customIncludeOriginDetails: true,
     });
 
     return (user as UserInfo | null) ?? null;
-  }
-
-  private async updateSession() {
-    await this.sessionResource.refresh();
   }
 }

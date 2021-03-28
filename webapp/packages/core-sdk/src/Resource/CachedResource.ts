@@ -8,12 +8,23 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 export interface ICachedResourceMetadata {
   outdated: boolean;
   loading: boolean;
+  exception: Error | null;
+}
+
+export interface IDataError<TParam> {
+  param: TParam;
+  exception: Error;
+}
+
+export interface IParamAlias<TParam> {
+  param: TParam;
+  getAlias: (param: TParam) => TParam;
 }
 
 export type CachedResourceData<
@@ -37,13 +48,16 @@ export abstract class CachedResource<
   data: TData;
 
   readonly onDataOutdated: IExecutor<TParam>;
-  readonly onDataUpdate: IExecutor<TData>;
+  readonly onDataUpdate: IExecutor<TParam>;
+  readonly onDataError: IExecutor<IDataError<TParam>>;
+  readonly beforeLoad: IExecutor<TParam>;
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
 
   protected loading = false;
 
   protected scheduler: TaskScheduler<TParam>;
+  protected paramAliases: Array<IParamAlias<TParam>>;
 
   constructor(defaultValue: TData) {
     makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loading'>(this, {
@@ -54,11 +68,23 @@ export abstract class CachedResource<
     this.includes = this.includes.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
 
-    this.metadata = new MetadataMap(() => ({ outdated: true, loading: false }));
+    this.paramAliases = [];
+    this.metadata = new MetadataMap(() => ({ outdated: true, loading: false, exception: null }));
     this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
+    this.beforeLoad = new Executor(null, this.includes);
     this.onDataOutdated = new Executor(null, this.includes);
-    this.onDataUpdate = new Executor();
+    this.onDataUpdate = new Executor(null, this.includes);
+    this.onDataError = new Executor<IDataError<TParam>>(null, (a, b) => this.includes(a.param, b.param));
+  }
+
+  sync(
+    resource: CachedResource<any, TParam, TParam, void>,
+    context: TContext
+  ): void {
+    resource.onDataOutdated.addHandler(param => this.markOutdated(param));
+    resource.onDataUpdate.addHandler(param => this.load(param, context));
+    this.beforeLoad.addHandler(param => resource.load(param));
   }
 
   abstract isLoaded(param: TParam, context: TContext): boolean;
@@ -72,45 +98,87 @@ export abstract class CachedResource<
   }
 
   isOutdated(param: TParam): boolean {
+    param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).outdated;
   }
 
   isDataLoading(param: TParam): boolean {
+    param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).loading;
   }
 
   markDataLoading(param: TParam, context: TContext): void {
+    param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = true;
   }
 
   markDataLoaded(param: TParam, context: TContext): void {
+    param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.loading = false;
   }
 
-  markOutdated(param: TParam): void {
+  async markDataError(exception: Error, param: TParam, context: TContext): Promise<void> {
+    param = this.transformParam(param);
+    const metadata = this.metadata.get(param as unknown as TKey);
+    metadata.exception = exception;
+    await this.onDataError.execute({ param, exception });
+  }
+
+  async markOutdated(param: TParam): Promise<void> {
+    param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = true;
-    this.onDataOutdated.execute(param);
+    await this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: TParam): void {
+    param = this.transformParam(param);
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = false;
+    metadata.exception = null;
+  }
+
+  addAlias(param: TParam, getAlias: (param: TParam) => TParam): void {
+    this.paramAliases.push({ param, getAlias });
+  }
+
+  transformParam(param: TParam): TParam {
+    let deep = 0;
+    // eslint-disable-next-line no-labels
+    transform:
+
+    if (deep < 10) {
+      for (const alias of this.paramAliases) {
+        if (this.includes(alias.param, param)) {
+          param = alias.getAlias(param);
+          deep++;
+          // eslint-disable-next-line no-labels
+          break transform;
+        }
+      }
+    } else {
+      console.warn('CachedResource: parameter transform was stopped');
+    }
+    return param;
   }
 
   async refresh(param: TParam, context: TContext): Promise<any> {
+    param = this.transformParam(param);
     await this.loadData(param, true, context);
     return this.data;
   }
 
   async load(param: TParam, context: TContext): Promise<any> {
+    param = this.transformParam(param);
     await this.loadData(param, false, context);
     return this.data;
   }
 
   protected includes(param: TParam, second: TParam): boolean {
+    param = this.transformParam(param);
+    second = this.transformParam(second);
     return param === second;
   }
 
@@ -138,46 +206,61 @@ export abstract class CachedResource<
       return;
     }
 
+    param = this.transformParam(param);
     this.markDataLoading(param, context);
     this.loading = true;
-    return this.scheduler.schedule(param, async () => {
+    return this.scheduler.schedule(
+      param,
+      async () => {
       // repeated because previous task maybe has been load requested data
-      if (exitCheck?.()) {
-        return;
-      }
+        if (exitCheck?.()) {
+          return;
+        }
 
-      return await this.taskWrapper(param, context, update);
-    }, () => {
-      this.markDataLoaded(param, context);
-      this.loading = false;
-    });
+        return await this.taskWrapper(param, context, update);
+      },
+      () => {
+        this.markDataLoaded(param, context);
+        this.loading = false;
+      },
+      () => this.onDataUpdate.execute(param),
+      exception => this.markDataError(exception, param, context));
   }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
+    param = this.transformParam(param);
+    const contexts = await this.beforeLoad.execute(param);
+
+    if (ExecutorInterrupter.isInterrupted(contexts) && !refresh) {
+      return;
+    }
+
     if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
       return;
     }
 
     this.markDataLoading(param, context);
     this.loading = true;
-    await this.scheduler.schedule(param, async () => {
+    await this.scheduler.schedule(
+      param,
+      async () => {
       // repeated because previous task maybe has been load requested data
-      if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
-        return;
-      }
+        if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
+          return;
+        }
 
-      await this.taskWrapper(param, context, this.loadingTask);
-    }, () => {
-      this.markDataLoaded(param, context);
-      this.loading = false;
-    });
+        await this.taskWrapper(param, context, this.loadingTask);
+      },
+      () => {
+        this.markDataLoaded(param, context);
+        this.loading = false;
+      },
+      () => this.onDataUpdate.execute(param),
+      exception => this.markDataError(exception, param, context));
   }
 
   private async loadingTask(param: TParam, context: TContext) {
     this.data = await this.loader(param, context);
-
-    // TODO: seems should be moved to scheduler `after` callback
-    this.onDataUpdate.execute(this.data);
   }
 
   private async taskWrapper<T>(
@@ -185,7 +268,7 @@ export abstract class CachedResource<
     context: TContext,
     promise: (param: TParam, context: TContext) => Promise<T>
   ) {
-    this.markOutdated(param);
+    await this.markOutdated(param);
     const value = await promise(param, context);
     this.markUpdated(param);
     return value;

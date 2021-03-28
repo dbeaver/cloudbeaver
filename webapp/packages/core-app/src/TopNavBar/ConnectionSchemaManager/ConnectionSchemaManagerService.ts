@@ -8,7 +8,6 @@
 
 import { computed, observable, makeObservable } from 'mobx';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
 import {
   ConnectionInfoResource,
   ConnectionsManagerService,
@@ -17,9 +16,10 @@ import {
   isConnectionProvider, IConnectionProvider,
   isConnectionSetter, IConnectionSetter
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 
 import type { ITab } from '../../shared/NavigationTabs/ITab';
 import { NavigationTabsService } from '../../shared/NavigationTabs/NavigationTabsService';
@@ -45,7 +45,7 @@ interface IActiveItem<T> {
 }
 
 @injectable()
-export class ConnectionSchemaManagerService {
+export class ConnectionSchemaManagerService extends Bootstrap {
   get currentConnectionId(): string | null | undefined {
     if (!this.activeItem?.getCurrentConnectionId) {
       return null;
@@ -125,8 +125,9 @@ export class ConnectionSchemaManagerService {
     private connectionsManagerService: ConnectionsManagerService,
     private dbDriverResource: DBDriverResource,
     private notificationService: NotificationService,
-    private appAuthService: AppAuthService
+    private sessionDataResource: SessionDataResource
   ) {
+    super();
     makeObservable<ConnectionSchemaManagerService, 'activeItem' | 'activeItemHistory'>(this, {
       currentObjectCatalog: computed,
       currentObjectSchema: computed,
@@ -136,15 +137,18 @@ export class ConnectionSchemaManagerService {
     });
   }
 
-  registerCallbacks(): void {
+  register(): void {
+    this.sessionDataResource.onDataUpdate
+      .addHandler(this.reset.bind(this));
+
     this.navigationTabsService.onTabSelect
       .subscribe(this.onTabSelect.bind(this));
 
     this.navigationTabsService.onTabClose
       .subscribe(this.onTabClose.bind(this));
-
-    this.appAuthService.auth.addHandler(() => this.reset());
   }
+
+  load(): void {}
 
   /**
    * Trigger when user select connection in dropdown

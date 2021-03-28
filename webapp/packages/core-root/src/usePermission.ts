@@ -10,7 +10,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { PermissionsService } from './PermissionsService';
 
-export function usePermission(key: string) {
+export function usePermission(key: string): boolean {
   const permissionsService = useService(PermissionsService);
 
   return permissionsService.has(key);

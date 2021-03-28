@@ -9,7 +9,6 @@
 import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -20,8 +19,9 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
-export interface IConfigurationPlaceholderProps extends IServerConfigurationPageState {
+export interface IConfigurationPlaceholderProps {
   configurationWizard: boolean;
+  state: IServerConfigurationPageState;
 }
 
 export interface IServerConfigSaveData {
@@ -54,7 +54,6 @@ export class ServerConfigurationService {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
-    private readonly usersResource: UsersResource,
   ) {
     makeObservable<ServerConfigurationService, 'done'>(this, {
       state: observable,
@@ -83,8 +82,6 @@ export class ServerConfigurationService {
       .before(this.prepareConfigTask)
       .addPostHandler(this.save);
 
-    this.prepareConfigTask.addHandler(this.prepareConfig);
-
     this.validationTask
       .addHandler(this.validateForm)
       .addPostHandler(this.ensureValidation);
@@ -95,18 +92,17 @@ export class ServerConfigurationService {
   }
 
   async loadConfig(): Promise<void> {
-    let reload = false;
-
     try {
-      const config = await this.serverConfigResource.load();
+      let reload = false;
       this.state = this.administrationScreenService.getItemState(
         'server-configuration',
         () => {
           reload = true;
-          return serverConfigStateContext();
+          return this.state;
         },
-        !config?.configurationMode
+        !this.administrationScreenService.isConfigurationMode
       );
+      this.serverConfigResource.setDataUpdate(this.state.serverConfig);
 
       await this.loadConfigTask.execute({
         state: this.state,
@@ -145,25 +141,14 @@ export class ServerConfigurationService {
         return;
       }
 
-      if (config.configurationMode) {
-        data.state.serverConfig.serverName = 'CloudBeaver';
-        data.state.serverConfig.sessionExpireTime = 30;
+      data.state.serverConfig.serverName = config.name || config.productInfo.name;
+      data.state.serverConfig.sessionExpireTime = config.sessionExpireTime;
 
-        data.state.serverConfig.adminCredentialsSaveEnabled = true;
-        data.state.serverConfig.publicCredentialsSaveEnabled = true;
-        data.state.serverConfig.customConnectionsEnabled = true;
+      data.state.serverConfig.adminCredentialsSaveEnabled = config.adminCredentialsSaveEnabled;
+      data.state.serverConfig.publicCredentialsSaveEnabled = config.publicCredentialsSaveEnabled;
+      data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
 
-        data.state.navigatorConfig = { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS };
-      } else {
-        data.state.serverConfig.serverName = config.name;
-        data.state.serverConfig.sessionExpireTime = (config.sessionExpireTime ?? 1800000) / 1000 / 60;
-
-        data.state.serverConfig.adminCredentialsSaveEnabled = config.adminCredentialsSaveEnabled;
-        data.state.serverConfig.publicCredentialsSaveEnabled = config.publicCredentialsSaveEnabled;
-        data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
-
-        data.state.navigatorConfig = { ...config.defaultNavigatorSettings };
-      }
+      data.state.navigatorConfig = { ...config.defaultNavigatorSettings };
     } catch (exception) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, 'Can\'t load server configuration');
@@ -178,35 +163,17 @@ export class ServerConfigurationService {
     };
   }
 
-  private prepareConfig: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
-    const state = contexts.getContext(serverConfigStateContext);
-
-    state.serverConfig.serverName = data.state.serverConfig.serverName;
-    state.serverConfig.sessionExpireTime = (data.state.serverConfig.sessionExpireTime ?? 30) * 1000 * 60;
-
-    state.serverConfig.adminCredentialsSaveEnabled = data.state.serverConfig.adminCredentialsSaveEnabled;
-    state.serverConfig.publicCredentialsSaveEnabled = data.state.serverConfig.publicCredentialsSaveEnabled;
-    state.serverConfig.customConnectionsEnabled = data.state.serverConfig.customConnectionsEnabled;
-
-    state.navigatorConfig = { ...data.state.navigatorConfig };
-  };
-
   private save: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
-    const state = contexts.getContext(serverConfigStateContext);
 
     if (!validation.getState()) {
       return;
     }
 
     try {
-      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: state.navigatorConfig });
+      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: data.state.navigatorConfig });
       if (!data.configurationWizard || data.finish) {
-        await this.graphQLService.sdk.configureServer({
-          configuration: state.serverConfig,
-        });
-        await this.serverConfigResource.update();
-        this.usersResource.refreshAllLazy();
+        await this.serverConfigResource.save();
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
@@ -267,8 +234,6 @@ export function serverConfigValidationContext(): IValidationStatusContext {
 export function serverConfigStateContext(): IServerConfigurationPageState {
   return {
     navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
-    serverConfig: {
-      enabledAuthProviders: [],
-    },
+    serverConfig: {},
   };
 }

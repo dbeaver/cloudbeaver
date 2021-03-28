@@ -72,6 +72,7 @@ export abstract class CachedMapResource<
     this.metadata = new MetadataMap(() => ({
       outdated: true,
       loading: false,
+      exception: null,
       includes: [...this.defaultIncludes],
     }));
 
@@ -82,6 +83,7 @@ export abstract class CachedMapResource<
   }
 
   isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
+    key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
       const metadata = this.metadata.get(key);
 
@@ -90,14 +92,17 @@ export abstract class CachedMapResource<
   }
 
   isOutdated(key: ResourceKey<TKey>): boolean {
+    key = this.transformParam(key);
     return ResourceKeyUtils.some(key, key => this.metadata.get(key).outdated);
   }
 
   isDataLoading(key: ResourceKey<TKey>): boolean {
+    key = this.transformParam(key);
     return ResourceKeyUtils.some(key, key => this.metadata.get(key).loading);
   }
 
   markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
+    key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.loading = true;
@@ -105,6 +110,8 @@ export abstract class CachedMapResource<
   }
 
   markDataLoaded(key: ResourceKey<TKey>, includes?: string[]): void {
+    key = this.transformParam(key);
+
     if (includes) {
       this.commitIncludes(key, includes);
     }
@@ -115,18 +122,32 @@ export abstract class CachedMapResource<
     });
   }
 
-  markOutdated(): void
-  markOutdated(key: ResourceKey<TKey>): void
-  markOutdated(key?: ResourceKey<TKey>): void {
+  async markDataError(exception: Error, key: ResourceKey<TKey>): Promise<void> {
+    key = this.transformParam(key);
+
+    ResourceKeyUtils.forEach(key, key => {
+      const metadata = this.metadata.get(key);
+      metadata.exception = exception;
+    });
+
+    await this.onDataError.execute({ param: key, exception });
+  }
+
+  markOutdated(): Promise<void>
+  markOutdated(key: ResourceKey<TKey>): Promise<void>
+  async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
     if (!key) {
       key = resourceKeyList(Array.from(this.data.keys()));
+    } else {
+      key = this.transformParam(key);
     }
 
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.outdated = true;
     });
-    this.onDataOutdated.execute(key);
+
+    await this.onDataOutdated.execute(key);
   }
 
   markUpdated(): void
@@ -134,15 +155,19 @@ export abstract class CachedMapResource<
   markUpdated(key?: ResourceKey<TKey>): void {
     if (!key) {
       key = resourceKeyList(Array.from(this.data.keys()));
+    } else {
+      key = this.transformParam(key);
     }
 
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
       metadata.outdated = false;
+      metadata.exception = null;
     });
   }
 
   isLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
+    key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
       if (!this.has(key)) {
         return false;
@@ -163,12 +188,14 @@ export abstract class CachedMapResource<
   get(key: ResourceKeyList<TKey>): Array<TValue | undefined>;
   get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined;
   get(key: ResourceKey<TKey>): Array<TValue | undefined>| TValue | undefined {
+    key = this.transformParam(key);
     return ResourceKeyUtils.map(key, key => this.data.get(key));
   }
 
   set(key: TKey, value: TValue): void;
   set(key: ResourceKeyList<TKey>, value: TValue[]): void;
   set(key: ResourceKey<TKey>, value: TValue | TValue[]): void {
+    key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, (key, i) => {
       if (i === -1) {
         this.data.set(key, value as TValue);
@@ -184,6 +211,7 @@ export abstract class CachedMapResource<
   delete(key: ResourceKeyList<TKey>): void;
   delete(key: ResourceKey<TKey>): void;
   delete(key: ResourceKey<TKey>): void {
+    key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => this.data.delete(key));
     this.markUpdated(key);
     this.onItemDelete.execute(key);
@@ -230,6 +258,7 @@ export abstract class CachedMapResource<
   }
 
   has(key: TKey): boolean {
+    key = this.transformParam(key) as TKey;
     return this.data.has(key);
   }
 
@@ -241,6 +270,7 @@ export abstract class CachedMapResource<
     if (!key) {
       return this.defaultIncludes;
     }
+    key = this.transformParam(key);
 
     const metadata = this.metadata.get(ResourceKeyUtils.first(key));
 
@@ -266,6 +296,7 @@ export abstract class CachedMapResource<
   }
 
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
+    key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
       const metadata = this.metadata.get(key);
 

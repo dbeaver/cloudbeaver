@@ -13,6 +13,7 @@ import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { BuildVersion } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
@@ -20,10 +21,13 @@ import type { IRouteParams } from '../AdministrationItem/IRouteParams';
 import { EAdminPermission } from '../EAdminPermission';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
-const ADMINISTRATION_INFO = 'administration_mode';
+const ADMINISTRATION_INFO = 'administration_info';
 
 interface IAdministrationScreenInfo {
-  mode: boolean;
+  workspaceId: string;
+  version: string;
+  serverVersion: string;
+  configurationMode: boolean;
 }
 
 @injectable()
@@ -46,16 +50,11 @@ export class AdministrationScreenService {
   }
 
   get isConfigurationMode(): boolean {
-    return !!this.serverConfigResource.data?.configurationMode;
+    return this.serverConfigResource.configurationMode;
   }
 
   get publicDisabled(): boolean {
-    if (this.serverConfigResource.data?.configurationMode
-    || (this.serverConfigResource.data?.licenseRequired && !this.serverConfigResource.data?.licenseValid)) {
-      return true;
-    }
-
-    return false;
+    return this.serverConfigResource.publicDisabled;
   }
 
   readonly ensurePermissions: IExecutor<void>;
@@ -76,7 +75,10 @@ export class AdministrationScreenService {
     });
 
     this.info = {
-      mode: false,
+      workspaceId: '',
+      version: BuildVersion.version || '',
+      serverVersion: '',
+      configurationMode: false,
     };
     this.itemState = new Map();
     this.activationEvent = new Executor();
@@ -140,16 +142,25 @@ export class AdministrationScreenService {
   getItemState<T>(name: string): T | undefined
   getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T
   getItemState<T>(
-    name: string, defaultState?: () => T,
+    name: string,
+    defaultState?: () => T,
     update?: boolean,
     validate?: (state: T) => boolean
   ): T | undefined {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
-    if (this.info.mode !== this.isConfigurationMode) {
+    if (
+      this.info.workspaceId !== this.serverConfigResource.workspaceId
+      || this.info.configurationMode !== this.isConfigurationMode
+      || this.info.serverVersion !== this.serverConfigResource.serverVersion
+      || this.info.version !== BuildVersion.version
+    ) {
       this.clearItemsState();
-      this.info.mode = this.isConfigurationMode;
+      this.info.workspaceId = this.serverConfigResource.workspaceId;
+      this.info.configurationMode = this.isConfigurationMode;
+      this.info.serverVersion = this.serverConfigResource.serverVersion;
+      this.info.version = BuildVersion.version || '';
     }
 
     if (defaultState) {

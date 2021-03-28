@@ -34,7 +34,9 @@ export class TaskScheduler<TIdentifier> {
   async schedule<T>(
     id: TIdentifier,
     promise: () => Promise<T>,
-    after?: () => Promise<void> | void,
+    after?: () => Promise<any> | any,
+    success?: () => Promise<any> | any,
+    error?: (exception: Error) => Promise<any> | any,
   ): Promise<T> {
     const task: ITask<TIdentifier> = {
       id,
@@ -44,7 +46,12 @@ export class TaskScheduler<TIdentifier> {
     this.queue.push(task);
 
     try {
-      return await task.task;
+      const value = await task.task;
+      await success?.();
+      return value;
+    } catch (exception) {
+      await error?.(exception);
+      throw exception;
     } finally {
       this.queue.splice(this.queue.indexOf(task), 1);
       await after?.();
@@ -61,7 +68,10 @@ export class TaskScheduler<TIdentifier> {
     }
   }
 
-  private async scheduler<T>(id: TIdentifier, promise: () => Promise<T>) {
+  private async scheduler<T>(
+    id: TIdentifier,
+    promise: () => Promise<T>,
+  ) {
     if (!this.isBlocked) {
       return promise();
     }

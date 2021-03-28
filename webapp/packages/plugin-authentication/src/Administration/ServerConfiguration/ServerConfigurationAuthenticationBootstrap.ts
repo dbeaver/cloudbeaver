@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { ILoadConfigData, IServerConfigSaveData, serverConfigStateContext, ServerConfigurationService, serverConfigValidationContext } from '@cloudbeaver/plugin-administration';
+import { ILoadConfigData, IServerConfigSaveData, ServerConfigurationService, serverConfigValidationContext } from '@cloudbeaver/plugin-administration';
 
 @injectable()
 export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
@@ -33,11 +33,11 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
   load(): void { }
 
   private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
-    const providers = await this.authProvidersResource.load();
+    const providers = await this.authProvidersResource.loadAll();
     const disabled = providers.length === 1 && !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
 
     if (disabled) {
-      data.state.serverConfig.enabledAuthProviders = providers.map(provider => provider.id);
+      data.state.serverConfig.enabledAuthProviders = [...this.authProvidersResource.keys];
       data.state.serverConfig.authenticationEnabled = true;
     }
 
@@ -71,26 +71,20 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
   };
 
   private prepareConfig: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
-    const providers = await this.authProvidersResource.load();
+    const providers = await this.authProvidersResource.loadAll();
     const disabled = providers.length === 1 && !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
 
-    const state = contexts.getContext(serverConfigStateContext);
-
-    state.serverConfig.anonymousAccessEnabled = data.state.serverConfig.anonymousAccessEnabled;
-    state.serverConfig.authenticationEnabled = data.state.serverConfig.authenticationEnabled;
-    state.serverConfig.enabledAuthProviders = data.state.serverConfig.enabledAuthProviders;
-
     if (disabled) {
-      state.serverConfig.enabledAuthProviders = providers.map(provider => provider.id);
-      state.serverConfig.authenticationEnabled = true;
+      data.state.serverConfig.enabledAuthProviders = [...this.authProvidersResource.keys];
+      data.state.serverConfig.authenticationEnabled = true;
     }
 
     if (
-      data.configurationWizard
-      && state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
+      !data.configurationWizard
+      || !data.state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
     ) {
-      state.serverConfig.adminName = data.state.serverConfig.adminName;
-      state.serverConfig.adminPassword = data.state.serverConfig.adminPassword;
+      data.state.serverConfig.adminName = undefined;
+      data.state.serverConfig.adminPassword = undefined;
     }
   };
 

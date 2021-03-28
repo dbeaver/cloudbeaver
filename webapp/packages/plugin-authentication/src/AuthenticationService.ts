@@ -11,7 +11,8 @@ import { AppScreenService } from '@cloudbeaver/core-app';
 import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
@@ -29,7 +30,8 @@ export class AuthenticationService extends Bootstrap {
     private notificationService: NotificationService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly authProviderService: AuthProviderService,
-    private readonly authProvidersResource: AuthProvidersResource
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super();
     this.authPromise = null;
@@ -73,11 +75,11 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.appAuthService.auth.addPostHandler(state => {
-      if (!state) {
-        this.requireAuthentication();
-      }
-    });
+    this.sessionDataResource.beforeLoad.addHandler(
+      ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
+    );
+    this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
+
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       const userInfo = await this.userInfoResource.load();
@@ -99,7 +101,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.authProvidersResource.load();
+    await this.authProvidersResource.loadAll();
     await this.userInfoResource.load();
 
     if (!this.authProvidersResource.has(data.subType ?? data.type)) {

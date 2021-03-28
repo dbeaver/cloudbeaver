@@ -37,8 +37,10 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
 
 type ControlledProps = BaseProps & {
   name?: string;
-  value?: string;
-  onChange?: (value: string, name?: string) => any;
+  value?: string | number;
+  mapState?: (value: string | number) => string | number;
+  mapValue?: (value: string | number) => string | number;
+  onChange?: (value: string | number, name?: string) => any;
   state?: never;
   autoHide?: never;
 };
@@ -46,7 +48,9 @@ type ControlledProps = BaseProps & {
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onChange?: (value: string, name: TKey) => any;
+  mapState?: (value: TState[TKey]) => TState[TKey];
+  mapValue?: (value: TState[TKey]) => TState[TKey];
+  onChange?: (value: TState[TKey], name: TKey) => any;
   autoHide?: boolean;
   value?: never;
 };
@@ -62,6 +66,8 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   value: valueControlled,
   required,
   state,
+  mapState,
+  mapValue,
   children,
   className,
   description,
@@ -77,21 +83,27 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   const context = useContext(FormContext);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = mapValue?.(event.target.value) ?? event.target.value;
+
     if (state) {
-      state[name] = event.target.value;
+      state[name] = value;
     }
     if (onChange) {
-      onChange(event.target.value, name);
+      onChange(value, name);
     }
     if (context) {
-      context.onChange(event.target.value, name);
+      context.onChange(value, name);
     }
   }, [state, name, context, onChange]);
 
-  const value = state ? state[name] : valueControlled;
-
   if (autoHide && !isControlPresented(name, state)) {
     return null;
+  }
+
+  let value = state ? state[name] : valueControlled;
+
+  if (mapState) {
+    value = mapState(value);
   }
 
   return styled(styles)(

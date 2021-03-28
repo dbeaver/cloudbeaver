@@ -48,6 +48,8 @@ export function useDataResource<
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
 
+  const outdated = resource.isOutdated(key);
+
   const refObj = useObjectRef({
     resource,
     key,
@@ -100,14 +102,14 @@ export function useDataResource<
       return refObj.exception;
     },
     get data() {
-      return resource.data;
+      return refObj.resource.data;
     },
     isLoaded: () => {
       if (refObj.key === null) {
         return false;
       }
 
-      return resource.isLoaded(refObj.key, refObj.includes);
+      return refObj.resource.isLoaded(refObj.key, refObj.includes);
     },
     reload: () => {
       refObj.load();
@@ -118,10 +120,10 @@ export function useDataResource<
       }
 
       if (refObj.key === undefined) {
-        return resource.isLoading();
+        return refObj.resource.isLoading();
       }
 
-      return resource.isDataLoading(refObj.key);
+      return refObj.resource.isDataLoading(refObj.key);
     },
   }));
 
@@ -129,7 +131,7 @@ export function useDataResource<
     if (exception === null) {
       refObj.load();
     }
-  }, [key, includes]);
+  }, [key, includes, outdated]);
 
   return result;
 }

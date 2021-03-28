@@ -2,6 +2,7 @@ query serverConfig {
   serverConfig {
     name
     version
+    workspaceId
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

@@ -53,6 +53,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       outdated: true,
       loading: false,
       withDetails: false,
+      exception: null,
       includes: [],
     }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));

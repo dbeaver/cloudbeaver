@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
 import {
   ConnectionAuthService, Connection, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
@@ -14,7 +13,7 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
-  PermissionsService, EPermission, ServerService
+  PermissionsService, EPermission, ServerService, SessionDataResource
 } from '@cloudbeaver/core-root';
 import {
   GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
@@ -101,7 +100,7 @@ export class NavNodeManagerService extends Bootstrap {
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
     private serverService: ServerService,
-    private appAuthService: AppAuthService,
+    private sessionDataResource: SessionDataResource,
     navigationService: NavigationService
   ) {
     super();
@@ -118,7 +117,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   register(): void {
-    this.appAuthService.auth.addHandler(this.refreshRoot.bind(this));
+    this.sessionDataResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
     this.connectionInfo.onSessionUpdate.addHandler(this.connectionRefreshHandler.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));

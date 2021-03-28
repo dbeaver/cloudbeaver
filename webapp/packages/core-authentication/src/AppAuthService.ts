@@ -8,7 +8,7 @@
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { ServerService, SessionService } from '@cloudbeaver/core-root';
+import { ServerService } from '@cloudbeaver/core-root';
 
 import { UserInfoResource } from './UserInfoResource';
 
@@ -27,12 +27,11 @@ export class AppAuthService extends Bootstrap {
 
   constructor(
     private serverService: ServerService,
-    private sessionService: SessionService,
     private userInfoResource: UserInfoResource,
   ) {
     super();
     this.auth = new Executor();
-    this.sessionService.session.onDataUpdate.addHandler(async () => { await this.authUser(); });
+    this.userInfoResource.onDataUpdate.addHandler(this.authUser.bind(this));
   }
 
   async isAuthNeeded(): Promise<boolean> {

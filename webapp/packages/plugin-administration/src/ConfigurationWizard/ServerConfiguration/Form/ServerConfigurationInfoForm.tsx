@@ -12,15 +12,16 @@ import styled from 'reshadow';
 
 import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
+
 interface Props {
-  serverConfig: ServerConfigInput;
+  state: IServerConfigurationPageState;
 }
 
 export const ServerConfigurationInfoForm: React.FC<Props> = observer(function ServerConfigurationInfoForm({
-  serverConfig,
+  state,
 }) {
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
@@ -29,7 +30,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
       <InputFieldNew
         type="text"
         name="serverName"
-        state={serverConfig}
+        state={state.serverConfig}
         mod='surface'
         required
         tiny
@@ -39,8 +40,10 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
       <InputFieldNew
         type="number"
         name="sessionExpireTime"
-        state={serverConfig}
+        state={state.serverConfig}
         mod='surface'
+        mapState={v => (v ?? 1800000) / 1000 / 60}
+        mapValue={v => (v ?? 30) * 1000 * 60}
         required
         tiny
       >

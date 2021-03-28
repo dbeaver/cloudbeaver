@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, action, computed, IKeyValueMap, makeObservable } from 'mobx';
+import { observable, action, computed, makeObservable } from 'mobx';
 import { Subject } from 'rxjs';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import type { IActiveView } from '@cloudbeaver/core-view';
 
@@ -68,6 +69,7 @@ export class NavigationTabsService {
     private autoSaveService: LocalStorageSaveService,
     private userInfoResource: UserInfoResource,
     private administrationScreenService: AdministrationScreenService,
+    sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService
   ) {
     makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
@@ -120,10 +122,10 @@ export class NavigationTabsService {
       }
     );
 
-    appAuthService.auth
+    sessionDataResource.onDataUpdate
       .addHandler(() => this.unloadTabs())
-      .addPostHandler(async state => {
-        if (state || appAuthService.authenticated) {
+      .addPostHandler(async () => {
+        if (appAuthService.authenticated) {
           await this.restoreTabs();
         }
       });

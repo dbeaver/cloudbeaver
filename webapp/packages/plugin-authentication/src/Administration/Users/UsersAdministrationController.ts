@@ -40,7 +40,7 @@ export class UsersAdministrationController implements IInitializableController {
   }
 
   get isLocalProviderAvailable(): boolean {
-    return this.authProvidersResource.data.some(({ id }) => id === AUTH_PROVIDER_LOCAL_ID);
+    return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
   }
 
   get isLoading(): boolean {
@@ -65,7 +65,7 @@ export class UsersAdministrationController implements IInitializableController {
   }
 
   init(): void {
-    this.authProvidersResource.load();
+    this.authProvidersResource.loadAll();
   }
 
   update = async () => {

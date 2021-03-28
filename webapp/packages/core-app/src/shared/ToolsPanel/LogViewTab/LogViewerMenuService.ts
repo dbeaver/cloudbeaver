@@ -6,18 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { EMainMenu, MainMenuService } from '../../../TopNavBar/MainMenu/MainMenuService';
 import { LogViewerService } from './LogViewerService';
 
 @injectable()
-export class LogViewerMenuService {
-  constructor(private mainMenuService: MainMenuService,
-    private logViewerService: LogViewerService) {
+export class LogViewerMenuService extends Bootstrap {
+  constructor(
+    private mainMenuService: MainMenuService,
+    private logViewerService: LogViewerService
+  ) {
+    super();
   }
 
-  registerMenuItems() {
+  register(): void {
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuToolsPanel,
       {
@@ -34,4 +37,6 @@ export class LogViewerMenuService {
   toggleLogViewer() {
     this.logViewerService.toggle();
   }
+
+  load(): void {}
 }

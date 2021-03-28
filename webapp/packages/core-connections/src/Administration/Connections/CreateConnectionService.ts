@@ -50,11 +50,14 @@ export class CreateConnectionService {
   }
 
   getDefault(): string | null {
-    if (this.tabsContainer.tabInfoList.length === 0) {
+    const tabs = this.tabsContainer.getDisplayed();
+
+    if (tabs.length === 0) {
       return null;
     }
+
     if (this.administrationScreenService.isConfigurationMode) {
-      const sorted = this.tabsContainer.tabInfoList.sort((a, b) => {
+      const sorted = tabs.sort((a, b) => {
         const aPriority = a.options?.configurationWizard?.activationPriority || Number.MAX_SAFE_INTEGER;
         const bPriority = b.options?.configurationWizard?.activationPriority || Number.MAX_SAFE_INTEGER;
 
@@ -63,7 +66,8 @@ export class CreateConnectionService {
 
       return sorted[0].key;
     }
-    return this.tabsContainer.tabInfoList[0].key;
+
+    return tabs[0].key;
   }
 
   setCreateMethod(method?: string | null): void {
@@ -105,7 +109,9 @@ export class CreateConnectionService {
 
   close(): void {
     this.clearConnectionTemplate();
-    for (const method of this.tabsContainer.tabInfoList) {
+    const tabs = this.tabsContainer.getDisplayed();
+
+    for (const method of tabs) {
       method.options?.close?.();
     }
   }

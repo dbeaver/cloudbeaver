@@ -9,10 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, Loader
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -77,6 +78,10 @@ const styles = composes(
       bottom: 0;
       padding: 8px 24px;
     }
+    auth-token-info-message {
+      composes: theme-typography--caption from global;
+      padding: 8px 24px;
+    }
   `
 );
 
@@ -85,6 +90,7 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
   options,
   rejectDialog,
 }) {
+  const userInfo = useService(UserInfoResource);
   const controller = useController(AuthDialogController, rejectDialog);
   const translate = useTranslate();
 
@@ -98,18 +104,24 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
         title={translate('authentication_login_dialog_title')}
-        header={showTabs && (
-          <TabList aria-label='Auth providers'>
-            {controller.providers.map(provider => (
-              <Tab
-                key={provider.id}
-                tabId={provider.id}
-                onOpen={() => controller.selectProvider(provider.id)}
-              >
-                <TabTitle>{provider.label}</TabTitle>
-              </Tab>
-            ))}
-          </TabList>
+        icon={controller.provider?.icon}
+        header={(
+          <>
+            {userInfo.data !== null && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
+            {showTabs && (
+              <TabList aria-label='Auth providers'>
+                {controller.providers.map(provider => (
+                  <Tab
+                    key={provider.id}
+                    tabId={provider.id}
+                    onOpen={() => controller.selectProvider(provider.id)}
+                  >
+                    <TabTitle>{provider.label}</TabTitle>
+                  </Tab>
+                ))}
+              </TabList>
+            )}
+          </>
         )}
         footer={(
           <AuthDialogFooter
