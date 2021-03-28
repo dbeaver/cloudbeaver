@@ -20,6 +20,7 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
+import org.jkiss.code.NotNull;
 
 import java.time.OffsetDateTime;
 
@@ -32,26 +33,30 @@ public class WebUserAuthToken {
     private final WebUser user;
     private final WebAuthInfo authInfo;
 
-    public WebUserAuthToken(WebSession session, WebUser user, WebAuthInfo authInfo) {
+    WebUserAuthToken(@NotNull WebSession session, @NotNull WebUser user, @NotNull WebAuthInfo authInfo) {
         this.session = session;
         this.user = user;
         this.authInfo = authInfo;
     }
 
+    @NotNull
     public String getAuthProvider() {
-        return authInfo.getAuthProvider().getId();
+        return authInfo.getAuthProviderDescriptor().getId();
     }
 
+    @NotNull
     public OffsetDateTime getLoginTime() {
         return authInfo.getLoginTime();
     }
 
+    @NotNull
     public String getMessage() {
         return authInfo.getMessage();
     }
 
+    @NotNull
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authInfo.getAuthProvider());
+        return new WebUserOriginInfo(session, user, authInfo.getAuthProviderDescriptor());
     }
 
 }

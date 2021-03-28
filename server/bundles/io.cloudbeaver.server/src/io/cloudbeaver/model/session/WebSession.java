@@ -638,7 +638,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
             if (providerID != null) {
                 for (WebAuthInfo ai : authTokens) {
-                    if (ai.getAuthProvider().getId().equals(providerID)) {
+                    if (ai.getAuthProvider().equals(providerID)) {
                         return ai;
                     }
                 }
@@ -663,7 +663,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
 
 
-        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProvider().getId());
+        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
         if (oldAuthInfo != null) {
             removeAuthInfo(oldAuthInfo);
         }

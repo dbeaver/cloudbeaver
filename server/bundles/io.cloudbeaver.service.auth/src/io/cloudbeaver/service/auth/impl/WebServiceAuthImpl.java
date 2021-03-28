@@ -148,8 +148,25 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (user == null) {
                 user = new WebUser(userId);
             }
+
+            DBWUserIdentity userIdentity = null;
+
             if (authProviderExternal != null) {
-                user.setDisplayName(authProviderExternal.getUserDisplayName(webSession.getProgressMonitor(), providerConfig, authParameters));
+                try {
+                    userIdentity =
+                        authProviderExternal.getUserIdentity(
+                            webSession.getProgressMonitor(),
+                            providerConfig,
+                            userCredentials);
+                } catch (DBException e) {
+                    log.debug("Error reading auth display name from provider " + providerId, e);
+                }
+            }
+            if (userIdentity == null) {
+                userIdentity = new DBWUserIdentity(userId, userId);
+            }
+            if (CommonUtils.isEmpty(user.getDisplayName())) {
+                user.setDisplayName(userIdentity.getDisplayName());
             }
 
             authSession = authProviderInstance.openSession(
@@ -158,10 +175,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 userCredentials
             );
 
-            WebAuthInfo authInfo = new WebAuthInfo(webSession, user);
-            authInfo.setLoginTime(OffsetDateTime.now());
-            authInfo.setAuthProvider(authProvider);
-            authInfo.setAuthSession(authSession);
+            WebAuthInfo authInfo = new WebAuthInfo(
+                webSession,
+                user,
+                authProvider,
+                userIdentity,
+                authSession,
+                OffsetDateTime.now());
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
             if (configMode) {
                 authInfo.setUserCredentials(userCredentials);
@@ -188,14 +208,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             return null;
         }
         return new WebUserInfo(webSession, webSession.getUser());
-    }
-
-    @Override
-    public WebAuthInfo sessionUser(@NotNull WebSession webSession) throws DBWebException {
-        if (webSession.getUser() == null) {
-            return null;
-        }
-        return webSession.getAuthInfo(null);
     }
 
     @Override

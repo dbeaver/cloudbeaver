@@ -17,9 +17,11 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.DBWAuthProvider;
+import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 
@@ -38,49 +40,57 @@ public class WebAuthInfo {
     private WebAuthProviderDescriptor authProvider;
     private DBASession authSession;
     private OffsetDateTime loginTime;
+    private DBWUserIdentity userIdentity;
     private String message;
 
     private transient Map<String, Object> userCredentials;
 
-    public WebAuthInfo(WebSession session, WebUser user) {
+    public WebAuthInfo(
+        @NotNull WebSession session,
+        @NotNull WebUser user,
+        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull DBWUserIdentity userIdentity,
+        @NotNull DBASession authSession,
+        @NotNull OffsetDateTime loginTime)
+    {
         this.session = session;
         this.user = user;
+        this.authProvider = authProvider;
+        this.userIdentity = userIdentity;
+        this.authSession = authSession;
+        this.loginTime = loginTime;
     }
 
     public WebUser getUser() {
         return user;
     }
 
+    public DBWUserIdentity getUserIdentity() {
+        return userIdentity;
+    }
+
     public String getUserId() {
-        return user.getUserId();
+        return userIdentity.getId();
     }
 
     public String getDisplayName() {
-        return user.getDisplayName();
+        return userIdentity.getDisplayName();
     }
 
-    public WebAuthProviderDescriptor getAuthProvider() {
+    public String getAuthProvider() {
+        return authProvider.getId();
+    }
+
+    public WebAuthProviderDescriptor getAuthProviderDescriptor() {
         return authProvider;
-    }
-
-    public void setAuthProvider(WebAuthProviderDescriptor authProvider) {
-        this.authProvider = authProvider;
     }
 
     public DBASession getAuthSession() {
         return authSession;
     }
 
-    public void setAuthSession(DBASession authSession) {
-        this.authSession = authSession;
-    }
-
     public OffsetDateTime getLoginTime() {
         return loginTime;
-    }
-
-    public void setLoginTime(OffsetDateTime loginTime) {
-        this.loginTime = loginTime;
     }
 
     public String getMessage() {

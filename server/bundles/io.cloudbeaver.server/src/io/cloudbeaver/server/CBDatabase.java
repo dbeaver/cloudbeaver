@@ -175,8 +175,8 @@ public class CBDatabase {
 
         // Associate all auth credentials with admin user
         for (WebAuthInfo ai : authInfoList) {
-            WebAuthProviderDescriptor authProvider = ai.getAuthProvider();
-            if (!authProvider.getId().equals(LocalAuthProvider.PROVIDER_ID)) {
+            if (!ai.getAuthProvider().equals(LocalAuthProvider.PROVIDER_ID)) {
+                WebAuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
                     application.getSecurityController().setUserCredentials(adminName, authProvider, userCredentials);

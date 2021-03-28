@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,14 +39,17 @@ public class WebUserInfo {
         this.user = user;
     }
 
+    @Property
     public String getUserId() {
         return user.getUserId();
     }
 
+    @Property
     public String getDisplayName() {
         return user.getDisplayName();
     }
 
+    @Property
     public List<WebUserAuthToken> getAuthTokens() {
         return session.getAllAuthInfo().stream()
             .map(ai -> new WebUserAuthToken(session, user, ai))
