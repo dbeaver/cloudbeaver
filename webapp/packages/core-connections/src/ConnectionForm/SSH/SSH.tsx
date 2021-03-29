@@ -159,7 +159,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormTabProps> = observer
               value={SSH_TUNNEL_ID + ' savePassword'}
               state={state}
               disabled={disabled || !enabled || form.form.readonly}
-            >{translate('connections_network_handler_ssh_tunnel_save_password')}
+            >{translate('connections_connection_edit_save_credentials')}
             </FieldCheckboxNew>
           )}
           <GroupItem>

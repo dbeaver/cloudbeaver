@@ -34,7 +34,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
@@ -119,7 +119,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       try {
         await this.connectionInfoResource.init(this.getConfig(connection.id));
 
-        this.notificationService.logSuccess({ title: `Connection ${connection.name} established` });
+        this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();
       } catch (exception) {
         this.showError(exception, 'Failed to establish connection');
