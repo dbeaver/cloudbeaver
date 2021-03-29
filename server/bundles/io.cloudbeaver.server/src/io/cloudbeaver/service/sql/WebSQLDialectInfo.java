@@ -19,6 +19,7 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.Pair;
 
 /**
@@ -77,7 +78,7 @@ public class WebSQLDialectInfo {
     }
 
     public String getScriptDelimiter() {
-        return dialect.getScriptDelimiter();
+        return SQLUtils.getDefaultScriptDelimiter(dialect);
     }
 
 }
