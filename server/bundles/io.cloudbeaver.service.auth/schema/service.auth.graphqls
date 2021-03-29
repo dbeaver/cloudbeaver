@@ -58,12 +58,14 @@ type UserInfo {
     displayName: String
 
     authTokens: [UserAuthToken!]!
+
+    linkedAuthProviders: [String!]!
 }
 
 extend type Query {
 
-    # Authorize user using specified auth provider
-    authLogin(provider: ID!, credentials: Object!): UserAuthToken!
+    # Authorize user using specified auth provider. If linkUser=true then associates new
+    authLogin(provider: ID!, credentials: Object!, linkUser: Boolean): UserAuthToken!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID): Boolean

@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
+import org.jkiss.utils.CommonUtils;
 
 /**
  * Web service implementation
@@ -38,7 +39,8 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("authLogin", env -> getService(env).authLogin(
                 getWebSession(env, false),
                 env.getArgument("provider"),
-                env.getArgument("credentials")))
+                env.getArgument("credentials"),
+                CommonUtils.toBoolean(env.getArgument("linkUser"))))
             .dataFetcher("authLogout", env -> {
                 getService(env).authLogout(getWebSession(env), env.getArgument("provider"));
                 return true;

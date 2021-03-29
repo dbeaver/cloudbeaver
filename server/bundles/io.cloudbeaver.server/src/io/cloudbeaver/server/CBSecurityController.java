@@ -373,6 +373,29 @@ class CBSecurityController implements DBWSecurityController {
         }
     }
 
+    @Override
+    public String[] getUserLinkedProviders(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
+                    "WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    List<String> providerIds = new ArrayList<>();
+
+                    while (dbResult.next()) {
+                        providerIds.add(dbResult.getString(1));
+                    }
+
+                    return providerIds.toArray(new String[0]);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving role in database", e);
+        }
+    }
+
     ///////////////////////////////////////////
     // Roles
 

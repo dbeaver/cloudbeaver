@@ -48,7 +48,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
 
     @Override
-    public WebAuthInfo authLogin(@NotNull WebSession webSession, @NotNull String providerId, @NotNull Map<String, Object> authParameters) throws DBWebException {
+    public WebAuthInfo authLogin(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @NotNull Map<String, Object> authParameters,
+        boolean linkWithActiveUser) throws DBWebException {
         DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
@@ -56,12 +60,20 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         boolean configMode = CBApplication.getInstance().isConfigurationMode();
 
+        // Check enabled auth providers
+        boolean providerEnabled = true;
+        String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
+        if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
+            providerEnabled = false;
+        }
         if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            // Admin can authorize in any providers
+            // 1. Admin can authorize in any providers
+            // 2. When it authorizes in non-local provider for the first time we force linkUser flag
+            if (!providerEnabled && webSession.getUser() != null) {
+                linkWithActiveUser = true;
+            }
         } else {
-            // Check enabled auth providers
-            String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
-            if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
+            if (!providerEnabled) {
                 throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
             }
         }
@@ -124,6 +136,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                                         new String[]{defaultRoleName},
                                         userId);
                                 }
+                            }
+                        } else {
+                            // We may need to associate new credentials with active user
+                            if (linkWithActiveUser) {
+                                securityController.setUserCredentials(userId, authProvider, userCredentials);
                             }
                         }
                     }

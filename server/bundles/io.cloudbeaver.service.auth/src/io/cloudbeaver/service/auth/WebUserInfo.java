@@ -16,11 +16,15 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +37,7 @@ public class WebUserInfo {
 
     private final WebSession session;
     private final WebUser user;
+    private String[] linkedProviders;
 
     public WebUserInfo(WebSession session, WebUser user) {
         this.session = session;
@@ -54,6 +59,19 @@ public class WebUserInfo {
         return session.getAllAuthInfo().stream()
             .map(ai -> new WebUserAuthToken(session, user, ai))
             .collect(Collectors.toList());
+    }
+
+    @Property
+    public List<String> getLinkedAuthProviders() throws DBWebException {
+        if (linkedProviders == null) {
+            try {
+                linkedProviders = CBApplication.getInstance().getSecurityController()
+                    .getUserLinkedProviders(session.getUser().getUserId());
+            } catch (DBCException e) {
+                throw new DBWebException("Error reading user linked providers");
+            }
+        }
+        return Arrays.asList(linkedProviders);
     }
 
 }
