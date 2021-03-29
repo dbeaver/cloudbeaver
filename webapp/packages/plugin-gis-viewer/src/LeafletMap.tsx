@@ -141,18 +141,12 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
   }, [getAssociatedValues]);
 
   useEffect(() => {
-    if (geoJSONLayerRef) {
+    if (geoJSONLayerRef && mapRef) {
       geoJSONLayerRef.clearLayers();
 
       for (let i = 0; i < geoJSON.length; i++) {
         geoJSONLayerRef.addData(geoJSON[i]);
       }
-    }
-  }, [geoJSON, geoJSONLayerRef]);
-
-  useEffect(() => {
-    if (mapRef && geoJSONLayerRef) {
-      mapRef.invalidateSize();
 
       const bounds = geoJSONLayerRef.getBounds();
 
@@ -172,7 +166,13 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
         mapRef.fitBounds(bounds);
       }
     }
-  }, [splitContext.isResizing, splitContext.mode, mapRef, geoJSONLayerRef, crs, geoJSON]);
+  }, [geoJSON, geoJSONLayerRef, crs, mapRef]);
+
+  useEffect(() => {
+    if (mapRef) {
+      mapRef.invalidateSize();
+    }
+  }, [splitContext.isResizing, splitContext.mode, mapRef]);
 
   return styled(styles)(
     <MapContainer crs={crs} whenCreated={setMapRef} zoom={12}>
