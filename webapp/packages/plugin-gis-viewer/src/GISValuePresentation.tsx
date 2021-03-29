@@ -6,18 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./terraformer-wkt.d.ts" />
+
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
-import wkt from 'terraformer-wkt-parser';
 
-import { TabContainerPanelComponent, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { IDataValuePanelProps, IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import { wktToGeoJSON } from '@terraformer/wkt';
 
 import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
-export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function GISValuePresentation({
+interface Props {
+  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  resultIndex: number;
+}
+
+export const GISValuePresentation: React.FC<Props> = observer(function GISValuePresentation({
   model,
   resultIndex,
 }) {
@@ -44,7 +52,18 @@ export const GISValuePresentation: TabContainerPanelComponent<IDataValuePanelPro
         continue;
       }
 
-      const parsedCellValue = wkt.parse(cellValue.mapText || cellValue.text);
+      let parsedCellValue: GeoJSON.GeometryObject | null = null;
+
+      try {
+        parsedCellValue = wktToGeoJSON(cellValue.mapText || cellValue.text);
+      } catch {
+        console.error(`Failed to parse ${cellValue.mapText || cellValue.text} value`);
+      }
+
+      if (!parsedCellValue) {
+        continue;
+      }
+
       result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
     }
 

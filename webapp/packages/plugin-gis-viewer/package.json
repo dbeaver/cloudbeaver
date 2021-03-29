@@ -38,9 +38,9 @@
     "rxjs": "^6.x.x"
   },
   "dependencies": {
+    "@terraformer/wkt": "^2.0.7",
     "leaflet": "^1.7.1",
-    "react-leaflet": "^3.1.0",
-    "terraformer-wkt-parser": "^1.2.1"
+    "react-leaflet": "^3.1.0"
   },
   "devDependencies": {
     "@types/react-leaflet": "^2.8.1"

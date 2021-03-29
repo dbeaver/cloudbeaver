@@ -1,12 +1,12 @@
-const { getAssets, withTimestamp } = require('./webpack.product.utils');
+const { resolve } = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const webpack = require('webpack')
 const { merge } = require('webpack-merge');
-const webpack = require('webpack');
-const { resolve } = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const TerserPlugin = require("terser-webpack-plugin");
 
-const commonConfig = require('./webpack.config.js');
+const commonConfig = require('./webpack.config.js')
+const { getAssets, withTimestamp } = require('./webpack.product.utils')
 
 const main = resolve('src/index.ts');
 const outputDir = resolve('lib');
@@ -31,7 +31,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       cacheGroups: {
         vendor: {
           // TODO: we need another way to detect libraries to exclude
-          test: /[\\/]node_modules[\\/](?!(@ag-grid|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
           name: 'vendors',
           chunks: 'all',
         },
@@ -40,7 +40,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     usedExports: true,
     sideEffects: true,
     concatenateModules: true,
-    
+
     minimizer: [new TerserPlugin({
       extractComments: /Copyright \(C\)/i,
     })],
@@ -52,10 +52,10 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     new webpack.DefinePlugin({
       _VERSION_: JSON.stringify(timestampVersion),
     }),
-    new HtmlWebpackPlugin({ 
-      template: resolve('src/index.html.ejs'), 
-      inject: 'body', 
-      version: timestampVersion 
+    new HtmlWebpackPlugin({
+      template: resolve('src/index.html.ejs'),
+      inject: 'body',
+      version: timestampVersion,
     }),
   ],
 });
