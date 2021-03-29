@@ -72,12 +72,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
           if (options.mode === 'edit') {
             const connection = await this.connectionsResource.update(config.connectionId!, config);
             status.info('Connection updated');
-            status.info(`Connection name: ${connection.name}`);
+            status.info(connection.name);
           } else {
             const connection = await this.connectionsResource.create(config);
             config.connectionId = connection.id;
             status.info('Connection created');
-            status.info(`Connection name: ${connection.name}`);
+            status.info(connection.name);
           }
         } else {
           const info = await this.connectionsResource.test(config);
@@ -91,12 +91,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
           if (options.mode === 'edit') {
             const connection = await this.connectionInfoResource.update(config);
             status.info('Connection updated');
-            status.info(`Connection name: ${connection.name}`);
+            status.info(connection.name);
           } else {
             const connection = await this.connectionInfoResource.createConnection(config);
             config.connectionId = connection.id;
             status.info('Connection created');
-            status.info(`Connection name: ${connection.name}`);
+            status.info(connection.name);
           }
         } else {
           const info = await this.connectionInfoResource.testConnection(config);

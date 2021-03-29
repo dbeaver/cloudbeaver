@@ -119,7 +119,7 @@ export class ConnectionController
       try {
         await this.connectionInfoResource.init(this.getConfig(connection.id));
 
-        this.notificationService.logSuccess({ title: 'Connection is established', message: `Connection name: ${connection.name}` });
+        this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();
       } catch (exception) {
         this.showError(exception, 'Failed to establish connection');
