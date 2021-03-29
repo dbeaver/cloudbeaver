@@ -1,18 +1,18 @@
-const { resolve } = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
-const webpack = require('webpack')
-const { merge } = require('webpack-merge');
+const { resolve } = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
+const { merge } = require('webpack-merge')
 
-const commonConfig = require('./webpack.config.js')
-const { getAssets, withTimestamp } = require('./webpack.product.utils')
+const commonConfig = require('./webpack.config.js');
+const { getAssets, withTimestamp } = require('./webpack.product.utils');
 
-const main = resolve('src/index.ts');
-const outputDir = resolve('lib');
-const package = require(resolve('package.json'))
+const main = resolve('src/index.ts')
+const outputDir = resolve('lib')
+const package = require(resolve('package.json'));
 
-const timestampVersion = withTimestamp(package.version);
+const timestampVersion = withTimestamp(package.version)
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   entry: main,
@@ -31,7 +31,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       cacheGroups: {
         vendor: {
           // TODO: we need another way to detect libraries to exclude
-          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|@terraformer|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
           name: 'vendors',
           chunks: 'all',
         },
@@ -58,4 +58,4 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       version: timestampVersion,
     }),
   ],
-});
+})
