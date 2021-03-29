@@ -59,7 +59,7 @@ export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
         footer={(
           <controls as='div'>
             <Button type="button" mod={['outlined']} onClick={props.rejectDialog}>
-              {translate('app_shared_inlineEditor_dialog_cancel')}
+              {translate('ui_processing_ok')}
             </Button>
           </controls>
         )}
