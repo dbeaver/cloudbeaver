@@ -15,11 +15,13 @@ const KEY = {
 };
 
 interface Props {
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
   big?: boolean;
 }
 
 export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
+  onClick,
   className,
   children,
 }) {
@@ -41,7 +43,10 @@ export const TreeNodeControl: React.FC<Props> = function TreeNodeControl({
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    context?.select(event.ctrlKey || event.metaKey);
+
+    if (onClick) {
+      onClick(event);
+    }
   };
 
   return (

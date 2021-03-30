@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
@@ -71,8 +71,12 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
     connected = !!connectionInfo?.connected;
   }
 
+  const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    context?.select(event.ctrlKey || event.metaKey);
+  }, [context]);
+
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl>
+    <TreeNodeControl onClick={onClickHandler}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
         {connected && <status as='div' />}
