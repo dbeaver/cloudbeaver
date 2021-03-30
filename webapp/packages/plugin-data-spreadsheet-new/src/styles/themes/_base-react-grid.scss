@@ -13,7 +13,7 @@ $edited-color: #ff99006b;
 @mixin base-react-grid() {
   :global {
     .cb-react-grid-container:focus-within {
-      .rdg-cell-custom-selected {
+      .rdg-cell-custom-selected:not(.rdg-cell-custom-editing) {
         background-color: rgba(0, 145, 234, 0.3);
       }
       .rdg-cell-selected {
