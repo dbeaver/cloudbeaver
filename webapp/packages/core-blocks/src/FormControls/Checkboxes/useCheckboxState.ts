@@ -77,7 +77,7 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
       }
 
       onChange?.(checked, name as TKey);
-      context?.onChange(checked, name);
+      context?.change(checked, name);
 
       refresh(count + 1);
     },

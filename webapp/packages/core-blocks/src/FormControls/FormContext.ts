@@ -8,8 +8,18 @@
 
 import { createContext } from 'react';
 
+import type { IExecutor } from '@cloudbeaver/core-executor';
+
+type ChangeHandler = (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+
+export interface IChangeData {
+  value: string | number | boolean | null | undefined;
+  name: string | undefined;
+}
+
 export interface IFormContext {
-  onChange: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+  changeExecutor: IExecutor<IChangeData>;
+  change: ChangeHandler;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

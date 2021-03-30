@@ -60,7 +60,7 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
     }
 
     if (formContext) {
-      formContext.onChange(value, name);
+      formContext.change(value, name);
     }
   }, [name, state, formContext, onChange]);
 

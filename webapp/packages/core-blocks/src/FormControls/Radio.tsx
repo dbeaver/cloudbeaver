@@ -144,7 +144,7 @@ export const Radio: RadioType = observer(function Radio({
     if (context) {
       context.onChange(value);
     } else if (formContext) {
-      formContext.onChange(value, name);
+      formContext.change(value, name);
     }
 
     if (onChange) {
