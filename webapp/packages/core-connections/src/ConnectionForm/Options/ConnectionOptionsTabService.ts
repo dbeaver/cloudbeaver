@@ -186,8 +186,21 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
     }
 
-    if (Object.keys(data.config.providerProperties).length > 0) {
-      config.providerProperties = data.config.providerProperties;
+    if (driver.providerProperties.length > 0) {
+      const providerProperties: Record<string, any> = { ...data.config.providerProperties };
+
+      for (const providerProperty of driver.providerProperties) {
+        if (providerProperty.defaultValue === null
+          || providerProperty.defaultValue === undefined
+          || !providerProperty.id
+          || providerProperty.id in providerProperties) {
+          continue;
+        }
+
+        providerProperties[providerProperty.id] = providerProperty.defaultValue;
+      }
+
+      config.providerProperties = providerProperties;
     }
   }
 
