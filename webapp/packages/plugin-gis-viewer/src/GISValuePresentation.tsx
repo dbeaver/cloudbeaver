@@ -52,19 +52,12 @@ export const GISValuePresentation: React.FC<Props> = observer(function GISValueP
         continue;
       }
 
-      let parsedCellValue: GeoJSON.GeometryObject | null = null;
-
       try {
-        parsedCellValue = wktToGeoJSON(cellValue.mapText || cellValue.text);
+        const parsedCellValue = wktToGeoJSON(cellValue.mapText || cellValue.text);
+        result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
       } catch {
         console.error(`Failed to parse ${cellValue.mapText || cellValue.text} value`);
       }
-
-      if (!parsedCellValue) {
-        continue;
-      }
-
-      result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
     }
 
     return result;
