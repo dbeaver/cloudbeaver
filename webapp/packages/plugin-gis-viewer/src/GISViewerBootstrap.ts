@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataValuePanelService, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { GISValuePresentation } from './GISValuePresentation';
+import { GISViewer } from './GISViewer';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
 @injectable()
@@ -25,7 +25,7 @@ export class GISViewerBootstrap extends Bootstrap {
       options: { dataFormat: [ResultDataFormat.Resultset] },
       name: 'gis_presentation_title',
       order: 10,
-      panel: () => GISValuePresentation,
+      panel: () => GISViewer,
       isHidden: (_, context) => {
         if (!context || !context.model.source.hasResult(context.resultIndex)) {
           return true;

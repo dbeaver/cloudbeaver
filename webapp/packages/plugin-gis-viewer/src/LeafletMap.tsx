@@ -150,7 +150,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
 
       const bounds = geoJSONLayerRef.getBounds();
 
-      if (Object.keys(bounds).length <= 0) {
+      if (Object.keys(bounds).length === 0) {
         return;
       }
 
