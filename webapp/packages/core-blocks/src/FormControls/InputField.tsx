@@ -72,7 +72,7 @@ export const InputField: InputFieldType = observer(function InputField({
       onChange(event.target.value, name);
     }
     if (context) {
-      context.onChange(event.target.value, name);
+      context.change(event.target.value, name);
     }
   }, [state, name, context, onChange]);
 

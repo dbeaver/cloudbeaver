@@ -6,9 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, forwardRef, useMemo } from 'react';
+import { useCallback, forwardRef, useState, useContext } from 'react';
 
-import { FormContext } from './FormContext';
+import { Executor } from '@cloudbeaver/core-executor';
+
+import { useObjectRef } from '../useObjectRef';
+import { FormContext, IChangeData, IFormContext } from './FormContext';
 
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange'> & {
   disabled?: boolean;
@@ -25,14 +28,23 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   },
   ref
 ) {
+  const parentContext = useContext(FormContext);
+  const props = useObjectRef({ parentContext, onChange, onSubmit });
+  const [changeExecutor] = useState(() => new Executor<IChangeData>());
+
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit(e);
-    }
-  }, [onSubmit]);
+    props.onSubmit?.(e);
+  }, []);
 
-  const context = useMemo(() => ({ onChange }), [onChange]);
+  const context = useObjectRef<IFormContext>({
+    changeExecutor,
+    change(value, name) {
+      props.onChange(value, name);
+      props.parentContext?.change(value, name);
+      changeExecutor.execute({ value, name });
+    },
+  }, {});
 
   return (
     <form {...rest} ref={ref} onSubmit={handleSubmit}>

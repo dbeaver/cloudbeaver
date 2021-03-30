@@ -195,7 +195,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
         onSelect(null, name, value);
       }
       if (context) {
-        context.onChange(null, name);
+        context.change(null, name);
       }
       setSearchValue('');
     },
@@ -213,7 +213,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
         onSelect(id, name, value);
       }
       if (context) {
-        context.onChange(id, name);
+        context.change(id, name);
       }
       setSearchValue('');
     },

@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, SwitchNew, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
@@ -24,8 +25,33 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const providers = useMapResource(AuthProvidersResource, AuthProvidersResource.keyAll);
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
+  const formContext = useContext(FormContext);
 
-  const disabled = providers.data.length === 1 && !providers.resource.has(AUTH_PROVIDER_LOCAL_ID);
+  if (formContext === null) {
+    throw new Error('Form state should be provided');
+  }
+
+  const localExists = providers.resource.has(AUTH_PROVIDER_LOCAL_ID);
+  const externalAuthentication = providers.data.length === 1 && !localExists;
+  const providersSelectable = providers.data.length > 1;
+
+  useExecutor({
+    executor: formContext.changeExecutor,
+    handlers: [function switchControls() {
+      if (externalAuthentication) {
+        serverConfig.enabledAuthProviders = [...providers.resource.keys];
+        serverConfig.authenticationEnabled = true;
+      }
+
+      if (serverConfig.enabledAuthProviders?.length === 0) {
+        serverConfig.authenticationEnabled = false;
+      }
+
+      if (!serverConfig.authenticationEnabled) {
+        serverConfig.anonymousAccessEnabled = true;
+      }
+    }],
+  });
 
   return styled(styles)(
     <Container wrap gap>
@@ -42,21 +68,19 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         >
           {translate('administration_configuration_wizard_configuration_anonymous_access')}
         </SwitchNew>
-        {!disabled && (
-          <SwitchNew
-            name="authenticationEnabled"
-            state={serverConfig}
-            description={translate('administration_configuration_wizard_configuration_authentication_description')}
-            mod={['primary']}
-            disabled={serverConfig.enabledAuthProviders?.length === 0}
-            small
-            autoHide
-          >
-            {translate('administration_configuration_wizard_configuration_authentication')}
-          </SwitchNew>
-        )}
+        <SwitchNew
+          name="authenticationEnabled"
+          state={serverConfig}
+          description={translate('administration_configuration_wizard_configuration_authentication_description')}
+          mod={['primary']}
+          disabled={serverConfig.enabledAuthProviders?.length === 0}
+          small
+          autoHide
+        >
+          {translate('administration_configuration_wizard_configuration_authentication')}
+        </SwitchNew>
         <Loader state={providers}>
-          {() => !disabled && styled(styles)(
+          {() => providersSelectable && styled(styles)(
             <>
               <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_provider')}</GroupTitle>
               {providers.data.map(provider => provider && (
@@ -77,7 +101,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           )}
         </Loader>
       </Group>
-      {configurationWizard ? (
+      {configurationWizard && localExists ? (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
       ) : (
         <Container medium />

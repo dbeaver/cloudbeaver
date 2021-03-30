@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
-import type { IExecutorHandler } from '@cloudbeaver/core-executor';
-
-import { useObjectRef } from '../../useObjectRef';
+import { useExecutor } from '../../useExecutor';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 
@@ -24,34 +22,25 @@ export function useTab(
     throw new Error('TabsContext not provided');
   }
 
-  const dynamic = useObjectRef({
-    tabId,
-    open: onOpen,
-    close: onClose,
+  useExecutor({
+    executor: state.openExecutor,
+    handlers: [function openHandler(data) {
+      if (tabId !== data.tabId) {
+        return;
+      }
+      onOpen?.(data);
+    }],
   });
 
-  useEffect(() => {
-    const openHandler: IExecutorHandler<ITabData<any>> = data => {
-      if (dynamic.tabId !== data.tabId) {
+  useExecutor({
+    executor: state.closeExecutor,
+    handlers: [function closeHandler(data) {
+      if (tabId !== data.tabId) {
         return;
       }
-      dynamic.open?.(data);
-    };
-    const closeHandler: IExecutorHandler<ITabData<any>> = data => {
-      if (dynamic.tabId !== data.tabId) {
-        return;
-      }
-      dynamic.close?.(data);
-    };
-
-    state.openExecutor.addHandler(openHandler);
-    state.closeExecutor.addHandler(closeHandler);
-
-    return () => {
-      state.openExecutor.removeHandler(openHandler);
-      state.closeExecutor.removeHandler(closeHandler);
-    };
-  }, [state.openExecutor, state.closeExecutor]);
+      onClose?.(data);
+    }],
+  });
 
   const handleOpen = () => state.open(tabId);
 
