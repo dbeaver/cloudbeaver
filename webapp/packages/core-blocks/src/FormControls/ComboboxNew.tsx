@@ -241,6 +241,7 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
           name={name}
           title={title}
           value={inputValue}
+          disabled={disabled}
           readOnly={readOnly}
           onChange={handleChange}
           {...rest}
