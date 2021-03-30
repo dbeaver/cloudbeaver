@@ -55,8 +55,9 @@ export const GISValuePresentation: React.FC<Props> = observer(function GISValueP
       try {
         const parsedCellValue = wktToGeoJSON(cellValue.mapText || cellValue.text);
         result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
-      } catch {
-        console.error(`Failed to parse ${cellValue.mapText || cellValue.text} value`);
+      } catch (exception) {
+        console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
+        console.error(exception);
       }
     }
 
