@@ -82,6 +82,10 @@ export class NavigationTreeContextMenuService extends Bootstrap {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataSource);
         },
+        isHidden: context => {
+          const connection = this.getConnectionFromNodeId(context.data.id);
+          return !connection?.connected;
+        },
         order: 2,
         title: 'app_navigationTree_connection_view',
         isPanel: true,
@@ -182,5 +186,5 @@ export class NavigationTreeContextMenuService extends Bootstrap {
     this.registerNodeViewMenuItem();
   }
 
-  load(): void {}
+  load(): void { }
 }
