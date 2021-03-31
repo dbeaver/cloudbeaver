@@ -13,6 +13,7 @@ import styled, { css, use } from 'reshadow';
 
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 import type { SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
@@ -45,7 +46,7 @@ const headerStyles = css`
     flex-grow: 1;
   }
   
-  sort-icon {
+  sort-icons {
     margin-left: 4px;
     display: flex;
     padding: 2px 4px;
@@ -57,24 +58,40 @@ const headerStyles = css`
     cursor: pointer;
   }
 
-  sort-icon > Icon {
+  sort-icons > SortIcon {
     width: 8px;
-    fill: #cbcbcb;
+    fill: currentColor !important;
   }
-  sort-icon > Icon:last-child {
+  sort-icons > SortIcon:last-child {
     transform: scaleY(-1);
   }
-  sort-icon > Icon[|active] {
-    fill: #338ECC;
-  }
-  sort-icon:hover > Icon {
+  sort-icons:hover > SortIcon {
     width: 9px;
   }
-  sort-icon[|disabled] {
+  sort-icons[|disabled] {
     opacity: 0.7;
     cursor: default;
   }
 `;
+
+const activeSortIcon = composes(
+  css`
+    Icon {
+      composes: theme-text-primary from global;
+    }
+  `
+);
+
+interface ISortIconProps {
+  active: boolean;
+  className?: string;
+}
+
+const SortIcon: React.FC<ISortIconProps> = function SortIcon({ active, className }) {
+  return styled(useStyles(active && activeSortIcon))(
+    <Icon name="sort-arrow" viewBox="0 0 6 6" className={className} />
+  );
+};
 
 function getColumn(colIdx: number, source: SqlResultSet) {
   return source.columns?.[colIdx];
@@ -134,10 +151,10 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
         <name as="div">{columnName}</name>
       </shrink-container>
       {sortable && (
-        <sort-icon as="div" onClick={handleSort} {...use({ disabled: loading })}>
-          <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: currentSortMode === 'asc' })} />
-          <Icon name="sort-arrow" viewBox="0 0 6 6" {...use({ active: currentSortMode === 'desc' })} />
-        </sort-icon>
+        <sort-icons as="div" onClick={handleSort} {...use({ disabled: loading })}>
+          <SortIcon active={currentSortMode === 'asc'} />
+          <SortIcon active={currentSortMode === 'desc'} />
+        </sort-icons>
       )}
     </table-header>
   );
