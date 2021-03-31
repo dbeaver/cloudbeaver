@@ -20,7 +20,7 @@ import {
 import { connectionProvider, ConnectionInfoResource, Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
@@ -73,10 +73,10 @@ export class ObjectViewerTabService {
     return tab.handlerState.pageId === page.key;
   }
 
-  objectViewerTabContext = async (
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    data: INodeNavigationData
-  ): Promise<IObjectViewerTabContext> => {
+  objectViewerTabContext: IAsyncContextLoader<IObjectViewerTabContext, INodeNavigationData> = async (
+    contexts,
+    data
+  ) => {
     const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
     const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
 
@@ -354,6 +354,9 @@ export class ObjectViewerTabService {
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   ) {
+    if (!contexts.hasContext(this.objectViewerTabContext)) {
+      return;
+    }
     try {
       const { switchPage } = await contexts.getContext(this.objectViewerTabContext);
 
