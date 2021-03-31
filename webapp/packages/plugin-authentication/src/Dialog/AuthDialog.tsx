@@ -100,6 +100,8 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
 
   const showTabs = !payload && controller.providers.length > 1;
 
+  const additional = userInfo.data !== null && controller.provider?.id && !userInfo.hasToken(controller.provider?.id);
+
   return styled(useStyles(styles))(
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
@@ -107,13 +109,14 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
         icon={controller.provider?.icon}
         header={(
           <>
-            {userInfo.data !== null && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
+            {additional && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
             {showTabs && (
               <TabList aria-label='Auth providers'>
                 {controller.providers.map(provider => (
                   <Tab
                     key={provider.id}
                     tabId={provider.id}
+                    disabled={controller.isAuthenticating}
                     onOpen={() => controller.selectProvider(provider.id)}
                   >
                     <TabTitle>{provider.label}</TabTitle>
