@@ -40,7 +40,7 @@ export interface DialogInternal {
 
 @injectable()
 export class CommonDialogService {
-  dialogs: DialogInternal[] = observable([]);
+  dialogs: DialogInternal[] = observable([], { deep: false });
 
   // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
   async open<TPayload, TResult>(

@@ -86,7 +86,7 @@ export class AdministrationScreenService {
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
-    this.permissionsResource.onDataUpdate.addHandler(() => {
+    this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
   }

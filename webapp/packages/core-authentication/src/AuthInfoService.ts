@@ -21,8 +21,8 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
-  async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
-    return this.userInfoResource.login(provider, credentials);
+  async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
+    return this.userInfoResource.login(provider, credentials, link);
   }
 
   async logout(): Promise<void> {

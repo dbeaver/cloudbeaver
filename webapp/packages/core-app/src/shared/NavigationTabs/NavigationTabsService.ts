@@ -315,6 +315,10 @@ export class NavigationTabsService {
   }
 
   private async restoreTab(tab: ITab, removedTabs: string[]): Promise<void> {
+    if (tab.restored) {
+      return;
+    }
+
     let restoreFail = false;
     try {
       const handler = this.handlers.get(tab.handlerId);

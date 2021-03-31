@@ -77,6 +77,7 @@ export interface QueryAllConnectionsArgs {
 export interface QueryAuthLoginArgs {
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+  linkUser?: Maybe<Scalars['Boolean']>;
 }
 
 export interface QueryAuthLogoutArgs {
@@ -935,6 +936,7 @@ export interface UserInfo {
   userId: Scalars['String'];
   displayName?: Maybe<Scalars['String']>;
   authTokens: UserAuthToken[];
+  linkedAuthProviders: Array<Scalars['String']>;
 }
 
 export interface DataTransferProcessorInfo {
@@ -967,6 +969,7 @@ export interface AsyncTaskCancelMutation { result: Mutation['asyncTaskCancel'] }
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
+  linkUser?: Maybe<Scalars['Boolean']>;
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
@@ -982,7 +985,7 @@ export type GetActiveUserQueryVariables = Exact<{
 
 export interface GetActiveUserQuery {
   user?: Maybe<(
-    Pick<UserInfo, 'userId' | 'displayName'>
+    Pick<UserInfo, 'userId' | 'displayName' | 'linkedAuthProviders'>
     & { authTokens: AuthTokenFragment[] }
   )>;
 }
@@ -1819,8 +1822,12 @@ export const AsyncTaskCancelDocument = `
 }
     `;
 export const AuthLoginDocument = `
-    query authLogin($provider: ID!, $credentials: Object!, $customIncludeOriginDetails: Boolean!) {
-  authToken: authLogin(provider: $provider, credentials: $credentials) {
+    query authLogin($provider: ID!, $credentials: Object!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
+  authToken: authLogin(
+    provider: $provider
+    credentials: $credentials
+    linkUser: $linkUser
+  ) {
     ...AuthToken
   }
 }
@@ -1835,6 +1842,7 @@ export const GetActiveUserDocument = `
   user: activeUser {
     userId
     displayName
+    linkedAuthProviders
     authTokens {
       ...AuthToken
     }

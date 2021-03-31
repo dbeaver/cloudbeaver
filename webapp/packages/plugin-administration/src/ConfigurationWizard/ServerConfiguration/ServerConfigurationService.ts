@@ -167,7 +167,7 @@ export class ServerConfigurationService {
     }
 
     try {
-      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: data.state.navigatorConfig });
+      await this.serverConfigResource.setDefaultNavigatorSettings(data.state.navigatorConfig);
       if (!data.configurationWizard || data.finish) {
         await this.serverConfigResource.save();
       }

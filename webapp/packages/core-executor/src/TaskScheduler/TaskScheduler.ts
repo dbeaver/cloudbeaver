@@ -17,6 +17,10 @@ export class TaskScheduler<TIdentifier> {
     return this.queue.map(task => task.id);
   }
 
+  get executing(): boolean {
+    return this.queue.length > 0;
+  }
+
   private readonly queue: Array<ITask<TIdentifier>>;
 
   private readonly isBlocked: BlockedExecution<TIdentifier> | null;
@@ -53,7 +57,6 @@ export class TaskScheduler<TIdentifier> {
       await error?.(exception);
       throw exception;
     } finally {
-      this.queue.splice(this.queue.indexOf(task), 1);
       await after?.();
     }
   }
@@ -72,18 +75,22 @@ export class TaskScheduler<TIdentifier> {
     id: TIdentifier,
     promise: () => Promise<T>,
   ) {
-    if (!this.isBlocked) {
-      return promise();
+    try {
+      if (!this.isBlocked) {
+        return await promise();
+      }
+
+      const queueList = this.queue.filter(active => this.isBlocked!(active.id, id));
+
+      for (const task of queueList) {
+        try {
+          await task.task;
+        } catch {}
+      }
+
+      return await promise();
+    } finally {
+      this.queue.splice(this.queue.findIndex(task => task.id === id), 1);
     }
-
-    const queueList = this.queue.filter(active => this.isBlocked!(active.id, id));
-
-    for (const task of queueList) {
-      try {
-        await task.task;
-      } catch {}
-    }
-
-    return promise();
   }
 }

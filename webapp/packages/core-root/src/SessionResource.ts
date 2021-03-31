@@ -21,11 +21,11 @@ export type SessionState = SessionStateFragment;
 export class SessionResource extends CachedDataResource<SessionState | null, void> {
   constructor(
     private graphQLService: GraphQLService,
-    private serverConfiguration: ServerConfigResource
+    serverConfiguration: ServerConfigResource
   ) {
     super(null);
 
-    this.sync(this.serverConfiguration);
+    this.sync(serverConfiguration);
   }
 
   protected async loader(): Promise<SessionState> {

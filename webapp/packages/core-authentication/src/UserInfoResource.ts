@@ -23,7 +23,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     super(null);
 
     this.sync(this.sessionResource);
+    this.sessionDataResource.beforeLoad.addHandler(() => this.load());
     this.onDataOutdated.addHandler(() => this.sessionDataResource.markOutdated());
+  }
+
+  isLinked(provideId: string): boolean {
+    return this.data?.linkedAuthProviders.includes(provideId) || false;
   }
 
   getId(): string {
@@ -40,7 +45,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     || this.data.authTokens.some(token => token.origin.type === type && token.origin.subType === subType);
   }
 
-  async login(provider: string, credentials: Record<string, string>): Promise<UserInfo | null> {
+  async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
     await this.performUpdate(undefined, undefined, async () => {
       const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
 
@@ -48,10 +53,11 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
       const { authToken } = await this.graphQLService.sdk.authLogin({
         provider,
         credentials: processedCredentials,
+        linkUser: link,
         customIncludeOriginDetails: true,
       });
 
-      if (this.data === null) {
+      if (this.data === null || link) {
         this.data = await this.loader();
       } else {
         this.data.authTokens.push(authToken as UserAuthToken);
@@ -67,9 +73,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
       if (this.data) {
         await this.graphQLService.sdk.authLogout();
         this.data = null;
-        this.sessionDataResource.refresh();
       }
     });
+    await this.sessionDataResource.refresh();
   }
 
   protected async loader(): Promise<UserInfo | null> {

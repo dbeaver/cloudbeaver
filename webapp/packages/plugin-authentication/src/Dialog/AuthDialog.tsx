@@ -85,20 +85,25 @@ const styles = composes(
   `
 );
 
-export const AuthDialog: DialogComponent<string | null, null> = observer(function AuthDialog({
-  payload,
+interface IAuthPayload {
+  provider: string | null;
+  link?: boolean;
+}
+
+export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
+  payload: { provider, link },
   options,
   rejectDialog,
 }) {
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, rejectDialog);
+  const controller = useController(AuthDialogController, link || false, rejectDialog);
   const translate = useTranslate();
 
-  if (payload) {
-    controller.selectProvider(payload);
+  if (provider) {
+    controller.selectProvider(provider);
   }
 
-  const showTabs = !payload && controller.providers.length > 1;
+  const showTabs = !provider && controller.providers.length > 1;
 
   const additional = userInfo.data !== null && controller.provider?.id && !userInfo.hasToken(controller.provider?.id);
 

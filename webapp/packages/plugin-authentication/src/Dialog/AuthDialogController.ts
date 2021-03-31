@@ -33,6 +33,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
+  private link!: boolean;
   private close!: () => void;
 
   constructor(
@@ -49,7 +50,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
     });
   }
 
-  init(onClose: () => void) {
+  init(link: boolean, onClose: () => void) {
+    this.link = link;
     this.close = onClose;
     this.loadProviders();
   }
@@ -65,7 +67,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
     this.isAuthenticating = true;
     try {
-      await this.authInfoService.login(this.provider.id, this.credentials);
+      await this.authInfoService.login(this.provider.id, this.credentials, this.link);
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
