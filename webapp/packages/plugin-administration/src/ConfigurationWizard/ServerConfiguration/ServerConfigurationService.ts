@@ -117,10 +117,6 @@ export class ServerConfigurationService {
     return this.done;
   }
 
-  async activate(): Promise<void> {
-    await this.loadConfig();
-  }
-
   async saveConfiguration(finish: boolean): Promise<boolean> {
     const contexts = await this.saveTask.execute(this.getSaveData(finish));
 

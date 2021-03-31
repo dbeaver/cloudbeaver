@@ -56,7 +56,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         ),
       },
       order: 4,
-      onActivate: this.serverConfigurationService.activate.bind(this.serverConfigurationService),
+      onActivate: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
     });
