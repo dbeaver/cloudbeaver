@@ -38,6 +38,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputFieldNew>
       <InputFieldNew
+        title={translate('administration_configuration_wizard_configuration_server_session_lifetime_description')}
         type="number"
         name="sessionExpireTime"
         state={state.serverConfig}

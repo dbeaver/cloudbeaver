@@ -84,7 +84,7 @@ export const InputField: InputFieldType = observer(function InputField({
 
   return styled(styles)(
     <field as="div" className={className} {...use({ long, short })}>
-      <field-label as='label'>{children} {required && '*'}</field-label>
+      <field-label as='label' title={rest.title}>{children} {required && '*'}</field-label>
       <input
         {...rest}
         name={name}

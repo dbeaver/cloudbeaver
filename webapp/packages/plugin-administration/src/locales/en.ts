@@ -14,6 +14,7 @@ export default [
   ['administration_configuration_wizard_configuration_server_info', 'Server Information'],
   ['administration_configuration_wizard_configuration_server_name', 'Server Name'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Session lifetime'],
+  ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires'],
 
   ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable custom connections'],

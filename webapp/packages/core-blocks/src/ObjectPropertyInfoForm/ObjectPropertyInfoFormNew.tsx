@@ -111,6 +111,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   return (
     <InputFieldNew
       type={password ? 'password' : 'text'}
+      title={property.description}
       name={property.id!}
       state={state}
       description={description}
