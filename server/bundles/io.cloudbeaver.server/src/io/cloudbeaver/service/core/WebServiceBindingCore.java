@@ -72,7 +72,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     return Collections.emptyList();
                 }
                 return getService(env).readSessionLog(
-                    getWebSession(env),
+                    session,
                     env.getArgument("maxEntries"),
                     env.getArgument("clearEntries"));
             })
