@@ -341,6 +341,7 @@ export interface MutationCreateConnectionArgs {
 
 export interface MutationCreateConnectionFromTemplateArgs {
   templateId: Scalars['ID'];
+  connectionName?: Maybe<Scalars['String']>;
 }
 
 export interface MutationDeleteConnectionArgs {
@@ -480,6 +481,7 @@ export interface ServerConfig {
   version: Scalars['String'];
   workspaceId: Scalars['ID'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
+  /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
   supportsCustomConnections?: Maybe<Scalars['Boolean']>;
   supportsConnectionBrowser?: Maybe<Scalars['Boolean']>;
@@ -1166,6 +1168,7 @@ export interface CreateConnectionFromNodeMutation { connection: DatabaseConnecti
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   templateId: Scalars['ID'];
+  connectionName: Scalars['String'];
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2023,8 +2026,11 @@ export const CreateConnectionFromNodeDocument = `
 }
     ${DatabaseConnectionFragmentDoc}`;
 export const CreateConnectionFromTemplateDocument = `
-    mutation createConnectionFromTemplate($templateId: ID!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
-  connection: createConnectionFromTemplate(templateId: $templateId) {
+    mutation createConnectionFromTemplate($templateId: ID!, $connectionName: String!, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $customIncludeNetworkHandlerCredentials: Boolean!) {
+  connection: createConnectionFromTemplate(
+    templateId: $templateId
+    connectionName: $connectionName
+  ) {
     ...DatabaseConnection
   }
 }
