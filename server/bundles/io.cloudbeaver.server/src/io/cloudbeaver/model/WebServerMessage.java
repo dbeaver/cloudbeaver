@@ -18,6 +18,9 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.server.CBConstants;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Web server message
  */
@@ -32,13 +35,24 @@ public class WebServerMessage {
     }
 
     private final MessageType type;
-    private long time;
-    private String message;
+    private final long time;
+    private final String message;
+    private final Throwable error;
+
 
     public WebServerMessage(MessageType type, String message) {
+        this(type, message, null);
+    }
+
+    public WebServerMessage(Throwable error) {
+        this(MessageType.ERROR, error.getMessage(), error);
+    }
+
+    public WebServerMessage(MessageType type, String message, Throwable error) {
         this.type = type;
         this.time = System.currentTimeMillis();
         this.message = message;
+        this.error = error;
     }
 
     public MessageType getType() {
@@ -54,6 +68,11 @@ public class WebServerMessage {
     }
 
     public String getStackTrace() {
+        if (error != null) {
+            StringWriter buf = new StringWriter();
+            error.printStackTrace(new PrintWriter(buf, true));
+            return buf.toString();
+        }
         return null;
     }
 

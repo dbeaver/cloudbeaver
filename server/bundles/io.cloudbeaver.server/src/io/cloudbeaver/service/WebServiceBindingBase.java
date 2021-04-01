@@ -106,14 +106,14 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env), errorOnNotFound);
     }
 
-    protected static WebSession findWebSession(DataFetchingEnvironment env) {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
-            getServletRequest(env));
-    }
-
     @NotNull
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
         return getWebConnection(getWebSession(env), env.getArgument("connectionId"));
+    }
+
+    public static WebSession findWebSession(DataFetchingEnvironment env) {
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
+            getServletRequest(env));
     }
 
     @NotNull
