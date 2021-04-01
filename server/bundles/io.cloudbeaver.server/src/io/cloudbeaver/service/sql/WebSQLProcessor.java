@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
+import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.utils.CommonUtils;
 
@@ -56,6 +57,7 @@ public class WebSQLProcessor {
     private final WebSession webSession;
     private final WebConnectionInfo connection;
     private final SQLSyntaxManager syntaxManager;
+    private final SQLRuleManager ruleManager;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
 
     private AtomicInteger contextId = new AtomicInteger();
@@ -66,6 +68,9 @@ public class WebSQLProcessor {
 
         syntaxManager = new SQLSyntaxManager();
         syntaxManager.init(connection.getDataSource());
+
+        ruleManager = new SQLRuleManager(syntaxManager);
+        ruleManager.loadRules(connection.getDataSource(), false);
     }
 
     void dispose() {
@@ -85,6 +90,10 @@ public class WebSQLProcessor {
 
     SQLSyntaxManager getSyntaxManager() {
         return syntaxManager;
+    }
+
+    SQLRuleManager getRuleManager() {
+        return ruleManager;
     }
 
     DBCExecutionContext getExecutionContext() {
