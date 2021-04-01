@@ -154,12 +154,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     throw new DBCException("You cannot authorize with different users credentials");
                 }
 
-                // Check for auth enabled. Auth is always enabled for admins
-                if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
-                    if (!securityController.getUserPermissions(userId).contains(DBWConstants.PERMISSION_ADMIN)) {
-                        throw new DBWebException("Authentication was disabled for this server");
-                    }
-                }
                 user = curUser;
             }
             if (user == null) {

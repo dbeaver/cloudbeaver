@@ -91,7 +91,7 @@ type ServerConfig {
     workspaceId: ID!
 
     anonymousAccessEnabled: Boolean
-    authenticationEnabled: Boolean
+    authenticationEnabled: Boolean @deprecated
     supportsCustomConnections: Boolean
     supportsConnectionBrowser: Boolean
     supportsWorkspaces: Boolean

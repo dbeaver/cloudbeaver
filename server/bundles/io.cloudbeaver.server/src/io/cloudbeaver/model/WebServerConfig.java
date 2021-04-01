@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -65,7 +66,8 @@ public class WebServerConfig {
 
     @Property
     public boolean isAuthenticationEnabled() {
-        return application.getAppConfiguration().isAuthenticationEnabled();
+        String[] enabledAuthProviders = getEnabledAuthProviders();
+        return enabledAuthProviders == null || !ArrayUtils.isEmpty(enabledAuthProviders);
     }
 
     @Property

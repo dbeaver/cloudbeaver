@@ -591,7 +591,6 @@ public class CBApplication extends BaseApplicationImpl {
                     json.name("app");
                     json.beginObject();
                     JSONUtils.field(json, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-                    JSONUtils.field(json, "authenticationEnabled", appConfig.isAuthenticationEnabled());
                     JSONUtils.field(json, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
                     JSONUtils.field(json, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
                     JSONUtils.field(json, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());

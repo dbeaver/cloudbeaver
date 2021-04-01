@@ -35,7 +35,6 @@ public class AdminServerConfig {
     private String adminPassword;
 
     private boolean anonymousAccessEnabled;
-    private boolean authenticationEnabled;
     private boolean customConnectionsEnabled;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
@@ -50,7 +49,6 @@ public class AdminServerConfig {
 
         CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-        this.authenticationEnabled = JSONUtils.getBoolean(params, "authenticationEnabled", appConfig.isAuthenticationEnabled());
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
         this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
         this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
@@ -89,10 +87,6 @@ public class AdminServerConfig {
 
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;
-    }
-
-    public boolean isAuthenticationEnabled() {
-        return authenticationEnabled;
     }
 
     public boolean isCustomConnectionsEnabled() {

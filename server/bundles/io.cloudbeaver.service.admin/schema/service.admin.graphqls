@@ -52,7 +52,6 @@ input ServerConfigInput {
     adminPassword: String
 
     anonymousAccessEnabled: Boolean
-    authenticationEnabled: Boolean
     customConnectionsEnabled: Boolean
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean

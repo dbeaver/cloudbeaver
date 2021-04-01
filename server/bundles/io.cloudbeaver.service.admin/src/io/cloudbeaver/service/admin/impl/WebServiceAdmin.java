@@ -354,7 +354,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             CBAppConfig appConfig = new CBAppConfig();
             appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
-            appConfig.setAuthenticationEnabled(config.isAuthenticationEnabled());
             appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
             appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
             appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
