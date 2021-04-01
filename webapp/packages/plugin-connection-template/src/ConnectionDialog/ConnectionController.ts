@@ -114,7 +114,7 @@ export class ConnectionController
     this.isConnecting = true;
     this.clearError();
     try {
-      const connectionNames = Array.from(this.connectionInfoResource.data.values())
+      const connectionNames = Array.from(this.connectionInfoResource.values)
         .map(connection => connection.name);
       const uniqueConnectionName = getUniqueConnectionName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(this.template.id, uniqueConnectionName);
