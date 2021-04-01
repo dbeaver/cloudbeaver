@@ -433,7 +433,7 @@ extend type Mutation {
 
     deleteConnection( id: ID! ): Boolean!
 
-    createConnectionFromTemplate( templateId: ID! ): ConnectionInfo!
+    createConnectionFromTemplate( templateId: ID!, connectionName: String ): ConnectionInfo!
 
     # Copies connection configuration from node
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig ): ConnectionInfo!
