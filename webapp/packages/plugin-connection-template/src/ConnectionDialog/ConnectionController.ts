@@ -9,7 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig
+  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName
 } from '@cloudbeaver/core-connections';
 import type { IFormInitConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
@@ -114,7 +114,10 @@ export class ConnectionController
     this.isConnecting = true;
     this.clearError();
     try {
-      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
+      const connectionNames = Array.from(this.connectionInfoResource.data.values())
+        .map(connection => connection.name);
+      const uniqueConnectionName = getUniqueConnectionName(this.template.name || 'Template connection', connectionNames);
+      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id, uniqueConnectionName);
 
       try {
         await this.connectionInfoResource.init(this.getConfig(connection.id));

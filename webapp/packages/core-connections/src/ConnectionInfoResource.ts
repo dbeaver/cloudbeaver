@@ -120,9 +120,10 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
   }
 
-  async createFromTemplate(templateId: string): Promise<Connection> {
+  async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
       templateId,
+      connectionName,
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(),
     });
