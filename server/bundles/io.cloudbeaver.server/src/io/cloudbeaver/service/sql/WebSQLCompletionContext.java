@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionContext;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 
 import java.util.Map;
 
@@ -56,6 +57,11 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
     @Override
     public SQLSyntaxManager getSyntaxManager() {
         return sqlContext.getProcessor().getSyntaxManager();
+    }
+
+    @Override
+    public SQLRuleManager getRuleManager() {
+        return sqlContext.getProcessor().getRuleManager();
     }
 
     @Override
