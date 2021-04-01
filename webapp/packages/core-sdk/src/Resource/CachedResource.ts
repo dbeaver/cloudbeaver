@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, action } from 'mobx';
 
+import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -44,7 +45,7 @@ export abstract class CachedResource<
   TParam,
   TKey = TParam,
   TContext = void
-> {
+> extends Dependency {
   data: TData;
 
   readonly onDataOutdated: IExecutor<TParam>;
@@ -54,15 +55,23 @@ export abstract class CachedResource<
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
 
-  protected loading = false;
+  protected get loading(): boolean {
+    return this.scheduler.executing;
+  }
 
   protected scheduler: TaskScheduler<TParam>;
   protected paramAliases: Array<IParamAlias<TParam>>;
 
   constructor(defaultValue: TData) {
-    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loading'>(this, {
+    super();
+    makeObservable<CachedResource<TData, TParam, TKey, TContext>, 'loader'>(this, {
       data: observable,
-      loading: observable,
+      loader: action,
+      markDataLoading: action,
+      markDataLoaded: action,
+      markDataError: action,
+      markOutdated: action,
+      markUpdated: action,
     });
 
     this.includes = this.includes.bind(this);
@@ -82,7 +91,7 @@ export abstract class CachedResource<
     resource: CachedResource<any, TParam, TParam, void>,
     context: TContext
   ): void {
-    resource.onDataOutdated.addHandler(param => this.markOutdated(param));
+    resource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     resource.onDataUpdate.addHandler(param => this.load(param, context));
     this.beforeLoad.addHandler(param => resource.load(param));
   }
@@ -207,22 +216,24 @@ export abstract class CachedResource<
     }
 
     param = this.transformParam(param);
+    const contexts = await this.beforeLoad.execute(param);
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     this.markDataLoading(param, context);
-    this.loading = true;
     return this.scheduler.schedule(
       param,
       async () => {
-      // repeated because previous task maybe has been load requested data
+        // repeated because previous task maybe has been load requested data
         if (exitCheck?.()) {
           return;
         }
 
         return await this.taskWrapper(param, context, update);
       },
-      () => {
-        this.markDataLoaded(param, context);
-        this.loading = false;
-      },
+      () => this.markDataLoaded(param, context),
       () => this.onDataUpdate.execute(param),
       exception => this.markDataError(exception, param, context));
   }
@@ -240,21 +251,17 @@ export abstract class CachedResource<
     }
 
     this.markDataLoading(param, context);
-    this.loading = true;
     await this.scheduler.schedule(
       param,
       async () => {
-      // repeated because previous task maybe has been load requested data
+        // repeated because previous task maybe has been load requested data
         if (this.isLoaded(param, context) && !this.isOutdated(param) && !refresh) {
           return;
         }
 
         await this.taskWrapper(param, context, this.loadingTask);
       },
-      () => {
-        this.markDataLoaded(param, context);
-        this.loading = false;
-      },
+      () => this.markDataLoaded(param, context),
       () => this.onDataUpdate.execute(param),
       exception => this.markDataError(exception, param, context));
   }

@@ -2,6 +2,7 @@ query getActiveUser($customIncludeOriginDetails: Boolean!) {
   user: activeUser {
     userId
     displayName
+    linkedAuthProviders
     authTokens {
       ...AuthToken
     }

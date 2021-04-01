@@ -37,13 +37,6 @@ export class ServerConfigurationPageController {
 
   change = (): void => {
     this.serverConfigurationService.changed();
-    if (this.state.serverConfig.enabledAuthProviders?.length === 0) {
-      this.state.serverConfig.authenticationEnabled = false;
-    }
-
-    if (!this.state.serverConfig.authenticationEnabled) {
-      this.state.serverConfig.anonymousAccessEnabled = true;
-    }
 
     if (!this.state.serverConfig.adminCredentialsSaveEnabled) {
       this.state.serverConfig.publicCredentialsSaveEnabled = false;

@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { useFormValidator } from '@cloudbeaver/core-executor';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
@@ -43,16 +43,19 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES, BASE_CONTAINERS_STYLES);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const serverConfigResource = useService(ServerConfigResource);
   const service = useService(ServerConfigurationService);
   const controller = useController(ServerConfigurationPageController);
+  const changed = serverConfigResource.isChanged()
+    || serverConfigResource.isNavigatorSettingsChanged(service.state.navigatorConfig);
   useFormValidator(service.validationTask, focusedRef);
 
   return styled(style)(
     <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
       {controller.editing && (
         <AdministrationTools>
-          <IconButton name="admin-save" viewBox="0 0 28 28" onClick={controller.save} />
-          <IconButton name="admin-cancel" viewBox="0 0 28 28" onClick={controller.reset} />
+          <IconButton name="admin-save" viewBox="0 0 28 28" disabled={!changed} onClick={controller.save} />
+          <IconButton name="admin-cancel" viewBox="0 0 28 28" disabled={!changed} onClick={controller.reset} />
         </AdministrationTools>
       )}
       <ColoredContainer wrap gap overflow parent>

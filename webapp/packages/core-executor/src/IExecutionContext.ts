@@ -12,7 +12,7 @@ export interface IContextGetter<TData> {
 }
 
 export interface IExecutionContextProvider<TData> {
-  hasContext: (token: IContextLoader<TData>) => boolean;
+  hasContext: (token: IContextLoader<any, TData>) => boolean;
   getContext: IContextGetter<TData>;
 }
 

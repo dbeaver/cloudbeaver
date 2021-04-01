@@ -85,20 +85,27 @@ const styles = composes(
   `
 );
 
-export const AuthDialog: DialogComponent<string | null, null> = observer(function AuthDialog({
-  payload,
+interface IAuthPayload {
+  provider: string | null;
+  link?: boolean;
+}
+
+export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
+  payload: { provider, link },
   options,
   rejectDialog,
 }) {
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, rejectDialog);
+  const controller = useController(AuthDialogController, link || false, rejectDialog);
   const translate = useTranslate();
 
-  if (payload) {
-    controller.selectProvider(payload);
+  if (provider) {
+    controller.selectProvider(provider);
   }
 
-  const showTabs = !payload && controller.providers.length > 1;
+  const showTabs = !provider && controller.providers.length > 1;
+
+  const additional = userInfo.data !== null && controller.provider?.id && !userInfo.hasToken(controller.provider?.id);
 
   return styled(useStyles(styles))(
     <TabsState currentTabId={controller.provider?.id}>
@@ -107,13 +114,14 @@ export const AuthDialog: DialogComponent<string | null, null> = observer(functio
         icon={controller.provider?.icon}
         header={(
           <>
-            {userInfo.data !== null && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
+            {additional && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
             {showTabs && (
               <TabList aria-label='Auth providers'>
                 {controller.providers.map(provider => (
                   <Tab
                     key={provider.id}
                     tabId={provider.id}
+                    disabled={controller.isAuthenticating}
                     onOpen={() => controller.selectProvider(provider.id)}
                   >
                     <TabTitle>{provider.label}</TabTitle>

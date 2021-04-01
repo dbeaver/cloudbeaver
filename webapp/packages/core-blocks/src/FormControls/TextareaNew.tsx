@@ -93,7 +93,7 @@ export const TextareaNew: TextareaType = observer(function TextareaNew({
       onChange(event.target.value, name);
     }
     if (context) {
-      context.onChange(event.target.value, name);
+      context.change(event.target.value, name);
     }
   }, [state, name, onChange]);
 

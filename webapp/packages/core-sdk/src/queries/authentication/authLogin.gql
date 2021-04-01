@@ -1,9 +1,10 @@
 query authLogin(
   $provider: ID!
   $credentials: Object!
+  $linkUser: Boolean
   $customIncludeOriginDetails: Boolean!
 ) {
-  authToken: authLogin(provider: $provider, credentials: $credentials) {
+  authToken: authLogin(provider: $provider, credentials: $credentials, linkUser: $linkUser) {
     ...AuthToken
   } 
 }

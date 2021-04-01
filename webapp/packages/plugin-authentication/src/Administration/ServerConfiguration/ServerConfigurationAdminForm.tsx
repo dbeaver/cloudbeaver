@@ -10,7 +10,6 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
@@ -25,10 +24,6 @@ export const ServerConfigurationAdminForm: React.FC<Props> = observer(function S
 }) {
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES);
-
-  if (!serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)) {
-    return null;
-  }
 
   return styled(style)(
     <Group form gap medium>

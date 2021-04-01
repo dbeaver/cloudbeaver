@@ -28,24 +28,23 @@ export interface Props {
   onLogin: () => void;
 }
 
-export const AuthDialogFooter = observer(
-  function AuthDialogFooter({
-    isAuthenticating,
-    onLogin,
-  }: Props) {
-    const translate = useTranslate();
+export const AuthDialogFooter = observer(function AuthDialogFooter({
+  isAuthenticating,
+  onLogin,
+}: Props) {
+  const translate = useTranslate();
 
-    return styled(styles)(
-      <controls as="div">
-        <Button
-          type="button"
-          mod={['unelevated']}
-          disabled={isAuthenticating}
-          onClick={onLogin}
-        >
-          {translate('authentication_login')}
-        </Button>
-      </controls>
-    );
-  }
+  return styled(styles)(
+    <controls as="div">
+      <Button
+        type="button"
+        mod={['unelevated']}
+        loading={isAuthenticating}
+        onClick={onLogin}
+      >
+        {translate('authentication_login')}
+      </Button>
+    </controls>
+  );
+}
 );

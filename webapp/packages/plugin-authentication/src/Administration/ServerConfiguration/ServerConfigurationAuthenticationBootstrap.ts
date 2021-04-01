@@ -26,26 +26,18 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
 
   register(): void {
     this.serverConfigurationService.validationTask.addHandler(this.validateForm);
-    this.serverConfigurationService.prepareConfigTask.addHandler(this.prepareConfig);
     this.serverConfigurationService.loadConfigTask.addHandler(this.loadServerConfig);
   }
 
   load(): void { }
 
   private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
-    const providers = await this.authProvidersResource.loadAll();
-    const disabled = providers.length === 1 && !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
-
-    if (disabled) {
-      data.state.serverConfig.enabledAuthProviders = [...this.authProvidersResource.keys];
-      data.state.serverConfig.authenticationEnabled = true;
-    }
-
     if (!data.reload) {
       return;
     }
 
     try {
+      await this.authProvidersResource.loadAll();
       const config = await this.serverConfigResource.load();
 
       if (!config) {
@@ -53,54 +45,39 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       }
 
       if (config.configurationMode) {
-        data.state.serverConfig.adminName = 'cbadmin';
-        data.state.serverConfig.adminPassword = '';
-
-        data.state.serverConfig.anonymousAccessEnabled = false;
-        data.state.serverConfig.authenticationEnabled = true;
+        if (this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID)) {
+          data.state.serverConfig.adminName = 'cbadmin';
+          data.state.serverConfig.adminPassword = '';
+        }
       } else {
-        data.state.serverConfig.anonymousAccessEnabled = config.anonymousAccessEnabled;
-        data.state.serverConfig.authenticationEnabled = config.authenticationEnabled;
+        data.state.serverConfig.adminName = undefined;
+        data.state.serverConfig.adminPassword = undefined;
       }
 
-      data.state.serverConfig.enabledAuthProviders = config.enabledAuthProviders;
+      data.state.serverConfig.anonymousAccessEnabled = config.anonymousAccessEnabled;
+      data.state.serverConfig.authenticationEnabled = config.authenticationEnabled;
+      data.state.serverConfig.enabledAuthProviders = [...config.enabledAuthProviders];
     } catch (exception) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, 'Can\'t load server configuration');
     }
   };
 
-  private prepareConfig: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
-    const providers = await this.authProvidersResource.loadAll();
-    const disabled = providers.length === 1 && !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
+  private validateForm: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
+    await this.authProvidersResource.loadAll();
+    const administratorPresented = data.configurationWizard && this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
 
-    if (disabled) {
-      data.state.serverConfig.enabledAuthProviders = [...this.authProvidersResource.keys];
-      data.state.serverConfig.authenticationEnabled = true;
+    if (!administratorPresented) {
+      return;
     }
 
-    if (
-      !data.configurationWizard
-      || !data.state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
-    ) {
-      data.state.serverConfig.adminName = undefined;
-      data.state.serverConfig.adminPassword = undefined;
-    }
-  };
-
-  private validateForm: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
-    if (
-      data.configurationWizard
-      && data.state.serverConfig.enabledAuthProviders?.includes(AUTH_PROVIDER_LOCAL_ID)
-    ) {
-      if (!data.state.serverConfig.adminName
+    if (!data.state.serverConfig.adminName
         || data.state.serverConfig.adminName.length < 6
         || !data.state.serverConfig.adminPassword
-      ) {
-        validation.invalidate();
-      }
+    ) {
+      validation.invalidate();
     }
   };
 }

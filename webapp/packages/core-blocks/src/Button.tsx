@@ -102,6 +102,7 @@ export const Button: React.FC<ButtonProps> = function Button({
   tag = 'button',
   disabled = false,
   loading,
+  className,
   ...rest
 }) {
   if (loading) {
@@ -110,7 +111,7 @@ export const Button: React.FC<ButtonProps> = function Button({
 
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} disabled={disabled} {...use({ loading })}>
+    <Button {...rest} disabled={disabled} {...use({ loading })} className={className}>
       <ripple as="div" />
       <button-label as='div'>{children}</button-label>
       <Loader small />

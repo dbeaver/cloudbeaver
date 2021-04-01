@@ -1,3 +1,4 @@
+export * from './ConnectionNavigatorViewSettings';
 export * from './PermissionsResource';
 export * from './PermissionsService';
 export * from './ServerConfigResource';

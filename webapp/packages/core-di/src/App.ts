@@ -7,6 +7,7 @@
  */
 
 import { Bootstrap } from './Bootstrap';
+import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
 import { RootContainerService } from './entities/RootContainerService';
 import type { IServiceCollection, IServiceInjector } from './IApp';
@@ -62,6 +63,8 @@ export class App {
           if ('register' in serviceInstance) {
             await serviceInstance.register();
           }
+        } else if (service.prototype instanceof Dependency) {
+          this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
         }
       }
     }

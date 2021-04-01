@@ -86,7 +86,7 @@ export class AdministrationScreenService {
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
-    this.permissionsResource.onDataUpdate.addHandler(() => {
+    this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
   }
@@ -256,7 +256,7 @@ export class AdministrationScreenService {
     return true;
   }
 
-  private async isAccessProvided(state: RouterState) {
+  private async isAccessProvided(state: RouterState): Promise<boolean> {
     await this.serverConfigResource.load();
 
     if (this.isConfigurationMode) {
@@ -264,8 +264,7 @@ export class AdministrationScreenService {
     }
 
     if (this.screenService.isActive(state.name, AdministrationScreenService.setupName)) {
-      this.navigateToRoot();
-      return;
+      return false;
     }
 
     await this.ensurePermissions.execute();
