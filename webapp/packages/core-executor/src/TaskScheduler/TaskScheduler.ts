@@ -12,6 +12,8 @@ import type { ITask } from './ITask';
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
 
+const queueLimit = 100;
+
 export class TaskScheduler<TIdentifier> {
   get activeList(): TIdentifier[] {
     return this.queue.map(task => task.id);
@@ -47,6 +49,9 @@ export class TaskScheduler<TIdentifier> {
       task: this.scheduler(id, promise),
     };
 
+    if (this.queue.length > queueLimit) {
+      throw new Error('Execution queue limit is reached');
+    }
     this.queue.push(task);
 
     try {
