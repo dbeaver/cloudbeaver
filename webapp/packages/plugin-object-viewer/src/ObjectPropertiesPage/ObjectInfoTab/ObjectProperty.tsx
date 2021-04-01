@@ -27,6 +27,7 @@ export const ObjectProperty = observer(function ObjectProperty({
         ? (
           <FieldCheckboxNew
             className={className}
+            title={objectProperty.description}
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
             disabled
@@ -38,6 +39,7 @@ export const ObjectProperty = observer(function ObjectProperty({
         : (
           <InputFieldNew
             className={className}
+            title={objectProperty.description}
             name={objectProperty.id}
             value={getValue(objectProperty.value)}
             readOnly

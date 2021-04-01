@@ -108,7 +108,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
 
   return styled(styles)(
     <field as="div" className={className} {...use({ small, medium, large })}>
-      <field-label as='label'>{children}{required && ' *'}</field-label>
+      <field-label as='label' title={rest.title}>{children}{required && ' *'}</field-label>
       <input
         ref={ref}
         role='new'
