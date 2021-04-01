@@ -52,7 +52,7 @@ export const ProductInfoDialog: React.FC<DialogComponentProps<null>> = observer(
     const version = useAppVersion();
 
     const productInfo = serverConfigResource.data?.productInfo;
-    const logoIcon = themeService.currentThemeId === 'light' ? '/icons/logo-secondary.svg' : '/icons/logo-secondary_theme-dark.svg';
+    const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
     return styled(styles)(
       <CommonDialogWrapper
