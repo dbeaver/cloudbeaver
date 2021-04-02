@@ -6,16 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./terraformer-wkt.d.ts" />
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
+import wellknown from 'wellknown';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
-import { wktToGeoJSON } from '@terraformer/wkt';
 
 import { IGeoJSONFeature, IAssociatedValue, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
@@ -53,7 +50,11 @@ export const GISValuePresentation: React.FC<Props> = observer(function GISValueP
       }
 
       try {
-        const parsedCellValue = wktToGeoJSON(cellValue.mapText || cellValue.text);
+        const parsedCellValue = wellknown.parse(cellValue.mapText || cellValue.text);
+        if (!parsedCellValue) {
+          continue;
+        }
+
         result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
       } catch (exception) {
         console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);

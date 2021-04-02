@@ -31,7 +31,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       cacheGroups: {
         vendor: {
           // TODO: we need another way to detect libraries to exclude
-          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|@terraformer|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|wellknown|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
           name: 'vendors',
           chunks: 'all',
         },
