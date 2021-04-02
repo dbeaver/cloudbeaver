@@ -9,13 +9,12 @@
 import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ActionSnackbarProps, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { INotification, NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutorHandler, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
@@ -32,7 +31,7 @@ export interface IServerConfigSaveData {
 
 export interface ILoadConfigData {
   state: IServerConfigurationPageState;
-  reload: boolean;
+  reset: boolean;
 }
 
 @injectable()
@@ -48,11 +47,12 @@ export class ServerConfigurationService {
   readonly pluginsContainer: PlaceholderContainer;
 
   private done: boolean;
+  private stateLinked: boolean;
+  private unSaveNotification: INotification<ActionSnackbarProps> | null;
 
   constructor(
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
   ) {
     makeObservable<ServerConfigurationService, 'done'>(this, {
@@ -61,9 +61,11 @@ export class ServerConfigurationService {
       done: observable,
     });
 
+    this.stateLinked = false;
     this.done = false;
     this.loading = true;
     this.state = serverConfigStateContext();
+    this.unSaveNotification = null;
     this.loadConfigTask = new Executor();
     this.prepareConfigTask = new Executor();
     this.saveTask = new Executor();
@@ -75,7 +77,10 @@ export class ServerConfigurationService {
       .next(this.validationTask, () => this.getSaveData(false))
       .addHandler(() => { this.loading = true; })
       .addHandler(this.loadServerConfig)
-      .addPostHandler(() => { this.loading = false; });
+      .addPostHandler(() => {
+        this.loading = false;
+        this.showUnsavedNotification();
+      });
 
     this.saveTask
       .before(this.validationTask)
@@ -85,28 +90,37 @@ export class ServerConfigurationService {
     this.validationTask
       .addHandler(this.validateForm)
       .addPostHandler(this.ensureValidation);
+
+    this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this));
   }
 
   changed(): void {
     this.done = false;
   }
 
-  async loadConfig(): Promise<void> {
+  deactivate(): void {
+    this.showUnsavedNotification();
+  }
+
+  async loadConfig(reset = false): Promise<void> {
     try {
-      let reload = false;
-      this.state = this.administrationScreenService.getItemState(
-        'server-configuration',
-        () => {
-          reload = true;
-          return this.state;
-        },
-        !this.administrationScreenService.isConfigurationMode
-      );
-      this.serverConfigResource.setDataUpdate(this.state.serverConfig);
+      if (!this.stateLinked) {
+        this.state = this.administrationScreenService.getItemState(
+          'server-configuration',
+          () => {
+            reset = true;
+            return this.state;
+          }
+        );
+        this.serverConfigResource.setDataUpdate(this.state.serverConfig);
+        this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
+
+        this.stateLinked = true;
+      }
 
       await this.loadConfigTask.execute({
         state: this.state,
-        reload,
+        reset,
       });
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load server configuration');
@@ -126,7 +140,7 @@ export class ServerConfigurationService {
   }
 
   private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
-    if (!data.reload) {
+    if (!data.reset) {
       return;
     }
 
@@ -144,7 +158,7 @@ export class ServerConfigurationService {
       data.state.serverConfig.publicCredentialsSaveEnabled = config.publicCredentialsSaveEnabled;
       data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
 
-      data.state.navigatorConfig = { ...config.defaultNavigatorSettings };
+      Object.assign(data.state.navigatorConfig, config.defaultNavigatorSettings);
     } catch (exception) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, 'Can\'t load server configuration');
@@ -167,7 +181,7 @@ export class ServerConfigurationService {
     }
 
     try {
-      await this.serverConfigResource.setDefaultNavigatorSettings(data.state.navigatorConfig);
+      await this.serverConfigResource.saveDefaultNavigatorSettings();
       if (!data.configurationWizard || data.finish) {
         await this.serverConfigResource.save();
       }
@@ -205,6 +219,26 @@ export class ServerConfigurationService {
       return false;
     }
     return true;
+  }
+
+  private showUnsavedNotification() {
+    if (
+      !this.serverConfigResource.isChanged()
+      && !this.serverConfigResource.isNavigatorSettingsChanged()
+    ) {
+      this.unSaveNotification?.close(true);
+      return;
+    }
+
+    if (this.unSaveNotification || this.administrationScreenService.isConfigurationMode) {
+      return;
+    }
+
+    this.unSaveNotification = this.notificationService.logInfo({
+      title: 'administration_configuration_wizard_configuration_server_info_unsaved',
+      persistent: true,
+      onClose: () => { this.unSaveNotification = null; },
+    });
   }
 }
 

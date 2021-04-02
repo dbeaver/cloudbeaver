@@ -199,6 +199,16 @@ export class AdministrationItemService {
   }
 
   private activateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside }) => {
+    let lastItem = 0;
+    while (true) {
+      const items = this.getActiveItems(configurationWizard);
+      if (lastItem === items.length) {
+        break;
+      }
+      await items[lastItem]?.onLoad?.(configurationWizard, outside);
+      lastItem++;
+    }
+
     if (configurationWizard) {
       let item = 0;
       while (true) {

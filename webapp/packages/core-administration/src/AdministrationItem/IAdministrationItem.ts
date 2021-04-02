@@ -91,6 +91,7 @@ export interface IAdministrationItemOptions {
   replace?: IAdministrationItemReplaceOptions;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
+  onLoad?: AdministrationItemEvent;
   onActivate?: AdministrationItemEvent;
   onDeActivate?: AdministrationItemEvent;
   canActivate?: AdministrationItemCanActivateEvent;

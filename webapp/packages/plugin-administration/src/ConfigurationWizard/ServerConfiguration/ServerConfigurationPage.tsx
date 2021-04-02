@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
+import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -20,7 +21,6 @@ import { ServerConfigurationConfigurationForm } from './Form/ServerConfiguration
 import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
-import { ServerConfigurationPageController } from './ServerConfigurationPageController';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = css`
@@ -43,23 +43,53 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES, BASE_CONTAINERS_STYLES);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
-  const serverConfigResource = useService(ServerConfigResource);
   const service = useService(ServerConfigurationService);
-  const controller = useController(ServerConfigurationPageController);
-  const changed = serverConfigResource.isChanged()
-    || serverConfigResource.isNavigatorSettingsChanged(service.state.navigatorConfig);
+  const serverConfigResource = useService(ServerConfigResource);
+  const commonDialogService = useService(CommonDialogService);
+  const configurationWizardService = useService(ConfigurationWizardService);
+  const changed = serverConfigResource.isChanged() || serverConfigResource.isNavigatorSettingsChanged();
   useFormValidator(service.validationTask, focusedRef);
 
+  function handleChange() {
+    service.changed();
+
+    if (!service.state.serverConfig.adminCredentialsSaveEnabled) {
+      service.state.serverConfig.publicCredentialsSaveEnabled = false;
+    }
+  }
+
+  function reset() {
+    service.loadConfig(true);
+  }
+
+  async function save() {
+    if (configurationWizard) {
+      await configurationWizardService.next();
+    } else {
+      if (serverConfigResource.isChanged()) {
+        const result = await commonDialogService.open(ConfirmationDialog, {
+          title: 'administration_server_configuration_save_confirmation_title',
+          message: 'administration_server_configuration_save_confirmation_message',
+        });
+
+        if (result === DialogueStateResult.Rejected) {
+          return;
+        }
+      }
+      await service.saveConfiguration(true);
+    }
+  }
+
   return styled(style)(
-    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={controller.save} onChange={controller.change}>
-      {controller.editing && (
+    <SubmittingForm ref={focusedRef} name='server_config' onSubmit={save} onChange={handleChange}>
+      {!configurationWizard && (
         <AdministrationTools>
-          <IconButton name="admin-save" viewBox="0 0 28 28" disabled={!changed} onClick={controller.save} />
-          <IconButton name="admin-cancel" viewBox="0 0 28 28" disabled={!changed} onClick={controller.reset} />
+          <IconButton name="admin-save" viewBox="0 0 28 28" disabled={!changed} onClick={save} />
+          <IconButton name="admin-cancel" viewBox="0 0 28 28" disabled={!changed} onClick={reset} />
         </AdministrationTools>
       )}
       <ColoredContainer wrap gap overflow parent>
-        {!controller.editing && (
+        {configurationWizard && (
           <Group form>
             <GroupItem>
               <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
@@ -73,18 +103,18 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         <Loader state={service}>
           {() => styled(style)(
             <Container wrap gap>
-              <ServerConfigurationInfoForm state={controller.state} />
+              <ServerConfigurationInfoForm state={service.state} />
               <Group form gap medium>
                 <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
-                <ServerConfigurationConfigurationForm serverConfig={controller.state.serverConfig} />
-                <ServerConfigurationNavigatorViewForm configs={controller.state} />
+                <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
+                <ServerConfigurationNavigatorViewForm configs={service.state} />
                 <Placeholder container={service.pluginsContainer} />
               </Group>
-              <ServerConfigurationSecurityForm serverConfig={controller.state.serverConfig} />
+              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
               <Placeholder
                 container={service.configurationContainer}
                 configurationWizard={configurationWizard}
-                state={controller.state}
+                state={service.state}
               />
             </Container>
           )}

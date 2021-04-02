@@ -1,11 +1,13 @@
 export default [
   ['administration_server_configuration_save_confirmation_title', 'Server settings update'],
   ['administration_server_configuration_save_confirmation_message', 'You are about to change critical settings, the application will be restarted.'],
+
   ['administration_configuration_wizard_welcome', 'Welcome'],
   ['administration_configuration_wizard_welcome_step_description', 'Welcome to CloudBeaver'],
   ['administration_configuration_wizard_welcome_title', 'Welcome to CloudBeaver, cloud database management system!'],
   ['administration_configuration_wizard_welcome_message', 'The easy configuration wizard will guide you through several simple steps to set up the CloudBeaver server. You will need to set server information and administrator credentials. You can also add first database connections here.'],
   ['administration_configuration_wizard_welcome_note', 'Note: you will be able to change these configuration parameters later on the administration panel.'],
+
   ['administration_configuration_wizard_configuration', 'Server configuration'],
   ['administration_configuration_wizard_configuration_step_description', 'Main server configuration'],
   ['administration_configuration_wizard_configuration_title', 'You can configure the main server parameters here.'],
@@ -13,6 +15,7 @@ export default [
 
   ['administration_configuration_wizard_configuration_server_info', 'Server Information'],
   ['administration_configuration_wizard_configuration_server_name', 'Server Name'],
+  ['administration_configuration_wizard_configuration_server_info_unsaved', 'You have unsaved changes'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Session lifetime'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires'],
 

@@ -18,12 +18,12 @@ import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 
-interface Props extends INotificationExtraProps {
+export interface ActionSnackbarProps extends INotificationExtraProps {
   onAction: () => void;
   actionText: string;
 }
 
-export const ActionSnackbar: NotificationComponent<Props> = observer(function ActionSnackbar({
+export const ActionSnackbar: NotificationComponent<ActionSnackbarProps> = observer(function ActionSnackbar({
   notification, onAction, actionText,
 }) {
   const translate = useTranslate();

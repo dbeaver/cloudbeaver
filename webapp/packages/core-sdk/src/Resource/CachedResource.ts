@@ -85,6 +85,26 @@ export abstract class CachedResource<
     this.onDataOutdated = new Executor(null, this.includes);
     this.onDataUpdate = new Executor(null, this.includes);
     this.onDataError = new Executor<IDataError<TParam>>(null, (a, b) => this.includes(a.param, b.param));
+
+    // const logName = (action: string) => () => console.log(this.constructor.name + ': ' + action);
+    // const logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
+    //   if (ExecutorInterrupter.isInterrupted(contexts)) {
+    //     console.log(this.constructor.name + ': ' + action + 'interrupted');
+    //   }
+    // };
+
+    // this.beforeLoad
+    //   .addHandler(logName('beforeLoad'))
+    //   .addPostHandler(logInterrupted('beforeLoad'));
+    // this.onDataOutdated
+    //   .addHandler(logName('onDataOutdated'))
+    //   .addPostHandler(logInterrupted('onDataOutdated'));
+    // this.onDataUpdate
+    //   .addHandler(logName('onDataUpdate'))
+    //   .addPostHandler(logInterrupted('onDataUpdate'));
+    // this.onDataError
+    //   .addHandler(logName('onDataError'))
+    //   .addPostHandler(logInterrupted('onDataError'));
   }
 
   sync(

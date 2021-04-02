@@ -43,6 +43,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         name="sessionExpireTime"
         state={state.serverConfig}
         mod='surface'
+        min={1}
         mapState={v => (v ?? 1800000) / 1000 / 60}
         mapValue={v => (v ?? 30) * 1000 * 60}
         required

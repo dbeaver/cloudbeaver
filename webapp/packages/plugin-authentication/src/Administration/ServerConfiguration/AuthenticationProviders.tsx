@@ -33,25 +33,20 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
   const localExists = providers.resource.has(AUTH_PROVIDER_LOCAL_ID);
   const externalAuthentication = providers.data.length === 1 && !localExists;
-  const providersSelectable = providers.data.length > 1;
+  const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
 
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
-      if (externalAuthentication) {
-        serverConfig.enabledAuthProviders = [...providers.resource.keys];
-        serverConfig.authenticationEnabled = true;
-      }
-
       if (serverConfig.enabledAuthProviders?.length === 0) {
-        serverConfig.authenticationEnabled = false;
-      }
-
-      if (!serverConfig.authenticationEnabled) {
         serverConfig.anonymousAccessEnabled = true;
       }
     }],
   });
+
+  if (externalAuthentication) {
+    return null;
+  }
 
   return styled(styles)(
     <Container wrap gap>
@@ -62,27 +57,16 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           state={serverConfig}
           description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
           mod={['primary']}
-          disabled={!serverConfig.authenticationEnabled}
+          disabled={authenticationDisabled}
           small
           autoHide
         >
           {translate('administration_configuration_wizard_configuration_anonymous_access')}
         </SwitchNew>
-        <SwitchNew
-          name="authenticationEnabled"
-          state={serverConfig}
-          description={translate('administration_configuration_wizard_configuration_authentication_description')}
-          mod={['primary']}
-          disabled={serverConfig.enabledAuthProviders?.length === 0}
-          small
-          autoHide
-        >
-          {translate('administration_configuration_wizard_configuration_authentication')}
-        </SwitchNew>
+        <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_provider')}</GroupTitle>
         <Loader state={providers}>
-          {() => providersSelectable && styled(styles)(
+          {() => styled(styles)(
             <>
-              <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_provider')}</GroupTitle>
               {providers.data.map(provider => provider && (
                 <SwitchNew
                   key={provider.id}

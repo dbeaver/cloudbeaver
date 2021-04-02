@@ -21,6 +21,7 @@ export const ADMINISTRATION_TOOLS_STYLES = composes(
     AdministrationTools {
       padding: 0 16px;
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       border-bottom: solid 1px;
       height: 48px;
