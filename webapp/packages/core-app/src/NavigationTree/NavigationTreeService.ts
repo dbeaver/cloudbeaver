@@ -72,13 +72,7 @@ export class NavigationTreeService {
   }
 
   getChildren(id: string): string[] | undefined {
-    const children = this.navTreeResource.get(id);
-
-    if (children) {
-      return children.slice(0, this.navTreeResource.childrenLimit);
-    }
-
-    return children;
+    return this.navTreeResource.get(id);
   }
 
   async navToNode(id: string, parentId: string): Promise<void> {

@@ -41,7 +41,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
-    return this.coreSettingsService.settings.getValue('app.childrenLimit');
+    return this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit');
   }
 
   constructor(
