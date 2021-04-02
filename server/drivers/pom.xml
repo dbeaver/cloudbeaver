@@ -13,6 +13,7 @@
     <modules>
         <module>clickhouse</module>
         <module>db2</module>
+        <module>db2_i</module>
         <module>derby</module>
         <module>h2</module>
         <module>jaybird</module>
