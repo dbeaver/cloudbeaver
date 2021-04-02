@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { Link } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
@@ -31,9 +31,9 @@ const style = css`
     overflow: hidden;
     padding-right: 16px;
     text-overflow: ellipsis;
-    &[|details] {
-      cursor: pointer;
-    }
+  }
+  Link:hover {
+    cursor: pointer;
   }
 
   tr:hover Icon {
@@ -43,7 +43,6 @@ const style = css`
 
 export const LogEntry = observer(function LogEntry({ item }: LogEntryProps) {
   const controller = useController(LogEntryController, item);
-  const isDetails = !!item.stackTrace;
 
   return styled(useStyles(style))(
     <tr>
@@ -51,8 +50,8 @@ export const LogEntry = observer(function LogEntry({ item }: LogEntryProps) {
       <td>{item.time}</td>
       <td>
         <message-cell as="div">
-          <message as="div" onClick={isDetails ? controller.showDetails : undefined} {...use({ details: isDetails })}>
-            {isDetails ? <Link>{item.message}</Link> : item.message}
+          <message as="div">
+            {item.stackTrace ? <Link onClick={controller.showDetails}>{item.message}</Link> : item.message}
           </message>
         </message-cell>
       </td>
