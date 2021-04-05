@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.*;
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
@@ -74,7 +75,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
         } else {
             if (!providerEnabled) {
-                throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+                // Admin can use local provider anytime
+                if (!isAdminAuthTry(providerId, authParameters)) {
+                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+                }
             }
         }
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
@@ -203,6 +207,23 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (DBException e) {
             throw new DBWebException("User authentication failed", e);
         }
+    }
+
+    private boolean isAdminAuthTry(@NotNull String providerId, @NotNull Map<String, Object> authParameters) {
+        boolean isAdmin = false;
+        if (LocalAuthProvider.PROVIDER_ID.equals(providerId)) {
+            Object userId = authParameters.get(LocalAuthProvider.CRED_USER);
+            if (userId != null) {
+                try {
+                    isAdmin = CBPlatform.getInstance().getApplication().getSecurityController()
+                        .getUserPermissions(CommonUtils.toString(userId))
+                            .contains(DBWConstants.PERMISSION_ADMIN);
+                } catch (DBCException e) {
+                    log.error(e);
+                }
+            }
+        }
+        return isAdmin;
     }
 
     @Override
