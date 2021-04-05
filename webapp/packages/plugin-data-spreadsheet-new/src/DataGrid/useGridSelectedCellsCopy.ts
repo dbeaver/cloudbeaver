@@ -24,6 +24,7 @@ function copyGridSelectedDataToClipboard(
   selectedCells: Map<number, number[]>
 ) {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const editor = model.source.getEditor(resultIndex);
   const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
 
   const selectedColumns: Set<number> = new Set();
@@ -44,7 +45,7 @@ function copyGridSelectedDataToClipboard(
       }
 
       if (colIndexes.includes(column)) {
-        const cell = model.source.getEditor(resultIndex).getCell(rowIdx, column);
+        const cell = editor.getCell(rowIdx, column);
         const cellValue = format.get(cell);
         if (cellValue === null) {
           continue;
