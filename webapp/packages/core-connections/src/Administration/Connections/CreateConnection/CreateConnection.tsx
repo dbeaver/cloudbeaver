@@ -79,10 +79,6 @@ const styles = composes(
       flex: auto 0 0;
     }
 
-    IconButton {
-      color: rgba(0, 0, 0, 0.45);
-    }
-
     StaticImage {
       width: 32px;
       max-height: 32px;

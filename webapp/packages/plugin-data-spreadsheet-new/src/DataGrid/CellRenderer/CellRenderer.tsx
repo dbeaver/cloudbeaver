@@ -58,6 +58,10 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }, [column, rowIdx, selectionContext]);
 
   const handleMouseUp = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!dataGridContext?.isGridInFocus()) {
+      return;
+    }
+
     selectionContext?.select(
       {
         colIdx: column.idx,
@@ -67,7 +71,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       event.shiftKey,
       false
     );
-  }, [column, rowIdx, selectionContext]);
+  }, [column, rowIdx, selectionContext, dataGridContext]);
 
   const handleDoubleClick = useCallback(() => {
     if (!column.editable) {

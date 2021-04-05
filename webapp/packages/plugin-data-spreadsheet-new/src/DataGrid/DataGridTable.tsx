@@ -45,6 +45,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 }
 
 export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
+  const gridContainerRef = useRef<HTMLDivElement>(null);
   const dataGridRef = useRef<DataGridHandle>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const styles = useStyles(reactGridStyles, baseStyles);
@@ -149,6 +150,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     model,
     columnResize,
     resultIndex,
+    isGridInFocus: () => gridContainerRef.current === document.activeElement,
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
   }), [model, resultIndex, editorRef, dataGridRef]);
@@ -160,6 +162,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
           <EditingContext.Provider value={editingContext}>
             <TableDataContext.Provider value={tableData}>
               <grid-container
+                ref={gridContainerRef}
                 as='div'
                 className="cb-react-grid-container"
                 tabIndex={-1}
