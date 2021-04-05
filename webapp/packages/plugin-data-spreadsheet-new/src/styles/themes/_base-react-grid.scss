@@ -16,9 +16,6 @@ $edited-color: #ff99006b;
       .rdg-cell-custom-selected:not(.rdg-cell-custom-editing) {
         background-color: rgba(0, 145, 234, 0.3);
       }
-      .rdg-cell-custom-null-selected:not(.rdg-cell-custom-editing) {
-        background-color: rgba(0, 145, 234, 0.1);
-      }
 
       .rdg-cell-selected {
         box-shadow: inset 0 0 0 1px #0091ea;
@@ -61,8 +58,7 @@ $edited-color: #ff99006b;
         @include mdc-theme-prop(background-color, surface, false);
       }
 
-      .rdg-cell-custom-selected,
-      .rdg-cell-custom-null-selected {
+      .rdg-cell-custom-selected {
         background-color: rgba(150, 150, 150, 0.3);
         box-shadow: none;
       }
