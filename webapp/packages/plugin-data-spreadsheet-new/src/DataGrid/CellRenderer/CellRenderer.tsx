@@ -30,7 +30,13 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const { rowIdx, column } = props;
 
   if (selectionContext?.isSelected(rowIdx, column.idx)) {
-    classes.push('rdg-cell-custom-selected');
+    const columnIndex = tableDataContext?.getDataColumnIndexFromKey(column.key) ?? null;
+
+    if (columnIndex !== null && editor?.getCell(rowIdx, columnIndex) === null) {
+      classes.push('rdg-cell-custom-null-selected');
+    } else {
+      classes.push('rdg-cell-custom-selected');
+    }
   }
 
   if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {

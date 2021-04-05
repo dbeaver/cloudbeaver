@@ -9,9 +9,8 @@
 import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import type { IDatabaseDataResult } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 
@@ -19,11 +18,12 @@ const EVENT_KEY_CODE = {
   C: 'KeyC',
 };
 
-function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells: Map<number, number[]>) {
-  if (!modelData.rows) {
-    return;
-  }
-
+function copyGridSelectedDataToClipboard(
+  model: IDatabaseDataModel<any, IDatabaseResultSet>,
+  resultIndex: number,
+  selectedCells: Map<number, number[]>
+) {
+  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
 
   const selectedColumns: Set<number> = new Set();
@@ -34,7 +34,7 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
     }
   }
 
-  const columns = [...selectedColumns].sort();
+  const columns = [...selectedColumns].sort((a, b) => a - b);
 
   let data = '';
   for (const [rowIdx, colIndexes] of orderedSelectedCells) {
@@ -44,8 +44,12 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
       }
 
       if (colIndexes.includes(column)) {
-        const value = modelData.rows?.[rowIdx][column];
-        data += value;
+        const cell = model.source.getEditor(resultIndex).getCell(rowIdx, column);
+        const cellValue = format.get(cell);
+        if (cellValue === null) {
+          continue;
+        }
+        data += cellValue;
       }
     }
     data += '\r\n';
@@ -58,17 +62,19 @@ function copyGridSelectedDataToClipboard(modelData: SqlResultSet, selectedCells:
 type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 
 export function useGridSelectedCellsCopy(
-  modelResultData: IDatabaseDataResult | null,
+  model: IDatabaseDataModel<any, IDatabaseResultSet>,
+  resultIndex: number,
   selectionContext: IDataGridSelectionContext
 ) {
-  const props = useObjectRef({ modelResultData, selectionContext });
-  const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
-    if (!props.modelResultData) {
-      return;
-    }
+  const props = useObjectRef({ model, resultIndex, selectionContext });
 
+  const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
-      copyGridSelectedDataToClipboard(props.modelResultData.data, props.selectionContext.selectedCells);
+      copyGridSelectedDataToClipboard(
+        props.model,
+        props.resultIndex,
+        props.selectionContext.selectedCells
+      );
     }
   }, []);
 
