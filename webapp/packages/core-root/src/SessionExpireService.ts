@@ -16,7 +16,7 @@ import { SessionError } from './SessionError';
 
 @injectable()
 export class SessionExpireService extends Bootstrap {
-  private isNotifiedAboutExpiredSession = false;
+  sessionExpired = false;
 
   onSessionExpire: IExecutor;
   constructor(
@@ -38,10 +38,10 @@ export class SessionExpireService extends Bootstrap {
     } catch (exception) {
       if (exception instanceof GQLError
         && exception.errorCode === EServerErrorCode.sessionExpired
-        && !this.isNotifiedAboutExpiredSession) {
+        && !this.sessionExpired) {
         const e = new SessionError('Session expired');
         this.graphQLService.blockRequests(e);
-        this.isNotifiedAboutExpiredSession = true;
+        this.sessionExpired = true;
         await this.onSessionExpire.execute();
       }
       throw exception;
