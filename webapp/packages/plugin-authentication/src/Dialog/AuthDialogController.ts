@@ -26,14 +26,19 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   get providers(): AuthProvider[] {
-    return this.authProvidersResource
-      .getEnabledProviders()
-      .sort(this.compareProviders);
+    let providers = this.authProvidersResource.values;
+
+    if (!this.admin) {
+      providers = this.authProvidersResource.getEnabledProviders();
+    }
+
+    return providers.sort(this.compareProviders);
   }
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
   private link!: boolean;
+  admin: boolean;
   private close!: () => void;
 
   constructor(
@@ -46,11 +51,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
       provider: observable,
       isAuthenticating: observable,
       credentials: observable,
+      admin: observable,
       providers: computed,
     });
+
+    this.admin = false;
   }
 
-  init(link: boolean, onClose: () => void) {
+  init(link: boolean, onClose: () => void): void {
     this.link = link;
     this.close = onClose;
     this.loadProviders();
@@ -95,8 +103,9 @@ export class AuthDialogController implements IInitializableController, IDestruct
   private async loadProviders() {
     try {
       await this.authProvidersResource.loadAll();
+
       if (this.providers.length > 0) {
-        this.provider = this.providers[0];
+        this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth providers');
