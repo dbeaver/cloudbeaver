@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -19,6 +20,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
 
@@ -42,11 +44,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   private loadedKeyMetadata: MetadataMap<string, boolean>;
   constructor(
     private graphQLService: GraphQLService,
+    private serverConfigResource: ServerConfigResource,
     private authProviderService: AuthProviderService,
     private authInfoService: AuthInfoService
   ) {
     super();
     this.loadedKeyMetadata = new MetadataMap(() => false);
+    this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
   }
 
   isNew(id: string): boolean {
@@ -72,7 +76,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       configurationParameters: {},
       metaParameters: {},
       origin: {
-        type: 'local',
+        type: AUTH_PROVIDER_LOCAL_ID,
         displayName: 'Local',
       },
     };
@@ -131,11 +135,10 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async updateCredentials(userId: string, credentials: Record<string, any>): Promise<void> {
-    const provider = 'local';
-    const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
+    const processedCredentials = await this.authProviderService.processCredentials(AUTH_PROVIDER_LOCAL_ID, credentials);
 
     await this.graphQLService.sdk.setUserCredentials({
-      providerId: provider,
+      providerId: AUTH_PROVIDER_LOCAL_ID,
       userId,
       credentials: processedCredentials,
     });
@@ -188,8 +191,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       }
 
       if (key === UsersResource.keyAll) {
-        // TODO: driverList must accept driverId, so we can update some drivers or all drivers,
-        //       here we should check is it's was a full update
         this.loadedKeyMetadata.set(UsersResource.keyAll, true);
       }
     });
@@ -209,5 +210,5 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 }
 
 export function isLocalUser(user: AdminUser): boolean {
-  return user.origin.type === 'local';
+  return user.origin.type === AUTH_PROVIDER_LOCAL_ID;
 }

@@ -38,7 +38,7 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this.links.get(link) || scoped?.getLinkHandlers(link, scoped.getLinkHandlers(link));
   }
 
-  before<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  before<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
     this.chain.push({
       executor,
       map,
@@ -47,7 +47,7 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this;
   }
 
-  next<TNext extends T>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  next<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
     this.chain.push({
       executor,
       map,

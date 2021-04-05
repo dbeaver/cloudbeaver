@@ -44,6 +44,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       outdated: true,
       loading: false,
       withDetails: false,
+      exception: null,
       includes: [],
     }));
   }

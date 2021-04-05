@@ -71,11 +71,13 @@ export class ConnectionOptionsTabService extends Bootstrap {
         if (submitType === 'submit') {
           if (options.mode === 'edit') {
             const connection = await this.connectionsResource.update(config.connectionId!, config);
-            status.info(`Connection ${connection.name} updated`);
+            status.info('Connection updated');
+            status.info(connection.name);
           } else {
             const connection = await this.connectionsResource.create(config);
             config.connectionId = connection.id;
-            status.info(`Connection ${connection.name} created`);
+            status.info('Connection created');
+            status.info(connection.name);
           }
         } else {
           const info = await this.connectionsResource.test(config);
@@ -88,11 +90,13 @@ export class ConnectionOptionsTabService extends Bootstrap {
         if (submitType === 'submit') {
           if (options.mode === 'edit') {
             const connection = await this.connectionInfoResource.update(config);
-            status.info(`Connection ${connection.name} updated`);
+            status.info('Connection updated');
+            status.info(connection.name);
           } else {
             const connection = await this.connectionInfoResource.createConnection(config);
             config.connectionId = connection.id;
-            status.info(`Connection ${connection.name} created`);
+            status.info('Connection created');
+            status.info(connection.name);
           }
         } else {
           const info = await this.connectionInfoResource.testConnection(config);
@@ -186,8 +190,21 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
     }
 
-    if (Object.keys(data.config.providerProperties).length > 0) {
-      config.providerProperties = data.config.providerProperties;
+    if (driver.providerProperties.length > 0) {
+      const providerProperties: Record<string, any> = { ...data.config.providerProperties };
+
+      for (const providerProperty of driver.providerProperties) {
+        if (providerProperty.defaultValue === null
+          || providerProperty.defaultValue === undefined
+          || !providerProperty.id
+          || providerProperty.id in providerProperties) {
+          continue;
+        }
+
+        providerProperties[providerProperty.id] = providerProperty.defaultValue;
+      }
+
+      config.providerProperties = providerProperties;
     }
   }
 

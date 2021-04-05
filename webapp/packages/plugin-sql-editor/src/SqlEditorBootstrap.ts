@@ -15,7 +15,7 @@ import {
   isObjectCatalogProvider, isObjectSchemaProvider
 } from '@cloudbeaver/core-app';
 import { isConnectionProvider } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { ActiveViewService } from '@cloudbeaver/core-view';
@@ -23,16 +23,18 @@ import { ActiveViewService } from '@cloudbeaver/core-view';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
 
 @injectable()
-export class SqlEditorBootstrap {
+export class SqlEditorBootstrap extends Bootstrap {
   constructor(
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
     private sqlEditorNavigatorService: SqlEditorNavigatorService,
     private connectionSchemaManagerService: ConnectionSchemaManagerService,
     private activeViewService: ActiveViewService
-  ) { }
+  ) {
+    super();
+  }
 
-  async bootstrap() {
+  register(): void {
     this.mainMenuService.registerRootItem(
       {
         id: 'sql-editor',
@@ -57,6 +59,8 @@ export class SqlEditorBootstrap {
       },
     });
   }
+
+  load(): void {}
 
   private isSQLEntryDisabled() {
     const activeView = this.activeViewService.view;

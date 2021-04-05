@@ -23,6 +23,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
+import org.jkiss.dbeaver.model.gis.GisConstants;
+import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
@@ -143,6 +145,11 @@ public class WebSQLUtils {
         map.put("srid", value.getSRID());
         map.put("text", value.toString());
         map.put("properties", value.getProperties());
+
+        DBGeometry xValue = GisTransformUtils.transformToSRID(value, GisConstants.SRID_4326);
+        if (xValue != null && xValue != value) {
+            map.put("mapText", xValue.toString());
+        }
         return map;
     }
 

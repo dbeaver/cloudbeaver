@@ -1,6 +1,7 @@
 export default [
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Время сессии'],
+  ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'В случае бездействия пользователя на протяжении указанного количества минут, его сессия будет закрыта.'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Разрешить пользовательские подключения'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Позволяет пользователям создавать собственные подключения. Иначе, любые подключения могут быть добавлены только со страницы администрирования'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Упрощенная версия дерева навигации'],

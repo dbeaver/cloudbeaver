@@ -7,10 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
-import { FormGroup, InputGroup, Switch } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, SwitchNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   serverConfig: ServerConfigInput;
@@ -20,37 +22,30 @@ export const ServerConfigurationSecurityForm: React.FC<Props> = observer(functio
   serverConfig,
 }) {
   const translate = useTranslate();
-
-  return (
-    <>
-      <FormGroup>
-        <InputGroup long>{translate('administration_configuration_wizard_configuration_security')}</InputGroup>
-      </FormGroup>
-      <FormGroup>
-        <Switch
-          name='adminCredentialsSaveEnabled'
-          description={translate('administration_configuration_wizard_configuration_security_admin_credentials_description')}
-          mod={['primary']}
-          state={serverConfig}
-          autoHide
-          long
-        >
-          {translate('administration_configuration_wizard_configuration_security_admin_credentials')}
-        </Switch>
-      </FormGroup>
-      <FormGroup>
-        <Switch
-          name='publicCredentialsSaveEnabled'
-          description={translate('administration_configuration_wizard_configuration_security_public_credentials_description')}
-          mod={['primary']}
-          state={serverConfig}
-          disabled={!serverConfig.adminCredentialsSaveEnabled}
-          autoHide
-          long
-        >
-          {translate('administration_configuration_wizard_configuration_security_public_credentials')}
-        </Switch>
-      </FormGroup>
-    </>
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+    <Group form gap medium>
+      <GroupTitle>{translate('administration_configuration_wizard_configuration_security')}</GroupTitle>
+      <SwitchNew
+        name="adminCredentialsSaveEnabled"
+        state={serverConfig}
+        description={translate('administration_configuration_wizard_configuration_security_admin_credentials_description')}
+        mod={['primary']}
+        small
+        autoHide
+      >
+        {translate('administration_configuration_wizard_configuration_security_admin_credentials')}
+      </SwitchNew>
+      <SwitchNew
+        name="publicCredentialsSaveEnabled"
+        state={serverConfig}
+        description={translate('administration_configuration_wizard_configuration_security_public_credentials_description')}
+        mod={['primary']}
+        disabled={!serverConfig.adminCredentialsSaveEnabled}
+        small
+        autoHide
+      >
+        {translate('administration_configuration_wizard_configuration_security_public_credentials')}
+      </SwitchNew>
+    </Group>
   );
 });

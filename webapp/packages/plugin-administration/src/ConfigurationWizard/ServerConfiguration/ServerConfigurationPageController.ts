@@ -36,9 +36,7 @@ export class ServerConfigurationPageController {
   };
 
   change = (): void => {
-    if (!this.state.serverConfig.authenticationEnabled) {
-      this.state.serverConfig.anonymousAccessEnabled = true;
-    }
+    this.serverConfigurationService.changed();
 
     if (!this.state.serverConfig.adminCredentialsSaveEnabled) {
       this.state.serverConfig.publicCredentialsSaveEnabled = false;
@@ -62,7 +60,7 @@ export class ServerConfigurationPageController {
     if (result === DialogueStateResult.Rejected) {
       return;
     }
-    await this.serverConfigurationService.save();
+    await this.serverConfigurationService.saveConfiguration(true);
   }
 
   private async finishConfiguration(): Promise<void> {

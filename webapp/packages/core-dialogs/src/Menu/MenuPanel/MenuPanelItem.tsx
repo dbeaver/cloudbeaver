@@ -12,14 +12,14 @@ import styled from 'reshadow';
 import { Checkbox, Icon, IconOrImage, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles, Style } from '@cloudbeaver/core-theming';
+import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
 import { use } from '@reshadow/react';
 
 import { menuPanelStyles } from './menuPanelStyles';
 
 interface MenuPanelItemProps {
   menuItem: IMenuItem;
-  style?: Style[];
+  style?: ComponentStyle;
 }
 
 export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelItem({
@@ -40,10 +40,10 @@ export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelIte
   if (controlType === 'radio') {
     control = <Radio checked={isChecked} mod={['primary', 'small']} ripple={false} />;
   } else if (controlType === 'checkbox') {
-    control = <Checkbox checked={isChecked} mod={['primary', 'small']} ripple={false} />;
+    control = <Checkbox checked={isChecked} mod={['primary', 'small']} style={style} ripple={false} />;
   }
 
-  return styled(useStyles(menuPanelStyles, ...style))(
+  return styled(useStyles(menuPanelStyles, style))(
     <menu-panel-item as="div" {...use({ separator })}>
       <menu-item-content as='div'>
         {icon ? (

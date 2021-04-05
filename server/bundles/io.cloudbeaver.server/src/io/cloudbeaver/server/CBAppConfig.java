@@ -33,7 +33,6 @@ public class CBAppConfig {
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = DataSourceNavigatorSettings.PRESET_FULL.getSettings();
 
     private boolean anonymousAccessEnabled = true;
-    private boolean authenticationEnabled = true;
     private String anonymousUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
     private String defaultUserRole = CBConstants.DEFAUL_APP_ANONYMOUS_ROLE_NAME;
     private boolean supportsCustomConnections = true;
@@ -47,14 +46,6 @@ public class CBAppConfig {
     private String[] enabledAuthProviders = null;
     private DataSourceNavigatorSettings defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
     private Map<String, Object> plugins = new LinkedHashMap<>();
-
-    public boolean isAuthenticationEnabled() {
-        return authenticationEnabled;
-    }
-
-    public void setAuthenticationEnabled(boolean authenticationEnabled) {
-        this.authenticationEnabled = authenticationEnabled;
-    }
 
     public boolean isAnonymousAccessEnabled() {
         return anonymousAccessEnabled;

@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { use, css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { baseFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
-import { Checkbox, CheckboxType, CheckboxControlledProps, CheckboxObjectProps } from './Checkbox';
+import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 
 const fieldCheckboxStyles = css`
   Checkbox {
@@ -21,26 +21,20 @@ const fieldCheckboxStyles = css`
 `;
 
 export const FieldCheckbox: CheckboxType = function FieldCheckbox({
-  checked: checkedControlled,
   children,
   className,
-  long,
-  autoHide,
   ...rest
-}: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
+}: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const styles = useStyles(baseFormControlStyles, fieldCheckboxStyles);
 
-  if (autoHide && !isControlPresented(rest.name, rest.state)) {
+  if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;
   }
 
   return styled(styles)(
-    <field className={className} as="div" {...use({ long })}>
+    <field className={className} as="div">
       <field-label as="div">{children}</field-label>
-      <Checkbox
-        {...rest}
-        checked={checkedControlled}
-      />
+      <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
     </field>
   );
 };

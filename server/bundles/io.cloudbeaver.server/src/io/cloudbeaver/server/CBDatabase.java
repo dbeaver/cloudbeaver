@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DBWSecurityController;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -158,7 +159,7 @@ public class CBDatabase {
         checkDatabaseStructure();
     }
 
-    void finishConfiguration(String adminName, String adminPassword) throws DBException {
+    void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
         }
@@ -170,10 +171,17 @@ public class CBDatabase {
             application.getSecurityController().deleteUser(initialData.getAdminName());
         }
         // Create new admin user
-        if (!CommonUtils.isEmpty(adminName) && !CommonUtils.isEmpty(adminPassword)) {
-            createAdminUser(adminName, adminPassword);
-        } else {
-            grantAdminPermissionsToUser(adminName);
+        createAdminUser(adminName, adminPassword);
+
+        // Associate all auth credentials with admin user
+        for (WebAuthInfo ai : authInfoList) {
+            if (!ai.getAuthProvider().equals(LocalAuthProvider.PROVIDER_ID)) {
+                WebAuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
+                Map<String, Object> userCredentials = ai.getUserCredentials();
+                if (!CommonUtils.isEmpty(userCredentials)) {
+                    application.getSecurityController().setUserCredentials(adminName, authProvider, userCredentials);
+                }
+            }
         }
     }
 
@@ -326,7 +334,7 @@ public class CBDatabase {
     }
 
     @NotNull
-    private WebUser createAdminUser(String adminName, String adminPassword) throws DBCException {
+    private WebUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBCException {
         DBWSecurityController serverController = application.getSecurityController();
         WebUser adminUser = serverController.getUserById(adminName);
         if (adminUser == null) {
@@ -334,16 +342,18 @@ public class CBDatabase {
             serverController.createUser(adminUser);
         }
 
-        // This is how client password will be transmitted from client
-        String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), adminPassword);
+        if (!CommonUtils.isEmpty(adminPassword)) {
+            // This is how client password will be transmitted from client
+            String clientPassword = LocalAuthProvider.makeClientPasswordHash(adminUser.getUserId(), adminPassword);
 
-        Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
-        credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
+            Map<String, Object> credentials = new LinkedHashMap<>();
+            credentials.put(LocalAuthProvider.CRED_USER, adminUser.getUserId());
+            credentials.put(LocalAuthProvider.CRED_PASSWORD, clientPassword);
 
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
-        if (authProvider != null) {
-            serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
+            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(LocalAuthProvider.PROVIDER_ID);
+            if (authProvider != null) {
+                serverController.setUserCredentials(adminUser.getUserId(), authProvider, credentials);
+            }
         }
 
         grantAdminPermissionsToUser(adminUser.getUserId());

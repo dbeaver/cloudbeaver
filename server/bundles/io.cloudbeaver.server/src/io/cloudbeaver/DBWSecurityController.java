@@ -70,6 +70,11 @@ public interface DBWSecurityController {
      */
     Map<String, Object> getUserCredentials(String userId, WebAuthProviderDescriptor authProvider) throws DBCException;
 
+    /**
+     * Returns list of auth provider IDs associated with this user
+     */
+    String[] getUserLinkedProviders(String userId) throws DBCException;
+
     ///////////////////////////////////////////
     // Roles
 

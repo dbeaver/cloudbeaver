@@ -8,10 +8,13 @@
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
+import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 
@@ -25,14 +28,17 @@ export class AuthenticationService extends Bootstrap {
     private authDialogService: AuthDialogService,
     private userInfoResource: UserInfoResource,
     private notificationService: NotificationService,
-    private readonly administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly authProviderService: AuthProviderService,
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super();
     this.authPromise = null;
   }
 
-  async authUser(provider: string | null = null): Promise<void> {
-    await this.auth(false, provider);
+  async authUser(provider: string | null = null, link?: boolean): Promise<void> {
+    await this.auth(false, provider, link);
   }
 
   async logout(): Promise<void> {
@@ -47,11 +53,11 @@ export class AuthenticationService extends Bootstrap {
     }
   }
 
-  private async auth(persistent: boolean, provider: string | null = null) {
+  private async auth(persistent: boolean, provider: string | null = null, link?: boolean) {
     if (this.authPromise) {
       return this.authPromise;
     }
-    this.authPromise = this.authDialogService.showLoginForm(persistent, provider);
+    this.authPromise = this.authDialogService.showLoginForm(persistent, provider, link);
     try {
       await this.authPromise;
     } finally {
@@ -69,11 +75,8 @@ export class AuthenticationService extends Bootstrap {
   }
 
   register(): void {
-    this.appAuthService.auth.addPostHandler(state => {
-      if (!state) {
-        this.requireAuthentication();
-      }
-    });
+    this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
+
     this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       const userInfo = await this.userInfoResource.load();
@@ -83,7 +86,32 @@ export class AuthenticationService extends Bootstrap {
 
       await this.auth(false);
     });
+    this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
 
   load(): void { }
+
+  private requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
+    if (data.type === AUTH_PROVIDER_LOCAL_ID) {
+      const provider = contexts.getContext(AuthProviderContext);
+      provider.auth();
+      return;
+    }
+
+    await this.authProvidersResource.loadAll();
+    await this.userInfoResource.load();
+
+    if (!this.authProvidersResource.has(data.subType ?? data.type)) {
+      return;
+    }
+
+    if (!this.userInfoResource.hasToken(data.type, data.subType)) {
+      await this.auth(false, data.subType ?? data.type);
+    }
+
+    if (this.userInfoResource.hasToken(data.type, data.subType)) {
+      const provider = contexts.getContext(AuthProviderContext);
+      provider.auth();
+    }
+  };
 }

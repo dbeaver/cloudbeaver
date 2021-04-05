@@ -7,6 +7,7 @@
  */
 
 import { Bootstrap } from './Bootstrap';
+import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
 import { RootContainerService } from './entities/RootContainerService';
 import type { IServiceCollection, IServiceInjector } from './IApp';
@@ -44,9 +45,6 @@ export class App {
   // first phase register all dependencies
   registerServices(): void {
     for (const plugin of this.plugins) {
-      if (plugin.registerServices) {
-        plugin.registerServices(this.getServiceCollection());
-      }
       if (plugin.providers?.length) {
         plugin.providers.forEach(provider => {
           // console.log('provider', provider.name);
@@ -65,6 +63,8 @@ export class App {
           if ('register' in serviceInstance) {
             await serviceInstance.register();
           }
+        } else if (service.prototype instanceof Dependency) {
+          this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
         }
       }
     }
@@ -80,25 +80,6 @@ export class App {
             await serviceInstance.load();
           }
         }
-      }
-    }
-  }
-
-  // second phase - run init scripts todo run it based on dependency tree
-  async initializePlugins(): Promise<void> {
-    for (const plugin of this.plugins) {
-      if (plugin.initialize) {
-        await plugin.initialize(this.getServiceInjector());
-      }
-    }
-  }
-
-  // third initialization phase? (never called)
-  async load(): Promise<void> {
-    for (const plugin of this.plugins) {
-      if (plugin.load) {
-        // todo run it based on dependency tree
-        await plugin.load();
       }
     }
   }

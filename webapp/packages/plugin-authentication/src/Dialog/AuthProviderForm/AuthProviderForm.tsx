@@ -37,6 +37,7 @@ export const AuthProviderForm = observer(function AuthProviderForm({
       {provider.credentialParameters.map(parameter => parameter.user && (
         <group key={parameter.id} as="div">
           <InputField
+            title={parameter.description}
             type={parameter.encryption === 'none' ? 'text' : 'password'}
             name={`authentication_${provider.id}_${parameter.id}`}
             value={credentials[parameter.id]}

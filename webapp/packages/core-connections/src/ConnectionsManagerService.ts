@@ -40,11 +40,12 @@ export class ConnectionsManagerService {
 
   async requireConnection(connectionId: string | null = null): Promise<Connection | null> {
     const context = await this.connectionExecutor.execute(connectionId);
+    const connection = context.getContext(this.connectionContext);
 
-    return (await context.getContext(this.connectionContext)).connection;
+    return connection.connection;
   }
 
-  async addOpenedConnection(connection: Connection) {
+  async addOpenedConnection(connection: Connection): Promise<void> {
     this.addConnection(connection);
   }
 
@@ -62,7 +63,7 @@ export class ConnectionsManagerService {
     );
   }
 
-  async deleteConnection(id: string) {
+  async deleteConnection(id: string): Promise<void> {
     const connection = await this.connectionInfo.load(id);
 
     if (!connection.features.includes(EConnectionFeature.manageable)) {
@@ -96,7 +97,8 @@ export class ConnectionsManagerService {
   }
 
   private async connectionDialog(connectionId: string | null, context: IExecutionContextProvider<string | null>) {
-    const connection = await context.getContext(this.connectionContext);
+    const connection = context.getContext(this.connectionContext);
+
     if (!connectionId) {
       if (!this.hasAnyConnection()) {
         return;
@@ -105,13 +107,9 @@ export class ConnectionsManagerService {
     }
 
     try {
-      if (!this.connectionInfo.has(connectionId)) {
-        return;
-      }
-
       const tempConnection = await this.connectionAuthService.auth(connectionId);
 
-      if (!tempConnection.connected) {
+      if (!tempConnection?.connected) {
         return;
       }
       connection.connection = tempConnection;

@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -44,6 +45,8 @@ import java.util.Set;
  * Web service implementation
  */
 public abstract class WebServiceBindingBase<API_TYPE extends DBWService> implements DBWServiceBindingGraphQL {
+
+    private static final Log log = Log.getLog(WebServiceBindingBase.class);
 
     private final Class<API_TYPE> apiInterface;
     private final API_TYPE serviceImpl;
@@ -103,14 +106,14 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             getServletRequest(env), errorOnNotFound);
     }
 
-    protected static WebSession findWebSession(DataFetchingEnvironment env) {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
-            getServletRequest(env));
-    }
-
     @NotNull
     protected static WebConnectionInfo getWebConnection(DataFetchingEnvironment env) throws DBWebException {
         return getWebConnection(getWebSession(env), env.getArgument("connectionId"));
+    }
+
+    public static WebSession findWebSession(DataFetchingEnvironment env) {
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
+            getServletRequest(env));
     }
 
     @NotNull
@@ -132,7 +135,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             try {
                 WebAction webAction = method.getAnnotation(WebAction.class);
                 if (webAction != null) {
-                    checkPermissions(webAction);
+                    checkPermissions(method, webAction);
                 }
                 return method.invoke(impl, args);
             } catch (InvocationTargetException e) {
@@ -140,7 +143,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
         }
 
-        private void checkPermissions(WebAction webAction) throws DBWebException {
+        private void checkPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
             String[] reqPermissions = webAction.requirePermissions();
             if (reqPermissions.length == 0) {
                 return;
@@ -153,6 +156,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             if (!application.isConfigurationMode()) {
                 Set<String> sessionPermissions = session.getSessionPermissions();
                 if (CommonUtils.isEmpty(sessionPermissions)) {
+                    log.debug("Anonymous access to " + method.getName() + " restricted");
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
                 }
 
@@ -166,6 +170,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 // Check permissions
                 for (String rp : reqPermissions) {
                     if (!sessionPermissions.contains(rp)) {
+                        log.debug("Access to " + method.getName() + " denied for " + session.getUser());
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
                 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { Bootstrap } from './Bootstrap';
 import { DataExportMenuService } from './DataExportMenuService';
@@ -21,16 +21,11 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
+    Bootstrap,
     DataExportMenuService,
     DataExportService,
     DataExportProcessService,
     DataTransferProcessorsResource,
     LocaleService,
   ],
-
-  async initialize(services: IServiceInjector) {
-    services
-      .resolveServiceByClass(Bootstrap)
-      .bootstrap();
-  },
 };

@@ -19,7 +19,7 @@ export class SessionSettingsService extends SettingsSource {
     }
   }
 
-  setValue(key: string, value: string) {
+  setValue(key: string, value: string): void {
     super.setValue(key, value);
     localStorage.setItem(this.localStorageKey, JSON.stringify(this.store));
   }

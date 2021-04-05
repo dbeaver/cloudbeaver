@@ -11,13 +11,15 @@ import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerService } from '@cloudbeaver/core-root';
+import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
+import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { UserInfo } from './UserInfo';
 
 @injectable()
-export class AuthMenuService extends Bootstrap {
+export class PluginBootstrap extends Bootstrap {
   constructor(
     private serverService: ServerService,
     private authDialogService: AuthDialogService,
@@ -25,12 +27,13 @@ export class AuthMenuService extends Bootstrap {
     private authInfoService: AuthInfoService,
     private settingsMenuService: SettingsMenuService,
     private topNavService: TopNavService,
-    private administrationTopAppBarService: AdministrationTopAppBarService
+    private administrationTopAppBarService: AdministrationTopAppBarService,
+    private readonly serverConfigurationService: ServerConfigurationService
   ) {
     super();
   }
 
-  register() {
+  register(): void {
     this.settingsMenuService.addMenuItem(
       SettingsMenuService.settingsMenuToken,
       {
@@ -55,6 +58,7 @@ export class AuthMenuService extends Bootstrap {
 
     this.topNavService.placeholder.add(UserInfo, 4);
     this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
+    this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
   }
 
   load(): void | Promise<void> { }

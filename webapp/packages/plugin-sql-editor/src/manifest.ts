@@ -23,6 +23,7 @@ export const sqlEditorPluginManifest: PluginManifest = {
   },
 
   providers: [
+    SqlEditorBootstrap,
     SqlDialectInfoService,
     SqlEditorTabService,
     SqlResultTabsService,
@@ -31,8 +32,4 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlEditorNavigatorService,
     LocaleService,
   ],
-
-  initialize(services): void {
-    services.resolveServiceByClass(SqlEditorBootstrap).bootstrap();
-  },
 };

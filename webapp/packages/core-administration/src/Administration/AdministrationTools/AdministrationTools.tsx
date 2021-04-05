@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import styled from 'reshadow';
+
 interface Props {
   className?: string;
 }
 
 export const AdministrationTools: React.FC<Props> = function AdministrationTools({ children, className }) {
-  return (
+  return styled()(
     <administration-tools as='div' className={className}>
       {children}
     </administration-tools>

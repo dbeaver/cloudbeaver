@@ -1,3 +1,4 @@
+export * from './BuildVersion';
 export * from './flat';
 export * from './MetadataMap';
 export * from './OrderedMap';
@@ -7,6 +8,7 @@ export * from './generateFileName';
 export * from './md5';
 export * from './TextTools';
 export * from './copyToClipboard';
+export * from './declensionOfNumber';
 
 export * from './Promises/CancellablePromise';
 export * from './Promises/Deferred';

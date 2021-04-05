@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { ConnectionAuthService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
@@ -39,10 +39,6 @@ export class NavigationTreeService {
   readonly navigationTreeMetadata: MetadataMap<string, INavigationNodeMetadata>;
   readonly nodeSelectionTask: IExecutor<INavigationNodeSelectionData>;
 
-  get childrenLimit(): number {
-    return this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit');
-  }
-
   constructor(
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
@@ -53,7 +49,6 @@ export class NavigationTreeService {
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
-      childrenLimit: computed,
       unselectAll: action,
     });
 
@@ -77,13 +72,7 @@ export class NavigationTreeService {
   }
 
   getChildren(id: string): string[] | undefined {
-    const children = this.navTreeResource.get(id);
-
-    if (children) {
-      return children.slice(0, this.childrenLimit);
-    }
-
-    return children;
+    return this.navTreeResource.get(id);
   }
 
   async navToNode(id: string, parentId: string): Promise<void> {
@@ -92,7 +81,7 @@ export class NavigationTreeService {
 
   async loadNestedNodes(id = ROOT_NODE_PATH): Promise<boolean> {
     try {
-      if (this.isConnectionNode(id) && !await this.tryInitConnection(id)) {
+      if (this.isConnectionNode(id) && !(await this.tryInitConnection(id))) {
         return false;
       }
       await this.navNodeManagerService.loadTree(id);
@@ -158,10 +147,11 @@ export class NavigationTreeService {
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
-  private async tryInitConnection(navNodeId: string) {
+  private async tryInitConnection(navNodeId: string): Promise<boolean> {
     const connection = await this.connectionAuthService.auth(
-      NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId));
+      NodeManagerUtils.connectionNodeIdToConnectionId(navNodeId)
+    );
 
-    return connection.connected;
+    return connection?.connected || false;
   }
 }

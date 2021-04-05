@@ -3,6 +3,7 @@ fragment ObjectOriginInfo on ObjectOrigin {
   subType
   displayName
   icon
+
   details @include(if: $customIncludeOriginDetails) {
     id
     displayName

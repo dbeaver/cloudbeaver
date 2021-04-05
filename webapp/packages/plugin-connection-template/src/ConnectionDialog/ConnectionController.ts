@@ -9,7 +9,7 @@
 import { observable, makeObservable } from 'mobx';
 
 import {
-  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig
+  DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, getUniqueConnectionName
 } from '@cloudbeaver/core-connections';
 import type { IFormInitConfig } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
@@ -34,7 +34,7 @@ export interface IConnectionController {
 
 @injectable()
 export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+  implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
@@ -114,12 +114,14 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isConnecting = true;
     this.clearError();
     try {
-      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id);
+      const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
+      const uniqueConnectionName = getUniqueConnectionName(this.template.name || 'Template connection', connectionNames);
+      const connection = await this.connectionInfoResource.createFromTemplate(this.template.id, uniqueConnectionName);
 
       try {
         await this.connectionInfoResource.init(this.getConfig(connection.id));
 
-        this.notificationService.logSuccess({ title: `Connection ${connection.name} established` });
+        this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();
       } catch (exception) {
         this.showError(exception, 'Failed to establish connection');

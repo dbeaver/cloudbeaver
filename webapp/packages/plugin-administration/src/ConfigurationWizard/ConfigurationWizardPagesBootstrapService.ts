@@ -44,10 +44,15 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
         order: 1.5,
+        onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
         isDone: this.serverConfigurationService.isDone.bind(this.serverConfigurationService),
-        onFinish: this.serverConfigurationService.validate.bind(this.serverConfigurationService),
-        onConfigurationFinish: this.serverConfigurationService.handleConfigurationFinish.bind(
-          this.serverConfigurationService
+        onFinish: this.serverConfigurationService.saveConfiguration.bind(
+          this.serverConfigurationService,
+          false
+        ),
+        onConfigurationFinish: this.serverConfigurationService.saveConfiguration.bind(
+          this.serverConfigurationService,
+          true
         ),
       },
       order: 4,

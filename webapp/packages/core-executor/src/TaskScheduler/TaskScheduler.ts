@@ -12,9 +12,15 @@ import type { ITask } from './ITask';
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
 
+const queueLimit = 100;
+
 export class TaskScheduler<TIdentifier> {
   get activeList(): TIdentifier[] {
     return this.queue.map(task => task.id);
+  }
+
+  get executing(): boolean {
+    return this.queue.length > 0;
   }
 
   private readonly queue: Array<ITask<TIdentifier>>;
@@ -34,19 +40,28 @@ export class TaskScheduler<TIdentifier> {
   async schedule<T>(
     id: TIdentifier,
     promise: () => Promise<T>,
-    after?: () => Promise<void> | void,
+    after?: () => Promise<any> | any,
+    success?: () => Promise<any> | any,
+    error?: (exception: Error) => Promise<any> | any,
   ): Promise<T> {
     const task: ITask<TIdentifier> = {
       id,
       task: this.scheduler(id, promise),
     };
 
+    if (this.queue.length > queueLimit) {
+      throw new Error('Execution queue limit is reached');
+    }
     this.queue.push(task);
 
     try {
-      return await task.task;
+      const value = await task.task;
+      await success?.();
+      return value;
+    } catch (exception) {
+      await error?.(exception);
+      throw exception;
     } finally {
-      this.queue.splice(this.queue.indexOf(task), 1);
       await after?.();
     }
   }
@@ -61,19 +76,26 @@ export class TaskScheduler<TIdentifier> {
     }
   }
 
-  private async scheduler<T>(id: TIdentifier, promise: () => Promise<T>) {
-    if (!this.isBlocked) {
-      return promise();
+  private async scheduler<T>(
+    id: TIdentifier,
+    promise: () => Promise<T>,
+  ) {
+    try {
+      if (!this.isBlocked) {
+        return await promise();
+      }
+
+      const queueList = this.queue.filter(active => this.isBlocked!(active.id, id));
+
+      for (const task of queueList) {
+        try {
+          await task.task;
+        } catch {}
+      }
+
+      return await promise();
+    } finally {
+      this.queue.splice(this.queue.findIndex(task => task.id === id), 1);
     }
-
-    const queueList = this.queue.filter(active => this.isBlocked!(active.id, id));
-
-    for (const task of queueList) {
-      try {
-        await task.task;
-      } catch {}
-    }
-
-    return promise();
   }
 }

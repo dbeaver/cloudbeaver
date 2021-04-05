@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.access.DBASession;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.OffsetDateTime;
@@ -47,11 +48,34 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
 
     @Override
-    public WebAuthInfo authLogin(@NotNull WebSession webSession, @NotNull String providerId, @NotNull Map<String, Object> authParameters) throws DBWebException {
-        DBWSecurityController serverController = CBPlatform.getInstance().getApplication().getSecurityController();
+    public WebAuthInfo authLogin(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @NotNull Map<String, Object> authParameters,
+        boolean linkWithActiveUser) throws DBWebException {
+        DBWSecurityController securityController = CBPlatform.getInstance().getApplication().getSecurityController();
 
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
+        }
+        boolean configMode = CBApplication.getInstance().isConfigurationMode();
+
+        // Check enabled auth providers
+        boolean providerEnabled = true;
+        String[] enabledAuthProviders = CBApplication.getInstance().getAppConfiguration().getEnabledAuthProviders();
+        if (enabledAuthProviders != null && !ArrayUtils.contains(enabledAuthProviders, providerId)) {
+            providerEnabled = false;
+        }
+        if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            // 1. Admin can authorize in any providers
+            // 2. When it authorizes in non-local provider for the first time we force linkUser flag
+            if (!providerEnabled && webSession.getUser() != null) {
+                linkWithActiveUser = true;
+            }
+        } else {
+            if (!providerEnabled) {
+                throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
+            }
         }
         WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
@@ -63,55 +87,116 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             DBWAuthProvider<?> authProviderInstance = authProvider.getInstance();
             DBWAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof DBWAuthProviderExternal<?> ?
                 (DBWAuthProviderExternal<?>) authProviderInstance : null;
+            Map<String, Object> userCredentials;
             if (authProviderExternal != null) {
-                authParameters = authProviderExternal.readExternalCredentials(webSession.getProgressMonitor(), providerConfig, authParameters);
+                userCredentials = authProviderExternal.authExternalUser(webSession.getProgressMonitor(), providerConfig, authParameters);
+            } else {
+                // User credentials are the same as auth parameters
+                userCredentials = authParameters;
             }
 
-            WebUser user = webSession.getUser();
-            String userId = serverController.getUserByCredentials(authProvider, authParameters);
-            if (userId == null) {
-                // User doesn't exist. We can create new user automatically if auth provider supports this
+            WebUser user = null;
+            String userId;
+            DBASession authSession;
+            if (configMode) {
                 if (authProviderExternal != null) {
-                    user = authProviderExternal.registerNewUser(webSession.getProgressMonitor(), serverController, providerConfig, authParameters, user);
-                    userId = user.getUserId();
+                    userId = authProviderExternal.validateLocalAuth(
+                        webSession.getProgressMonitor(),
+                        securityController,
+                        providerConfig,
+                        userCredentials,
+                        webSession.getUser());
+                } else {
+                    userId = "temp_config_admin";
                 }
-
+            } else {
+                WebUser curUser = webSession.getUser();
+                userId = securityController.getUserByCredentials(authProvider, userCredentials);
                 if (userId == null) {
-                    throw new DBCException("Invalid user credentials");
+                    // User doesn't exist. We can create new user automatically if auth provider supports this
+                    if (authProviderExternal != null) {
+                        userId = authProviderExternal.validateLocalAuth(
+                            webSession.getProgressMonitor(),
+                            securityController,
+                            providerConfig,
+                            userCredentials,
+                            curUser);
+
+                        if (curUser == null || !userId.equals(curUser.getUserId())) {
+                            // Create new user
+                            curUser = securityController.getUserById(userId);
+                            if (curUser == null) {
+                                curUser = new WebUser(userId);
+                                securityController.createUser(curUser);
+
+                                String defaultRoleName = CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultUserRole();
+                                if (!CommonUtils.isEmpty(defaultRoleName)) {
+                                    securityController.setUserRoles(
+                                        userId,
+                                        new String[]{defaultRoleName},
+                                        userId);
+                                }
+                            }
+                        } else {
+                            // We may need to associate new credentials with active user
+                            if (linkWithActiveUser) {
+                                securityController.setUserCredentials(userId, authProvider, userCredentials);
+                            }
+                        }
+                    }
+
+                    if (userId == null) {
+                        throw new DBCException("Invalid user credentials");
+                    }
                 }
-            }
-            if (user != null && !user.getUserId().equals(userId)) {
-                log.debug("Attempt to authorize user '" + userId + "' while user '" + user.getUserId() + "' already authorized");
-                throw new DBCException("You cannot authorize with different users credentials");
-            }
-
-            // Check for auth enabled. Auth is always enabled for admins
-            if (!CBApplication.getInstance().getAppConfiguration().isAuthenticationEnabled()) {
-                if (!serverController.getUserPermissions(userId).contains(DBWConstants.PERMISSION_ADMIN)) {
-                    throw new DBWebException("Authentication was disabled for this server");
+                if (curUser != null && !curUser.getUserId().equals(userId)) {
+                    log.debug("Attempt to authorize user '" + userId + "' while user '" + curUser.getUserId() + "' already authorized");
+                    throw new DBCException("You cannot authorize with different users credentials");
                 }
+
+                user = curUser;
             }
-
-            Map<String, Object> userCredentials = serverController.getUserCredentials(userId, authProvider);
-
-            DBASession authSession = authProviderInstance.openSession(
-                webSession,
-                providerConfig,
-                userCredentials,
-                authParameters);
-
             if (user == null) {
                 user = new WebUser(userId);
             }
+
+            DBWUserIdentity userIdentity = null;
+
             if (authProviderExternal != null) {
-                user.setDisplayName(authProviderExternal.getUserDisplayName(webSession.getProgressMonitor(), providerConfig, authParameters));
+                try {
+                    userIdentity =
+                        authProviderExternal.getUserIdentity(
+                            webSession.getProgressMonitor(),
+                            providerConfig,
+                            userCredentials);
+                } catch (DBException e) {
+                    log.debug("Error reading auth display name from provider " + providerId, e);
+                }
+            }
+            if (userIdentity == null) {
+                userIdentity = new DBWUserIdentity(userId, userId);
+            }
+            if (CommonUtils.isEmpty(user.getDisplayName())) {
+                user.setDisplayName(userIdentity.getDisplayName());
             }
 
-            WebAuthInfo authInfo = new WebAuthInfo(webSession, user);
-            authInfo.setLoginTime(OffsetDateTime.now());
-            authInfo.setAuthProvider(authProvider);
-            authInfo.setAuthSession(authSession);
+            authSession = authProviderInstance.openSession(
+                webSession,
+                providerConfig,
+                userCredentials
+            );
+
+            WebAuthInfo authInfo = new WebAuthInfo(
+                webSession,
+                user,
+                authProvider,
+                userIdentity,
+                authSession,
+                OffsetDateTime.now());
             authInfo.setMessage("Authenticated with " + authProvider.getLabel() + " provider");
+            if (configMode) {
+                authInfo.setUserCredentials(userCredentials);
+            }
             webSession.addAuthInfo(authInfo);
 
             return authInfo;
@@ -137,15 +222,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthInfo sessionUser(@NotNull WebSession webSession) throws DBWebException {
-        if (webSession.getUser() == null) {
-            return null;
-        }
-        return webSession.getAuthInfo(null);
-    }
-
-    @Override
-    public WebAuthProviderInfo[] getAuthProviders(@NotNull WebSession webSession) {
+    public WebAuthProviderInfo[] getAuthProviders() {
         return WebServiceRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);

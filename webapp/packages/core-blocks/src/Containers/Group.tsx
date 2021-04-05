@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridOptions, ILayoutSizeProps } from './LayoutProps';
+import type { IContainerProps } from './IContainerProps';
 
-interface Props extends ILayoutSizeProps, IGridOptions {
+interface Props extends IContainerProps {
   className?: string;
   form?: boolean;
-  keepSize?: boolean;
+  center?: boolean;
 }
 
 export const Group: React.FC<Props> = function Group({ children, className }) {

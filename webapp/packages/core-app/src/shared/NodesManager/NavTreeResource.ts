@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
@@ -22,6 +22,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import { CoreSettingsService } from '../../CoreSettingsService';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 
 // TODO: so much dirty
@@ -39,13 +40,19 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
 export class NavTreeResource extends CachedMapResource<string, string[]> {
   protected metadata: MetadataMap<string, INodeMetadata>;
 
+  get childrenLimit(): number {
+    return this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit');
+  }
+
   constructor(
     private graphQLService: GraphQLService,
-    private navNodeInfoResource: NavNodeInfoResource
+    private navNodeInfoResource: NavNodeInfoResource,
+    private coreSettingsService: CoreSettingsService,
   ) {
     super();
 
     makeObservable(this, {
+      childrenLimit: computed,
       setDetails: action,
     });
 
@@ -53,6 +60,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       outdated: true,
       loading: false,
       withDetails: false,
+      exception: null,
       includes: [],
     }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
@@ -241,6 +249,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       withDetails: metadata.withDetails,
     });
 
-    return { navNodeChildren, navNodeInfo, parentPath };
+    return { navNodeChildren: navNodeChildren.slice(0, this.childrenLimit), navNodeInfo, parentPath };
   }
 }

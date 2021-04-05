@@ -7,8 +7,9 @@
  */
 
 import { ConnectionInfoResource, ConnectionsManagerService, EConnectionFeature } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import { NavigationTreeContextMenuService } from '../../NavigationTree/NavigationTreeContextMenuService';
 import { EMainMenu, MainMenuService } from '../../TopNavBar/MainMenu/MainMenuService';
@@ -17,15 +18,18 @@ import { EObjectFeature } from './EObjectFeature';
 import { NodeManagerUtils } from './NodeManagerUtils';
 
 @injectable()
-export class ConnectionDialogsService {
+export class ConnectionDialogsService extends Bootstrap {
   constructor(
     private mainMenuService: MainMenuService,
     private contextMenuService: ContextMenuService,
     private connectionsManagerService: ConnectionsManagerService,
-    private connectionInfoResource: ConnectionInfoResource
-  ) {}
+    private connectionInfoResource: ConnectionInfoResource,
+    private notificationService: NotificationService,
+  ) {
+    super();
+  }
 
-  registerMenuItems(): void {
+  register(): void {
     this.mainMenuService.registerMenuItem(
       EMainMenu.mainMenuConnectionsPanel,
       {
@@ -74,13 +78,19 @@ export class ConnectionDialogsService {
             || !connection?.features.includes(EConnectionFeature.manageable);
         },
         title: 'ui_delete',
-        onClick: (context: IMenuContext<NavNode>) => {
+        onClick: async (context: IMenuContext<NavNode>) => {
           const node = context.data;
-          this.connectionsManagerService.deleteConnection(
-            NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
-          );
+          try {
+            await this.connectionsManagerService.deleteConnection(
+              NodeManagerUtils.connectionNodeIdToConnectionId(node.id)
+            );
+          } catch (exception) {
+            this.notificationService.logException(exception, 'Failed to delete connection');
+          }
         },
       }
     );
   }
+
+  load(): void { }
 }

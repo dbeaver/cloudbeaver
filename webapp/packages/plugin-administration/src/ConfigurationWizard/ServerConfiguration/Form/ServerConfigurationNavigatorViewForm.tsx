@@ -8,10 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
+import styled from 'reshadow';
 
-import { FormGroup, Switch } from '@cloudbeaver/core-blocks';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-connections';
+import { BASE_CONTAINERS_STYLES, SwitchNew } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 
@@ -34,20 +36,18 @@ export const ServerConfigurationNavigatorViewForm: React.FC<Props> = observer(fu
     }
   }, [configs]);
 
-  return (
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <FormGroup>
-        <Switch
-          name='simpleNavigatorViewEnabled'
-          description={translate('administration_configuration_wizard_configuration_navigation_tree_view_description')}
-          mod={['primary']}
-          checked={isSimpleView}
-          long
-          onChange={onNavigatorViewChangeHandler}
-        >
-          {translate('administration_configuration_wizard_configuration_navigation_tree_view')}
-        </Switch>
-      </FormGroup>
+      <SwitchNew
+        name="simpleNavigatorViewEnabled"
+        description={translate('administration_configuration_wizard_configuration_navigation_tree_view_description')}
+        mod={['primary']}
+        checked={isSimpleView}
+        small
+        onChange={onNavigatorViewChangeHandler}
+      >
+        {translate('administration_configuration_wizard_configuration_navigation_tree_view')}
+      </SwitchNew>
     </>
   );
 });

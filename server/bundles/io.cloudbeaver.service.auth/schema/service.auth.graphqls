@@ -37,6 +37,12 @@ type UserAuthToken {
     # Authorization time
     loginTime: DateTime!
 
+    # User identity (aka user name) specific to auth provider
+    userId: String!
+
+    # User display name specific to auth provider
+    displayName: String!
+
     # Optional login message
     message: String
 
@@ -44,42 +50,28 @@ type UserAuthToken {
     origin: ObjectOrigin!
 }
 
-type UserAuthInfo {
-    # User unique identifier
-    userId: String! @deprecated
-    # Human readable display name. May be null
-    displayName: String @deprecated
-    # Auth provider ID
-    authProvider: String! @deprecated
-
-    loginTime: DateTime! @deprecated
-
-    # Optional login message
-    message: String @deprecated
-
-    origin: ObjectOrigin! @deprecated
-}
-
 type UserInfo {
     # User unique identifier
     userId: String!
-    # Human readable display name. May be null
+
+    # Human readable display name. It is taken from the first auth provider which was used for user login.
     displayName: String
 
     authTokens: [UserAuthToken!]!
+
+    linkedAuthProviders: [String!]!
 }
 
 extend type Query {
 
-    # Authorize user using specified auth provider
+    # Authorize user using specified auth provider. If linkUser=true then associates new
+    authLogin(provider: ID!, credentials: Object!, linkUser: Boolean): UserAuthToken!
 
-    authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     authLogout(provider: ID): Boolean
 
+    # Active user information. null is no user was authorized within session
     activeUser: UserInfo
-
-    sessionUser: UserAuthInfo @deprecated
 
     authProviders: [AuthProviderInfo!]!
 

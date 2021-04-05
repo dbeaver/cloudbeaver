@@ -13,7 +13,7 @@ import './styles/main/app-loading-screen.css';
 import './styles/main/elevation.scss';
 import './styles/main/typography.scss';
 import './styles/main/color.scss';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
@@ -33,7 +33,7 @@ const THEME_SETTINGS_KEY = 'themeSettings';
 const DEFAULT_THEME_ID = 'light';
 
 @injectable()
-export class ThemeService {
+export class ThemeService extends Bootstrap {
   get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
   }
@@ -60,6 +60,8 @@ export class ThemeService {
     private notificationService: NotificationService,
     private settingsService: SettingsService
   ) {
+    super();
+
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
       themes: computed,
       currentTheme: computed,
@@ -67,11 +69,13 @@ export class ThemeService {
       settings: observable,
       setCurrentThemeId: action,
     });
+  }
 
+  register(): void {
     this.loadAllThemes();
   }
 
-  async init() {
+  async load(): Promise<void> {
     this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY);
     await this.changeThemeAsync(this.currentThemeId);
   }

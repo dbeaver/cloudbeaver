@@ -9,21 +9,17 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { StaticImage, useMapResource } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, StaticImage, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../../../../NetworkHandlerResource';
-import type { DatabaseConnection } from '../../../ConnectionsResource';
+import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
-interface Props {
-  context: DatabaseConnection;
-}
-
-export const SSH: React.FC<Props> = observer(function SSH({ context }) {
+export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function SSH({ connection }) {
   const translate = useTranslate();
   const handler = useMapResource(NetworkHandlerResource, SSH_TUNNEL_ID);
-  const sshConfig = context.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
+  const sshConfig = connection.networkHandlersConfig.find(state => state.id === SSH_TUNNEL_ID);
 
   if (!sshConfig || !sshConfig.enabled) {
     return null;

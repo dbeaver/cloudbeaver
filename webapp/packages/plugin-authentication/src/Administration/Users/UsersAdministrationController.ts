@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AdminUser, AuthProvidersResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -40,7 +40,7 @@ export class UsersAdministrationController implements IInitializableController {
   }
 
   get isLocalProviderAvailable(): boolean {
-    return this.authProvidersResource.data.some(({ id }) => id === 'local');
+    return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
   }
 
   get isLoading(): boolean {
@@ -65,7 +65,7 @@ export class UsersAdministrationController implements IInitializableController {
   }
 
   init(): void {
-    this.authProvidersResource.load();
+    this.authProvidersResource.loadAll();
   }
 
   update = async () => {

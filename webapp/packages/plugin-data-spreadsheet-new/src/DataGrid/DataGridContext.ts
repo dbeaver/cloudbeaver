@@ -7,6 +7,7 @@
  */
 
 import { createContext } from 'react';
+import type { DataGridHandle } from 'react-data-grid';
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
@@ -21,6 +22,7 @@ export interface IDataGridContext {
   resultIndex: number;
   columnResize: IExecutor<IColumnResizeInfo>;
   getEditorPortal: () => HTMLDivElement | null;
+  getDataGridApi: () => DataGridHandle | null;
 }
 
 export const DataGridContext = createContext<IDataGridContext | null>(null);

@@ -58,10 +58,16 @@ export function useMapResource<
   const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
-  const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
-  const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
+  let key: TKeyArg = keyObj as TKeyArg;
+  let includes: TIncludes = [] as TIncludes;
+
+  if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
+    key = keyObj.key;
+    includes = keyObj.includes;
+  }
 
   const refObj = useObjectRef({
+    loading: false,
     resource,
     key,
     exception,
@@ -77,8 +83,16 @@ export function useMapResource<
     actions,
   });
 
+  const outdated = resource.isOutdated(key);
+
   refObj.load = async function load() {
-    const { resource, actions, prevData } = refObj;
+    const { loading, resource, actions, prevData } = refObj;
+
+    if (loading) {
+      return;
+    }
+
+    this.loading = true;
 
     try {
       await actions?.onLoad?.(resource);
@@ -87,7 +101,7 @@ export function useMapResource<
         return;
       }
 
-      const newData = await resource.load(key, includes);
+      const newData = await resource.load(key, includes as any);
 
       try {
         await actions?.onData?.(
@@ -102,6 +116,8 @@ export function useMapResource<
       setException(exception);
       actions?.onError?.(exception);
       notifications.logException(exception, 'Can\'t load data');
+    } finally {
+      this.loading = false;
     }
   };
 
@@ -124,7 +140,7 @@ export function useMapResource<
         return true;
       }
 
-      return resource.isLoaded(refObj.key, refObj.includes);
+      return resource.isLoaded(refObj.key, refObj.includes as any);
     },
     reload: () => {
       setException(null);
@@ -143,7 +159,11 @@ export function useMapResource<
     if (exception === null) {
       refObj.load();
     }
-  }, [key, includes]);
+  }, [key, includes, outdated]);
 
   return result;
+}
+
+function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is KeyWithIncludes<TKey, TIncludes> {
+  return obj && typeof obj === 'object' && 'includes' in obj && 'key' in obj;
 }

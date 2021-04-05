@@ -260,8 +260,6 @@ public class WebServiceCore implements DBWServiceCore {
         if (dataSourceContainer.isConnected()) {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
         }
-//
-//        WebServiceUtils.initAuthProperties(dataSourceContainer, authProperties);
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
@@ -270,7 +268,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
-            connectionInfo.setSavedCredentials(null, null);
+            connectionInfo.clearSavedCredentials();
         }
         // Mark all specified network configs as saved
         if (networkCredentials != null) {
@@ -288,8 +286,13 @@ public class WebServiceCore implements DBWServiceCore {
         }
         if (saveCredentials != null && saveCredentials) {
             // Save all passed credentials in the datasource container
+            WebServiceUtils.saveAuthProperties(
+                dataSourceContainer,
+                dataSourceContainer.getConnectionConfiguration(),
+                authProperties,
+                true);
+
             WebServiceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
-            dataSourceContainer.setSavePassword(true);
             dataSourceContainer.persistConfiguration();
         }
 
@@ -341,7 +344,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean deleteConnection(WebSession webSession, String connectionId) throws DBWebException {
+    public boolean deleteConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException {
         if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
             throw new DBWebException("Connection delete is restricted by server configuration");
         }
@@ -350,7 +353,11 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo createConnectionFromTemplate(WebSession webSession, String templateId) throws DBWebException {
+    public WebConnectionInfo createConnectionFromTemplate(
+        @NotNull WebSession webSession,
+        @NotNull String templateId,
+        @Nullable String connectionName) throws DBWebException
+    {
         DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
@@ -361,6 +368,9 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
 
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+        if (!CommonUtils.isEmpty(connectionName)) {
+            newDataSource.setName(connectionName);
+        }
         sessionRegistry.addDataSource(newDataSource);
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -405,7 +415,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo testConnection(WebSession webSession, WebConnectionConfig connectionConfig) throws DBWebException {
+    public WebConnectionInfo testConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig connectionConfig) throws DBWebException {
         String connectionId = connectionConfig.getConnectionId();
 
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
@@ -441,7 +451,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebNetworkEndpointInfo testNetworkHandler(WebSession webSession, WebNetworkHandlerConfigInput nhConfig) throws DBWebException {
+    public WebNetworkEndpointInfo testNetworkHandler(@NotNull WebSession webSession, @NotNull WebNetworkHandlerConfigInput nhConfig) throws DBWebException {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
         monitor.beginTask("Instantiate SSH tunnel", 2);
 
@@ -494,7 +504,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo closeConnection(WebSession webSession, String connectionId) throws DBWebException {
+    public WebConnectionInfo closeConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException {
         return closeAndDeleteConnection(webSession, connectionId, false);
     }
 
@@ -519,7 +529,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
-            connectionInfo.setSavedCredentials(null, null);
+            connectionInfo.clearSavedCredentials();
         }
 
         return connectionInfo;

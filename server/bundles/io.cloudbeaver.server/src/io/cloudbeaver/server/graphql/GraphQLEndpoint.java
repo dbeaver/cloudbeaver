@@ -33,9 +33,11 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
+import io.cloudbeaver.service.WebServiceBindingBase;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.IOUtils;
 
@@ -256,7 +258,7 @@ public class GraphQLEndpoint extends HttpServlet {
         response.getWriter().print(resString);
     }
 
-    private class WebInstrumentation extends SimpleInstrumentation {
+    private static class WebInstrumentation extends SimpleInstrumentation {
         @Override
         public CompletableFuture<ExecutionResult> instrumentExecutionResult(ExecutionResult executionResult, InstrumentationExecutionParameters parameters) {
             return super.instrumentExecutionResult(executionResult, parameters);
@@ -284,6 +286,12 @@ public class GraphQLEndpoint extends HttpServlet {
                     exception = ((InvocationTargetException) exception).getTargetException();
                 }
                 log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "', " + handlerParameters.getArgumentValues(), exception);
+
+                // Log in session
+                WebSession webSession = WebServiceBindingBase.findWebSession(handlerParameters.getDataFetchingEnvironment());
+                if (webSession != null) {
+                    webSession.addSessionError(exception);
+                }
 
                 SourceLocation sourceLocation = handlerParameters.getSourceLocation();
                 ExecutionPath path = handlerParameters.getPath();

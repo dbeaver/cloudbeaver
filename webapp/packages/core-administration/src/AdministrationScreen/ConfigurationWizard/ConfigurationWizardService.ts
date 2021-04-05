@@ -11,7 +11,7 @@ import { computed, makeObservable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-import { AdministrationItemService } from '../../AdministrationItem/AdministrationItemService';
+import { AdministrationItemService, filterHiddenAdministrationItem } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
 import type { IAdministrationItem } from '../../AdministrationItem/IAdministrationItem';
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems';
@@ -20,8 +20,11 @@ import { AdministrationScreenService } from '../AdministrationScreenService';
 @injectable()
 export class ConfigurationWizardService {
   get steps(): IAdministrationItem[] {
-    return this.administrationItemService.items
-      .filter(filterConfigurationWizard(true))
+    return this.administrationItemService.getUniqueItems(true)
+      .filter(item =>
+        filterConfigurationWizard(true)(item)
+        && filterHiddenAdministrationItem(true)(item)
+      )
       .sort(orderAdministrationItems(true));
   }
 
@@ -163,7 +166,7 @@ export class ConfigurationWizardService {
   }
 
   private getStep(name: string) {
-    return this.administrationItemService.items
+    return this.administrationItemService.getUniqueItems(true)
       .find(step => filterConfigurationWizard(true)(step) && step.name === name);
   }
 

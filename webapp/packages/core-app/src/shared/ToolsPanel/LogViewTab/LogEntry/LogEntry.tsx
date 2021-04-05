@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Link } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -26,24 +26,14 @@ const style = css`
     align-items: center;
   }
   message {
-    flex: 1;
     word-break: break-word;
     white-space: nowrap;
     overflow: hidden;
     padding-right: 16px;
     text-overflow: ellipsis;
   }
-  
-  snack {
-    display: flex;
+  Link:hover {
     cursor: pointer;
-  }
-      
-  snack Icon {
-    display: block;
-    width: 16px;
-    height: 10px;
-    fill: rgba(255, 255, 255, 0);
   }
 
   tr:hover Icon {
@@ -61,11 +51,8 @@ export const LogEntry = observer(function LogEntry({ item }: LogEntryProps) {
       <td>
         <message-cell as="div">
           <message as="div">
-            {item.message}
+            {item.stackTrace ? <Link onClick={controller.showDetails}>{item.message}</Link> : item.message}
           </message>
-          <snack as="div" onClick={controller.showDetails}>
-            <Icon name="snack" viewBox="0 0 16 10" />
-          </snack>
         </message-cell>
       </td>
     </tr>

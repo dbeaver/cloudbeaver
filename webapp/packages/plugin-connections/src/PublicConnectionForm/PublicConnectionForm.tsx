@@ -65,7 +65,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   const save = useCallback(() => service.close(true), []);
 
   return styled(styles)(
-    <Loader loading={service.dataOptions !== null}>
+    <Loader loading={service.dataOptions === null}>
       {() => (
         <PublicConnectionFormRenderer
           dataOptions={service.dataOptions!}

@@ -111,7 +111,7 @@ export const ConnectionForm = observer(function ConnectionForm({
       <box as='div'>
         <TabList style={style}>
           <fill as="div" />
-          <Placeholder container={service.actionsContainer} context={{ data, form: formState.form, options }} />
+          <Placeholder container={service.actionsContainer} data={data} form={formState.form} options={options} />
           <Button
             type="button"
             disabled={formState.form.disabled}

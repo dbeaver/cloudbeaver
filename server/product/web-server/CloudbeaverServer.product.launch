@@ -51,10 +51,12 @@
         <setEntry value="org.apache.felix.scr@1:true"/>
         <setEntry value="org.bouncycastle.bcpkix@default:default"/>
         <setEntry value="org.bouncycastle.bcprov@default:default"/>
+        <setEntry value="org.eclipse.core.commands@default:default"/>
         <setEntry value="org.eclipse.core.contenttype@default:default"/>
         <setEntry value="org.eclipse.core.databinding.observable@default:default"/>
         <setEntry value="org.eclipse.core.databinding.property@default:default"/>
         <setEntry value="org.eclipse.core.databinding@default:default"/>
+        <setEntry value="org.eclipse.core.expressions@default:default"/>
         <setEntry value="org.eclipse.core.filebuffers@default:default"/>
         <setEntry value="org.eclipse.core.filesystem.win32.x86_64@default:false"/>
         <setEntry value="org.eclipse.core.filesystem@default:default"/>

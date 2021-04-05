@@ -27,13 +27,13 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   get providers(): AuthProvider[] {
     return this.authProvidersResource
-      .data
-      .concat()
+      .getEnabledProviders()
       .sort(this.compareProviders);
   }
 
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
+  private link!: boolean;
   private close!: () => void;
 
   constructor(
@@ -50,7 +50,8 @@ export class AuthDialogController implements IInitializableController, IDestruct
     });
   }
 
-  init(onClose: () => void) {
+  init(link: boolean, onClose: () => void) {
+    this.link = link;
     this.close = onClose;
     this.loadProviders();
   }
@@ -66,8 +67,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
     this.isAuthenticating = true;
     try {
-      await this.authInfoService.logout();
-      await this.authInfoService.login(this.provider.id, this.credentials);
+      await this.authInfoService.login(this.provider.id, this.credentials, this.link);
       this.close();
     } catch (exception) {
       if (!this.error.catch(exception) || this.isDistructed) {
@@ -82,8 +82,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     if (providerId === this.provider?.id) {
       return;
     }
-    this.provider = this.authProvidersResource
-      .data.find(provider => provider.id === providerId) || null;
+    this.provider = this.authProvidersResource.get(providerId) || null;
     this.credentials = {};
   };
 
@@ -95,7 +94,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
 
   private async loadProviders() {
     try {
-      await this.authProvidersResource.load();
+      await this.authProvidersResource.loadAll();
       if (this.providers.length > 0) {
         this.provider = this.providers[0];
       }

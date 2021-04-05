@@ -8,10 +8,9 @@
 
 import { action, makeObservable } from 'mobx';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
-import { SessionResource } from '@cloudbeaver/core-root';
+import { NavigatorViewSettings, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -27,7 +26,6 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
-import type { NavigatorViewSettings } from './ConnectionNavigatorViewSettings';
 
 export type Connection = DatabaseConnection & { authProperties?: UserConnectionAuthPropertiesFragment[] };
 export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
@@ -47,18 +45,21 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 export class ConnectionInfoResource extends CachedMapResource<string, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
+
+  /**
+   * @deprecated Should be refactored according new SessionDataResource
+   */
   readonly onSessionUpdate: IExecutor<Connection[]>;
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
     private connectionsResource: ConnectionsResource,
-    appAuthService: AppAuthService,
-    sessionResource: SessionResource
+    sessionDataResource: SessionDataResource
   ) {
     super();
 
     makeObservable(this, {
-      refreshSession: action,
+      refreshUserConnections: action,
       createFromTemplate: action,
       createConnection: action,
       createFromNode: action,
@@ -76,11 +77,12 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
-    sessionResource.onDataOutdated.addHandler(() => this.markOutdated());
-    appAuthService.auth.addHandler(() => this.refreshSession(true));
+
+    sessionDataResource.onDataOutdated.addHandler(() => this.markOutdated());
+    sessionDataResource.onDataUpdate.addHandler(() => this.refreshUserConnections(true));
   }
 
-  async refreshSession(sessionUpdate?: boolean): Promise<void> {
+  async refreshUserConnections(sessionUpdate?: boolean): Promise<void> {
     this.sessionUpdate = sessionUpdate === true;
     try {
       const connectionsList = resourceKeyList(Array.from(this.data.keys()));
@@ -118,9 +120,10 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     }
   }
 
-  async createFromTemplate(templateId: string): Promise<Connection> {
+  async createFromTemplate(templateId: string, connectionName: string): Promise<Connection> {
     const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
       templateId,
+      connectionName,
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(),
     });
@@ -259,7 +262,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
       customIncludeNetworkHandlerCredentials: false,
       customIncludeOriginDetails: false,
       includeAuthProperties: false,
-      includeOrigin: false,
+      includeOrigin: true,
     };
   }
 }

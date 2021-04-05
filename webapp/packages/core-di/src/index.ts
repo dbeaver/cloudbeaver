@@ -2,6 +2,7 @@ export * from './IApp';
 export * from './App';
 export * from './AppContext';
 export * from './Bootstrap';
+export * from './Dependency';
 export * from './injectable';
 export * from './PluginManifest';
 export * from './useService';

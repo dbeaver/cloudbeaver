@@ -11,4 +11,4 @@ import type { IExecutionContextProvider } from './IExecutionContext';
 export type IExecutorHandler<T> = (
   data: T,
   contexts: IExecutionContextProvider<T>
-) => void | Promise<void>;
+) => any | Promise<any>;

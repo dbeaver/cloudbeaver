@@ -6,23 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { NotificationService } from './NotificationService';
 
 @injectable()
-export class ExceptionsCatcherService {
+export class ExceptionsCatcherService extends Bootstrap {
   baseCatcher: OnErrorEventHandler | null = null;
 
   private ignored: string[] = [];
   private messageTitle = 'Uncatched exception';
 
-  constructor(private notificationService: NotificationService) { }
+  constructor(private notificationService: NotificationService) {
+    super();
+  }
 
-  subscribe() {
+  register(): void {
     this.baseCatcher = window.onerror;
     window.onerror = this.catcher;
   }
+
+  load(): void {}
 
   unsubscribe() {
     window.onerror = this.baseCatcher;

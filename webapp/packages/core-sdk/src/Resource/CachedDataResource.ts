@@ -35,6 +35,7 @@ export abstract class CachedDataResource<
   markUpdated(param: TParam): void {
     const metadata = this.metadata.get(param as unknown as TKey);
     metadata.outdated = false;
+    metadata.exception = null;
     this.loaded = true;
   }
 

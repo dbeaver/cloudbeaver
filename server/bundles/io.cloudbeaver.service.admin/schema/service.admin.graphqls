@@ -57,7 +57,7 @@ input ServerConfigInput {
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
 
-    enabledAuthProviders: [ID!]!
+    enabledAuthProviders: [ID!]
 
     sessionExpireTime: Int
 }

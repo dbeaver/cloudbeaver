@@ -22,6 +22,7 @@ export const manifest: PluginManifest = {
   info: { name: 'Object Viewer Plugin' },
 
   providers: [
+    ObjectViewerBootstrap,
     ObjectPropertiesPageService,
     ObjectFoldersService,
     ObjectViewerTabService,
@@ -31,11 +32,4 @@ export const manifest: PluginManifest = {
     DBObjectPageService,
     LocaleService,
   ],
-
-  async initialize(injector: IServiceInjector) {
-    injector
-      .resolveServiceByClass(ObjectViewerBootstrap)
-      .bootstrap();
-  },
-
 };

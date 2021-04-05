@@ -72,7 +72,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     return Collections.emptyList();
                 }
                 return getService(env).readSessionLog(
-                    getWebSession(env),
+                    session,
                     env.getArgument("maxEntries"),
                     env.getArgument("clearEntries"));
             })
@@ -89,7 +89,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("createConnection", env -> getService(env).createConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("updateConnection", env -> getService(env).updateConnection(getWebSession(env), getConnectionConfig(env)))
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(getWebSession(env), env.getArgument("templateId")))
+            .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(
+                getWebSession(env),
+                env.getArgument("templateId"),
+                env.getArgument("connectionName")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
                 env.getArgument("nodePath"),

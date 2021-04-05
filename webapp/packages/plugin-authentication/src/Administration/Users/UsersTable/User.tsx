@@ -46,7 +46,7 @@ export const User: React.FC<Props> = observer(function User({ user, selectable }
       <TableColumnValue expand>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
       <TableColumnValue flex>
-        <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} context={user} />
+        <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
       </TableColumnValue>
     </TableItem>
   );

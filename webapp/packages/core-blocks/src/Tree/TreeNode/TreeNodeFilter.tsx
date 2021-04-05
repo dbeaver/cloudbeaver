@@ -110,7 +110,7 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
         value={context.filterValue}
         {...use({ filterEnabled })}
         onKeyDown={onKeyDown}
-        onChange={value => context.filter(value.trim())}
+        onChange={value => context.filter(String(value).trim())}
       />
       <IconButton name='search' disabled={disabled} onClick={onFilterEnabledChange} {...use({ filterEnabled })} />
     </filter-container>

@@ -2,6 +2,7 @@ query serverConfig {
   serverConfig {
     name
     version
+    workspaceId
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
@@ -20,6 +21,7 @@ query serverConfig {
     configurationMode
     developmentMode
 
+    enabledAuthProviders
     supportedLanguages {
       isoCode
       displayName

@@ -92,7 +92,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private boolean cacheExpired;
 
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final List<WebServerMessage> progressMessages = new ArrayList<>();
+    private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
@@ -101,7 +101,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
-    private DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
+    private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private ProjectMetadata sessionProject;
     private final SessionContextImpl sessionAuthContext;
 
@@ -202,9 +202,11 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     public void forceUserRefresh(WebUser user) {
         if (!CommonUtils.equalObjects(this.user, user)) {
             // User has changed. We need to reset all session attributes
+            clearAuthTokens();
             try {
                 resetSessionCache();
             } catch (DBCException e) {
+                addSessionError(e);
                 log.error(e);
             }
         }
@@ -273,6 +275,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         try {
             this.refreshConnections();
         } catch (Exception e) {
+            addSessionError(e);
             log.error("Error getting connection list", e);
         }
     }
@@ -319,6 +322,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 .getSubjectConnectionAccess(new String[]{subjectId}))
                 .map(DBWConnectionGrant::getConnectionId).collect(Collectors.toSet());
         } catch (DBCException e) {
+            addSessionError(e);
             log.error("Error reading connection grants", e);
             return Collections.emptySet();
         }
@@ -373,6 +377,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             accessibleConnectionIds = readAccessibleConnectionIds();
 
         } catch (Exception e) {
+            addSessionError(e);
             log.error("Error reading session permissions", e);
         }
     }
@@ -394,10 +399,10 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
      * Returns and clears progress messages
      */
     @Association
-    public List<WebServerMessage> getProgressMessages() {
-        synchronized (progressMessages) {
-            List<WebServerMessage> copy = new ArrayList<>(progressMessages);
-            progressMessages.clear();
+    public List<WebServerMessage> getSessionMessages() {
+        synchronized (sessionMessages) {
+            List<WebServerMessage> copy = new ArrayList<>(sessionMessages);
+            sessionMessages.clear();
             return copy;
         }
     }
@@ -416,10 +421,13 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     DBWSecurityController.getInstance().createSession(this);
                     this.persisted = true;
                 } else {
-                    // Update record
-                    DBWSecurityController.getInstance().updateSession(this);
+                    if (!CBApplication.getInstance().isConfigurationMode()) {
+                        // Update record
+                        DBWSecurityController.getInstance().updateSession(this);
+                    }
                 }
             } catch (Exception e) {
+                addSessionError(e);
                 log.error("Error persisting web session", e);
             }
         }
@@ -544,7 +552,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         return true;
     }
 
-    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor runnable) {
+    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
 
@@ -559,6 +567,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                     asyncTask.setStatus("Finished");
                     asyncTask.setRunning(false);
                 } catch (InvocationTargetException e) {
+                    addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
                 } catch (InterruptedException e) {
                     asyncTask.setJobError(e);
@@ -573,19 +582,25 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         return asyncTask;
     }
 
+    public void addSessionError(Throwable exception) {
+        synchronized (sessionMessages) {
+            sessionMessages.add(new WebServerMessage(exception));
+        }
+    }
+
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
-        synchronized (progressMessages) {
+        synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();
             int entryCount = CommonUtils.toInt(maxEntries);
-            if (entryCount == 0 || entryCount >= progressMessages.size()) {
-                messages.addAll(progressMessages);
+            if (entryCount == 0 || entryCount >= sessionMessages.size()) {
+                messages.addAll(sessionMessages);
                 if (CommonUtils.toBoolean(clearLog)) {
-                    progressMessages.clear();
+                    sessionMessages.clear();
                 }
             } else {
-                messages.addAll(progressMessages.subList(0, maxEntries));
+                messages.addAll(sessionMessages.subList(0, maxEntries));
                 if (CommonUtils.toBoolean(clearLog)) {
-                    progressMessages.removeAll(messages);
+                    sessionMessages.removeAll(messages);
                 }
             }
             return messages;
@@ -635,7 +650,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 
             if (providerID != null) {
                 for (WebAuthInfo ai : authTokens) {
-                    if (ai.getAuthProvider().getId().equals(providerID)) {
+                    if (ai.getAuthProvider().equals(providerID)) {
                         return ai;
                     }
                 }
@@ -660,7 +675,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
 
 
-        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProvider().getId());
+        WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
         if (oldAuthInfo != null) {
             removeAuthInfo(oldAuthInfo);
         }
@@ -744,6 +759,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
 //            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
 //            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
+            addSessionError(e);
             log.error(e);
         }
         return true;
@@ -770,15 +786,15 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
         public void beginTask(String name, int totalWork) {
-            synchronized (progressMessages) {
-                progressMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
+            synchronized (sessionMessages) {
+                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
             }
         }
 
         @Override
         public void subTask(String name) {
-            synchronized (progressMessages) {
-                progressMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
+            synchronized (sessionMessages) {
+                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
             }
         }
     }

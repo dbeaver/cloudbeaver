@@ -7,19 +7,40 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { md5 } from '@cloudbeaver/core-utils';
 
 import { AuthProvidersResource } from './AuthProvidersResource';
 
 @injectable()
 export class AuthProviderService {
+  readonly requestAuthProvider: IExecutor<ObjectOrigin>;
   constructor(
-    private providers: AuthProvidersResource
-  ) { }
+    private readonly authProvidersResource: AuthProvidersResource
+  ) {
+    this.requestAuthProvider = new Executor();
+  }
+
+  async requireProvider(type: string, subType?: string): Promise<boolean>
+  async requireProvider(origin: ObjectOrigin): Promise<boolean>
+  async requireProvider(origin: ObjectOrigin | string, subType?: string): Promise<boolean> {
+    if (typeof origin === 'string') {
+      origin = {
+        displayName: '',
+        type: origin,
+        subType,
+      };
+    }
+
+    const contexts = await this.requestAuthProvider.execute(origin);
+    const provider = contexts.getContext(AuthProviderContext);
+
+    return provider.get();
+  }
 
   async processCredentials(providerId: string, credentials: Record<string, any>): Promise<Record<string, any>> {
-    const providers = await this.providers.load();
-    const provider = providers.find(provider => provider.id === providerId);
+    const provider = await this.authProvidersResource.load(providerId);
 
     if (!provider) {
       return credentials;
@@ -36,4 +57,20 @@ export class AuthProviderService {
 
     return credentialsProcessed;
   }
+}
+
+interface IAuthProviderContext{
+  get: () => boolean;
+  auth: () => void;
+}
+
+export function AuthProviderContext(): IAuthProviderContext {
+  let state = false;
+
+  return {
+    get: () => state,
+    auth: () => {
+      state = true;
+    },
+  };
 }

@@ -7,106 +7,64 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useState } from 'react';
 
-import type { IGridItemsLayoutProps } from '../../Containers/LayoutProps';
-import { FormContext } from '../FormContext';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { isControlPresented } from '../isControlPresented';
-import { CheckboxMarkup } from './CheckboxMarkup';
+import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
+import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
-export type CheckboxMod = 'primary' | 'small';
-
-export type CheckboxBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked'> & IGridItemsLayoutProps & {
-  value?: string;
-  checkboxLabel?: string;
-  long?: boolean;
+export interface CheckboxBaseProps {
+  label?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
-};
-
-type CheckboxOnChangeEvent<T> =
-  ((value: boolean, name: T) => void) |
-  ((value: boolean, name: T) => boolean);
-
-export type CheckboxControlledProps = CheckboxBaseProps & {
-  checked?: boolean;
   indeterminate?: boolean;
-  onChange?: CheckboxOnChangeEvent<string | undefined>;
+  style?: ComponentStyle;
+}
+
+export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked' | 'id' | 'style'> & ILayoutSizeProps;
+
+export interface ICheckboxControlledProps extends CheckboxInputProps {
+  value?: string;
   state?: never;
+  checked?: boolean;
+  onChange?: CheckboxOnChangeEvent<string | undefined>;
   autoHide?: never;
-};
+}
 
-export type CheckboxObjectProps<TKey extends keyof TState, TState> = CheckboxBaseProps & {
-  name: TKey;
-  state: TState;
-  onChange?: CheckboxOnChangeEvent<TKey>;
+export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInputProps {
+  value?: string;
+  state: Partial<Record<TKey, boolean | null | string | string[]>>;
   checked?: never;
-  indeterminate?: boolean;
+  onChange?: CheckboxOnChangeEvent<TKey>;
   autoHide?: boolean;
-};
+  name: TKey;
+}
 
 export interface CheckboxType {
-  (props: CheckboxControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends keyof TState, TState>(props: CheckboxObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
+  (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
   name,
   value,
   state,
-  checkboxLabel,
-  checked: checkedControlled,
+  label,
+  checked,
   children,
   mod,
   ripple,
   className,
-  long,
   autoHide,
   onChange,
   ...rest
-}: CheckboxControlledProps | CheckboxObjectProps<any, any>) {
-  const [count, refresh] = useState(0);
-  const context = useContext(FormContext);
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (state) {
-      if (Array.isArray(state[name])) {
-        state[name] = (state[name] as string[]).filter(item => item !== value);
-        if (event.target.checked) {
-          state[name].push(value);
-        }
-      } else {
-        state[name] = event.target.checked;
-      }
-    }
-    if (onChange) {
-      const checked = onChange(event.target.checked, name);
-
-      if (typeof checked === 'boolean') {
-        event.target.checked = checked;
-      }
-    }
-    if (context) {
-      context.onChange(event.target.checked, name);
-    }
-    refresh(count + 1);
-  }, [state, name, value, onChange, context, count]);
+}: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
+  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
-  }
-
-  let checked = checkedControlled;
-
-  if (state) {
-    if (typeof state[name] === 'string') {
-      checked = state[name] === 'true';
-    } else {
-      checked = state[name];
-    }
-  }
-
-  if (Array.isArray(checked)) {
-    checked = checked.includes(value);
   }
 
   return (
@@ -114,12 +72,12 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
       {...rest}
       name={name}
       id={value || name}
-      checked={checked}
-      label={checkboxLabel}
+      checked={checkboxState.checked}
+      label={label}
       className={className}
       mod={mod}
       ripple={ripple}
-      onChange={handleChange}
+      onChange={checkboxState.change}
     />
   );
 });

@@ -48,7 +48,10 @@ export function useDataResource<
   const key = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.key : keyObj;
   const includes = keyObj && typeof keyObj === 'object' && 'includes' in keyObj ? keyObj.includes : [];
 
+  const outdated = resource.isOutdated(key);
+
   const refObj = useObjectRef({
+    loading: false,
     resource,
     key,
     exception,
@@ -65,7 +68,13 @@ export function useDataResource<
   });
 
   refObj.load = async function load() {
-    const { resource, actions, prevData } = refObj;
+    const { loading, resource, actions, prevData } = refObj;
+
+    if (loading) {
+      return;
+    }
+
+    this.loading = true;
 
     try {
       await actions?.onLoad?.(resource);
@@ -89,6 +98,8 @@ export function useDataResource<
       setException(exception);
       actions?.onError?.(exception);
       notifications.logException(exception, 'Can\'t load data');
+    } finally {
+      this.loading = false;
     }
   };
 
@@ -100,14 +111,14 @@ export function useDataResource<
       return refObj.exception;
     },
     get data() {
-      return resource.data;
+      return refObj.resource.data;
     },
     isLoaded: () => {
       if (refObj.key === null) {
         return false;
       }
 
-      return resource.isLoaded(refObj.key, refObj.includes);
+      return refObj.resource.isLoaded(refObj.key, refObj.includes);
     },
     reload: () => {
       refObj.load();
@@ -117,13 +128,19 @@ export function useDataResource<
         return false;
       }
 
-      return resource.isDataLoading(refObj.key);
+      if (refObj.key === undefined) {
+        return refObj.resource.isLoading();
+      }
+
+      return refObj.resource.isDataLoading(refObj.key);
     },
   }));
 
   useEffect(() => {
-    refObj.load();
-  }, [key, includes]);
+    if (exception === null) {
+      refObj.load();
+    }
+  }, [key, includes, outdated]);
 
   return result;
 }

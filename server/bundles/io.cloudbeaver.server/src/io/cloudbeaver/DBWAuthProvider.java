@@ -17,6 +17,7 @@
 package io.cloudbeaver;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.access.DBASession;
 
@@ -28,10 +29,9 @@ import java.util.Map;
 public interface DBWAuthProvider<AUTH_SESSION extends DBASession> {
 
     AUTH_SESSION openSession(
-        WebSession mainSession,
-        Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
-        Map<String, Object> userCredentials, // Saved user credentials (e.g. associated 3rd party provider user name or realm)
-        Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
+        @NotNull WebSession mainSession,
+        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        @NotNull Map<String, Object> userCredentials // Saved user credentials (e.g. associated 3rd party provider user name or realm)
     ) throws DBException;
 
     void closeSession(AUTH_SESSION session) throws DBException;

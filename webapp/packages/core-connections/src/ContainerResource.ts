@@ -44,7 +44,13 @@ string
     private connectionInfoResource: ConnectionInfoResource
   ) {
     super(new MetadataMap(() => ({ })));
-    this.metadata = new MetadataMap(() => ({ outdated: true, loading: false, outdatedData: [], loadingData: [] }));
+    this.metadata = new MetadataMap(() => ({
+      outdated: true,
+      loading: false,
+      exception: null,
+      outdatedData: [],
+      loadingData: [],
+    }));
     this.connectionInfoResource.onItemDelete.addHandler(
       key => ResourceKeyUtils.forEach(key, key => this.data.delete(key))
     );
@@ -92,19 +98,20 @@ string
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
 
-  markOutdated(param: ObjectContainerParams): void {
+  async markOutdated(param: ObjectContainerParams): Promise<void> {
     const catalogId = param.catalogId ?? defaultCatalog;
 
     const metadata = this.metadata.get(param.connectionId);
     if (!metadata.outdatedData.includes(catalogId)) {
       metadata.outdatedData.push(catalogId);
     }
-    this.onDataOutdated.execute(param);
+    await this.onDataOutdated.execute(param);
   }
 
   markUpdated(param: ObjectContainerParams): void {
     const metadata = this.metadata.get(param.connectionId);
     const catalogId = param.catalogId ?? defaultCatalog;
+    metadata.exception = null;
     metadata.outdatedData = metadata.outdatedData.filter(id => id !== catalogId);
   }
 
