@@ -912,6 +912,7 @@ export interface AuthCredentialInfo {
   description?: Maybe<Scalars['String']>;
   admin?: Maybe<Scalars['Boolean']>;
   user?: Maybe<Scalars['Boolean']>;
+  identifying?: Maybe<Scalars['Boolean']>;
   possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
   encryption?: Maybe<AuthCredentialEncryption>;
 }
@@ -997,7 +998,7 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthProvidersQuery {
   providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
-    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
+    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
   )>;
 }
 
@@ -1866,6 +1867,7 @@ export const GetAuthProvidersDocument = `
       description
       admin
       user
+      identifying
       possibleValues
       encryption
     }

@@ -24,6 +24,7 @@ query getAuthProviders {
       description
       admin
       user
+      identifying
       possibleValues
       encryption
     }

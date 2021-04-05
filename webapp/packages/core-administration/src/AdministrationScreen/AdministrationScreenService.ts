@@ -249,7 +249,9 @@ export class AdministrationScreenService {
       return false;
     }
 
-    if (!(await this.isAccessProvided(state))) {
+    const accessProvided = await this.isAccessProvided(state);
+
+    if (!accessProvided) {
       this.screenService.navigateToRoot();
       return false;
     }
@@ -269,7 +271,9 @@ export class AdministrationScreenService {
 
     await this.ensurePermissions.execute();
 
-    if (!(await this.permissionsService.hasAsync(EAdminPermission.admin))) {
+    const administrator = await this.permissionsService.hasAsync(EAdminPermission.admin);
+
+    if (!administrator) {
       return false;
     }
 
