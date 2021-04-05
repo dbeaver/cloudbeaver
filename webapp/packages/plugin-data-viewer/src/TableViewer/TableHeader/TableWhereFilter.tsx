@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
-import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
@@ -33,20 +33,24 @@ const styles = composes(
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({
   model,
+  resultIndex,
 }) {
   const translate = useTranslate();
   const [filterValue, setValue] = useState(() => model.source.options?.whereFilter || '');
+  const props = useObjectRef({ model, resultIndex, filterValue });
 
   const handleApply = useCallback(() => {
-    if (model.isLoading()) {
+    const { model, resultIndex, filterValue } = props;
+    if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
     model.source.options!.whereFilter = filterValue;
     model.refresh();
-  }, [model, filterValue]);
+  }, []);
 
   const resetFilter = useCallback(() => {
-    if (model.isLoading()) {
+    const { model, resultIndex, filterValue } = props;
+    if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
     const applyNeeded = model.source.options?.whereFilter === filterValue;
@@ -57,7 +61,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       model.source.options!.whereFilter = '';
       model.refresh();
     }
-  }, [model, filterValue]);
+  }, []);
 
   return styled(useStyles(styles))(
     <InlineEditor
@@ -66,7 +70,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       placeholder={translate('table_header_sql_expression')}
       controlsPosition='inside'
       edited={!!filterValue}
-      disabled={model.isLoading() || model.source.results.length > 1}
+      disabled={model.isLoading() || model.source.results.length > 1 || model.isDisabled(resultIndex)}
       simple
       onSave={handleApply}
       onUndo={resetFilter}

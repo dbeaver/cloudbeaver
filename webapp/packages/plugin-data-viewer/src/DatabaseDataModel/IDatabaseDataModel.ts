@@ -19,6 +19,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   readonly countGain: number;
 
   isReadonly: () => boolean;
+  isDisabled: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
 

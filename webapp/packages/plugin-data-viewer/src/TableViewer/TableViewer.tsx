@@ -200,7 +200,7 @@ export const TableViewer = observer(function TableViewer({
 
   return styled(styles)(
     <table-viewer as="div" className={className}>
-      <TableHeader model={dataModel} />
+      <TableHeader model={dataModel} resultIndex={resultIndex} />
       <table-content as='div'>
         <TablePresentationBar
           type={DataPresentationType.main}

@@ -12,29 +12,31 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource } from './ContainerDataSource';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
-import type { DataModelWrapper } from './TableViewer/DataModelWrapper';
+import { DataModelWrapper } from './TableViewer/DataModelWrapper';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
 export class DataViewerTableService {
-  constructor(private tableViewerStorageService: TableViewerStorageService,
+  constructor(
+    private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService) {
-  }
+    private notificationService: NotificationService
+  ) { }
 
   has(tableId: string): boolean {
     return this.tableViewerStorageService.has(tableId);
   }
 
-  get(modelId: string): DataModelWrapper | undefined {
+  get(modelId: string): IDatabaseDataModel<any, any> | undefined {
     return this.tableViewerStorageService.get(modelId);
   }
 
   async removeTableModel(tableId: string): Promise<void> {
     const model = this.tableViewerStorageService.get(tableId);
-    if (model) {
+    if (model instanceof DataModelWrapper) {
       await model.dispose();
     }
     this.tableViewerStorageService.remove(tableId);

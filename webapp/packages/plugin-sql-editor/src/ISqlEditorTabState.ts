@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
-export interface ISqlQueryParams extends IExecutionContext {
+export interface ISqlQueryParams extends IDatabaseExecutionContext {
   query: string;
 }
 
@@ -35,7 +35,7 @@ export interface IQueryTabGroup {
   order: number;
 }
 
-export interface ISqlEditorTabState extends Partial<IExecutionContext> {
+export interface ISqlEditorTabState extends Partial<IDatabaseExecutionContext> {
   order: number;
   query: string;
   currentResultTabId?: string;

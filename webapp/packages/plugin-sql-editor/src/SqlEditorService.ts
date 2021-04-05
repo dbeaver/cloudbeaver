@@ -10,7 +10,7 @@ import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
-import type { IExecutionContext } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
@@ -42,7 +42,7 @@ export class SqlEditorService {
     return result.sqlCompletionProposals;
   }
 
-  async initEditorConnection(state: ISqlEditorTabState): Promise<IExecutionContext | undefined> {
+  async initEditorConnection(state: ISqlEditorTabState): Promise<IDatabaseExecutionContext | undefined> {
     if (!state.connectionId) {
       console.error('executeEditorQuery connectionId is not provided');
       return;
@@ -61,7 +61,7 @@ export class SqlEditorService {
     connectionId?: string,
     catalogId?: string,
     schemaId?: string
-  ): Promise<IExecutionContext | null> {
+  ): Promise<IDatabaseExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
     if (!connection) {
       return null;
@@ -106,7 +106,7 @@ export class SqlEditorService {
     connectionId: string,
     defaultCatalog?: string,
     defaultSchema?: string
-  ): Promise<IExecutionContext> {
+  ): Promise<IDatabaseExecutionContext> {
     const response = await this.gql.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,

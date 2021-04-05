@@ -14,11 +14,11 @@ import { TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
-import type { DataModelWrapper } from './DataModelWrapper';
 
 type TableGridProps = PropsWithChildren<{
-  model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
+  model: IDatabaseDataModel<any, any>;
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions | null;
   resultIndex: number;

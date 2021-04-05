@@ -9,27 +9,19 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
-import {
-  DatabaseDataEditor,
-  DatabaseDataSource, IDatabaseResultSet
-} from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataEditor, DatabaseDataSource, IDatabaseDataOptions, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IQueryTabGroup } from './ISqlEditorTabState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 import type { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
-export interface IDataContainerOptions {
+export interface IDataQueryOptions extends IDatabaseDataOptions {
   tabId: string;
-  sourceName: string;
-  connectionId: string;
-  whereFilter: string;
-  constraints: SqlDataFilterConstraint[];
-  group: IQueryTabGroup;
+  query: string;
 }
 
-export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
+export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IDatabaseResultSet> {
   get canCancel(): boolean {
     return this.queryExecutionProcess?.getState() === EDeferredState.PENDING;
   }
@@ -51,6 +43,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     this.editor = new DatabaseDataEditor();
   }
 
+  isDisabled(resultIndex: number): boolean {
+    return !this.getResult(resultIndex)?.data;
+  }
+
   cancel(): boolean {
     if (this.queryExecutionProcess) {
       this.queryExecutionProcess.cancel();
@@ -61,9 +57,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   async save(
     prevResults: IDatabaseResultSet[]
   ): Promise<IDatabaseResultSet[]> {
-    const params = this.options?.group.sqlQueryParams;
-    if (!params) {
-      throw new Error('sqlQueryParams must be provided');
+    if (!this.options || !this.executionContext) {
+      return prevResults;
     }
 
     const changes = this.editor?.getChanges(true);
@@ -75,8 +70,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     try {
       for (const update of changes) {
         const response = await this.graphQLService.sdk.updateResultsDataBatch({
-          connectionId: params.connectionId,
-          contextId: params.contextId,
+          connectionId: this.options.connectionId,
+          contextId: this.executionContext.contextId,
           resultsId: update.resultId,
           updatedRows: Array.from(update.diff.values()).map(diff => ({
             data: diff.source,
@@ -92,6 +87,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
         this.requestInfo = {
           requestDuration: response.result?.duration || 0,
           requestMessage: 'Saved successfully',
+          source: this.options.query || null,
         };
 
         const result = prevResults.find(result => result.id === update.resultId)!;
@@ -115,7 +111,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return prevResults;
   }
 
-  setOptions(options: IDataContainerOptions): this {
+  setOptions(options: IDataQueryOptions): this {
     this.options = options;
     return this;
   }
@@ -124,6 +120,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     this.requestInfo = {
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
+      source: this.options?.query || null,
     };
 
     if (!response.results) {
@@ -133,6 +130,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
     return response.results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || '0',
       dataFormat: result.dataFormat!,
+      updateRowCount: result.updateRowCount || 0,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
@@ -143,7 +141,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
   async request(
     prevResults: IDatabaseResultSet[]
   ): Promise<IDatabaseResultSet[]> {
-    if (!this.options) {
+    if (!this.options || !this.executionContext) {
       return prevResults;
     }
     const limit = this.count;
@@ -155,7 +153,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataContainerOptions, I
 
     try {
       await this.queryExecutionProcess.start(
-        this.options.group.sqlQueryParams,
+        this.options.query,
+        this.executionContext,
         {
           offset: this.offset,
           limit,

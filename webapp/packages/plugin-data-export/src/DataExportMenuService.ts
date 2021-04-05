@@ -6,14 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature
-} from '@cloudbeaver/core-app';
+import { NavigationTreeContextMenuService, NodeManagerUtils, NavNode, EObjectFeature } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  IMenuContext, CommonDialogService, ContextMenuService
-} from '@cloudbeaver/core-dialogs';
-import { TableFooterMenuService, ITableFooterMenuContext } from '@cloudbeaver/plugin-data-viewer';
+import { IMenuContext, CommonDialogService, ContextMenuService } from '@cloudbeaver/core-dialogs';
+import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
@@ -32,7 +29,9 @@ export class DataExportMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        return context.data.model.isLoading() || !context.data.model.getResult(context.data.resultIndex);
+        return context.data.model.isLoading()
+        || context.data.model.isDisabled(context.data.resultIndex)
+        || !context.data.model.getResult(context.data.resultIndex);
       },
       order: 5,
       title: 'data_transfer_dialog_export',
@@ -69,16 +68,18 @@ export class DataExportMenuService {
       throw new Error('Result must be provided');
     }
 
-    if (!context.data.model.source.options) {
+    const source = context.data.model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
+
+    if (!source.options) {
       throw new Error('Source options must be provided');
     }
 
     this.commonDialogService.open(DataExportDialog, {
-      connectionId: context.data.model.source.options.connectionId,
+      connectionId: source.options.connectionId,
       contextId: context.data.model.source.executionContext?.contextId,
-      containerNodePath: context.data.model.source.options.containerNodePath,
+      containerNodePath: source.options.containerNodePath,
       resultId: result.id,
-      sourceName: context.data.model.source.options.sourceName,
+      sourceName: source.options.query,
     });
   }
 }

@@ -9,11 +9,12 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import type { DataModelWrapper } from '../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { TableWhereFilter } from './TableWhereFilter';
 
 export interface ITableHeaderPlaceholderProps {
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
+  resultIndex: number;
 }
 
 @injectable()

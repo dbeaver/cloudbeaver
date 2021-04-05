@@ -18,8 +18,10 @@ export * from './DatabaseDataModel/IDatabaseDataAction';
 export * from './DatabaseDataModel/IDatabaseDataActions';
 export * from './DatabaseDataModel/IDatabaseDataEditor';
 export * from './DatabaseDataModel/IDatabaseDataModel';
+export * from './DatabaseDataModel/IDatabaseDataOptions';
 export * from './DatabaseDataModel/IDatabaseDataResult';
 export * from './DatabaseDataModel/IDatabaseDataSource';
+export * from './DatabaseDataModel/IDatabaseExecutionContext';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 
 // All Services and Components that is provided by this plugin should be exported here
@@ -35,6 +37,6 @@ export * from './TableViewer/TableDataModel/TableColumn';
 export * from './TableViewer/TableDataModel/TableRow';
 export * from './TableViewer/TableDataModel/EditedRow';
 
-export * from './IExecutionContext';
-
+export * from './ContainerDataSource';
 export * from './DataPresentationService';
+export * from './useDataModel';

@@ -20,6 +20,7 @@ import type { IDataPresentationOptions } from '../../DataPresentationService';
 
 interface Props {
   model: IDatabaseDataModel<any>;
+  resultIndex: number;
   presentation: IDataPresentationOptions;
   className?: string;
   style?: ComponentStyle;
@@ -27,6 +28,7 @@ interface Props {
 
 export const PresentationTab = observer(function PresentationTab({
   model,
+  resultIndex,
   presentation,
   className,
   style,
@@ -44,7 +46,7 @@ export const PresentationTab = observer(function PresentationTab({
         style={verticalRotatedTabStyles}
         model={model}
         presentation={presentation}
-        disabled={model.isLoading()}
+        disabled={model.isLoading() || model.isDisabled(resultIndex)}
       />
     );
   }
@@ -53,7 +55,7 @@ export const PresentationTab = observer(function PresentationTab({
     <Tab
       tabId={presentation.id}
       style={[verticalRotatedTabStyles, style]}
-      disabled={model.isLoading()}
+      disabled={model.isLoading() || model.isDisabled(resultIndex)}
     >
       {presentation.icon && <TabIcon icon={presentation.icon} />}
       {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IExecutionContext {
+export interface IDatabaseExecutionContext {
   connectionId: string;
   contextId: string;
   objectCatalogId?: string;

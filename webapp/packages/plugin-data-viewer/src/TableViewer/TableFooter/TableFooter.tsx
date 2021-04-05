@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import type { DataModelWrapper } from '../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 const tableFooterStyles = composes(
@@ -65,7 +65,7 @@ const tableFooterStyles = composes(
 
 interface TableFooterProps {
   resultIndex: number;
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
 }
 
 export const TableFooter = observer(function TableFooter({
@@ -95,7 +95,7 @@ export const TableFooter = observer(function TableFooter({
           type="button"
           name='reload'
           viewBox="0 0 16 16"
-          disabled={model.isLoading()}
+          disabled={model.isLoading() || model.isDisabled(resultIndex)}
           onClick={() => model.refresh()}
         />
       </reload>
@@ -105,7 +105,7 @@ export const TableFooter = observer(function TableFooter({
             ref={ref}
             type="number"
             value={model.countGain}
-            disabled={model.isLoading()}
+            disabled={model.isLoading() || model.isDisabled(resultIndex)}
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
           />

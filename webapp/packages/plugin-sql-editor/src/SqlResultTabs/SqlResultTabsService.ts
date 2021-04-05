@@ -95,9 +95,8 @@ export class SqlResultTabsService {
 
     source.setOptions({
       tabId: tabId,
-      group: tabGroup,
+      query: sqlQueryParams.query,
       connectionId: sqlQueryParams.connectionId,
-      sourceName: sqlQueryParams.query,
       constraints: [],
       whereFilter: '',
     })

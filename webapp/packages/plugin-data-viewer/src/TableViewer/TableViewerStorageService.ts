@@ -29,8 +29,8 @@ export class TableViewerStorageService {
     return this.tableModelMap.has(tableId);
   }
 
-  get(tableId: string): DataModelWrapper | undefined {
-    return this.tableModelMap.get(tableId) as DataModelWrapper;
+  get<T extends IDatabaseDataModel<any, any>>(tableId: string): T | undefined {
+    return this.tableModelMap.get(tableId) as any;
   }
 
   /**
