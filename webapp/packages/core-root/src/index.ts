@@ -1,4 +1,6 @@
 export * from './ConnectionNavigatorViewSettings';
+export * from './NetworkError';
+export * from './NetworkStateService';
 export * from './PermissionsResource';
 export * from './PermissionsService';
 export * from './ServerConfigResource';

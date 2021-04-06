@@ -78,6 +78,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { ProductManagerService, ProductSettingsService } from '@cloudbeaver/core-product';
 import {
+  NetworkStateService,
   SessionService,
   ServerService,
   PermissionsService,
@@ -104,6 +105,7 @@ export const coreManifest: PluginManifest = {
 
   providers: [
     RouterService, // important, should be first because the router starts in load phase first after all plugins register phase
+    NetworkStateService,
     AdministrationLocaleService,
     AdministrationTopAppBarService,
     AdministrationScreenService,
