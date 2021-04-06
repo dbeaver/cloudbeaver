@@ -250,7 +250,6 @@ export class ServerConfigurationService {
 
     this.serverConfigResource.unlinkUpdate();
     this.stateLinked = false;
-    console.log('unlinked');
   }
 }
 
