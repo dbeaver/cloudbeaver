@@ -38,7 +38,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
   readonly error = new GQLErrorCatcher();
   private isDistructed = false;
   private link!: boolean;
-  admin: boolean;
+  private admin: boolean;
   private close!: () => void;
 
   constructor(
@@ -47,7 +47,7 @@ export class AuthDialogController implements IInitializableController, IDestruct
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService
   ) {
-    makeObservable(this, {
+    makeObservable<AuthDialogController, 'admin'>(this, {
       provider: observable,
       isAuthenticating: observable,
       credentials: observable,
@@ -62,6 +62,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
     this.link = link;
     this.close = onClose;
     this.loadProviders();
+  }
+
+  setAdminMode(mode: boolean): void {
+    if (this.admin !== mode) {
+      this.admin = mode;
+
+      this.selectFirstAvailable();
+    }
   }
 
   destruct(): void {
@@ -104,11 +112,15 @@ export class AuthDialogController implements IInitializableController, IDestruct
     try {
       await this.authProvidersResource.loadAll();
 
-      if (this.providers.length > 0) {
-        this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
-      }
+      this.selectFirstAvailable();
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t load auth providers');
+    }
+  }
+
+  private selectFirstAvailable(): void {
+    if (this.providers.length > 0) {
+      this.provider = this.providers.find(provider => provider.defaultProvider) ?? this.providers[0];
     }
   }
 

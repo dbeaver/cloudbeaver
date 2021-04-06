@@ -107,7 +107,7 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
   if (provider) {
     controller.selectProvider(provider);
   } else {
-    controller.admin = administrationScreenService.activeScreen !== null;
+    controller.setAdminMode(administrationScreenService.activeScreen !== null);
   }
 
   const showTabs = !provider && controller.providers.length > 1;
