@@ -8,12 +8,16 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { RouterService } from '@cloudbeaver/core-routing';
 
 @injectable()
 export class NavigationService {
   readonly navigationTask: IExecutor<any>;
 
-  constructor() {
+  constructor(
+    routerService: RouterService
+  ) {
     this.navigationTask = new Executor();
+    routerService.transitionTask.before(this.navigationTask);
   }
 }

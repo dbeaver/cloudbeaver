@@ -6,16 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useRef } from 'react';
-
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
+import type { DatabaseConnection } from '../Administration/ConnectionsResource';
 import type { IConnectionFormData } from './ConnectionFormService';
 
 interface IState {
   config: ConnectionConfig | undefined;
   connectionId: string | undefined;
   driverId: string | undefined;
+  info: DatabaseConnection | undefined;
 }
 
 export function useConnectionData(
@@ -25,25 +26,29 @@ export function useConnectionData(
   const connectionId = data.info?.id || data.config.connectionId;
   const driverId = data.info?.driverId || data.config.driverId;
 
-  const lastDataRef = useRef<IState>({
+  const lastDataRef = useObjectRef<IState>({
     connectionId: undefined,
     driverId: undefined,
     config: undefined,
-  });
+    info: undefined,
+  }, {});
 
   if (
-    lastDataRef.current.connectionId !== connectionId
-    || lastDataRef.current.driverId !== driverId
-    || lastDataRef.current.config !== data.config
+    lastDataRef.connectionId !== connectionId
+    || lastDataRef.driverId !== driverId
+    || lastDataRef.config !== data.config
+    || lastDataRef.info !== data.info
   ) {
     fill(
       data,
-      lastDataRef.current.connectionId !== null
-      || lastDataRef.current.driverId !== null
-      || lastDataRef.current.config !== data.config
+      lastDataRef.connectionId !== null
+      || lastDataRef.driverId !== null
+      || lastDataRef.config !== data.config
+      || lastDataRef.info !== data.info
     );
-    lastDataRef.current.connectionId = connectionId;
-    lastDataRef.current.driverId = driverId;
-    lastDataRef.current.config = data.config;
+    lastDataRef.connectionId = connectionId;
+    lastDataRef.driverId = driverId;
+    lastDataRef.config = data.config;
+    lastDataRef.info = data.info;
   }
 }
