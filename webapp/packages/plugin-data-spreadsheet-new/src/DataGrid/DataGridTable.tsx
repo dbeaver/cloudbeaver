@@ -77,7 +77,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     },
   });
 
-  const { onKeydownHandler } = useGridSelectedCellsCopy(model, resultIndex, gridSelectionContext);
+  const { onKeydownHandler } = useGridSelectedCellsCopy(model, resultIndex, tableData, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       dataGridRef.current?.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });

@@ -13,6 +13,7 @@ import { copyToClipboard } from '@cloudbeaver/core-utils';
 import { IDatabaseDataModel, IDatabaseResultSet, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
+import type { ITableData } from './TableDataContext';
 
 const EVENT_KEY_CODE = {
   C: 'KeyC',
@@ -21,42 +22,42 @@ const EVENT_KEY_CODE = {
 function copyGridSelectedDataToClipboard(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
+  tableData: ITableData,
   selectedCells: Map<number, number[]>
 ) {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const editor = model.source.getEditor(resultIndex);
+
   const orderedSelectedCells: Map<number, number[]> = new Map([...selectedCells].sort((a, b) => a[0] - b[0]));
 
   const selectedColumns: Set<number> = new Set();
-
   for (const colIndexes of orderedSelectedCells.values()) {
     for (const colIdx of colIndexes) {
       selectedColumns.add(colIdx);
     }
   }
 
-  const columns = [...selectedColumns].sort((a, b) => a - b);
-
-  let data = '';
+  const rowsValues: string[] = [];
   for (const [rowIdx, colIndexes] of orderedSelectedCells) {
-    for (const column of columns) {
-      if (column !== columns[0]) {
-        data += '\t';
+    const rowCellsValues: string[] = [];
+    for (const column of tableData.columns) {
+      const columnIdx = tableData.getDataColumnIndexFromKey(column.key);
+      if (columnIdx === null || !selectedColumns.has(columnIdx)) {
+        continue;
       }
 
-      if (colIndexes.includes(column)) {
-        const cell = editor.getCell(rowIdx, column);
+      if (colIndexes.includes(columnIdx)) {
+        const cell = editor.getCell(rowIdx, columnIdx);
         const cellValue = format.get(cell);
-        if (cellValue === null) {
-          continue;
-        }
-        data += cellValue;
+        rowCellsValues.push(cellValue ?? '');
+      } else {
+        rowCellsValues.push('');
       }
     }
-    data += '\r\n';
+    rowsValues.push(rowCellsValues.join('\t'));
   }
 
-  copyToClipboard(data);
+  copyToClipboard(rowsValues.join('\r\n'));
 }
 
 // needed for event.code
@@ -65,15 +66,17 @@ type IKeyboardEvent = React.KeyboardEvent<HTMLDivElement> & KeyboardEvent;
 export function useGridSelectedCellsCopy(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
+  tableData: ITableData,
   selectionContext: IDataGridSelectionContext
 ) {
-  const props = useObjectRef({ model, resultIndex, selectionContext });
+  const props = useObjectRef({ model, resultIndex, tableData, selectionContext });
 
   const onKeydownHandler = useCallback((event: IKeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.code === EVENT_KEY_CODE.C) {
       copyGridSelectedDataToClipboard(
         props.model,
         props.resultIndex,
+        props.tableData,
         props.selectionContext.selectedCells
       );
     }
