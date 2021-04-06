@@ -23,6 +23,7 @@ interface IActivationData {
   screen: IAdministrationItemRoute;
   configurationWizard: boolean;
   outside: boolean;
+  outsideAdminPage: boolean;
 }
 
 @injectable()
@@ -161,17 +162,19 @@ export class AdministrationItemService {
   async activate(
     screen: IAdministrationItemRoute,
     configurationWizard: boolean,
-    outside: boolean
+    outside: boolean,
+    outsideAdminPage: boolean
   ): Promise<void> {
-    await this.activationTask.execute({ screen, configurationWizard, outside });
+    await this.activationTask.execute({ screen, configurationWizard, outside, outsideAdminPage });
   }
 
   async deActivate(
     screen: IAdministrationItemRoute,
     configurationWizard: boolean,
-    outside: boolean
+    outside: boolean,
+    outsideAdminPage: boolean
   ): Promise<void> {
-    await this.deActivationTask.execute({ screen, configurationWizard, outside });
+    await this.deActivationTask.execute({ screen, configurationWizard, outside, outsideAdminPage });
   }
 
   async canActivate(
@@ -198,14 +201,19 @@ export class AdministrationItemService {
     return true;
   }
 
-  private activateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside }) => {
+  private activateHandler: IExecutorHandler<IActivationData> = async ({
+    screen,
+    configurationWizard,
+    outside,
+    outsideAdminPage,
+  }) => {
     let lastItem = 0;
     while (true) {
       const items = this.getActiveItems(configurationWizard);
       if (lastItem === items.length) {
         break;
       }
-      await items[lastItem]?.onLoad?.(configurationWizard, outside);
+      await items[lastItem]?.onLoad?.(configurationWizard, outside, outsideAdminPage);
       lastItem++;
     }
 
@@ -226,20 +234,25 @@ export class AdministrationItemService {
       return;
     }
 
-    await item.onActivate?.(configurationWizard, outside);
+    await item.onActivate?.(configurationWizard, outside, outsideAdminPage);
 
     if (screen.sub) {
       await this.getItemSub(item, screen.sub)?.onActivate?.(screen.param, configurationWizard, outside);
     }
   };
 
-  private deActivateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside }) => {
+  private deActivateHandler: IExecutorHandler<IActivationData> = async ({
+    screen,
+    configurationWizard,
+    outside,
+    outsideAdminPage,
+  }) => {
     const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
       return;
     }
 
-    await item.onDeActivate?.(configurationWizard, outside);
+    await item.onDeActivate?.(configurationWizard, outside, outsideAdminPage);
 
     if (screen.sub) {
       await this.getItemSub(item, screen.sub)?.onDeActivate?.(screen.param, configurationWizard, outside);

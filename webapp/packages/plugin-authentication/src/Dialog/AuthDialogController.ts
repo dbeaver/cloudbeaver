@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AuthInfoService, AuthProvidersResource, AuthProvider } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AuthProvidersResource, AuthProvider, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -26,10 +26,14 @@ export class AuthDialogController implements IInitializableController, IDestruct
   }
 
   get providers(): AuthProvider[] {
-    let providers = this.authProvidersResource.values;
+    const providers = this.authProvidersResource.getEnabledProviders();
 
-    if (!this.admin) {
-      providers = this.authProvidersResource.getEnabledProviders();
+    if (this.admin && !this.authProvidersResource.isEnabled(AUTH_PROVIDER_LOCAL_ID)) {
+      const local = this.authProvidersResource.get(AUTH_PROVIDER_LOCAL_ID);
+
+      if (local) {
+        providers.push(local);
+      }
     }
 
     return providers.sort(this.compareProviders);

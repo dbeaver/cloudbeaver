@@ -112,6 +112,24 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     this.navigatorSettingsUpdate = update;
   }
 
+  unlinkUpdate(): void {
+    this.update = {};
+
+    if (this.data) {
+      Object.assign(this.navigatorSettingsUpdate, this.data.defaultNavigatorSettings);
+    } else {
+      this.navigatorSettingsUpdate = {
+        hideFolders: false,
+        hideSchemas: false,
+        hideVirtualModel: false,
+        mergeEntities: false,
+        showOnlyEntities: false,
+        showSystemObjects: false,
+        showUtilityObjects: false,
+      };
+    }
+  }
+
   async saveDefaultNavigatorSettings(): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });

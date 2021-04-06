@@ -92,6 +92,8 @@ export class ServerConfigurationService {
       .addPostHandler(this.ensureValidation);
 
     this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this));
+
+    this.administrationScreenService.activationEvent.addHandler(this.unlinkState.bind(this));
   }
 
   changed(): void {
@@ -239,6 +241,16 @@ export class ServerConfigurationService {
       persistent: true,
       onClose: () => { this.unSaveNotification = null; },
     });
+  }
+
+  private unlinkState(state: boolean): void {
+    if (state) {
+      return;
+    }
+
+    this.serverConfigResource.unlinkUpdate();
+    this.stateLinked = false;
+    console.log('unlinked');
   }
 }
 
