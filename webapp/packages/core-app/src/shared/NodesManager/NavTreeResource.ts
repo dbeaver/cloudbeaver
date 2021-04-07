@@ -9,6 +9,7 @@
 import { action, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -48,6 +49,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private graphQLService: GraphQLService,
     private navNodeInfoResource: NavNodeInfoResource,
     private coreSettingsService: CoreSettingsService,
+    private sessionDataResource: SessionDataResource
   ) {
     super();
 
@@ -64,6 +66,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       includes: [],
     }));
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
+    this.sessionDataResource.onDataUpdate.addPostHandler(() => this.markOutdated());
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {

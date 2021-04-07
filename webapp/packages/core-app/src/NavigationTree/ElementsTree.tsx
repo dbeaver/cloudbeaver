@@ -10,10 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
+import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { useChildren } from '../shared/useChildren';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { ITreeContext, TreeContext } from './TreeContext';
@@ -65,6 +67,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
 }) {
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
+  useMapResource(NavTreeResource, root || ROOT_NODE_PATH);
   const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({ filter: '' })));
 
   const treeNodesState = localState || localTreeNodesState;
