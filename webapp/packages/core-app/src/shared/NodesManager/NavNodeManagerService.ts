@@ -341,6 +341,7 @@ export class NavNodeManagerService extends Bootstrap {
     this.navTree.delete(ROOT_NODE_PATH);
     const enabled = await this.isNavTreeEnabled();
     if (enabled) {
+      // this.navTree.markOutdated(ROOT_NODE_PATH);
       await this.navTree.refresh(ROOT_NODE_PATH);
     }
   }
@@ -367,6 +368,7 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
+    // this.navTree.markOutdated(ROOT_NODE_PATH);
     await this.navTree.refresh(ROOT_NODE_PATH);
   }
 

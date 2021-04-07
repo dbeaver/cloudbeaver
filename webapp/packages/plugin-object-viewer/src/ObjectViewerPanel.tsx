@@ -10,10 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useChildren, TabHandlerPanelProps, NavigationTabsService } from '@cloudbeaver/core-app';
-import {
-  Loader, TabsBox, TabPanel, TextPlaceholder, Button
-} from '@cloudbeaver/core-blocks';
+import { useChildren, TabHandlerPanelProps } from '@cloudbeaver/core-app';
+import { Loader, TabsBox, TabPanel, TextPlaceholder, Button } from '@cloudbeaver/core-blocks';
 import { useConnectionInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -46,7 +44,6 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
   const translate = useTranslate();
   const connection = useConnectionInfo(tab.handlerState.connectionId || '');
-  const navigation = useService(NavigationTabsService);
   const style = useStyles(styles);
   const {
     children, isOutdated, isLoading, isLoaded,
@@ -56,8 +53,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
 
   const handleConnect = useCallback(async () => {
     await connection.connect();
-    navigation.selectTab(tab.id);
-  }, [navigation, connection, tab]);
+  }, [connection]);
 
   if (connection.connectionInfo) {
     if (connection.isLoading()) {

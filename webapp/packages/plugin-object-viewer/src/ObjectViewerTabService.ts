@@ -96,7 +96,7 @@ export class ObjectViewerTabService {
           connectionId: nodeInfo.connection?.id,
           objectId: nodeInfo.nodeId,
           parentId: nodeInfo.parentId,
-          parents: await nodeInfo.getParents(),
+          parents: nodeInfo.getParents(),
           folderId: nodeInfo.folderId,
           pageId: '',
           pagesState: {},

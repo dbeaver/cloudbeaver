@@ -9,12 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useFocus } from '@cloudbeaver/core-blocks';
+import { useFocus, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { useActiveView } from '@cloudbeaver/core-view';
 
 import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { ElementsTree } from './ElementsTree';
 import { NavigationTreeService } from './NavigationTreeService';
 import { useNavigationTree } from './useNavigationTree';
@@ -59,6 +60,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
   const { isSelected, handleOpen, handleSelect } = useNavigationTree();
+  useMapResource(NavTreeResource, ROOT_NODE_PATH);
 
   if (!isEnabled) {
     return null;
