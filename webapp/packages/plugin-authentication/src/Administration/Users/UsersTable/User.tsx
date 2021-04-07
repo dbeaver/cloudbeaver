@@ -15,6 +15,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { use } from '@reshadow/react';
 
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
@@ -22,6 +23,9 @@ import { UserEdit } from './UserEdit';
 const styles = css`
   TableColumnValue[expand] {
     cursor: pointer;
+  }
+  TableColumnValue[|gap] {
+    gap: 16px;
   }
 `;
 
@@ -45,7 +49,7 @@ export const User: React.FC<Props> = observer(function User({ user, selectable }
       </TableColumnValue>
       <TableColumnValue expand>{user.userId}</TableColumnValue>
       <TableColumnValue>{user.grantedRoles.join(', ')}</TableColumnValue>
-      <TableColumnValue flex>
+      <TableColumnValue flex {...use({ gap: true })}>
         <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
       </TableColumnValue>
     </TableItem>

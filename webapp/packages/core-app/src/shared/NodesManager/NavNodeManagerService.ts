@@ -13,7 +13,7 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
-  PermissionsService, EPermission, ServerService, SessionDataResource
+  PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
 import {
   GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
@@ -100,7 +100,6 @@ export class NavNodeManagerService extends Bootstrap {
     private connectionAuthService: ConnectionAuthService,
     private notificationService: NotificationService,
     private serverService: ServerService,
-    private sessionDataResource: SessionDataResource,
     navigationService: NavigationService
   ) {
     super();
@@ -117,8 +116,8 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionDataResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
-    this.connectionInfo.onSessionUpdate.addHandler(this.connectionRefreshHandler.bind(this));
+    // this.sessionDataResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
+    // this.connectionInfo.onSessionUpdate.addHandler(this.connectionRefreshHandler.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
