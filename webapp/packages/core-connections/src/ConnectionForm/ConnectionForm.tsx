@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import {
   TabsState, TabList,
-  Button, BORDER_TAB_STYLES, TabPanelList, Placeholder, useObjectRef
+  Button, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -24,12 +24,8 @@ import { useConnectionFormState } from './useConnectionFormState';
 
 const styles = composes(
   css`
-    Tab {
-      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
-
     TabList {
-      composes: theme-background-surface theme-text-on-surface from global;
+      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     }
 
     box {
@@ -42,7 +38,23 @@ const styles = composes(
   `,
   css`
     TabList {
+      position: relative;
       flex-shrink: 0;
+      align-items: center;
+    
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-bottom: solid 2px;
+        border-color: inherit;
+      }
+    }
+    Tab {
+      height: 46px!important;
+      text-transform: uppercase;
+      font-weight: 500 !important;
     }
     box {
       display: flex;
@@ -74,6 +86,7 @@ interface Props {
   options: IConnectionFormOptions;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig) => void;
+  className?: string;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
@@ -81,9 +94,10 @@ export const ConnectionForm = observer(function ConnectionForm({
   options,
   onCancel = () => {},
   onSave = () => {},
+  className,
 }: Props) {
   const props = useObjectRef({ onSave });
-  const style = [styles, BORDER_TAB_STYLES];
+  const style = [styles, UNDERLINE_TAB_STYLES];
   const translate = useTranslate();
   const service = useService(ConnectionFormService);
   const formState = useConnectionFormState(data, options);
@@ -108,8 +122,8 @@ export const ConnectionForm = observer(function ConnectionForm({
       form={formState}
       options={options}
     >
-      <box as='div'>
-        <TabList style={style}>
+      <box as='div' className={className}>
+        <TabList style={style} disabled={formState.form.disabled}>
           <fill as="div" />
           <Placeholder container={service.actionsContainer} data={data} form={formState.form} options={options} />
           <Button

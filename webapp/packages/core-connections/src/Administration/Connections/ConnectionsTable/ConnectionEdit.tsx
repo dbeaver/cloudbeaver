@@ -33,7 +33,7 @@ const styles = composes(
       padding: 24px 0;
       display: flex;
       flex-direction: column;
-      height: 630px;
+      height: 640px;
     }
   `
 );
