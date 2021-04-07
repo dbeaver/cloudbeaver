@@ -14,7 +14,7 @@ import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutorHandler, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
 
@@ -55,6 +55,7 @@ export class ServerConfigurationService {
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
+    private readonly sessionDataResource: SessionDataResource
   ) {
     makeObservable<ServerConfigurationService, 'done'>(this, {
       state: observable,
@@ -192,6 +193,9 @@ export class ServerConfigurationService {
       await this.serverConfigResource.saveDefaultNavigatorSettings();
       if (!data.configurationWizard || data.finish) {
         await this.serverConfigResource.save();
+      }
+      if (data.configurationWizard && data.finish) {
+        await this.sessionDataResource.refresh();
       }
     } catch (exception) {
       this.notificationService.logException(exception, 'Can\'t save server configuration');
