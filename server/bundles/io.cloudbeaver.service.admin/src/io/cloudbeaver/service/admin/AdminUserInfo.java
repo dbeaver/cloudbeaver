@@ -94,7 +94,12 @@ public class AdminUserInfo {
         return result.toArray(new WebUserOriginInfo[0]);
     }
 
-    public String[] getUserLinkedProviders() throws DBWebException {
+    @Property
+    public String[] getLinkedAuthProviders() throws DBWebException {
+        return getUserLinkedProviders();
+    }
+
+    private String[] getUserLinkedProviders() throws DBWebException {
         if (userLinkedProviders != null) {
             return userLinkedProviders;
         }
