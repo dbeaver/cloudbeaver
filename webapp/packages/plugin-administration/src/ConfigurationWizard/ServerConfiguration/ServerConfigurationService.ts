@@ -9,10 +9,10 @@
 import { observable, makeObservable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ActionSnackbarProps, PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ActionSnackbar, ActionSnackbarProps, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { INotification, NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor, IExecutorHandler, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
@@ -39,6 +39,7 @@ export class ServerConfigurationService {
   state: IServerConfigurationPageState;
   loading: boolean;
 
+  readonly routeName: string;
   readonly loadConfigTask: IExecutor<ILoadConfigData>;
   readonly prepareConfigTask: IExecutor<IServerConfigSaveData>;
   readonly saveTask: IExecutor<IServerConfigSaveData>;
@@ -61,6 +62,7 @@ export class ServerConfigurationService {
       done: observable,
     });
 
+    this.routeName = 'configuration';
     this.stateLinked = false;
     this.done = false;
     this.loading = true;
@@ -79,7 +81,7 @@ export class ServerConfigurationService {
       .addHandler(this.loadServerConfig)
       .addPostHandler(() => {
         this.loading = false;
-        this.showUnsavedNotification();
+        this.showUnsavedNotification(false);
       });
 
     this.saveTask
@@ -91,17 +93,21 @@ export class ServerConfigurationService {
       .addHandler(this.validateForm)
       .addPostHandler(this.ensureValidation);
 
-    this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this));
+    this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this, false));
 
     this.administrationScreenService.activationEvent.addHandler(this.unlinkState.bind(this));
   }
 
   changed(): void {
     this.done = false;
+
+    this.showUnsavedNotification(true);
   }
 
-  deactivate(): void {
-    this.showUnsavedNotification();
+  deactivate(configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean): void {
+    if (!outsideAdminPage) {
+      this.showUnsavedNotification(false);
+    }
   }
 
   async loadConfig(reset = false): Promise<void> {
@@ -223,7 +229,7 @@ export class ServerConfigurationService {
     return true;
   }
 
-  private showUnsavedNotification() {
+  private showUnsavedNotification(close: boolean) {
     if (
       !this.serverConfigResource.isChanged()
       && !this.serverConfigResource.isNavigatorSettingsChanged()
@@ -232,13 +238,17 @@ export class ServerConfigurationService {
       return;
     }
 
-    if (this.unSaveNotification || this.administrationScreenService.isConfigurationMode) {
+    if (close || this.unSaveNotification || this.administrationScreenService.isConfigurationMode) {
       return;
     }
 
-    this.unSaveNotification = this.notificationService.logInfo({
-      title: 'administration_configuration_wizard_configuration_server_info_unsaved',
-      persistent: true,
+    this.unSaveNotification = this.notificationService.customNotification(() => ActionSnackbar, {
+      actionText: 'administration_configuration_wizard_configuration_server_info_unsaved_navigate',
+      onAction: () => this.administrationScreenService.navigateToItem(this.routeName),
+    }, {
+      title: 'administration_configuration_wizard_configuration_server_info_unsaved_title',
+      message: 'administration_configuration_wizard_configuration_server_info_unsaved_message',
+      type: ENotificationType.Info,
       onClose: () => { this.unSaveNotification = null; },
     });
   }
@@ -248,6 +258,7 @@ export class ServerConfigurationService {
       return;
     }
 
+    this.unSaveNotification?.close(true);
     this.serverConfigResource.unlinkUpdate();
     this.stateLinked = false;
   }

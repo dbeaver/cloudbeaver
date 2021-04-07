@@ -39,7 +39,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       getDrawerComponent: () => WelcomeDrawerItem,
     });
     this.administrationItemService.create({
-      name: 'configuration',
+      name: this.serverConfigurationService.routeName,
       type: AdministrationItemType.Default,
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
@@ -57,7 +57,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       },
       order: 4,
       onActivate: () => this.serverConfigurationService.loadConfig(),
-      onDeActivate: () => this.serverConfigurationService.deactivate(),
+      onDeActivate: this.serverConfigurationService.deactivate.bind(this.serverConfigurationService),
       onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService, false),
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
