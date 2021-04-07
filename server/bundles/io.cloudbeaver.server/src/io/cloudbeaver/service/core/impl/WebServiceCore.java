@@ -299,8 +299,8 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean deleteConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
-        if (!connectionInfo.isTemplate() && !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
-            throw new DBWebException("Connection delete is restricted by server configuration");
+        if (connectionInfo.getDataSourceContainer().getProject() != webSession.getSingletonProject()) {
+            throw new DBWebException("Global connection '" + connectionInfo.getName() + "' configuration cannot be deleted");
         }
         closeAndDeleteConnection(webSession, connectionId, true);
         return true;
@@ -322,7 +322,6 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
 
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-        ((DataSourceDescriptor) newDataSource).setTemplate(true);
         if (!CommonUtils.isEmpty(connectionName)) {
             newDataSource.setName(connectionName);
         }
