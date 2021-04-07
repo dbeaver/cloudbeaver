@@ -60,7 +60,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
   const { isSelected, handleOpen, handleSelect } = useNavigationTree();
-  useMapResource(NavTreeResource, ROOT_NODE_PATH);
+  useMapResource(NavTreeResource, isEnabled ? ROOT_NODE_PATH : null);
 
   if (!isEnabled) {
     return null;
