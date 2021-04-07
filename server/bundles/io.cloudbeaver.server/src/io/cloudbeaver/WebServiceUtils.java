@@ -236,7 +236,12 @@ public class WebServiceUtils {
         }
     }
 
-    public static void saveAuthProperties(DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration, Map<String, Object> authProperties, boolean saveCredentials) {
+    public static void saveAuthProperties(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        @Nullable Map<String, Object> authProperties,
+        boolean saveCredentials)
+    {
         dataSourceContainer.setSavePassword(saveCredentials);
         if (!saveCredentials) {
             // Reset credentials
@@ -246,6 +251,9 @@ public class WebServiceUtils {
                 // No changes
                 return;
             }
+        }
+        if (!saveCredentials) {
+            configuration.setUserPassword(null);
         }
         {
             // Read save credentials
