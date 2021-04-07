@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionForm, useConnectionFormData, IConnectionFormDataOptions, IConnectionFormOptions, IConnectionFormSubmitData } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionForm, useConnectionFormData, IConnectionFormDataOptions, IConnectionFormOptions } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
@@ -21,6 +21,9 @@ import { PublicConnectionFormService } from './PublicConnectionFormService';
 const styles = css`
   Loader {
     height: 100%;
+  }
+  ConnectionForm {
+    padding-top: 16px;
   }
 `;
 
@@ -46,7 +49,7 @@ const PublicConnectionFormRenderer: React.FC<Props> = observer(function PublicCo
 
   return styled(styles)(
     <Loader state={connection}>
-      {() => (
+      {() => styled(styles)(
         <ConnectionForm
           data={data}
           options={options}

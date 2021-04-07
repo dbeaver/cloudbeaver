@@ -46,7 +46,7 @@ export const TabList: React.FC<Props> = observer(function TabList({
             component={tabInfo.tab?.()}
             {...state.props}
             style={style}
-            disabled={tabInfo.isDisabled?.(tabInfo.key, state.props)}
+            disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
             onOpen={tabInfo.onOpen}
             onClose={tabInfo.onClose}
           />
