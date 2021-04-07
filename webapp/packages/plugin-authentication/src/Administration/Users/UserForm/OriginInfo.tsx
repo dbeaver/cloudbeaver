@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -49,10 +49,17 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     try {
       const userOrigin = await usersResource.load(user.userId, ['customIncludeOriginDetails']);
       const propertiesState = {} as Record<string, any>;
-      for (const property of userOrigin.origin.details!) {
+
+      let origin = userOrigin.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+
+      if (!origin) {
+        origin = userOrigin.origins[0];
+      }
+
+      for (const property of origin.details!) {
         propertiesState[property.id!] = property.value;
       }
-      state.properties = userOrigin.origin.details!;
+      state.properties = origin.details!;
       state.state = propertiesState;
       state.loaded = true;
     } catch (error) {

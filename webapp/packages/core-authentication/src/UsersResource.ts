@@ -75,10 +75,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
-      origin: {
+      origins: [{
         type: AUTH_PROVIDER_LOCAL_ID,
         displayName: 'Local',
-      },
+      }],
+      linkedAuthProviders: [AUTH_PROVIDER_LOCAL_ID],
     };
   }
 
@@ -210,5 +211,5 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 }
 
 export function isLocalUser(user: AdminUser): boolean {
-  return user.origin.type === AUTH_PROVIDER_LOCAL_ID;
+  return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
 }

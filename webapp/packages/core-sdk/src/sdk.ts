@@ -870,7 +870,8 @@ export interface AdminUserInfo {
   configurationParameters: Scalars['Object'];
   grantedRoles: Array<Scalars['ID']>;
   grantedConnections: AdminConnectionGrantInfo[];
-  origin: ObjectOrigin;
+  origins: ObjectOrigin[];
+  linkedAuthProviders: Array<Scalars['String']>;
 }
 
 export interface AdminRoleInfo {
@@ -936,7 +937,7 @@ export interface UserAuthToken {
 }
 
 export interface UserInfo {
-  userId: Scalars['String'];
+  userId: Scalars['ID'];
   displayName?: Maybe<Scalars['String']>;
   authTokens: UserAuthToken[];
   linkedAuthProviders: Array<Scalars['String']>;
@@ -1326,8 +1327,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminUserInfoFragment = (
-  Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
-  & { origin: ObjectOriginInfoFragment }
+  Pick<AdminUserInfo, 'userId' | 'grantedRoles' | 'linkedAuthProviders'>
+  & { origins: ObjectOriginInfoFragment[] }
 );
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
@@ -1645,7 +1646,8 @@ export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
-  origin {
+  linkedAuthProviders
+  origins {
     ...ObjectOriginInfo
   }
 }
