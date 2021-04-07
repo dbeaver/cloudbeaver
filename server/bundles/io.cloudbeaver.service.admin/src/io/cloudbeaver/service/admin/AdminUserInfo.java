@@ -16,21 +16,22 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.DBWAuthProviderExternal;
 import io.cloudbeaver.DBWConnectionGrant;
-import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebRole;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.CommonUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +43,8 @@ public class AdminUserInfo {
 
     private final WebSession session;
     private final WebUser user;
+    private String[] userLinkedProviders;
+
 
     public AdminUserInfo(WebSession session, WebUser user) {
         this.session = session;
@@ -78,16 +81,29 @@ public class AdminUserInfo {
     }
 
     @Property
-    public WebUserOriginInfo getOrigin() {
-        String providerId = user.getMetaParameter(DBWAuthProviderExternal.META_AUTH_PROVIDER);
-        if (CommonUtils.isEmpty(providerId)) {
-            providerId = LocalAuthProvider.PROVIDER_ID;
+    public WebUserOriginInfo[] getOrigins() throws DBWebException {
+        List<WebUserOriginInfo> result = new ArrayList<>();
+        for (String provider : getUserLinkedProviders()) {
+            WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(provider);
+            if (authProvider == null) {
+                log.error("Auth provider '" + provider + "' not found");
+            } else {
+                result.add(new WebUserOriginInfo(session, user, authProvider));
+            }
         }
-        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(providerId);
-        if (authProvider == null) {
-            log.error("Auth provider '" + providerId + "' not found");
+        return result.toArray(new WebUserOriginInfo[0]);
+    }
+
+    public String[] getUserLinkedProviders() throws DBWebException {
+        if (userLinkedProviders != null) {
+            return userLinkedProviders;
         }
-        return new WebUserOriginInfo(session, user, authProvider);
+        try {
+            userLinkedProviders = CBApplication.getInstance().getSecurityController().getUserLinkedProviders(user.getUserId());
+        } catch (DBCException e) {
+            throw new DBWebException("Error reading user linked providers", e);
+        }
+        return userLinkedProviders;
     }
 
 }
