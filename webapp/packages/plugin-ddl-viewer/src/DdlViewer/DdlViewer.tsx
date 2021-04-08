@@ -19,6 +19,7 @@ const styles = css`
   wrapper {
     flex: 1;
     overflow: auto;
+    composes: theme-typography--body1 from global;
   }
   CodeEditor {
     height: 100%;
