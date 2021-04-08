@@ -9,10 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoFormNew, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 import { css } from '@reshadow/react';
 
 import type { IConnectionFormTabProps } from '../ConnectionFormService';
@@ -29,6 +32,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
 }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
+  const userInfoService = useService(UserInfoResource);
   const state = useTabState<Record<string, any>>(() => ({}));
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
@@ -36,6 +40,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
     key: tab.selected ? data.info!.id : null,
     includes: ['includeOrigin', 'customIncludeOriginDetails'],
   }, {
+    isActive: () => !data.info?.origin || userInfoService.hasOrigin(data.info.origin),
     onData: (connection, res, prev) => {
       if (!connection.origin.details) {
         return;
@@ -67,6 +72,16 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormTabProps> = o
     return styled(styles)(
       <ColoredContainer>
         <ExceptionMessage exception={connection.exception} onRetry={connection.reload} />
+      </ColoredContainer>
+    );
+  }
+
+  const authorized = !data.info?.origin || userInfoService.hasOrigin(data.info.origin);
+
+  if (!authorized && data.info?.origin) {
+    return styled(styles)(
+      <ColoredContainer parent vertical>
+        <AuthenticationProvider origin={data.info.origin} onAuthenticate={connection.reload} />
       </ColoredContainer>
     );
   }

@@ -24,6 +24,7 @@ const styles = css`
 `;
 
 export type Props = {
+  onAuthenticate?: () => void;
   children?: () => React.ReactNode;
   className?: string;
 } & ({
@@ -55,8 +56,9 @@ export const AuthenticationProvider: React.FC<Props> = observer(function Authent
     return props.children?.() as null || null;
   }
 
-  function handleAuth() {
-    authProviderService.requireProvider(type, subType);
+  async function handleAuth() {
+    await authProviderService.requireProvider(type, subType);
+    props.onAuthenticate?.();
   }
 
   return styled(style)(

@@ -15,6 +15,7 @@ import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, 
 import { useObjectRef } from './useObjectRef';
 
 interface IActions<TResource extends CachedMapResource<any, any, any>> {
+  isActive?: () => Promise<boolean> | boolean;
   onLoad?: (resource: TResource) => Promise<any> | any;
   onData?: (
     data: CachedMapResourceValue<TResource>,
@@ -88,7 +89,9 @@ export function useMapResource<
   refObj.load = async function load() {
     const { loading, resource, actions, prevData } = refObj;
 
-    if (loading) {
+    const active = await actions?.isActive?.();
+
+    if (loading || active === false) {
       return;
     }
 

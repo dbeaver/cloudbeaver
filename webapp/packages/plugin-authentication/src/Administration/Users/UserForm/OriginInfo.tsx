@@ -8,12 +8,13 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
 
@@ -31,7 +32,9 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
 }) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
+  const userInfoService = useService(UserInfoResource);
   const state = useTabState<IState>(() => ({
+    origin: null,
     properties: [],
     state: {},
     loading: false,
@@ -39,8 +42,16 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     exception: null,
   }));
 
+  let origin = user.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
+
+  if (!origin) {
+    origin = user.origins[0];
+  }
+
+  const authorized = userInfoService.hasOrigin(origin);
+
   const load = async () => {
-    if (state.loaded) {
+    if (state.loaded || !origin || !userInfoService.hasOrigin(origin)) {
       return;
     }
     state.loading = true;
@@ -91,7 +102,15 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
     );
   }
 
-  if (state.properties.length === 0) {
+  if (!authorized) {
+    return (
+      <FormBox>
+        <AuthenticationProvider origin={origin} onAuthenticate={load} />
+      </FormBox>
+    );
+  }
+
+  if (!origin || (state.loaded && state.properties.length === 0)) {
     return (
       <FormBox>
         <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>

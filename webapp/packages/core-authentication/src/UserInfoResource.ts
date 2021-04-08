@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AuthProviderService } from './AuthProviderService';
 
@@ -33,6 +33,14 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
 
   getId(): string {
     return this.data?.userId || 'anonymous';
+  }
+
+  hasOrigin(origin: ObjectOrigin): boolean {
+    if (!this.data) {
+      return false;
+    }
+
+    return this.hasToken(origin.type, origin.subType);
   }
 
   hasToken(type: string, subType?: string): boolean {
