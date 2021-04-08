@@ -10,7 +10,7 @@ import { action, observable, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { PermissionsService, EPermission, PermissionsResource } from '@cloudbeaver/core-root';
+import { PermissionsService, EPermission, PermissionsResource, SessionExpireService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -26,7 +26,7 @@ export class LogViewerService {
   }
 
   private log: ILogEntry[] = [];
-  private interval: any = null;
+  private timeoutTaskId: any = null;
   private failedRequestsCount = 0;
   private maxFailedRequests = 0;
 
@@ -36,6 +36,7 @@ export class LogViewerService {
     private notificationService: NotificationService,
     private permissionsService: PermissionsService,
     private permissionsResource: PermissionsResource,
+    private sessionExpireService: SessionExpireService
   ) {
     makeObservable<LogViewerService, 'log' | 'addNewEntries'>(this, {
       _isActive: observable,
@@ -66,19 +67,18 @@ export class LogViewerService {
     if (!this.isLogViewerAvailable()) {
       throw new Error('Access denied');
     }
+    this.failedRequestsCount = 0;
     this._isActive = true;
-    await this.updateLog();
     const refreshInterval = this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout');
     this.maxFailedRequests = this.coreSettingsService.settings.getValue('app.logViewer.maxFailedRequests');
-    this.interval = setInterval(() => {
-      this.updateLog();
-    }, refreshInterval);
+
+    this.runInterval(refreshInterval);
   }
 
   stopLog(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = null;
+    if (this.timeoutTaskId) {
+      clearTimeout(this.timeoutTaskId);
+      this.timeoutTaskId = null;
     }
     this._isActive = false;
   }
@@ -108,16 +108,24 @@ export class LogViewerService {
     }
   }
 
-  private async updateLog() {
-    if (!this.isLogViewerAvailable()) {
-      return;
-    }
+  private runInterval(refreshInterval: number) {
+    this.timeoutTaskId = setTimeout(async () => {
+      await this.updateLog();
 
+      if (this._isActive) {
+        this.runInterval(refreshInterval);
+      }
+    }, refreshInterval);
+  }
+
+  private async updateLog() {
     try {
       const newEntries = await this.loadLog();
       this.addNewEntries(newEntries);
     } catch (e) {
-      this.notificationService.logException(e, 'Failed to load log');
+      if (this.failedRequestsCount === 0 && !this.sessionExpireService.sessionExpired) {
+        this.notificationService.logException(e, 'Failed to load log');
+      }
 
       this.failedRequestsCount++;
       if (this.failedRequestsCount === this.maxFailedRequests) {

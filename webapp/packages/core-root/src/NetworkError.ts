@@ -1,3 +1,4 @@
+
 /*
  * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2021 DBeaver Corp and others
@@ -6,12 +7,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-
-export interface IDatabaseDataResult {
-  id: string;
-  dataFormat: ResultDataFormat;
-  loadedFully: boolean;
-  updateRowCount: number;
-  data: any;
+export class NetworkError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'NetworkError';
+  }
 }

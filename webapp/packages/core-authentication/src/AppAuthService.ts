@@ -42,8 +42,7 @@ export class AppAuthService extends Bootstrap {
 
     const user = await this.userInfoResource.load();
 
-    return !!config.authenticationEnabled
-      && !config.configurationMode
+    return !config.configurationMode
       && !config.anonymousAccessEnabled
       && user === null;
   }

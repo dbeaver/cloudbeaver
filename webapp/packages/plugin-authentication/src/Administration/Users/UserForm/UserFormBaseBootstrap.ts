@@ -33,7 +33,7 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'origin',
       order: 2,
-      isHidden: (tabId, props) => props?.user.origin.type === AUTH_PROVIDER_LOCAL_ID,
+      isHidden: (tabId, props) => !props?.user.origins.some(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID),
       panel: () => OriginInfo,
       tab: () => OriginInfoTab,
     });

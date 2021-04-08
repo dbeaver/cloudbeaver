@@ -93,6 +93,7 @@ export const TablePresentationBar = observer(function TablePresentationBar({
               key={presentation.id}
               presentation={presentation}
               model={model}
+              resultIndex={resultIndex}
               style={styles}
             />
           ))}

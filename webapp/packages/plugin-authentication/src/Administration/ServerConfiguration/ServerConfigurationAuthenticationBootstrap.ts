@@ -32,7 +32,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
   load(): void { }
 
   private loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
-    if (!data.reload) {
+    if (!data.reset) {
       return;
     }
 
@@ -55,7 +55,6 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       }
 
       data.state.serverConfig.anonymousAccessEnabled = config.anonymousAccessEnabled;
-      data.state.serverConfig.authenticationEnabled = config.authenticationEnabled;
       data.state.serverConfig.enabledAuthProviders = [...config.enabledAuthProviders];
     } catch (exception) {
       ExecutorInterrupter.interrupt(contexts);

@@ -55,6 +55,7 @@ const styles = composes(
       position: relative;
       display: flex;
       flex-direction: column;
+      padding-top: 16px;
       flex: 1;
       overflow: auto;
     }
@@ -77,10 +78,6 @@ const styles = composes(
       display: flex;
       font-weight: 400;
       flex: auto 0 0;
-    }
-
-    IconButton {
-      color: rgba(0, 0, 0, 0.45);
     }
 
     StaticImage {

@@ -13,11 +13,11 @@ import {
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DetailsError } from '@cloudbeaver/core-sdk';
 
-import type { DataModelWrapper } from '../../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { ErrorDialog } from '../../ErrorDialog';
 
 export interface ITableFooterMenuContext {
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any>;
   resultIndex: number;
 }
 
@@ -75,7 +75,7 @@ export class TableFooterMenuService {
     });
   }
 
-  constructMenuWithContext(model: DataModelWrapper, resultIndex: number): IMenuItem[] {
+  constructMenuWithContext(model: IDatabaseDataModel<any>, resultIndex: number): IMenuItem[] {
     const context: IMenuContext<ITableFooterMenuContext> = {
       menuId: this.tableFooterMenuToken,
       contextId: model.id,
@@ -89,7 +89,7 @@ export class TableFooterMenuService {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
   }
 
-  private async saveData(model: DataModelWrapper) {
+  private async saveData(model: IDatabaseDataModel<any>) {
     while (true) {
       try {
         await model.source.saveData();

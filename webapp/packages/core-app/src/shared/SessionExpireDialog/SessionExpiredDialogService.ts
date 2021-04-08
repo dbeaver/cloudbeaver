@@ -8,7 +8,7 @@
 
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { SessionExpireService } from '@cloudbeaver/core-root';
 
@@ -25,15 +25,15 @@ export class SessionExpiredDialogService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionExpireService.onSessionExpire.subscribe(this.handleSessionExpired.bind(this));
+    this.sessionExpireService.onSessionExpire.addHandler(this.handleSessionExpired.bind(this));
   }
 
   load(): void | Promise<void> { }
 
   private async handleSessionExpired(): Promise<void> {
-    try {
-      await this.commonDialogService.open(SessionExpiredDialog, null);
-    } finally {
+    const state = await this.commonDialogService.open(SessionExpiredDialog, null);
+
+    if (state === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(() => ActionSnackbar, {
         actionText: 'app_root_session_expired_reload',
         onAction: () => location.reload(),

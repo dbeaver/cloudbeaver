@@ -26,7 +26,7 @@ export class ObjectFoldersController implements IInitializableController, IDestr
     private navigationTabsService: NavigationTabsService
   ) { }
 
-  getTabContainer() {
+  getTabContainer(): ObjectFoldersTabContainer {
     return this.tabContainer;
   }
 
@@ -43,7 +43,7 @@ export class ObjectFoldersController implements IInitializableController, IDestr
     });
   }
 
-  activateTab(folderId: string | null) {
+  private activateTab(folderId: string | null): void {
     try {
       this.tabContainer.activateTab(folderId);
     } catch {
@@ -52,7 +52,7 @@ export class ObjectFoldersController implements IInitializableController, IDestr
     }
   }
 
-  activateFirstTab() {
+  private activateFirstTab() {
     const firstTab = this.tabContainer.tabs[0];
     this.tabContainer.activateTab(firstTab?.tabId || null);
   }

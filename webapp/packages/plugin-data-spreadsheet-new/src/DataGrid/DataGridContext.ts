@@ -21,6 +21,7 @@ export interface IDataGridContext {
   model: IDatabaseDataModel<any>;
   resultIndex: number;
   columnResize: IExecutor<IColumnResizeInfo>;
+  isGridInFocus: () => boolean;
   getEditorPortal: () => HTMLDivElement | null;
   getDataGridApi: () => DataGridHandle | null;
 }

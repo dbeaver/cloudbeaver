@@ -10,7 +10,6 @@ query serverConfig {
     sessionExpireTime
 
     anonymousAccessEnabled
-    authenticationEnabled
 
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled

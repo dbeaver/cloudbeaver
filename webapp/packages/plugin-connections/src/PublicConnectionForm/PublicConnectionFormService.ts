@@ -12,6 +12,7 @@ import { ConnectionInfoResource, IConnectionFormDataOptions, IConnectionFormOpti
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
@@ -27,7 +28,8 @@ export class PublicConnectionFormService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly optionsPanelService: OptionsPanelService,
-    private readonly connectionInfoResource: ConnectionInfoResource
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly sessionDataResource: SessionDataResource
   ) {
     makeObservable(this, {
       dataOptions: observable,
@@ -43,6 +45,9 @@ export class PublicConnectionFormService {
     this.dataOptions = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.closeDeleted);
+    this.sessionDataResource.onDataOutdated.addHandler(() => {
+      this.close(true);
+    });
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {

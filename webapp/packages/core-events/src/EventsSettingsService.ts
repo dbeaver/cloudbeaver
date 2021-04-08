@@ -11,7 +11,7 @@ import { PluginManagerService } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   notificationsPool: 5,
-  maxPersistentAllow: 1,
+  maxPersistentAllow: 5,
 
 };
 

@@ -26,6 +26,7 @@ import org.jkiss.utils.CommonUtils;
  */
 public abstract class AbstractExternalAuthProvider<SESSION extends DBASession> implements DBWAuthProviderExternal<SESSION> {
 
+    @Deprecated
     protected void setUserOrigin(WebUser user, String type, String subType) {
         user.setMetaParameter(META_AUTH_PROVIDER, type);
         if (!CommonUtils.isEmpty(subType)) {

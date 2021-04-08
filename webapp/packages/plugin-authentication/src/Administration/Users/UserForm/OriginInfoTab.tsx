@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -22,9 +23,10 @@ export const OriginInfoTab: TabContainerTabComponent<IUserFormProps> = observer(
   style,
   ...rest
 }) {
+  const origin = user.origins.find(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
   return styled(useStyles(style))(
     <Tab {...rest} style={style}>
-      <TabTitle><Translate token={user.origin.displayName} /></TabTitle>
+      <TabTitle><Translate token={origin?.displayName || 'Origin'} /></TabTitle>
     </Tab>
   );
 });

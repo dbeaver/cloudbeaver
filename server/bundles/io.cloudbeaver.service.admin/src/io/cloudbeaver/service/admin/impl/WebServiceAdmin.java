@@ -396,6 +396,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 }
             }
 
+            boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
+
             CBApplication.getInstance().finishConfiguration(
                 config.getServerName(),
                 adminName,
@@ -405,7 +407,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig);
 
             // Refresh active session
-            webSession.forceUserRefresh(null);
+            if (configurationMode) {
+                // In config mode we always refresh because admin user doesn't exist yet
+                webSession.forceUserRefresh(null);
+            } else {
+                // Just reload session state
+                webSession.forceUserRefresh(webSession.getUser());
+            }
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
         }

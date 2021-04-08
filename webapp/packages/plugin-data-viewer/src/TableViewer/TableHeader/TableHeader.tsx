@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { DataModelWrapper } from '../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { TableHeaderService } from './TableHeaderService';
 
 const styles = css`
@@ -25,17 +25,19 @@ const styles = css`
 `;
 
 interface Props {
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
+  resultIndex: number;
 }
 
 export const TableHeader = observer(function TableHeader({
   model,
+  resultIndex,
 }: Props) {
   const service = useService(TableHeaderService);
 
   return styled(styles)(
     <table-header as="div">
-      <Placeholder container={service.tableHeaderPlaceholder} model={model} />
+      <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} />
     </table-header>
   );
 });

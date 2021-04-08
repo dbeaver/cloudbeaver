@@ -9,21 +9,18 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { GraphQLService, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataEditor } from './DatabaseDataModel/DatabaseDataEditor';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
+import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
+import type { IDatabaseExecutionContext } from './DatabaseDataModel/IDatabaseExecutionContext';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { FetchTableDataAsyncProcess } from './FetchTableDataAsyncProcess';
-import type { IExecutionContext } from './IExecutionContext';
 
-export interface IDataContainerOptions {
+export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
-  sourceName?: string; // TODO: should be refactored, used only in QueryDataSource
-  connectionId: string;
-  whereFilter: string;
-  constraints: SqlDataFilterConstraint[];
 }
 
 export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
@@ -46,6 +43,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     this.currentFetchTableProcess = null;
     this.executionContext = null;
     this.editor = new DatabaseDataEditor();
+  }
+
+  isDisabled(resultIndex: number): boolean {
+    return !this.getResult(resultIndex)?.data;
   }
 
   cancel(): boolean {
@@ -91,6 +92,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       this.requestInfo = {
         requestDuration: response?.duration || 0,
         requestMessage: response?.statusMessage || '',
+        source: null,
       };
 
       this.clearError();
@@ -102,6 +104,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       return response.results.map<IDatabaseResultSet>(result => ({
         id: result.resultSet?.id || '0',
         dataFormat: result.dataFormat!,
+        updateRowCount: result.updateRowCount || 0,
         loadedFully: (result.resultSet?.rows?.length || 0) < limit,
         data: result.resultSet,
       }));
@@ -142,6 +145,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         this.requestInfo = {
           requestDuration: response.result?.duration || 0,
           requestMessage: 'Saved successfully',
+          source: null,
         };
 
         const result = prevResults.find(result => result.id === update.resultId)!;
@@ -175,7 +179,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  private async ensureContextCreated(): Promise<IExecutionContext> {
+  private async ensureContextCreated(): Promise<IDatabaseExecutionContext> {
     if (!this.executionContext) {
       if (!this.options) {
         throw new Error('Options must be provided');
@@ -189,7 +193,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     connectionId: string,
     defaultCatalog?: string,
     defaultSchema?: string
-  ): Promise<IExecutionContext> {
+  ): Promise<IDatabaseExecutionContext> {
     const response = await this.graphQLService.sdk.sqlContextCreate({
       connectionId,
       defaultCatalog,

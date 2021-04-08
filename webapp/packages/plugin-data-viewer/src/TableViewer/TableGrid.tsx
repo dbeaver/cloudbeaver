@@ -11,14 +11,14 @@ import type { PropsWithChildren } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
-import type { DataModelWrapper } from './DataModelWrapper';
+import { TableStatistics } from './TableStatistics';
 
 type TableGridProps = PropsWithChildren<{
-  model: DataModelWrapper; // TODO: change to IDatabaseDataModel<any>
+  model: IDatabaseDataModel<any>;
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions;
   resultIndex: number;
@@ -37,8 +37,6 @@ export const TableGrid = observer(function TableGrid({
   presentation,
   resultIndex,
 }: TableGridProps) {
-  const translate = useTranslate();
-
   if (
     (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)
     || !model.source.hasResult(resultIndex)
@@ -56,7 +54,7 @@ export const TableGrid = observer(function TableGrid({
   const Presentation = presentation.getPresentationComponent();
 
   if (result?.loadedFully && !result.data) {
-    return <TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>;
+    return <TableStatistics model={model} resultIndex={resultIndex} />;
   }
 
   return styled(styles)(

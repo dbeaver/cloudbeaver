@@ -73,7 +73,7 @@ export const TableColumnValue = observer(function TableColumnValue({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      {flex && <td-flex as='div'>{children}</td-flex>}
+      {flex && <td-flex as='div' className={className}>{children}</td-flex>}
       {!flex && children}
     </td>
   );

@@ -10,7 +10,7 @@ import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration
 import { SettingsMenuService, TopNavService } from '@cloudbeaver/core-app';
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
@@ -21,7 +21,7 @@ import { UserInfo } from './UserInfo';
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private serverService: ServerService,
+    private serverConfigResource: ServerConfigResource,
     private authDialogService: AuthDialogService,
     private authenticationService: AuthenticationService,
     private authInfoService: AuthInfoService,
@@ -39,7 +39,7 @@ export class PluginBootstrap extends Bootstrap {
       {
         id: 'login',
         order: 0,
-        isHidden: () => !this.serverService.config.data?.authenticationEnabled || !!this.authInfoService.userInfo,
+        isHidden: () => this.serverConfigResource.enabledAuthProviders.length === 0 || !!this.authInfoService.userInfo,
         title: 'authentication_login',
         onClick: () => this.authDialogService.showLoginForm(),
       }

@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import type { DataModelWrapper } from '../../DataModelWrapper';
+import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { TableFooterMenuItem } from './TableFooterMenuItem';
 import { TableFooterMenuService } from './TableFooterMenuService';
 
@@ -28,7 +28,7 @@ const styles = css`
 
 interface TableFooterMenuProps {
   resultIndex: number;
-  model: DataModelWrapper;
+  model: IDatabaseDataModel<any, any>;
   className?: string;
 }
 

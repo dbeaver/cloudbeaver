@@ -13,8 +13,7 @@ import {
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState
 } from '@cloudbeaver/core-utils';
-
-import type { ISqlQueryParams } from '../ISqlEditorTabState';
+import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 const DELAY_BETWEEN_TRIES = 1000;
 
@@ -31,13 +30,14 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   }
 
   async start(
-    sqlQueryParams: ISqlQueryParams,
+    query: string,
+    context: IDatabaseExecutionContext,
     filter: SqlDataFilter,
     dataFormat: ResultDataFormat
   ): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(sqlQueryParams, filter, dataFormat);
+      const taskInfo = await this.executeQueryAsync(query, context, filter, dataFormat);
       await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -106,14 +106,15 @@ export class SQLQueryExecutionProcess extends Deferred<SqlExecuteInfo> {
   }
 
   private async executeQueryAsync(
-    sqlQueryParams: ISqlQueryParams,
+    query: string,
+    context: IDatabaseExecutionContext,
     filter: SqlDataFilter,
     dataFormat: ResultDataFormat
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
-      connectionId: sqlQueryParams.connectionId,
-      contextId: sqlQueryParams.contextId,
-      query: sqlQueryParams.query,
+      connectionId: context.connectionId,
+      contextId: context.contextId,
+      query,
       filter,
       dataFormat,
     });

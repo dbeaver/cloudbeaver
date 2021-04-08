@@ -72,9 +72,13 @@ export const Loader: React.FC<Props> = observer(function Loader({
       if ('loading' in element) {
         loading = element.loading;
         loaded = !loading;
-      } else if ('isLoading' in element) {
-        loaded = element.isLoaded();
-        loading = element.isLoading() || !loaded;
+      } else {
+        if ('isLoaded' in element) {
+          loaded = element.isLoaded();
+        }
+        if ('isLoading' in element) {
+          loading = element.isLoading();
+        }
       }
     }
   }
@@ -95,8 +99,14 @@ export const Loader: React.FC<Props> = observer(function Loader({
     return () => clearTimeout(id);
   }, [loading]);
 
-  if (children && loaded) {
-    return children();
+  if (children) {
+    if (loaded) {
+      return children();
+    }
+
+    if (!loading) {
+      return null;
+    }
   }
 
   if ((!isVisible && overlay) || !loading) {

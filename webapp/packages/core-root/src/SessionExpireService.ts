@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Subject } from 'rxjs';
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import {
   GQLError, GraphQLService, EServerErrorCode
 } from '@cloudbeaver/core-sdk';
@@ -17,13 +16,14 @@ import { SessionError } from './SessionError';
 
 @injectable()
 export class SessionExpireService extends Bootstrap {
-  private isNotifiedAboutExpiredSession = false;
+  sessionExpired = false;
 
-  onSessionExpire = new Subject();
+  onSessionExpire: IExecutor;
   constructor(
     private graphQLService: GraphQLService
   ) {
     super();
+    this.onSessionExpire = new Executor();
   }
 
   register(): void {
@@ -38,11 +38,11 @@ export class SessionExpireService extends Bootstrap {
     } catch (exception) {
       if (exception instanceof GQLError
         && exception.errorCode === EServerErrorCode.sessionExpired
-        && !this.isNotifiedAboutExpiredSession) {
+        && !this.sessionExpired) {
         const e = new SessionError('Session expired');
         this.graphQLService.blockRequests(e);
-        this.isNotifiedAboutExpiredSession = true;
-        this.onSessionExpire.next();
+        this.sessionExpired = true;
+        await this.onSessionExpire.execute();
       }
       throw exception;
     }

@@ -16,7 +16,6 @@ import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IActiveView } from '@cloudbeaver/core-view';
 
-import { CoreSettingsService } from '../CoreSettingsService';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeExtensionsService } from '../shared/NodesManager/NavNodeExtensionsService';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
@@ -45,7 +44,6 @@ export class NavigationTreeService {
     private connectionAuthService: ConnectionAuthService,
     private navNodeExtensionsService: NavNodeExtensionsService,
     private navTreeResource: NavTreeResource,
-    private coreSettingsService: CoreSettingsService,
     private navNodeInfoResource: NavNodeInfoResource
   ) {
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {

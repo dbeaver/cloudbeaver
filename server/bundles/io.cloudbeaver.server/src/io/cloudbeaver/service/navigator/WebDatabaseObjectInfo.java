@@ -132,14 +132,7 @@ public class WebDatabaseObjectInfo {
     @Property
     public String[] getFeatures() {
         List<String> features = new ArrayList<>();
-        if (object instanceof DBPScriptObject) features.add("script");
-        if (object instanceof DBPScriptObjectExt) features.add("scriptExtended");
-        if (object instanceof DBSDataContainer) features.add("dataContainer");
-        if (object instanceof DBSDataManipulator) features.add("dataManipulator");
-        if (object instanceof DBSEntity) features.add("entity");
-        if (object instanceof DBSSchema) features.add("schema");
-        if (object instanceof DBSCatalog) features.add("catalog");
-        if (object instanceof DBSObjectContainer) features.add("objectContainer");
+        getObjectFeatures(object, features);
         if (object instanceof DBPDataSourceContainer) {
             features.add("dataSource");
             DBPDataSourceContainer dbpDataSourceContainer = (DBPDataSourceContainer) this.object;
@@ -149,8 +142,35 @@ public class WebDatabaseObjectInfo {
             if (dbpDataSourceContainer.isTemporary()) {
                 features.add("dataSourceTemporary");
             }
+            if (dbpDataSourceContainer.isConnected()) {
+                DBPDataSource dataSource = dbpDataSourceContainer.getDataSource();
+                if (dataSource != null) {
+                    getObjectFeatures(dataSource, features);
+                }
+            }
         }
         return features.toArray(new String[0]);
+    }
+
+    private static void getObjectFeatures(DBSObject object, List<String> features) {
+        if (object instanceof DBPScriptObject) features.add("script");
+        if (object instanceof DBPScriptObjectExt) features.add("scriptExtended");
+        if (object instanceof DBSDataContainer) features.add("dataContainer");
+        if (object instanceof DBSDataManipulator) features.add("dataManipulator");
+        if (object instanceof DBSEntity) features.add("entity");
+        if (object instanceof DBSSchema) features.add("schema");
+        if (object instanceof DBSCatalog) features.add("catalog");
+        if (object instanceof DBSObjectContainer) {
+            features.add("objectContainer");
+            try {
+                Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
+                if (DBSEntity.class.isAssignableFrom(childType)) {
+                    features.add("entityContainer");
+                }
+            } catch (Exception e) {
+                log.error(e);
+            }
+        }
     }
 
     @Property

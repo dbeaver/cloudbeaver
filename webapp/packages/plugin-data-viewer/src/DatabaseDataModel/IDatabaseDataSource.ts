@@ -8,15 +8,16 @@
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionContext } from '../IExecutionContext';
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export interface IRequestInfo {
   readonly requestDuration: number;
   readonly requestMessage: string;
+  readonly source: string | null;
 }
 
 export enum DatabaseDataAccessMode {
@@ -36,11 +37,12 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
-  readonly executionContext: IExecutionContext | null;
+  readonly executionContext: IDatabaseExecutionContext | null;
   readonly canCancel: boolean;
 
   isReadonly: () => boolean;
   isLoading: () => boolean;
+  isDisabled: (resultIndex: number) => boolean;
 
   hasResult: (resultIndex: number) => boolean;
 
@@ -60,7 +62,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
-  setExecutionContext: (context: IExecutionContext | null) => this;
+  setExecutionContext: (context: IDatabaseExecutionContext | null) => this;
 
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;

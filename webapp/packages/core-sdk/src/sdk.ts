@@ -870,7 +870,8 @@ export interface AdminUserInfo {
   configurationParameters: Scalars['Object'];
   grantedRoles: Array<Scalars['ID']>;
   grantedConnections: AdminConnectionGrantInfo[];
-  origin: ObjectOrigin;
+  origins: ObjectOrigin[];
+  linkedAuthProviders: Array<Scalars['String']>;
 }
 
 export interface AdminRoleInfo {
@@ -912,6 +913,7 @@ export interface AuthCredentialInfo {
   description?: Maybe<Scalars['String']>;
   admin?: Maybe<Scalars['Boolean']>;
   user?: Maybe<Scalars['Boolean']>;
+  identifying?: Maybe<Scalars['Boolean']>;
   possibleValues?: Maybe<Array<Maybe<Scalars['String']>>>;
   encryption?: Maybe<AuthCredentialEncryption>;
 }
@@ -935,7 +937,7 @@ export interface UserAuthToken {
 }
 
 export interface UserInfo {
-  userId: Scalars['String'];
+  userId: Scalars['ID'];
   displayName?: Maybe<Scalars['String']>;
   authTokens: UserAuthToken[];
   linkedAuthProviders: Array<Scalars['String']>;
@@ -997,7 +999,7 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never }>;
 export interface GetAuthProvidersQuery {
   providers: Array<(
     Pick<AuthProviderInfo, 'id' | 'label' | 'icon' | 'description' | 'defaultProvider'>
-    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'possibleValues' | 'encryption'>> }
+    & { credentialParameters: Array<Pick<AuthCredentialInfo, 'id' | 'displayName' | 'description' | 'admin' | 'user' | 'identifying' | 'possibleValues' | 'encryption'>> }
   )>;
 }
 
@@ -1325,8 +1327,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 export interface NavGetStructContainersQuery { navGetStructContainers: { catalogList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>>; schemaList: Array<Pick<DatabaseObjectInfo, 'name' | 'description' | 'type' | 'features'>> } }
 
 export type AdminUserInfoFragment = (
-  Pick<AdminUserInfo, 'userId' | 'grantedRoles'>
-  & { origin: ObjectOriginInfoFragment }
+  Pick<AdminUserInfo, 'userId' | 'grantedRoles' | 'linkedAuthProviders'>
+  & { origins: ObjectOriginInfoFragment[] }
 );
 
 export type AllNavigatorSettingsFragment = Pick<NavigatorSettings, 'showSystemObjects' | 'showUtilityObjects' | 'showOnlyEntities' | 'mergeEntities' | 'hideFolders' | 'hideSchemas' | 'hideVirtualModel'>;
@@ -1571,7 +1573,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'authenticationEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -1644,7 +1646,8 @@ export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
-  origin {
+  linkedAuthProviders
+  origins {
     ...ObjectOriginInfo
   }
 }
@@ -1866,6 +1869,7 @@ export const GetAuthProvidersDocument = `
       description
       admin
       user
+      identifying
       possibleValues
       encryption
     }
@@ -2506,7 +2510,6 @@ export const ServerConfigDocument = `
     supportsWorkspaces
     sessionExpireTime
     anonymousAccessEnabled
-    authenticationEnabled
     adminCredentialsSaveEnabled
     publicCredentialsSaveEnabled
     licenseRequired

@@ -12,6 +12,7 @@ import { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { PlaceholderComponent, StaticImage } from '@cloudbeaver/core-blocks';
+import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import type { IUserDetailsInfoProps } from '../../UsersAdministrationService';
 
@@ -22,12 +23,26 @@ const USER_DETAILS_STYLES = css`
   }
 `;
 
-export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(function Origin({ user }) {
-  const isLocal = user.origin.type === AUTH_PROVIDER_LOCAL_ID;
-  const icon = isLocal ? '/icons/local_connection.svg' : user.origin.icon;
-  const title = isLocal ? 'Local user' : user.origin.displayName;
+interface IOriginIconProps {
+  origin: ObjectOrigin;
+}
+
+export const OriginIcon: React.FC<IOriginIconProps> = observer(function Origin({ origin }) {
+  const isLocal = origin.type === AUTH_PROVIDER_LOCAL_ID;
+  const icon = isLocal ? '/icons/local_connection.svg' : origin.icon;
+  const title = isLocal ? 'Local user' : origin.displayName;
 
   return styled(USER_DETAILS_STYLES)(
-    <StaticImage icon={icon} title={title} />
+    <StaticImage key={origin.type + origin.subType} icon={icon} title={title} />
+  );
+});
+
+export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(function Origin({ user }) {
+  return (
+    <>
+      {user.origins.map(origin => (
+        <OriginIcon key={origin.type + origin.subType} origin={origin} />
+      ))}
+    </>
   );
 });

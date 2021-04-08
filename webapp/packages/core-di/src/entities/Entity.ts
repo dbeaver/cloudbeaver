@@ -37,7 +37,8 @@ export class Entity {
 
   addChild(entity: Entity): void {
     if (this.children.has(entity.id)) {
-      throw new Error(`Entity (${this.id}) already contains child entity (${entity.id})`);
+      this.removeChild(entity.id);
+      // throw new Error(`Entity (${this.id}) already contains child entity (${entity.id})`);
     }
     this.children.set(entity.id, entity);
     entity.bindWithParent(this);
@@ -45,7 +46,8 @@ export class Entity {
 
   removeChild(id: string): void {
     if (!this.children.has(id)) {
-      throw new Error(`Child entity (${id}) not found in entity (${this.id})`);
+      return;
+      // throw new Error(`Child entity (${id}) not found in entity (${this.id})`);
     }
     const entity = this.children.get(id);
     if (entity) {

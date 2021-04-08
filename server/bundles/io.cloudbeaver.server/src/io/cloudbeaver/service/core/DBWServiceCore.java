@@ -89,13 +89,6 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebConnectionInfo getConnectionState(WebSession webSession, String connectionId) throws DBWebException;
 
-    // Replaced with initConnection
-    @Deprecated
-    @WebAction
-    WebConnectionInfo openConnection(
-        @NotNull WebSession webSession,
-        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
-
     @WebAction
     WebConnectionInfo initConnection(
         @NotNull WebSession webSession,

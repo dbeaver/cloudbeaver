@@ -1,8 +1,9 @@
 fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedRoles
+  linkedAuthProviders
   
-  origin {
+  origins {
     ...ObjectOriginInfo
   }
 }

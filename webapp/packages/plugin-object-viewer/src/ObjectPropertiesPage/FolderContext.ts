@@ -7,6 +7,6 @@
  */
 
 import { createContext } from 'react';
-import { TabStateReturn } from 'reakit';
+import type { TabStateReturn } from 'reakit';
 
 export const FolderContext = createContext<TabStateReturn | undefined>(undefined);

@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   SubmittingForm, ErrorMessage, TabsState, TabList, Tab, TabTitle, Loader
@@ -91,16 +92,22 @@ interface IAuthPayload {
 }
 
 export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function AuthDialog({
-  payload: { provider, link },
+  payload: {
+    provider,
+    link = false,
+  },
   options,
   rejectDialog,
 }) {
+  const administrationScreenService = useService(AdministrationScreenService);
   const userInfo = useService(UserInfoResource);
-  const controller = useController(AuthDialogController, link || false, rejectDialog);
+  const controller = useController(AuthDialogController, link, rejectDialog);
   const translate = useTranslate();
 
   if (provider) {
     controller.selectProvider(provider);
+  } else {
+    controller.setAdminMode(administrationScreenService.activeScreen !== null);
   }
 
   const showTabs = !provider && controller.providers.length > 1;

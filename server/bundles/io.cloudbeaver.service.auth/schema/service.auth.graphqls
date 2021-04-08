@@ -13,6 +13,9 @@ type AuthCredentialInfo {
     admin: Boolean
     # This field must be shown in login form
     user: Boolean
+    # This field can be used as user identifier
+
+    identifying: Boolean
     possibleValues: [String]
     encryption: AuthCredentialEncryption
 }
@@ -52,7 +55,7 @@ type UserAuthToken {
 
 type UserInfo {
     # User unique identifier
-    userId: String!
+    userId: ID!
 
     # Human readable display name. It is taken from the first auth provider which was used for user login.
     displayName: String

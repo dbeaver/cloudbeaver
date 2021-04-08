@@ -194,11 +194,13 @@ export class AdministrationScreenService {
 
     const toScreen = this.getScreen(nextState);
     const screen = this.getScreen(state);
+
     if (screen) {
       await this.administrationItemService.deActivate(
         screen,
         this.isConfigurationMode,
-        screen.item !== toScreen?.item
+        screen.item !== toScreen?.item,
+        toScreen === null
       );
     }
 
@@ -239,7 +241,8 @@ export class AdministrationScreenService {
       await this.administrationItemService.activate(
         screen,
         this.isConfigurationMode,
-        screen.item !== fromScreen?.item
+        screen.item !== fromScreen?.item,
+        fromScreen === null
       );
     }
   }
@@ -249,7 +252,9 @@ export class AdministrationScreenService {
       return false;
     }
 
-    if (!(await this.isAccessProvided(state))) {
+    const accessProvided = await this.isAccessProvided(state);
+
+    if (!accessProvided) {
       this.screenService.navigateToRoot();
       return false;
     }
@@ -269,7 +274,9 @@ export class AdministrationScreenService {
 
     await this.ensurePermissions.execute();
 
-    if (!(await this.permissionsService.hasAsync(EAdminPermission.admin))) {
+    const administrator = await this.permissionsService.hasAsync(EAdminPermission.admin);
+
+    if (!administrator) {
       return false;
     }
 

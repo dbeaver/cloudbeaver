@@ -33,8 +33,6 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -200,51 +198,6 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession.getWebConnectionInfo(connectionId);
     }
 
-    @Deprecated
-    @Override
-    public WebConnectionInfo openConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
-        String templateId = config.getTemplateId();
-        if (CommonUtils.isEmpty(templateId)) {
-            throw new DBWebException("Only preconfigured data sources are supported yet");
-        }
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
-        if (dataSourceTemplate == null) {
-            throw new DBWebException("Datasource '" + templateId + "' not found");
-        }
-
-        DBPDataSourceRegistry sessionRegistry = webSession.getSingletonProject().getDataSourceRegistry();
-        DBPDataSourceContainer newDataSource = sessionRegistry.createDataSource(dataSourceTemplate);
-        newDataSource.setSavePassword(true);
-        ((DataSourceDescriptor)newDataSource).setTemporary(true);
-
-        DBPConnectionConfiguration cfg = newDataSource.getConnectionConfiguration();
-        if (AuthModelDatabaseNative.ID.equals(config.getAuthModelId())) {
-            cfg.setUserName(JSONUtils.getString(config.getCredentials(), "userName"));
-            cfg.setUserPassword(JSONUtils.getString(config.getCredentials(), "userPassword"));
-        } else {
-            cfg.setUserName(config.getUserName());
-            cfg.setUserPassword(config.getUserPassword());
-        }
-        if (!CommonUtils.isEmpty(config.getName())) {
-            newDataSource.setName(config.getName());
-        }
-        if (!CommonUtils.isEmpty(config.getDescription())) {
-            newDataSource.setDescription(config.getDescription());
-        }
-        try {
-            newDataSource.connect(webSession.getProgressMonitor(), true, false);
-        } catch (DBException e) {
-            throw new DBWebException("Error connecting to database", e);
-        }
-        sessionRegistry.addDataSource(newDataSource);
-
-        WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
-        webSession.addConnection(connectionInfo);
-
-        return connectionInfo;
-    }
-
     @Override
     public WebConnectionInfo initConnection(
         @NotNull WebSession webSession,
@@ -345,8 +298,9 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public boolean deleteConnection(@NotNull WebSession webSession, @NotNull String connectionId) throws DBWebException {
-        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
-            throw new DBWebException("Connection delete is restricted by server configuration");
+        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(connectionId);
+        if (connectionInfo.getDataSourceContainer().getProject() != webSession.getSingletonProject()) {
+            throw new DBWebException("Global connection '" + connectionInfo.getName() + "' configuration cannot be deleted");
         }
         closeAndDeleteConnection(webSession, connectionId, true);
         return true;

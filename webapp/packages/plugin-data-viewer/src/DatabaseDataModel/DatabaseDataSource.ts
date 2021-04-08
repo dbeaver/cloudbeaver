@@ -10,13 +10,13 @@ import { observable, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionContext } from '../IExecutionContext';
 import { DatabaseDataActions } from './DatabaseDataActions';
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {
@@ -31,14 +31,15 @@ implements IDatabaseDataSource<TOptions, TResult> {
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
-  executionContext: IExecutionContext | null;
+  executionContext: IDatabaseExecutionContext | null;
   abstract get canCancel(): boolean;
 
+  protected disabled: boolean;
   private activeRequest: Promise<TResult[]> | null;
   private activeSave: Promise<TResult[]> | null;
 
   constructor() {
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'disabled'>(this, {
       access: observable,
       dataFormat: observable,
       supportedDataFormats: observable,
@@ -50,6 +51,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       requestInfo: observable,
       error: observable,
       executionContext: observable,
+      disabled: observable,
       activeRequest: observable,
       activeSave: observable,
     });
@@ -61,6 +63,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.offset = 0;
     this.count = 0;
     this.options = null;
+    this.disabled = false;
     this.activeRequest = null;
     this.activeSave = null;
     this.executionContext = null;
@@ -69,6 +72,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.requestInfo = {
       requestDuration: 0,
       requestMessage: '',
+      source: null,
     };
     this.error = null;
   }
@@ -117,11 +121,15 @@ implements IDatabaseDataSource<TOptions, TResult> {
   }
 
   isReadonly(): boolean {
-    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1;
+    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
   }
 
   isLoading(): boolean {
     return !!this.activeRequest || !!this.activeSave;
+  }
+
+  isDisabled(resultIndex: number): boolean {
+    return !!this.activeRequest || !!this.activeSave || this.disabled;
   }
 
   setEditor(editor: IDatabaseDataEditor<TResult>): this {
@@ -156,7 +164,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
-  setExecutionContext(context: IExecutionContext | null): this {
+  setExecutionContext(context: IDatabaseExecutionContext | null): this {
     this.executionContext = context;
     return this;
   }

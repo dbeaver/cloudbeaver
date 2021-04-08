@@ -6,12 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+export function isArraysEqual<T>(first: T[], second: T[]): boolean {
+  if (first.length !== second.length) {
+    return false;
+  }
 
-export interface IDatabaseDataResult {
-  id: string;
-  dataFormat: ResultDataFormat;
-  loadedFully: boolean;
-  updateRowCount: number;
-  data: any;
+  return !first.some(region => !second.includes(region));
 }
