@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { use, css } from 'reshadow';
 
 import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { Button } from '@cloudbeaver/core-blocks';
+import { Button, useFocus } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -51,11 +51,14 @@ const styles = composes(
 export const FinishPage = observer(function FinishPage() {
   const translate = useTranslate();
   const service = useController(ConfigurationWizardService);
+  const [focus] = useFocus<HTMLDivElement>({
+    focusFirstChild: true,
+  });
 
   return styled(useStyles(styles))(
     <layout-grid as="div">
       <layout-grid-inner as="div">
-        <layout-grid-cell as='div' {...use({ span: 12 })}>
+        <layout-grid-cell ref={focus} as='div' {...use({ span: 12 })}>
           <h3>{translate('administration_configuration_wizard_finish_title')}</h3>
           <p>{translate('administration_configuration_wizard_finish_message')}</p>
 
