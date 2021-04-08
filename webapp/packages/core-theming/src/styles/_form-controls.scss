@@ -72,6 +72,12 @@
     &:focus {
       @include mdc-theme-prop(border-color, primary, false);
     }
+    // we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug
+    &:-internal-autofill-selected,
+    &:-internal-autofill-previewed {
+      -webkit-text-fill-color: $mdc-theme-on-secondary;
+      box-shadow: 0 0 0 50px $input-background inset;
+    }
 
     &:global([type="checkbox"]) {
       height: 16px;
