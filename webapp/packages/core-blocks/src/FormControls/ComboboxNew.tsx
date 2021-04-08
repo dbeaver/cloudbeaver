@@ -46,7 +46,7 @@ const styles = composes(
       font-weight: 500;
     }
     input {
-      padding-right: 20px;
+      padding-right: 12px !important;
     }
     MenuButton {
       position: absolute;
@@ -74,7 +74,7 @@ const styles = composes(
       & MenuItem {
         background: transparent;
         display: block;
-        padding: 4px 36px;
+        padding: 4px 12px;
         text-align: left;
         outline: none;
         color: inherit;
