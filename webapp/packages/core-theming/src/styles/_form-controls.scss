@@ -65,7 +65,7 @@
     outline: none;
     border-radius: 3px;
 
-    @include mdc-theme-prop(color, text-primary-on-light, false);
+    @include mdc-theme-prop(color, on-secondary, false);
     @include mdc-theme-prop(border-color, background, false);
     @include mdc-theme-prop(background-color, input-background, false);
 
@@ -87,12 +87,12 @@
     &:global([readonly]) {
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
-      @include mdc-theme-prop(color, text-secondary-on-light, false);
+      opacity: 0.8;
     }
     &:global([disabled]) {
       @include mdc-theme-prop(border-color, input-border-disabled, false);
       @include mdc-theme-prop(background-color, input-background-disabled, false);
-      @include mdc-theme-prop(color, text-hint-on-light, false);
+      opacity: 0.7;
     }
     &:global([data-embedded]) {
       &:global([disabled]),
