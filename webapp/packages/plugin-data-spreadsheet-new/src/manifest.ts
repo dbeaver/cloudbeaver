@@ -9,9 +9,10 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DataGridSettingsService } from './DataGridSettingsService';
+import { LocaleService } from './LocaleService';
 import { SpreadsheetService } from './SpreadsheetService';
 
 export const manifest: PluginManifest = {
   info: { name: 'New spreadsheet implementation' },
-  providers: [SpreadsheetService, DataGridSettingsService],
+  providers: [SpreadsheetService, DataGridSettingsService, LocaleService],
 };

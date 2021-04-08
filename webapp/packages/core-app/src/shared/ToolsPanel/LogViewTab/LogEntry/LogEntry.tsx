@@ -32,6 +32,10 @@ const style = css`
     padding-right: 16px;
     text-overflow: ellipsis;
   }
+  Link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   Link:hover {
     cursor: pointer;
   }
@@ -50,7 +54,7 @@ export const LogEntry = observer(function LogEntry({ item }: LogEntryProps) {
       <td>{item.time}</td>
       <td>
         <message-cell as="div">
-          <message as="div">
+          <message as="div" title={item.message}>
             {item.stackTrace ? <Link onClick={controller.showDetails}>{item.message}</Link> : item.message}
           </message>
         </message-cell>

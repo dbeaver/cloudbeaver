@@ -105,6 +105,7 @@ export const menuPanelStyles = composes(
         width: 16px;
         height: 16px;
         opacity: 0.5;
+        transform: rotate(-90deg);
       }
       & IconOrImage {
         width: 14px;
