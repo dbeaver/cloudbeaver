@@ -129,6 +129,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
             hideCancel
             autofocus
             active
+            simple
             onSave={handleSave}
             onReject={handleReject}
             onChange={handleChange}
