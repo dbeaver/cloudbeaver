@@ -32,7 +32,7 @@ export const settingsMenuStyles = css`
       margin-left: auto;
     }
     & Icon {
-      transform: rotate(-180deg);
+      transform: rotate(90deg);
     }
   }
 `;

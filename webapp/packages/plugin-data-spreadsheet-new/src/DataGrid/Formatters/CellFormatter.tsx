@@ -60,7 +60,7 @@ export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ 
   }
 
   return (
-    <cell-formatter ref={cellRef} as='div' className={`cell-formatter ${classes}`}>
+    <cell-formatter ref={cellRef} title={value} as='div' className={`cell-formatter ${classes}`}>
       {value}
     </cell-formatter>
   );

@@ -66,7 +66,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       return null;
     }
     return (
-      <FormFieldDescriptionNew label={property.displayName} className={className}>
+      <FormFieldDescriptionNew title={property.description} label={property.displayName} className={className}>
         {state[property.id!]}
       </FormFieldDescriptionNew>
     );

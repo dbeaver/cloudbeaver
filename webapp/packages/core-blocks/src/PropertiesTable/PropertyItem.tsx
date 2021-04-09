@@ -92,10 +92,8 @@ const styles = composes(
       display: block;
     }
     property-select Icon {
-      transform: rotate(90deg);
-
       &[|focus] {
-        transform: rotate(-90deg);
+        transform: rotate(180deg);
       }
     }
     button {

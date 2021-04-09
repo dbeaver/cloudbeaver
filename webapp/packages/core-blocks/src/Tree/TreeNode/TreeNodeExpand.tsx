@@ -19,10 +19,6 @@ const styles = css`
     cursor: pointer;
     height: 100%;
     width: 100%;
-
-    &[name="angle"] {
-      transform: rotate(-90deg);
-    }
   }
 `;
 

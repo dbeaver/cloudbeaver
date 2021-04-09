@@ -12,6 +12,7 @@ import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css, use } from 'reshadow';
 
 import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import type { SortMode } from '@cloudbeaver/plugin-data-viewer';
@@ -103,6 +104,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   const dataGridContext = useContext(DataGridContext);
   const gridSortingContext = useContext(DataGridSortingContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
+  const translate = useTranslate();
 
   if (!dataGridContext || !gridSortingContext || !gridSelectionContext) {
     throw new Error('One of the following contexts are missed(data grid context, grid sorting context, grid selection context)');
@@ -117,6 +119,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   // TODO we want to get "sortable" property from SqlResultColumn data
   const sortable = model.source.results.length === 1;
   const currentSortMode = gridSortingContext.getSortMode(columnName);
+  const columnTooltip = columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '');
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -144,14 +147,14 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 
   return styled(headerStyles)(
     <table-header as="div" onClick={handleColumnSelection}>
-      <shrink-container as='div'>
+      <shrink-container as='div' title={columnTooltip}>
         <icon as="div">
           <StaticImage icon={column?.icon} />
         </icon>
         <name as="div">{columnName}</name>
       </shrink-container>
       {sortable && (
-        <sort-icons as="div" onClick={handleSort} {...use({ disabled: loading })}>
+        <sort-icons title={translate('data_grid_table_tooltip_column_header_sort')} as="div" onClick={handleSort} {...use({ disabled: loading })}>
           <SortIcon active={currentSortMode === 'asc'} />
           <SortIcon active={currentSortMode === 'desc'} />
         </sort-icons>

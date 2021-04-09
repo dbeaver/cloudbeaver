@@ -22,18 +22,20 @@ const formFieldDescriptionNewStyles = css`
 
 interface Props {
   label?: string;
+  title?: string;
   className?: string;
 }
 
 export const FormFieldDescriptionNew: React.FC<Props> = function FormFieldDescriptionNew({
   label,
+  title,
   children,
   className,
 }) {
   const styles = useStyles(baseFormControlStylesNew, formFieldDescriptionNewStyles);
 
   return styled(styles)(
-    <field as='div' className={className}>
+    <field title={title} as='div' className={className}>
       {label && <field-label as='label'>{label}</field-label>}
       <field-description as='div'>
         {children}

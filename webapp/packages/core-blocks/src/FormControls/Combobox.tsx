@@ -70,12 +70,8 @@ const styles = composes(
       height: 16px;
       display: block;
     }
-    MenuButton Icon {
-      transform: rotate(90deg);
-
-      &[|focus] {
-        transform: rotate(-90deg);
-      }
+    MenuButton Icon[|focus] {
+      transform: rotate(180deg);
     }
     input-box {
       flex: 1;
