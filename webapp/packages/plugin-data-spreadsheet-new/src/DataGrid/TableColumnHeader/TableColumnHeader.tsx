@@ -119,6 +119,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   // TODO we want to get "sortable" property from SqlResultColumn data
   const sortable = model.source.results.length === 1;
   const currentSortMode = gridSortingContext.getSortMode(columnName);
+  const columnTooltip = columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '');
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -146,7 +147,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 
   return styled(headerStyles)(
     <table-header as="div" onClick={handleColumnSelection}>
-      <shrink-container as='div' title={columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '')}>
+      <shrink-container as='div' title={columnTooltip}>
         <icon as="div">
           <StaticImage icon={column?.icon} />
         </icon>
