@@ -13,7 +13,9 @@ import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import { IConnectionFormSubmitData, IConnectionFormTabProps, ConnectionFormService } from '../ConnectionFormService';
+import { connectionConfigContext } from '../connectionConfigContext';
+import { IConnectionFormSubmitData, IConnectionFormProps, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { connectionFormStateContext } from '../connectionFormStateContext';
 import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
@@ -36,19 +38,22 @@ export class ConnectionAccessTabService extends Bootstrap {
       name: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: (tabId, props) => props?.options.type !== 'admin',
-      isDisabled: (tabId, props) => !props?.data.config.driverId
+      isHidden: (tabId, props) => props?.state.type !== 'admin',
+      isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
     });
 
     this.connectionFormService.formSubmittingTask
       .addHandler(this.save.bind(this));
+
+    this.connectionFormService.formStateTask
+      .addHandler(this.formState.bind(this));
   }
 
   load(): void { }
 
-  private stateGetter(context: IConnectionFormTabProps): MetadataValueGetter<string, IConnectionAccessTabState> {
+  private stateGetter(context: IConnectionFormProps): MetadataValueGetter<string, IConnectionAccessTabState> {
     return () => ({
       selectedSubjects: new Map(),
       loading: false,
@@ -61,7 +66,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    if (data.submitType === 'test' || data.options.type === 'public') {
+    if (data.submitType === 'test' || data.state.type === 'public') {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
@@ -70,16 +75,16 @@ export class ConnectionAccessTabService extends Bootstrap {
       return;
     }
 
-    const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
-    const state = data.data.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
+    const config = contexts.getContext(connectionConfigContext);
+    const state = data.state.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
 
     if (!state || !config.connectionId) {
       return;
     }
 
-    const subjects = await this.connectionsResource.loadAccessSubjects(config.connectionId);
+    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
 
-    if (this.isChanged(subjects, state.grantedSubjects)) {
+    if (changed) {
       await this.connectionsResource.setAccessSubjects(
         config.connectionId,
         state.grantedSubjects.map(subject => subject.subjectId)
@@ -87,7 +92,31 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
   }
 
-  private isChanged(current: AdminConnectionGrantInfo[], next: AdminConnectionGrantInfo[]): boolean {
+  private async formState(
+    data: IConnectionFormState,
+    contexts: IExecutionContextProvider<IConnectionFormState>
+  ) {
+    if (data.type === 'public') {
+      return;
+    }
+    const config = contexts.getContext(connectionConfigContext);
+    const state = data.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
+
+    if (!state || !config.connectionId) {
+      return;
+    }
+
+    const changed = await this.isChanged(config.connectionId, state.grantedSubjects);
+
+    if (changed) {
+      const stateContext = contexts.getContext(connectionFormStateContext);
+
+      stateContext.markEdited();
+    }
+  }
+
+  private async isChanged(connectionId: string, next: AdminConnectionGrantInfo[]): Promise<boolean> {
+    const current = await this.connectionsResource.loadAccessSubjects(connectionId);
     if (current.length !== next.length) {
       return true;
     }

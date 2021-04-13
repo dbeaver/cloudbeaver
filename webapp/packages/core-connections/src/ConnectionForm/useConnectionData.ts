@@ -10,7 +10,7 @@ import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
-import type { IConnectionFormData } from './ConnectionFormService';
+import type { IConnectionFormState } from './ConnectionFormService';
 
 interface IState {
   config: ConnectionConfig | undefined;
@@ -20,12 +20,9 @@ interface IState {
 }
 
 export function useConnectionData(
-  data: IConnectionFormData,
-  fill: (data: IConnectionFormData, update: boolean) => void
+  state: IConnectionFormState,
+  fill: (state: IConnectionFormState, update: boolean) => void
 ): void {
-  const connectionId = data.info?.id || data.config.connectionId;
-  const driverId = data.info?.driverId || data.config.driverId;
-
   const lastDataRef = useObjectRef<IState>({
     connectionId: undefined,
     driverId: undefined,
@@ -34,21 +31,21 @@ export function useConnectionData(
   }, {});
 
   if (
-    lastDataRef.connectionId !== connectionId
-    || lastDataRef.driverId !== driverId
-    || lastDataRef.config !== data.config
-    || lastDataRef.info !== data.info
+    lastDataRef.connectionId !== state.config.connectionId
+    || lastDataRef.driverId !== state.config.driverId
+    || lastDataRef.config !== state.config
+    || lastDataRef.info !== state.info
   ) {
     fill(
-      data,
+      state,
       lastDataRef.connectionId !== null
       || lastDataRef.driverId !== null
-      || lastDataRef.config !== data.config
-      || lastDataRef.info !== data.info
+      || lastDataRef.config !== state.config
+      || lastDataRef.info !== state.info
     );
-    lastDataRef.connectionId = connectionId;
-    lastDataRef.driverId = driverId;
-    lastDataRef.config = data.config;
-    lastDataRef.info = data.info;
+    lastDataRef.connectionId = state.config.connectionId;
+    lastDataRef.driverId = state.config.driverId;
+    lastDataRef.config = state.config;
+    lastDataRef.info = state.info;
   }
 }

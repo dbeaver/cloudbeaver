@@ -27,7 +27,7 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       order: 3,
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
-      isHidden: (tabId, props) => props?.data.info ? isLocalConnection(props.data.info) : true,
+      isHidden: (tabId, props) => props?.state.info ? isLocalConnection(props.state.info) : true,
     });
   }
 

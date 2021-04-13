@@ -7,20 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
   TabsState, TabList,
-  Button, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef
+  Button, UNDERLINE_TAB_STYLES, TabPanelList, Placeholder, useObjectRef, useExecutor
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionFormService, IConnectionFormData, IConnectionFormOptions } from './ConnectionFormService';
-import { useConnectionFormState } from './useConnectionFormState';
+import { connectionConfigContext } from './connectionConfigContext';
+import { ConnectionFormService, IConnectionFormState } from './ConnectionFormService';
 
 const styles = composes(
   css`
@@ -82,16 +81,14 @@ const styles = composes(
 );
 
 interface Props {
-  data: IConnectionFormData;
-  options: IConnectionFormOptions;
+  state: IConnectionFormState;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig) => void;
   className?: string;
 }
 
 export const ConnectionForm = observer(function ConnectionForm({
-  data,
-  options,
+  state,
   onCancel = () => {},
   onSave = () => {},
   className,
@@ -100,35 +97,33 @@ export const ConnectionForm = observer(function ConnectionForm({
   const style = [styles, UNDERLINE_TAB_STYLES];
   const translate = useTranslate();
   const service = useService(ConnectionFormService);
-  const formState = useConnectionFormState(data, options);
 
-  useEffect(() => {
-    formState.submittingHandlers.addPostHandler((data, contexts) => {
+  useExecutor({
+    executor: state.submittingHandlers,
+    postHandlers: [function save(data, contexts) {
       const validation = contexts.getContext(service.connectionValidationContext);
       const state = contexts.getContext(service.connectionStatusContext);
-      const config = contexts.getContext(service.connectionConfigContext);
+      const config = contexts.getContext(connectionConfigContext);
 
       if (validation.valid && state.saved && data.submitType === 'submit') {
         props.onSave(config);
       }
-    });
-  }, []);
+    }],
+  });
 
   return styled(useStyles(style))(
     <TabsState
       container={service.tabsContainer}
-      localState={data.partsState}
-      data={data}
-      form={formState}
-      options={options}
+      localState={state.partsState}
+      state={state}
     >
       <box as='div' className={className}>
-        <TabList style={style} disabled={formState.form.disabled}>
+        <TabList style={style} disabled={state.disabled}>
           <fill as="div" />
-          <Placeholder container={service.actionsContainer} data={data} form={formState.form} options={options} />
+          <Placeholder container={service.actionsContainer} state={state} />
           <Button
             type="button"
-            disabled={formState.form.disabled}
+            disabled={state.disabled}
             mod={['outlined']}
             onClick={onCancel}
           >
@@ -136,19 +131,19 @@ export const ConnectionForm = observer(function ConnectionForm({
           </Button>
           <Button
             type="button"
-            disabled={formState.form.disabled}
+            disabled={state.disabled}
             mod={['outlined']}
-            onClick={formState.test}
+            onClick={state.test}
           >
             {translate('connections_connection_test')}
           </Button>
           <Button
             type="button"
-            disabled={formState.form.disabled || formState.form.readonly}
+            disabled={state.disabled || state.readonly}
             mod={['unelevated']}
-            onClick={formState.save}
+            onClick={state.save}
           >
-            {translate(options.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
+            {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
           </Button>
         </TabList>
         <content-box as="div">

@@ -6,67 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { useState } from 'react';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import type { CachedMapResource, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
-import { isLocalConnection } from '../Administration/ConnectionsResource';
-import { EConnectionFeature } from '../EConnectionFeature';
-import { IConnectionForm, IConnectionFormData, IConnectionFormOptions, IConnectionFormState, IConnectionFormSubmitData, ConnectionFormService } from './ConnectionFormService';
+import type { DatabaseConnection } from '../Administration/ConnectionsResource';
+import { IConnectionFormState, ConnectionFormService } from './ConnectionFormService';
+import { ConnectionFormState } from './ConnectionFormState';
 
 export function useConnectionFormState(
-  data: IConnectionFormData,
-  options: IConnectionFormOptions,
-  defaultState?: IConnectionForm
+  resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>,
+  configure?: (state: IConnectionFormState) => any
 ): IConnectionFormState {
-  const props = useObjectRef({ data, options });
   const service = useService(ConnectionFormService);
-  const [submittingHandlers] = useState(() => new ExecutorHandlersCollection<IConnectionFormSubmitData>());
-  const [form] = useState<IConnectionForm>(() => observable({
-    disabled: false,
-    loading: false,
-    get readonly() {
-      if (options.type === 'admin' || options.mode === 'create') {
-        return false;
-      }
-
-      if (props.data.info?.features && !props.data.info.features.includes(EConnectionFeature.manageable)) {
-        return true;
-      }
-
-      return false;
-    },
-    get originLocal() {
-      return !props.data.info || isLocalConnection(props.data.info);
-    },
-    ...defaultState,
-  }));
-
-  return useObjectRef({
-    form,
-    submittingHandlers,
-    async save() {
-      await service.formSubmittingTask.executeScope(
-        {
-          ...props,
-          form,
-          submitType: 'submit',
-        },
-        submittingHandlers
-      );
-    },
-    async test() {
-      await service.formSubmittingTask.executeScope(
-        {
-          ...props,
-          form,
-          submitType: 'test',
-        },
-        submittingHandlers
-      );
-    },
+  const [state] = useState<IConnectionFormState>(() => {
+    const state = new ConnectionFormState(
+      service,
+      resource,
+    );
+    configure?.(state);
+    return state;
   });
+
+  return state;
 }

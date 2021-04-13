@@ -16,9 +16,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
 import { DBDriverResource } from '../../../DBDriverResource';
 import { CreateConnectionService } from '../CreateConnectionService';
-import { CreateConnectionForm } from './CreateConnectionForm';
 
 const styles = composes(
   css`
@@ -131,8 +131,8 @@ export const CreateConnection = observer(function CreateConnection({
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <connection-create-content as='div'>
-          <CreateConnectionForm
-            dataOptions={createConnectionService.data}
+          <ConnectionForm
+            state={createConnectionService.data}
             onCancel={createConnectionService.clearConnectionTemplate}
             onSave={createConnectionService.clearConnectionTemplate}
           />

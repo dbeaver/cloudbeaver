@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionForm, useConnectionFormData, IConnectionFormDataOptions, IConnectionFormOptions } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionForm, IConnectionFormState } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
@@ -28,31 +28,26 @@ const styles = css`
 `;
 
 interface Props {
-  options: IConnectionFormOptions;
-  dataOptions: IConnectionFormDataOptions;
+  state: IConnectionFormState;
   onCancel: () => void;
   onSave: (config: ConnectionConfig) => void;
 }
 
 const PublicConnectionFormRenderer: React.FC<Props> = observer(function PublicConnectionForm({
-  options,
-  dataOptions,
+  state,
   onCancel,
   onSave,
 }) {
   const connection = useMapResource(ConnectionInfoResource, {
-    key: dataOptions.config.connectionId || null,
+    key: state.config.connectionId || null,
     includes: ['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties', 'customIncludeNetworkHandlerCredentials'],
   });
-
-  const data = useConnectionFormData(dataOptions);
 
   return styled(styles)(
     <Loader state={connection}>
       {() => styled(styles)(
         <ConnectionForm
-          data={data}
-          options={options}
+          state={state}
           onSave={onSave}
           onCancel={onCancel}
         />
@@ -68,11 +63,10 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   const save = useCallback(() => service.close(true), []);
 
   return styled(styles)(
-    <Loader loading={service.dataOptions === null}>
-      {() => (
+    <Loader loading={service.formState === null}>
+      {() => service.formState && (
         <PublicConnectionFormRenderer
-          dataOptions={service.dataOptions!}
-          options={service.options}
+          state={service.formState}
           onSave={save}
           onCancel={close}
         />

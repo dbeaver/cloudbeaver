@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import type { IConnectionFormData } from '../ConnectionFormService';
+import type { IConnectionFormState } from '../ConnectionFormService';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
 interface IConnectionAccessState {
@@ -21,7 +21,7 @@ interface IConnectionAccessState {
   load: () => Promise<void>;
 }
 
-export function useConnectionAccessState(data: IConnectionFormData): IConnectionAccessState {
+export function useConnectionAccessState(formState: IConnectionFormState): IConnectionAccessState {
   const connectionsResource = useService(ConnectionsResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IConnectionAccessTabState>();
@@ -50,8 +50,8 @@ export function useConnectionAccessState(data: IConnectionFormData): IConnection
     try {
       state.loading = true;
 
-      if (data.info) {
-        state.grantedSubjects = await connectionsResource.loadAccessSubjects(data.info.id);
+      if (formState.info) {
+        state.grantedSubjects = await connectionsResource.loadAccessSubjects(formState.info.id);
       }
 
       for (const subject of state.grantedSubjects) {

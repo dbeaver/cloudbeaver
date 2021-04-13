@@ -13,7 +13,9 @@ import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
-import { IConnectionFormSubmitData, ConnectionFormService } from '../ConnectionFormService';
+import { connectionConfigContext } from '../connectionConfigContext';
+import { IConnectionFormSubmitData, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { connectionFormStateContext } from '../connectionFormStateContext';
 import { SSH } from './SSH';
 import { SSHTab } from './SSHTab';
 
@@ -34,8 +36,8 @@ export class ConnectionSSHTabService extends Bootstrap {
       tab: () => SSHTab,
       panel: () => SSH,
       isHidden: (tabId, props) => {
-        if (props?.data.config.driverId) {
-          const driver = this.dbDriverResource.get(props.data.config.driverId);
+        if (props?.state.config.driverId) {
+          const driver = this.dbDriverResource.get(props?.state.config.driverId);
 
           return !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
         }
@@ -48,25 +50,30 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     this.connectionFormService.formValidationTask
       .addHandler(this.validate.bind(this));
+
+    this.connectionFormService.formStateTask
+      .addHandler(this.formState.bind(this));
   }
 
   load(): void { }
 
   private validate(
     {
-      data,
-      options,
+      state: {
+        config,
+        info,
+      },
     }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
-    if (!data.config.networkHandlersConfig) {
+    if (!config.networkHandlersConfig) {
       return;
     }
 
-    for (const handler of data.config.networkHandlersConfig) {
-      if (handler.enabled && handler.savePassword && this.isChanged(handler, data.info)) {
+    for (const handler of config.networkHandlersConfig) {
+      if (handler.enabled && handler.savePassword && this.isChanged(handler, info)) {
         if (!handler.userName?.length) {
           validation.error("Field SSH 'User' can't be empty");
         }
@@ -87,21 +94,20 @@ export class ConnectionSSHTabService extends Bootstrap {
 
   private async prepareConfig(
     {
-      data,
-      options,
+      state,
     }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
-    const config = contexts.getContext(this.connectionFormService.connectionConfigContext);
+    const config = contexts.getContext(connectionConfigContext);
 
-    if (!data.config.networkHandlersConfig || data.config.networkHandlersConfig.length === 0) {
+    if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
       return;
     }
 
     const configs: NetworkHandlerConfigInput[] = [];
 
-    for (const handler of data.config.networkHandlersConfig) {
-      if (this.isChanged(handler, data.info)) {
+    for (const handler of state.config.networkHandlersConfig) {
+      if (this.isChanged(handler, state.info)) {
         configs.push(handler);
       }
     }
@@ -111,11 +117,27 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
   }
 
+  private formState(
+    data: IConnectionFormState,
+    contexts: IExecutionContextProvider<IConnectionFormState>
+  ) {
+    const config = contexts.getContext(connectionConfigContext);
+    if (config.networkHandlersConfig !== undefined) {
+      const stateContext = contexts.getContext(connectionFormStateContext);
+
+      stateContext.markEdited();
+    }
+  }
+
   private isChanged(handler: NetworkHandlerConfigInput, info?: DatabaseConnection) {
     const initialConfig = info?.networkHandlersConfig.find(h => h.id === handler.id);
+    if (!initialConfig && !handler.enabled) {
+      return false;
+    }
 
     const port = Number(initialConfig?.properties?.port);
     const formPort = Number(handler.properties?.port);
+
     if (handler.enabled !== initialConfig?.enabled
         || handler.savePassword !== initialConfig?.savePassword
         || handler.userName !== initialConfig?.userName

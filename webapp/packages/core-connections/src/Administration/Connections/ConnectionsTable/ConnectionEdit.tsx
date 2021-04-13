@@ -6,19 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useState } from 'react';
+import { useContext, useCallback, useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, TableContext, useMapResource } from '@cloudbeaver/core-blocks';
-import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
-import type { IConnectionFormOptions } from '../../../ConnectionForm/ConnectionFormService';
-import { useConnectionFormData } from '../../../ConnectionForm/useConnectionFormData';
+import { useConnectionFormState } from '../../../ConnectionForm/useConnectionFormState';
 import { ConnectionsResource } from '../../ConnectionsResource';
 
 const styles = composes(
@@ -57,25 +53,19 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
     });
   }, []);
 
-  const config = useMemo<ConnectionConfig>(() => observable({ connectionId: item }), [item]);
+  const data = useConnectionFormState(
+    connection.resource,
+    state => state.setOptions('edit', 'admin')
+  );
 
-  const data = useConnectionFormData({
-    config,
-    resource: connection.resource,
-  });
-
-  const [options] = useState<IConnectionFormOptions>(() => ({
-    mode: 'edit',
-    type: 'admin',
-  }));
+  data.config.connectionId = item;
 
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>
       <Loader state={connection}>
         {() => (
           <ConnectionForm
-            data={data}
-            options={options}
+            state={data}
             onCancel={collapse}
             // onSave={collapse}
           />

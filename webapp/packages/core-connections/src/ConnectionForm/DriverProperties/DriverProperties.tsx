@@ -16,7 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../DBDriverResource';
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../ConnectionFormService';
 import { useConnectionData } from '../useConnectionData';
 
 const styles = css`
@@ -31,24 +31,23 @@ const styles = css`
   }
 `;
 
-export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function DriverProperties({
+export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({
   tabId,
-  data,
-  form,
+  state: formState,
 }) {
   const style = useStyles(styles);
   const { selected } = useTab(tabId);
 
-  useConnectionData(data, data => {
-    if (!data.config.properties) {
-      data.config.properties = {};
+  useConnectionData(formState, state => {
+    if (!state.config.properties) {
+      state.config.properties = {};
     }
 
-    if (!data.info) {
+    if (!state.info) {
       return;
     }
 
-    data.config.properties = { ...data.info.properties };
+    state.config.properties = { ...state.info.properties };
   });
 
   const [state] = useState(() => {
@@ -69,16 +68,16 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
 
   const driver = useMapResource(
     DBDriverResource,
-    { key: (selected && data.config.driverId) || null, includes: ['includeDriverProperties'] },
+    { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
     {
       onData: driver => {
-        for (const key of Object.keys(data.config.properties)) {
+        for (const key of Object.keys(formState.config.properties)) {
           if (driver.driverProperties?.some(property => property.id === key)
            || state.propertiesList.some(property => property.key === key)) {
             continue;
           }
 
-          state.add(key, data.config.properties[key]);
+          state.add(key, formState.config.properties[key]);
         }
       },
     }
@@ -106,8 +105,8 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormTabProp
         {() => (
           <PropertiesTable
             properties={joinedProperties.get()}
-            propertiesState={data.config.properties}
-            readOnly={form.form.readonly}
+            propertiesState={formState.config.properties}
+            readOnly={formState.readonly}
             onAdd={state.add}
           />
         )}

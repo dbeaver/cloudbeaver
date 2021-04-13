@@ -13,7 +13,9 @@ import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionFormDataOptions } from '../../ConnectionForm/useConnectionFormData';
+import { ConnectionFormService, IConnectionFormState } from '../../ConnectionForm/ConnectionFormService';
+import { ConnectionFormState } from '../../ConnectionForm/ConnectionFormState';
+import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
 export interface ICreateMethodOptions {
@@ -26,13 +28,15 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  data: IConnectionFormDataOptions | null;
+  data: IConnectionFormState | null;
 
   readonly tabsContainer: TabsContainer<void, ICreateMethodOptions>;
 
   constructor(
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
-    private readonly administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly connectionFormService: ConnectionFormService,
+    private readonly connectionsResource: ConnectionsResource
   ) {
     makeObservable(this, {
       data: observable,
@@ -97,10 +101,15 @@ export class CreateConnectionService {
   }
 
   setConnectionTemplate(config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = {
-      config,
-      availableDrivers,
-    };
+    this.data = new ConnectionFormState(
+      this.connectionFormService,
+      this.connectionsResource
+    );
+
+    this.data
+      .setOptions('create', 'admin')
+      .setConfig(config)
+      .setAvailableDrivers(availableDrivers || []);
   }
 
   clearConnectionTemplate(): void {

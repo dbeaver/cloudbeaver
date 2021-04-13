@@ -34,7 +34,7 @@ export class CustomConnectionController implements IInitializableController {
     });
   }
 
-  init(onClose: () => void) {
+  init(onClose: () => void): void {
     this.loadDBDrivers();
     this.onClose = onClose;
   }
@@ -42,7 +42,7 @@ export class CustomConnectionController implements IInitializableController {
   onDriverSelect = async (driverId: string) => {
     const state = await this.publicConnectionFormService.open(
       { driverId },
-      this.dbDriverResource.values.map(driver => driver.id)
+      this.dbDriverResource.keys
     );
 
     if (state) {

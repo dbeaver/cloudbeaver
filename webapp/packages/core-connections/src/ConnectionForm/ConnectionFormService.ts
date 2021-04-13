@@ -14,49 +14,47 @@ import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables 
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
+import type { IConnectionFormStateContext } from './connectionFormStateContext';
 
-export interface IConnectionForm {
-  originLocal: boolean; // connection specific, maybe should be in another place
-  disabled: boolean;
-  loading: boolean;
-  readonly: boolean;
-}
-
-export interface IConnectionFormData {
-  config: ConnectionConfig;
-  availableDrivers?: string[];
-
-  info: DatabaseConnection | undefined;
-  resource?: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
-  partsState: MetadataMap<string, any>;
-}
-
-export interface IConnectionFormOptions {
-  mode: 'edit' | 'create';
-  type: 'admin' | 'public';
-}
+export type ConnectionFormMode = 'edit' | 'create';
+export type ConnectionFormType = 'admin' | 'public';
 
 export interface IConnectionFormProps {
-  data: IConnectionFormData;
-  options: IConnectionFormOptions;
-  form: IConnectionForm;
+  state: IConnectionFormState;
 }
 
-export interface IConnectionFormSubmitData extends IConnectionFormProps {
+export interface IConnectionFormSubmitData {
   submitType: 'submit' | 'test';
+  state: IConnectionFormState;
 }
 
 export interface IConnectionFormState {
-  form: IConnectionForm;
-  submittingHandlers: IExecutorHandlersCollection<IConnectionFormSubmitData>;
-  save: () => Promise<void>;
-  test: () => Promise<void>;
-}
+  mode: ConnectionFormMode;
+  type: ConnectionFormType;
 
-export interface IConnectionFormTabProps {
-  data: IConnectionFormData;
-  options: IConnectionFormOptions;
-  form: IConnectionFormState;
+  config: ConnectionConfig;
+
+  partsState: MetadataMap<string, any>;
+
+  disabled: boolean;
+  loading: boolean;
+
+  readonly availableDrivers: string[];
+  readonly resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
+  readonly info: DatabaseConnection | undefined;
+  readonly readonly: boolean;
+  readonly submittingHandlers: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+
+  readonly setPartsState: (state: MetadataMap<string, any>) => this;
+  readonly setOptions: (
+    mode: ConnectionFormMode,
+    type: ConnectionFormType
+  ) => this;
+  readonly setConfig: (config: ConnectionConfig) => this;
+  readonly setAvailableDrivers: (drivers: string[]) => this;
+  readonly save: () => Promise<void>;
+  readonly test: () => Promise<void>;
+  readonly checkFormState: () => Promise<IConnectionFormStateContext>;
 }
 
 export interface IConnectionFormValidation {
@@ -76,11 +74,12 @@ export interface IConnectionFormStatus {
 
 @injectable()
 export class ConnectionFormService {
-  readonly tabsContainer: TabsContainer<IConnectionFormTabProps>;
+  readonly tabsContainer: TabsContainer<IConnectionFormProps>;
   readonly actionsContainer: PlaceholderContainer<IConnectionFormProps>;
   readonly prepareConfigTask: IExecutor<IConnectionFormSubmitData>;
   readonly formValidationTask: IExecutor<IConnectionFormSubmitData>;
   readonly formSubmittingTask: IExecutor<IConnectionFormSubmitData>;
+  readonly formStateTask: IExecutor<IConnectionFormState>;
 
   constructor(
     private readonly notificationService: NotificationService
@@ -90,16 +89,18 @@ export class ConnectionFormService {
     this.prepareConfigTask = new Executor();
     this.formSubmittingTask = new Executor();
     this.formValidationTask = new Executor();
+    this.formStateTask = new Executor();
 
     this.formSubmittingTask
       .before(this.formValidationTask)
       .before(this.prepareConfigTask);
 
+    this.formStateTask
+      .before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
+
     this.formSubmittingTask.addPostHandler(this.showStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
   }
-
-  connectionConfigContext = (): ConnectionConfig => ({});
 
   connectionValidationContext = (): IConnectionFormValidation => ({
     valid: true,
@@ -159,7 +160,9 @@ export class ConnectionFormService {
 
     if (validation.messages.length > 0) {
       this.notificationService.notify({
-        title: data.options.mode === 'edit' ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error',
+        title: data.state.mode === 'edit'
+          ? 'connections_administration_connection_save_error'
+          : 'connections_administration_connection_create_error',
         message: validation.messages.join('\n'),
       }, validation.valid ? ENotificationType.Info : ENotificationType.Error);
     }

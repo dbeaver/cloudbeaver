@@ -8,7 +8,8 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource, IConnectionFormDataOptions, IConnectionFormOptions } from '@cloudbeaver/core-connections';
+import { ConnectionFormService, ConnectionInfoResource, IConnectionFormState } from '@cloudbeaver/core-connections';
+import { ConnectionFormState } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -22,27 +23,22 @@ const formGetter = () => PublicConnectionForm;
 
 @injectable()
 export class PublicConnectionFormService {
-  options: IConnectionFormOptions;
-  dataOptions: IConnectionFormDataOptions | null;
+  formState: IConnectionFormState | null;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sessionDataResource: SessionDataResource
   ) {
     makeObservable(this, {
-      dataOptions: observable,
-      options: observable,
+      formState: observable.shallow,
+      change: action,
       open: action,
       close: action,
     });
-
-    this.options = {
-      mode: 'create',
-      type: 'public',
-    };
-    this.dataOptions = null;
+    this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.closeDeleted);
     this.sessionDataResource.onDataOutdated.addHandler(() => {
@@ -51,12 +47,17 @@ export class PublicConnectionFormService {
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {
-    this.dataOptions = {
-      config: { ...config },
-      availableDrivers: availableDrivers,
-      resource: this.connectionInfoResource,
-    };
-    this.options.mode = config.connectionId ? 'edit' : 'create';
+    if (!this.formState) {
+      this.formState = new ConnectionFormState(
+        this.connectionFormService,
+        this.connectionInfoResource
+      );
+    }
+
+    this.formState
+      .setOptions(config.connectionId ? 'edit' : 'create', 'public')
+      .setConfig(config)
+      .setAvailableDrivers(availableDrivers || []);
   }
 
   async open(config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
@@ -71,35 +72,41 @@ export class PublicConnectionFormService {
 
   async close(saved?: boolean): Promise<void> {
     if (saved) {
-      this.dataOptions = null;
+      this.formState = null;
     }
 
     const state = await this.optionsPanelService.close();
 
     if (state) {
-      this.dataOptions = null;
+      this.formState = null;
     }
   }
 
   private closeDeleted: IExecutorHandler<ResourceKey<string>> = async (data, contexts) => {
-    if (!this.dataOptions) {
+    if (!this.formState) {
       return;
     }
 
-    if (ResourceKeyUtils.includes(data, this.dataOptions.config.connectionId)) {
+    if (ResourceKeyUtils.includes(data, this.formState.config.connectionId)) {
       this.close();
     }
   };
 
   private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (
-      !this.dataOptions
+      !this.formState
       || this.optionsPanelService.panelComponent !== formGetter
       || (
-        this.dataOptions.config.connectionId
-        && !this.connectionInfoResource.has(this.dataOptions.config.connectionId)
+        this.formState.config.connectionId
+        && !this.connectionInfoResource.has(this.formState.config.connectionId)
       )
     ) {
+      return;
+    }
+
+    const state = await this.formState.checkFormState();
+
+    if (!state.edited) {
       return;
     }
 

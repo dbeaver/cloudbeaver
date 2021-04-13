@@ -27,7 +27,7 @@ import {
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { IConnectionFormTabProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../ConnectionFormService';
 import { useConnectionAccessState } from './useConnectionAccessState';
 
 const styles = composes(
@@ -51,11 +51,11 @@ const styles = composes(
   `
 );
 
-export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormTabProps> = observer(function ConnectionAccess({
+export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({
   tabId,
-  data,
+  state: formState,
 }) {
-  const { state, load, select } = useConnectionAccessState(data);
+  const { state, load, select } = useConnectionAccessState(formState);
   const style = useStyles(styles);
   const translate = useTranslate();
 
