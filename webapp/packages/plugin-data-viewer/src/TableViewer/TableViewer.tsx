@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { PropsWithChildren, useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Button, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useErrorDetails, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Button, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useErrorDetails, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -118,6 +119,12 @@ type TableViewerProps = PropsWithChildren<{
   onValuePresentationChange: (id: string | null) => void;
 }>;
 
+interface ErrorInfo {
+  error: Error | null;
+  display: boolean;
+  hide: () => void;
+}
+
 export const TableViewer = observer(function TableViewer({
   tableId,
   resultIndex = 0,
@@ -133,8 +140,17 @@ export const TableViewer = observer(function TableViewer({
   const dataModel = tableViewerStorageService.get(tableId);
   const result = dataModel?.getResult(resultIndex);
   const translate = useTranslate();
+  const errorInfo = useObjectRef<ErrorInfo>({
+    error: null,
+    display: false,
+    hide() {
+      this.display = false;
+    },
+  }, {}, {
+    display: observable,
+  });
   const error = useErrorDetails(dataModel?.source.error || null);
-  const animated = useStateDelay(!!error.details, 1);
+  const animated = useStateDelay(errorInfo.display, 1);
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
@@ -198,6 +214,11 @@ export const TableViewer = observer(function TableViewer({
   && resultExist;
   const loading = dataModel.isLoading();
 
+  if (errorInfo.error !== dataModel?.source.error) {
+    errorInfo.error = dataModel?.source.error || null;
+    errorInfo.display = !!dataModel?.source.error;
+  }
+
   return styled(styles)(
     <table-viewer as="div" className={className}>
       <TableHeader model={dataModel} resultIndex={resultIndex} />
@@ -237,10 +258,10 @@ export const TableViewer = observer(function TableViewer({
               </pane-content>
             </Pane>
           </Split>
-          <error as="div" hidden={!error.details} {...use({ animated })}>
+          <error as="div" hidden={!errorInfo.display || loading} {...use({ animated })}>
             {error.details?.message}
             <br /><br />
-            <Button type='button' mod={['outlined']} onClick={() => dataModel.source.clearError()}>
+            <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
               {translate('ui_error_close')}
             </Button>
             {error.details?.hasDetails && (
