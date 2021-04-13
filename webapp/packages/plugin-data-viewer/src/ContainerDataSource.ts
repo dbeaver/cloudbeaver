@@ -46,7 +46,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   isDisabled(resultIndex: number): boolean {
-    return !this.getResult(resultIndex)?.data;
+    return !this.getResult(resultIndex)?.data && this.error === null;
   }
 
   cancel(): boolean {
