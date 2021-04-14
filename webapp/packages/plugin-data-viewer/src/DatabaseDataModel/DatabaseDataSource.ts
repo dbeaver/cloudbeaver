@@ -37,6 +37,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   protected disabled: boolean;
   private activeRequest: Promise<TResult[]> | null;
   private activeSave: Promise<TResult[]> | null;
+  private lastAction: () => Promise<void>;
 
   constructor() {
     makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'disabled'>(this, {
@@ -75,6 +76,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       source: null,
     };
     this.error = null;
+    this.lastAction = this.requestData.bind(this);
   }
 
   getAction<T extends IDatabaseDataAction<TResult>>(
@@ -169,6 +171,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
+  async retry(): Promise<void> {
+    await this.lastAction();
+  }
+
   async requestData(): Promise<void> {
     if (this.activeSave) {
       try {
@@ -180,6 +186,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       await this.activeRequest;
       return;
     }
+    this.lastAction = this.requestData.bind(this);
 
     try {
       const promise = this.request(this.results);
@@ -205,6 +212,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       await this.activeSave;
       return;
     }
+    this.lastAction = this.saveData.bind(this);
 
     try {
       const promise = this.save(this.results);

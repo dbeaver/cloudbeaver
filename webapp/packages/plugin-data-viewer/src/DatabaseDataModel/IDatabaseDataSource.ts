@@ -64,6 +64,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IDatabaseExecutionContext | null) => this;
 
+  retry: () => Promise<void>;
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<boolean> | boolean;

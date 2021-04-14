@@ -94,6 +94,10 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this;
   }
 
+  async retry(): Promise<void> {
+    await this.source.retry();
+  }
+
   async refresh(): Promise<void> {
     await this.requestData();
   }

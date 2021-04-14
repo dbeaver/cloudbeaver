@@ -32,6 +32,7 @@ export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResul
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
 
+  retry: () => Promise<void>;
   refresh: () => Promise<void>;
   reload: () => Promise<void>;
   requestDataPortion: (offset: number, count: number) => Promise<void>;

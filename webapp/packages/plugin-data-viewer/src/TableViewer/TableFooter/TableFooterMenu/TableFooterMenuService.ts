@@ -8,13 +8,10 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem, CommonDialogService, DialogueStateResult
+  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
 } from '@cloudbeaver/core-dialogs';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DetailsError } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
-import { ErrorDialog } from '../../ErrorDialog';
 
 export interface ITableFooterMenuContext {
   model: IDatabaseDataModel<any>;
@@ -27,8 +24,7 @@ export class TableFooterMenuService {
   private tableFooterMenuToken = 'tableFooterMenu';
 
   constructor(
-    private contextMenuService: ContextMenuService,
-    private commonDialogService: CommonDialogService
+    private contextMenuService: ContextMenuService
   ) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
@@ -48,9 +44,7 @@ export class TableFooterMenuService {
       order: 1,
       title: 'ui_processing_save',
       icon: 'table-save',
-      onClick: context => {
-        this.saveData(context.data.model);
-      },
+      onClick: context => context.data.model.source.saveData(),
     });
     this.registerMenuItem({
       id: 'cancel ',
@@ -87,37 +81,5 @@ export class TableFooterMenuService {
 
   registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
     this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
-  }
-
-  private async saveData(model: IDatabaseDataModel<any>) {
-    while (true) {
-      try {
-        await model.source.saveData();
-        return;
-      } catch (exception) {
-        let hasDetails = false;
-        let message = `${exception.name}: ${exception.message}`;
-
-        if (exception instanceof DetailsError) {
-          hasDetails = exception.hasDetails();
-          message = exception.errorMessage;
-        }
-
-        const state = await this.commonDialogService.open(
-          ErrorDialog,
-          {
-            message,
-            title: 'ui_data_saving_error',
-            onShowDetails: hasDetails
-              ? () => this.commonDialogService.open(ErrorDetailsDialog, exception)
-              : undefined,
-          }
-        );
-
-        if (state === DialogueStateResult.Rejected) {
-          return;
-        }
-      }
-    }
   }
 }

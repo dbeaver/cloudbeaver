@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { PropsWithChildren, useCallback } from 'react';
-import styled, { css, use } from 'reshadow';
+import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
-import { Button, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useErrorDetails, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
+import { TableError } from './TableError';
 import { TableFooter } from './TableFooter/TableFooter';
 import { TableGrid } from './TableGrid';
 import { TableHeader } from './TableHeader/TableHeader';
@@ -27,7 +26,7 @@ import { TableViewerStorageService } from './TableViewerStorageService';
 
 const viewerStyles = composes(
   css`
-    error, pane-content {
+    pane-content {
       composes: theme-background-surface theme-text-on-surface from global;
     }
     table-viewer {
@@ -83,24 +82,6 @@ const viewerStyles = composes(
         margin-left: 4px;
       }
     }
-    error {
-      position: absolute;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      white-space: pre-wrap;
-      padding: 16px;
-      overflow: auto;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    error[|animated] {
-      opacity: 1;
-    }
-    Button {
-      margin-right: 16px;
-    }
     Loader {
       position: absolute;
       width: 100%;
@@ -109,7 +90,7 @@ const viewerStyles = composes(
   `
 );
 
-type TableViewerProps = PropsWithChildren<{
+interface Props {
   tableId: string;
   resultIndex: number | undefined;
   presentationId: string | undefined;
@@ -117,15 +98,9 @@ type TableViewerProps = PropsWithChildren<{
   className?: string;
   onPresentationChange: (id: string) => void;
   onValuePresentationChange: (id: string | null) => void;
-}>;
-
-interface ErrorInfo {
-  error: Error | null;
-  display: boolean;
-  hide: () => void;
 }
 
-export const TableViewer = observer(function TableViewer({
+export const TableViewer: React.FC<Props> = observer(function TableViewer({
   tableId,
   resultIndex = 0,
   presentationId,
@@ -133,24 +108,13 @@ export const TableViewer = observer(function TableViewer({
   className,
   onPresentationChange,
   onValuePresentationChange,
-}: TableViewerProps) {
+}) {
   const styles = useStyles(viewerStyles, splitStyles);
   const dataPresentationService = useService(DataPresentationService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const dataModel = tableViewerStorageService.get(tableId);
   const result = dataModel?.getResult(resultIndex);
-  const translate = useTranslate();
-  const errorInfo = useObjectRef<ErrorInfo>({
-    error: null,
-    display: false,
-    hide() {
-      this.display = false;
-    },
-  }, {}, {
-    display: observable,
-  });
-  const error = useErrorDetails(dataModel?.source.error || null);
-  const animated = useStateDelay(errorInfo.display, 1);
+  const loading = dataModel?.isLoading() ?? true;
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
@@ -212,12 +176,6 @@ export const TableViewer = observer(function TableViewer({
     || valuePresentation?.dataFormat === dataFormat)
   && overlay
   && resultExist;
-  const loading = dataModel.isLoading();
-
-  if (errorInfo.error !== dataModel?.source.error) {
-    errorInfo.error = dataModel?.source.error || null;
-    errorInfo.display = !!dataModel?.source.error;
-  }
 
   return styled(styles)(
     <table-viewer as="div" className={className}>
@@ -258,18 +216,7 @@ export const TableViewer = observer(function TableViewer({
               </pane-content>
             </Pane>
           </Split>
-          <error as="div" hidden={!errorInfo.display || loading} {...use({ animated })}>
-            {error.details?.message}
-            <br /><br />
-            <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
-              {translate('ui_error_close')}
-            </Button>
-            {error.details?.hasDetails && (
-              <Button type='button' mod={['unelevated']} onClick={error.open}>
-                {translate('ui_errors_details')}
-              </Button>
-            )}
-          </error>
+          <TableError model={dataModel} loading={loading} />
           <Loader
             loading={loading}
             cancelDisabled={!dataModel.source.canCancel}
