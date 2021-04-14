@@ -38,6 +38,12 @@ export const BASE_CONTAINERS_STYLES = composes(
         align-items: baseline;
       }
 
+      &[center] {
+        align-items: center;
+        justify-content: center;
+        align-content: center;
+      }
+
       &[wrap] {
         flex-wrap: wrap;
       }
