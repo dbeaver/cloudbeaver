@@ -12,13 +12,13 @@ import styled, { css } from 'reshadow';
 import {
   Pane, ResizerControls, SlideBox, SlideElement, slideBoxStyles, Split, splitHorizontalStyles, splitStyles, SlideOverlay
 } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
-import { LogViewTab } from '../shared/ToolsPanel/LogViewTab/LogViewTab';
-import { LogViewTabController } from '../shared/ToolsPanel/LogViewTab/LogViewTabController';
+import { LogViewer } from '../shared/ToolsPanel/LogViewer/LogViewer';
+import { useLogViewer } from '../shared/ToolsPanel/LogViewer/useLogViewer';
 
 const styles = composes(
   css`
@@ -45,7 +45,7 @@ const styles = composes(
 );
 
 export const RightArea = observer(function RightArea() {
-  const controller = useController(LogViewTabController);
+  const logViewerState = useLogViewer();
   const optionsPanelService = useService(OptionsPanelService);
   const OptionsPanel = optionsPanelService.getPanelComponent();
 
@@ -55,13 +55,13 @@ export const RightArea = observer(function RightArea() {
         <OptionsPanel />
       </SlideElement>
       <SlideElement>
-        <Split sticky={30} split="horizontal" mode={controller.isActive ? undefined : 'minimize'} keepRatio>
+        <Split sticky={30} split="horizontal" mode={logViewerState.isActive ? undefined : 'minimize'} keepRatio>
           <Pane>
             <NavigationTabsBar />
           </Pane>
-          {controller.isActive && <ResizerControls />}
+          {logViewerState.isActive && <ResizerControls />}
           <Pane main>
-            <LogViewTab />
+            <LogViewer />
           </Pane>
         </Split>
         <SlideOverlay onClick={() => optionsPanelService.close()} />

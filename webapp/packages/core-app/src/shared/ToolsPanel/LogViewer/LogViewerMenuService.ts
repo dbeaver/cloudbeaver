@@ -38,5 +38,5 @@ export class LogViewerMenuService extends Bootstrap {
     this.logViewerService.toggle();
   }
 
-  load(): void {}
+  load(): void { }
 }

@@ -7,17 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { Link } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import type { ILogEntry } from '../ILogEntry';
-import { LogEntryController } from './LogEntryController';
+import type { ILogEntry } from './ILogEntry';
 
 export interface LogEntryProps {
   item: ILogEntry;
+  onItemSelect: (error: ILogEntry | null) => void;
+  selected?: boolean;
+  className?: string;
 }
 
 const style = css`
@@ -39,23 +40,24 @@ const style = css`
   Link:hover {
     cursor: pointer;
   }
-
-  tr:hover Icon {
-    fill: #338fcc;
+  tr[|selected] {
+    font-weight: 500;
   }
 `;
 
-export const LogEntry = observer(function LogEntry({ item }: LogEntryProps) {
-  const controller = useController(LogEntryController, item);
-
+export const LogEntry = observer(function LogEntry({ item, onItemSelect, selected = false, className }: LogEntryProps) {
   return styled(useStyles(style))(
-    <tr>
+    <tr className={className} {...use({ selected, expanded: selected })}>
       <td>{item.type}</td>
       <td>{item.time}</td>
       <td>
         <message-cell as="div">
           <message as="div" title={item.message}>
-            {item.stackTrace ? <Link onClick={controller.showDetails}>{item.message}</Link> : item.message}
+            {item.stackTrace ? (
+              <Link onClick={() => onItemSelect(selected ? null : item)}>
+                {item.message}
+              </Link>
+            ) : item.message}
           </message>
         </message-cell>
       </td>
