@@ -11,51 +11,53 @@ import styled, { use } from 'reshadow';
 import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { commonDialogStyle } from './styles';
+import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
 
 export interface CommonDialogWrapperProps {
   title?: string;
+  subTitle?: string;
   icon?: string;
   viewBox?: string;
-  error?: boolean;
+  bigIcon?: boolean;
   onReject?: () => void;
   className?: string;
-  noBodyPadding?: boolean;
   footer?: JSX.Element | boolean;
-  header?: JSX.Element | boolean;
   children?: React.ReactNode;
 }
 
 export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function CommonDialogWrapper({
   title,
+  subTitle,
   icon,
   viewBox,
-  error,
-  header,
+  bigIcon,
   footer,
-  noBodyPadding,
   className,
   onReject,
   children,
 }) {
-  if (!icon && error) {
-    icon = '/icons/error_icon.svg';
-  }
-  return styled(useStyles(commonDialogStyle))(
+  return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle))(
     <dialog className={className}>
       <header>
         <header-title as="div">
-          {icon && <IconOrImage {...use({ error })} icon={icon} viewBox={viewBox} />}
-          <h1>{title}</h1>
+          {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
+          <header-title-text as='div'>
+            <h3>{title}</h3>
+            <sub-title as='div'>{subTitle}</sub-title>
+          </header-title-text>
           {onReject && (
             <reject as="div">
               <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
             </reject>
           )}
         </header-title>
-        {header}
       </header>
-      <dialog-body as="div" {...use({ noPadding: noBodyPadding })}>{children}</dialog-body>
+      <dialog-body as="div">
+        <dialog-body-content as='div'>
+          {children}
+        </dialog-body-content>
+        <dialog-body-overflow as='div' />
+      </dialog-body>
       <footer>
         {footer}
       </footer>

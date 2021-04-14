@@ -67,10 +67,10 @@ export const ConnectionDialog = observer(function ConnectionDialog({
   const translate = useTranslate();
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  let title = translate('basicConnection_connectionDialog_newConnection');
+  let subtitle: string | undefined;
 
   if (controller.step === ConnectionStep.Connection && controller.template?.name) {
-    title = controller.template.name;
+    subtitle = controller.template.name;
   }
 
   const sshConfig = controller.template?.networkHandlersConfig.find(
@@ -81,9 +81,9 @@ export const ConnectionDialog = observer(function ConnectionDialog({
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={title}
+      title={translate('basicConnection_connectionDialog_newConnection')}
+      subTitle={subtitle}
       icon={controller.dbDriver?.icon}
-      noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect}
       footer={controller.step === ConnectionStep.Connection && (
         <ConnectionDialogFooter
           isConnecting={controller.isConnecting}

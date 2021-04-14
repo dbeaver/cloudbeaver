@@ -58,7 +58,6 @@ const styles = composes(
       box-sizing: border-box;
       display: inline-flex;
       width: 100%;
-      padding-left: 24px;
       outline: none;
     }
     Tab {
@@ -112,41 +111,38 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
 
   const showTabs = !provider && controller.providers.length > 1;
 
-  const additional = userInfo.data !== null && controller.provider?.id && !userInfo.hasToken(controller.provider?.id);
+  const additional = userInfo.data !== null
+    && controller.provider?.id !== undefined
+    && !userInfo.hasToken(controller.provider.id);
 
   return styled(useStyles(styles))(
     <TabsState currentTabId={controller.provider?.id}>
       <CommonDialogWrapper
         title={translate('authentication_login_dialog_title')}
         icon={controller.provider?.icon}
-        header={(
-          <>
-            {additional && <auth-token-info-message as='div'>{translate('authentication_request_token')}</auth-token-info-message>}
-            {showTabs && (
-              <TabList aria-label='Auth providers'>
-                {controller.providers.map(provider => (
-                  <Tab
-                    key={provider.id}
-                    tabId={provider.id}
-                    disabled={controller.isAuthenticating}
-                    onOpen={() => controller.selectProvider(provider.id)}
-                  >
-                    <TabTitle>{provider.label}</TabTitle>
-                  </Tab>
-                ))}
-              </TabList>
-            )}
-          </>
-        )}
+        subTitle={additional ? translate('authentication_request_token') : undefined}
         footer={(
           <AuthDialogFooter
             isAuthenticating={controller.isAuthenticating}
             onLogin={controller.login}
           />
         )}
-        noBodyPadding
         onReject={options?.persistent ? undefined : rejectDialog}
       >
+        {showTabs && (
+          <TabList aria-label='Auth providers'>
+            {controller.providers.map(provider => (
+              <Tab
+                key={provider.id}
+                tabId={provider.id}
+                disabled={controller.isAuthenticating}
+                onOpen={() => controller.selectProvider(provider.id)}
+              >
+                <TabTitle>{provider.label}</TabTitle>
+              </Tab>
+            ))}
+          </TabList>
+        )}
         <SubmittingForm onSubmit={controller.login}>
           {controller.provider && (
             <AuthProviderForm

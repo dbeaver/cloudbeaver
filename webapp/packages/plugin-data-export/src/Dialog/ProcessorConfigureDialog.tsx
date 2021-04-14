@@ -83,7 +83,6 @@ export const ProcessorConfigureDialog = observer(
             onCancel={onClose}
           />
         )}
-        noBodyPadding
         onReject={onClose}
       >
         <PropertiesTable

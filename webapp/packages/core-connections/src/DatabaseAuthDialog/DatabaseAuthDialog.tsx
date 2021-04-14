@@ -95,7 +95,8 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={connection.connectionInfo?.name}
+      title={translate('connections_database_authentication')}
+      subTitle={connection.connectionInfo?.name}
       icon={driver?.icon}
       footer={(
         <DBAuthDialogFooter
@@ -103,7 +104,6 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
           onLogin={controller.login}
         />
       )}
-      noBodyPadding
       onReject={options?.persistent ? undefined : rejectDialog}
     >
       {(!connection.isLoaded() || connection.isLoading())

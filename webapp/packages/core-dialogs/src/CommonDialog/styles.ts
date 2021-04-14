@@ -12,6 +12,8 @@ export const dialogStyles = css`
     DialogBackdrop {
       box-sizing: border-box;
       background-color: rgba(0,0,0,0.48);
+      /*backdrop-filter: blur(4px);
+      background-color: rgba(221, 221, 221, 0.25);*/
       position: fixed;
       top: 0px;
       right: 0px;
