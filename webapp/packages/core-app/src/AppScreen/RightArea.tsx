@@ -18,7 +18,7 @@ import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTabsBar } from '../shared/NavigationTabs/NavigationTabsBar';
 import { LogViewer } from '../shared/ToolsPanel/LogViewer/LogViewer';
-import { useLogViewer } from '../shared/ToolsPanel/LogViewer/useLogViewer';
+import { LogViewerService } from '../shared/ToolsPanel/LogViewer/LogViewerService';
 
 const styles = composes(
   css`
@@ -45,7 +45,7 @@ const styles = composes(
 );
 
 export const RightArea = observer(function RightArea() {
-  const logViewerState = useLogViewer();
+  const logViewerService = useService(LogViewerService);
   const optionsPanelService = useService(OptionsPanelService);
   const OptionsPanel = optionsPanelService.getPanelComponent();
 
@@ -55,11 +55,11 @@ export const RightArea = observer(function RightArea() {
         <OptionsPanel />
       </SlideElement>
       <SlideElement>
-        <Split sticky={30} split="horizontal" mode={logViewerState.isActive ? undefined : 'minimize'} keepRatio>
+        <Split sticky={30} split="horizontal" mode={logViewerService.isActive ? undefined : 'minimize'} keepRatio>
           <Pane>
             <NavigationTabsBar />
           </Pane>
-          {logViewerState.isActive && <ResizerControls />}
+          {logViewerService.isActive && <ResizerControls />}
           <Pane main>
             <LogViewer />
           </Pane>

@@ -65,14 +65,14 @@ export const LogViewerInfoPanel: React.FC<Props> = observer(function LogViewerIn
 
   const typeInfo = `${selectedItem.type} ${selectedItem.time}`;
 
-  const onCopyValue = useCallback(() => {
+  const сopyMessage = useCallback(() => {
     copy(`${selectedItem.message}\n\n${selectedItem.stackTrace}`, true);
   }, [copy, selectedItem]);
 
   return styled(styles)(
     <panel-wrapper as='div' className={className}>
       <buttons as='div'>
-        <Button mod={['unelevated']} onClick={onCopyValue}>
+        <Button mod={['unelevated']} onClick={сopyMessage}>
           {translate('ui_copy_to_clipboard')}
         </Button>
         <Button mod={['outlined']} onClick={onClose}>

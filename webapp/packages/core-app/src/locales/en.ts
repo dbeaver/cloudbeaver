@@ -5,6 +5,7 @@ export default [
   ['app_shared_connectionMenu_disconnect', 'Disconnect All'],
   ['app_shared_toolsMenu_tools', 'Tools'],
   ['app_shared_toolsMenu_logViewer', 'Log viewer'],
+  ['app_shared_toolsMenu_logViewer_placeholder', 'Log viewer is not active'],
   ['app_shared_settingsMenu_config', 'Configuration'],
   ['app_shared_settingsMenu_theme', 'Theme'],
   ['app_shared_settingsMenu_lang', 'Language'],

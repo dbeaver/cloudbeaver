@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Pane, ResizerControls, Split, splitStyles } from '@cloudbeaver/core-blocks';
+import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { LogViewerInfoPanel } from './LogViewerInfoPanel';
@@ -35,14 +36,15 @@ const styles = composes(
 
 export const LogViewer = observer(function LogViewer() {
   const style = useStyles(styles, splitStyles);
+  const translate = useTranslate();
   const logViewerState = useLogViewer();
 
-  const onCloseInfoPanel = useCallback(() => {
+  const closeInfoPanel = useCallback(() => {
     logViewerState.selectItem(null);
   }, [logViewerState]);
 
   if (!logViewerState.isActive) {
-    return null;
+    return <TextPlaceholder>{translate('app_shared_toolsMenu_logViewer_placeholder')}</TextPlaceholder>;
   }
 
   return styled(style)(
@@ -62,7 +64,7 @@ export const LogViewer = observer(function LogViewer() {
             <Pane>
               <LogViewerInfoPanel
                 selectedItem={logViewerState.selectedItem}
-                onClose={onCloseInfoPanel}
+                onClose={closeInfoPanel}
               />
             </Pane>
           </>
