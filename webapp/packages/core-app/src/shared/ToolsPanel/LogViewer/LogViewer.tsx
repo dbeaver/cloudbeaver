@@ -19,12 +19,12 @@ import { useLogViewer } from './useLogViewer';
 
 const styles = composes(
   css`
-    pane-content {
+    Pane {
       composes: theme-background-surface theme-text-on-surface from global;
     }
   `,
   css`
-    log-view-wrapper, Pane, pane-content {
+    log-view-wrapper, Pane {
       position: relative;
       display: flex;
       flex: 1;
@@ -49,25 +49,21 @@ export const LogViewer = observer(function LogViewer() {
     <log-view-wrapper as='div'>
       <Split mode={logViewerState.selectedItem ? undefined : 'maximize'} keepRatio>
         <Pane main>
-          <pane-content as='div'>
-            <LogViewerTable
-              items={logViewerState.logItems}
-              selectedItem={logViewerState.selectedItem}
-              onItemSelect={logViewerState.selectItem}
-              onClear={() => logViewerState.clearLog()}
-            />
-          </pane-content>
+          <LogViewerTable
+            items={logViewerState.logItems}
+            selectedItem={logViewerState.selectedItem}
+            onItemSelect={logViewerState.selectItem}
+            onClear={() => logViewerState.clearLog()}
+          />
         </Pane>
         {logViewerState.selectedItem && (
           <>
             <ResizerControls />
             <Pane>
-              <pane-content as='div'>
-                <LogViewerInfoPanel
-                  selectedItem={logViewerState.selectedItem}
-                  onClose={onCloseInfoPanel}
-                />
-              </pane-content>
+              <LogViewerInfoPanel
+                selectedItem={logViewerState.selectedItem}
+                onClose={onCloseInfoPanel}
+              />
             </Pane>
           </>
         )}
