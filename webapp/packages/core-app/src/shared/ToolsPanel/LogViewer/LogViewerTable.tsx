@@ -66,23 +66,23 @@ const styles = composes(
 interface Props {
   items: ILogEntry[];
   selectedItem: ILogEntry | null;
-  onItemSelect: (item: ILogEntry | null) => void;
-  onClearTable: () => void;
+  onItemSelect: (item: ILogEntry) => void;
+  onClear: () => void;
   className?: string;
 }
-export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable({ items, selectedItem, onItemSelect, onClearTable, className }) {
+export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
   const style = useStyles(styles);
 
   return styled(style)(
     <wrapper as='div' className={className}>
       <buttons as="div">
-        <Button mod={['unelevated']} onClick={onClearTable}>
+        <Button mod={['unelevated']} onClick={onClear}>
           {translate('app_log_view_clear_log')}
         </Button>
       </buttons>
       <table-wrapper as="div">
-        <table {...use({ expanded: selectedItem })}>
+        <table {...use({ expanded: !!selectedItem })}>
           <thead>
             <tr>
               <type as='th'>{translate('app_log_view_entry_type')}</type>
@@ -96,7 +96,7 @@ export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable(
                 key={item.id}
                 item={item}
                 selected={item.id === selectedItem?.id}
-                onItemSelect={onItemSelect}
+                onSelect={onItemSelect}
               />
             ))}
           </tbody>

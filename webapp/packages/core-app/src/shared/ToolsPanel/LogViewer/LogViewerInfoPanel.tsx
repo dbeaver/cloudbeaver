@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, TextareaNew, useClipboard } from '@cloudbeaver/core-blocks';
@@ -57,17 +59,20 @@ interface Props {
   className?: string;
 }
 
-export const LogViewerInfoPanel: React.FC<Props> = function LogViewerInfoPanel({ selectedItem, onClose, className }) {
+export const LogViewerInfoPanel: React.FC<Props> = observer(function LogViewerInfoPanel({ selectedItem, onClose, className }) {
   const translate = useTranslate();
   const copy = useClipboard();
 
-  const valueToCopy = `${selectedItem.message}\n\n${selectedItem.stackTrace}`;
   const typeInfo = `${selectedItem.type} ${selectedItem.time}`;
+
+  const onCopyValue = useCallback(() => {
+    copy(`${selectedItem.message}\n\n${selectedItem.stackTrace}`, true);
+  }, [copy, selectedItem]);
 
   return styled(styles)(
     <panel-wrapper as='div' className={className}>
       <buttons as='div'>
-        <Button mod={['unelevated']} onClick={() => copy(valueToCopy, true)}>
+        <Button mod={['unelevated']} onClick={onCopyValue}>
           {translate('ui_copy_to_clipboard')}
         </Button>
         <Button mod={['outlined']} onClick={onClose}>
@@ -87,4 +92,4 @@ export const LogViewerInfoPanel: React.FC<Props> = function LogViewerInfoPanel({
       </content-wrapper>
     </panel-wrapper>
   );
-};
+});

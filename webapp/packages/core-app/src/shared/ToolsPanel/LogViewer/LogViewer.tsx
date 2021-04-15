@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Pane, ResizerControls, Split, splitStyles } from '@cloudbeaver/core-blocks';
@@ -36,6 +37,10 @@ export const LogViewer = observer(function LogViewer() {
   const style = useStyles(styles, splitStyles);
   const logViewerState = useLogViewer();
 
+  const onCloseInfoPanel = useCallback(() => {
+    logViewerState.selectItem(null);
+  }, [logViewerState]);
+
   if (!logViewerState.isActive) {
     return null;
   }
@@ -48,8 +53,8 @@ export const LogViewer = observer(function LogViewer() {
             <LogViewerTable
               items={logViewerState.logItems}
               selectedItem={logViewerState.selectedItem}
-              onClearTable={logViewerState.clearLog}
               onItemSelect={logViewerState.selectItem}
+              onClear={() => logViewerState.clearLog()}
             />
           </pane-content>
         </Pane>
@@ -60,7 +65,7 @@ export const LogViewer = observer(function LogViewer() {
               <pane-content as='div'>
                 <LogViewerInfoPanel
                   selectedItem={logViewerState.selectedItem}
-                  onClose={logViewerState.closeInfoPanel}
+                  onClose={onCloseInfoPanel}
                 />
               </pane-content>
             </Pane>

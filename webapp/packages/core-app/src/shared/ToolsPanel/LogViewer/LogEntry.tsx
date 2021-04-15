@@ -14,9 +14,9 @@ import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILogEntry } from './ILogEntry';
 
-export interface LogEntryProps {
+interface Props {
   item: ILogEntry;
-  onItemSelect: (error: ILogEntry | null) => void;
+  onSelect: (item: ILogEntry) => void;
   selected?: boolean;
   className?: string;
 }
@@ -40,21 +40,21 @@ const style = css`
   Link:hover {
     cursor: pointer;
   }
-  tr[|selected] {
+  tr[|expanded] {
     font-weight: 500;
   }
 `;
 
-export const LogEntry = observer(function LogEntry({ item, onItemSelect, selected = false, className }: LogEntryProps) {
+export const LogEntry = observer(function LogEntry({ item, onSelect, selected = false, className }: Props) {
   return styled(useStyles(style))(
-    <tr className={className} {...use({ selected, expanded: selected })}>
+    <tr className={className} {...use({ expanded: selected })}>
       <td>{item.type}</td>
       <td>{item.time}</td>
       <td>
         <message-cell as="div">
           <message as="div" title={item.message}>
             {item.stackTrace ? (
-              <Link onClick={() => onItemSelect(selected ? null : item)}>
+              <Link onClick={() => onSelect(item)}>
                 {item.message}
               </Link>
             ) : item.message}
