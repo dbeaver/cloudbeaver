@@ -4,6 +4,7 @@ export default [
   ['app_shared_connectionMenu_disconnect', 'Отключить все'],
   ['app_shared_toolsMenu_tools', 'Инструменты'],
   ['app_shared_toolsMenu_logViewer', 'Просмотр лога'],
+  ['app_shared_toolsMenu_logViewer_placeholder', 'Просмотр логов неактивен'],
   ['app_shared_settingsMenu_config', 'Настройки'],
   ['app_shared_settingsMenu_theme', 'Тема'],
   ['app_shared_settingsMenu_lang', 'Язык'],

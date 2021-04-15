@@ -46,9 +46,9 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
 
     const translate = useTranslate();
 
-    const [copy] = useClipboard();
+    const copy = useClipboard();
     const copyHandler = useCallback(
-      () => copy(error.textToCopy),
+      () => copy(error.textToCopy, true),
       []
     );
 

@@ -19,8 +19,9 @@ export * from './shared/NodesManager/NavNodeExtensionsService';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
-export * from './shared/ToolsPanel/LogViewTab/LogViewerMenuService';
-export * from './shared/ToolsPanel/LogViewTab/LogViewerService';
+export * from './shared/ToolsPanel/LogViewer/LogViewerMenuService';
+export * from './shared/ToolsPanel/LogViewer/LogViewerService';
+
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
