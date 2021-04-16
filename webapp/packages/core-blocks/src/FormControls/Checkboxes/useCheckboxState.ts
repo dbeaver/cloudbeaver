@@ -11,11 +11,12 @@ import { useContext, useState } from 'react';
 import { useObjectRef } from '../../useObjectRef';
 import { FormContext } from '../FormContext';
 
-export type CheckboxOnChangeEvent<T> =(value: boolean, name: T) => void;
+export type CheckboxOnChangeEvent<T> = (value: boolean, name: T) => void;
 
 export type CheckboxStateOptions<TKey extends string> = {
   value: string | undefined;
   checked: boolean | undefined;
+  defaultChecked: boolean | undefined;
 } & (
   {
     state: undefined;
@@ -42,7 +43,7 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
 
   let checked = optionsRef.checked ?? false;
 
-  if (state !== undefined && name !== undefined) {
+  if (state !== undefined && name !== undefined && name in state) {
     const currentState = state[name as TKey];
 
     if (typeof value === 'string' && Array.isArray(currentState)) {
@@ -52,6 +53,8 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
     } else {
       checked = !!currentState;
     }
+  } else if (optionsRef.defaultChecked !== undefined) {
+    checked = optionsRef.defaultChecked;
   }
 
   return useObjectRef({

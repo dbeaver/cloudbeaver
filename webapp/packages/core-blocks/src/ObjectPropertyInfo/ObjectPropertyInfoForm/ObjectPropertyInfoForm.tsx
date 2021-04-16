@@ -14,13 +14,13 @@ import { InputField } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { FieldCheckbox } from '../FormControls/Checkboxes/FieldCheckbox';
-import { Combobox } from '../FormControls/Combobox';
-import { FormFieldDescription } from '../FormControls/FormFieldDescription';
-import { FormGroup } from '../FormControls/FormGroup';
-import { isControlPresented } from '../FormControls/isControlPresented';
-import { Link } from '../Link';
-import { TextPlaceholder } from '../TextPlaceholder';
+import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
+import { Combobox } from '../../FormControls/Combobox';
+import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
+import { FormGroup } from '../../FormControls/FormGroup';
+import { isControlPresented } from '../../FormControls/isControlPresented';
+import { Link } from '../../Link';
+import { TextPlaceholder } from '../../TextPlaceholder';
 import { formStyles } from './formStyles';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];

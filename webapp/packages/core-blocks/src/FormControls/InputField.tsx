@@ -76,7 +76,15 @@ export const InputField: InputFieldType = observer(function InputField({
     }
   }, [state, name, context, onChange]);
 
-  const value = state ? state[name] : valueControlled;
+  let value: any = valueControlled;
+
+  if (state) {
+    if (name in state) {
+      value = state[name];
+    } else if (rest.defaultValue !== undefined) {
+      value = rest.defaultValue;
+    }
+  }
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;

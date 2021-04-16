@@ -7,18 +7,16 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { FieldCheckboxNew } from '../FormControls/Checkboxes/FieldCheckboxNew';
-import { ComboboxNew } from '../FormControls/ComboboxNew';
-import { FormFieldDescriptionNew } from '../FormControls/FormFieldDescriptionNew';
-import { InputFieldNew } from '../FormControls/InputFieldNew';
-import { isControlPresented } from '../FormControls/isControlPresented';
-import { Link } from '../Link';
-import { TextPlaceholder } from '../TextPlaceholder';
+import type { Layout } from '../../Containers/ILayoutSizeProps';
+import { FieldCheckboxNew } from '../../FormControls/Checkboxes/FieldCheckboxNew';
+import { ComboboxNew } from '../../FormControls/ComboboxNew';
+import { FormFieldDescriptionNew } from '../../FormControls/FormFieldDescriptionNew';
+import { InputFieldNew } from '../../FormControls/InputFieldNew';
+import { isControlPresented } from '../../FormControls/isControlPresented';
+import { Link } from '../../Link';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -32,10 +30,30 @@ interface RenderFieldProps {
   autoHide?: boolean;
   showRememberTip?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  layout?: Layout;
   className?: string;
 }
 
-const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
+function isCheckbox(property: ObjectPropertyInfo) {
+  return property.dataType?.toLowerCase() === 'boolean';
+}
+
+function getDefaultValueFor(property: ObjectPropertyInfo) {
+  const checkbox = isCheckbox(property);
+  const value = property.value;
+
+  if (value === null || value === undefined) {
+    return checkbox ? false : '';
+  }
+
+  if (typeof value === 'string') {
+    return checkbox ? value === 'true' : value;
+  }
+
+  return value.displayName || value.value || JSON.stringify(value);
+}
+
+export const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   property,
   state,
   editable = true,
@@ -45,12 +63,14 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   autoHide,
   showRememberTip,
   onFocus,
+  layout,
   className,
 }) {
   const href = property.features.includes('href');
   const password = property.features.includes('password');
-  const checkbox = property.dataType === 'Boolean';
+  const checkbox = isCheckbox(property);
   const combobox = property.validValues && property.validValues.length > 0;
+  const defaultValue = getDefaultValueFor(property);
   let description: string | undefined;
 
   if (href) {
@@ -81,8 +101,10 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       <FieldCheckboxNew
         name={property.id!}
         state={state}
+        defaultChecked={defaultValue}
         title={property.description}
         disabled={disabled || readOnly}
+        layout={layout}
         className={className}
       >
         {property.displayName ?? ''}
@@ -101,6 +123,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
         defaultValue={property.defaultValue}
         title={property.description}
         disabled={disabled}
+        layout={layout}
         className={className}
       >
         {property.displayName ?? ''}
@@ -114,6 +137,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       title={property.description}
       name={property.id!}
       state={state}
+      defaultValue={defaultValue}
       description={description}
       disabled={disabled}
       readOnly={readOnly}
@@ -121,65 +145,10 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
       className={className}
+      layout={layout}
       onFocus={onFocus}
     >
       {property.displayName}
     </InputFieldNew>
-  );
-});
-
-interface ObjectPropertyFormProps extends ILayoutSizeProps {
-  properties: ObjectPropertyInfo[] | undefined;
-  state: Record<string, string | number>;
-  editable?: boolean;
-  autofillToken?: string;
-  className?: string;
-  disabled?: boolean;
-  readOnly?: boolean;
-  autoHide?: boolean;
-  showRememberTip?: boolean;
-  onFocus?: (name: string) => void;
-}
-
-export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = observer(function ObjectPropertyInfoFormNew({
-  properties,
-  state,
-  editable = true,
-  className,
-  autofillToken = '',
-  disabled,
-  readOnly,
-  autoHide,
-  showRememberTip,
-  onFocus,
-}) {
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    if (onFocus) {
-      onFocus(e.target.name);
-    }
-  }, [onFocus]);
-
-  if (!properties || properties.length === 0) {
-    return <TextPlaceholder>Properties empty</TextPlaceholder>;
-  }
-
-  return (
-    <>
-      {properties.map(property => (
-        <RenderField
-          key={property.id}
-          className={className}
-          property={property}
-          state={state}
-          editable={editable}
-          autofillToken={autofillToken}
-          disabled={disabled}
-          readOnly={readOnly}
-          autoHide={autoHide}
-          showRememberTip={showRememberTip}
-          onFocus={handleFocus}
-        />
-      ))}
-    </>
   );
 });

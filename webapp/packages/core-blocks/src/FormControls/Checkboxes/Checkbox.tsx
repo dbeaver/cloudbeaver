@@ -61,7 +61,14 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
+  const checkboxState = useCheckboxState({
+    value,
+    checked,
+    defaultChecked: rest.defaultChecked,
+    state,
+    name,
+    onChange,
+  });
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;

@@ -11,12 +11,10 @@ import type { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { ColoredContainer, Group, Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { ObjectProperty } from './ObjectProperty';
 
 type ObjectPropertiesProps = PropsWithChildren<{
   objectId: string;
@@ -28,6 +26,7 @@ export const ObjectProperties = observer(function ObjectProperties({
   const translate = useTranslate();
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject?.properties);
 
   if (!dbObject?.properties && isLoading) {
     return <Loader />;
@@ -38,12 +37,32 @@ export const ObjectProperties = observer(function ObjectProperties({
   }
 
   return styled(styles)(
-    <ColoredContainer overflow parent>
-      <Group gap large>
-        {dbObject.properties.map(v => (
-          <ObjectProperty key={v.id} objectProperty={v} small />
-        ))}
-      </Group>
+    <ColoredContainer overflow parent gap>
+      {isUncategorizedExists && (
+        <Group gap large>
+          <ObjectPropertyInfoFormNew
+            properties={dbObject?.properties}
+            category={null}
+            state={{}}
+            layout="mixedControls"
+            small
+            readOnly
+          />
+        </Group>
+      )}
+      {categories.map(category => (
+        <Group key={category} gap large>
+          <GroupTitle>{category}</GroupTitle>
+          <ObjectPropertyInfoFormNew
+            properties={dbObject?.properties}
+            category={category}
+            state={{}}
+            layout="mixedControls"
+            small
+            readOnly
+          />
+        </Group>
+      ))}
     </ColoredContainer>
   );
 });

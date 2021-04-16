@@ -100,7 +100,15 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     return null;
   }
 
-  let value = state ? state[name] : valueControlled;
+  let value: any = valueControlled;
+
+  if (state) {
+    if (name in state) {
+      value = state[name];
+    } else if (rest.defaultValue !== undefined) {
+      value = rest.defaultValue;
+    }
+  }
 
   if (mapState) {
     value = mapState(value);

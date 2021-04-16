@@ -103,7 +103,14 @@ export const Switch: SwitchType = observer(function Switch({
   disabled,
   ...rest
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
+  const checkboxState = useCheckboxState({
+    value,
+    checked,
+    defaultChecked: rest.defaultChecked,
+    state,
+    name,
+    onChange,
+  });
   const styles = useStyles(
     baseFormControlStyles,
     switchStyles,
