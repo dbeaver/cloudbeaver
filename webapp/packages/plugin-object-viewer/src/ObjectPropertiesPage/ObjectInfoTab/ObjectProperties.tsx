@@ -14,11 +14,14 @@ import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
 import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 type ObjectPropertiesProps = PropsWithChildren<{
   objectId: string;
 }>;
+
+const emptyArray: ObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,
@@ -26,7 +29,7 @@ export const ObjectProperties = observer(function ObjectProperties({
   const translate = useTranslate();
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);
-  const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject?.properties);
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject?.properties ?? emptyArray);
 
   if (!dbObject?.properties && isLoading) {
     return <Loader />;
@@ -44,7 +47,6 @@ export const ObjectProperties = observer(function ObjectProperties({
             properties={dbObject?.properties}
             category={null}
             state={{}}
-            layout="mixedControls"
             small
             readOnly
           />
@@ -57,7 +59,6 @@ export const ObjectProperties = observer(function ObjectProperties({
             properties={dbObject?.properties}
             category={category}
             state={{}}
-            layout="mixedControls"
             small
             readOnly
           />

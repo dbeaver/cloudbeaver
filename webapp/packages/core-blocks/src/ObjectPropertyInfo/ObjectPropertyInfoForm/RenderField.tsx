@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import type { Layout } from '../../Containers/ILayoutSizeProps';
 import { FieldCheckboxNew } from '../../FormControls/Checkboxes/FieldCheckboxNew';
 import { ComboboxNew } from '../../FormControls/ComboboxNew';
 import { FormFieldDescriptionNew } from '../../FormControls/FormFieldDescriptionNew';
@@ -30,7 +29,6 @@ interface RenderFieldProps {
   autoHide?: boolean;
   showRememberTip?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  layout?: Layout;
   className?: string;
 }
 
@@ -63,7 +61,6 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
   autoHide,
   showRememberTip,
   onFocus,
-  layout,
   className,
 }) {
   const href = property.features.includes('href');
@@ -104,7 +101,6 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
         defaultChecked={defaultValue}
         title={property.description}
         disabled={disabled || readOnly}
-        layout={layout}
         className={className}
       >
         {property.displayName ?? ''}
@@ -123,7 +119,6 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
         defaultValue={property.defaultValue}
         title={property.description}
         disabled={disabled}
-        layout={layout}
         className={className}
       >
         {property.displayName ?? ''}
@@ -145,7 +140,6 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
       className={className}
-      layout={layout}
       onFocus={onFocus}
     >
       {property.displayName}

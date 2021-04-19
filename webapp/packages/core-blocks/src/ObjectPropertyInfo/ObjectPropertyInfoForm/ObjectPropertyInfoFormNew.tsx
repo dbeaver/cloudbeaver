@@ -40,7 +40,6 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
   readOnly,
   autoHide,
   showRememberTip,
-  layout,
   onFocus,
 }) {
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
@@ -53,34 +52,28 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 
-  let filteredProperties: ObjectPropertyInfo[] | null = null;
-
-  if (category !== undefined) {
-    if (category === null) {
-      filteredProperties = properties.filter(property => !property.category);
-    } else {
-      filteredProperties = properties.filter(property => property.category === category);
-    }
-  }
-
   return (
     <>
-      {(filteredProperties || properties).map(property => (
-        <RenderField
-          key={property.id}
-          className={className}
-          property={property}
-          state={state}
-          editable={editable}
-          autofillToken={autofillToken}
-          disabled={disabled}
-          readOnly={readOnly}
-          autoHide={autoHide}
-          showRememberTip={showRememberTip}
-          layout={layout}
-          onFocus={handleFocus}
-        />
-      ))}
+      {properties.map(property => {
+        if (category !== undefined && property.category !== category) {
+          return null;
+        }
+        return (
+          <RenderField
+            key={property.id}
+            className={className}
+            property={property}
+            state={state}
+            editable={editable}
+            autofillToken={autofillToken}
+            disabled={disabled}
+            readOnly={readOnly}
+            autoHide={autoHide}
+            showRememberTip={showRememberTip}
+            onFocus={handleFocus}
+          />
+        );
+      })}
     </>
   );
 });

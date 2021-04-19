@@ -16,16 +16,12 @@ interface ICategoriesInfo {
   isUncategorizedExists: boolean;
 }
 
-export function useObjectPropertyCategories(properties: ObjectPropertyInfo[] | undefined) {
+export function useObjectPropertyCategories(properties: ObjectPropertyInfo[]) {
   const categories: IComputedValue<ICategoriesInfo> = useMemo(() => computed(() => {
     const result: ICategoriesInfo = {
       categories: [],
       isUncategorizedExists: false,
     };
-
-    if (!properties) {
-      return result;
-    }
 
     for (const property of properties) {
       const category = property.category;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -22,14 +22,6 @@ const fieldCheckboxStyles = css`
     display: flex;
     align-items: flex-end;
     white-space: pre-wrap;
-    &[|layout='mixedControls'] layout {
-      /* same as input height */
-      height: 32px;
-    }
-  }
-  layout {
-    display: flex;
-    align-items: center;
   }
   field-label {
     composes: theme-typography--body2 from global;
@@ -43,7 +35,6 @@ const fieldCheckboxStyles = css`
 export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
   children,
   className,
-  layout,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const styles = useStyles(baseFormControlStylesNew, fieldCheckboxStyles);
@@ -53,11 +44,9 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
   }
 
   return styled(styles)(
-    <field className={className} as="div" {...use({ layout })}>
-      <layout as='div'>
-        <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
-        <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
-      </layout>
+    <field className={className} as="div">
+      <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
+      <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
     </field>
   );
 };
