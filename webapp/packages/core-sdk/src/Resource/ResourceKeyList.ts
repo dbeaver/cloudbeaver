@@ -13,9 +13,11 @@ export type SingleResourceKey<T> = Exclude<T, Exclude<T, ResourceKeyList<any>>> 
 
 export class ResourceKeyList<TKey> {
   readonly list: TKey[];
+  readonly mark: any;
 
-  constructor(list: TKey[] | TKey) {
+  constructor(list: TKey[] | TKey, mark?: any) {
     this.list = Array.isArray(list) ? list : [list];
+    this.mark = mark;
   }
 
   includes(key: ResourceKeyList<TKey> | TKey): boolean {
@@ -35,6 +37,7 @@ interface MapFnc {
 }
 
 export interface ResourceKeyUtils {
+  hasMark: <TKey>(key: ResourceKey<TKey>, mark: any) => boolean;
   count: <TKey>(key: ResourceKey<TKey>) => number;
   first: <TKey>(key: ResourceKey<TKey>) => TKey;
   forEach: <TKey>(key: ResourceKey<TKey>, action: (key: TKey, index: number) => any) => void;
@@ -47,6 +50,17 @@ export interface ResourceKeyUtils {
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ResourceKeyUtils: ResourceKeyUtils = {
+  hasMark<TKey>(
+    key: ResourceKey<TKey>,
+    mark: any
+  ): boolean {
+    if (isResourceKeyList(key)) {
+      return key.mark === mark;
+    } else {
+      return false;
+    }
+  },
+
   count<TKey>(
     key: ResourceKey<TKey>
   ): number {
@@ -134,6 +148,6 @@ export function isResourceKeyList<T>(data: any): data is ResourceKeyList<T> {
   return data instanceof ResourceKeyList;
 }
 
-export function resourceKeyList<T>(list: T[]): ResourceKeyList<T> {
-  return new ResourceKeyList(list);
+export function resourceKeyList<T>(list: T[], mark?: any): ResourceKeyList<T> {
+  return new ResourceKeyList(list, mark);
 }

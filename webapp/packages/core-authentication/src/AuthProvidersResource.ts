@@ -22,7 +22,7 @@ export type AuthProvider = AuthProviderInfo;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider, void> {
-  static keyAll = resourceKeyList(['all']);
+  static keyAll = resourceKeyList(['all'], 'all');
   private loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(
@@ -36,9 +36,9 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     this.serverConfigResource.onDataUpdate.addHandler(async () => { await this.load(AuthProvidersResource.keyAll); });
     this.addAlias(AuthProvidersResource.keyAll, key => {
       if (this.keys.length > 0) {
-        return resourceKeyList(this.keys);
+        return resourceKeyList(this.keys, AuthProvidersResource.keyAll.mark);
       }
-      return key;
+      return AuthProvidersResource.keyAll;
     });
   }
 
@@ -80,7 +80,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
 
-    const all = ResourceKeyUtils.includes(AuthProvidersResource.keyAll, key);
+    const all = ResourceKeyUtils.hasMark(key, AuthProvidersResource.keyAll.mark);
 
     if (all) {
       this.data.clear();
