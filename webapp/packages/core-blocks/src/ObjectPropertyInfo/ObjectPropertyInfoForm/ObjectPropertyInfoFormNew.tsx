@@ -16,8 +16,8 @@ import { TextPlaceholder } from '../../TextPlaceholder';
 import { RenderField } from './RenderField';
 
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
-  properties: ObjectPropertyInfo[] | undefined;
-  state: Record<string, string | number>;
+  properties: ObjectPropertyInfo[];
+  state?: Record<string, string | number>;
   category?: string | null;
   editable?: boolean;
   autofillToken?: string;
@@ -48,7 +48,7 @@ export const ObjectPropertyInfoFormNew: React.FC<ObjectPropertyFormProps> = obse
     }
   }, [onFocus]);
 
-  if (!properties || properties.length === 0) {
+  if (properties.length === 0) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
   }
 

@@ -28,11 +28,12 @@ const INPUT_FIELD_STYLES = css`
   }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
   description?: string;
   mod?: 'surface';
   ref?: React.Ref<HTMLInputElement>;
   style?: ComponentStyle;
+  defaultValue?: string | number;
 };
 
 type ControlledProps = BaseProps & {
@@ -47,7 +48,7 @@ type ControlledProps = BaseProps & {
 
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
-  state: TState;
+  state?: TState;
   mapState?: (value: TState[TKey]) => TState[TKey];
   mapValue?: (value: TState[TKey]) => TState[TKey];
   onChange?: (value: TState[TKey], name: TKey) => any;
@@ -64,6 +65,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   name,
   style,
   value: valueControlled,
+  defaultValue,
   required,
   state,
   mapState,
@@ -96,18 +98,14 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     }
   }, [state, name, context, onChange]);
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;
   }
 
-  let value: any = valueControlled;
+  let value: any = valueControlled ?? defaultValue ?? undefined;
 
-  if (state) {
-    if (name in state) {
-      value = state[name];
-    } else if (rest.defaultValue !== undefined) {
-      value = rest.defaultValue;
-    }
+  if (state && name !== undefined && name in state) {
+    value = state[name];
   }
 
   if (mapState) {

@@ -227,7 +227,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(authModel && !driver.data?.anonymousAccess) && (
+          {(authModel && !driver.data?.anonymousAccess && properties) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <Container wrap gap>

@@ -15,6 +15,7 @@ export type CheckboxOnChangeEvent<T> = (value: boolean, name: T) => void;
 
 export type CheckboxStateOptions<TKey extends string> = {
   value: string | undefined;
+  defaultValue: string | undefined;
   checked: boolean | undefined;
   defaultChecked: boolean | undefined;
 } & (
@@ -39,22 +40,21 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
   const [count, refresh] = useState(0);
   const context = useContext(FormContext);
   const optionsRef = useObjectRef({ ...options, context, count });
-  const { state, name, value } = optionsRef;
+  const { state, name } = optionsRef;
 
-  let checked = optionsRef.checked ?? false;
+  let checked = optionsRef.checked ?? optionsRef.defaultChecked ?? false;
+  const value = optionsRef.value ?? optionsRef.defaultValue ?? undefined;
 
   if (state !== undefined && name !== undefined && name in state) {
     const currentState = state[name as TKey];
 
-    if (typeof value === 'string' && Array.isArray(currentState)) {
-      checked = currentState.includes(value);
+    if (typeof value === 'string') {
+      checked = Array.isArray(currentState) ? currentState.includes(value) : currentState === value;
     } else if (typeof currentState === 'string') {
       checked = currentState.toLowerCase() === 'true';
     } else {
       checked = !!currentState;
     }
-  } else if (optionsRef.defaultChecked !== undefined) {
-    checked = optionsRef.defaultChecked;
   }
 
   return useObjectRef({

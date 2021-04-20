@@ -21,7 +21,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
-  state: Record<string, any>;
+  state?: Record<string, any>;
   editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
@@ -32,20 +32,31 @@ interface RenderFieldProps {
   className?: string;
 }
 
-function isCheckbox(property: ObjectPropertyInfo) {
-  return property.dataType?.toLowerCase() === 'boolean';
+type ControlType = 'checkbox' | 'combobox' | 'link' | 'input';
+
+function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
+  const dataType = property.dataType?.toLowerCase();
+
+  if (dataType === 'boolean') {
+    return 'checkbox';
+  } else if (property.validValues && property.validValues.length > 0) {
+    return 'combobox';
+  } else if (property.features.includes('href')) {
+    return 'link';
+  }
+
+  return 'input';
 }
 
-function getDefaultValueFor(property: ObjectPropertyInfo) {
-  const checkbox = isCheckbox(property);
-  const value = property.value;
+function getValue(value: any, controlType: ControlType) {
+  const checkbox = controlType === 'checkbox';
 
   if (value === null || value === undefined) {
     return checkbox ? false : '';
   }
 
   if (typeof value === 'string') {
-    return checkbox ? value === 'true' : value;
+    return checkbox ? value.toLowerCase() === 'true' : value;
   }
 
   return value.displayName || value.value || JSON.stringify(value);
@@ -63,17 +74,17 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
   onFocus,
   className,
 }) {
-  const href = property.features.includes('href');
+  const controltype = getControlTypeFor(property);
   const password = property.features.includes('password');
-  const checkbox = isCheckbox(property);
-  const combobox = property.validValues && property.validValues.length > 0;
-  const defaultValue = getDefaultValueFor(property);
+
+  const value = getValue(property.value, controltype);
+  const defaultValue = getValue(property.defaultValue, controltype);
   let description: string | undefined;
 
-  if (href) {
+  if (controltype === 'link') {
     return (
       <FormFieldDescriptionNew label={property.displayName} className={className}>
-        <Link href={state[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+        <Link href={state?.[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
       </FormFieldDescriptionNew>
     );
   }
@@ -84,7 +95,7 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
     }
     return (
       <FormFieldDescriptionNew title={property.description} label={property.displayName} className={className}>
-        {state[property.id!]}
+        {state?.[property.id!]}
       </FormFieldDescriptionNew>
     );
   }
@@ -93,12 +104,12 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
     description = 'Password saved';
   }
 
-  if (checkbox) {
+  if (controltype === 'checkbox') {
     return (
       <FieldCheckboxNew
         name={property.id!}
         state={state}
-        defaultChecked={defaultValue}
+        checked={state === undefined ? value : undefined}
         title={property.description}
         disabled={disabled || readOnly}
         className={className}
@@ -108,7 +119,7 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
     );
   }
 
-  if (combobox) {
+  if (controltype === 'combobox') {
     return (
       <ComboboxNew
         name={property.id!}
@@ -116,7 +127,7 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
         items={property.validValues!}
         keySelector={value => value}
         valueSelector={value => value}
-        defaultValue={property.defaultValue}
+        defaultValue={defaultValue}
         title={property.description}
         disabled={disabled}
         className={className}
@@ -132,7 +143,7 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
       title={property.description}
       name={property.id!}
       state={state}
-      defaultValue={defaultValue}
+      value={state === undefined ? value : undefined}
       description={description}
       disabled={disabled}
       readOnly={readOnly}

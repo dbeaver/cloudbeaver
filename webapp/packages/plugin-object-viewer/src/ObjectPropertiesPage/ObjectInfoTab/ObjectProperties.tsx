@@ -30,12 +30,13 @@ export const ObjectProperties = observer(function ObjectProperties({
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject?.properties ?? emptyArray);
+  const properties = dbObject?.properties;
 
-  if (!dbObject?.properties && isLoading) {
+  if (!properties && isLoading) {
     return <Loader />;
   }
 
-  if (!dbObject?.properties || dbObject.properties.length === 0) {
+  if (!properties || properties.length === 0) {
     return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
@@ -44,9 +45,8 @@ export const ObjectProperties = observer(function ObjectProperties({
       {isUncategorizedExists && (
         <Group gap large>
           <ObjectPropertyInfoFormNew
-            properties={dbObject?.properties}
+            properties={properties}
             category={null}
-            state={{}}
             small
             readOnly
           />
@@ -56,9 +56,8 @@ export const ObjectProperties = observer(function ObjectProperties({
         <Group key={category} gap large>
           <GroupTitle>{category}</GroupTitle>
           <ObjectPropertyInfoFormNew
-            properties={dbObject?.properties}
+            properties={properties}
             category={category}
-            state={{}}
             small
             readOnly
           />

@@ -16,18 +16,18 @@ import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'defaultValue'> & {
   description?: string;
   mod?: 'surface';
   long?: boolean;
   short?: boolean;
+  defaultValue?: string;
 };
 
 type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   onChange?: (value: string, name?: string) => any;
-
   state?: never;
   autoHide?: never;
 };
@@ -37,7 +37,6 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   state: TState;
   onChange?: (value: string, name: TKey) => any;
   autoHide?: boolean;
-
   value?: never;
 };
 
@@ -49,6 +48,7 @@ interface InputFieldType {
 export const InputField: InputFieldType = observer(function InputField({
   name,
   value: valueControlled,
+  defaultValue,
   required,
   state,
   children,
@@ -76,17 +76,13 @@ export const InputField: InputFieldType = observer(function InputField({
     }
   }, [state, name, context, onChange]);
 
-  let value: any = valueControlled;
+  let value: any = valueControlled ?? defaultValue ?? undefined;
 
-  if (state) {
-    if (name in state) {
-      value = state[name];
-    } else if (rest.defaultValue !== undefined) {
-      value = rest.defaultValue;
-    }
+  if (state && name !== undefined && name in state) {
+    value = state[name];
   }
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;
   }
 

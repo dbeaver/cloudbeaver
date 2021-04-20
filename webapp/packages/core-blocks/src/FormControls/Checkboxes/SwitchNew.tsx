@@ -85,6 +85,8 @@ const switchState = {
 interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
   description?: string;
+  defaultValue?: string;
+  defaultChecked?: boolean;
 }
 
 interface SwitchType {
@@ -95,9 +97,11 @@ interface SwitchType {
 export const SwitchNew: SwitchType = observer(function SwitchNew({
   name,
   value,
+  defaultValue,
   description,
   state,
   checked,
+  defaultChecked,
   className,
   children,
   onChange,
@@ -108,8 +112,9 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const checkboxState = useCheckboxState({
     value,
+    defaultValue,
     checked,
-    defaultChecked: rest.defaultChecked,
+    defaultChecked,
     state,
     name,
     onChange,
@@ -122,7 +127,7 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
     checkboxState.checked && switchState.checked
   );
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state, defaultChecked)) {
     return null;
   }
 

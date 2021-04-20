@@ -21,9 +21,11 @@ export interface CheckboxBaseProps {
   ripple?: boolean;
   indeterminate?: boolean;
   style?: ComponentStyle;
+  defaultChecked?: boolean;
+  defaultValue?: string;
 }
 
-export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked' | 'id' | 'style'> & ILayoutSizeProps;
+export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'id' | 'style'> & ILayoutSizeProps;
 
 export interface ICheckboxControlledProps extends CheckboxInputProps {
   value?: string;
@@ -35,7 +37,7 @@ export interface ICheckboxControlledProps extends CheckboxInputProps {
 
 export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInputProps {
   value?: string;
-  state: Partial<Record<TKey, boolean | null | string | string[]>>;
+  state?: Partial<Record<TKey, boolean | null | string | string[]>>;
   checked?: never;
   onChange?: CheckboxOnChangeEvent<TKey>;
   autoHide?: boolean;
@@ -50,9 +52,11 @@ export interface CheckboxType {
 export const Checkbox: CheckboxType = observer(function Checkbox({
   name,
   value,
+  defaultValue,
   state,
   label,
   checked,
+  defaultChecked,
   children,
   mod,
   ripple,
@@ -63,14 +67,15 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const checkboxState = useCheckboxState({
     value,
+    defaultValue,
     checked,
-    defaultChecked: rest.defaultChecked,
+    defaultChecked,
     state,
     name,
     onChange,
   });
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state, defaultChecked)) {
     return null;
   }
 
