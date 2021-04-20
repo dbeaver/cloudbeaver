@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { TabProps } from '../Tab/TabProps';
 
@@ -48,5 +48,11 @@ export interface ITabsContainer<TProps = Record<string, any>, TOptions extends R
   readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
   readonly selectedId: string | null;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
+  getTabState: <T>(
+    state: MetadataMap<string, any>,
+    tabId: string,
+    props: TProps,
+    valueGetter?: MetadataValueGetter<string, T>
+  ) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
 }
