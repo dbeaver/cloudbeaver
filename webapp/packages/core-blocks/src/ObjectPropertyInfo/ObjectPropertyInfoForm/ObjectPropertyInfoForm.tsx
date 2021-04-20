@@ -80,6 +80,7 @@ const RenderField: React.FC<RenderFieldProps> = observer(function RenderField({
   if (checkbox) {
     return (
       <FieldCheckbox
+        id={property.id}
         name={property.id!}
         state={state}
         label={property.displayName}

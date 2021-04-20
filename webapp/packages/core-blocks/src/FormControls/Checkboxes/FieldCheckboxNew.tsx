@@ -46,7 +46,7 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
   return styled(styles)(
     <field className={className} as="div">
       <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
-      <field-label htmlFor={rest.value || rest.name} title={rest.title} as="label">{children}</field-label>
+      <field-label htmlFor={rest.id || rest.name} title={rest.title} as="label">{children}</field-label>
     </field>
   );
 };

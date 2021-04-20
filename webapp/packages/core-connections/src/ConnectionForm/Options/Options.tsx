@@ -205,8 +205,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             )}
             {admin && originLocal && (
               <FieldCheckboxNew
+                id={config.connectionId}
                 name="template"
-                value={config.connectionId}
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
@@ -243,8 +243,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               </Container>
               {credentialsSavingEnabled && (
                 <FieldCheckboxNew
+                  id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
-                  value={config.connectionId + 'authNeeded'}
                   state={config}
                   disabled={disabled || readonly}
                 >{translate('connections_connection_edit_save_credentials')}

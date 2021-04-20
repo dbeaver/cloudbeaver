@@ -118,8 +118,8 @@ export const ConnectionDialog = observer(function ConnectionDialog({
               {credentialsSavingEnabled && (
                 <FormGroup>
                   <FieldCheckbox
+                    id={controller.template?.id || 'DBAuthSaveCredentials'}
                     name="saveCredentials"
-                    value={controller.template?.id || 'DBAuthSaveCredentials'}
                     label={translate('connections_connection_edit_save_credentials')}
                     disabled={controller.isConnecting}
                     state={controller.config}

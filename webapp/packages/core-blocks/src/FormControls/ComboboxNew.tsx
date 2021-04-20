@@ -117,7 +117,7 @@ type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
 
 type ObjectProps<TValue, TKey extends keyof TState, TState> = BaseProps<TState[TKey], TValue> & {
   name: TKey;
-  state?: TState;
+  state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
   onChange?: (value: string, name: TKey | undefined) => any;
   value?: never;

@@ -79,10 +79,7 @@ const switchState = {
 
 interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
-  label?: string;
   description?: string;
-  defaultValue?: string;
-  defaultChecked?: boolean;
 }
 
 interface SwitchType {

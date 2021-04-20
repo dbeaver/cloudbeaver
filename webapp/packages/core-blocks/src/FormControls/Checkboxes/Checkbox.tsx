@@ -16,19 +16,20 @@ import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
 export interface CheckboxBaseProps {
-  label?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;
   style?: ComponentStyle;
-  defaultChecked?: boolean;
-  defaultValue?: string;
 }
 
-export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'id' | 'style'> & ILayoutSizeProps;
+export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'> & ILayoutSizeProps & {
+  value?: string;
+  defaultValue?: string;
+  defaultChecked?: boolean;
+  label?: string;
+};
 
 export interface ICheckboxControlledProps extends CheckboxInputProps {
-  value?: string;
   state?: never;
   checked?: boolean;
   onChange?: CheckboxOnChangeEvent<string | undefined>;
@@ -36,14 +37,12 @@ export interface ICheckboxControlledProps extends CheckboxInputProps {
 }
 
 export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInputProps {
-  value?: string;
-  state?: Partial<Record<TKey, boolean | null | string | string[]>>;
+  state: Partial<Record<TKey, boolean | null | string | string[]>>;
   checked?: never;
   onChange?: CheckboxOnChangeEvent<TKey>;
   autoHide?: boolean;
   name: TKey;
 }
-
 export interface CheckboxType {
   (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
   <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
@@ -83,7 +82,6 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     <CheckboxMarkup
       {...rest}
       name={name}
-      id={value || name}
       checked={checkboxState.checked}
       label={label}
       className={className}

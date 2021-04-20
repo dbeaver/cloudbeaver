@@ -105,11 +105,25 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
   }
 
   if (controltype === 'checkbox') {
+    if (state !== undefined) {
+      return (
+        <FieldCheckboxNew
+          id={property.id}
+          name={property.id!}
+          state={state}
+          title={property.description}
+          disabled={disabled || readOnly}
+          className={className}
+        >
+          {property.displayName ?? ''}
+        </FieldCheckboxNew>
+      );
+    }
     return (
       <FieldCheckboxNew
+        id={property.id}
         name={property.id!}
-        state={state}
-        checked={state === undefined ? value : undefined}
+        checked={value}
         title={property.description}
         disabled={disabled || readOnly}
         className={className}
@@ -120,10 +134,27 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
   }
 
   if (controltype === 'combobox') {
+    if (state !== undefined) {
+      return (
+        <ComboboxNew
+          name={property.id!}
+          state={state}
+          items={property.validValues!}
+          keySelector={value => value}
+          valueSelector={value => value}
+          defaultValue={defaultValue}
+          title={property.description}
+          disabled={disabled}
+          className={className}
+        >
+          {property.displayName ?? ''}
+        </ComboboxNew>
+      );
+    }
+
     return (
       <ComboboxNew
         name={property.id!}
-        state={state}
         items={property.validValues!}
         keySelector={value => value}
         valueSelector={value => value}
@@ -137,17 +168,35 @@ export const RenderField: React.FC<RenderFieldProps> = observer(function RenderF
     );
   }
 
+  if (state !== undefined) {
+    return (
+      <InputFieldNew
+        type={password ? 'password' : 'text'}
+        title={property.description}
+        name={property.id!}
+        state={state}
+        description={description}
+        disabled={disabled}
+        readOnly={readOnly}
+        autoHide={autoHide}
+        autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
+        mod='surface'
+        className={className}
+        onFocus={onFocus}
+      >
+        {property.displayName}
+      </InputFieldNew>
+    );
+  }
   return (
     <InputFieldNew
       type={password ? 'password' : 'text'}
       title={property.description}
       name={property.id!}
-      state={state}
-      value={state === undefined ? value : undefined}
+      value={value}
       description={description}
       disabled={disabled}
       readOnly={readOnly}
-      autoHide={autoHide}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod='surface'
       className={className}
