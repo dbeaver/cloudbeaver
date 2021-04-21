@@ -184,7 +184,7 @@ export class ConnectionSSHTabService extends Bootstrap {
         || handler.savePassword !== initialConfig?.savePassword
         || handler.userName !== initialConfig?.userName
         || (
-          (initialConfig?.password === null && handler.password !== '')
+          ((initialConfig?.password === null || initialConfig?.password === '') && handler.password !== '')
             || (handler.password?.length || 0) > 0
         )
         || handler.properties?.host !== initialConfig?.properties?.host

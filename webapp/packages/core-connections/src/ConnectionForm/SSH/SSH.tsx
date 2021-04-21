@@ -126,6 +126,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               type="password"
               name="password"
               placeholder={passwordHint}
+              autoComplete='new-password'
               state={state}
               disabled={disabled || !enabled}
               readOnly={readonly}
