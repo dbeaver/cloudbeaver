@@ -59,7 +59,7 @@ const PublicConnectionFormRenderer: React.FC<Props> = observer(function PublicCo
 export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
   const service = useService(PublicConnectionFormService);
 
-  const close = useCallback(() => service.close(), []);
+  const close = useCallback(() => service.close(true), []);
   const save = useCallback(() => service.close(true), []);
 
   return styled(styles)(

@@ -8,8 +8,8 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { isPropertiesEqual } from '@cloudbeaver/core-utils';
+import { isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource, DatabaseConnection } from '../../Administration/ConnectionsResource';
 import { ConnectionInfoResource } from '../../ConnectionInfoResource';
@@ -208,22 +208,27 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(connectionFormStateContext);
+    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
 
     if (
-      config.name !== data.info.name
-      || config.description !== data.info.description
-      || config.template !== data.info.template
-      || config.driverId !== data.info.driverId
-      || (config.url !== undefined && config.url !== data.info.url)
-      || (config.host !== undefined && config.host !== data.info.host)
-      || (config.port !== undefined && config.port !== data.info.port)
-      || (config.databaseName !== undefined && config.databaseName !== data.info.databaseName)
+      !isValuesEqual(config.name, data.info.name, '')
+      || !isValuesEqual(config.description, data.info.description, '')
+      || !isValuesEqual(config.template, data.info.template, true)
+      || !isValuesEqual(config.driverId, data.info.driverId, '')
+      || (config.url !== undefined && !isValuesEqual(config.url, data.info.url, ''))
+      || (config.host !== undefined && !isValuesEqual(config.host, data.info.host, ''))
+      || (config.port !== undefined && !isValuesEqual(config.port, data.info.port, ''))
+      || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
       || config.credentials !== undefined
-      || (config.authModelId !== undefined && config.authModelId !== data.info.authModel)
+      || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
       || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.saveCredentials)
       || (
         config.providerProperties !== undefined
-        && !isPropertiesEqual(config.providerProperties, data.info.providerProperties)
+        && !isObjectPropertyInfoStateEqual(
+          driver.providerProperties,
+          config.providerProperties,
+          data.info.providerProperties
+        )
       )
     ) {
       stateContext.markEdited();

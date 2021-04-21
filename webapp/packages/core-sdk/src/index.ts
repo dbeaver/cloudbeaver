@@ -11,5 +11,6 @@ export * from './getErrorDetails';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';
+export * from './isObjectPropertyInfoStateEqual';
 export * from './sdk';
 export * from './ServerInternalError';

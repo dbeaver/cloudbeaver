@@ -7,6 +7,7 @@ export * from './uuid_';
 export * from './generateFileName';
 export * from './isArraysEqual';
 export * from './isPropertiesEqual';
+export * from './isValuesEqual';
 export * from './md5';
 export * from './TextTools';
 export * from './copyToClipboard';

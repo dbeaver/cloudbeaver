@@ -8,8 +8,9 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isPropertiesEqual } from '@cloudbeaver/core-utils';
+import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
 
+import { DBDriverResource } from '../../DBDriverResource';
 import { connectionConfigContext } from '../connectionConfigContext';
 import { IConnectionFormSubmitData, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
 import { connectionFormStateContext } from '../connectionFormStateContext';
@@ -18,7 +19,8 @@ import { DriverProperties } from './DriverProperties';
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
   constructor(
-    private readonly connectionFormService: ConnectionFormService
+    private readonly connectionFormService: ConnectionFormService,
+    private readonly dbDriverResource: DBDriverResource,
   ) {
     super();
   }
@@ -54,15 +56,21 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
   ) {
     const config = contexts.getContext(connectionConfigContext);
 
-    config.properties = state.config.properties;
+    config.properties = { ...state.config.properties };
   }
 
-  private formState(
+  private async formState(
     data: IConnectionFormState,
     contexts: IExecutionContextProvider<IConnectionFormState>
   ) {
+    if (!data.info || !data.config.driverId) {
+      return;
+    }
+
     const config = contexts.getContext(connectionConfigContext);
-    if (!isPropertiesEqual(config.properties, data.info?.properties)) {
+    const driver = await this.dbDriverResource.load(data.config.driverId, ['includeDriverProperties']);
+
+    if (!isObjectPropertyInfoStateEqual(driver.driverProperties, config.properties, data.info.properties)) {
       const stateContext = contexts.getContext(connectionFormStateContext);
 
       stateContext.markEdited();
