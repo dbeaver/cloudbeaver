@@ -16,17 +16,20 @@ import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
 export interface CheckboxBaseProps {
-  label?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;
   style?: ComponentStyle;
 }
 
-export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'checked' | 'id' | 'style'> & ILayoutSizeProps;
+export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'> & ILayoutSizeProps & {
+  value?: string;
+  defaultValue?: string;
+  defaultChecked?: boolean;
+  label?: string;
+};
 
 export interface ICheckboxControlledProps extends CheckboxInputProps {
-  value?: string;
   state?: never;
   checked?: boolean;
   onChange?: CheckboxOnChangeEvent<string | undefined>;
@@ -34,7 +37,6 @@ export interface ICheckboxControlledProps extends CheckboxInputProps {
 }
 
 export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInputProps {
-  value?: string;
   state: Partial<Record<TKey, boolean | null | string | string[]>>;
   checked?: never;
   onChange?: CheckboxOnChangeEvent<TKey>;
@@ -50,9 +52,11 @@ export interface CheckboxType {
 export const Checkbox: CheckboxType = observer(function Checkbox({
   name,
   value,
+  defaultValue,
   state,
   label,
   checked,
+  defaultChecked,
   children,
   mod,
   ripple,
@@ -61,7 +65,15 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
+  const checkboxState = useCheckboxState({
+    value,
+    defaultValue,
+    checked,
+    defaultChecked,
+    state,
+    name,
+    onChange,
+  });
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
@@ -71,7 +83,6 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     <CheckboxMarkup
       {...rest}
       name={name}
-      id={value || name}
       checked={checkboxState.checked}
       label={label}
       className={className}

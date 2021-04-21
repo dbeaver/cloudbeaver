@@ -27,7 +27,6 @@ type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   onChange?: (value: string, name?: string) => any;
-
   state?: never;
   autoHide?: never;
 };
@@ -37,7 +36,6 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   state: TState;
   onChange?: (value: string, name: TKey) => any;
   autoHide?: boolean;
-
   value?: never;
 };
 
@@ -49,6 +47,7 @@ interface InputFieldType {
 export const InputField: InputFieldType = observer(function InputField({
   name,
   value: valueControlled,
+  defaultValue,
   required,
   state,
   children,
@@ -76,9 +75,13 @@ export const InputField: InputFieldType = observer(function InputField({
     }
   }, [state, name, context, onChange]);
 
-  const value = state ? state[name] : valueControlled;
+  let value: any = valueControlled ?? defaultValue ?? undefined;
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (state && name !== undefined && name in state) {
+    value = state[name];
+  }
+
+  if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;
   }
 

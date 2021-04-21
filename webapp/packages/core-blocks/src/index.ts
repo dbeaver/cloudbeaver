@@ -4,8 +4,9 @@ export * from './ItemList';
 export * from './layout/AppLogo';
 export * from './layout/TopAppBar';
 export * from './Loader/Loader';
-export * from './ObjectPropertyInfoForm/ObjectPropertyInfoForm';
-export * from './ObjectPropertyInfoForm/ObjectPropertyInfoFormNew';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormNew';
+export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 
 export * from './Placeholder/Placeholder';
 export * from './Placeholder/PlaceholderContainer';

@@ -11,11 +11,13 @@ import { useContext, useState } from 'react';
 import { useObjectRef } from '../../useObjectRef';
 import { FormContext } from '../FormContext';
 
-export type CheckboxOnChangeEvent<T> =(value: boolean, name: T) => void;
+export type CheckboxOnChangeEvent<T> = (value: boolean, name: T) => void;
 
 export type CheckboxStateOptions<TKey extends string> = {
   value: string | undefined;
+  defaultValue: string | undefined;
   checked: boolean | undefined;
+  defaultChecked: boolean | undefined;
 } & (
   {
     state: undefined;
@@ -30,23 +32,24 @@ export type CheckboxStateOptions<TKey extends string> = {
 );
 
 interface ICheckboxState {
-  checked: boolean;
+  checked: boolean | undefined;
   change: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function useCheckboxState<TKey extends string>(options: CheckboxStateOptions<TKey>): ICheckboxState {
   const [count, refresh] = useState(0);
   const context = useContext(FormContext);
-  const optionsRef = useObjectRef({ ...options, context, count });
+  const controlledValue = options.value ?? options.defaultValue ?? undefined;
+  const optionsRef = useObjectRef({ ...options, context, count, value: controlledValue });
   const { state, name, value } = optionsRef;
 
-  let checked = optionsRef.checked ?? false;
+  let checked = optionsRef.checked ?? optionsRef.defaultChecked ?? undefined;
 
-  if (state !== undefined && name !== undefined) {
+  if (state !== undefined && name !== undefined && name in state) {
     const currentState = state[name as TKey];
 
-    if (typeof value === 'string' && Array.isArray(currentState)) {
-      checked = currentState.includes(value);
+    if (typeof value === 'string') {
+      checked = Array.isArray(currentState) ? currentState.includes(value) : currentState === value;
     } else if (typeof currentState === 'string') {
       checked = currentState.toLowerCase() === 'true';
     } else {
@@ -54,7 +57,7 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
     }
   }
 
-  return useObjectRef({
+  return useObjectRef<ICheckboxState>({
     checked,
     change(event: React.ChangeEvent<HTMLInputElement>) {
       const { state, name, value, onChange, count, context } = optionsRef;
@@ -63,13 +66,16 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
       if (state !== undefined && name !== undefined) {
         const currentState = state[name as TKey];
 
-        if (typeof value === 'string' && Array.isArray(currentState)) {
-          const elementIndex = currentState.indexOf(value);
-
-          if (checked && elementIndex === -1) {
-            currentState.push(value);
-          } else if (elementIndex !== -1) {
-            currentState.splice(elementIndex, 1);
+        if (typeof value === 'string') {
+          if (Array.isArray(currentState)) {
+            const elementIndex = currentState.indexOf(value);
+            if (checked && elementIndex === -1) {
+              currentState.push(value);
+            } else if (elementIndex !== -1) {
+              currentState.splice(elementIndex, 1);
+            }
+          } else {
+            state[name as TKey] = value;
           }
         } else {
           state[name as TKey] = checked;

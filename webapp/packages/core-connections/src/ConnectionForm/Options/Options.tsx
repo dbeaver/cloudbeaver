@@ -205,8 +205,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             )}
             {admin && originLocal && (
               <FieldCheckboxNew
+                id={config.connectionId}
                 name="template"
-                value={config.connectionId}
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
@@ -227,7 +227,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(authModel && !driver.data?.anonymousAccess) && (
+          {(authModel && !driver.data?.anonymousAccess && properties) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <Container wrap gap>
@@ -243,8 +243,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               </Container>
               {credentialsSavingEnabled && (
                 <FieldCheckboxNew
+                  id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
-                  value={config.connectionId + 'authNeeded'}
                   state={config}
                   disabled={disabled || readonly}
                 >{translate('connections_connection_edit_save_credentials')}

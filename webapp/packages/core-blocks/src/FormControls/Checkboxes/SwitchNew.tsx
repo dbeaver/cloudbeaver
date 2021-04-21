@@ -95,9 +95,11 @@ interface SwitchType {
 export const SwitchNew: SwitchType = observer(function SwitchNew({
   name,
   value,
+  defaultValue,
   description,
   state,
   checked,
+  defaultChecked,
   className,
   children,
   onChange,
@@ -106,7 +108,15 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
   disabled,
   ...rest
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
+  const checkboxState = useCheckboxState({
+    value,
+    defaultValue,
+    checked,
+    defaultChecked,
+    state,
+    name,
+    onChange,
+  });
   const styles = useStyles(
     baseFormControlStylesNew,
     switchStyles,

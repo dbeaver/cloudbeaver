@@ -64,6 +64,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   name,
   style,
   value: valueControlled,
+  defaultValue,
   required,
   state,
   mapState,
@@ -96,11 +97,15 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     }
   }, [state, name, context, onChange]);
 
-  if (autoHide && !isControlPresented(name, state)) {
+  if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;
   }
 
-  let value = state ? state[name] : valueControlled;
+  let value: any = valueControlled ?? defaultValue ?? undefined;
+
+  if (state && name !== undefined && name in state) {
+    value = state[name];
+  }
 
   if (mapState) {
     value = mapState(value);

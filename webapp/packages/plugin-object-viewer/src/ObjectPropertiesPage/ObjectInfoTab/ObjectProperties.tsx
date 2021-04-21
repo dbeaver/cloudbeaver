@@ -11,16 +11,17 @@ import type { PropsWithChildren } from 'react';
 import styled from 'reshadow';
 
 import { useDatabaseObjectInfo } from '@cloudbeaver/core-app';
-import { ColoredContainer, Group, Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
 import { BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { ObjectProperty } from './ObjectProperty';
 
 type ObjectPropertiesProps = PropsWithChildren<{
   objectId: string;
 }>;
+
+const emptyArray: ObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer(function ObjectProperties({
   objectId,
@@ -28,22 +29,40 @@ export const ObjectProperties = observer(function ObjectProperties({
   const translate = useTranslate();
   const { dbObject, isLoading } = useDatabaseObjectInfo(objectId);
   const styles = useStyles(BASE_CONTAINERS_STYLES);
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject?.properties ?? emptyArray);
+  const properties = dbObject?.properties;
 
-  if (!dbObject?.properties && isLoading) {
+  if (!properties && isLoading) {
     return <Loader />;
   }
 
-  if (!dbObject?.properties || dbObject.properties.length === 0) {
+  if (!properties || properties.length === 0) {
     return <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>;
   }
 
   return styled(styles)(
-    <ColoredContainer overflow parent>
-      <Group gap large>
-        {dbObject.properties.map(v => (
-          <ObjectProperty key={v.id} objectProperty={v} small />
-        ))}
-      </Group>
+    <ColoredContainer overflow parent gap>
+      {isUncategorizedExists && (
+        <Group gap large>
+          <ObjectPropertyInfoFormNew
+            properties={properties}
+            category={null}
+            small
+            readOnly
+          />
+        </Group>
+      )}
+      {categories.map(category => (
+        <Group key={category} gap large>
+          <GroupTitle>{category}</GroupTitle>
+          <ObjectPropertyInfoFormNew
+            properties={properties}
+            category={category}
+            small
+            readOnly
+          />
+        </Group>
+      ))}
     </ColoredContainer>
   );
 });

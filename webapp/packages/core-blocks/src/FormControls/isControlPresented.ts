@@ -6,9 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function isControlPresented(name: string | undefined, state: any): boolean {
+export function isControlPresented(
+  name: string | undefined, state: any, defaultValue?: string | number | readonly string[]
+): boolean {
   if (state !== undefined && name !== undefined) {
-    return name in state && state[name] !== null;
+    if (name in state) {
+      return state[name] !== null;
+    }
+    return defaultValue !== undefined;
   }
   return true;
 }
