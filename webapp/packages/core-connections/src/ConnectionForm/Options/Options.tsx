@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
@@ -36,8 +35,8 @@ import { isLocalConnection } from '../../Administration/ConnectionsResource';
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
 import { DBDriverResource } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import { IConnectionFormProps, ConnectionFormService } from '../ConnectionFormService';
-import { useConnectionData } from '../useConnectionData';
+import { ConnectionFormService } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ParametersFormNew } from './ParametersFormNew';
 import { useOptions } from './useOptions';
 
@@ -59,54 +58,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     info,
     config,
     availableDrivers,
-    submittingHandlers,
+    submittingTask: submittingHandlers,
     save,
     readonly,
     disabled,
   } = state;
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef);
-  useConnectionData(state, action((data, update) => {
-    if (!data.config.credentials || update) {
-      data.config.credentials = {};
-      data.config.saveCredentials = false;
-    }
-
-    if (!data.config.providerProperties || update) {
-      data.config.providerProperties = {};
-    }
-
-    if (!data.info) {
-      return;
-    }
-
-    data.config.connectionId = data.info.id;
-
-    data.config.name = data.info.name;
-    data.config.description = data.info.description;
-    data.config.template = data.info.template;
-    data.config.driverId = data.info.driverId;
-
-    data.config.host = data.info.host;
-    data.config.port = data.info.port;
-    data.config.databaseName = data.info.databaseName;
-    data.config.url = data.info.url;
-
-    data.config.authModelId = data.info.authModel;
-    data.config.saveCredentials = data.info.saveCredentials;
-
-    if (data.info.authProperties) {
-      for (const property of data.info.authProperties) {
-        if (!property.features.includes('password')) {
-          data.config.credentials[property.id!] = property.value;
-        }
-      }
-    }
-
-    if (data.info.providerProperties) {
-      data.config.providerProperties = { ...data.info.providerProperties };
-    }
-  }));
   const optionsHook = useOptions(props.state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
@@ -140,7 +98,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const drivers = driver.resource.values.filter(({ id }) => availableDrivers?.includes(id));
   let properties = authModel?.properties;
 
-  if (info && info.authProperties.length > 0) {
+  if (info?.authProperties && info.authProperties.length > 0) {
     properties = info.authProperties;
   }
 

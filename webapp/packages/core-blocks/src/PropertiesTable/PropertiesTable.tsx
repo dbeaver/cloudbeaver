@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer, useLocalStore } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
@@ -34,24 +34,25 @@ interface PropertiesTableProps {
 
 export const PropertiesTable = observer(function PropertiesTable(props: PropertiesTableProps) {
   const { className, onAdd, readOnly, propertiesState } = props;
-  const propsRef = useObjectRef(props);
   const translate = useTranslate();
-  const state = useLocalStore<PropertiesState>(() => (propertiesState || {}));
+  const propsRef = useObjectRef({ ...props });
 
   const changeName = useCallback((id: string, key: string) => {
-    const { properties, onKeyChange } = propsRef;
+    const { properties, propertiesState, onKeyChange } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
       return;
     }
 
-    const isUnique = properties.filter(({ key }) => key === property.key).length === 1;
+    if (propertiesState) {
+      const isUnique = properties.filter(({ key }) => key === property.key).length === 1;
 
-    if (state[property.key] !== undefined && isUnique) {
-      state[key] = state[property.key];
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete state[property.key];
+      if (propertiesState[property.key] !== undefined && isUnique) {
+        propertiesState[key] = propertiesState[property.key];
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete propertiesState[property.key];
+      }
     }
 
     if (onKeyChange) {
@@ -61,31 +62,33 @@ export const PropertiesTable = observer(function PropertiesTable(props: Properti
   }, []);
 
   const changeValue = useCallback((id: string, value: string) => {
-    const { properties, onChange } = propsRef;
+    const { properties, propertiesState, onChange } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
       return;
     }
 
-    state[property.key] = value;
+    if (propertiesState) {
+      propertiesState[property.key] = value;
 
-    if (onChange) {
-      onChange(state);
+      if (onChange) {
+        onChange(propertiesState);
+      }
     }
   }, []);
 
   const removeProperty = useCallback((id: string) => {
-    const { properties, onRemove } = propsRef;
+    const { properties, propertiesState, onRemove } = propsRef;
     const property = properties.find(property => property.id === id);
 
     if (!property) {
       return;
     }
 
-    if (state[property.key] !== undefined) {
+    if (propertiesState?.[property.key] !== undefined) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete state[property.key];
+      delete propertiesState[property.key];
     }
 
     if (onRemove) {
@@ -120,7 +123,7 @@ export const PropertiesTable = observer(function PropertiesTable(props: Properti
           <PropertyItem
             key={property.id}
             property={property}
-            value={state[property.key]}
+            value={propertiesState?.[property.key]}
             error={!isKeyUnique(property.key)}
             readOnly={readOnly}
             onNameChange={changeName}

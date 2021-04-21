@@ -12,8 +12,9 @@ import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
 
 import { DBDriverResource } from '../../DBDriverResource';
 import { connectionConfigContext } from '../connectionConfigContext';
-import { IConnectionFormSubmitData, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormFillConfigData, IConnectionFormSubmitData, IConnectionFormState } from '../IConnectionFormProps';
 import { DriverProperties } from './DriverProperties';
 
 @injectable()
@@ -44,9 +45,27 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
     this.connectionFormService.formStateTask
       .addHandler(this.formState.bind(this));
+
+    this.connectionFormService.fillConfigTask
+      .addHandler(this.fillConfig.bind(this));
   }
 
   load(): void { }
+
+  private fillConfig(
+    { state, updated }: IConnectionFormFillConfigData,
+    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
+  ) {
+    if (!state.config.properties) {
+      state.config.properties = {};
+    }
+
+    if (!state.info) {
+      return;
+    }
+
+    state.config.properties = { ...state.info.properties };
+  }
 
   private prepareConfig(
     {

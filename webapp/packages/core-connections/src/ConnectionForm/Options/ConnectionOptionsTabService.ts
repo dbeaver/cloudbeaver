@@ -18,8 +18,10 @@ import { DBDriverResource } from '../../DBDriverResource';
 import { getUniqueConnectionName } from '../../getUniqueConnectionName';
 import { isJDBCConnection } from '../../isJDBCConnection';
 import { connectionConfigContext } from '../connectionConfigContext';
-import { IConnectionFormSubmitData, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
+import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
 import { Options } from './Options';
 
 @injectable()
@@ -53,6 +55,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     this.connectionFormService.formStateTask
       .addHandler(this.formState.bind(this));
+
+    this.connectionFormService.configureTask
+      .addHandler(this.configure.bind(this));
+
+    this.connectionFormService.fillConfigTask
+      .addHandler(this.fillConfig.bind(this));
   }
 
   load(): void { }
@@ -129,6 +137,57 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
   }
 
+  private fillConfig(
+    { state, updated }: IConnectionFormFillConfigData,
+    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
+  ) {
+    if (!state.config.credentials || updated) {
+      state.config.credentials = {};
+      state.config.saveCredentials = false;
+    }
+
+    if (!state.config.providerProperties || updated) {
+      state.config.providerProperties = {};
+    }
+
+    if (!state.info) {
+      return;
+    }
+
+    state.config.connectionId = state.info.id;
+
+    state.config.name = state.info.name;
+    state.config.description = state.info.description;
+    state.config.template = state.info.template;
+    state.config.driverId = state.info.driverId;
+
+    state.config.host = state.info.host;
+    state.config.port = state.info.port;
+    state.config.databaseName = state.info.databaseName;
+    state.config.url = state.info.url;
+
+    state.config.authModelId = state.info.authModel;
+    state.config.saveCredentials = state.info.saveCredentials;
+
+    if (state.info.authProperties) {
+      for (const property of state.info.authProperties) {
+        if (!property.features.includes('password')) {
+          state.config.credentials[property.id!] = property.value;
+        }
+      }
+    }
+
+    if (state.info.providerProperties) {
+      state.config.providerProperties = { ...state.info.providerProperties };
+    }
+  }
+
+  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeAuthProperties');
+  }
+
   private async prepareConfig(
     {
       state,
@@ -136,6 +195,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
+
     const driver = await this.dbDriverResource.load(state.config.driverId!, ['includeProviderProperties']);
 
     if (state.mode === 'edit') {

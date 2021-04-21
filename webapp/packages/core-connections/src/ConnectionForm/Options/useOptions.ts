@@ -13,7 +13,7 @@ import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
 import type { DBDriver } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
-import type { IConnectionFormState } from '../ConnectionFormService';
+import type { IConnectionFormState } from '../IConnectionFormProps';
 
 interface IRefObject {
   prevName: string | null;

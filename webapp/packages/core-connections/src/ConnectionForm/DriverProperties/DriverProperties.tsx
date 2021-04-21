@@ -16,8 +16,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DBDriverResource } from '../../DBDriverResource';
-import type { IConnectionFormProps } from '../ConnectionFormService';
-import { useConnectionData } from '../useConnectionData';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const styles = css`
   properties {
@@ -37,18 +36,6 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
 }) {
   const style = useStyles(styles);
   const { selected } = useTab(tabId);
-
-  useConnectionData(formState, state => {
-    if (!state.config.properties) {
-      state.config.properties = {};
-    }
-
-    if (!state.info) {
-      return;
-    }
-
-    state.config.properties = { ...state.info.properties };
-  });
 
   const [state] = useState(() => {
     const propertiesList: IProperty[] = observable([]);

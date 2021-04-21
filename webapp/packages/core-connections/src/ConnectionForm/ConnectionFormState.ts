@@ -8,14 +8,16 @@
 
 import { computed, makeObservable, observable } from 'mobx';
 
-import { ExecutorHandlersCollection, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
-import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
+import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
 import { EConnectionFeature } from '../EConnectionFeature';
-import type { IConnectionFormState, IConnectionFormSubmitData, ConnectionFormMode, ConnectionFormType, ConnectionFormService } from './ConnectionFormService';
-import { connectionFormStateContext, IConnectionFormStateContext } from './connectionFormStateContext';
+import { connectionFormConfigureContext } from './connectionFormConfigureContext';
+import type { ConnectionFormService } from './ConnectionFormService';
+import { connectionFormStateContext, IConnectionFormStateInfo } from './connectionFormStateContext';
+import type { IConnectionFormState, ConnectionFormMode, ConnectionFormType, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export class ConnectionFormState implements IConnectionFormState {
   mode: ConnectionFormMode;
@@ -25,8 +27,16 @@ export class ConnectionFormState implements IConnectionFormState {
 
   partsState: MetadataMap<string, any>;
 
-  disabled: boolean;
-  loading: boolean;
+  statusMessage: string | null;
+  configured: boolean;
+
+  get loading(): boolean {
+    return this.loadConnectionTask.executing || this.submittingTask.executing;
+  }
+
+  get disabled(): boolean {
+    return this.loading || !!this.stateInfo?.disabled || this.loadConnectionTask.executing;
+  }
 
   get availableDrivers(): string[] {
     if (this._availableDrivers.length === 0 && this.config.driverId) {
@@ -45,11 +55,15 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   get readonly(): boolean {
+    if (this.stateInfo?.readonly) {
+      return true;
+    }
+
     if (this.type === 'admin' || this.mode === 'create') {
       return false;
     }
 
-    if (this.info?.features && !this.info.features.includes(EConnectionFeature.manageable)) {
+    if (!this.info?.features.includes(EConnectionFeature.manageable)) {
       return true;
     }
 
@@ -58,53 +72,84 @@ export class ConnectionFormState implements IConnectionFormState {
 
   readonly resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
   readonly service: ConnectionFormService;
-  readonly submittingHandlers: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+  readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
 
+  private stateInfo: IConnectionFormStateInfo | null;
+  private loadConnectionTask: IExecutor<IConnectionFormState>;
+  private formStateTask: IExecutor<IConnectionFormState>;
   private _availableDrivers: string[];
 
   constructor(
     service: ConnectionFormService,
     resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>
   ) {
-    makeObservable<IConnectionFormState, '_availableDrivers'>(this, {
+    makeObservable<IConnectionFormState, '_availableDrivers' | 'stateInfo'>(this, {
       mode: observable,
       type: observable,
       config: observable,
       availableDrivers: computed,
       _availableDrivers: observable,
       info: computed,
-      disabled: observable,
-      loading: observable,
+      statusMessage: observable,
+      configured: observable,
       readonly: computed,
+      stateInfo: observable,
     });
 
     this.resource = resource;
     this.config = {};
     this._availableDrivers = [];
+    this.stateInfo = null;
     this.partsState = new MetadataMap();
     this.service = service;
-    this.submittingHandlers = new ExecutorHandlersCollection();
-    this.disabled = false;
-    this.loading = false;
+    this.formStateTask = new Executor<IConnectionFormState>(this, () => true);
+    this.loadConnectionTask = new Executor<IConnectionFormState>(this, () => true);
+    this.submittingTask = new Executor();
+    this.statusMessage = null;
+    this.configured = false;
     this.mode = 'create';
     this.type = 'public';
 
-    this.submittingHandlers
-      .addHandler(() => {
-        this.loading = true;
-        this.disabled = true;
-      })
-      .addPostHandler(() => {
-        this.loading = false;
-        this.disabled = false;
-      });
-
+    this.syncInfo = this.syncInfo.bind(this);
     this.test = this.test.bind(this);
     this.save = this.save.bind(this);
     this.checkFormState = this.checkFormState.bind(this);
+    this.loadInfo = this.loadInfo.bind(this);
+    this.updateFormState = this.updateFormState.bind(this);
+
+    this.formStateTask
+      .addCollection(service.formStateTask)
+      .addPostHandler(this.updateFormState);
+
+    this.resource.onItemAdd
+      .addHandler(this.syncInfo);
+
+    this.loadConnectionTask
+      .before(service.configureTask)
+      .addPostHandler(this.loadInfo)
+      .next(service.fillConfigTask, (state, contexts) => {
+        const configuration = contexts.getContext(connectionFormConfigureContext);
+
+        return {
+          state,
+          updated: state.info !== configuration.info,
+        };
+      })
+      .next(this.formStateTask);
+  }
+
+  async loadConnectionInfo(): Promise<DatabaseConnection | undefined> {
+    await this.loadConnectionTask.execute(this);
+
+    return this.info;
+  }
+
+  async load(): Promise<void> {
+    await this.loadConnectionInfo();
   }
 
   reset(): void {
+    this.configured = false;
     this.partsState.clear();
   }
 
@@ -135,34 +180,73 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   async save(): Promise<void> {
-    await this.service.formSubmittingTask.executeScope(
+    await this.submittingTask.executeScope(
       {
         state: this,
         submitType: 'submit',
       },
-      this.submittingHandlers
+      this.service.formSubmittingTask
     );
   }
 
   async test(): Promise<void> {
-    await this.service.formSubmittingTask.executeScope(
+    await this.submittingTask.executeScope(
       {
         state: this,
         submitType: 'test',
       },
-      this.submittingHandlers
+      this.service.formSubmittingTask
     );
   }
 
-  async checkFormState(): Promise<IConnectionFormStateContext> {
+  async checkFormState(): Promise<IConnectionFormStateInfo | null> {
+    await this.loadConnectionInfo();
+    return this.stateInfo;
+  }
+
+  dispose(): void {
+    this.resource.onItemAdd
+      .removeHandler(this.syncInfo);
+  }
+
+  private updateFormState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>): void {
+    const context = contexts.getContext(connectionFormStateContext);
+
     if (this.mode === 'create') {
-      const context = connectionFormStateContext();
       context.markEdited();
-      return context;
     }
 
-    const contexts = await this.service.formStateTask.execute(this);
+    this.statusMessage = context.statusMessage;
 
-    return contexts.getContext(connectionFormStateContext);
+    if (this.statusMessage === null && this.mode === 'edit') {
+      if (!this.info?.features.includes(EConnectionFeature.manageable)) {
+        this.statusMessage = 'connections_connection_edit_not_own_deny';
+      }
+    }
+
+    this.stateInfo = context;
+    this.configured = true;
+  }
+
+  private syncInfo(key: ResourceKey<string>) {
+    if (!ResourceKeyUtils.includes(key, this.config.connectionId)) {
+      return;
+    }
+
+    this.loadConnectionInfo();
+  }
+
+  private async loadInfo(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    if (!data.config.connectionId) {
+      return;
+    }
+
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    if (!this.resource.has(data.config.connectionId)) {
+      return;
+    }
+
+    await this.resource.load(data.config.connectionId, configuration.connectionIncludes);
   }
 }

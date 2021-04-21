@@ -10,6 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GraphQLService, ObjectOrigin, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
 
 @injectable()
@@ -46,6 +47,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   hasToken(type: string, subType?: string): boolean {
     if (!this.data) {
       return false;
+    }
+
+    if (type === AUTH_PROVIDER_LOCAL_ID) {
+      return true;
     }
 
     // TODO: will be changed due wrong origin in authTokens

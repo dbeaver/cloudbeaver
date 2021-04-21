@@ -14,8 +14,9 @@ import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
 import { connectionConfigContext } from '../connectionConfigContext';
-import { IConnectionFormSubmitData, IConnectionFormProps, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
@@ -76,9 +77,13 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
 
     const config = contexts.getContext(connectionConfigContext);
-    const state = data.state.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
+      data.state.partsState,
+      this.key,
+      { state: data.state }
+    );
 
-    if (!state || !config.connectionId) {
+    if (!config.connectionId) {
       return;
     }
 
@@ -100,9 +105,13 @@ export class ConnectionAccessTabService extends Bootstrap {
       return;
     }
     const config = contexts.getContext(connectionConfigContext);
-    const state = data.partsState.get(this.key, () => null) as IConnectionAccessTabState | null;
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
+      data.partsState,
+      this.key,
+      { state: data }
+    );
 
-    if (!state || !config.connectionId) {
+    if (!config.connectionId) {
       return;
     }
 

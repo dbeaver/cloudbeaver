@@ -14,7 +14,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { ConnectionConfig, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { PublicConnectionForm } from './PublicConnectionForm';
@@ -40,10 +40,10 @@ export class PublicConnectionFormService {
     });
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
-    this.connectionInfoResource.onItemDelete.addHandler(this.closeDeleted);
-    this.sessionDataResource.onDataOutdated.addHandler(() => {
-      this.close(true);
-    });
+    this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeDeleted);
+    // this.sessionDataResource.onDataOutdated.addHandler(() => {
+    //   this.close(true);
+    // });
   }
 
   change(config: ConnectionConfig, availableDrivers?: string[]): void {
@@ -58,6 +58,8 @@ export class PublicConnectionFormService {
       .setOptions(config.connectionId ? 'edit' : 'create', 'public')
       .setConfig(config)
       .setAvailableDrivers(availableDrivers || []);
+
+    this.formState.load();
   }
 
   async open(config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
@@ -72,23 +74,23 @@ export class PublicConnectionFormService {
 
   async close(saved?: boolean): Promise<void> {
     if (saved) {
-      this.formState = null;
+      this.clearFormState();
     }
 
     const state = await this.optionsPanelService.close();
 
     if (state) {
-      this.formState = null;
+      this.clearFormState();
     }
   }
 
-  private closeDeleted: IExecutorHandler<ResourceKey<string>> = async (data, contexts) => {
-    if (!this.formState) {
+  private closeDeleted: IExecutorHandler<ResourceKey<string>> = (data, contexts) => {
+    if (!this.formState || !this.formState.config.connectionId) {
       return;
     }
 
-    if (ResourceKeyUtils.includes(data, this.formState.config.connectionId)) {
-      this.close();
+    if (!this.connectionInfoResource.has(this.formState.config.connectionId)) {
+      this.close(true);
     }
   };
 
@@ -106,7 +108,7 @@ export class PublicConnectionFormService {
 
     const state = await this.formState.checkFormState();
 
-    if (!state.edited) {
+    if (!state?.edited) {
       return;
     }
 
@@ -120,4 +122,9 @@ export class PublicConnectionFormService {
       ExecutorInterrupter.interrupt(contexts);
     }
   };
+
+  private clearFormState() {
+    this.formState?.dispose();
+    this.formState = null;
+  }
 }

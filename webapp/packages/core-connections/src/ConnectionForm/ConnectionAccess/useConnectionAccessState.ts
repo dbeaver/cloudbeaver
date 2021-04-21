@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import type { IConnectionFormState } from '../ConnectionFormService';
+import type { IConnectionFormState } from '../IConnectionFormProps';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
 interface IConnectionAccessState {

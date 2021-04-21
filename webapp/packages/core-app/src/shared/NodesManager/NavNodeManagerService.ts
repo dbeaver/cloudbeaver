@@ -377,7 +377,7 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
-    const count = ResourceKeyUtils.count(key);
+    // const count = ResourceKeyUtils.count(key);
 
     await this.navTree.load(ROOT_NODE_PATH);
     await ResourceKeyUtils.forEachAsync(key, async key => {
@@ -391,11 +391,11 @@ export class NavNodeManagerService extends Bootstrap {
         this.removeTree(nodeId);
       }
 
-      if (count > 1) {
-        this.navNodeInfoResource.markOutdated(nodeId);
-      } else {
-        await this.navNodeInfoResource.refresh(nodeId);
-      }
+      // if (count > 1) {
+      this.navNodeInfoResource.markOutdated(nodeId);
+      // } else {
+      // await this.navNodeInfoResource.refresh(nodeId);
+      // }
     });
   }
 

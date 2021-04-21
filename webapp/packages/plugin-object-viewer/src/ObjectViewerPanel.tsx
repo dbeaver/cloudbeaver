@@ -56,7 +56,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   }, [connection]);
 
   if (connection.connectionInfo) {
-    if (connection.isLoading()) {
+    if (connection.isLoading() && !isLoaded()) {
       return <Loader />;
     }
 

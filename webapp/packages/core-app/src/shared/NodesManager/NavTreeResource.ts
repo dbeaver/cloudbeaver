@@ -53,9 +53,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   ) {
     super();
 
-    makeObservable(this, {
+    makeObservable<NavTreeResource, 'setNavObject'>(this, {
       childrenLimit: computed,
       setDetails: action,
+      setNavObject: action,
     });
 
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
@@ -137,7 +138,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const value = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
-      const childrenToRemove = this.data.get(key)?.concat() || [];
+      const childrenToRemove = this.data.get(key) || [];
       this.data.set(key, value);
       this.delete(resourceKeyList(childrenToRemove.filter(navNodeId => !value.includes(navNodeId))));
     });
@@ -184,7 +185,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     if (isResourceKeyList(navNode)) {
       prevChildren = navNode.list.concat();
     } else {
-      prevChildren = [navNode, ...(this.get(navNode)?.concat() || [])];
+      prevChildren = [navNode, ...(this.get(navNode) || [])];
     }
     nestedChildren.push(...prevChildren);
 

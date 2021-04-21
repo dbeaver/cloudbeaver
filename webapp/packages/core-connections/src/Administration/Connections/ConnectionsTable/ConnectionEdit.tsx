@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TableContext, useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionForm } from '../../../ConnectionForm/ConnectionForm';
@@ -26,10 +26,10 @@ const styles = composes(
   css`
     box {
       box-sizing: border-box;
-      padding: 24px 0;
+      padding-bottom: 24px;
       display: flex;
       flex-direction: column;
-      height: 640px;
+      height: 664px;
     }
   `
 );
@@ -41,10 +41,10 @@ interface Props {
 export const ConnectionEdit = observer(function ConnectionEditNew({
   item,
 }: Props) {
-  const connection = useMapResource(ConnectionsResource, { key: item, includes: ['customIncludeNetworkHandlerCredentials'] });
+  const connectionsResource = useService(ConnectionsResource);
   const boxRef = useRef<HTMLDivElement>(null);
-  const tableContext = useContext(TableContext);
-  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
+  // const tableContext = useContext(TableContext);
+  // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
 
   useEffect(() => {
     boxRef.current?.scrollIntoView({
@@ -54,7 +54,7 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
   }, []);
 
   const data = useConnectionFormState(
-    connection.resource,
+    connectionsResource,
     state => state.setOptions('edit', 'admin')
   );
 
@@ -62,15 +62,11 @@ export const ConnectionEdit = observer(function ConnectionEditNew({
 
   return styled(useStyles(styles))(
     <box ref={boxRef} as='div'>
-      <Loader state={connection}>
-        {() => (
-          <ConnectionForm
-            state={data}
-            onCancel={collapse}
-            // onSave={collapse}
-          />
-        )}
-      </Loader>
+      <ConnectionForm
+        state={data}
+        // onCancel={collapse}
+        // onSave={collapse}
+      />
     </box>
   );
 });

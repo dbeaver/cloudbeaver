@@ -23,6 +23,7 @@ import {
   ResourceKeyUtils,
   TestConnectionMutation,
   NavigatorSettingsInput,
+  ResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource, DatabaseConnection } from './Administration/ConnectionsResource';
@@ -74,7 +75,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
-    this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+    // this.onItemAdd.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
@@ -101,16 +102,11 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           ...this.getIncludesMap(),
         });
 
-        const restoredConnections = new Set<string>();
-
-        for (const connection of connections) {
-          await this.add(connection);
-          restoredConnections.add(connection.id);
-        }
+        await this.addList(connections);
 
         const unrestoredConnectionIdList = Array.from(this.data.values())
           .map(connection => connection.id)
-          .filter(connectionId => !restoredConnections.has(connectionId));
+          .filter(connectionId => !connections.some(connection => connection.id === connectionId));
 
         this.delete(resourceKeyList(unrestoredConnectionIdList));
 
@@ -157,6 +153,17 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     });
 
     return this.add(connection);
+  }
+
+  async addList(connections: Connection[]): Promise<Connection[]> {
+    const newConnections = connections.filter(connection => !this.data.has(connection.id));
+    const key = this.updateConnection(...connections);
+
+    for (const connection of newConnections) {
+      await this.onConnectionCreate.execute(this.get(connection.id)!);
+    }
+
+    return this.get(key) as Connection[];
   }
 
   async add(connection: Connection): Promise<Connection> {
@@ -245,17 +252,19 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
         ...this.getIncludesMap(key, includes),
       });
 
-      for (const connection of connections) {
-        this.updateConnection(connection);
-      }
+      this.updateConnection(...connections);
     });
 
     return this.data;
   }
 
-  private updateConnection(connection: Connection) {
-    const oldConnection = this.get(connection.id) || {};
-    this.set(connection.id, { ...oldConnection, ...connection });
+  private updateConnection(...connections: Connection[]): ResourceKeyList<string> {
+    const key = resourceKeyList(connections.map(connection => connection.id));
+
+    const oldConnection = this.get(key);
+    this.set(key, oldConnection.map((connection, i) => ({ ...connection, ...connections[i] })));
+
+    return key;
   }
 
   private getDefaultIncludes(): ConnectionInfoIncludes {
