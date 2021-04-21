@@ -35,6 +35,13 @@ export class ComputedMenuItemModel implements IMenuItem {
     return this.options.titleGetter ? this.options.titleGetter() || '' : '';
   }
 
+  get toolTip() {
+    if (this.options.toolTip) {
+      return this.options.toolTip;
+    }
+    return this.options.toolTipGetter ? this.options.toolTipGetter() : undefined;
+  }
+
   get isDisabled() {
     return this.options.isDisabled ? this.options.isDisabled() : false;
   }
@@ -57,6 +64,7 @@ export class ComputedMenuItemModel implements IMenuItem {
   constructor(private options: IComputedMenuItemOptions) {
     makeObservable(this, {
       title: computed,
+      toolTip: computed,
       isDisabled: computed,
       icon: computed,
       isHidden: computed,

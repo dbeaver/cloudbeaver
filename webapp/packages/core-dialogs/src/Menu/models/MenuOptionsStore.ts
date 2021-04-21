@@ -22,6 +22,8 @@ export interface IMenuItemOptions {
   // set icon or getter
   icon?: string;
   iconGetter?: () => string | undefined;
+  toolTip?: string;
+  toolTipGetter?: () => TLocalizationToken | undefined;
   order?: number;
   isPanel?: boolean;
   panel?: IMenuPanel;
