@@ -7,24 +7,20 @@
  */
 
 import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
-import type { IExecutorHandler } from './IExecutorHandler';
 import type { IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export interface IExecutor<T = void> {
-  before: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
-  next: <TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext) => this;
+export interface IExecutor<T = void> extends IExecutorHandlersCollection<T> {
+  readonly executing: boolean;
+
   execute: (
     data: T,
     context?: IExecutionContext<T>,
     scope?: IExecutorHandlersCollection<T>
   ) => Promise<IExecutionContextProvider<T>>;
+
   executeScope: (
     data: T,
     scope?: IExecutorHandlersCollection<T>,
     context?: IExecutionContext<T>
   ) => Promise<IExecutionContextProvider<T>>;
-  addHandler: (handler: IExecutorHandler<T>) => this;
-  removeHandler: (handler: IExecutorHandler<T>) => void;
-  addPostHandler: (handler: IExecutorHandler<T>) => this;
-  removePostHandler: (handler: IExecutorHandler<T>) => void;
 }

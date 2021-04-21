@@ -6,24 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ExecutionContext } from './ExecutionContext';
-import { ExecutorInterrupter, IExecutorInterrupter } from './ExecutorInterrupter';
-import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
-import type { IExecutor } from './IExecutor';
 import type { IExecutorHandler } from './IExecutorHandler';
-import type { ChainLinkType, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
+import type { ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
 export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandlersCollection<T> {
   handlers: Array<IExecutorHandler<T>> = [];
   postHandlers: Array<IExecutorHandler<T>> = [];
   chain: Array<IChainLink<T>> = [];
-  private links: Map<IExecutor<any>, ExecutorHandlersCollection<T>>;
+  readonly collections: Array<IExecutorHandlersCollection<T>>;
+  private links: Map<IExecutorHandlersCollection<any>, IExecutorHandlersCollection<T>>;
 
   constructor() {
     this.links = new Map();
+    this.collections = [];
   }
 
-  for(link: IExecutor<any>): IExecutorHandlersCollection<T> {
+  addCollection(collection: IExecutorHandlersCollection<T>): this {
+    this.collections.push(collection);
+    return this;
+  }
+
+  for(link: IExecutorHandlersCollection<any>): IExecutorHandlersCollection<T> {
     if (!this.links.has(link)) {
       this.links.set(link, new ExecutorHandlersCollection());
     }
@@ -31,14 +34,11 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this.links.get(link)!;
   }
 
-  getLinkHandlers(
-    link: IExecutor<any>,
-    scoped?: IExecutorHandlersCollection<T>
-  ): IExecutorHandlersCollection<T> | undefined {
-    return this.links.get(link) || scoped?.getLinkHandlers(link, scoped.getLinkHandlers(link));
+  getLinkHandlers(link: IExecutorHandlersCollection<any>): IExecutorHandlersCollection<T> | undefined {
+    return this.links.get(link);
   }
 
-  before<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  before<TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>): this {
     this.chain.push({
       executor,
       map,
@@ -47,7 +47,7 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
     return this;
   }
 
-  next<TNext>(executor: IExecutor<TNext>, map?: (data: T) => TNext): this {
+  next<TNext>(executor: IExecutorHandlersCollection<TNext>, map?: ExecutorDataMap<T, TNext>): this {
     this.chain.push({
       executor,
       map,
@@ -72,66 +72,5 @@ export class ExecutorHandlersCollection<T = unknown> implements IExecutorHandler
 
   removePostHandler(handler: IExecutorHandler<T>): void {
     this.postHandlers = this.postHandlers.filter(h => h !== handler);
-  }
-
-  async execute(
-    data: T,
-    context: IExecutionContext<T>,
-    scoped?: IExecutorHandlersCollection<T>
-  ): Promise<IExecutionContextProvider<T>> {
-    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
-
-    await this.executeChain(data, context, 'before', scoped);
-
-    try {
-      await this.executeHandlers(data, context, this.handlers, interrupter);
-
-      if (scoped) {
-        await this.executeHandlers(data, context, scoped.handlers, interrupter);
-      }
-    } finally {
-      await this.executeHandlers(data, context, this.postHandlers);
-
-      if (scoped) {
-        await this.executeHandlers(data, context, scoped.postHandlers);
-      }
-    }
-
-    await this.executeChain(data, context, 'next', scoped);
-    return context;
-  }
-
-  private async executeChain(
-    data: T,
-    context: IExecutionContext<T>,
-    type: ChainLinkType,
-    scoped?: IExecutorHandlersCollection<T>
-  ): Promise<void> {
-    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
-    const chain = [...this.chain, ...(scoped?.chain || [])];
-
-    for (const link of chain.filter(link => link.type === type)) {
-      if (interrupter.interrupted) {
-        return;
-      }
-
-      const mappedData = link.map ? link.map(data) : data;
-      const chainedContext = new ExecutionContext(mappedData, context);
-      await link.executor.execute(mappedData, chainedContext, this.getLinkHandlers(link.executor, scoped));
-    }
-  }
-
-  private async executeHandlers(
-    data: T,
-    context: IExecutionContext<T>,
-    handlers: Array<IExecutorHandler<any>>,
-    interrupter?: IExecutorInterrupter
-  ): Promise<void> {
-    for (const handler of handlers) {
-      if (interrupter?.interrupted) {
-        return;
-      }
-      await handler(data, context);
-    }
   }
 }
