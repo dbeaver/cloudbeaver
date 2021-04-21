@@ -9,53 +9,10 @@
 import { PlaceholderContainer, TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
-import type { CachedMapResource, ConnectionConfig, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
-import type { MetadataMap } from '@cloudbeaver/core-utils';
+import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import type { DatabaseConnection } from '../Administration/ConnectionsResource';
-import type { IConnectionFormStateContext } from './connectionFormStateContext';
-
-export type ConnectionFormMode = 'edit' | 'create';
-export type ConnectionFormType = 'admin' | 'public';
-
-export interface IConnectionFormProps {
-  state: IConnectionFormState;
-}
-
-export interface IConnectionFormSubmitData {
-  submitType: 'submit' | 'test';
-  state: IConnectionFormState;
-}
-
-export interface IConnectionFormState {
-  mode: ConnectionFormMode;
-  type: ConnectionFormType;
-
-  config: ConnectionConfig;
-
-  partsState: MetadataMap<string, any>;
-
-  disabled: boolean;
-  loading: boolean;
-
-  readonly availableDrivers: string[];
-  readonly resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>;
-  readonly info: DatabaseConnection | undefined;
-  readonly readonly: boolean;
-  readonly submittingHandlers: IExecutorHandlersCollection<IConnectionFormSubmitData>;
-
-  readonly setPartsState: (state: MetadataMap<string, any>) => this;
-  readonly setOptions: (
-    mode: ConnectionFormMode,
-    type: ConnectionFormType
-  ) => this;
-  readonly setConfig: (config: ConnectionConfig) => this;
-  readonly setAvailableDrivers: (drivers: string[]) => this;
-  readonly save: () => Promise<void>;
-  readonly test: () => Promise<void>;
-  readonly checkFormState: () => Promise<IConnectionFormStateContext>;
-}
+import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
+import type { IConnectionFormProps, IConnectionFormState, IConnectionFormFillConfigData, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export interface IConnectionFormValidation {
   valid: boolean;
@@ -76,20 +33,25 @@ export interface IConnectionFormStatus {
 export class ConnectionFormService {
   readonly tabsContainer: TabsContainer<IConnectionFormProps>;
   readonly actionsContainer: PlaceholderContainer<IConnectionFormProps>;
-  readonly prepareConfigTask: IExecutor<IConnectionFormSubmitData>;
-  readonly formValidationTask: IExecutor<IConnectionFormSubmitData>;
-  readonly formSubmittingTask: IExecutor<IConnectionFormSubmitData>;
-  readonly formStateTask: IExecutor<IConnectionFormState>;
+
+  readonly configureTask: IExecutorHandlersCollection<IConnectionFormState>;
+  readonly fillConfigTask: IExecutorHandlersCollection<IConnectionFormFillConfigData>;
+  readonly prepareConfigTask: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+  readonly formValidationTask: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+  readonly formSubmittingTask: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+  readonly formStateTask: IExecutorHandlersCollection<IConnectionFormState>;
 
   constructor(
     private readonly notificationService: NotificationService
   ) {
     this.tabsContainer = new TabsContainer();
     this.actionsContainer = new PlaceholderContainer();
-    this.prepareConfigTask = new Executor();
-    this.formSubmittingTask = new Executor();
-    this.formValidationTask = new Executor();
-    this.formStateTask = new Executor();
+    this.configureTask = new ExecutorHandlersCollection();
+    this.fillConfigTask = new ExecutorHandlersCollection();
+    this.prepareConfigTask = new ExecutorHandlersCollection();
+    this.formSubmittingTask = new ExecutorHandlersCollection();
+    this.formValidationTask = new ExecutorHandlersCollection();
+    this.formStateTask = new ExecutorHandlersCollection();
 
     this.formSubmittingTask
       .before(this.formValidationTask)
@@ -98,8 +60,10 @@ export class ConnectionFormService {
     this.formStateTask
       .before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
-    this.formSubmittingTask.addPostHandler(this.showStatusMessage);
+    this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
+
+    this.actionsContainer.add(ConnectionFormBaseActions);
   }
 
   connectionValidationContext = (): IConnectionFormValidation => ({
@@ -128,7 +92,7 @@ export class ConnectionFormService {
     },
   });
 
-  private showStatusMessage: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
+  private showSubmittingStatusMessage: IExecutorHandler<IConnectionFormSubmitData> = (data, contexts) => {
     const status = contexts.getContext(this.connectionStatusContext);
 
     if (!status.saved) {

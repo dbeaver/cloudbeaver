@@ -13,8 +13,9 @@ import { TabsContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
-import { ConnectionFormService, IConnectionFormState } from '../../ConnectionForm/ConnectionFormService';
+import { ConnectionFormService } from '../../ConnectionForm/ConnectionFormService';
 import { ConnectionFormState } from '../../ConnectionForm/ConnectionFormState';
+import type { IConnectionFormState } from '../../ConnectionForm/IConnectionFormProps';
 import { ConnectionsResource } from '../ConnectionsResource';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
 
@@ -110,9 +111,12 @@ export class CreateConnectionService {
       .setOptions('create', 'admin')
       .setConfig(config)
       .setAvailableDrivers(availableDrivers || []);
+
+    this.data.load();
   }
 
   clearConnectionTemplate(): void {
+    this.data?.dispose();
     this.data = null;
   }
 

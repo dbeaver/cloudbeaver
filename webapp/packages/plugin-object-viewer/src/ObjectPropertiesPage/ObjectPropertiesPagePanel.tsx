@@ -48,7 +48,7 @@ export const ObjectPropertiesPagePanel = observer(function ObjectPropertiesPageP
   }
 
   return styled(style)(
-    <wrapper as="div">
+    <wrapper>
       <ObjectFolders tab={tab} />
     </wrapper>
   );

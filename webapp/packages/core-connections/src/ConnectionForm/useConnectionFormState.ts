@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import type { CachedMapResource, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseConnection } from '../Administration/ConnectionsResource';
-import { IConnectionFormState, ConnectionFormService } from './ConnectionFormService';
+import { ConnectionFormService } from './ConnectionFormService';
 import { ConnectionFormState } from './ConnectionFormState';
+import type { IConnectionFormState } from './IConnectionFormProps';
 
 export function useConnectionFormState(
   resource: CachedMapResource<string, DatabaseConnection, GetConnectionsQueryVariables>,
@@ -26,8 +27,12 @@ export function useConnectionFormState(
       resource,
     );
     configure?.(state);
+
+    state.load();
     return state;
   });
+
+  useEffect(() => () => state.dispose(), []);
 
   return state;
 }

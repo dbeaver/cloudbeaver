@@ -14,8 +14,10 @@ import type { DatabaseConnection } from '../../Administration/ConnectionsResourc
 import { DBDriverResource } from '../../DBDriverResource';
 import { SSH_TUNNEL_ID } from '../../NetworkHandlerResource';
 import { connectionConfigContext } from '../connectionConfigContext';
-import { IConnectionFormSubmitData, ConnectionFormService, IConnectionFormState } from '../ConnectionFormService';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
+import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionFormStateContext } from '../connectionFormStateContext';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { SSH } from './SSH';
 import { SSHTab } from './SSHTab';
 
@@ -53,9 +55,49 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     this.connectionFormService.formStateTask
       .addHandler(this.formState.bind(this));
+
+    this.connectionFormService.configureTask
+      .addHandler(this.configure.bind(this));
+
+    this.connectionFormService.fillConfigTask
+      .addHandler(this.fillConfig.bind(this));
   }
 
   load(): void { }
+
+  private fillConfig(
+    { state, updated }: IConnectionFormFillConfigData,
+    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
+  ) {
+    const initialConfig = state.info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+
+    if (!state.config.networkHandlersConfig) {
+      state.config.networkHandlersConfig = [];
+    }
+
+    if (!state.config.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
+      state.config.networkHandlersConfig.push({
+        id: SSH_TUNNEL_ID,
+        enabled: false,
+        password: '',
+        savePassword: true,
+        userName: '',
+        ...initialConfig,
+
+        properties: {
+          port: 22,
+          host: '',
+          ...initialConfig?.properties,
+        },
+      });
+    }
+  }
+
+  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('customIncludeNetworkHandlerCredentials');
+  }
 
   private validate(
     {

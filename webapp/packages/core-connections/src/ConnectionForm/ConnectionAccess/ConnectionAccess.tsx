@@ -27,7 +27,7 @@ import {
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import type { IConnectionFormProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { useConnectionAccessState } from './useConnectionAccessState';
 
 const styles = composes(

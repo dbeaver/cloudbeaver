@@ -18,7 +18,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 import { css } from '@reshadow/react';
 
-import type { IConnectionFormProps } from '../ConnectionFormService';
+import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const style = css`
   Loader {
@@ -36,10 +36,10 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const tab = useTab(tabId);
   const translate = useTranslate();
   const userInfoService = useService(UserInfoResource);
-  const state = useTabState<Record<string, any>>(() => ({}));
+  const state = useTabState<Record<string, any>>();
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
-  const connection = useMapResource(resource!, {
+  const connection = useMapResource(resource, {
     key: tab.selected ? info!.id : null,
     includes: ['includeOrigin', 'customIncludeOriginDetails'],
   }, {
