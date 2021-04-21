@@ -27,7 +27,7 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const styles = useStyles(baseFormControlStyles, fieldCheckboxStyles);
 
-  if (rest.autoHide && !isControlPresented(rest.name, rest.state, rest.defaultChecked)) {
+  if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
     return null;
   }
 

@@ -7,7 +7,7 @@
  */
 
 export function isControlPresented(
-  name: string | undefined, state: any, defaultValue?: string | number | boolean
+  name: string | undefined, state: any, defaultValue?: string | number | readonly string[]
 ): boolean {
   if (state !== undefined && name !== undefined) {
     if (name in state) {

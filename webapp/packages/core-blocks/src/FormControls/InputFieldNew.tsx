@@ -28,12 +28,11 @@ const INPUT_FIELD_STYLES = css`
   }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
   mod?: 'surface';
   ref?: React.Ref<HTMLInputElement>;
   style?: ComponentStyle;
-  defaultValue?: string | number;
 };
 
 type ControlledProps = BaseProps & {

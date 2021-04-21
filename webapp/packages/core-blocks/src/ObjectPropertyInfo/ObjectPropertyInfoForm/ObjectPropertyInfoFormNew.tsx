@@ -17,7 +17,7 @@ import { RenderField } from './RenderField';
 
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ObjectPropertyInfo[];
-  state?: Record<string, string | number>;
+  state?: Record<string, any>;
   category?: string | null;
   editable?: boolean;
   autofillToken?: string;

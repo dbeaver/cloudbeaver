@@ -125,7 +125,7 @@ export const SwitchNew: SwitchType = observer(function SwitchNew({
     checkboxState.checked && switchState.checked
   );
 
-  if (autoHide && !isControlPresented(name, state, defaultChecked)) {
+  if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 

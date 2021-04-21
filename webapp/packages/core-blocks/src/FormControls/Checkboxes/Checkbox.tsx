@@ -43,6 +43,7 @@ export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInput
   autoHide?: boolean;
   name: TKey;
 }
+
 export interface CheckboxType {
   (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
   <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
@@ -74,7 +75,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     onChange,
   });
 
-  if (autoHide && !isControlPresented(name, state, defaultChecked)) {
+  if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 

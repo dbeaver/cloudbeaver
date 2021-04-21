@@ -16,12 +16,11 @@ import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'defaultValue'> & {
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & {
   description?: string;
   mod?: 'surface';
   long?: boolean;
   short?: boolean;
-  defaultValue?: string;
 };
 
 type ControlledProps = BaseProps & {

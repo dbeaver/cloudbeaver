@@ -121,7 +121,7 @@ export const Switch: SwitchType = observer(function Switch({
     checkboxState.checked && switchState.checked
   );
 
-  if (autoHide && !isControlPresented(name, state, defaultChecked)) {
+  if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 
