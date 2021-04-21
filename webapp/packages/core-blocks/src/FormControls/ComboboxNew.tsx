@@ -97,10 +97,11 @@ const styles = composes(
   `
 );
 
-type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value'> & ILayoutSizeProps & {
+type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> & ILayoutSizeProps & {
   propertyName?: string;
   items: TValue[];
   searchable?: boolean;
+  defaultValue?: string;
   keySelector: (item: TValue) => TKey;
   valueSelector: (item: TValue) => string;
   onSwitch?: (state: boolean) => void;
@@ -129,6 +130,7 @@ interface ComboboxType {
 
 export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
   value: controlledValue,
+  defaultValue,
   name,
   state,
   propertyName,
@@ -154,14 +156,10 @@ export const ComboboxNew: ComboboxType = observer(function ComboboxNew({
     gutter: 4,
   });
   const [searchValue, setSearchValue] = useState('');
-  let value: string | number | readonly string[] | undefined = controlledValue;
+  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
-  if (state) {
-    if (name in state) {
-      value = state[name];
-    } else if (rest.defaultValue !== undefined) {
-      value = rest.defaultValue;
-    }
+  if (state && name !== undefined && name in state) {
+    value = state[name];
   }
 
   const selectedItem = items.find(item => keySelector(item) === value);

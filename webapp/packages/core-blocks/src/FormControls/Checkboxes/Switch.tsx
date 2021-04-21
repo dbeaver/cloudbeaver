@@ -79,7 +79,6 @@ const switchState = {
 
 interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
-  label?: string;
   description?: string;
 }
 
@@ -91,10 +90,12 @@ interface SwitchType {
 export const Switch: SwitchType = observer(function Switch({
   name,
   value,
+  defaultValue,
   label,
   description,
   state,
   checked,
+  defaultChecked,
   className,
   children,
   onChange,
@@ -103,7 +104,15 @@ export const Switch: SwitchType = observer(function Switch({
   disabled,
   ...rest
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  const checkboxState = useCheckboxState({ value, checked, state, name, onChange });
+  const checkboxState = useCheckboxState({
+    value,
+    defaultValue,
+    checked,
+    defaultChecked,
+    state,
+    name,
+    onChange,
+  });
   const styles = useStyles(
     baseFormControlStyles,
     switchStyles,

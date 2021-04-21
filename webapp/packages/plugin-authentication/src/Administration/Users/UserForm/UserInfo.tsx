@@ -98,7 +98,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         {controller.roles.map((role, i) => (
           <FormGroup key={role.roleId}>
             <FieldCheckbox
-              value={role.roleId}
+              id={role.roleId}
               name='role'
               label={role.roleName || role.roleId}
               checked={!!controller.credentials.roles.get(role.roleId)}
