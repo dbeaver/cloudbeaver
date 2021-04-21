@@ -7,11 +7,12 @@
  */
 
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
+import { Connection, ConnectionInfoResource } from './ConnectionInfoResource';
 import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
+import { SSH_TUNNEL_ID } from './NetworkHandlerResource';
 
 @injectable()
 export class ConnectionAuthService {
