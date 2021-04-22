@@ -9,7 +9,7 @@
 @mixin base-common-dialog() {
   :global(.#{$theme-class}) {
     dialog-body-overflow {
-      background-image: linear-gradient(to top, $mdc-theme-surface, rgba(255, 255, 255, 0));
+      background-image: linear-gradient(to top, $mdc-theme-surface, rgba($mdc-theme-surface, 0));
     }
   }
 }
