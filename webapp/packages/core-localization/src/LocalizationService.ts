@@ -55,19 +55,23 @@ export class LocalizationService extends Bootstrap {
     this.localeProviders.push(provider);
   }
 
-  readonly translate = (token: TLocalizationToken): string => {
+  readonly translate = <T extends TLocalizationToken | undefined>(token: T): T => {
+    if (token === undefined) {
+      return undefined as T;
+    }
+
     let translation = this.localeMap
       .get(this.getCurrentLanguage())
-      ?.get(token);
+      ?.get(token as TLocalizationToken);
 
     if (!translation) {
       translation = this.localeMap
         .get(DEFAULT_LOCALE_NAME)
-        ?.get(token);
+        ?.get(token as TLocalizationToken);
     }
 
     if (typeof translation === 'string') {
-      return translation;
+      return translation as T;
     }
     return token;
   };
