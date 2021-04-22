@@ -69,6 +69,9 @@ export class ConnectionSSHTabService extends Bootstrap {
     { state, updated }: IConnectionFormFillConfigData,
     contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
   ) {
+    if (!updated) {
+      return;
+    }
     const initialConfig = state.info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
     if (!state.config.networkHandlersConfig) {

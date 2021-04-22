@@ -141,6 +141,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     { state, updated }: IConnectionFormFillConfigData,
     contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
   ) {
+    if (!updated) {
+      return;
+    }
+
     if (!state.config.credentials || updated) {
       state.config.credentials = {};
       state.config.saveCredentials = false;

@@ -56,6 +56,9 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     { state, updated }: IConnectionFormFillConfigData,
     contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
   ) {
+    if (!updated) {
+      return;
+    }
     if (!state.config.properties) {
       state.config.properties = {};
     }
