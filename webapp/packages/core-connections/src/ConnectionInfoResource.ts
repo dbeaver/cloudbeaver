@@ -267,3 +267,7 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
     };
   }
 }
+
+export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+  return (a.name).localeCompare(b.name);
+}

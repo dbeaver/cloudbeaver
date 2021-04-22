@@ -12,7 +12,8 @@ import {
   ConnectionInfoResource,
   DBDriverResource,
   Connection,
-  ConnectionsManagerService
+  ConnectionsManagerService,
+  compareConnectionsInfo
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloudbeaver/core-dialogs';
@@ -145,10 +146,11 @@ export class ConnectionSelectorController {
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return Array.from(this.connectionInfo.data.values())
-      .sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? ''))
+    return this.connectionInfo.values
+      .slice()
+      .sort(compareConnectionsInfo)
       .map(item => {
-        const icon = this.navNodeInfoResource.get(NodeManagerUtils.connectionIdToConnectionNodeId(item.id))?.icon;
+        const icon = this.dbDriverResource.get(item.driverId)?.icon;
 
         const menuItem: IMenuItem = {
           id: item.id,
