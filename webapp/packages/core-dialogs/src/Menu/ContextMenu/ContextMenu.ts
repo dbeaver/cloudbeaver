@@ -85,6 +85,8 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   // set title or getter
   title?: TLocalizationToken;
   titleGetter?: () => TLocalizationToken | undefined;
+  tooltip?: TLocalizationToken;
+  tooltipGetter?: () => TLocalizationToken | undefined;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
   // set icon or getter
@@ -99,6 +101,8 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     // doesn't depend on context
     this.title = options.title;
     this.titleGetter = options.titleGetter;
+    this.tooltip = options.tooltip;
+    this.tooltipGetter = options.tooltipGetter;
     this.icon = options.icon;
     this.type = options.type;
     this.separator = options.separator;

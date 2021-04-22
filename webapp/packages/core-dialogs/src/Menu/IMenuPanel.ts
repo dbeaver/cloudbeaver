@@ -29,6 +29,7 @@ export interface IMenuItem {
   isDisabled?: boolean;
   isHidden?: boolean;
   icon?: string; // path to icon or svg icon name
+  tooltip?: string;
   panel?: IMenuPanel; // if menu has sub-items
   type?: MenuItemType;
   separator?: boolean;

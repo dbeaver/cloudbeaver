@@ -35,6 +35,7 @@ export class DataExportMenuService {
       },
       order: 5,
       title: 'data_transfer_dialog_export',
+      tooltip: 'data_transfer_dialog_export_tooltip',
       icon: 'table-export',
       onClick: this.exportData.bind(this),
     });

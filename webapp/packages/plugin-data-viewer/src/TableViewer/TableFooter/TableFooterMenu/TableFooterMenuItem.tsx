@@ -70,6 +70,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
         as="button"
         {...props}
         disabled={menuItem.isDisabled}
+        title={translate(menuItem.tooltip)}
         onClick={() => menuItem.onClick?.()}
       >
         {menuItem.icon && (

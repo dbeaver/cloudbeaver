@@ -126,6 +126,7 @@ export const PropertyItem = observer(function PropertyItem({
 }: Props) {
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
+  const propertyValue = value !== undefined ? value : property.defaultValue;
   const [focus, setFocus] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
@@ -156,7 +157,7 @@ export const PropertyItem = observer(function PropertyItem({
           {property.displayName || property.key}
         </ShadowInput>
       </property-name>
-      <property-value as='div'>
+      <property-value as='div' title={propertyValue}>
         <ShadowInput
           type='text'
           name={`${property.id}_value`}
@@ -166,7 +167,7 @@ export const PropertyItem = observer(function PropertyItem({
           onChange={handleValueChange}
           {...use({ focus, edited })}
         >
-          {value !== undefined ? value : property.defaultValue}
+          {propertyValue}
         </ShadowInput>
         {(!readOnly && property.validValues && property.validValues.length > 0) && (
           <property-select as="div">
