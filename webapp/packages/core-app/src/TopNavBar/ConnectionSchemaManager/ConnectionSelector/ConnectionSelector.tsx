@@ -23,6 +23,11 @@ const menuStyles = css`
 `;
 
 const connectionMenu = css`
+  MenuItem IconOrImage {
+    background-color: #fff;
+    padding: 2px;
+    border-radius: 2px;
+  }
   menu-trigger-icon {
     background-color: #fff;
     border-radius: 4px;

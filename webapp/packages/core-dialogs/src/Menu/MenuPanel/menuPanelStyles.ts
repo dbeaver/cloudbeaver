@@ -108,8 +108,8 @@ export const menuPanelStyles = composes(
         transform: rotate(-90deg);
       }
       & IconOrImage {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
       }
     }
   `

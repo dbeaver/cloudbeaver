@@ -19,6 +19,7 @@ import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloud
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
 
@@ -110,6 +111,7 @@ export class ConnectionSelectorController {
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
     private optionsPanelService: OptionsPanelService,
+    private navNodeInfoResource: NavNodeInfoResource,
   ) {
     makeObservable<ConnectionSelectorController, 'currentObjectContainerIcon'>(this, {
       currentConnection: computed,
@@ -143,14 +145,19 @@ export class ConnectionSelectorController {
   }
 
   private getConnectionItems(): IMenuItem[] {
-    return Array.from(this.connectionInfo.data.values()).map(item => {
-      const menuItem: IMenuItem = {
-        id: item.id,
-        title: item.name || item.id,
-        onClick: () => this.connectionSelectorService.selectConnection(item.id),
-      };
-      return menuItem;
-    });
+    return Array.from(this.connectionInfo.data.values())
+      .sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? ''))
+      .map(item => {
+        const icon = this.navNodeInfoResource.get(NodeManagerUtils.connectionIdToConnectionNodeId(item.id))?.icon;
+
+        const menuItem: IMenuItem = {
+          id: item.id,
+          title: item.name || item.id,
+          icon,
+          onClick: () => this.connectionSelectorService.selectConnection(item.id),
+        };
+        return menuItem;
+      });
   }
 
   private getObjectContainerItems(): IMenuItem[] {
@@ -174,9 +181,16 @@ export class ConnectionSelectorController {
           ? () => this.connectionSelectorService.selectCatalog(catalogName!)
           : () => this.connectionSelectorService.selectSchema(schemaName!);
 
+        let icon = 'database';
+
+        if (catalogName && schemaName) {
+          icon = 'schema_system';
+        }
+
         const menuItem: IMenuItem = {
           id: title,
           title,
+          icon,
           onClick: handler,
         };
         return menuItem;
