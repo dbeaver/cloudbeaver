@@ -15,6 +15,7 @@ import type { IConnectionFormState } from './IConnectionFormProps';
 export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<DatabaseConnection, GetConnectionsQueryVariables>;
 
 export interface IConnectionFormConfigureContext {
+  readonly driverId: string | undefined;
   readonly info: DatabaseConnection | undefined;
   readonly connectionIncludes: ConnectionFormInfoIncludes;
 
@@ -27,6 +28,7 @@ export function connectionFormConfigureContext(
 ): IConnectionFormConfigureContext {
   return {
     info: state.info,
+    driverId: state.config.driverId,
     connectionIncludes: [],
     include(...includes) {
       for (const include of includes) {

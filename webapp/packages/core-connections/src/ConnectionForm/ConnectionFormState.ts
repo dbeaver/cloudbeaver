@@ -132,7 +132,9 @@ export class ConnectionFormState implements IConnectionFormState {
 
         return {
           state,
-          updated: state.info !== configuration.info,
+          updated: state.info !== configuration.info
+            || state.config.driverId !== configuration.driverId
+            || !this.configured,
         };
       })
       .next(this.formStateTask);
