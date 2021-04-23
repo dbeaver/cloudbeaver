@@ -23,6 +23,8 @@ const styles = css`
     height: 100%;
   }
   content-wrapper {
+    display: flex;
+    flex-direction: column;
     padding: 0 16px 16px;
     height: 100%;
     overflow: auto;
@@ -45,12 +47,15 @@ const styles = css`
   }
   message {
     overflow: auto;
+    min-height: 40px;
     max-height: 96px;
   }
   type, message {
     margin-bottom: 12px;
   }
-  
+  TextareaNew {
+    flex: 1;
+  } 
 `;
 
 interface Props {
