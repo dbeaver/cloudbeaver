@@ -99,12 +99,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
         if (submitType === 'submit') {
           if (state.mode === 'edit') {
             const connection = await this.connectionInfoResource.update(config);
-            status.info('Connection updated');
+            status.info('Connection was updated');
             status.info(connection.name);
           } else {
             const connection = await this.connectionInfoResource.createConnection(config);
             config.connectionId = connection.id;
-            status.info('Connection created');
+            status.info('Connection was created');
             status.info(connection.name);
           }
         } else {
