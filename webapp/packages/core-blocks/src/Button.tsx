@@ -6,12 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 import { use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { Loader } from './Loader/Loader';
+import { useObjectRef } from './useObjectRef';
 
 const buttonStyles = composes(
   css`
@@ -93,28 +96,52 @@ type ButtonProps = (
   tag?: 'button' | 'a';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
+  loader?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement> | (() => Promise<any>);
   download?: boolean;
 };
 
-export const Button: React.FC<ButtonProps> = function Button({
+export const Button: React.FC<ButtonProps> = observer(function Button({
   children,
   mod,
   tag = 'button',
   disabled = false,
   loading,
+  loader,
+  onClick,
   className,
   ...rest
 }) {
+  const state = useObjectRef({
+    loading: false,
+    click: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) => {},
+  }, {
+    click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement>) {
+      const returnValue = onClick?.(e);
+
+      if (returnValue instanceof Promise) {
+        if (loader) {
+          this.loading = true;
+          returnValue.finally(() => {
+            this.loading = false;
+          });
+        }
+      }
+    },
+  }, { loading: observable }, ['click']);
+
+  loading = state.loading || loading;
+
   if (loading) {
     disabled = true;
   }
 
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} disabled={disabled} {...use({ loading })} className={className}>
+    <Button {...rest} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
       <ripple as="div" />
       <button-label as='div'>{children}</button-label>
       <Loader small />
     </Button>
   );
-};
+});

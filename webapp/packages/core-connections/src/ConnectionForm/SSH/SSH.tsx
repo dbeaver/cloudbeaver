@@ -150,7 +150,7 @@ export const SSH: TabContainerPanelComponent<IConnectionFormProps> = observer(fu
               type='button'
               mod={['outlined']}
               disabled={disabled || !enabled || !passwordFilled}
-              loading={loading}
+              loader
               onClick={testConnection}
             >
               {translate('connections_network_handler_test')}

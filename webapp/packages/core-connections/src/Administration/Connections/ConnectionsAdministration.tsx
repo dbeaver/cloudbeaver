@@ -88,9 +88,9 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
             </message-box>
           )}
           <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" disabled={!!sub} onClick={service.create} />
-            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
-            <IconButton name="refresh-outline" viewBox="0 0 16 16" onClick={controller.update} />
+            <IconButton name="add" viewBox="0 0 28 28" disabled={!!sub || controller.isProcessing} onClick={service.create} />
+            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected || controller.isProcessing} onClick={controller.delete} />
+            <IconButton name="refresh-outline" viewBox="0 0 16 16" disabled={controller.isProcessing} onClick={controller.update} />
           </AdministrationTools>
           {sub && (
             <CreateConnection method={param} configurationWizard={configurationWizard} />
@@ -100,7 +100,7 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
             selectedItems={controller.selectedItems}
             expandedItems={controller.expandedItems}
           />
-          <Loader loading={controller.isLoading} overlay />
+          <Loader loading={controller.isProcessing} overlay />
         </layout-grid-cell>
       </layout-grid-inner>
     </layout-grid>
