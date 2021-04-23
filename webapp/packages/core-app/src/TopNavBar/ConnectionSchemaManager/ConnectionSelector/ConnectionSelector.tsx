@@ -12,6 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
+import { EPermission, usePermission } from '@cloudbeaver/core-root';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { TopMenuItem } from '../../shared/TopMenuItem';
@@ -56,11 +57,12 @@ const styles = css`
 export const ConnectionSelector = observer(function ConnectionSelector() {
   const style = useStyles(styles);
   const controller = useController(ConnectionSelectorController);
-  const driver = useMapResource(DBDriverResource, null, { onLoad: resource => resource.loadAll() });
+  const isEnabled = usePermission(EPermission.public);
+  const driver = useMapResource(DBDriverResource, null, { onLoad: resource => isEnabled && resource.loadAll() });
   const ConnectionMenu = TopMenuItem;
   const SchemaOrCatalogMenu = TopMenuItem;
 
-  if (!driver.isLoaded()) {
+  if (!isEnabled || !driver.isLoaded()) {
     return null;
   }
 
