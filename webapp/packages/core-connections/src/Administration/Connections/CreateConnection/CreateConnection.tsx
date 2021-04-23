@@ -55,7 +55,6 @@ const styles = composes(
       position: relative;
       display: flex;
       flex-direction: column;
-      padding-top: 16px;
       flex: 1;
       overflow: auto;
     }
