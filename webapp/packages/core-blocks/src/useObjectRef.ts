@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AnnotationsMap, makeObservable } from 'mobx';
+import { AnnotationsMap, makeObservable, observable } from 'mobx';
 import { useState } from 'react';
 
 export function useObjectRef<T>(
@@ -16,8 +16,10 @@ export function useObjectRef<T>(
   bind?: Array<keyof T>
 ): T {
   const [ref] = useState(() => {
-    if (observed) {
-      makeObservable(init, typeof observed === 'object' ? observed : undefined, { deep: false });
+    if (observed === true) {
+      observable(init, undefined, { deep: false });
+    } else if (typeof observed === 'object') {
+      makeObservable(init, observed, { deep: false });
     }
 
     if (bind) {
