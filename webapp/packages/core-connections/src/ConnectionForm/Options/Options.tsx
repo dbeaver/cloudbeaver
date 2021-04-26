@@ -11,6 +11,7 @@ import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   InputFieldNew,
   SubmittingForm,
@@ -30,6 +31,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
+import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import { isLocalConnection } from '../../Administration/ConnectionsResource';
 import { DatabaseAuthModelsResource } from '../../DatabaseAuthModelsResource';
@@ -63,6 +65,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     readonly,
     disabled,
   } = state;
+
+  const authentication = useAuthenticationAction({
+    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+  });
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef);
   const optionsHook = useOptions(props.state);
@@ -185,7 +191,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(authModel && !driver.data?.anonymousAccess && properties) && (
+          {(authModel && !driver.data?.anonymousAccess && properties && authentication.authorized) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               <Container wrap gap>

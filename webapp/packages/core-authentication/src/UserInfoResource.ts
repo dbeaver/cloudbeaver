@@ -45,12 +45,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   }
 
   hasToken(type: string, subType?: string): boolean {
-    if (!this.data) {
-      return false;
-    }
-
     if (type === AUTH_PROVIDER_LOCAL_ID) {
       return true;
+    }
+
+    if (!this.data) {
+      return false;
     }
 
     // TODO: will be changed due wrong origin in authTokens
