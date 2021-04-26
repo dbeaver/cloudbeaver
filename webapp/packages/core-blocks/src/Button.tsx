@@ -13,6 +13,7 @@ import { use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { Icon } from './Icons';
 import { Loader } from './Loader/Loader';
 import { useObjectRef } from './useObjectRef';
 
@@ -20,6 +21,12 @@ const buttonStyles = composes(
   css`
     Button {
       composes: theme-button from global;
+    }
+    button-label {
+      composes: theme-button__label from global;
+    }
+    button-icon {
+      composes: theme-button__icon from global;
     }
     ripple {
       composes: theme-button_ripple from global;
@@ -92,6 +99,8 @@ type ButtonProps = (
   & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
 ) & {
   loading?: boolean;
+  icon?: string;
+  viewBox?: string;
   mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
@@ -103,6 +112,8 @@ type ButtonProps = (
 
 export const Button: React.FC<ButtonProps> = observer(function Button({
   children,
+  icon,
+  viewBox,
   mod,
   tag = 'button',
   disabled = false,
@@ -139,8 +150,9 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
   const Button = tag;
   return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
     <Button {...rest} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
-      <ripple as="div" />
-      <button-label as='div'>{children}</button-label>
+      <ripple />
+      {icon && <button-icon><Icon name={icon} viewBox={viewBox} /></button-icon>}
+      <button-label as='span'>{children}</button-label>
       <Loader small />
     </Button>
   );

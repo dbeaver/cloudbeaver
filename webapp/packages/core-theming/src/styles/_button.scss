@@ -15,11 +15,17 @@
 
   .theme-button {
     composes: mdc-button;
-    height: 28px;
+    height: 32px;
 
     &[disabled] {
       opacity: 1;
     }
+  }
+  .theme-button__label {
+    composes: mdc-button__label;
+  }
+  .theme-button__icon {
+    composes: mdc-button__icon;
   }
   .theme-button_ripple {
     composes: mdc-button__ripple;

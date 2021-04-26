@@ -12,6 +12,7 @@ interface Props extends IContainerProps {
   className?: string;
   form?: boolean;
   center?: boolean;
+  box?: boolean;
 }
 
 export const Group: React.FC<Props> = function Group({ children, className }) {

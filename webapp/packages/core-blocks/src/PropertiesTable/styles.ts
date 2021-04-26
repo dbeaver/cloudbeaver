@@ -13,10 +13,7 @@ import { composes } from '@cloudbeaver/core-theming';
 export const PROPERTIES_TABLE_STYLES = composes(
   css`
     properties-header {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-    properties-header-name, properties-header-value {
-      composes: theme-background-surface theme-text-on-surface from global;
+      composes: theme-background-surface theme-text-on-surface theme-border-color-secondary from global;
     }
   `,
   css`
@@ -28,10 +25,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
     properties-header {
       box-sizing: border-box;
       display: inline-flex;
-      padding: 2px 0;
-      position: sticky;
-      z-index: 1;
-      top: 0;
+      border-bottom: solid 1px;
     }
     properties-header-name, properties-header-value {
       composes: theme-typography--caption from global;
@@ -40,22 +34,25 @@ export const PROPERTIES_TABLE_STYLES = composes(
       flex: 1;
       padding: 4px 36px;
     }
-    properties-header-value, properties-header-right {
-      margin-left: 2px;
-    }
     properties-header-name {
       flex: 0 0 auto;
       width: 300px;
     }
-    properties-header-right {
-      flex: 0 0 auto;
+    properties-header-add {
+      flex: 0 0 100%;
+      padding: 8px 28px;
+
+      & Button {
+        text-transform: initial;
+      }
     }
 
     properties-list {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding-bottom: 24px;
+      overflow: auto;
+      max-height: 600px;
     }
   `
 );

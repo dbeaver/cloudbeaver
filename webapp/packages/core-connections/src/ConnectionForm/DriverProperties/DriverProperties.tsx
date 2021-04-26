@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IProperty, Loader, PropertiesTable, TabContainerPanelComponent, useMapResource, useTab } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, TabContainerPanelComponent, useMapResource, useTab } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -19,14 +19,17 @@ import { DBDriverResource } from '../../DBDriverResource';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 const styles = css`
-  properties {
-    display: flex;
+  ColoredContainer {
     flex: 1;
-    flex-direction: column;
     overflow: auto;
   }
-  center {
-    margin: auto;
+  Group {
+    max-height: 100%;
+  }
+  PropertiesTable {
+    padding-top: 8px;
+    max-height: 100%;
+    box-sizing: border-box;
   }
 `;
 
@@ -34,7 +37,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   tabId,
   state: formState,
 }) {
-  const style = useStyles(styles);
+  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const { selected } = useTab(tabId);
 
   const [state] = useState(() => {
@@ -50,7 +53,11 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
       });
     }
 
-    return { propertiesList, add };
+    function remove(property: IProperty) {
+      propertiesList.splice(propertiesList.indexOf(property), 1);
+    }
+
+    return { propertiesList, add, remove };
   });
 
   const driver = useMapResource(
@@ -87,17 +94,20 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   ])), [driver.data]);
 
   return styled(style)(
-    <properties as="div">
-      <Loader state={driver}>
-        {() => (
-          <PropertiesTable
-            properties={joinedProperties.get()}
-            propertiesState={formState.config.properties}
-            readOnly={formState.readonly}
-            onAdd={state.add}
-          />
-        )}
-      </Loader>
-    </properties>
+    <Loader state={driver}>
+      {() => styled(style)(
+        <ColoredContainer parent>
+          <Group box keepSize large>
+            <PropertiesTable
+              properties={joinedProperties.get()}
+              propertiesState={formState.config.properties}
+              readOnly={formState.readonly}
+              onAdd={state.add}
+              onRemove={state.remove}
+            />
+          </Group>
+        </ColoredContainer>
+      )}
+    </Loader>
   );
 });

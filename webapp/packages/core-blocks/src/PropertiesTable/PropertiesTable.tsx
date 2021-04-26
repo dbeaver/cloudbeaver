@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -21,21 +22,24 @@ import { PROPERTIES_TABLE_STYLES } from './styles';
 
 type PropertiesState = Record<string, string>;
 
-interface PropertiesTableProps {
+interface Props {
   properties: IProperty[];
   propertiesState?: PropertiesState;
   readOnly?: boolean;
   onKeyChange?: (id: string, name: string) => void;
   onChange?: (state: PropertiesState) => void;
   onAdd?: () => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (property: IProperty) => void;
   className?: string;
 }
 
-export const PropertiesTable = observer(function PropertiesTable(props: PropertiesTableProps) {
+export const PropertiesTable = observer(function PropertiesTable(props: Props) {
   const { className, onAdd, readOnly, propertiesState } = props;
   const translate = useTranslate();
   const propsRef = useObjectRef({ ...props });
+
+  const sortedProperties = useMemo(() => computed(() => propsRef.properties.slice().sort(
+    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''))), [propsRef.properties]);
 
   const changeName = useCallback((id: string, key: string) => {
     const { properties, propertiesState, onKeyChange } = propsRef;
@@ -92,9 +96,8 @@ export const PropertiesTable = observer(function PropertiesTable(props: Properti
     }
 
     if (onRemove) {
-      onRemove(id);
+      onRemove(property);
     }
-    properties.splice(properties.indexOf(property), 1);
   }, []);
 
   const isKeyUnique = useCallback(
@@ -102,24 +105,30 @@ export const PropertiesTable = observer(function PropertiesTable(props: Properti
     []
   );
 
-  const alphabetOrderProperties = propsRef.properties.slice().sort(
-    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''));
-
   return styled(useStyles(PROPERTIES_TABLE_STYLES))(
-    <properties as="div" className={className}>
-      <properties-header as="div">
-        <properties-header-name as="div">
+    <properties className={className}>
+      <properties-header>
+        <properties-header-name>
           {translate('block_properties_table_name')}
         </properties-header-name>
-        <properties-header-value as="div">
+        <properties-header-value>
           {translate('block_properties_table_value')}
         </properties-header-value>
-        <properties-header-right as="div">
-          {onAdd && !readOnly && <Button type='button' mod={['outlined']} onClick={() => onAdd()}>{translate('block_properties_table_add')}</Button>}
-        </properties-header-right>
       </properties-header>
-      <properties-list as="div">
-        {alphabetOrderProperties.map(property => (
+      <properties-list>
+        {onAdd && !readOnly && (
+          <properties-header-add>
+            <Button
+              icon='add_sm'
+              viewBox="0 0 18 18"
+              type='button'
+              onClick={() => onAdd()}
+            >
+              {translate('block_properties_table_add')}
+            </Button>
+          </properties-header-add>
+        )}
+        {sortedProperties.get().map(property => (
           <PropertyItem
             key={property.id}
             property={property}

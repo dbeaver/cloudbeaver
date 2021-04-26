@@ -71,6 +71,11 @@ export const BASE_CONTAINERS_STYLES = composes(
         margin-right: 25%;
       }
 
+      &[box] {
+        padding: 0;
+        overflow: hidden;
+      }
+
       &[center] {
         margin: 0 auto;
       }
