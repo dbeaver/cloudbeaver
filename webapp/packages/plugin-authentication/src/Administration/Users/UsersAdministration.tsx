@@ -10,8 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, IconButton } from '@cloudbeaver/core-blocks';
+import { Loader, LabeledIconButton } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { CreateUser } from './CreateUser';
@@ -32,19 +33,17 @@ const styles = composes(
   css`
     layout-grid {
       width: 100%;
+      overflow: auto;
+      flex: 1;
     }
 
-    layout-grid, layout-grid-inner {
+    layout-grid-inner {
       min-height: 100%;
     }
 
     layout-grid-cell {
       position: relative;
       border: solid 1px;
-    }
-
-    AdministrationTools {
-      border: none;
     }
 
     Loader {
@@ -56,40 +55,64 @@ const styles = composes(
 export const UsersAdministration = observer(function UsersAdministration({
   sub,
 }: AdministrationItemContentProps) {
+  const translate = useTranslate();
   const service = useService(CreateUserService);
   const controller = useController(UsersAdministrationController);
+  const isLocalProviderAvailable = controller.isLocalProviderAvailable;
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
-    <layout-grid as="div">
-      <layout-grid-inner as="div">
-        <layout-grid-cell as='div' {...use({ span: 12 })}>
-          {controller.isProvidersLoading
-            ? <Loader />
-            : (
-              <>
-                <AdministrationTools>
-                  {controller.isLocalProviderAvailable && (
-                    <>
-                      <IconButton name="add" viewBox="0 0 28 28" disabled={sub && !!service.user} onClick={service.create} />
-                      <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected} onClick={controller.delete} />
-                    </>
+    <>
+      <AdministrationTools>
+        {isLocalProviderAvailable && (
+          <LabeledIconButton
+            title={translate('authentication_administration_tools_add_tooltip')}
+            label={translate('ui_add')}
+            icon="add"
+            viewBox="0 0 24 24"
+            disabled={sub && !!service.user}
+            onClick={service.create}
+          />
+        )}
+        <LabeledIconButton
+          title={translate('authentication_administration_tools_refresh_tooltip')}
+          label={translate('ui_refresh')}
+          icon="refresh"
+          viewBox="0 0 24 24"
+          onClick={controller.update}
+        />
+        {isLocalProviderAvailable && (
+          <LabeledIconButton
+            title={translate('authentication_administration_tools_delete_tooltip')}
+            label={translate('ui_delete')}
+            icon="trash"
+            viewBox="0 0 24 24"
+            disabled={!controller.itemsSelected}
+            onClick={controller.delete}
+          />
+        )}
+      </AdministrationTools>
+      <layout-grid as="div">
+        <layout-grid-inner as="div">
+          <layout-grid-cell as='div' {...use({ span: 12 })}>
+            {controller.isProvidersLoading
+              ? <Loader />
+              : (
+                <>
+                  {sub && service.user && (
+                    <CreateUser user={service.user} onCancel={service.cancelCreate} />
                   )}
-                  <IconButton name="refresh-outline" viewBox="0 0 28 28" onClick={controller.update} />
-                </AdministrationTools>
-                {sub && service.user && (
-                  <CreateUser user={service.user} onCancel={service.cancelCreate} />
-                )}
-                <UsersTable
-                  users={controller.users}
-                  selectedItems={controller.selectedItems}
-                  expandedItems={controller.expandedItems}
-                  selectable={controller.isLocalProviderAvailable}
-                />
-                <Loader loading={controller.isLoading} overlay />
-              </>
-            )}
-        </layout-grid-cell>
-      </layout-grid-inner>
-    </layout-grid>
+                  <UsersTable
+                    users={controller.users}
+                    selectedItems={controller.selectedItems}
+                    expandedItems={controller.expandedItems}
+                    selectable={controller.isLocalProviderAvailable}
+                  />
+                  <Loader loading={controller.isLoading} overlay />
+                </>
+              )}
+          </layout-grid-cell>
+        </layout-grid-inner>
+      </layout-grid>
+    </>
   );
 });

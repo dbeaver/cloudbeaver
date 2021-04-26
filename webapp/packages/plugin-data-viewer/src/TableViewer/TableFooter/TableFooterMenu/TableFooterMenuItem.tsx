@@ -8,10 +8,9 @@
 
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
-import { Button } from 'reakit';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { IconOrImage, LabeledIconButton } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -25,25 +24,8 @@ export const tableFooterMenuStyles = composes(
     Menu {
       composes: theme-text-on-surface from global;
     }
-    Button {
-      composes: theme-text-on-secondary from global;
-    }
-    MenuTrigger, Button {
-      composes: theme-ripple from global;
-    }
   `,
   css`
-    MenuTrigger, Button {
-      height: 100%;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-    Button {
-      background: transparent;
-      outline: none;
-    }
     menu-trigger-icon IconOrImage {
       display: block;
       width: 24px;
@@ -65,21 +47,16 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   const styles = useStyles(tableFooterMenuStyles);
 
   if (!menuItem.panel) {
-    return styled(styles)(
-      <Button
-        as="button"
+    return (
+      <LabeledIconButton
         {...props}
-        disabled={menuItem.isDisabled}
         title={translate(menuItem.tooltip)}
+        label={translate(menuItem.title)}
+        icon={menuItem.icon}
+        viewBox="0 0 32 32"
+        disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
-      >
-        {menuItem.icon && (
-          <menu-trigger-icon as="div">
-            <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
-          </menu-trigger-icon>
-        )}
-        {menuItem.title && <menu-trigger-title as="div">{translate(menuItem.title)}</menu-trigger-title>}
-      </Button>
+      />
     );
   }
 

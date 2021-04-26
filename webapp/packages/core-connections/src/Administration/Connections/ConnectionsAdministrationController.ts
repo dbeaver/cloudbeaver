@@ -10,7 +10,7 @@ import { observable, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { DatabaseConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';
@@ -47,8 +47,9 @@ export class ConnectionsAdministrationController {
     this.isProcessing = true;
     try {
       await this.connectionsResource.refreshAll();
+      this.notificationService.notify({ title: 'connections_administration_tools_refresh_success' }, ENotificationType.Success);
     } catch (exception) {
-      this.notificationService.logException(exception, 'Connections update failed');
+      this.notificationService.logException(exception, 'connections_administration_tools_refresh_fail');
     } finally {
       this.isProcessing = false;
     }

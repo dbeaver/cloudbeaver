@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, LabeledIconButton, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -84,8 +84,22 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     <SubmittingForm ref={focusedRef} name='server_config' onSubmit={save} onChange={handleChange}>
       {!configurationWizard && (
         <AdministrationTools>
-          <IconButton name="admin-save" viewBox="0 0 28 28" disabled={!changed} onClick={save} />
-          <IconButton name="admin-cancel" viewBox="0 0 28 28" disabled={!changed} onClick={reset} />
+          <LabeledIconButton
+            title={translate('administration_configuration_tools_save_tooltip')}
+            label={translate('ui_processing_save')}
+            icon="admin-save"
+            viewBox="0 0 24 24"
+            disabled={!changed}
+            onClick={save}
+          />
+          <LabeledIconButton
+            title={translate('administration_configuration_tools_cancel_tooltip')}
+            label={translate('ui_processing_cancel')}
+            icon="admin-cancel"
+            viewBox="0 0 24 24"
+            disabled={!changed}
+            onClick={reset}
+          />
         </AdministrationTools>
       )}
       <ColoredContainer wrap gap overflow parent>

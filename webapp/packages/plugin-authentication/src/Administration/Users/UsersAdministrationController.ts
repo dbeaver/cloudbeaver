@@ -11,7 +11,7 @@ import { observable, computed, makeObservable } from 'mobx';
 import { AdminUser, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
@@ -71,6 +71,7 @@ export class UsersAdministrationController implements IInitializableController {
   update = async () => {
     try {
       await this.usersResource.refreshAll();
+      this.notificationService.notify({ title: 'authentication_administration_tools_refresh_success' }, ENotificationType.Success);
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Users update failed');

@@ -19,6 +19,8 @@ export const defaultENLocale = [
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],
   ['ui_delete', 'Delete'],
+  ['ui_add', 'Add'],
+  ['ui_refresh', 'Refresh'],
   ['ui_data_saving_error', 'Save error'],
   ['ui_data_delete_confirmation', 'Delete confirmation'],
   ['ui_no_matches_placeholder', 'Your search returned no matches.'],

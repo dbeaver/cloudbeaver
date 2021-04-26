@@ -19,17 +19,14 @@ export const ADMINISTRATION_TOOLS_STYLES = composes(
   `,
   css`
     AdministrationTools {
-      padding: 0 16px;
       display: flex;
       flex-shrink: 0;
       align-items: center;
       border-bottom: solid 1px;
       height: 48px;
-
-      & IconButton {
-        height: 32px;
-        width: 32px;
-        margin-right: 16px;
+      & LabeledIconButton {
+        font-weight: 600;
+        font-size: 15px;
       }
     }
   `

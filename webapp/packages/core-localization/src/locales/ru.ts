@@ -17,6 +17,8 @@ export const defaultRULocale = [
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],
+  ['ui_add', 'Добавить'],
+  ['ui_refresh', 'Обновить'],
   ['ui_data_saving_error', 'Ошибка при сохранении изменений'],
   ['ui_no_matches_placeholder', 'По вашему запросу ничего не найдено.'],
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],

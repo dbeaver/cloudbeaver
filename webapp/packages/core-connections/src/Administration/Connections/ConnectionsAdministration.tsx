@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, IconButton, useMapResource } from '@cloudbeaver/core-blocks';
+import { Loader, useMapResource, LabeledIconButton } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
+import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionsResource } from '../ConnectionsResource';
@@ -38,6 +38,7 @@ const styles = composes(
     }
 
     layout-grid {
+      overflow: auto;
       width: 100%;
       flex: 1;
     }
@@ -49,10 +50,6 @@ const styles = composes(
     layout-grid-cell {
       position: relative;
       border: solid 1px;
-    }
-
-    AdministrationTools {
-      border: none;
     }
 
     actions {
@@ -74,35 +71,60 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
 }) {
   const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
+  const translate = useTranslate();
 
   useMapResource(ConnectionsResource, ConnectionsResource.keyAll);
 
   return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
-    <layout-grid as="div">
-      <layout-grid-inner as="div">
-        <layout-grid-cell as='div' {...use({ span: 12 })}>
-          {configurationWizard && (
-            <message-box as='div'>
-              <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
-              <p><Translate token='connections_administration_configuration_wizard_message' /></p>
-            </message-box>
-          )}
-          <AdministrationTools>
-            <IconButton name="add" viewBox="0 0 28 28" disabled={!!sub || controller.isProcessing} onClick={service.create} />
-            <IconButton name="trash" viewBox="0 0 28 28" disabled={!controller.itemsSelected || controller.isProcessing} onClick={controller.delete} />
-            <IconButton name="refresh-outline" viewBox="0 0 16 16" disabled={controller.isProcessing} onClick={controller.update} />
-          </AdministrationTools>
-          {sub && (
-            <CreateConnection method={param} configurationWizard={configurationWizard} />
-          )}
-          <ConnectionsTable
-            connections={controller.connections}
-            selectedItems={controller.selectedItems}
-            expandedItems={controller.expandedItems}
-          />
-          <Loader loading={controller.isProcessing} overlay />
-        </layout-grid-cell>
-      </layout-grid-inner>
-    </layout-grid>
+    <>
+      <AdministrationTools>
+        <LabeledIconButton
+          title={translate('connections_administration_tools_add_tooltip')}
+          label={translate('ui_add')}
+          icon='add'
+          viewBox="0 0 24 24"
+          disabled={!!sub || controller.isProcessing}
+          onClick={service.create}
+        />
+        <LabeledIconButton
+          title={translate('connections_administration_tools_refresh_tooltip')}
+          label={translate('ui_refresh')}
+          icon="refresh"
+          viewBox="0 0 24 24"
+          disabled={controller.isProcessing}
+          onClick={controller.update}
+        />
+        <LabeledIconButton
+          title={translate('connections_administration_tools_delete_tooltip')}
+          label={translate('ui_delete')}
+          icon="trash"
+          viewBox="0 0 24 24"
+          disabled={!controller.itemsSelected || controller.isProcessing}
+          onClick={controller.delete}
+        />
+      </AdministrationTools>
+      <layout-grid as="div">
+        <layout-grid-inner as="div">
+          <layout-grid-cell as='div' {...use({ span: 12 })}>
+            {configurationWizard && (
+              <message-box as='div'>
+                <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
+                <p><Translate token='connections_administration_configuration_wizard_message' /></p>
+              </message-box>
+            )}
+
+            {sub && (
+              <CreateConnection method={param} configurationWizard={configurationWizard} />
+            )}
+            <ConnectionsTable
+              connections={controller.connections}
+              selectedItems={controller.selectedItems}
+              expandedItems={controller.expandedItems}
+            />
+            <Loader loading={controller.isProcessing} overlay />
+          </layout-grid-cell>
+        </layout-grid-inner>
+      </layout-grid>
+    </>
   );
 });
