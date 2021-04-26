@@ -37,6 +37,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     this.connectionFormService.tabsContainer.add({
       key: this.key,
       name: 'connections_connection_edit_access',
+      title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
       isHidden: (tabId, props) => props?.state.type !== 'admin',

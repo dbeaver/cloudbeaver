@@ -9,6 +9,7 @@
 import { useContext } from 'react';
 
 import { useExecutor } from '../../useExecutor';
+import { useObjectRef } from '../../useObjectRef';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 
@@ -42,17 +43,14 @@ export function useTab(
     }],
   });
 
-  const handleOpen = () => state.open(tabId);
-
-  const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation(); // it's here because close triggers handleOpen too
-    state.close(tabId);
-  };
-
-  return {
+  return useObjectRef({
     state,
+    getInfo: () => state.getTabInfo(tabId),
     selected: state.state.selectedId === tabId,
-    handleOpen,
-    handleClose,
-  };
+    handleOpen: () => state.open(tabId),
+    handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation(); // it's here because close triggers handleOpen too
+      state.close(tabId);
+    },
+  });
 }

@@ -21,6 +21,7 @@ export type TabContainerPanelComponent<TProps = Record<string, any>> = React.FC<
 export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
   key: string;
   name?: string;
+  title?: string;
   icon?: string;
   order?: number;
   options?: TOptions;

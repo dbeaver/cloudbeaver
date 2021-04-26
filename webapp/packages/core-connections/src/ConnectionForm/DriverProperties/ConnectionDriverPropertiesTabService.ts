@@ -30,6 +30,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     this.connectionFormService.tabsContainer.add({
       key: 'driver_properties',
       name: 'customConnection_properties',
+      title: 'customConnection_properties',
       order: 2,
       panel: () => DriverProperties,
       isDisabled: (tabId, props) => {
