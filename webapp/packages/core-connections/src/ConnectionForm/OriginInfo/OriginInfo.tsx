@@ -24,6 +24,10 @@ const style = css`
   Loader {
     height: 100%;
   }
+  ColoredContainer {
+    flex: 1;
+    overflow: auto;
+  }
 `;
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
