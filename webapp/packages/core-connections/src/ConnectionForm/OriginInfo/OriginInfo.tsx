@@ -107,7 +107,8 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
         <ObjectPropertyInfoFormNew
           properties={connection.data.origin.details}
           state={state}
-          editable={false}
+          readOnly
+          small
           autoHide
         />
       </Group>
