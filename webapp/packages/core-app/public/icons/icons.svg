@@ -29,8 +29,8 @@
     </g>
   </symbol>
 
-  <symbol id="add_sm" viewBox="-3 -3 14 14">
-    <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M5 0H3v3H0v2h3v3h2V5h3V3H5V0z"/>
+  <symbol id="add_sm" viewBox="0 0 18 18">
+    <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M10 5H8v3H5v2h3v3h2v-3h3V8h-3V5z"/>
   </symbol>
 
   <symbol id="arrow" viewBox="0 0 16 16">

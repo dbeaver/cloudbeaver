@@ -40,11 +40,7 @@ export const PROPERTIES_TABLE_STYLES = composes(
     }
     properties-header-add {
       flex: 0 0 100%;
-      padding: 8px 28px;
-
-      & Button {
-        text-transform: initial;
-      }
+      padding: 0px 28px;
     }
 
     properties-list {
@@ -53,6 +49,18 @@ export const PROPERTIES_TABLE_STYLES = composes(
       flex-direction: column;
       overflow: auto;
       max-height: 600px;
+      padding: 4px 0px;
     }
   `
 );
+
+export const PROPERTIES_TABLE_ADD_STYLES = css`
+  button-icon {
+    margin-right: 0px !important;
+  }
+  button-label {
+    composes: theme-typography--caption from global;
+    text-transform: initial;
+    font-weight: 500;
+  }
+`;

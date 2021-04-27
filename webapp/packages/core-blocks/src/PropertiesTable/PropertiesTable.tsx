@@ -18,7 +18,7 @@ import { Button } from '../Button';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_TABLE_STYLES } from './styles';
+import { PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
 
 type PropertiesState = Record<string, string>;
 
@@ -122,6 +122,7 @@ export const PropertiesTable = observer(function PropertiesTable(props: Props) {
               icon='add_sm'
               viewBox="0 0 18 18"
               type='button'
+              styles={PROPERTIES_TABLE_ADD_STYLES}
               onClick={() => onAdd()}
             >
               {translate('block_properties_table_add')}

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 import { use } from 'reshadow';
 
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles, composes, ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icons';
 import { Loader } from './Loader/Loader';
@@ -101,6 +101,7 @@ type ButtonProps = (
   loading?: boolean;
   icon?: string;
   viewBox?: string;
+  styles?: ComponentStyle;
   mod?: Array<keyof typeof buttonMod>;
   tag?: 'button' | 'a';
   href?: string;
@@ -115,6 +116,7 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
   icon,
   viewBox,
   mod,
+  styles,
   tag = 'button',
   disabled = false,
   loading,
@@ -148,7 +150,7 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
   }
 
   const Button = tag;
-  return styled(useStyles(buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
+  return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
     <Button {...rest} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
       <ripple />
       {icon && <button-icon><Icon name={icon} viewBox={viewBox} /></button-icon>}
