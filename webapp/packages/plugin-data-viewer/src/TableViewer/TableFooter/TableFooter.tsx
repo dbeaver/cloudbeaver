@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, SubmittingForm } from '@cloudbeaver/core-blocks';
+import { IconButton, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -23,10 +23,7 @@ const tableFooterStyles = composes(
     }
   `,
   css`
-    table-footer {
-      height: 40px;
-      flex: 0 0 auto;
-      display: flex;
+    ToolsPanel {
       align-items: center;
     }
     count input,
@@ -89,7 +86,7 @@ export const TableFooter = observer(function TableFooter({
   );
 
   return styled(useStyles(tableFooterStyles))(
-    <table-footer as="div">
+    <ToolsPanel>
       <reload as="div">
         <IconButton
           type="button"
@@ -117,6 +114,6 @@ export const TableFooter = observer(function TableFooter({
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>
       )}
-    </table-footer>
+    </ToolsPanel>
   );
 });

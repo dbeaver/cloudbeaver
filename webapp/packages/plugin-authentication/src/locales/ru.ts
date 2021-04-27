@@ -16,7 +16,7 @@ export default [
   ['authentication_administration_user_info', 'Общее'],
   ['authentication_administration_item', 'Пользователи'],
   ['authentication_administration_tools_add_tooltip', 'Добавить нового пользователя'],
-  ['authentication_administration_tools_refresh_tooltip', 'Обновить лист пользователей'],
+  ['authentication_administration_tools_refresh_tooltip', 'Обновить список пользователей'],
   ['authentication_administration_tools_delete_tooltip', 'Удалить выбранных пользователей'],
   ['authentication_administration_tools_refresh_success', 'Список пользователей обновлен'],
   ['authentication_administration_user_updated', 'User updated'],

@@ -47,7 +47,7 @@ export class ConnectionsAdministrationController {
     this.isProcessing = true;
     try {
       await this.connectionsResource.refreshAll();
-      this.notificationService.notify({ title: 'connections_administration_tools_refresh_success' }, ENotificationType.Success);
+      this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
     } catch (exception) {
       this.notificationService.logException(exception, 'connections_administration_tools_refresh_fail');
     } finally {

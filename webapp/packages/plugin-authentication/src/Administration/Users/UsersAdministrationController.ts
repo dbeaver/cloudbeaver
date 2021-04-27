@@ -71,7 +71,7 @@ export class UsersAdministrationController implements IInitializableController {
   update = async () => {
     try {
       await this.usersResource.refreshAll();
-      this.notificationService.notify({ title: 'authentication_administration_tools_refresh_success' }, ENotificationType.Success);
+      this.notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
     } catch (exception) {
       if (!this.error.catch(exception)) {
         this.notificationService.logException(exception, 'Users update failed');

@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useMapResource, LabeledIconButton } from '@cloudbeaver/core-blocks';
+import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
+import { Loader, useMapResource, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -75,34 +75,35 @@ export const ConnectionsAdministration: React.FC<AdministrationItemContentProps>
 
   useMapResource(ConnectionsResource, ConnectionsResource.keyAll);
 
-  return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
+  return styled(useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>
-      <AdministrationTools>
-        <LabeledIconButton
+      <ToolsPanel>
+        <ToolsAction
           title={translate('connections_administration_tools_add_tooltip')}
-          label={translate('ui_add')}
           icon='add'
           viewBox="0 0 24 24"
           disabled={!!sub || controller.isProcessing}
           onClick={service.create}
-        />
-        <LabeledIconButton
+        >{translate('ui_add')}
+        </ToolsAction>
+        <ToolsAction
           title={translate('connections_administration_tools_refresh_tooltip')}
-          label={translate('ui_refresh')}
           icon="refresh"
           viewBox="0 0 24 24"
           disabled={controller.isProcessing}
           onClick={controller.update}
-        />
-        <LabeledIconButton
+        >{translate('ui_refresh')}
+        </ToolsAction>
+        <ToolsAction
           title={translate('connections_administration_tools_delete_tooltip')}
-          label={translate('ui_delete')}
           icon="trash"
           viewBox="0 0 24 24"
           disabled={!controller.itemsSelected || controller.isProcessing}
           onClick={controller.delete}
-        />
-      </AdministrationTools>
+        >
+          {translate('ui_delete')}
+        </ToolsAction>
+      </ToolsPanel>
       <layout-grid as="div">
         <layout-grid-inner as="div">
           <layout-grid-cell as='div' {...use({ span: 12 })}>

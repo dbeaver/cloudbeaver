@@ -11,23 +11,15 @@ import { css } from 'reshadow';
 
 import { composes } from '@cloudbeaver/core-theming';
 
-export const ADMINISTRATION_TOOLS_STYLES = composes(
+export const ADMINISTRATION_TOOLS_PANEL_STYLES = composes(
   css`
-    AdministrationTools {
+    ToolsPanel {
       composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     }
   `,
   css`
-    AdministrationTools {
-      display: flex;
-      flex-shrink: 0;
-      align-items: center;
+    ToolsPanel {
       border-bottom: solid 1px;
-      height: 48px;
-      & LabeledIconButton {
-        font-weight: 600;
-        font-size: 15px;
-      }
     }
   `
 );

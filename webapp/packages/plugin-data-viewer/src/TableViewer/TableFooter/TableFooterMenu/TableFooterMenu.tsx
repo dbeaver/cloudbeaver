@@ -20,10 +20,6 @@ const styles = css`
     display: flex;
     height: 100%;
   }
-  TableFooterMenuItem {
-    text-transform: uppercase;
-    font-weight: 700;
-  }
 `;
 
 interface TableFooterMenuProps {

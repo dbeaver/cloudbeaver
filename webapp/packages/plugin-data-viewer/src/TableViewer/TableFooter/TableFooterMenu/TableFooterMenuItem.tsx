@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage, LabeledIconButton } from '@cloudbeaver/core-blocks';
+import { IconOrImage, ToolsAction } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -24,8 +24,18 @@ export const tableFooterMenuStyles = composes(
     Menu {
       composes: theme-text-on-surface from global;
     }
+    MenuTrigger {
+      composes: theme-ripple from global;
+    }
   `,
   css`
+    MenuTrigger {
+      height: 100%;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
     menu-trigger-icon IconOrImage {
       display: block;
       width: 24px;
@@ -48,15 +58,15 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
 
   if (!menuItem.panel) {
     return (
-      <LabeledIconButton
+      <ToolsAction
         {...props}
         title={translate(menuItem.tooltip)}
-        label={translate(menuItem.title)}
         icon={menuItem.icon}
         viewBox="0 0 32 32"
         disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
-      />
+      >{translate(menuItem.title)}
+      </ToolsAction>
     );
   }
 

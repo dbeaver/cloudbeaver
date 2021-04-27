@@ -10,10 +10,9 @@ import type { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import type { RequireAtLeastOne } from '@cloudbeaver/core-utils';
 
-import { Button } from './Button';
-import { IconOrImage } from './IconOrImage';
+import { Button } from '../Button';
+import { IconOrImage } from '../IconOrImage';
 
 const styles = composes(
   css`
@@ -23,7 +22,6 @@ const styles = composes(
   `,
   css`
     Button {
-      height: 100%;
       padding: 0 16px;
       display: flex;
       align-items: center;
@@ -32,29 +30,31 @@ const styles = composes(
       outline: none;
       color: inherit;
     }
-     IconOrImage {
+    IconOrImage {
       display: block;
       width: 24px;
     }
     button-label {
       display: block;
       text-transform: uppercase;
+      font-weight: 700;
+    }
+    IconOrImage + button-label {
       padding-left: 8px
     }
   `
 );
 
 interface Props extends ButtonHTMLAttributes<any> {
-  label?: string;
   icon?: string;
   viewBox?: string;
 }
 
-export const LabeledIconButton: React.FC<RequireAtLeastOne<Props, 'label' | 'icon'>> = function LabeledIconButton({ label, icon, viewBox, ...rest }) {
+export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
   return styled(useStyles(styles))(
     <Button as="button" {...rest}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {label && <button-label as="div">{label}</button-label>}
+      {children && <button-label as="div">{children}</button-label>}
     </Button>
   );
 };

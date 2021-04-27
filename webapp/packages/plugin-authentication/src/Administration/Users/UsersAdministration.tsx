@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { AdministrationTools, AdministrationItemContentProps, ADMINISTRATION_TOOLS_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, LabeledIconButton } from '@cloudbeaver/core-blocks';
+import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
+import { Loader, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -60,37 +60,37 @@ export const UsersAdministration = observer(function UsersAdministration({
   const controller = useController(UsersAdministrationController);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
 
-  return styled(useStyles(styles, ADMINISTRATION_TOOLS_STYLES))(
+  return styled(useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>
-      <AdministrationTools>
+      <ToolsPanel>
         {isLocalProviderAvailable && (
-          <LabeledIconButton
+          <ToolsAction
             title={translate('authentication_administration_tools_add_tooltip')}
-            label={translate('ui_add')}
             icon="add"
             viewBox="0 0 24 24"
             disabled={sub && !!service.user}
             onClick={service.create}
-          />
+          >{translate('ui_add')}
+          </ToolsAction>
         )}
-        <LabeledIconButton
+        <ToolsAction
           title={translate('authentication_administration_tools_refresh_tooltip')}
-          label={translate('ui_refresh')}
           icon="refresh"
           viewBox="0 0 24 24"
           onClick={controller.update}
-        />
+        >{translate('ui_refresh')}
+        </ToolsAction>
         {isLocalProviderAvailable && (
-          <LabeledIconButton
+          <ToolsAction
             title={translate('authentication_administration_tools_delete_tooltip')}
-            label={translate('ui_delete')}
             icon="trash"
             viewBox="0 0 24 24"
             disabled={!controller.itemsSelected}
             onClick={controller.delete}
-          />
+          >{translate('ui_delete')}
+          </ToolsAction>
         )}
-      </AdministrationTools>
+      </ToolsPanel>
       <layout-grid as="div">
         <layout-grid-inner as="div">
           <layout-grid-cell as='div' {...use({ span: 12 })}>
