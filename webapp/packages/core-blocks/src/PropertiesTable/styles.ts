@@ -61,6 +61,6 @@ export const PROPERTIES_TABLE_ADD_STYLES = css`
   button-label {
     composes: theme-typography--caption from global;
     text-transform: initial;
-    font-weight: 500;
+    font-weight: 600;
   }
 `;
