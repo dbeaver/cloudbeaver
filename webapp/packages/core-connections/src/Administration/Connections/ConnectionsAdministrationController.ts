@@ -10,7 +10,7 @@ import { observable, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { DatabaseConnection, compareConnections, ConnectionsResource } from '../ConnectionsResource';

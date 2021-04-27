@@ -11,7 +11,7 @@ import { observable, computed, makeObservable } from 'mobx';
 import { AdminUser, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
