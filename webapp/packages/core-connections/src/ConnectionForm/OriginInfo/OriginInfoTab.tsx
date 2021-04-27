@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { TabTitle, Tab, TabContainerTabComponent, useMapResource } from '@cloudbeaver/core-blocks';
+import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -21,9 +20,8 @@ export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = obs
   style,
   ...rest
 }) {
-  const provider = useMapResource(AuthProvidersResource, info?.origin.subType ?? info?.origin.type ?? null);
   return styled(useStyles(style))(
-    <Tab {...rest} title={provider.data?.description} style={style}>
+    <Tab {...rest} style={style}>
       <TabTitle><Translate token={info?.origin.displayName || 'Origin'} /></TabTitle>
     </Tab>
   );
