@@ -90,7 +90,8 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             viewBox="0 0 24 24"
             disabled={!changed}
             onClick={save}
-          >{translate('ui_processing_save')}
+          >
+            {translate('ui_processing_save')}
           </ToolsAction>
           <ToolsAction
             title={translate('administration_configuration_tools_cancel_tooltip')}
@@ -98,7 +99,8 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             viewBox="0 0 24 24"
             disabled={!changed}
             onClick={reset}
-          >{translate('ui_processing_cancel')}
+          >
+            {translate('ui_processing_cancel')}
           </ToolsAction>
         </ToolsPanel>
       )}
@@ -113,7 +115,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             </GroupItem>
           </Group>
         )}
-
         <Loader state={service}>
           {() => styled(style)(
             <Container wrap gap>

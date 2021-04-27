@@ -70,7 +70,8 @@ export const UsersAdministration = observer(function UsersAdministration({
             viewBox="0 0 24 24"
             disabled={sub && !!service.user}
             onClick={service.create}
-          >{translate('ui_add')}
+          >
+            {translate('ui_add')}
           </ToolsAction>
         )}
         <ToolsAction
@@ -78,7 +79,8 @@ export const UsersAdministration = observer(function UsersAdministration({
           icon="refresh"
           viewBox="0 0 24 24"
           onClick={controller.update}
-        >{translate('ui_refresh')}
+        >
+          {translate('ui_refresh')}
         </ToolsAction>
         {isLocalProviderAvailable && (
           <ToolsAction
@@ -87,29 +89,28 @@ export const UsersAdministration = observer(function UsersAdministration({
             viewBox="0 0 24 24"
             disabled={!controller.itemsSelected}
             onClick={controller.delete}
-          >{translate('ui_delete')}
+          >
+            {translate('ui_delete')}
           </ToolsAction>
         )}
       </ToolsPanel>
-      <layout-grid as="div">
-        <layout-grid-inner as="div">
-          <layout-grid-cell as='div' {...use({ span: 12 })}>
-            {controller.isProvidersLoading
-              ? <Loader />
-              : (
-                <>
-                  {sub && service.user && (
-                    <CreateUser user={service.user} onCancel={service.cancelCreate} />
-                  )}
-                  <UsersTable
-                    users={controller.users}
-                    selectedItems={controller.selectedItems}
-                    expandedItems={controller.expandedItems}
-                    selectable={controller.isLocalProviderAvailable}
-                  />
-                  <Loader loading={controller.isLoading} overlay />
-                </>
-              )}
+      <layout-grid>
+        <layout-grid-inner>
+          <layout-grid-cell {...use({ span: 12 })}>
+            {controller.isProvidersLoading ? <Loader /> : (
+              <>
+                {sub && service.user && (
+                  <CreateUser user={service.user} onCancel={service.cancelCreate} />
+                )}
+                <UsersTable
+                  users={controller.users}
+                  selectedItems={controller.selectedItems}
+                  expandedItems={controller.expandedItems}
+                  selectable={controller.isLocalProviderAvailable}
+                />
+                <Loader loading={controller.isLoading} overlay />
+              </>
+            )}
           </layout-grid-cell>
         </layout-grid-inner>
       </layout-grid>

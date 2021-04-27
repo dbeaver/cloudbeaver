@@ -78,11 +78,11 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
       style={[tableFooterMenuStyles]}
     >
       {menuItem.icon && (
-        <menu-trigger-icon as="div">
+        <menu-trigger-icon>
           <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
         </menu-trigger-icon>
       )}
-      {menuItem.title && <menu-trigger-title as="div">{translate(menuItem.title)}</menu-trigger-title>}
+      {menuItem.title && <menu-trigger-title>{translate(menuItem.title)}</menu-trigger-title>}
     </MenuTrigger>
   );
 });

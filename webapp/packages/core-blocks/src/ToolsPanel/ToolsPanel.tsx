@@ -23,7 +23,7 @@ interface Props {
 
 export const ToolsPanel: React.FC<Props> = function ToolsPanel({ className, children }) {
   return styled(useStyles(styles))(
-    <container as='div' className={className}>
+    <container className={className}>
       {children}
     </container>
   );

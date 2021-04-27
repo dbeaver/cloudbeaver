@@ -13,7 +13,7 @@ export default [
   ['connections_administration_tools_add_tooltip', 'Добавить новое подключение'],
   ['connections_administration_tools_refresh_tooltip', 'Обновить список подключений'],
   ['connections_administration_tools_delete_tooltip', 'Удалить выбранные подключения'],
-  ['connections_administration_tools_refresh_success', 'Подключения обновлены'],
+  ['connections_administration_tools_refresh_success', 'Список подключений обновлен'],
   ['connections_administration_tools_refresh_fail', 'Не удалось обновить список подключений'],
   ['connections_connection_connect', 'Подключиться'],
   ['connections_connection_create_custom', 'Настроить'],

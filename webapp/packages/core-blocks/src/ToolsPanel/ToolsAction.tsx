@@ -11,17 +11,16 @@ import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { Button } from '../Button';
 import { IconOrImage } from '../IconOrImage';
 
 const styles = composes(
   css`
-    Button {
+    button {
       composes: theme-ripple from global;
     }
   `,
   css`
-    Button {
+    button {
       padding: 0 16px;
       display: flex;
       align-items: center;
@@ -52,9 +51,9 @@ interface Props extends ButtonHTMLAttributes<any> {
 
 export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
   return styled(useStyles(styles))(
-    <Button as="button" {...rest}>
+    <button {...rest}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {children && <button-label as="div">{children}</button-label>}
-    </Button>
+      {children && <button-label>{children}</button-label>}
+    </button>
   );
 };
