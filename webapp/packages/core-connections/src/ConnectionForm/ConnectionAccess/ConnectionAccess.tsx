@@ -22,7 +22,10 @@ import {
   Loader,
   useTab,
   TabContainerPanelComponent,
-  useMapResource
+  useMapResource,
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Group
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
@@ -37,16 +40,17 @@ const styles = composes(
     }
   `,
   css`
-    box {
-      position: relative;
-      display: flex;
+    ColoredContainer {
       flex: 1;
+      overflow: auto;
+    }
+    Group {
+      max-height: 100%;
+      position: relative;
+      overflow: auto !important;
     }
     Table {
       flex: 1;
-    }
-    TableColumnHeader {
-      border-top: solid 1px;
     }
   `
 );
@@ -56,7 +60,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   state: formState,
 }) {
   const { state, load, select } = useConnectionAccessState(formState);
-  const style = useStyles(styles);
+  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
   const users = useMapResource(UsersResource, null, {
@@ -68,58 +72,55 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   });
 
   const { selected } = useTab(tabId, load);
-  const disabled = users.isLoading() || roles.isLoading() || state.loading || !state.loaded;
+  const loading = users.isLoading() || roles.isLoading() || state.loading;
+  const disabled = loading || !state.loaded || formState.disabled;
 
   if (!selected) {
     return null;
   }
 
-  if (disabled) {
-    return styled(style)(
-      <box as='div'>
-        <Loader key="static" />
-      </box>
-    );
-  }
-
   if (users.resource.values.length === 0 && roles.resource.values.length) {
     return styled(style)(
-      <box as='div'>
-        <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
-      </box>
+      <ColoredContainer parent>
+        <Group keepSize large>
+          <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
+        </Group>
+      </ColoredContainer>
     );
   }
 
   return styled(style)(
-    <box as='div'>
-      <Table selectedItems={state.selectedSubjects} onSelect={select}>
-        <TableHeader>
-          <TableColumnHeader min />
-          <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-          <TableColumnHeader />
-        </TableHeader>
-        <TableBody>
-          {roles.resource.values.map(role => (
-            <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
-              <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled} />
-              </TableColumnValue>
-              <TableColumnValue>{role.roleName}</TableColumnValue>
-              <TableColumnValue />
-            </TableItem>
-          ))}
-          {users.resource.values.map(user => (
-            <TableItem key={user.userId} item={user.userId} selectDisabled={disabled}>
-              <TableColumnValue centerContent flex>
-                <TableItemSelect disabled={disabled} />
-              </TableColumnValue>
-              <TableColumnValue>{user.userId}</TableColumnValue>
-              <TableColumnValue />
-            </TableItem>
-          ))}
-        </TableBody>
-      </Table>
-      <Loader key="overlay" loading={disabled} overlay />
-    </box>
+    <ColoredContainer parent>
+      <Group box keepSize large>
+        <Table selectedItems={state.selectedSubjects} onSelect={select}>
+          <TableHeader>
+            <TableColumnHeader min />
+            <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
+            <TableColumnHeader />
+          </TableHeader>
+          <TableBody>
+            {roles.resource.values.map(role => (
+              <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
+                <TableColumnValue centerContent flex>
+                  <TableItemSelect disabled={disabled} />
+                </TableColumnValue>
+                <TableColumnValue>{role.roleName}</TableColumnValue>
+                <TableColumnValue />
+              </TableItem>
+            ))}
+            {users.resource.values.map(user => (
+              <TableItem key={user.userId} item={user.userId} selectDisabled={disabled}>
+                <TableColumnValue centerContent flex>
+                  <TableItemSelect disabled={disabled} />
+                </TableColumnValue>
+                <TableColumnValue>{user.userId}</TableColumnValue>
+                <TableColumnValue />
+              </TableItem>
+            ))}
+          </TableBody>
+        </Table>
+        <Loader key="overlay" loading={loading} overlay />
+      </Group>
+    </ColoredContainer>
   );
 });
