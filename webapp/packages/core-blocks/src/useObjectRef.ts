@@ -9,7 +9,7 @@
 import { AnnotationsMap, makeObservable, observable } from 'mobx';
 import { useState } from 'react';
 
-export function useObjectRef<T>(
+export function useObjectRef<T extends Record<string, any>>(
   init: T,
   update?: Partial<T>,
   observed?: boolean | AnnotationsMap<T, never>,

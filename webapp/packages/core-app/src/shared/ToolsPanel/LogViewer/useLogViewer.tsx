@@ -25,7 +25,7 @@ export function useLogViewer() {
   const props: Props = useObjectRef(
     { selectedItem: null, logViewerService },
     { logViewerService },
-    { selectedItem: observable }
+    { selectedItem: observable.ref }
   );
 
   return useObjectRef({

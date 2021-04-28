@@ -141,7 +141,7 @@ export const Button: React.FC<ButtonProps> = observer(function Button({
         }
       }
     },
-  }, { loading: observable }, ['click']);
+  }, { loading: observable.ref }, ['click']);
 
   loading = state.loading || loading;
 

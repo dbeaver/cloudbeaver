@@ -111,9 +111,5 @@ export function useOptions(state: IConnectionFormState) {
 
       // config.credentials = {};
     },
-  }, undefined, {
-    updateNameTemplate: action,
-    setDefaults: action,
-    setAuthModel: action,
   });
 }

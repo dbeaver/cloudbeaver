@@ -100,7 +100,7 @@ export const TableError: React.FC<Props> = observer(function TableViewer({
       this.display = true;
     },
   }, {}, {
-    display: observable,
+    display: observable.ref,
   });
   const error = useErrorDetails(model.source.error || null);
   const animated = useStateDelay(!!errorInfo.error && !loading, 1);

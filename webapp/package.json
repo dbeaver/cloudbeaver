@@ -16,8 +16,8 @@
     "clean-dist": "rimraf lib/*"
   },
   "devDependencies": {
-    "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.8",
+    "@types/react": "^16.9.12",
+    "@types/react-dom": "^16.9.12",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "eslint": "^7.18.0",
@@ -36,20 +36,20 @@
     "eslint-plugin-standard": "^5.0.0",
     "eslint-webpack-plugin": "^2.4.1",
     "lerna": "^3.22.1",
-    "mobx": "^6.0.4",
-    "mobx-react-lite": "^3.1.6",
+    "mobx": "^6.3.0",
+    "mobx-react-lite": "^3.2.0",
     "node-sass": "^5.0.0",
-    "preact": "^10.5.10",
+    "preact": "^10.5.13",
     "preact-jsx-runtime": "^1.2.0",
-    "preact-render-to-string": "^5.1.12",
+    "preact-render-to-string": "^5.1.19",
     "preact-ssr-prepass": "^1.1.3",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "reakit": "^1.3.4",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "reakit": "^1.3.8",
     "reflect-metadata": "^0.1.13",
     "reshadow": "^0.0.1-alpha.80",
     "rimraf": "^3.0.2",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.4"
   },
   "dependencies": {}
 }
