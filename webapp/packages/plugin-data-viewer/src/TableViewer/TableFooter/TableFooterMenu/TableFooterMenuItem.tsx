@@ -8,10 +8,9 @@
 
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
-import { Button } from 'reakit';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { IconOrImage, ToolsAction } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
@@ -25,24 +24,17 @@ export const tableFooterMenuStyles = composes(
     Menu {
       composes: theme-text-on-surface from global;
     }
-    Button {
-      composes: theme-text-on-secondary from global;
-    }
-    MenuTrigger, Button {
+    MenuTrigger {
       composes: theme-ripple from global;
     }
   `,
   css`
-    MenuTrigger, Button {
+    MenuTrigger {
       height: 100%;
       padding: 0 16px;
       display: flex;
       align-items: center;
       cursor: pointer;
-    }
-    Button {
-      background: transparent;
-      outline: none;
     }
     menu-trigger-icon IconOrImage {
       display: block;
@@ -65,37 +57,33 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   const styles = useStyles(tableFooterMenuStyles);
 
   if (!menuItem.panel) {
-    return styled(styles)(
-      <Button
-        as="button"
+    return (
+      <ToolsAction
         {...props}
-        disabled={menuItem.isDisabled}
         title={translate(menuItem.tooltip)}
+        icon={menuItem.icon}
+        viewBox="0 0 32 32"
+        disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
-      >
-        {menuItem.icon && (
-          <menu-trigger-icon as="div">
-            <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
-          </menu-trigger-icon>
-        )}
-        {menuItem.title && <menu-trigger-title as="div">{translate(menuItem.title)}</menu-trigger-title>}
-      </Button>
+      >{translate(menuItem.title)}
+      </ToolsAction>
     );
   }
 
   return styled(styles)(
     <MenuTrigger
       {...props}
+      title={translate(menuItem.tooltip)}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
       style={[tableFooterMenuStyles]}
     >
       {menuItem.icon && (
-        <menu-trigger-icon as="div">
+        <menu-trigger-icon>
           <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
         </menu-trigger-icon>
       )}
-      {menuItem.title && <menu-trigger-title as="div">{translate(menuItem.title)}</menu-trigger-title>}
+      {menuItem.title && <menu-trigger-title>{translate(menuItem.title)}</menu-trigger-title>}
     </MenuTrigger>
   );
 });

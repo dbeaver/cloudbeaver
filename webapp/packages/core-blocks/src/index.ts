@@ -30,6 +30,8 @@ export * from './Tree/TreeNode/TreeNodeSelect';
 export * from './Tree/TreeNode/TreeNodeFilter';
 export * from './Tree/TreeNode/TreeNodeStyles';
 export * from './Button';
+export * from './ToolsPanel/ToolsAction';
+export * from './ToolsPanel/ToolsPanel';
 export * from './FormControls/Checkboxes/Checkbox';
 export * from './FormControls/Checkboxes/FieldCheckbox';
 export * from './FormControls/Checkboxes/FieldCheckboxNew';

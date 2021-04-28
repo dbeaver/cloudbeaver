@@ -20,10 +20,6 @@ const styles = css`
     display: flex;
     height: 100%;
   }
-  TableFooterMenuItem {
-    text-transform: uppercase;
-    font-weight: 700;
-  }
 `;
 
 interface TableFooterMenuProps {
@@ -40,7 +36,7 @@ export const TableFooterMenu = observer(function TableFooterMenu({
   const mainMenuService = useService(TableFooterMenuService);
 
   return styled(styles)(
-    <menu-wrapper as="div" className={className}>
+    <menu-wrapper className={className}>
       {mainMenuService.constructMenuWithContext(model, resultIndex).map((topItem, i) => (
         <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}

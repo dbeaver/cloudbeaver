@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, AdministrationTools, ADMINISTRATION_TOOLS_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, IconButton, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator } from '@cloudbeaver/core-blocks';
+import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, ToolsAction, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -41,7 +41,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   configurationWizard,
 }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_STYLES, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);
@@ -83,10 +83,26 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   return styled(style)(
     <SubmittingForm ref={focusedRef} name='server_config' onSubmit={save} onChange={handleChange}>
       {!configurationWizard && (
-        <AdministrationTools>
-          <IconButton name="admin-save" viewBox="0 0 28 28" disabled={!changed} onClick={save} />
-          <IconButton name="admin-cancel" viewBox="0 0 28 28" disabled={!changed} onClick={reset} />
-        </AdministrationTools>
+        <ToolsPanel>
+          <ToolsAction
+            title={translate('administration_configuration_tools_save_tooltip')}
+            icon="admin-save"
+            viewBox="0 0 24 24"
+            disabled={!changed}
+            onClick={save}
+          >
+            {translate('ui_processing_save')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('administration_configuration_tools_cancel_tooltip')}
+            icon="admin-cancel"
+            viewBox="0 0 24 24"
+            disabled={!changed}
+            onClick={reset}
+          >
+            {translate('ui_processing_cancel')}
+          </ToolsAction>
+        </ToolsPanel>
       )}
       <ColoredContainer wrap gap overflow parent>
         {configurationWizard && (
@@ -99,7 +115,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             </GroupItem>
           </Group>
         )}
-
         <Loader state={service}>
           {() => styled(style)(
             <Container wrap gap>
