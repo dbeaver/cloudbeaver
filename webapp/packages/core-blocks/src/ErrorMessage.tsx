@@ -10,37 +10,41 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from './Button';
+import { IconOrImage } from './IconOrImage';
 
-const styles = composes(
-  css`
-    message-body {
-      composes: theme-text-error from global;
-    }
-  `,
-  css`
-    message {
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-    }
+const styles = css`
+  message {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    height: 50px;
+    padding: 9px 12px;  
+  }
 
-    message-body {
-      box-sizing: border-box;
-      flex: 1;
-      padding: 12px;
-      word-break: break-word;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    message-actions {
-      padding-left: 12px;
-    }
-  `
-);
+  IconOrImage {
+    width: 24px;
+    height: 24px;
+    padding-right: 8px;
+  }
+
+  message-body {
+    composes: theme-typography--body2 from global;
+    line-height: 1.2;
+    box-sizing: border-box;
+    flex: 1;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  message-actions {
+    margin-left: 16px;
+  }
+`;
 
 interface ErrorMessageProps {
   hasDetails?: boolean;
@@ -59,6 +63,7 @@ export const ErrorMessage = observer(function ErrorMessage({
 
   return styled(useStyles(styles))(
     <message as="div" className={className}>
+      <IconOrImage icon="/icons/error_icon.svg" viewBox='0 0 24 24' />
       <message-body title={text} as="div">
         {text}
       </message-body>

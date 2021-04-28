@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { forwardRef, Ref } from 'react';
+
 import type { IContainerProps } from './IContainerProps';
 
 interface Props extends IContainerProps {
@@ -13,12 +15,13 @@ interface Props extends IContainerProps {
   form?: boolean;
   center?: boolean;
   box?: boolean;
+  ref?: Ref<HTMLDivElement>;
 }
 
-export const Group: React.FC<Props> = function Group({ children, className }) {
+export const Group: React.FC<Props> = forwardRef<HTMLDivElement, Props>(function Group({ children, className }, ref) {
   return (
-    <div className={className}>
+    <div ref={ref} className={className}>
       {children}
     </div>
   );
-};
+});

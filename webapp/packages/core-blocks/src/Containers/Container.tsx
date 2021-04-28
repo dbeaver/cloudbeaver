@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { forwardRef, Ref } from 'react';
+
 import type { IContainerProps } from './IContainerProps';
 
-export const Container: React.FC<IContainerProps> = function Container({ children, ...rest }) {
+interface Props extends IContainerProps {
+  ref?: Ref<HTMLDivElement>;
+}
+
+export const Container = forwardRef<HTMLDivElement, Props>(function Container({ children, ...rest }, ref) {
   return (
-    <div {...rest}>
+    <div {...rest} ref={ref}>
       {children}
     </div>
   );
-};
+});

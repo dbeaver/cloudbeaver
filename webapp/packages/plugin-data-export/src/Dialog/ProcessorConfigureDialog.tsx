@@ -38,6 +38,7 @@ const styles = composes(
       margin: auto;
     }
     ErrorMessage {
+      z-index: 1;
       position: sticky;
       bottom: 0;
       padding: 8px 24px;
