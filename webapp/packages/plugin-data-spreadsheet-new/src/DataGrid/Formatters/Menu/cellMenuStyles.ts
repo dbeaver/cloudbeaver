@@ -1,0 +1,39 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2021 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { css } from 'reshadow';
+
+export const cellMenuStyles = css`
+  cell-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 4px;
+  }
+  MenuTrigger {
+    padding: 0;
+    height: 20px;
+
+    &:before {
+      display: none;
+    }
+
+    & Icon {
+      cursor: pointer;
+      width: 16px;
+      height: 10px;
+      fill: #dedede;
+    }
+
+    &[|selected] Icon, 
+    &:hover Icon, 
+    &:focus Icon {
+      fill: #338fcc;
+    }
+  }
+`;

@@ -8,27 +8,26 @@
 
 import { observable } from 'mobx';
 import { useState } from 'react';
-import type { Position } from 'react-data-grid/lib/types';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-import type { IEditingContext } from './EditingContext';
+import type { CellPosition, IEditingContext } from './EditingContext';
 
-function findPosition(position: Position): (position: Position) => boolean {
+function findPosition(position: CellPosition): (position: CellPosition) => boolean {
   return p => p.idx === position.idx && p.rowIdx === position.rowIdx;
 }
 
 interface IEditingOptions {
   readonly?: boolean;
-  onEdit: (position: Position, key?: string) => boolean;
+  onEdit: (position: CellPosition, key?: string) => boolean;
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
   const optionsRef = useObjectRef<IEditingOptions>(options);
-  const [editingCells] = useState(() => observable<Position>([]));
+  const [editingCells] = useState(() => observable<CellPosition>([]));
 
   const [context] = useState<IEditingContext>({
-    edit(position: Position, key?: string) {
+    edit(position: CellPosition, key?: string) {
       if (optionsRef.readonly) {
         return;
       }
@@ -46,13 +45,13 @@ export function useEditing(options: IEditingOptions): IEditingContext {
       editingCells.clear();
       editingCells.push(position);
     },
-    closeEditor(position: Position) {
+    closeEditor(position: CellPosition) {
       editingCells.splice(editingCells.findIndex(findPosition(position)), 1);
     },
     close() {
       editingCells.clear();
     },
-    isEditing(position: Position) {
+    isEditing(position: CellPosition) {
       return editingCells.some(findPosition(position));
     },
   });

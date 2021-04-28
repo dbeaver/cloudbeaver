@@ -78,6 +78,7 @@ export * from './useExecutor';
 export * from './useFocus';
 export * from './useFormValidator';
 export * from './useMapResource';
+export * from './useMouse';
 export * from './useObjectRef';
 export * from './useStateDelay';
 export * from './useErrorDetails';

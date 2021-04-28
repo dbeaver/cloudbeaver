@@ -10,14 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DataGrid from 'react-data-grid';
 import type { DataGridHandle } from 'react-data-grid';
-import type { Position } from 'react-data-grid/lib/types';
 import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../Editing/EditingContext';
+import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
 import baseStyles from '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
@@ -115,7 +114,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
     return () => model.source.editor?.actions.removeHandler(listener);
   }, [model.source, resultIndex]);
 
-  const handleFocusChange = (position: Position) => {
+  const handleFocusChange = (position: CellPosition) => {
     const key = tableData.getColumnKeyFromColumnIndex(position.idx);
     const column = tableData.getColumnInfo(key);
 

@@ -6,14 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
+import styled from 'reshadow';
 
 import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
+import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
+import { CellMenu } from './Menu/CellMenu';
 
 function getClasses(rawValue: any) {
   const classes = [];
@@ -23,9 +27,10 @@ function getClasses(rawValue: any) {
   return classes.join(' ');
 }
 
-export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ rowIdx, row, column, isCellSelected }) {
+export const CellFormatter: React.FC<FormatterProps> = observer(function CellFormatter({ rowIdx, row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
   const cellRef = useRef<HTMLDivElement>(null);
+  const cellContext = useContext(CellContext);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
@@ -59,9 +64,14 @@ export const CellFormatter: React.FC<FormatterProps> = function CellFormatter({ 
     );
   }
 
-  return (
-    <cell-formatter ref={cellRef} title={value} as='div' className={`cell-formatter ${classes}`}>
-      {value}
-    </cell-formatter>
+  return styled()(
+    <>
+      <cell-formatter ref={cellRef} title={value} className={`cell-formatter ${classes}`}>
+        {value}
+      </cell-formatter>
+      {(isCellSelected || cellContext?.mouse.state.mouseEnter) && context && (
+        <CellMenu model={context.model} resultIndex={context.resultIndex} row={rowIdx} column={Number(column.key)} />
+      )}
+    </>
   );
-};
+});

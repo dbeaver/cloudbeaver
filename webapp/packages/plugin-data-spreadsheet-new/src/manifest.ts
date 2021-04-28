@@ -8,11 +8,17 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { DataGridContextMenuService } from './DataGrid/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { LocaleService } from './LocaleService';
-import { SpreadsheetService } from './SpreadsheetService';
+import { SpreadsheetBootstrap } from './SpreadsheetBootstrap';
 
 export const manifest: PluginManifest = {
   info: { name: 'New spreadsheet implementation' },
-  providers: [SpreadsheetService, DataGridSettingsService, LocaleService],
+  providers: [
+    SpreadsheetBootstrap,
+    DataGridSettingsService,
+    LocaleService,
+    DataGridContextMenuService,
+  ],
 };

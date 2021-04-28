@@ -11,14 +11,16 @@ import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContextMenuService } from './DataGrid/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
 @injectable()
-export class SpreadsheetService extends Bootstrap {
+export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
     private dataPresentationService: DataPresentationService,
     private dataGridSettingsService: DataGridSettingsService,
+    private dataGridContextMenuService: DataGridContextMenuService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -34,6 +36,7 @@ export class SpreadsheetService extends Bootstrap {
       title: 'Table',
       icon: '/icons/grid.png',
     });
+    this.dataGridContextMenuService.register();
   }
 
   load(): void | Promise<void> { }
