@@ -20,6 +20,7 @@ export const ADMINISTRATION_TOOLS_PANEL_STYLES = composes(
   css`
     ToolsPanel {
       border-bottom: solid 1px;
+      flex: 0 0 auto;
     }
   `
 );
