@@ -25,6 +25,7 @@ const tableFooterStyles = composes(
   css`
     ToolsPanel {
       align-items: center;
+      flex: 0 0 auto;
     }
     count input,
     count placeholder {

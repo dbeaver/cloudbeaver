@@ -73,6 +73,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   return styled(styles)(
     <MenuTrigger
       {...props}
+      title={translate(menuItem.tooltip)}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
       style={[tableFooterMenuStyles]}
