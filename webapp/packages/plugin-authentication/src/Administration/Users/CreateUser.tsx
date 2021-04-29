@@ -36,7 +36,6 @@ const styles = composes(
       composes: theme-typography--headline6 from global;
       box-sizing: border-box;
       padding: 16px 24px;
-      border-top: solid 1px;
       align-items: center;
       display: flex;
       font-weight: 400;

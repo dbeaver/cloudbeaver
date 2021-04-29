@@ -43,8 +43,7 @@ const styles = composes(
 
     layout-grid-cell {
       position: relative;
-      border: solid;
-      border-width: 0 1px 1px 1px;
+      border: solid 1px;
     }
 
     Loader {
