@@ -490,7 +490,7 @@ public class WebSQLProcessor {
                     results.setResultSet(dataReceiver.getResultSet());
                 }
             } else {
-                int updateRowCount = dbStat.getUpdateRowCount();
+                long updateRowCount = dbStat.getUpdateRowCount();
                 if (updateRowCount >= 0) {
                     results.setUpdateRowCount(updateRowCount);
                 } else {
