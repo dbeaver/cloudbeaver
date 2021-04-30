@@ -28,7 +28,9 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
@@ -86,6 +88,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         } catch (DBException e) {
             throw new DBWebException("Error processing SQL proposals", e);
         }
+    }
+
+    @Override
+    public DBCLogicalOperator[] getSupportedOperations(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, int attributeIndex) throws DBWebException {
+        WebSQLResultsInfo results = contextInfo.getResults(resultsId);
+        if (attributeIndex < 0 || attributeIndex >= results.getAttributes().length) {
+            throw new DBWebException("Invalid attribute index (" + attributeIndex + ")");
+        }
+        DBDAttributeBinding attribute = results.getAttributes()[attributeIndex];
+        return attribute.getValueHandler().getSupportedOperators(attribute);
     }
 
     @Override

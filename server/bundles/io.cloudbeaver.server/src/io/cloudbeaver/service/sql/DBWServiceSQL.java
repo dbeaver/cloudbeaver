@@ -24,6 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,12 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException;
+
+    @WebAction
+    DBCLogicalOperator[] getSupportedOperations(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        int attributeIndex) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(@NotNull WebSQLProcessor processor, String defaultCatalog, String defaultSchema) throws DBWebException;

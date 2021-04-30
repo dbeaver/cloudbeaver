@@ -58,7 +58,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("position"),
                     env.getArgument("maxResults")
                 )
-            );
+            )
+            .dataFetcher("sqlSupportedOperations", env ->
+                getService(env).getSupportedOperations(
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    env.getArgument("attributeIndex"))
+            )
+        ;
 
         model.getMutationType()
             .dataFetcher("sqlContextCreate", env -> getService(env).createContext(

@@ -122,6 +122,12 @@ input SQLResultRow {
     updateValues: Object
 }
 
+type DataTypeLogicalOperation {
+    id: ID!
+    expression: String!
+    argumentCount: Int
+}
+
 extend type Query {
 
     sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
@@ -136,6 +142,12 @@ extend type Query {
         maxResults: Int
     ): [ SQLCompletionProposal ]
 
+    sqlSupportedOperations(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        attributeIndex: Int!
+    ): [DataTypeLogicalOperation!]!
 }
 
 extend type Mutation {
@@ -171,9 +183,9 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
-
+        # Row cell values (to identify row)
         updateRow: [ Object ]!,
-        # Map<Int,Object>
+        # Values to update - Map<Int,Object>
         updateValues: Object
     ): SQLExecuteInfo
 
