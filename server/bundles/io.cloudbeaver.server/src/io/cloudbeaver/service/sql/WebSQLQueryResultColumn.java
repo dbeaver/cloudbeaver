@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBValueFormatting;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 
@@ -107,6 +108,11 @@ public class WebSQLQueryResultColumn {
     @Property
     public String getReadOnlyStatus() {
         return DBExecUtils.getAttributeReadOnlyStatus(attrMeta);
+    }
+
+    @Property
+    public DBCLogicalOperator[] getSupportedOperations() {
+        return attrMeta.getValueHandler().getSupportedOperators(attrMeta);
     }
 
     @Override

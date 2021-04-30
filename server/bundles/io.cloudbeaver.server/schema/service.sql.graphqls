@@ -82,6 +82,9 @@ type SQLResultColumn {
 
     readOnly: Boolean!
     readOnlyStatus: String
+
+    # Operations supported for this attribute
+    supportedOperations: [DataTypeLogicalOperation!]!
 }
 
 type DatabaseDocument {
