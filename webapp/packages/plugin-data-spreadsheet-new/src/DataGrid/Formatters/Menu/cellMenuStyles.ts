@@ -10,14 +10,12 @@ import { css } from 'reshadow';
 
 export const cellMenuStyles = css`
   cell-menu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0 4px;
+    flex: 0 0 auto;
+    padding-left: 8px;
   }
   MenuTrigger {
     padding: 0;
-    height: 20px;
+    height: 16px;
 
     &:before {
       display: none;
@@ -26,14 +24,7 @@ export const cellMenuStyles = css`
     & Icon {
       cursor: pointer;
       width: 16px;
-      height: 10px;
-      fill: #dedede;
-    }
-
-    &[|selected] Icon, 
-    &:hover Icon, 
-    &:focus Icon {
-      fill: #338fcc;
+      height: 10px; 
     }
   }
 `;
