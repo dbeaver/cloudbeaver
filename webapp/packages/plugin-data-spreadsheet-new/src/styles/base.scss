@@ -30,6 +30,12 @@
 
   .rdg-cell {
     border-color: transparent;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .cell-formatter {
+    flex: 1;
   }
 
   .rdg-cell-editing {
