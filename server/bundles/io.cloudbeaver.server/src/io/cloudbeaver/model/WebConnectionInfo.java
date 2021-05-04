@@ -263,7 +263,7 @@ public class WebConnectionInfo {
         // Fill session and user provided credentials
         boolean hasContextCredentials = session.hasContextCredentials();
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
-        session.provideAuthParameters(dataSourceContainer, configWithAuth);
+        session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
