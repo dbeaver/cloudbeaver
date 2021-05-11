@@ -38,8 +38,10 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
 }) {
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle))(
     <dialog className={className}>
-      <header {...use({ icon: !!icon })}>
-        {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
+      <header>
+        <icon-container>
+          {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
+        </icon-container>
         <header-title>
           <h3>{title}</h3>
           {onReject && (

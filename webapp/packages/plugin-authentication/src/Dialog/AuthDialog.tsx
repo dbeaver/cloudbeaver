@@ -12,46 +12,54 @@ import styled, { css } from 'reshadow';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
-  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES
+  SubmittingForm, TabsState, TabList, Tab, TabTitle, Loader, UNDERLINE_TAB_STYLES, ErrorMessage
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthDialogController } from './AuthDialogController';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 
-const styles = css`
-  CommonDialogWrapper {
-    min-height: 400px;
-    width: 600px;
-    min-width: auto;
-  }
-  SubmittingForm {
-    overflow: auto;
-    margin: auto;
-  }
-  SubmittingForm, AuthProviderForm {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  TabList {
-    justify-content: center;
-  }
-  Tab {
-    text-transform: uppercase;
-    &:global([aria-selected=true]) {
-      font-weight: 500 !important;
+const styles = composes(
+  css`
+    ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
-  }
-  AuthProviderForm {
-    flex-direction: column;
-    padding: 18px 24px;
-  }
-`;
+`,
+  css`
+    CommonDialogWrapper {
+      min-height: 400px;
+      min-width: 600px;
+    }
+    SubmittingForm {
+      overflow: auto;
+      margin: auto;
+    }
+    SubmittingForm, AuthProviderForm {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    TabList {
+      justify-content: center;
+    }
+    Tab {
+      text-transform: uppercase;
+      &:global([aria-selected=true]) {
+        font-weight: 500 !important;
+      }
+    }
+    AuthProviderForm {
+      flex-direction: column;
+      padding: 18px 24px;
+    }
+    ErrorMessage {
+      flex: 1;
+    }
+`);
 
 interface IAuthPayload {
   provider: string | null;
@@ -93,10 +101,16 @@ export const AuthDialog: DialogComponent<IAuthPayload, null> = observer(function
         footer={(
           <AuthDialogFooter
             isAuthenticating={controller.isAuthenticating}
-            error={controller.error}
             onLogin={controller.login}
-            onShowDetals={controller.showDetails}
-          />
+          >
+            {controller.error?.responseMessage && (
+              <ErrorMessage
+                text={controller.error.responseMessage}
+                hasDetails={controller.error.hasDetails}
+                onShowDetails={controller.showDetails}
+              />
+            )}
+          </AuthDialogFooter>
         )}
         onReject={options?.persistent ? undefined : rejectDialog}
       >

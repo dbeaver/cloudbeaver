@@ -9,69 +9,48 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button, ErrorMessage } from '@cloudbeaver/core-blocks';
+import { Button } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-const styles = composes(
-  css`
-    ErrorMessage {
-      composes: theme-background-secondary from global;
+const styles = css`
+  footer-container {
+    display: flex;
+    height: 100%;
+    flex: 1;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  Button {
+    flex: 0 0 auto;
+    &:not(:first-child) {
+      margin-left: 17px;
     }
-  `,
-  css`
-    controls {
-      display: flex;
-      height: 100%;
-      flex: 1;
-      align-items: center;
-      justify-content: flex-end;
-    }
-    ErrorMessage {
-      flex: 0.9;
-      & + controls {
-        margin-left: 17px;
-        flex: 0.1;
-      }
-    }
-`);
+  }
+`;
 
 export interface Props {
   isAuthenticating: boolean;
   onLogin: () => void;
-  error?: GQLErrorCatcher;
-  onShowDetals?: () => void;
 }
 
-export const AuthDialogFooter = observer(function AuthDialogFooter({
+export const AuthDialogFooter: React.FC<Props> = observer(function AuthDialogFooter({
   isAuthenticating,
   onLogin,
-  error,
-  onShowDetals,
-}: Props) {
+  children,
+}) {
   const translate = useTranslate();
 
-  return styled(useStyles(styles))(
-    <>
-      {error?.responseMessage && (
-        <ErrorMessage
-          text={error.responseMessage}
-          hasDetails={error.hasDetails}
-          onShowDetails={onShowDetals}
-        />
-      )}
-      <controls>
-        <Button
-          type="button"
-          mod={['unelevated']}
-          loading={isAuthenticating}
-          onClick={onLogin}
-        >
-          {translate('authentication_login')}
-        </Button>
-      </controls>
-    </>
+  return styled(styles)(
+    <footer-container>
+      {children}
+      <Button
+        type="button"
+        mod={['unelevated']}
+        loading={isAuthenticating}
+        onClick={onLogin}
+      >
+        {translate('authentication_login')}
+      </Button>
+    </footer-container>
   );
-}
-);
+});

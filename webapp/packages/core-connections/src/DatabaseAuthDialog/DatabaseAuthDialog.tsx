@@ -20,11 +20,13 @@ import {
   FieldCheckboxNew,
   ObjectPropertyInfoFormNew,
   GroupTitle,
+  ErrorMessage,
+  TextPlaceholder,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { SSH_TUNNEL_ID } from '../NetworkHandlerResource';
 import { useConnectionInfo } from '../useConnectionInfo';
@@ -33,25 +35,31 @@ import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 import { SSHAuthForm } from './SSHAuthForm';
 
-const styles = css`
-  CommonDialogWrapper {
-    min-height: 400px;
-    width: 600px;
-    min-width: auto;
-  }
-  SubmittingForm {
-    overflow: auto;
-    margin: auto;
-  }
-  SubmittingForm {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  Container {
-    align-content: center;
-  }
-`;
+const styles = composes(
+  css`
+    ErrorMessage {
+      composes: theme-background-secondary theme-text-on-secondary from global;
+    }
+  `,
+  css`
+    CommonDialogWrapper {
+      min-height: 400px;
+      min-width: 600px;
+    }
+    SubmittingForm {
+      overflow: auto;
+      margin: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    Container {
+      align-content: center;
+    }
+    ErrorMessage {
+      flex: 1;
+    }
+`);
 
 export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   payload,
@@ -73,20 +81,26 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
   const isAuthNeeded = connection.connectionInfo?.authNeeded;
   const isSSHAuthNeeded = sshConfig?.enabled && !sshConfig.savePassword;
 
-  const databaseAuthenticationTitle = translate('connections_database_authentication');
+  const title = translate('connections_database_authentication');
 
   return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
     <CommonDialogWrapper
-      title={databaseAuthenticationTitle}
+      title={title}
       subTitle={connection.connectionInfo?.name}
       icon={driver?.icon}
       footer={(
         <DBAuthDialogFooter
           isAuthenticating={controller.isAuthenticating}
-          error={controller.error}
           onLogin={controller.login}
-          onShowDetals={controller.showDetails}
-        />
+        >
+          {controller.error?.responseMessage && (
+            <ErrorMessage
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.showDetails}
+            />
+          )}
+        </DBAuthDialogFooter>
       )}
       onReject={options?.persistent ? undefined : rejectDialog}
     >
@@ -95,33 +109,45 @@ export const DatabaseAuthDialog = observer(function DatabaseAuthDialog({
         : (
           <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
             <Container>
-              {isAuthNeeded && connection.connectionInfo?.authProperties && (
+              {isAuthNeeded && (
                 <Group gap small>
-                  {isSSHAuthNeeded && <GroupTitle>{databaseAuthenticationTitle}</GroupTitle>}
-                  <ObjectPropertyInfoFormNew
-                    autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
-                    properties={connection.connectionInfo.authProperties}
-                    state={controller.config.credentials}
-                    disabled={controller.isAuthenticating}
-                  />
-                  {credentialsSavingEnabled && (
-                    <FieldCheckboxNew
-                      id={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
-                      name="saveCredentials"
-                      label={translate('connections_connection_edit_save_credentials')}
-                      disabled={controller.isAuthenticating}
-                      state={controller.config}
-                    />
+                  {connection.connectionInfo?.authProperties ? (
+                    <>
+                      {isSSHAuthNeeded && sshConfig && <GroupTitle>{title}</GroupTitle>}
+                      <ObjectPropertyInfoFormNew
+                        autofillToken={`section-${connection.connectionInfo?.id || ''} section-auth`}
+                        properties={connection.connectionInfo.authProperties}
+                        state={controller.config.credentials}
+                        disabled={controller.isAuthenticating}
+                      />
+                      {credentialsSavingEnabled && (
+                        <FieldCheckboxNew
+                          id={connection.connectionInfo?.id || 'DBAuthSaveCredentials'}
+                          name="saveCredentials"
+                          label={translate('connections_connection_edit_save_credentials')}
+                          disabled={controller.isAuthenticating}
+                          state={controller.config}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <TextPlaceholder>Authentication data is not avaliable</TextPlaceholder>
                   )}
                 </Group>
               )}
-              {isSSHAuthNeeded && sshConfig && (
-                <SSHAuthForm
-                  config={controller.config}
-                  sshHandlerId={sshConfig.id}
-                  allowPasswordSave={credentialsSavingEnabled}
-                  disabled={controller.isAuthenticating}
-                />
+              {isSSHAuthNeeded && (
+                <Group gap small>
+                  {sshConfig ? (
+                    <SSHAuthForm
+                      config={controller.config}
+                      sshHandlerId={sshConfig.id}
+                      allowPasswordSave={credentialsSavingEnabled}
+                      disabled={controller.isAuthenticating}
+                    />
+                  ) : (
+                    <TextPlaceholder>SSH Authentication data is not avaliable</TextPlaceholder>
+                  )}
+                </Group>
               )}
             </Container>
           </SubmittingForm>

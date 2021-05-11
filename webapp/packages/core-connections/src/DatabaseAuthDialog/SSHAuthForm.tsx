@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckboxNew, Group, GroupTitle, InputFieldNew, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckboxNew, GroupTitle, InputFieldNew, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -42,7 +42,7 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
   const state = config.networkCredentials.find(state => state.id === sshHandlerId)!;
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
-    <Group className={className} gap small>
+    <>
       <GroupTitle>{translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}</GroupTitle>
       <InputFieldNew
         type="text"
@@ -71,6 +71,6 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
           disabled={disabled}
         />
       )}
-    </Group>
+    </>
   );
 });

@@ -28,11 +28,12 @@ const styles = css`
   IconOrImage {
     width: 24px;
     height: 24px;
-    padding-right: 8px;
+    margin-right: 8px;
   }
 
   message-body {
     composes: theme-typography--body2 from global;
+    max-height: 100%;
     line-height: 1.2;
     box-sizing: border-box;
     flex: 1;
@@ -62,12 +63,12 @@ export const ErrorMessage = observer(function ErrorMessage({
   const translate = useTranslate();
 
   return styled(useStyles(styles))(
-    <message as="div" className={className}>
+    <message className={className}>
       <IconOrImage icon="/icons/error_icon.svg" viewBox='0 0 24 24' />
-      <message-body title={text} as="div">
+      <message-body title={text}>
         {text}
       </message-body>
-      <message-actions as="div">
+      <message-actions>
         {hasDetails && (
           <Button type='button' mod={['outlined']} onClick={onShowDetails}>
             {translate('ui_errors_details')}

@@ -49,11 +49,8 @@ export const commonDialogBaseStyle = composes(
     header {
       position: relative;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: max-content 1fr;
       margin-bottom: 24px;
-      &[|icon] {
-        grid-template-columns: max-content 1fr;
-      }
     }
     header-title {
       display: flex;
@@ -62,10 +59,15 @@ export const commonDialogBaseStyle = composes(
       position: relative;
       min-height: 24px;
     }
+    icon-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     IconOrImage {
       width: 24px;
       height: 24px;
-      padding-right: 16px;
+      margin-right: 16px;
       &[|bigIcon] {
         width: 40px;
         height: 40px;
