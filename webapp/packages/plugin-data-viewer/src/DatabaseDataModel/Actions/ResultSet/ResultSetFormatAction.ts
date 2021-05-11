@@ -8,19 +8,16 @@
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
-export class ResultSetFormatAction implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
+export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
-  result: IDatabaseResultSet;
-
-  constructor(result: IDatabaseResultSet) {
-    this.result = result;
-  }
 
   isReadOnly(key: IResultSetElementKey): boolean {
     let columnReadonly = false;
@@ -70,9 +67,5 @@ export class ResultSetFormatAction implements IDatabaseDataFormatAction<IResultS
     }
 
     return String(value);
-  }
-
-  updateResult(result: IDatabaseResultSet): void {
-    this.result = result;
   }
 }

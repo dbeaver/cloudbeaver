@@ -22,7 +22,7 @@ export type DatabaseDataEditorActionsData<TKey> = {
 };
 
 export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataResult>
-  extends IDatabaseDataAction<TResult> {
+  extends IDatabaseDataAction<any, TResult> {
   readonly actions: IExecutor<DatabaseDataEditorActionsData<TKey>>;
   isSelected: () => boolean;
   isElementSelected: (key: TKey) => boolean;
