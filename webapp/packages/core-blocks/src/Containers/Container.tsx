@@ -10,9 +10,9 @@ import { forwardRef } from 'react';
 
 import type { IContainerProps } from './IContainerProps';
 
-export const Container = forwardRef<HTMLDivElement, IContainerProps>(function Container({ children, ...rest }, ref) {
+export const Container = forwardRef<HTMLDivElement, IContainerProps>(function Container({ children, className }, ref) {
   return (
-    <div {...rest} ref={ref}>
+    <div ref={ref} className={className}>
       {children}
     </div>
   );

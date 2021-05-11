@@ -20,11 +20,11 @@ const styles = css`
     align-items: center;
     justify-content: flex-end;
   }
+  footer-container > :not(:first-child) {
+    margin-left: 16px;
+  }
   Button {
     flex: 0 0 auto;
-    &:not(:first-child) {
-      margin-left: 17px;
-    }
   }
 `;
 

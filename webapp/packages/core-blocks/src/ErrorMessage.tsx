@@ -22,7 +22,7 @@ const styles = css`
     align-items: center;
     border-radius: 4px;
     height: 50px;
-    padding: 9px 12px;  
+    padding: 8px 12px;  
   }
 
   IconOrImage {

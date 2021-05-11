@@ -54,9 +54,6 @@ const styles = composes(
       align-items: center;
       justify-content: center;
     }
-    ErrorMessage {
-      z-index: 1;
-    }
 `);
 
 export const ConnectionDialog = observer(function ConnectionDialog({
