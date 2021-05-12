@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { FieldCheckbox, FormGroup, InputField, InputGroup, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckboxNew, GroupTitle, InputFieldNew, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NetworkHandlerResource } from '../NetworkHandlerResource';
 import type { IFormInitConfig } from './IFormInitConfig';
@@ -20,17 +21,11 @@ interface Props {
   sshHandlerId: string;
   allowPasswordSave: boolean;
   disabled: boolean;
+  className?: string;
 }
 
-const styles = css`
-  form-container {
-    display: inline-flex;
-    flex-direction: column;
-  }
-`;
-
 export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
-  config, sshHandlerId, allowPasswordSave, disabled,
+  config, sshHandlerId, allowPasswordSave, disabled, className,
 }) {
   const translate = useTranslate();
   const handler = useMapResource(NetworkHandlerResource, sshHandlerId);
@@ -46,44 +41,36 @@ export const SSHAuthForm: React.FC<Props> = observer(function SSHAuthForm({
 
   const state = config.networkCredentials.find(state => state.id === sshHandlerId)!;
 
-  return styled(styles)(
-    <form-container as='div'>
-      <FormGroup>
-        <InputGroup>{translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}</InputGroup>
-      </FormGroup>
-      <FormGroup>
-        <InputField
-          type="text"
-          name="userName"
-          state={state}
-          disabled={disabled}
-          mod='surface'
-        >
-          {translate('connections_network_handler_ssh_tunnel_user')}
-        </InputField>
-      </FormGroup>
-      <FormGroup>
-        <InputField
-          type="password"
-          name="password"
-          state={state}
-          disabled={disabled}
-          mod='surface'
-        >
-          {translate('connections_network_handler_ssh_tunnel_password')}
-        </InputField>
-      </FormGroup>
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+    <>
+      <GroupTitle>{translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}</GroupTitle>
+      <InputFieldNew
+        type="text"
+        name="userName"
+        state={state}
+        disabled={disabled}
+        mod='surface'
+      >
+        {translate('connections_network_handler_ssh_tunnel_user')}
+      </InputFieldNew>
+      <InputFieldNew
+        type="password"
+        name="password"
+        state={state}
+        disabled={disabled}
+        mod='surface'
+      >
+        {translate('connections_network_handler_ssh_tunnel_password')}
+      </InputFieldNew>
       {allowPasswordSave && (
-        <FormGroup>
-          <FieldCheckbox
-            name="savePassword"
-            value={sshHandlerId + ' savePassword'}
-            state={state}
-            label={translate('connections_connection_edit_save_credentials')}
-            disabled={disabled}
-          />
-        </FormGroup>
+        <FieldCheckboxNew
+          id={sshHandlerId + ' savePassword'}
+          name="savePassword"
+          state={state}
+          label={translate('connections_connection_edit_save_credentials')}
+          disabled={disabled}
+        />
       )}
-    </form-container>
+    </>
   );
 });
