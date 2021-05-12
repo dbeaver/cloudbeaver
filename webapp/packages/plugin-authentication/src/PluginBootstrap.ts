@@ -41,7 +41,7 @@ export class PluginBootstrap extends Bootstrap {
         order: 0,
         isHidden: () => this.serverConfigResource.enabledAuthProviders.length === 0 || !!this.authInfoService.userInfo,
         title: 'authentication_login',
-        onClick: () => this.authDialogService.showLoginForm(),
+        onClick: () => this.authDialogService.showLoginForm(false, null, true),
       }
     );
 
