@@ -48,22 +48,26 @@ export const commonDialogBaseStyle = composes(
     }
     header {
       position: relative;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: max-content 1fr;
       margin-bottom: 24px;
     }
     header-title {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       position: relative;
-      gap: 16px;
       min-height: 24px;
+    }
+    icon-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     IconOrImage {
       width: 24px;
       height: 24px;
-      padding-right: 0;
-
+      margin-right: 16px;
       &[|bigIcon] {
         width: 40px;
         height: 40px;
@@ -96,15 +100,12 @@ export const commonDialogBaseStyle = composes(
       height: 24px;
       pointer-events: none;
     }
-    header-title-text {
-      display: block;
-      flex: 1;
-    }
     h3 {
       margin: 0;
     }
     sub-title {
       composes: theme-typography--caption from global;
+      grid-column: 2;
     }
     reject {
       cursor: pointer;

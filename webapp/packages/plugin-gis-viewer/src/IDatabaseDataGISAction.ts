@@ -11,7 +11,7 @@ import type { IDatabaseDataResult, IDatabaseDataAction, IResultSetElementKey } f
 import type { IGISType } from './ResultSetGISAction';
 
 export interface IDatabaseDataGISAction<TKey, TResult extends IDatabaseDataResult>
-  extends IDatabaseDataAction<TResult> {
+  extends IDatabaseDataAction<any, TResult> {
   getGISDataFor: (selectedCells: Array<Required<IResultSetElementKey>>) => Array<Required<IResultSetElementKey>>;
   getCellValue: (cell: IResultSetElementKey) => IGISType | undefined;
   isGISFormat: (cell: IResultSetElementKey) => boolean;

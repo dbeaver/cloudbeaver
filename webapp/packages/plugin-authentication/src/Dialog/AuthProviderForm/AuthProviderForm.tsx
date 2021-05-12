@@ -11,10 +11,8 @@ import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import type { AuthProvider } from '@cloudbeaver/core-authentication';
-import { InputField, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, InputFieldNew, useFocus } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
-
-import { formStyles } from './formStyles';
 
 interface Props {
   provider: AuthProvider;
@@ -28,28 +26,27 @@ export const AuthProviderForm = observer(function AuthProviderForm({
   authenticate,
 }: Props) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
-  const handleChange = useCallback((key: string, value: string) => {
+  const handleChange = useCallback((key: string, value: string | number) => {
     credentials[key] = value;
   }, [credentials]);
 
-  return styled(useStyles(formStyles))(
-    <login-form ref={elementRef} as='div'>
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+    <Group ref={elementRef} gap small center>
       {provider.credentialParameters.map(parameter => parameter.user && (
-        <group key={parameter.id} as="div">
-          <InputField
-            title={parameter.description}
-            type={parameter.encryption === 'none' ? 'text' : 'password'}
-            name={`authentication_${provider.id}_${parameter.id}`}
-            value={credentials[parameter.id]}
-            disabled={authenticate}
-            autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
-            mod='surface'
-            onChange={value => handleChange(parameter.id, value)}
-          >
-            {parameter.displayName}
-          </InputField>
-        </group>
+        <InputFieldNew
+          key={parameter.id}
+          title={parameter.description}
+          type={parameter.encryption === 'none' ? 'text' : 'password'}
+          name={`authentication_${provider.id}_${parameter.id}`}
+          value={credentials[parameter.id]}
+          disabled={authenticate}
+          autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
+          mod='surface'
+          onChange={value => handleChange(parameter.id, value)}
+        >
+          {parameter.displayName}
+        </InputFieldNew>
       ))}
-    </login-form>
+    </Group>
   );
 });

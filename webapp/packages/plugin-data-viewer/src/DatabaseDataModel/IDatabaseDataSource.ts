@@ -29,7 +29,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
-  readonly actions: IDatabaseDataActions<TResult>;
+  readonly actions: IDatabaseDataActions<TOptions, TResult>;
   readonly editor: IDatabaseDataEditor<TResult> | null;
   readonly results: TResult[];
   readonly offset: number;
@@ -46,9 +46,9 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   hasResult: (resultIndex: number) => boolean;
 
-  getAction: <T extends IDatabaseDataAction<TResult>>(
+  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
 
   /** @deprecated will be moved to getAction */

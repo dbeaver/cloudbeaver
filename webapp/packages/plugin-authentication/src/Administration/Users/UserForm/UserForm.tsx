@@ -38,7 +38,7 @@ const styles = composes(
     }
 
     ErrorMessage {
-      composes: theme-background-secondary from global;
+      composes: theme-background-secondary theme-text-on-secondary from global;
     }
 
     FormBox {

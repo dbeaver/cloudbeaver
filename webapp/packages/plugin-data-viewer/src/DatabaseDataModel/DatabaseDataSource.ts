@@ -24,7 +24,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
   editor: IDatabaseDataEditor<TResult> | null;
-  actions: IDatabaseDataActions<TResult>;
+  actions: IDatabaseDataActions<TOptions, TResult>;
   results: TResult[];
   offset: number;
   count: number;
@@ -57,7 +57,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       activeSave: observable,
     });
 
-    this.actions = new DatabaseDataActions();
+    this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
     this.editor = null;
@@ -79,9 +79,9 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.lastAction = this.requestData.bind(this);
   }
 
-  getAction<T extends IDatabaseDataAction<TResult>>(
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>
   ): T {
     if (!this.hasResult(resultIndex)) {
       throw new Error('Result index out of range');

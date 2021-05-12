@@ -9,6 +9,7 @@ export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
 export * from './DatabaseDataModel/Actions/IDatabaseDataFormatAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
+export * from './DatabaseDataModel/DatabaseDataAction';
 export * from './DatabaseDataModel/DatabaseDataActions';
 export * from './DatabaseDataModel/DatabaseDataEditor';
 export * from './DatabaseDataModel/DatabaseDataFormat';

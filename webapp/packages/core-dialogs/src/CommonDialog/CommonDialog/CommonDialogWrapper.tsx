@@ -39,24 +39,24 @@ export const CommonDialogWrapper: React.FC<CommonDialogWrapperProps> = function 
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle))(
     <dialog className={className}>
       <header>
-        <header-title as="div">
+        <icon-container>
           {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
-          <header-title-text as='div'>
-            <h3>{title}</h3>
-            <sub-title as='div'>{subTitle}</sub-title>
-          </header-title-text>
+        </icon-container>
+        <header-title>
+          <h3>{title}</h3>
           {onReject && (
-            <reject as="div">
+            <reject>
               <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
             </reject>
           )}
         </header-title>
+        {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body as="div">
-        <dialog-body-content as='div'>
+      <dialog-body>
+        <dialog-body-content>
           {children}
         </dialog-body-content>
-        <dialog-body-overflow as='div' />
+        <dialog-body-overflow />
       </dialog-body>
       <footer>
         {footer}

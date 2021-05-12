@@ -11,6 +11,6 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 import type { IResultSetElementKey } from './ResultSet/IResultSetElementKey';
 
 export interface IDatabaseResultDataAction<TKey, TResult extends IDatabaseDataResult>
-  extends IDatabaseDataAction<TResult> {
+  extends IDatabaseDataAction<any, TResult> {
   getCellValue: (cell: IResultSetElementKey) => any;
 }
