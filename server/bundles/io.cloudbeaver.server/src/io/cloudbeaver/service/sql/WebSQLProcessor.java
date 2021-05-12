@@ -231,10 +231,13 @@ public class WebSQLProcessor {
                     executeInfo.setDuration(statistics.getTotalTime());
 
                     WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
-                    results.setResultSet(dataReceiver.getResultSet());
+                    WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
+                    results.setResultSet(resultSet);
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
 
-                    executeInfo.setStatusMessage(dataReceiver.getResultSet().getRows().length + " row(s) fetched");
+                    if (resultSet != null && resultSet.getRows() != null) {
+                        executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
+                    }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
                 }
