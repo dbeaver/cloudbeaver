@@ -118,6 +118,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   setResults(results: TResult[]): this {
     this.editor?.cancelChanges();
+    this.actions.updateResults(results);
     this.results = results;
     return this;
   }
@@ -194,8 +195,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeRequest = promise;
       }
-      this.editor?.cancelChanges();
-      this.results = await promise;
+      this.setResults(await promise);
     } finally {
       this.activeRequest = null;
     }
@@ -220,7 +220,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       if (promise instanceof Promise) {
         this.activeSave = promise;
       }
-      this.results = await promise;
+      this.setResults(await promise);
     } finally {
       this.activeSave = null;
     }
