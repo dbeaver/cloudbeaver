@@ -9,13 +9,11 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../shared/NodesManager/EObjectFeature';
 import { useNode } from '../../shared/NodesManager/useNode';
 import { useChildren } from '../../shared/useChildren';
-import { NavigationTreeService } from '../NavigationTreeService';
 import { TreeContext } from '../TreeContext';
 
 interface INavigationNode {
@@ -37,7 +35,6 @@ export function useNavigationNode(node: NavNode): INavigationNode {
   const contextRef = useObjectRef({
     context: useContext(TreeContext),
   });
-  const navigationTreeService = useService(NavigationTreeService);
   const [processing, setProcessing] = useState(false);
   const { isLoading } = useNode(node.id);
   const children = useChildren(node.id);
@@ -56,20 +53,6 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     expanded = false;
   }
 
-  const handleExpand = async () => {
-    if (!expanded) {
-      const timeout = setTimeout(() => setProcessing(true), 1);
-      const state = await navigationTreeService.loadNestedNodes(node.id);
-      clearTimeout(timeout);
-      setProcessing(false);
-      if (!state) {
-        contextRef.context?.tree.expand(node, false);
-        return;
-      }
-    }
-    contextRef.context?.tree.expand(node, !expanded);
-  };
-
   const handleOpen = async () => {
     setProcessing(true);
     try {
@@ -77,6 +60,10 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleExpand = async () => {
+    contextRef.context?.tree.expand(node, !expanded);
   };
 
   const handleSelect = (multiple = false, nested = false) => {

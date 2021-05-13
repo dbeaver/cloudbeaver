@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import {
   ConnectionAuthService, Connection, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
@@ -140,14 +142,14 @@ export class NavNodeManagerService extends Bootstrap {
   getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>
   getTree(navNodeId: string | NavNodeKey | NavNodeKey[]): string[] | undefined | Array<string[] | undefined> {
     if (typeof navNodeId === 'string') {
-      return this.navTree.data.get(navNodeId);
+      return this.navTree.get(navNodeId);
     }
 
     if (Array.isArray(navNodeId)) {
       return navNodeId.map(node => this.navTree.data.get(node.nodeId));
     }
 
-    return this.navTree.data.get(navNodeId.nodeId);
+    return this.navTree.get(navNodeId.nodeId);
   }
 
   loadTree(navNodeId: string): Promise<string[]> {
@@ -339,35 +341,40 @@ export class NavNodeManagerService extends Bootstrap {
     // const count = ResourceKeyUtils.count(key);
 
     await this.navTree.load(ROOT_NODE_PATH);
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      this.navTree.markTreeOutdated(nodeId);
 
-      // addOpenedConnection
-      const connectionInfo = this.connectionInfo.get(key);
+    runInAction(() => {
+      ResourceKeyUtils.forEach(key, async key => {
+        const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+        this.navTree.markTreeOutdated(nodeId);
 
-      if (!connectionInfo?.connected) {
-        this.removeTree(nodeId);
-      }
+        if (this.navTree.has(nodeId)) {
+          const connectionInfo = this.connectionInfo.get(key);
 
-      // if (count > 1) {
-      this.navNodeInfoResource.markOutdated(nodeId);
+          if (!connectionInfo?.connected) {
+            this.removeTree(nodeId);
+          }
+        }
+
+        // if (count > 1) {
+        this.navNodeInfoResource.markOutdated(nodeId);
       // } else {
       // await this.navNodeInfoResource.refresh(nodeId);
       // }
+      });
     });
   }
 
-  private async connectionRemoveHandler(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, key => {
-    // deleteConnection
-      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+  private connectionRemoveHandler(key: ResourceKey<string>) {
+    runInAction(() => {
+      ResourceKeyUtils.forEach(key, key => {
+        const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
 
-      const node = this.getNode(navNodeId);
-      if (!node) {
-        return;
-      }
-      this.navTree.deleteInNode(node.parentId, [navNodeId]);
+        const node = this.getNode(navNodeId);
+        if (!node) {
+          return;
+        }
+        this.navTree.deleteInNode(node.parentId, [navNodeId]);
+      });
     });
   }
 
