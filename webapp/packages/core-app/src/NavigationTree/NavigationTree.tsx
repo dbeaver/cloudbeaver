@@ -58,7 +58,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const [onFocus, onBlur] = useActiveView(navTreeService.getView);
   const [ref] = useFocus<HTMLDivElement>({ onFocus, onBlur });
   const isEnabled = usePermission(EPermission.public);
-  const { isSelected, handleOpen, handleSelect } = useNavigationTree();
+  const { handleOpen, handleSelect } = useNavigationTree();
 
   if (!isEnabled) {
     return null;
@@ -68,6 +68,7 @@ export const NavigationTree = observer(function NavigationTree() {
     <inside-box ref={ref} as='div' tabIndex={0}>
       <ElementsTree
         root={ROOT_NODE_PATH}
+        localState={navTreeService.treeState}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center as="div">
             <message as="div">
@@ -76,9 +77,8 @@ export const NavigationTree = observer(function NavigationTree() {
             </message>
           </center>
         )}
-        isSelected={isSelected}
+        customSelect={handleSelect}
         onOpen={handleOpen}
-        onSelect={handleSelect}
       />
     </inside-box>
   );

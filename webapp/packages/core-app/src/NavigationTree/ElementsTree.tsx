@@ -7,18 +7,22 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { useService } from '@cloudbeaver/core-di';
+import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import { ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { useChildren } from '../shared/useChildren';
+import { elementsTreeNameFilter } from './elementsTreeNameFilter';
+import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { ITreeContext, TreeContext } from './TreeContext';
+import { IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
 
 const styles = css`
   tree {
@@ -34,10 +38,6 @@ const styles = css`
   }
 `;
 
-export interface ITreeNodeState {
-  filter: string;
-}
-
 interface Props {
   root?: string;
   selectionTree?: boolean;
@@ -47,61 +47,63 @@ interface Props {
   }>;
   emptyPlaceholder: React.FC;
   className?: string;
+  filters?: IElementsTreeFilter[];
+  customSelect?: (node: NavNode, multiple: boolean) => void;
+  isGroup?: (node: NavNode) => boolean;
+  onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
   onOpen?: (node: NavNode) => Promise<void> | void;
-  onSelect?: (node: NavNode, multiple: boolean) => void;
-  isSelected?: (node: NavNode) => boolean;
+  onSelect?: (node: NavNode, state: boolean) => void;
   onFilter?: (node: NavNode, value: string) => void;
 }
 
 export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
-  root,
+  root = ROOT_NODE_PATH,
   control,
   localState,
   selectionTree = false,
   emptyPlaceholder,
+  filters,
   className,
+  isGroup,
+  customSelect,
+  onExpand,
   onOpen,
   onSelect,
-  isSelected,
   onFilter,
 }) {
   const nodeChildren = useChildren(root);
   const Placeholder = emptyPlaceholder;
-  useMapResource(NavTreeResource, root || ROOT_NODE_PATH);
-  const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({ filter: '' })));
+  const navNodeInfoResource = useService(NavNodeInfoResource);
 
-  const treeNodesState = localState || localTreeNodesState;
+  useMapResource(NavTreeResource, root);
 
-  const getTreeNodeState = useCallback((node: NavNode) =>
-    treeNodesState.get(node.id), [treeNodesState]);
+  const nameFilter = useMemo(() => elementsTreeNameFilter(navNodeInfoResource), [navNodeInfoResource]);
 
-  const onFilterHandler = useCallback((node: NavNode, value: string) => {
-    const treeNodeState = treeNodesState.get(node.id);
-    treeNodeState.filter = value;
-
-    if (onFilter) {
-      onFilter(node, value);
-    }
-  }, [treeNodesState, onFilter]);
+  const tree = useElementsTree({
+    root,
+    localState,
+    filters: [nameFilter, ...(filters || [])],
+    isGroup,
+    onFilter,
+    customSelect,
+    onExpand,
+    onSelect,
+  });
 
   const context = useMemo<ITreeContext>(
     () => ({
-      treeNodesState,
-      getTreeNodeState,
+      tree,
       selectionTree,
       control,
       onOpen,
-      onSelect,
-      isSelected,
-      onFilter: onFilterHandler,
     }),
-    [control, selectionTree, onOpen, onSelect, isSelected, onFilterHandler, treeNodesState, getTreeNodeState]
+    [control, selectionTree, onOpen]
   );
 
   if (!nodeChildren.children || nodeChildren.children.length === 0) {
     if (nodeChildren.isLoading()) {
       return styled(styles)(
-        <center as="div">
+        <center>
           <Loader />
         </center>
       );
@@ -112,10 +114,8 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
 
   return styled(styles)(
     <TreeContext.Provider value={context}>
-      <tree as="div" className={className}>
-        {nodeChildren.children.map(id => (
-          <NavigationNodeElement key={id} nodeId={id} />
-        ))}
+      <tree className={className}>
+        <NavigationNodeNested nodeId={root} component={NavigationNodeElement} root />
         <Loader loading={nodeChildren.isLoading()} overlay />
       </tree>
     </TreeContext.Provider>

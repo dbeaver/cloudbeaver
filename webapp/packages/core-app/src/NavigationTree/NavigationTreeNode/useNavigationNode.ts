@@ -8,6 +8,7 @@
 
 import { useContext, useEffect, useState } from 'react';
 
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { NavNode } from '../../shared/NodesManager/EntityTypes';
@@ -27,29 +28,29 @@ interface INavigationNode {
   leaf: boolean;
   handleExpand: () => void;
   handleOpen: () => void;
-  handleSelect: (isMultiple?: boolean) => void;
+  handleSelect: (isMultiple?: boolean, nested?: boolean) => void;
   handleFilter: (value: string) => void;
   filterValue: string;
 }
 
 export function useNavigationNode(node: NavNode): INavigationNode {
-  const context = useContext(TreeContext);
+  const contextRef = useObjectRef({
+    context: useContext(TreeContext),
+  });
   const navigationTreeService = useService(NavigationTreeService);
   const [processing, setProcessing] = useState(false);
-  const { isLoading, isOutdated } = useNode(node.id);
+  const { isLoading } = useNode(node.id);
   const children = useChildren(node.id);
   const loading = isLoading() || children.isLoading() || processing;
 
-  const isExpanded = navigationTreeService.isNodeExpanded(node.id);
-  let leaf = isLeaf(node) || (children.children?.length === 0 && !children.isOutdated());
+  const state = contextRef.context?.tree.getNodeState(node.id);
+  const isExpanded = state?.expanded || false;
+  let leaf = isLeaf(node);
   let expanded = isExpanded && !leaf;
 
   if (
     node.objectFeatures.includes(EObjectFeature.dataSource)
-    && (
-      !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
-      || (!children.children && isOutdated())
-    )
+    && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)
   ) {
     leaf = false;
     expanded = false;
@@ -62,61 +63,43 @@ export function useNavigationNode(node: NavNode): INavigationNode {
       clearTimeout(timeout);
       setProcessing(false);
       if (!state) {
-        navigationTreeService.expandNode(node.id, false);
+        contextRef.context?.tree.expand(node, false);
         return;
       }
     }
-    navigationTreeService.expandNode(node.id, !expanded);
+    contextRef.context?.tree.expand(node, !expanded);
   };
 
   const handleOpen = async () => {
     setProcessing(true);
     try {
-      await context?.onOpen?.(node);
+      await contextRef.context?.onOpen?.(node);
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleSelect = (multiple = false) => {
-    context?.onSelect?.(node, multiple);
+  const handleSelect = (multiple = false, nested = false) => {
+    contextRef.context?.tree.select(node, multiple, nested);
   };
 
   const handleFilter = (value: string) => {
-    context?.onFilter?.(node, value);
+    contextRef.context?.tree.filter(node, value);
   };
 
-  // TODO: probably should be refactored
-  useEffect(() => {
-    if (expanded && children.isOutdated() && !children.isLoading() && children.isLoaded() && !isOutdated()) {
-      setProcessing(true);
-      navigationTreeService
-        .loadNestedNodes(node.id)
-        .then(state => {
-          setProcessing(false);
-          if (!state) {
-            navigationTreeService.expandNode(node.id, false);
-          }
-        });
-    }
-  }, [expanded, children.isOutdated(), children.isLoading(), children.isLoaded(), isOutdated(), node]);
-
   useEffect(() => () => {
-    if (!context?.selectionTree && node && context?.isSelected?.(node)) {
-      context.onSelect?.(node, true);
+    if (!contextRef.context?.selectionTree) {
+      const state = contextRef.context?.tree.getNodeState(node.id);
+
+      if (state?.selected) {
+        contextRef.context?.tree.select(node, true, false);
+      }
     }
-  }, [context, node.id]);
-
-  useEffect(() => () => {
-    // TODO: seems like selection & expand should be specific for separate tree definitions
-    navigationTreeService.expandNode(node.id, false);
-
-    context?.treeNodesState?.delete(node.id);
   }, [node.id]);
 
   return {
-    control: context?.control,
-    selected: context?.isSelected?.(node) || false,
+    control: contextRef.context?.control,
+    selected: state?.selected || false,
     loading,
     expanded,
     leaf,
@@ -124,7 +107,7 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     handleOpen,
     handleSelect,
     handleFilter,
-    filterValue: context?.treeNodesState?.get(node.id).filter || '',
+    filterValue: state?.filter || '',
   };
 }
 

@@ -6,27 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
-import { css } from 'reshadow';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
 import { TreeNodeContext } from './TreeNodeContext';
 
-const styles = css`
-  Icon {
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-  }
-`;
-
 interface Props {
+  group?: boolean;
+  onSelect?: () => void;
+  selected?: boolean;
   disabled?: boolean;
   className?: string;
 }
 
-export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
+export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect({
+  onSelect,
+  group,
+  selected,
   disabled,
   className,
 }) {
@@ -45,9 +42,13 @@ export const TreeNodeSelect: React.FC<Props> = function TreeNodeSelect({
     event.preventDefault();
   };
 
-  return styled(styles)(
+  return (
     <div className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
-      <Checkbox checked={context.selected} disabled={disabled} onChange={() => context.select(true)} />
+      <Checkbox
+        checked={selected ?? context.selected}
+        disabled={disabled}
+        onChange={onSelect ?? (() => context.select(true, group))}
+      />
     </div>
   );
-};
+});

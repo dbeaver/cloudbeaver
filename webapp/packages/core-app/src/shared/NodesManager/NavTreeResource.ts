@@ -9,6 +9,7 @@
 import { action, computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -39,6 +40,7 @@ interface INodeMetadata extends ICachedMapResourceMetadata {
 
 @injectable()
 export class NavTreeResource extends CachedMapResource<string, string[]> {
+  readonly onNodeRefresh: IExecutor<string>;
   protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
@@ -66,8 +68,23 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       exception: null,
       includes: [],
     }));
+
+    this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
     this.onDataOutdated.addHandler(navNodeInfoResource.markOutdated.bind(navNodeInfoResource));
     this.sessionDataResource.onDataUpdate.addPostHandler(() => this.markOutdated());
+  }
+
+  async refreshTree(navNodeId: string): Promise<void> {
+    await this.graphQLService.sdk.navRefreshNode({
+      nodePath: navNodeId,
+    });
+    this.markTreeOutdated(navNodeId);
+    await this.refresh(navNodeId);
+    await this.onNodeRefresh.execute(navNodeId);
+  }
+
+  markTreeOutdated(navNodeId: ResourceKey<string>): void {
+    this.markOutdated(resourceKeyList(this.getNestedChildren(navNodeId)));
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {
@@ -252,6 +269,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       parentPath,
       withDetails: metadata.withDetails,
     });
+
+    navNodeInfo.hasChildren = navNodeChildren.length > 0;
 
     return { navNodeChildren: navNodeChildren.slice(0, this.childrenLimit), navNodeInfo, parentPath };
   }

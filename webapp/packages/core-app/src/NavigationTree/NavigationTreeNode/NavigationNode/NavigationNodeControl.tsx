@@ -79,10 +79,10 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
     <TreeNodeControl onClick={onClickHandler}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
-        {connected && <status as='div' />}
+        {connected && <status />}
       </TreeNodeIcon>
       <TreeNodeName>{node.name}</TreeNodeName>
-      <portal as="div">
+      <portal>
         <TreeNodeMenu node={node} selected={context?.selected} />
       </portal>
     </TreeNodeControl>

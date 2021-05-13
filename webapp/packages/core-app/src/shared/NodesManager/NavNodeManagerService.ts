@@ -16,7 +16,7 @@ import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
 import {
-  GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
+  resourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
@@ -92,7 +92,6 @@ export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
 
   constructor(
-    private graphQLService: GraphQLService,
     private permissionsService: PermissionsService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
@@ -116,8 +115,6 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   register(): void {
-    // this.sessionDataResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
-    // this.connectionInfo.onSessionUpdate.addHandler(this.connectionRefreshHandler.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
@@ -135,15 +132,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async refreshTree(navNodeId: string): Promise<void> {
-    await this.graphQLService.sdk.navRefreshNode({
-      nodePath: navNodeId,
-    });
-    this.markTreeOutdated(navNodeId);
-    await this.navTree.refresh(navNodeId);
-  }
-
-  markTreeOutdated(navNodeId: ResourceKey<string>): void {
-    this.navTree.markOutdated(resourceKeyList(this.navTree.getNestedChildren(navNodeId)));
+    await this.navTree.refreshTree(navNodeId);
   }
 
   getTree(navNodeId: string): string[] | undefined
@@ -167,10 +156,6 @@ export class NavNodeManagerService extends Bootstrap {
 
   removeTree(path = ROOT_NODE_PATH): void {
     this.navTree.delete(path);
-  }
-
-  async refreshNode(navNodeId: string): Promise<void> {
-    await this.navNodeInfoResource.refresh(navNodeId);
   }
 
   getNode(navNodeId: string): NavNode | undefined
@@ -329,22 +314,6 @@ export class NavNodeManagerService extends Bootstrap {
     };
   };
 
-  async updateRoot(): Promise<void> {
-    const enabled = await this.isNavTreeEnabled();
-    if (enabled) {
-      await this.navTree.refresh(ROOT_NODE_PATH);
-    }
-  }
-
-  async refreshRoot(): Promise<void> {
-    this.navTree.delete(ROOT_NODE_PATH);
-    const enabled = await this.isNavTreeEnabled();
-    if (enabled) {
-      // this.navTree.markOutdated(ROOT_NODE_PATH);
-      await this.navTree.refresh(ROOT_NODE_PATH);
-    }
-  }
-
   private async connectionCreateHandler(connection: Connection) {
     const enabled = await this.isNavTreeEnabled();
     if (!enabled) {
@@ -352,23 +321,13 @@ export class NavNodeManagerService extends Bootstrap {
     }
 
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-    this.markTreeOutdated(nodeId);
+    this.navTree.markTreeOutdated(nodeId);
 
     const tree = await this.navTree.load(ROOT_NODE_PATH);
 
     if (!tree.includes(nodeId)) {
       await this.navTree.refresh(ROOT_NODE_PATH);
     }
-  }
-
-  private async connectionRefreshHandler(connections: Connection[]) {
-    const enabled = await this.isNavTreeEnabled();
-    if (!enabled) {
-      return;
-    }
-
-    // this.navTree.markOutdated(ROOT_NODE_PATH);
-    await this.navTree.refresh(ROOT_NODE_PATH);
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
@@ -382,7 +341,7 @@ export class NavNodeManagerService extends Bootstrap {
     await this.navTree.load(ROOT_NODE_PATH);
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      this.markTreeOutdated(nodeId);
+      this.navTree.markTreeOutdated(nodeId);
 
       // addOpenedConnection
       const connectionInfo = this.connectionInfo.get(key);

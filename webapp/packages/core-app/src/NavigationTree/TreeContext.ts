@@ -8,22 +8,16 @@
 
 import { createContext } from 'react';
 
-import type { MetadataMap } from '@cloudbeaver/core-utils';
-
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
-import type { ITreeNodeState } from './ElementsTree';
+import type { IElementsTree } from './useElementsTree';
 
 export interface ITreeContext {
-  treeNodesState?: MetadataMap<string, ITreeNodeState>;
-  getTreeNodeState?: (node: NavNode) => ITreeNodeState;
+  tree: IElementsTree;
   selectionTree: boolean;
   control?: React.FC<{
     node: NavNode;
   }>;
   onOpen?: (node: NavNode) => Promise<void> | void;
-  onSelect?: (node: NavNode, multiple: boolean) => void;
-  isSelected?: (node: NavNode) => boolean;
-  onFilter?: (node: NavNode, value: string) => void;
 }
 
 export const TreeContext = createContext<ITreeContext | null>(null);

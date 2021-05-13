@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useMemo, useRef, memo } from 'react';
+import { observable } from 'mobx';
+import { memo } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
+import { useObjectRef } from '../../useObjectRef';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
 import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
@@ -21,7 +23,7 @@ interface Props {
   leaf?: boolean;
   className?: string;
   onExpand?: () => void;
-  onSelect?: (multiple?: boolean) => void;
+  onSelect?: (multiple?: boolean, nested?: boolean) => void;
   onFilter?: (value: string) => void;
   filterValue?: string;
   onOpen?: () => void;
@@ -37,41 +39,42 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
   children,
   ...handlers
 }) {
-  const handlersRef = useRef(handlers);
-  handlersRef.current = handlers;
+  const handlersRef = useObjectRef(handlers);
 
-  const handleExpand = useCallback(() => {
-    handlersRef.current.onExpand?.();
-  }, []);
-
-  const handleSelect = useCallback(
-    (multiple?: boolean): void => handlersRef.current.onSelect?.(multiple),
-    []
-  );
-
-  const handleFilter = useCallback(
-    (value: string): void => handlersRef.current.onFilter?.(value),
-    []
-  );
-
-  const handleOpen = useCallback(() => {
-    handlersRef.current.onOpen?.();
-  }, []);
-
-  const nodeContext = useMemo<ITreeNodeContext>(() => ({
+  const nodeContext = useObjectRef<ITreeNodeContext>({
     loading,
     selected,
     expanded,
     leaf,
     filterValue,
-    expand: handleExpand,
-    select: handleSelect,
-    filter: handleFilter,
-    open: handleOpen,
-  }), [loading, selected, expanded, leaf, filterValue, handleExpand, handleSelect, handleOpen, handleFilter]);
+    expand() {
+      handlersRef.onExpand?.();
+    },
+    select(multiple?: boolean, nested?: boolean): void {
+      handlersRef.onSelect?.(multiple, nested);
+    },
+    filter(value: string): void {
+      handlersRef.onFilter?.(value);
+    },
+    open() {
+      handlersRef.onOpen?.();
+    },
+  }, {
+    loading,
+    selected,
+    expanded,
+    leaf,
+    filterValue,
+  }, {
+    loading: observable.ref,
+    selected: observable.ref,
+    expanded: observable.ref,
+    leaf: observable.ref,
+    filterValue: observable.ref,
+  });
 
   return styled(useStyles(TREE_NODE_STYLES))(
-    <node as="div" {...use({ expanded })} className={className}>
+    <node {...use({ expanded })} className={className}>
       <TreeNodeContext.Provider value={nodeContext}>
         {children}
       </TreeNodeContext.Provider>
