@@ -21,6 +21,8 @@ export default [
   ['app_navigationTree_connection_view_option_showSystemObjects', 'Показывать системные объекты'],
   ['app_navigationTree_refreshNode', 'Обновить'],
   ['app_navigationTree_context_disconnect', 'Отключить'],
+  ['app_navigationTree_connection_group_user', 'Пользовательские подключения'],
+  ['app_navigationTree_connection_group_shared', 'Общие подключения'],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],
   ['app_shared_inlineEditor_dialog_apply', 'Применить'],
   ['app_shared_inlineEditor_dialog_cancel', 'Отменить'],

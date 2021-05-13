@@ -10,19 +10,12 @@ import { observer } from 'mobx-react-lite';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
 
-import type { NavNode } from '../../shared/NodesManager/EntityTypes';
+import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
-interface Props {
-  node: NavNode;
-  component: React.FC<{
-    nodeId: string;
-  }>;
-}
-
-export const NavigationNode: React.FC<Props> = observer(function NavigationNode({
+export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,
   component,
 }) {

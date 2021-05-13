@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { useState } from 'react';
 
 import { useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -17,6 +18,15 @@ import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { NavNodeInfoResource } from '../shared/NodesManager/NavNodeInfoResource';
 import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { NavigationTreeService } from './NavigationTreeService';
+
+export type ElementsTreeCustomRendererComponent = React.FC<{
+  nodeId: string;
+  component: React.FC<{
+    nodeId: string;
+  }>;
+}>;
+
+export type IElementsTreeCustomRenderer = (nodeId: string) => ElementsTreeCustomRendererComponent | undefined;
 
 export type IElementsTreeFilter = (
   node: NavNode,
@@ -34,6 +44,7 @@ interface IOptions {
   root: string;
   localState?: MetadataMap<string, ITreeNodeState>;
   filters?: IElementsTreeFilter[];
+  renderers?: IElementsTreeCustomRenderer[];
   customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => void;
@@ -42,6 +53,8 @@ interface IOptions {
 }
 
 export interface IElementsTree {
+  root: string;
+  renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
   getNodeChildren: (nodeId: string) => string[];
@@ -140,6 +153,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
   }
 
   const elementsTree = useObjectRef<IElementsTree>({
+    root: options.root,
+    renderers: options.renderers || [],
     state,
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
@@ -175,7 +190,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       setSelection(node.id, !treeNodeState.selected);
     },
-  });
+  }, undefined, { root: observable.ref, renderers: observable.ref });
 
   async function refreshNode(nodeId: string) {
     let children = [nodeId];
