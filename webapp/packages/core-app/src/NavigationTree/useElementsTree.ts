@@ -76,6 +76,36 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const state = options.localState || localTreeNodesState;
 
+  async function loadTree(nodeId: string) {
+    let children = [nodeId];
+
+    while (children.length > 0) {
+      const nextChildren: string[] = [];
+
+      for (const child of children) {
+        const nodeState = state.get(child);
+        if (!nodeState.expanded && child !== options.root) {
+          continue;
+        }
+
+        const loaded = await navTreeService.loadNestedNodes(child);
+
+        if (!loaded) {
+          const node = navNodeInfoResource.get(child);
+
+          if (node) {
+            elementsTree.expand(node, false);
+          }
+          continue;
+        }
+
+        nextChildren.push(...(navTreeResource.get(child) || []));
+      }
+
+      children = nextChildren;
+    }
+  }
+
   function getNodeChildren(nodeId: string): string[] {
     const node = navNodeInfoResource.get(nodeId);
 
@@ -166,9 +196,13 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       options.onFilter?.(node, value);
     },
-    expand(node: NavNode, state: boolean) {
+    async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
       treeNodeState.expanded = state;
+
+      if (state) {
+        await loadTree(node.id);
+      }
 
       options.onExpand?.(node, state);
     },
@@ -192,39 +226,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
   }, undefined, { root: observable.ref, renderers: observable.ref });
 
-  async function refreshNode(nodeId: string) {
-    let children = [nodeId];
-
-    while (children.length > 0) {
-      const nextChildren: string[] = [];
-
-      for (const child of children) {
-        const nodeState = state.get(child);
-        if (!nodeState.expanded && child !== options.root) {
-          continue;
-        }
-
-        const loaded = await navTreeService.loadNestedNodes(child);
-
-        if (!loaded) {
-          const node = navNodeInfoResource.get(child);
-
-          if (node) {
-            elementsTree.expand(node, false);
-          }
-          continue;
-        }
-
-        nextChildren.push(...(navTreeResource.get(child) || []));
-      }
-
-      children = nextChildren;
-    }
-  }
-
   useExecutor({
     executor: navTreeResource.onNodeRefresh,
-    handlers: [refreshNode],
+    handlers: [loadTree],
   });
 
   useExecutor({

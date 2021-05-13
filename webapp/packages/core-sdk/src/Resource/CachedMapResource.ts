@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -77,6 +77,8 @@ export abstract class CachedMapResource<
     }));
 
     makeObservable(this, {
+      set: action,
+      delete: action,
       values: computed,
       keys: computed,
     });
