@@ -141,11 +141,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                                         userId);
                                 }
                             }
-                        } else {
-                            // We may need to associate new credentials with active user
-                            if (linkWithActiveUser) {
-                                securityController.setUserCredentials(userId, authProvider, userCredentials);
-                            }
+                        }
+                        // We may need to associate new credentials with active user
+                        if (linkWithActiveUser) {
+                            securityController.setUserCredentials(userId, authProvider, userCredentials);
                         }
                     }
 
@@ -153,7 +152,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         throw new DBCException("Invalid user credentials");
                     }
                 }
-                if (curUser != null && !curUser.getUserId().equals(userId)) {
+                if (linkWithActiveUser && curUser != null && !curUser.getUserId().equals(userId)) {
                     log.debug("Attempt to authorize user '" + userId + "' while user '" + curUser.getUserId() + "' already authorized");
                     throw new DBCException("You cannot authorize with different users credentials");
                 }
