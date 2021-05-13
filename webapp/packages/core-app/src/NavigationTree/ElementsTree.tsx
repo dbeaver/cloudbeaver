@@ -22,7 +22,7 @@ import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
 import { ITreeContext, TreeContext } from './TreeContext';
-import { IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
+import { IElementsTreeCustomRenderer, IElementsTreeFilter, ITreeNodeState, useElementsTree } from './useElementsTree';
 
 const styles = css`
   tree {
@@ -48,6 +48,7 @@ interface Props {
   emptyPlaceholder: React.FC;
   className?: string;
   filters?: IElementsTreeFilter[];
+  renderers?: IElementsTreeCustomRenderer[];
   customSelect?: (node: NavNode, multiple: boolean) => void;
   isGroup?: (node: NavNode) => boolean;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
@@ -63,6 +64,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
   selectionTree = false,
   emptyPlaceholder,
   filters,
+  renderers,
   className,
   isGroup,
   customSelect,
@@ -83,6 +85,7 @@ export const ElementsTree: React.FC<Props> = observer(function ElementsTree({
     root,
     localState,
     filters: [nameFilter, ...(filters || [])],
+    renderers,
     isGroup,
     onFilter,
     customSelect,

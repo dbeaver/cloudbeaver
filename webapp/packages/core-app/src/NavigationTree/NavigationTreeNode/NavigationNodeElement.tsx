@@ -7,8 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
-import { useNode } from '../../shared/NodesManager/useNode';
+import { useService } from '@cloudbeaver/core-di';
+
+import { NavNodeInfoResource } from '../../shared/NodesManager/NavNodeInfoResource';
+import { TreeContext } from '../TreeContext';
 import { NavigationNode } from './NavigationNode';
 
 interface NavigationTreeNodeProps {
@@ -18,7 +22,22 @@ interface NavigationTreeNodeProps {
 export const NavigationNodeElement = observer(function NavigationNodeElement({
   nodeId,
 }: NavigationTreeNodeProps) {
-  const { node } = useNode(nodeId);
+  const context = useContext(TreeContext);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+
+  if (context?.tree.renderers) {
+    for (const renderer of context.tree.renderers) {
+      const CustomRenderer = renderer(nodeId);
+
+      if (CustomRenderer === undefined) {
+        continue;
+      }
+
+      return <CustomRenderer nodeId={nodeId} component={NavigationNodeElement} />;
+    }
+  }
+
+  const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
     return null;
