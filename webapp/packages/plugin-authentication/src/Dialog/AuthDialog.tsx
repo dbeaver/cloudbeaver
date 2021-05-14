@@ -32,7 +32,7 @@ const styles = composes(
   css`
     CommonDialogWrapper {
       min-height: 400px;
-      min-width: 600px;
+      min-width: 500px;
     }
     SubmittingForm {
       overflow: auto;
