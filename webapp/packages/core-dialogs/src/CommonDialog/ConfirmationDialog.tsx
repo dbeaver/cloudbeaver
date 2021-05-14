@@ -52,22 +52,24 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload> = fu
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, style))(
     <dialog className={className}>
       <header>
-        <header-title as="div">
+        <icon-container>
           {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
-          <header-title-text as='div'>
-            <h3><Translate token={title} /></h3>
-            <sub-title as='div'>{subTitle}</sub-title>
-          </header-title-text>
-          <reject as="div">
-            <Icon name="cross" viewBox="0 0 16 16" onClick={rejectDialog} />
-          </reject>
+        </icon-container>
+        <header-title>
+          <h3><Translate token={title} /></h3>
+          {rejectDialog && (
+            <reject>
+              <Icon name="cross" viewBox="0 0 16 16" onClick={rejectDialog} />
+            </reject>
+          )}
         </header-title>
+        {subTitle && <sub-title>{subTitle}</sub-title>}
       </header>
-      <dialog-body as="div">
-        <dialog-body-content as='div'>
+      <dialog-body>
+        <dialog-body-content>
           <Translate token={message} />
         </dialog-body-content>
-        <dialog-body-overflow as='div' />
+        <dialog-body-overflow />
       </dialog-body>
       <footer>
         <Button
