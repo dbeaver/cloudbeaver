@@ -15,7 +15,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 const styles = css`
   footer-container {
     display: flex;
-    height: 100%;
+    width: min-content;
     flex: 1;
     align-items: center;
     justify-content: flex-end;
