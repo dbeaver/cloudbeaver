@@ -27,7 +27,7 @@ export const TreeNodeIcon: React.FC<Props> = function TreeNodeIcon({
   children,
 }) {
   return styled(styles)(
-    <icon as="div" className={className}>
+    <icon className={className}>
       <StaticImage icon={icon} />
       {children}
     </icon>

@@ -45,11 +45,11 @@ interface IOptions {
   localState?: MetadataMap<string, ITreeNodeState>;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
-  customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => void;
+  customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
   isGroup?: (node: NavNode) => boolean;
-  onExpand?: (node: NavNode, state: boolean) => void;
-  onSelect?: (node: NavNode, state: boolean) => void;
-  onFilter?: (node: NavNode, value: string) => void;
+  onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
+  onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
+  onFilter?: (node: NavNode, value: string) => Promise<void> | void;
 }
 
 export interface IElementsTree {
@@ -58,9 +58,9 @@ export interface IElementsTree {
   state: MetadataMap<string, ITreeNodeState>;
   getNodeState: (nodeId: string) => ITreeNodeState;
   getNodeChildren: (nodeId: string) => string[];
-  filter: (node: NavNode, value: string) => void;
-  select: (node: NavNode, multiple: boolean, nested: boolean) => void;
-  expand: (node: NavNode, state: boolean) => void;
+  filter: (node: NavNode, value: string) => Promise<void>;
+  select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
+  expand: (node: NavNode, state: boolean) => Promise<void>;
 }
 
 export function useElementsTree(options: IOptions): IElementsTree {
@@ -94,7 +94,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
           const node = navNodeInfoResource.get(child);
 
           if (node) {
-            elementsTree.expand(node, false);
+            await elementsTree.expand(node, false);
           }
           continue;
         }
@@ -135,7 +135,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     return nestedChildren;
   }
 
-  function clearSelection(nodeId: string) {
+  async function clearSelection(nodeId: string) {
     const node = navNodeInfoResource.get(nodeId);
 
     const ignore = node && options.isGroup?.(node)
@@ -150,14 +150,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
           const node = navNodeInfoResource.get(id);
 
           if (node) {
-            options.onSelect(node, false);
+            await options.onSelect(node, false);
           }
         }
       }
     }
   }
 
-  function setSelection(nodeId: string, selected: boolean): void {
+  async function setSelection(nodeId: string, selected: boolean): Promise<void> {
     const node = navNodeInfoResource.get(nodeId);
 
     if (!node) {
@@ -174,12 +174,16 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const children = getNodeChildren(nodeId);
 
       for (const child of children) {
-        setSelection(child, selected);
+        await setSelection(child, selected);
+      }
+
+      if (children.length === 0) {
+        return;
       }
     }
 
     treeNodeState.selected = selected;
-    options.onSelect?.(node, selected);
+    await options.onSelect?.(node, selected);
   }
 
   const elementsTree = useObjectRef<IElementsTree>({
@@ -190,11 +194,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
       return this.state.get(nodeId);
     },
     getNodeChildren,
-    filter(node: NavNode, value: string) {
+    async filter(node: NavNode, value: string) {
       const treeNodeState = this.state.get(node.id);
       treeNodeState.filter = value;
 
-      options.onFilter?.(node, value);
+      await options.onFilter?.(node, value);
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
@@ -204,25 +208,25 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await loadTree(node.id);
       }
 
-      options.onExpand?.(node, state);
+      await options.onExpand?.(node, state);
     },
-    select(node: NavNode, multiple: boolean, nested: boolean) {
+    async select(node: NavNode, multiple: boolean, nested: boolean) {
       if (options.customSelect) {
-        options.customSelect(node, multiple, nested);
+        await options.customSelect(node, multiple, nested);
         return;
       }
 
       const treeNodeState = this.state.get(node.id);
 
       if (!multiple) {
-        clearSelection(node.id);
+        await clearSelection(node.id);
 
         if (treeNodeState.selected) {
           return;
         }
       }
 
-      setSelection(node.id, !treeNodeState.selected);
+      await setSelection(node.id, !treeNodeState.selected);
     },
   }, undefined, { root: observable.ref, renderers: observable.ref });
 
@@ -242,12 +246,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   useExecutor({
     executor: navTreeResource.onItemDelete,
-    handlers: [function collapseDeletedTree(key) {
-      ResourceKeyUtils.forEach(key, key => {
+    handlers: [async function collapseDeletedTree(key) {
+      await ResourceKeyUtils.forEachAsync(key, async key => {
         const node = navNodeInfoResource.get(key);
 
         if (node) {
-          elementsTree.expand(node, false);
+          await elementsTree.expand(node, false);
         }
       });
     }],

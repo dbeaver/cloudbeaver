@@ -43,5 +43,6 @@ export const NavigationNodeElement = observer(function NavigationNodeElement({
     return null;
   }
 
+  // TODO: after node update reference can be lost and NavigationNode skip update
   return <NavigationNode node={node} component={NavigationNodeElement} />;
 });

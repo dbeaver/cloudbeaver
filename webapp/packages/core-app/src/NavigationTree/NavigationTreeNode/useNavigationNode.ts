@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
@@ -24,24 +24,30 @@ interface INavigationNode {
   loading: boolean;
   expanded: boolean;
   leaf: boolean;
-  handleExpand: () => void;
-  handleOpen: () => void;
-  handleSelect: (isMultiple?: boolean, nested?: boolean) => void;
-  handleFilter: (value: string) => void;
+  handleExpand: () => Promise<void>;
+  handleOpen: () => Promise<void>;
+  handleSelect: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
+  handleFilter: (value: string) => Promise<void>;
   filterValue: string;
 }
 
-export function useNavigationNode(node: NavNode): INavigationNode {
+export function useNavigationNode({ id }: NavNode): INavigationNode {
   const contextRef = useObjectRef({
     context: useContext(TreeContext),
   });
-  const [processing, setProcessing] = useState(false);
-  const { isLoading } = useNode(node.id);
+  const { node, isLoading } = useNode(id);
+
+  // TODO: hack to provide actual node information
+  if (!node) {
+    throw new Error('Node should exists');
+  }
+
   const children = useChildren(node.id);
-  const loading = isLoading() || children.isLoading() || processing;
+  const loading = isLoading() || children.isLoading();
 
   const state = contextRef.context?.tree.getNodeState(node.id);
   const isExpanded = state?.expanded || false;
+
   let leaf = isLeaf(node);
   let expanded = isExpanded && !leaf;
 
@@ -53,26 +59,13 @@ export function useNavigationNode(node: NavNode): INavigationNode {
     expanded = false;
   }
 
-  const handleOpen = async () => {
-    setProcessing(true);
-    try {
-      await contextRef.context?.onOpen?.(node);
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const handleExpand = async () => {
-    contextRef.context?.tree.expand(node, !expanded);
-  };
-
-  const handleSelect = (multiple = false, nested = false) => {
-    contextRef.context?.tree.select(node, multiple, nested);
-  };
-
-  const handleFilter = (value: string) => {
-    contextRef.context?.tree.filter(node, value);
-  };
+  const handleOpen = async () => contextRef.context?.onOpen?.(node);
+  const handleExpand = async () => contextRef.context?.tree.expand(node, !expanded);
+  const handleSelect = async (
+    multiple = false,
+    nested = false
+  ) => contextRef.context?.tree.select(node, multiple, nested);
+  const handleFilter = async (value: string) => contextRef.context?.tree.filter(node, value);
 
   useEffect(() => () => {
     if (!contextRef.context?.selectionTree) {

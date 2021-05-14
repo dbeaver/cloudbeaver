@@ -100,7 +100,7 @@ export const TreeNodeFilter: React.FC<Props> = observer(function TreeNodeFilter(
     }
   }, [filterEnabled]);
 
-  useEffect(() => () => context.filter(''), []);
+  useEffect(() => () => { context.filter(''); }, []);
 
   return styled(useStyles(styles))(
     <filter-container className={className} onClick={handleClick} onDoubleClick={preventPropagation}>

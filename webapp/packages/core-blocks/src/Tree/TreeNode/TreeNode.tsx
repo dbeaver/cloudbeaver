@@ -22,11 +22,11 @@ interface Props {
   expanded?: boolean;
   leaf?: boolean;
   className?: string;
-  onExpand?: () => void;
-  onSelect?: (multiple?: boolean, nested?: boolean) => void;
-  onFilter?: (value: string) => void;
+  onExpand?: () => Promise<void> | void;
+  onSelect?: (multiple?: boolean, nested?: boolean) => Promise<void> | void;
+  onFilter?: (value: string) => Promise<void> | void;
   filterValue?: string;
-  onOpen?: () => void;
+  onOpen?: () => Promise<void> | void;
 }
 
 export const TreeNode: React.FC<Props> = memo(function TreeNode({
@@ -41,23 +41,45 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
 }) {
   const handlersRef = useObjectRef(handlers);
 
+  async function processAction(action: () => Promise<void>) {
+    const timeout = setTimeout(() => {
+      nodeContext.processing = true;
+    }, 250);
+
+    try {
+      await action();
+    } finally {
+      clearTimeout(timeout);
+      nodeContext.processing = false;
+    }
+  }
+
   const nodeContext = useObjectRef<ITreeNodeContext>({
+    processing: false,
     loading,
     selected,
     expanded,
     leaf,
     filterValue,
-    expand() {
-      handlersRef.onExpand?.();
+    async expand() {
+      await processAction(async () => {
+        await handlersRef.onExpand?.();
+      });
     },
-    select(multiple?: boolean, nested?: boolean): void {
-      handlersRef.onSelect?.(multiple, nested);
+    async select(multiple?: boolean, nested?: boolean) {
+      await processAction(async () => {
+        await handlersRef.onSelect?.(multiple, nested);
+      });
     },
-    filter(value: string): void {
-      handlersRef.onFilter?.(value);
+    async filter(value: string) {
+      await processAction(async () => {
+        await handlersRef.onFilter?.(value);
+      });
     },
-    open() {
-      handlersRef.onOpen?.();
+    async open() {
+      await processAction(async () => {
+        await handlersRef.onOpen?.();
+      });
     },
   }, {
     loading,
@@ -66,6 +88,7 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
     leaf,
     filterValue,
   }, {
+    processing: observable.ref,
     loading: observable.ref,
     selected: observable.ref,
     expanded: observable.ref,
