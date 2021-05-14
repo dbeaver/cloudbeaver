@@ -270,7 +270,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       withDetails: metadata.withDetails,
     });
 
-    navNodeInfo.hasChildren = navNodeChildren.length > 0;
+    navNodeInfo.hasChildren = navNodeInfo.hasChildren && navNodeChildren.length > 0;
 
     return { navNodeChildren: navNodeChildren.slice(0, this.childrenLimit), navNodeInfo, parentPath };
   }
