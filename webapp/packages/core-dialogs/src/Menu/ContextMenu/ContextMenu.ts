@@ -84,7 +84,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   onClick?: () => void;
   // set title or getter
   title?: TLocalizationToken;
-  titleGetter?: () => TLocalizationToken | undefined;
+  titleGetter?: () => TLocalizationToken;
   tooltip?: TLocalizationToken;
   tooltipGetter?: () => TLocalizationToken | undefined;
   isDisabled?: () => boolean;
@@ -100,7 +100,6 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     private context: IMenuContext<T>) {
     // doesn't depend on context
     this.title = options.title;
-    this.titleGetter = options.titleGetter;
     this.tooltip = options.tooltip;
     this.tooltipGetter = options.tooltipGetter;
     this.icon = options.icon;
@@ -121,6 +120,9 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     }
     if (options.isChecked) {
       this.isChecked = () => options.isChecked!(this.context);
+    }
+    if (options.titleGetter) {
+      this.titleGetter = () => options.titleGetter!(this.context);
     }
   }
 }

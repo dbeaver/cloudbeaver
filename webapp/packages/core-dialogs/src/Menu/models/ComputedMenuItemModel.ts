@@ -15,6 +15,7 @@ import type { IMenuItemOptions, MenuItemType } from './MenuOptionsStore';
 
 export interface IComputedMenuItemOptions extends IMenuItemOptions {
   onClick?: () => void;
+  titleGetter?: () => string;
   isDisabled?: () => boolean;
   isHidden?: () => boolean;
   isChecked?: () => boolean;

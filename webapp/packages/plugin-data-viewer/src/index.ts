@@ -6,6 +6,7 @@ export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSortAction';
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
 export * from './DatabaseDataModel/Actions/IDatabaseDataFormatAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';

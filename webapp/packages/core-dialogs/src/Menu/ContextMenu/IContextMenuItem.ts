@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+
 import type { IMenuItemOptions } from '../models/MenuOptionsStore';
 import type { IMenuContext } from './IMenuContext';
 
@@ -14,6 +16,7 @@ import type { IMenuContext } from './IMenuContext';
  */
 export interface IContextMenuItem<T> extends IMenuItemOptions {
   onClick?: (context: IMenuContext<T>) => void;
+  titleGetter?: (context: IMenuContext<T>) => TLocalizationToken;
   // if isPresent is false menu item will not be included in resulting context menu
   isPresent: (context: IMenuContext<T>) => boolean;
   isDisabled?: (context: IMenuContext<T>) => boolean;
