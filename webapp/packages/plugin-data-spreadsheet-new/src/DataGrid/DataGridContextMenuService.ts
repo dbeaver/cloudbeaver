@@ -43,29 +43,5 @@ export class DataGridContextMenuService {
     });
   }
 
-  register() {
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
-      this.contextMenuService.getRootMenuToken(),
-      {
-        id: this.getMenuToken(),
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        order: 2,
-        title: 'Cell',
-      }
-    );
-
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
-      this.getMenuToken(),
-      {
-        id: 'edit',
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        order: 2,
-        title: 'Cell',
-      }
-    );
-  }
+  register(): void { }
 }
