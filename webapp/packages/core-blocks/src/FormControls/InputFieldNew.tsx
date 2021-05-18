@@ -48,7 +48,7 @@ type ControlledProps = BaseProps & {
 type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  mapState?: (value: TState[TKey]) => TState[TKey];
+  mapState?: (value: TState[TKey]) => TState[TKey] | string | number;
   mapValue?: (value: TState[TKey]) => TState[TKey];
   onChange?: (value: TState[TKey], name: TKey) => any;
   autoHide?: boolean;

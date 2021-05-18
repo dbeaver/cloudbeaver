@@ -60,7 +60,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     });
   }
 
-  protected async loader(key: ResourceKey<string>) {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, NavNode>> {
     if (isResourceKeyList(key)) {
       const values: NavNode[] = [];
       for (const nodePath of key.list) {

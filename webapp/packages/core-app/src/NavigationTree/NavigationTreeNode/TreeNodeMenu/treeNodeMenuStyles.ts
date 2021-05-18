@@ -12,7 +12,7 @@ export const treeNodeMenuStyles = css`
   MenuTrigger {
     margin-left: 16px;
     padding: 0;
-    height: 20px;
+    height: 16px;
 
     &:before {
       display: none;

@@ -9,15 +9,16 @@
 import { createContext } from 'react';
 
 export interface ITreeNodeContext {
+  processing: boolean;
   expanded: boolean;
   loading: boolean;
   selected: boolean;
   leaf: boolean;
-  select: (multiple?: boolean) => void;
-  filter: (value: string) => void;
+  select: (multiple?: boolean, nested?: boolean) => Promise<void>;
+  filter: (value: string) => Promise<void>;
   filterValue: string;
-  expand: () => void;
-  open: () => void;
+  expand: () => Promise<void>;
+  open: () => Promise<void>;
 }
 
 export const TreeNodeContext = createContext<ITreeNodeContext | null>(null);

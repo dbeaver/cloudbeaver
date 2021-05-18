@@ -18,6 +18,8 @@ export default [
   ['app_navigationTree_connection_view_option_showSystemObjects', 'Show system objects'],
   ['app_navigationTree_refreshNode', 'Refresh'],
   ['app_navigationTree_context_disconnect', 'Disconnect'],
+  ['app_navigationTree_connection_group_user', 'User Connections'],
+  ['app_navigationTree_connection_group_shared', 'Shared Connections'],
   ['app_shared_inlineEditor_dialog_title', 'Edit mode'],
   ['app_shared_inlineEditor_dialog_apply', 'Apply'],
   ['app_shared_inlineEditor_dialog_cancel', 'Cancel'],

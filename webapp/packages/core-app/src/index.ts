@@ -27,6 +27,7 @@ export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/NavigationTreeService';
 export * from './NavigationTree/NavigationTreeContextMenuService';
+export * from './NavigationTree/useElementsTree';
 export * from './AppLocaleService';
 
 // Models

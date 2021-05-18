@@ -8,12 +8,16 @@
 
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
-export interface IContainerProps extends ILayoutSizeProps {
-  baseline?: boolean;
-  center?: boolean;
-  vertical?: boolean;
-  wrap?: boolean;
-  overflow?: boolean;
-  parent?: boolean;
-  gap?: boolean;
+export function filterLayoutFakeProps<T extends ILayoutSizeProps>(props: T): Omit<T, keyof ILayoutSizeProps> {
+  const {
+    keepSize,
+    tiny,
+    small,
+    medium,
+    large,
+    fill,
+    ...rest
+  } = props;
+
+  return rest;
 }

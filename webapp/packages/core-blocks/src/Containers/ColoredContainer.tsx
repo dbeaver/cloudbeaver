@@ -8,12 +8,11 @@
 
 import { forwardRef } from 'react';
 
+import { filterContainerFakeProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
 
-export const ColoredContainer = forwardRef<HTMLDivElement, IContainerProps>(function ColoredContainer({ children, className }, ref) {
-  return (
-    <div ref={ref} className={className}>
-      {children}
-    </div>
-  );
+export const ColoredContainer = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function ColoredContainer(props, ref) {
+  const divProps = filterContainerFakeProps(props);
+
+  return <div ref={ref} {...divProps} />;
 });

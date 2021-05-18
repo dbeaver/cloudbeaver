@@ -71,7 +71,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.auth(true);
+    await this.auth(true, null, true);
   }
 
   register(): void {
@@ -87,7 +87,7 @@ export class AuthenticationService extends Bootstrap {
         return;
       }
 
-      await this.auth(false);
+      await this.auth(false, null, true);
     });
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }

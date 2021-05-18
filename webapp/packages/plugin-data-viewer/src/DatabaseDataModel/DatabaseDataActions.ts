@@ -50,11 +50,17 @@ implements IDatabaseDataActions<TOptions, TResult> {
   }
 
   updateResults(results: TResult[]): void {
-    const keys = Array.from(this.actions.keys());
+    const actionsMap = Array.from(this.actions.entries());
 
-    for (const key of keys) {
-      if (!results.some(result => result.id === key)) {
+    for (const [key, actions] of actionsMap) {
+      const result = results.find(result => result.id === key);
+
+      if (!result) {
         this.actions.delete(key);
+      } else {
+        for (const action of actions.values()) {
+          action.updateResult(result);
+        }
       }
     }
   }

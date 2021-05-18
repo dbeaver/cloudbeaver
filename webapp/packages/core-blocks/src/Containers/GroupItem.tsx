@@ -6,16 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { filterLayoutFakeProps } from './filterLayoutFakeProps';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
-interface Props extends ILayoutSizeProps {
-  className?: string;
-}
-
-export const GroupItem: React.FC<Props> = function GroupItem({ children, className }) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
+export const GroupItem: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLDivElement>> = function GroupItem(props) {
+  const divProps = filterLayoutFakeProps(props);
+  return <div {...divProps} />;
 };

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runInAction } from 'mobx';
+
 import {
   ConnectionAuthService, Connection, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
@@ -16,7 +18,7 @@ import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
 import {
-  GraphQLService, resourceKeyList, ResourceKey, ResourceKeyUtils
+  resourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
@@ -92,7 +94,6 @@ export class NavNodeManagerService extends Bootstrap {
   readonly navigator: IExecutor<INodeNavigationData>;
 
   constructor(
-    private graphQLService: GraphQLService,
     private permissionsService: PermissionsService,
     readonly connectionInfo: ConnectionInfoResource,
     readonly navTree: NavTreeResource,
@@ -116,8 +117,6 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   register(): void {
-    // this.sessionDataResource.onDataUpdate.addHandler(this.refreshRoot.bind(this));
-    // this.connectionInfo.onSessionUpdate.addHandler(this.connectionRefreshHandler.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
     this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
     this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
@@ -135,15 +134,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async refreshTree(navNodeId: string): Promise<void> {
-    await this.graphQLService.sdk.navRefreshNode({
-      nodePath: navNodeId,
-    });
-    this.markTreeOutdated(navNodeId);
-    await this.navTree.refresh(navNodeId);
-  }
-
-  markTreeOutdated(navNodeId: ResourceKey<string>): void {
-    this.navTree.markOutdated(resourceKeyList(this.navTree.getNestedChildren(navNodeId)));
+    await this.navTree.refreshTree(navNodeId);
   }
 
   getTree(navNodeId: string): string[] | undefined
@@ -151,14 +142,14 @@ export class NavNodeManagerService extends Bootstrap {
   getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>
   getTree(navNodeId: string | NavNodeKey | NavNodeKey[]): string[] | undefined | Array<string[] | undefined> {
     if (typeof navNodeId === 'string') {
-      return this.navTree.data.get(navNodeId);
+      return this.navTree.get(navNodeId);
     }
 
     if (Array.isArray(navNodeId)) {
       return navNodeId.map(node => this.navTree.data.get(node.nodeId));
     }
 
-    return this.navTree.data.get(navNodeId.nodeId);
+    return this.navTree.get(navNodeId.nodeId);
   }
 
   loadTree(navNodeId: string): Promise<string[]> {
@@ -167,10 +158,6 @@ export class NavNodeManagerService extends Bootstrap {
 
   removeTree(path = ROOT_NODE_PATH): void {
     this.navTree.delete(path);
-  }
-
-  async refreshNode(navNodeId: string): Promise<void> {
-    await this.navNodeInfoResource.refresh(navNodeId);
   }
 
   getNode(navNodeId: string): NavNode | undefined
@@ -329,22 +316,6 @@ export class NavNodeManagerService extends Bootstrap {
     };
   };
 
-  async updateRoot(): Promise<void> {
-    const enabled = await this.isNavTreeEnabled();
-    if (enabled) {
-      await this.navTree.refresh(ROOT_NODE_PATH);
-    }
-  }
-
-  async refreshRoot(): Promise<void> {
-    this.navTree.delete(ROOT_NODE_PATH);
-    const enabled = await this.isNavTreeEnabled();
-    if (enabled) {
-      // this.navTree.markOutdated(ROOT_NODE_PATH);
-      await this.navTree.refresh(ROOT_NODE_PATH);
-    }
-  }
-
   private async connectionCreateHandler(connection: Connection) {
     const enabled = await this.isNavTreeEnabled();
     if (!enabled) {
@@ -352,23 +323,13 @@ export class NavNodeManagerService extends Bootstrap {
     }
 
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-    this.markTreeOutdated(nodeId);
+    this.navTree.markTreeOutdated(nodeId);
 
     const tree = await this.navTree.load(ROOT_NODE_PATH);
 
     if (!tree.includes(nodeId)) {
       await this.navTree.refresh(ROOT_NODE_PATH);
     }
-  }
-
-  private async connectionRefreshHandler(connections: Connection[]) {
-    const enabled = await this.isNavTreeEnabled();
-    if (!enabled) {
-      return;
-    }
-
-    // this.navTree.markOutdated(ROOT_NODE_PATH);
-    await this.navTree.refresh(ROOT_NODE_PATH);
   }
 
   private async connectionUpdateHandler(key: ResourceKey<string>) {
@@ -380,35 +341,40 @@ export class NavNodeManagerService extends Bootstrap {
     // const count = ResourceKeyUtils.count(key);
 
     await this.navTree.load(ROOT_NODE_PATH);
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-      this.markTreeOutdated(nodeId);
 
-      // addOpenedConnection
-      const connectionInfo = this.connectionInfo.get(key);
+    runInAction(() => {
+      ResourceKeyUtils.forEach(key, async key => {
+        const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+        this.navTree.markTreeOutdated(nodeId);
 
-      if (!connectionInfo?.connected) {
-        this.removeTree(nodeId);
-      }
+        if (this.navTree.has(nodeId)) {
+          const connectionInfo = this.connectionInfo.get(key);
 
-      // if (count > 1) {
-      this.navNodeInfoResource.markOutdated(nodeId);
+          if (!connectionInfo?.connected) {
+            this.removeTree(nodeId);
+          }
+        }
+
+        // if (count > 1) {
+        this.navNodeInfoResource.markOutdated(nodeId);
       // } else {
       // await this.navNodeInfoResource.refresh(nodeId);
       // }
+      });
     });
   }
 
-  private async connectionRemoveHandler(key: ResourceKey<string>) {
-    ResourceKeyUtils.forEach(key, key => {
-    // deleteConnection
-      const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
+  private connectionRemoveHandler(key: ResourceKey<string>) {
+    runInAction(() => {
+      ResourceKeyUtils.forEach(key, key => {
+        const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
 
-      const node = this.getNode(navNodeId);
-      if (!node) {
-        return;
-      }
-      this.navTree.deleteInNode(node.parentId, [navNodeId]);
+        const node = this.getNode(navNodeId);
+        if (!node) {
+          return;
+        }
+        this.navTree.deleteInNode(node.parentId, [navNodeId]);
+      });
     });
   }
 

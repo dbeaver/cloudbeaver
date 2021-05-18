@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
@@ -102,13 +102,15 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
           ...this.getIncludesMap(),
         });
 
+        runInAction(() => {
+          const unrestoredConnectionIdList = Array.from(this.data.values())
+            .map(connection => connection.id)
+            .filter(connectionId => !connections.some(connection => connection.id === connectionId));
+
+          this.delete(resourceKeyList(unrestoredConnectionIdList));
+        });
+
         await this.addList(connections);
-
-        const unrestoredConnectionIdList = Array.from(this.data.values())
-          .map(connection => connection.id)
-          .filter(connectionId => !connections.some(connection => connection.id === connectionId));
-
-        this.delete(resourceKeyList(unrestoredConnectionIdList));
 
         await this.onSessionUpdate.execute(connections);
       });

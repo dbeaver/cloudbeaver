@@ -29,7 +29,6 @@ function getClasses(rawValue: any) {
 
 export const CellFormatter: React.FC<FormatterProps> = observer(function CellFormatter({ rowIdx, row, column, isCellSelected }) {
   const editorRef = useRef<IEditorRef>(null);
-  const cellRef = useRef<HTMLDivElement>(null);
   const cellContext = useContext(CellContext);
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
@@ -66,7 +65,7 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
 
   return styled()(
     <>
-      <cell-formatter ref={cellRef} title={value} className={`cell-formatter ${classes}`}>
+      <cell-formatter title={value} className={`cell-formatter ${classes}`}>
         {value}
       </cell-formatter>
       {(isCellSelected || cellContext?.mouse.state.mouseEnter) && context && (

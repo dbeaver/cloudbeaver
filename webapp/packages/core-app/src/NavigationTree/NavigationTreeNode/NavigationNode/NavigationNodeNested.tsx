@@ -11,57 +11,49 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import styled from 'reshadow';
 
-import { TreeNodeContext, TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { TreeNodeNested, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
-import { useChildren } from '../../../shared/useChildren';
+import { TreeContext } from '../../TreeContext';
 
 interface Props {
   nodeId: string;
   component: React.FC<{
     nodeId: string;
   }>;
-}
-
-function isDefined<T>(val: T | undefined | null): val is T {
-  return val !== undefined && val !== null;
+  root?: boolean;
 }
 
 export const NavigationNodeNested: React.FC<Props> = observer(function NavigationNodeNested({
   nodeId,
   component,
+  root,
 }) {
   const styles = useStyles(TREE_NODE_STYLES);
-  const context = useContext(TreeNodeContext);
-  const navNodeInfo = useService(NavNodeInfoResource);
-  const childrenInfo = useChildren(nodeId);
+  const treeContext = useContext(TreeContext);
 
-  const children = useMemo(() => computed(() => {
-    if (!childrenInfo?.children) {
-      return [];
-    }
+  const children = useMemo(
+    () => computed(() => treeContext?.tree.getNodeChildren(nodeId) || []),
+    [nodeId, treeContext?.tree]
+  ).get();
 
-    const childrenEntities = navNodeInfo.get(resourceKeyList(childrenInfo.children)).filter(isDefined);
-
-    if (!context?.filterValue) {
-      return childrenEntities;
-    }
-
-    return childrenEntities.filter(child => child.name?.toLowerCase().includes(context.filterValue.toLowerCase()));
-  }), [childrenInfo.children, context?.filterValue, navNodeInfo]).get();
-
-  if (!children.length || !context?.expanded) {
+  if (children.length === 0) {
     return null;
   }
 
   const NavigationNode = component;
 
+  if (root) {
+    return styled(styles)(
+      <>
+        {children.map(child => <NavigationNode key={child} nodeId={child} />)}
+      </>
+    );
+  }
+
   return styled(styles)(
     <TreeNodeNested>
-      {children.map(child => <NavigationNode key={child.id} nodeId={child.id} />)}
+      {children.map(child => <NavigationNode key={child} nodeId={child} />)}
     </TreeNodeNested>
   );
 });

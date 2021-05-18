@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
@@ -56,7 +57,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
+export const TreeNodeFilter: React.FC<Props> = observer(function TreeNodeFilter({
   disabled,
   className,
 }) {
@@ -99,10 +100,10 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
     }
   }, [filterEnabled]);
 
-  useEffect(() => () => context.filter(''), []);
+  useEffect(() => () => { context.filter(''); }, []);
 
   return styled(useStyles(styles))(
-    <filter-container as='div' className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
+    <filter-container className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
       <InputFieldNew
         ref={inputRef}
         style={innerInputStyle}
@@ -115,4 +116,4 @@ export const TreeNodeFilter: React.FC<Props> = function TreeNodeFilter({
       <IconButton name='search' disabled={disabled} onClick={onFilterEnabledChange} {...use({ filterEnabled })} />
     </filter-container>
   );
-};
+});
