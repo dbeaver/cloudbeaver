@@ -15,7 +15,7 @@ import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { getNextSortMode, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
+import { ESortMode, getNextSortMode, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
@@ -136,17 +136,17 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   };
 
   return styled(headerStyles)(
-    <table-header as="div" onClick={handleColumnSelection}>
-      <shrink-container as='div' title={columnTooltip}>
-        <icon as="div">
+    <table-header onClick={handleColumnSelection}>
+      <shrink-container title={columnTooltip}>
+        <icon>
           <StaticImage icon={column?.icon} />
         </icon>
-        <name as="div">{columnName}</name>
+        <name>{columnName}</name>
       </shrink-container>
       {sortable && (
-        <sort-icons title={translate('data_grid_table_tooltip_column_header_sort')} as="div" onClick={handleSort} {...use({ disabled: loading })}>
-          <SortIcon active={currentSortMode === 'asc'} />
-          <SortIcon active={currentSortMode === 'desc'} />
+        <sort-icons title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
+          <SortIcon active={currentSortMode === ESortMode.asc} />
+          <SortIcon active={currentSortMode === ESortMode.desc} />
         </sort-icons>
       )}
     </table-header>

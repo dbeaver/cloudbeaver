@@ -16,7 +16,7 @@ import type { IMenuContext } from './IMenuContext';
  */
 export interface IContextMenuItem<T> extends IMenuItemOptions {
   onClick?: (context: IMenuContext<T>) => void;
-  titleGetter?: (context: IMenuContext<T>) => TLocalizationToken;
+  titleGetter?: (context: IMenuContext<T>) => TLocalizationToken | undefined;
   // if isPresent is false menu item will not be included in resulting context menu
   isPresent: (context: IMenuContext<T>) => boolean;
   isDisabled?: (context: IMenuContext<T>) => boolean;

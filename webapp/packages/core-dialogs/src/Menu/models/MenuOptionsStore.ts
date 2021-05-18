@@ -9,7 +9,6 @@
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
-import type { IMenuContext } from '../ContextMenu/IMenuContext';
 import type { IMenuPanel } from '../IMenuPanel';
 
 const DEFAULT_ITEM_ORDER = 100;
@@ -19,7 +18,7 @@ export interface IMenuItemOptions {
   id: string;
   // set title or getter
   title?: TLocalizationToken;
-  titleGetter?: (...args: any[]) => TLocalizationToken;
+  titleGetter?: (...args: any[]) => TLocalizationToken | undefined;
   // set icon or getter
   icon?: string;
   iconGetter?: () => string | undefined;
