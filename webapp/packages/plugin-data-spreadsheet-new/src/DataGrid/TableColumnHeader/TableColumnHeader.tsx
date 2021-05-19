@@ -136,7 +136,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   };
 
   return styled(headerStyles)(
-    <table-header onClick={handleColumnSelection}>
+    <table-header as='div' onClick={handleColumnSelection}>
       <shrink-container title={columnTooltip}>
         <icon>
           <StaticImage icon={column?.icon} />
@@ -144,7 +144,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
         <name>{columnName}</name>
       </shrink-container>
       {sortable && (
-        <sort-icons title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
+        <sort-icons as='div' title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
           <SortIcon active={currentSortMode === ESortMode.asc} />
           <SortIcon active={currentSortMode === ESortMode.desc} />
         </sort-icons>

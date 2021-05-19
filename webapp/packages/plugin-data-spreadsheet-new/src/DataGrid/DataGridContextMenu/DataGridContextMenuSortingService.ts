@@ -7,45 +7,22 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
-import { IDatabaseDataModel, ResultSetDataAction, ESortMode, getNextSortMode, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
+import { ContextMenuService } from '@cloudbeaver/core-dialogs';
+import { ESortMode, getNextSortMode, IDatabaseDataModel, ResultSetDataAction, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
 
-export interface IDataGridCellMenuContext {
-  model: IDatabaseDataModel<any>;
-  resultIndex: number;
-  row: number;
-  column: number;
-}
+import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
-export class DataGridContextMenuService {
-  static cellContext = 'data-grid-cell-context-menu';
-  private static menuToken = 'dataGridCell';
+export class DataGridContextMenuSortingService {
   private static menuSortingToken = 'menuSorting';
 
   constructor(
+    private dataGridContextMenuService: DataGridContextMenuService,
     private contextMenuService: ContextMenuService,
   ) { }
 
-  getMenuToken(): string {
-    return DataGridContextMenuService.menuToken;
-  }
-
   getMenuSortingToken(): string {
-    return DataGridContextMenuService.menuSortingToken;
-  }
-
-  constructMenuWithContext(
-    model: IDatabaseDataModel<any>,
-    resultIndex: number,
-    row: number,
-    column: number
-  ): IMenuPanel {
-    return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>({
-      menuId: this.getMenuToken(),
-      contextType: DataGridContextMenuService.cellContext,
-      data: { model, resultIndex, row, column },
-    });
+    return DataGridContextMenuSortingService.menuSortingToken;
   }
 
   private getColumnName(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
@@ -73,8 +50,8 @@ export class DataGridContextMenuService {
     return sorting.getSortMode(columnName);
   }
 
-  register() {
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
+  register(): void {
+    this.dataGridContextMenuService.add(
       this.contextMenuService.getRootMenuToken(),
       {
         id: this.getMenuSortingToken(),
@@ -87,7 +64,7 @@ export class DataGridContextMenuService {
         isPanel: true,
       }
     );
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
+    this.dataGridContextMenuService.add(
       this.getMenuSortingToken(),
       {
         id: 'asc',
@@ -104,12 +81,12 @@ export class DataGridContextMenuService {
           context.data.resultIndex,
           context.data.column) === ESortMode.asc,
         titleGetter: context => {
-          const columnName = this.getColumnName(context.data.model, context.data.resultIndex, context.data.column)!;
-          return `Order by ${columnName} ASC`;
+          const columnName = this.getColumnName(context.data.model, context.data.resultIndex, context.data.column);
+          return `Order by ${columnName || ''} ASC`;
         },
       }
     );
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
+    this.dataGridContextMenuService.add(
       this.getMenuSortingToken(),
       {
         id: 'desc',
@@ -126,12 +103,12 @@ export class DataGridContextMenuService {
           context.data.resultIndex,
           context.data.column) === ESortMode.desc,
         titleGetter: context => {
-          const columnName = this.getColumnName(context.data.model, context.data.resultIndex, context.data.column)!;
-          return `Order by ${columnName} DESC`;
+          const columnName = this.getColumnName(context.data.model, context.data.resultIndex, context.data.column);
+          return `Order by ${columnName || ''} DESC`;
         },
       }
     );
-    this.contextMenuService.addMenuItem<IDataGridCellMenuContext>(
+    this.dataGridContextMenuService.add(
       this.getMenuSortingToken(),
       {
         id: 'toggleSorting',

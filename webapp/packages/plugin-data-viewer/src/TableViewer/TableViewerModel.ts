@@ -12,8 +12,6 @@ import { Subject, Observable } from 'rxjs';
 import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { SortMode } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSortAction';
-import { ESortMode } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSortAction';
 import { DatabaseDataAccessMode } from '../DatabaseDataModel/IDatabaseDataSource';
 import type { RowDiff } from './TableDataModel/EditedRow';
 import type { TableColumn } from './TableDataModel/TableColumn';
@@ -28,6 +26,8 @@ export const fetchingSettings = {
 };
 
 export type AgGridRow = any[];
+
+type SortMode = 'asc' | 'desc' | null;
 
 export type SortModel = Array<{
   colId: string;
@@ -257,7 +257,7 @@ export class TableViewerModel {
   getSortModel(): SortModel {
     return Array.from(this.sortedColumns.values()).map(v => ({
       colId: v.attribute,
-      sort: v.orderAsc ? ESortMode.asc : ESortMode.desc,
+      sort: v.orderAsc ? 'asc' : 'desc',
     }));
   }
 

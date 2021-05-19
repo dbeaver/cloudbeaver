@@ -55,7 +55,7 @@ export class ResultSetSortAction extends DatabaseDataAction<IDatabaseDataOptions
 
   setSortMode(columnName: string, sortMode: SortMode, multiple: boolean): void {
     if (!this.source.options) {
-      return;
+      throw new Error('Options must be provided');
     }
 
     const resetSortMode = sortMode === null;
@@ -89,8 +89,7 @@ export class ResultSetSortAction extends DatabaseDataAction<IDatabaseDataOptions
       throw new Error('Options must be provided');
     }
 
-    const currentConstraints = this.source.options.constraints;
-    const currentConstraint = currentConstraints.find(constraint => constraint.attribute === columnName);
+    const currentConstraint = this.source.options.constraints.find(constraint => constraint.attribute === columnName);
 
     if (!currentConstraint) {
       return null;

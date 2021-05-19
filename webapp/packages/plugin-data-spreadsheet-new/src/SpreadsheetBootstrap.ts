@@ -11,7 +11,7 @@ import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGrid/DataGridContextMenuService';
+import { DataGridContextMenuSortingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSortingService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
@@ -20,7 +20,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
     private dataPresentationService: DataPresentationService,
     private dataGridSettingsService: DataGridSettingsService,
-    private dataGridContextMenuService: DataGridContextMenuService,
+    private dataGridContextMenuSortingService: DataGridContextMenuSortingService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -36,7 +36,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       title: 'Table',
       icon: '/icons/grid.png',
     });
-    this.dataGridContextMenuService.register();
+    this.dataGridContextMenuSortingService.register();
   }
 
   load(): void | Promise<void> { }

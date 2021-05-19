@@ -84,7 +84,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   onClick?: () => void;
   // set title or getter
   title?: TLocalizationToken;
-  titleGetter?: (context: IMenuContext<T>) => TLocalizationToken | undefined;
+  titleGetter?: () => TLocalizationToken | undefined;
   tooltip?: TLocalizationToken;
   tooltipGetter?: () => TLocalizationToken | undefined;
   isDisabled?: () => boolean;

@@ -16,7 +16,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from '../../DataGridContextMenuService';
+import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
 import { cellMenuStyles } from './cellMenuStyles';
 
 interface Props {
