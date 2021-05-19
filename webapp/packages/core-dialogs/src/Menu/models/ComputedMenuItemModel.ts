@@ -8,9 +8,9 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
+import type { IMenuItem, IMenuPanel } from '../IMenuPanel';
 import type { IMenuItemOptions, MenuItemType } from './MenuOptionsStore';
 
 export interface IComputedMenuItemOptions extends IMenuItemOptions {

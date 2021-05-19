@@ -7,6 +7,7 @@ export * from './Menu/IMenuPanel';
 export { MenuTrigger } from './Menu/MenuPanel/MenuTrigger';
 export * from './Menu/StaticMenu/StaticMenu';
 
+export * from './Menu/models/ComputedContextMenuModel';
 export * from './Menu/models/ComputedMenuItemModel';
 export * from './Menu/models/ComputedMenuPanelModel';
 

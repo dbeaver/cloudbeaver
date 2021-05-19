@@ -10,6 +10,7 @@ import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IMenuPanel } from '../IMenuPanel';
+import { ComputedContextMenuModel } from '../models/ComputedContextMenuModel';
 import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
 import { MenuItemType, MenuOptionsStore } from '../models/MenuOptionsStore';
 import type { IContextMenuItem } from './IContextMenuItem';
@@ -48,8 +49,14 @@ export class ContextMenu {
     const modelOptions = new ComputedMenuItemOptionsWithContext(params, context);
     const model = new ComputedMenuItemModel(modelOptions);
 
-    if (params.isPanel) {
+    if (params.isPanel && !params.panel) {
       model.panel = this.constructMenuPanelWithContext<T>(params.id, context);
+    } else if (params.panel instanceof ComputedContextMenuModel) {
+      const basePanel = params.panel;
+      model.panel = new ContextMenuPanel(
+        `${params.panel.id}-${context.contextId!}-panel`,
+        () => this.constructMenuItems(basePanel.options.menuItemsGetter(context), context),
+      );
     }
 
     return model;
