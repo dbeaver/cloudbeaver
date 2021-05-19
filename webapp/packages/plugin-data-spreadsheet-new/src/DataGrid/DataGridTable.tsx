@@ -23,8 +23,6 @@ import { reactGridStyles } from '../styles/styles';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
-import { DataGridSortingContext } from './DataGridSorting/DataGridSortingContext';
-import { useGridSortingContext } from './DataGridSorting/useGridSortingContext';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { RowRenderer } from './RowRenderer/RowRenderer';
 import { TableDataContext } from './TableDataContext';
@@ -54,7 +52,6 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const tableData = useTableData(model, resultIndex);
 
-  const gridSortingContext = useGridSortingContext(model);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
   const editingContext = useEditing({
     readonly: model.isReadonly(),
@@ -155,42 +152,40 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   return styled(styles)(
     <DataGridContext.Provider value={gridContext}>
-      <DataGridSortingContext.Provider value={gridSortingContext}>
-        <DataGridSelectionContext.Provider value={gridSelectionContext}>
-          <EditingContext.Provider value={editingContext}>
-            <TableDataContext.Provider value={tableData}>
-              <grid-container
-                ref={gridContainerRef}
-                as='div'
-                className="cb-react-grid-container"
-                tabIndex={-1}
-                onKeyDown={onKeydownHandler}
-                onMouseDown={onMouseDownHandler}
-                onMouseMove={onMouseMoveHandler}
-              >
-                <DataGrid
-                  ref={dataGridRef}
-                  className={`cb-react-grid-theme ${className}`}
-                  columns={tableData.columns}
-                  defaultColumnOptions={{
-                    minWidth: 40,
-                    resizable: true,
-                    formatter: CellFormatter,
-                  }}
-                  rows={tableData.rows}
-                  headerRowHeight={28}
-                  rowHeight={24}
-                  rowRenderer={RowRenderer}
-                  onSelectedCellChange={handleFocusChange}
-                  onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
-                  onScroll={handleScroll}
-                />
-                <div ref={editorRef} />
-              </grid-container>
-            </TableDataContext.Provider>
-          </EditingContext.Provider>
-        </DataGridSelectionContext.Provider>
-      </DataGridSortingContext.Provider>
+      <DataGridSelectionContext.Provider value={gridSelectionContext}>
+        <EditingContext.Provider value={editingContext}>
+          <TableDataContext.Provider value={tableData}>
+            <grid-container
+              ref={gridContainerRef}
+              as='div'
+              className="cb-react-grid-container"
+              tabIndex={-1}
+              onKeyDown={onKeydownHandler}
+              onMouseDown={onMouseDownHandler}
+              onMouseMove={onMouseMoveHandler}
+            >
+              <DataGrid
+                ref={dataGridRef}
+                className={`cb-react-grid-theme ${className}`}
+                columns={tableData.columns}
+                defaultColumnOptions={{
+                  minWidth: 60,
+                  resizable: true,
+                  formatter: CellFormatter,
+                }}
+                rows={tableData.rows}
+                headerRowHeight={28}
+                rowHeight={24}
+                rowRenderer={RowRenderer}
+                onSelectedCellChange={handleFocusChange}
+                onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
+                onScroll={handleScroll}
+              />
+              <div ref={editorRef} />
+            </grid-container>
+          </TableDataContext.Provider>
+        </EditingContext.Provider>
+      </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>
   );
 });

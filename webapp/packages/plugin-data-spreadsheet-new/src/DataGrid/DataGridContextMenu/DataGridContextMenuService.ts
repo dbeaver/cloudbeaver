@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IContextMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridCellMenuContext {
@@ -23,7 +23,7 @@ export class DataGridContextMenuService {
   private static menuToken = 'dataGridCell';
 
   constructor(
-    private contextMenuService: ContextMenuService
+    private contextMenuService: ContextMenuService,
   ) { }
 
   getMenuToken(): string {
@@ -41,6 +41,10 @@ export class DataGridContextMenuService {
       contextType: DataGridContextMenuService.cellContext,
       data: { model, resultIndex, row, column },
     });
+  }
+
+  add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {
+    this.contextMenuService.addMenuItem(panelId, menuItem);
   }
 
   register(): void { }

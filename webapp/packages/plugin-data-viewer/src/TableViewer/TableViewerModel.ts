@@ -27,7 +27,7 @@ export const fetchingSettings = {
 
 export type AgGridRow = any[];
 
-export type SortMode = 'asc' | 'desc' | null;
+type SortMode = 'asc' | 'desc' | null;
 
 export type SortModel = Array<{
   colId: string;

@@ -38,6 +38,7 @@ export const menuPanelStyles = composes(
       & box {
         display: flex;
         align-items: center;
+        flex: 1;
         height: inherit;
       }
     }
@@ -110,6 +111,7 @@ export const menuPanelStyles = composes(
       & IconOrImage {
         width: 16px;
         height: 16px;
+        object-fit: contain;
       }
     }
   `

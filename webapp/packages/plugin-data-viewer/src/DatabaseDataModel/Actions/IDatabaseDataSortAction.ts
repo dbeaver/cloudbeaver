@@ -6,14 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-import type { IResultSetElementKey } from './ResultSet/IResultSetElementKey';
+import type { SortMode } from './ResultSet/ResultSetSortAction';
 
-export interface IDatabaseResultDataAction<TKey, TResult extends IDatabaseDataResult>
+export interface IDatabaseDataSortAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  getCellValue: (cell: IResultSetElementKey) => any;
-  getColumn: (columnIndex: number) => SqlResultColumn | undefined;
+  setSortMode: (columnName: string, sortMode: SortMode, multiple: boolean) => void;
+  getSortMode: (columnName: string) => SortMode;
 }

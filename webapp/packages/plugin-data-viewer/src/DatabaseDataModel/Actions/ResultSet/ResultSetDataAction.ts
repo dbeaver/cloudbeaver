@@ -18,4 +18,12 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
 
     return this.result.data.rows[cell.row][cell.column];
   }
+
+  getColumn(columnIndex: number) {
+    if (!this.result.data?.columns) {
+      return undefined;
+    }
+
+    return this.result.data.columns[columnIndex];
+  }
 }

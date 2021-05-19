@@ -15,11 +15,10 @@ import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
-import type { SortMode } from '@cloudbeaver/plugin-data-viewer';
+import { ESortMode, getNextSortMode, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { DataGridSortingContext } from '../DataGridSorting/DataGridSortingContext';
 
 const headerStyles = css`
   table-header {
@@ -102,15 +101,15 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   column: calculatedColumn,
 }) {
   const dataGridContext = useContext(DataGridContext);
-  const gridSortingContext = useContext(DataGridSortingContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
   const translate = useTranslate();
 
-  if (!dataGridContext || !gridSortingContext || !gridSelectionContext) {
-    throw new Error('One of the following contexts are missed(data grid context, grid sorting context, grid selection context)');
+  if (!dataGridContext || !gridSelectionContext) {
+    throw new Error('One of the following contexts are missed(data grid context, grid selection context)');
   }
 
   const model = dataGridContext.model;
+  const sorting = model.source.getAction(dataGridContext.resultIndex, ResultSetSortAction);
   const columnName = calculatedColumn.name as string;
   const column = getColumn(Number(calculatedColumn.key), model.getResult(dataGridContext.resultIndex)?.data);
 
@@ -118,7 +117,8 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 
   // TODO we want to get "sortable" property from SqlResultColumn data
   const sortable = model.source.results.length === 1;
-  const currentSortMode = gridSortingContext.getSortMode(columnName);
+  const currentSortMode = sorting.getSortMode(columnName);
+
   const columnTooltip = columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '');
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -126,19 +126,9 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
     if (loading) {
       return;
     }
-
-    let nextSort: SortMode;
-    switch (currentSortMode) {
-      case 'asc':
-        nextSort = 'desc';
-        break;
-      case 'desc':
-        nextSort = null;
-        break;
-      default:
-        nextSort = 'asc';
-    }
-    gridSortingContext.setSortMode(columnName, nextSort, e.ctrlKey || e.metaKey);
+    const nextSortMode = getNextSortMode(sorting.getSortMode(columnName));
+    sorting.setSortMode(columnName, nextSortMode, e.ctrlKey || e.metaKey);
+    model.refresh();
   };
 
   const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -146,17 +136,17 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   };
 
   return styled(headerStyles)(
-    <table-header as="div" onClick={handleColumnSelection}>
-      <shrink-container as='div' title={columnTooltip}>
-        <icon as="div">
+    <table-header as='div' onClick={handleColumnSelection}>
+      <shrink-container title={columnTooltip}>
+        <icon>
           <StaticImage icon={column?.icon} />
         </icon>
-        <name as="div">{columnName}</name>
+        <name>{columnName}</name>
       </shrink-container>
       {sortable && (
-        <sort-icons title={translate('data_grid_table_tooltip_column_header_sort')} as="div" onClick={handleSort} {...use({ disabled: loading })}>
-          <SortIcon active={currentSortMode === 'asc'} />
-          <SortIcon active={currentSortMode === 'desc'} />
+        <sort-icons as='div' title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
+          <SortIcon active={currentSortMode === ESortMode.asc} />
+          <SortIcon active={currentSortMode === ESortMode.desc} />
         </sort-icons>
       )}
     </table-header>

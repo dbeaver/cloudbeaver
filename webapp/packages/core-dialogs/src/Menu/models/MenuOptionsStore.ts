@@ -18,7 +18,7 @@ export interface IMenuItemOptions {
   id: string;
   // set title or getter
   title?: TLocalizationToken;
-  titleGetter?: () => TLocalizationToken | undefined;
+  titleGetter?: (...args: any[]) => TLocalizationToken | undefined;
   // set icon or getter
   icon?: string;
   iconGetter?: () => string | undefined;

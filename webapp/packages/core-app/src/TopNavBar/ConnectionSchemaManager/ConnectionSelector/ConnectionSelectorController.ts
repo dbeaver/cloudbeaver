@@ -75,14 +75,14 @@ export class ConnectionSelectorController {
       || this.getObjectContainerItems().length === 0;
   }
 
-  private get currentConnectionTitle(): string | undefined {
+  private get currentConnectionTitle(): string {
     if (this.currentConnection) {
       return this.currentConnection.name;
     }
     return 'app_topnavbar_connection_schema_manager_not_selected';
   }
 
-  private get currentObjectContainerTitle(): string | undefined {
+  private get currentObjectContainerTitle(): string {
     const value = NodeManagerUtils.concatSchemaAndCatalog(
       this.connectionSelectorService.currentObjectCatalogId,
       this.connectionSelectorService.currentObjectSchemaId
@@ -97,7 +97,7 @@ export class ConnectionSelectorController {
 
   private get currentObjectContainerIcon(): string {
     if (this.connectionSelectorService.currentObjectSchema?.features?.includes(EObjectFeature.schema)) {
-    // TODO move such kind of icon paths to a set of constants
+      // TODO move such kind of icon paths to a set of constants
       return 'schema_system';
     }
     if (this.connectionSelectorService.currentObjectCatalog?.features?.includes(EObjectFeature.catalog)) {
