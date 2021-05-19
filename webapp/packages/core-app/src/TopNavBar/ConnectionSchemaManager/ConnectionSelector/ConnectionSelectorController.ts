@@ -20,7 +20,6 @@ import { ComputedMenuItemModel, ComputedMenuPanelModel, IMenuItem } from '@cloud
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
-import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { ConnectionSchemaManagerService } from '../ConnectionSchemaManagerService';
 
@@ -112,7 +111,6 @@ export class ConnectionSelectorController {
     private connectionInfo: ConnectionInfoResource,
     private connectionsManagerService: ConnectionsManagerService,
     private optionsPanelService: OptionsPanelService,
-    private navNodeInfoResource: NavNodeInfoResource,
   ) {
     makeObservable<ConnectionSelectorController, 'currentObjectContainerIcon'>(this, {
       currentConnection: computed,
