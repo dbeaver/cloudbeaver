@@ -19,6 +19,7 @@ export class OptionsPanelService {
   readonly closeTask: IExecutor;
 
   panelComponent: (() => React.FC) | null;
+  private basePanelComponent: (() => React.FC) | null;
 
   constructor(
     private navigationService: NavigationService
@@ -29,8 +30,13 @@ export class OptionsPanelService {
     });
     this.active = false;
     this.panelComponent = null;
+    this.basePanelComponent = null;
     this.closeTask = new Executor();
     this.navigationService.navigationTask.addHandler(this.navigationHandler);
+  }
+
+  isOpen(component: () => React.FC): boolean {
+    return this.basePanelComponent === component;
   }
 
   getPanelComponent(): React.FC {
@@ -46,6 +52,7 @@ export class OptionsPanelService {
     }
 
     this.panelComponent = component;
+    this.basePanelComponent = component;
     this.active = true;
     return true;
   }
@@ -64,6 +71,7 @@ export class OptionsPanelService {
     }
 
     this.panelComponent = null;
+    this.basePanelComponent = null;
     this.active = false;
     return true;
   }
