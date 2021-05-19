@@ -97,7 +97,7 @@ export class PublicConnectionFormService {
   private closeHandler: IExecutorHandler<any> = async (data, contexts) => {
     if (
       !this.formState
-      || this.optionsPanelService.panelComponent !== formGetter
+      || !this.optionsPanelService.isOpen(formGetter)
       || (
         this.formState.config.connectionId
         && !this.connectionInfoResource.has(this.formState.config.connectionId)
