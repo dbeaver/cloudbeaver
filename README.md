@@ -22,6 +22,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 21.0.2 - 2021-05-20
+
+- User's and shared connections are divided to different groups in the navigation tree.
+- New design for authentication and driver properties dialogs was applied. 
+- Management for administrators' accounts was improved.
+- Minor UI fixes and improvements.
+
 ### CloudBeaver 21.0.1 - 2021-04-28
 
 - Database logos were added to the top menu selector.
