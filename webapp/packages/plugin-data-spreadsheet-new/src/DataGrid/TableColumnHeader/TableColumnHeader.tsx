@@ -117,17 +117,17 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
 
   // TODO we want to get "sortable" property from SqlResultColumn data
   const sortable = model.source.results.length === 1;
-  const currentSortMode = sorting.getSortMode(columnName);
+  const currentSortMode = sorting.getSortMode(column?.name || '');
 
   const columnTooltip = columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '');
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (loading) {
+    if (loading || !column?.name) {
       return;
     }
-    const nextSortMode = getNextSortMode(sorting.getSortMode(columnName));
-    sorting.setSortMode(columnName, nextSortMode, e.ctrlKey || e.metaKey);
+    const nextSortMode = getNextSortMode(sorting.getSortMode(column.name));
+    sorting.setSortMode(column.name, nextSortMode, e.ctrlKey || e.metaKey);
     model.refresh();
   };
 

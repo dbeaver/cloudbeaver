@@ -53,6 +53,24 @@ export class ResultSetSortAction extends DatabaseDataAction<IDatabaseDataOptions
       .map((constaint, idx) => ({ ...constaint, orderPosition: idx }));
   }
 
+  getSortingConstraints() {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    return this.source.options.constraints
+      .filter(constraint => constraint.orderAsc !== undefined);
+  }
+
+  removeSortingConstraints() {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    this.source.options.constraints = this.source.options.constraints
+      .filter(constaint => constaint.orderAsc === undefined);
+  }
+
   setSortMode(columnName: string, sortMode: SortMode, multiple: boolean): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
