@@ -11,11 +11,10 @@ import { useContext } from 'react';
 import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css, use } from 'reshadow';
 
-import { StaticImage, Icon } from '@cloudbeaver/core-blocks';
+import { StaticImage, IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
-import { ESortMode, getNextSortMode, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
+import { ESortMode, getNextSortMode, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
@@ -45,7 +44,6 @@ const headerStyles = css`
     font-weight: 400;
     flex-grow: 1;
   }
-  
   sort-icons {
     margin-left: 4px;
     display: flex;
@@ -57,13 +55,8 @@ const headerStyles = css`
     box-sizing: border-box;
     cursor: pointer;
   }
-
   sort-icons > SortIcon {
     width: 8px;
-    fill: currentColor !important;
-  }
-  sort-icons > SortIcon:last-child {
-    transform: scaleY(-1);
   }
   sort-icons:hover > SortIcon {
     width: 9px;
@@ -73,23 +66,18 @@ const headerStyles = css`
     cursor: default;
   }
 `;
-
-const activeSortIcon = composes(
-  css`
-    Icon {
-      composes: theme-text-primary from global;
-    }
-  `
-);
-
 interface ISortIconProps {
-  active: boolean;
+  sortMode: SortMode;
   className?: string;
 }
 
-const SortIcon: React.FC<ISortIconProps> = function SortIcon({ active, className }) {
-  return styled(useStyles(active && activeSortIcon))(
-    <Icon name="sort-arrow" viewBox="0 0 6 6" className={className} />
+const SortIcon: React.FC<ISortIconProps> = function SortIcon({ sortMode, className }) {
+  return (
+    <>
+      {sortMode === ESortMode.asc && <IconOrImage icon="/icons/sort_increase.png" className={className} />}
+      {sortMode === ESortMode.desc && <IconOrImage icon="/icons/sort_decrease.png" className={className} />}
+      {sortMode === null && <IconOrImage icon="/icons/sort_unknown.png" className={className} />}
+    </>
   );
 };
 
@@ -145,8 +133,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
       </shrink-container>
       {sortable && (
         <sort-icons as='div' title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
-          <SortIcon active={currentSortMode === ESortMode.asc} />
-          <SortIcon active={currentSortMode === ESortMode.desc} />
+          <SortIcon sortMode={currentSortMode} />
         </sort-icons>
       )}
     </table-header>
