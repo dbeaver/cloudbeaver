@@ -12,7 +12,7 @@ import { IMenuContext, CommonDialogService, ContextMenuService } from '@cloudbea
 import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
-import { DataExportMenuSettingsService } from './DataExportMenuSettingsService';
+import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
 @injectable()
@@ -21,7 +21,7 @@ export class DataExportMenuService {
     private commonDialogService: CommonDialogService,
     private tableFooterMenuService: TableFooterMenuService,
     private contextMenuService: ContextMenuService,
-    private dataExportMenuSettingsService: DataExportMenuSettingsService,
+    private dataExportSettingsService: DataExportSettingsService,
   ) { }
 
   register(): void {
@@ -30,7 +30,7 @@ export class DataExportMenuService {
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
-      isHidden: () => this.dataExportMenuSettingsService.settings.getValue('disabled'),
+      isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
       isDisabled(context) {
         return context.data.model.isLoading()
           || context.data.model.isDisabled(context.data.resultIndex)

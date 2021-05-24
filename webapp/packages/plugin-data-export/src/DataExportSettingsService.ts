@@ -13,10 +13,10 @@ const defaultSettings = {
   disabled: false,
 };
 
-export type DataExportMenuSettings = typeof defaultSettings;
+export type DataExportSettings = typeof defaultSettings;
 
 @injectable()
-export class DataExportMenuSettingsService {
+export class DataExportSettingsService {
   readonly settings = this.pluginManagerService.getPluginSettings('plugin_data_export', defaultSettings);
 
   constructor(private pluginManagerService: PluginManagerService) { }

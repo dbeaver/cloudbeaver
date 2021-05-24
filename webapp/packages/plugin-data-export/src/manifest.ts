@@ -10,9 +10,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { Bootstrap } from './Bootstrap';
 import { DataExportMenuService } from './DataExportMenuService';
-import { DataExportMenuSettingsService } from './DataExportMenuSettingsService';
 import { DataExportProcessService } from './DataExportProcessService';
 import { DataExportService } from './DataExportService';
+import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
 import { LocaleService } from './LocaleService';
 
@@ -24,7 +24,7 @@ export const manifest: PluginManifest = {
   providers: [
     Bootstrap,
     DataExportMenuService,
-    DataExportMenuSettingsService,
+    DataExportSettingsService,
     DataExportService,
     DataExportProcessService,
     DataTransferProcessorsResource,
