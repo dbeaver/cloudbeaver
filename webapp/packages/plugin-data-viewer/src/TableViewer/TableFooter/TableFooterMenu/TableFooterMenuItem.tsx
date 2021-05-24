@@ -35,6 +35,9 @@ export const tableFooterMenuStyles = composes(
       display: flex;
       align-items: center;
       cursor: pointer;
+      &[|hidden] {
+        display: none;
+      }
     }
     ToolsAction[|hidden] {
       display: none;
@@ -78,6 +81,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   return styled(styles)(
     <MenuTrigger
       {...props}
+      {...use({ hidden: menuItem.isHidden })}
       title={translate(menuItem.tooltip)}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
