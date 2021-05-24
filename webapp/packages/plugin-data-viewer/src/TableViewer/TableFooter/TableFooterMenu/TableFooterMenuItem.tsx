@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { IconOrImage, ToolsAction } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
@@ -36,6 +36,9 @@ export const tableFooterMenuStyles = composes(
       align-items: center;
       cursor: pointer;
     }
+    ToolsAction[|hidden] {
+      display: none;
+    }
     menu-trigger-icon IconOrImage {
       display: block;
       width: 24px;
@@ -57,15 +60,17 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
   const styles = useStyles(tableFooterMenuStyles);
 
   if (!menuItem.panel) {
-    return (
+    return styled(styles)(
       <ToolsAction
         {...props}
+        {...use({ hidden: menuItem.isHidden })}
         title={translate(menuItem.tooltip)}
         icon={menuItem.icon}
         viewBox="0 0 32 32"
         disabled={menuItem.isDisabled}
         onClick={() => menuItem.onClick?.()}
-      >{translate(menuItem.title)}
+      >
+        {translate(menuItem.title)}
       </ToolsAction>
     );
   }

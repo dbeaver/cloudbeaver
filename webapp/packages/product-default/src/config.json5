@@ -21,6 +21,9 @@
     plugin_data_spreadsheet_new: {
         hidden: false
     },
+    plugin_data_export: {
+        disabled: false
+    },
     // Notifications config
     core_events: {
         notificationsPool: 5
