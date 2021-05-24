@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.utils.CommonUtils;
@@ -473,7 +474,8 @@ public class WebSQLProcessor {
 
 
     private void fillQueryResults(
-        @NotNull WebSQLContextInfo contextInfo, @NotNull DBSDataContainer dataContainer,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull DBSDataContainer dataContainer,
         @NotNull DBCStatement dbStat,
         boolean hasResultSet,
         @NotNull WebSQLExecuteInfo executeInfo,
@@ -505,6 +507,12 @@ public class WebSQLProcessor {
         }
 
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
+
+        if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
+            StringBuilder where = new StringBuilder();
+            SQLUtils.appendConditionString(filter.makeDataFilter(), dbStat.getSession().getDataSource(), null, where, true);
+            executeInfo.setFilterText(where.toString());
+        }
     }
 
     private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebSQLQueryDataReceiver dataReceiver) throws DBCException {

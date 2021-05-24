@@ -38,7 +38,7 @@ public class WebSQLDataFilter {
     private int offset;
     private int limit ;
     private String where;
-    private List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
+    private final List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
 
     public WebSQLDataFilter() {
         this.offset = 0;
@@ -83,6 +83,10 @@ public class WebSQLDataFilter {
 
     public List<WebSQLDataFilterConstraint> getConstraints() {
         return constraints;
+    }
+
+    public String getWhere() {
+        return where;
     }
 
     public DBDDataFilter makeDataFilter() {

@@ -115,8 +115,13 @@ type SQLQueryResults {
 
 type SQLExecuteInfo {
 
+    # Status message
     statusMessage: String
-    duration: Int
+    # Execute time (ms)
+    duration: Int!
+    # Actual conditions applied to query
+    filterText: String
+    # Results
     results: [ SQLQueryResults! ]!
 }
 
