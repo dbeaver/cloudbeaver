@@ -9,15 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import type { HeaderRendererProps } from 'react-data-grid';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { StaticImage, IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import type { SqlResultSet } from '@cloudbeaver/core-sdk';
-import { ESortMode, getNextSortMode, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
+import { StaticImage } from '@cloudbeaver/core-blocks';
+import { ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
+import { SortButton } from './SortButton';
 
 const headerStyles = css`
   table-header {
@@ -44,80 +43,27 @@ const headerStyles = css`
     font-weight: 400;
     flex-grow: 1;
   }
-  sort-icons {
-    margin-left: 4px;
-    display: flex;
-    padding: 2px 4px;
-    flex-direction: column;
-    align-content: center;
-    align-items: center;
-    min-width: 20px;
-    box-sizing: border-box;
-    cursor: pointer;
-  }
-  sort-icons > SortIcon {
-    width: 8px;
-  }
-  sort-icons:hover > SortIcon {
-    width: 9px;
-  }
-  sort-icons[|disabled] {
-    opacity: 0.7;
-    cursor: default;
-  }
 `;
-interface ISortIconProps {
-  sortMode: SortMode;
-  className?: string;
-}
-
-const SortIcon: React.FC<ISortIconProps> = function SortIcon({ sortMode, className }) {
-  return (
-    <>
-      {sortMode === ESortMode.asc && <IconOrImage icon="/icons/sort_increase.png" className={className} />}
-      {sortMode === ESortMode.desc && <IconOrImage icon="/icons/sort_decrease.png" className={className} />}
-      {sortMode === null && <IconOrImage icon="/icons/sort_unknown.png" className={className} />}
-    </>
-  );
-};
-
-function getColumn(colIdx: number, source: SqlResultSet) {
-  return source.columns?.[colIdx];
-}
 
 export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeader({
   column: calculatedColumn,
 }) {
   const dataGridContext = useContext(DataGridContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
-  const translate = useTranslate();
 
   if (!dataGridContext || !gridSelectionContext) {
     throw new Error('One of the following contexts are missed(data grid context, grid selection context)');
   }
 
+  const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
-  const sorting = model.source.getAction(dataGridContext.resultIndex, ResultSetSortAction);
+  const data = model.source.getAction(resultIndex, ResultSetDataAction);
+  const column = data.getColumn(Number(calculatedColumn.key));
   const columnName = calculatedColumn.name as string;
-  const column = getColumn(Number(calculatedColumn.key), model.getResult(dataGridContext.resultIndex)?.data);
-
-  const loading = model.isLoading();
 
   // TODO we want to get "sortable" property from SqlResultColumn data
   const sortable = model.source.results.length === 1;
-  const currentSortMode = sorting.getSortMode(column?.name || '');
-
   const columnTooltip = columnName + (column?.fullTypeName ? ': ' + column.fullTypeName : '');
-
-  const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (loading || !column?.name) {
-      return;
-    }
-    const nextSortMode = getNextSortMode(sorting.getSortMode(column.name));
-    sorting.setSortMode(column.name, nextSortMode, e.ctrlKey || e.metaKey);
-    model.refresh();
-  };
 
   const handleColumnSelection = (e: React.MouseEvent<HTMLDivElement>) => {
     gridSelectionContext.selectColumn(calculatedColumn.idx, e.ctrlKey || e.metaKey);
@@ -131,10 +77,8 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {sortable && (
-        <sort-icons as='div' title={translate('data_grid_table_tooltip_column_header_sort')} onClick={handleSort} {...use({ disabled: loading })}>
-          <SortIcon sortMode={currentSortMode} />
-        </sort-icons>
+      {sortable && column?.name && (
+        <SortButton model={model} resultIndex={resultIndex} columnName={column.name} />
       )}
     </table-header>
   );
