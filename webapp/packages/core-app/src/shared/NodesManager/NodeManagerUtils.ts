@@ -16,6 +16,25 @@ export const NodeManagerUtils = {
     return connectionNodeId.replace('database://', '');
   },
 
+  parentsFromPath(nodeId: string): string[] {
+    const parts = nodeId
+      .replace('//', '\\')
+      .split('/');
+    let lastPath = '';
+    const parents: string[] = [];
+
+    for (const part of parts) {
+      if (lastPath !== '') {
+        lastPath += '/';
+      }
+      lastPath += part.replace('\\', '//');
+
+      parents.push(lastPath);
+    }
+
+    return parents;
+  },
+
   connectionIdToConnectionNodeId(connectionId: string): string {
     return `database://${connectionId}`;
   },
