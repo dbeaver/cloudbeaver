@@ -30,7 +30,8 @@ public class CBConstants {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String RUNTIME_DATA_DIR_NAME = ".data";
-    public static final String RUNTIME_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
+    public static final String RUNTIME_APP_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
+    public static final String RUNTIME_PRODUCT_CONFIG_FILE_NAME = ".product.runtime.conf";
 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
 

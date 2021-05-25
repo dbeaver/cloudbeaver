@@ -174,7 +174,7 @@ public class CBApplication extends BaseApplicationImpl {
         try {
             loadConfiguration(configPath);
 
-            File runtimeConfigFile = getRuntimeConfigFile();
+            File runtimeConfigFile = getRuntimeAppConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -327,8 +327,13 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     @NotNull
-    private File getRuntimeConfigFile() {
-        return new File(getDataDirectory(false), CBConstants.RUNTIME_CONFIG_FILE_NAME);
+    private File getRuntimeAppConfigFile() {
+        return new File(getDataDirectory(false), CBConstants.RUNTIME_APP_CONFIG_FILE_NAME);
+    }
+
+    @NotNull
+    private File getRuntimeProductConfigFile() {
+        return new File(getDataDirectory(false), CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
     }
 
     @NotNull
@@ -439,6 +444,19 @@ public class CBApplication extends BaseApplicationImpl {
                 }
             }
         }
+
+        // Add product config from runtime
+        {
+            File rtConfig = getRuntimeProductConfigFile();
+            if (rtConfig.exists()) {
+                log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
+                try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                    productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+                } catch (Exception e) {
+                    log.error("Error reading product runtime configuration", e);
+                }
+            }
+        }
     }
 
     static String getRelativePath(String path, String curDir) {
@@ -530,7 +548,7 @@ public class CBApplication extends BaseApplicationImpl {
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
-            File runtimeConfigFile = getRuntimeConfigFile();
+            File runtimeConfigFile = getRuntimeAppConfigFile();
             if (runtimeConfigFile.exists()) {
                 log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
                 parseConfiguration(runtimeConfigFile);
@@ -567,7 +585,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     private void saveRuntimeConfig(String newServerName, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
 
-        File runtimeConfigFile = getRuntimeConfigFile();
+        File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setLenient()
