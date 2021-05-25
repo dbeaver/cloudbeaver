@@ -100,16 +100,19 @@ public class WebSQLDataFilter {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         if (!CommonUtils.isEmpty(constraints)) {
-            if (!(dataContainer instanceof DBSEntity)) {
-                throw new DBException("Cannot apply filter criteria to non-entity data container");
-            }
             List<DBDAttributeConstraint> dbdConstraints = new ArrayList<>();
             for (WebSQLDataFilterConstraint webConstr : constraints) {
-                DBSEntityAttribute attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
-                if (attribute == null) {
-                    throw new DBException("Attribute '" + webConstr.getAttribute() + "' not found in '" + DBUtils.getObjectFullName(dataContainer, DBPEvaluationContext.UI) + "'");
+                DBDAttributeConstraint dbConstraint;
+                if (dataContainer instanceof DBSEntity) {
+                    DBSEntityAttribute attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
+                    if (attribute == null) {
+                        throw new DBException("Attribute '" + webConstr.getAttribute() + "' not found in '" + DBUtils.getObjectFullName(dataContainer, DBPEvaluationContext.UI) + "'");
+                    }
+                    dbConstraint = new DBDAttributeConstraint(attribute, -1);
+                } else {
+                    dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
                 }
-                DBDAttributeConstraint dbConstraint = new DBDAttributeConstraint(attribute, -1);
+
                 if (webConstr.getOrderPosition() != null) {
                     dbConstraint.setOrderPosition(webConstr.getOrderPosition());
                 }

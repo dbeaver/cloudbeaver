@@ -40,9 +40,9 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
 
     private static final Log log = Log.getLog(WebSQLQueryDataContainer.class);
 
-    private DBPDataSource dataSource;
-    private String query;
-    private DBSDataContainer queryDataContainer;
+    private final DBPDataSource dataSource;
+    private final String query;
+    private final DBSDataContainer queryDataContainer;
 
     public WebSQLQueryDataContainer(DBPDataSource dataSource, String query) {
         this.dataSource = dataSource;
