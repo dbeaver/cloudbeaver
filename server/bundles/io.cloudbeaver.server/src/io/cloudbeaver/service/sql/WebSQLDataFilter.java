@@ -16,9 +16,16 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -89,13 +96,20 @@ public class WebSQLDataFilter {
         return where;
     }
 
-    public DBDDataFilter makeDataFilter() {
+    public DBDDataFilter makeDataFilter(DBRProgressMonitor monitor, DBSDataContainer dataContainer) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         if (!CommonUtils.isEmpty(constraints)) {
+            if (!(dataContainer instanceof DBSEntity)) {
+                throw new DBException("Cannot apply filter criteria to non-entity data container");
+            }
             List<DBDAttributeConstraint> dbdConstraints = new ArrayList<>();
             for (WebSQLDataFilterConstraint webConstr : constraints) {
-                DBDAttributeConstraint dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
+                DBSEntityAttribute attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
+                if (attribute == null) {
+                    throw new DBException("Attribute '" + webConstr.getAttribute() + "' not found in '" + DBUtils.getObjectFullName(dataContainer, DBPEvaluationContext.UI) + "'");
+                }
+                DBDAttributeConstraint dbConstraint = new DBDAttributeConstraint(attribute, -1);
                 if (webConstr.getOrderPosition() != null) {
                     dbConstraint.setOrderPosition(webConstr.getOrderPosition());
                 }

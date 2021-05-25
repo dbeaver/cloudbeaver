@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
@@ -154,22 +155,22 @@ public class WebSQLProcessor {
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
-        {
-            DBDDataFilter dataFilter = filter.makeDataFilter();
-            if (dataFilter.hasFilters()) {
-                sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
-                    monitor,
-                    context.getDataSource(),
-                    sql,
-                    dataFilter);
-            }
-        }
-
-        final WebSQLDataFilter dataFilter = filter;
-        final String sqlQueryText = sql;
-        SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
-
         try {
+            {
+                DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
+                if (dataFilter.hasFilters()) {
+                    sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
+                        monitor,
+                        context.getDataSource(),
+                        sql,
+                        dataFilter);
+                }
+            }
+
+            final WebSQLDataFilter dataFilter = filter;
+            final String sqlQueryText = sql;
+            SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
+
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                 try (DBCSession session = context.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
                     AbstractExecutionSource source = new AbstractExecutionSource(
@@ -216,7 +217,7 @@ public class WebSQLProcessor {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
-        DBDDataFilter dataFilter = filter.makeDataFilter();
+        DBDDataFilter dataFilter = filter.makeDataFilter(monitor, dataContainer);
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
@@ -235,6 +236,7 @@ public class WebSQLProcessor {
                     WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
                     results.setResultSet(resultSet);
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
+                    setResultFilterText(dataContainer, session.getDataSource(), executeInfo, filter);
 
                     if (resultSet != null && resultSet.getRows() != null) {
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
@@ -508,9 +510,18 @@ public class WebSQLProcessor {
 
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
+        setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, filter);
+    }
+
+    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull WebSQLDataFilter filter) throws DBException {
         if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
-            SQLUtils.appendConditionString(filter.makeDataFilter(), dbStat.getSession().getDataSource(), null, where, true);
+            SQLUtils.appendConditionString(
+                filter.makeDataFilter(webSession.getProgressMonitor(), dataContainer),
+                dataSource,
+                null,
+                where,
+                true);
             executeInfo.setFilterText(where.toString());
         }
     }
