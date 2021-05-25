@@ -16,6 +16,7 @@ mutation updateResultsDataBatch(
         addedRows: $addedRows
     ) {
         duration
+        filterText
         results {
             updateRowCount
             resultSet {

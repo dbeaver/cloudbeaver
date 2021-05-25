@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ESortMode, getNextSortMode, IDatabaseDataModel, IDatabaseDataResult, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
+import { ESortMode, getNextSortMode, IDatabaseDataModel, IDatabaseDataResult, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
 const styles = css`
   sort-button {
@@ -51,8 +51,8 @@ export const SortButton: React.FC<Props> = observer(function SortButtton({
   className,
 }) {
   const translate = useTranslate();
-  const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
-  const currentSortMode = sorting.getSortMode(columnName);
+  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+  const currentSortMode = constraints.getSortMode(columnName);
   const loading = model.isLoading();
 
   let icon = '/icons/sort_unknown.png';
@@ -69,7 +69,7 @@ export const SortButton: React.FC<Props> = observer(function SortButtton({
     }
 
     const nextSortMode = getNextSortMode(currentSortMode);
-    sorting.setSortMode(columnName, nextSortMode, e.ctrlKey || e.metaKey);
+    constraints.setSortMode(columnName, nextSortMode, e.ctrlKey || e.metaKey);
     model.refresh();
   };
 

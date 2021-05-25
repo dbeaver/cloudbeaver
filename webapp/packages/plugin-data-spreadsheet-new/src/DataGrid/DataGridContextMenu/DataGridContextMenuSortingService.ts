@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService } from '@cloudbeaver/core-dialogs';
-import { ESortMode, getNextSortMode, IDatabaseDataModel, ResultSetDataAction, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
+import { ESortMode, IDatabaseDataModel, ResultSetConstraintAction, ResultSetDataAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -37,28 +37,28 @@ export class DataGridContextMenuSortingService {
     sortMode: SortMode
   ) {
     const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    sorting.setSortMode(columnName, sortMode, true);
+    constraints.setSortMode(columnName, sortMode, true);
     await model.refresh();
   }
 
   private getSortMode(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
     const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    return sorting.getSortMode(columnName);
+    return constraints.getSortMode(columnName);
   }
 
   private getSortingConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
-    return sorting.getSortingConstraints();
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    return constraints.getSortingConstraints();
   }
 
-  private async removeSortingConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+  private async removeSortingFromConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    sorting.removeSortingConstraints();
+    constraints.deleteSortingFromConstraints();
     await model.refresh();
   }
 
@@ -137,13 +137,16 @@ export class DataGridContextMenuSortingService {
       this.getMenuSortingToken(),
       {
         id: 'disableAllSorting',
-        isPresent: context => {
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden: context => {
           const sortingConstraints = this.getSortingConstraints(context.data.model, context.data.resultIndex);
-          return context.contextType === DataGridContextMenuService.cellContext && sortingConstraints.length > 1;
+          return sortingConstraints.length === 0;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.removeSortingConstraints(context.data.model, context.data.resultIndex);
+          await this.removeSortingFromConstraints(context.data.model, context.data.resultIndex);
         },
         title: 'data_grid_table_disable_all_sorting',
       }

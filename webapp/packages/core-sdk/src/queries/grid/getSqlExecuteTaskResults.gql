@@ -6,6 +6,7 @@ mutation getSqlExecuteTaskResults(
     ) {
         duration
         statusMessage
+        filterText
         results {
             title
             updateRowCount
@@ -26,6 +27,11 @@ mutation getSqlExecuteTaskResults(
                     readOnly
                     scale
                     typeName
+                    supportedOperations {
+                        id
+                        expression
+                        argumentCount
+                    }
                 }
                 rows
                 hasMoreData

@@ -51,7 +51,7 @@ export const CellMenu = observer(function TreeNodeMenu({
 
   return styled(cellMenuStyles)(
     <cell-menu as='div' onClick={e => e.stopPropagation()}>
-      <MenuTrigger panel={panel}>
+      <MenuTrigger panel={panel} onClick={() => dataGridContextMenuService.openMenu(model, resultIndex, row, column)}>
         <Icon name="snack" viewBox="0 0 16 10" />
       </MenuTrigger>
     </cell-menu>

@@ -13,5 +13,6 @@ export interface IDatabaseDataFormatAction<TKey, TResult extends IDatabaseDataRe
   extends IDatabaseDataAction<any, TResult> {
   isReadOnly: (key: TKey) => boolean;
   get: (value: any) => any;
+  isNull: (value: any) => boolean;
   toString: (value: any) => string;
 }

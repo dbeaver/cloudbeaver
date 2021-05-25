@@ -39,6 +39,16 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     return value !== null && typeof value === 'object';
   }
 
+  isNull(value: any): boolean {
+    if (value !== null) {
+      if (typeof value === 'object' && 'value' in value) {
+        return value.value === null;
+      }
+      return false;
+    }
+    return true;
+  }
+
   get(value: any): any {
     if (value !== null && typeof value === 'object') {
       if ('text' in value) {
