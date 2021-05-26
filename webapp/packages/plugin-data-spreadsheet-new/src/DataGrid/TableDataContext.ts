@@ -23,6 +23,7 @@ export interface ITableData {
   getColumnIndexFromKey: (columnKey: string | number) => number | null;
   isIndexColumn: (columnKey: string | number) => boolean;
   isIndexColumnInRange: (columnsRange: Array<Column<any[], any>>) => boolean;
+  isReadOnly: () => boolean;
   getColumnKeyFromColumnIndex: (columnIndex: number) => number;
 }
 
