@@ -274,6 +274,8 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo updateConnection(@NotNull WebSession webSession, @NotNull WebConnectionConfig config) throws DBWebException {
+        // Do not check for custom connection option. Already created connections can be edited.
+        // Also template connections can be edited
         if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
             throw new DBWebException("Connection edit is restricted by server configuration");
         }
