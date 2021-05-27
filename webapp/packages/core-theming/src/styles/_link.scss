@@ -11,7 +11,7 @@
     color: $link-color;
     text-decoration: none;
 
-    &:href,
+    &:hover,
     &:focus {
       color: $link-color-focus;
       text-decoration: underline;

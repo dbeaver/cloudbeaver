@@ -16,6 +16,7 @@ export * from './shared/NodesManager/NavNodeInfoResource';
 export * from './shared/NodesManager/NavNodeManagerService';
 export * from './shared/NodesManager/NavTreeResource';
 export * from './shared/NodesManager/NavNodeExtensionsService';
+export * from './shared/NodesManager/NodeLink';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';

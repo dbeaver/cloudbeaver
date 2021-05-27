@@ -284,6 +284,10 @@ export class NavNodeManagerService extends Bootstrap {
       const parents: string[] = [];
       let parent = this.getNode(nodeId);
 
+      if (!parent) {
+        return NodeManagerUtils.parentsFromPath(nodeId);
+      }
+
       while (parent && parent.parentId !== ROOT_NODE_PATH && parent.id !== parent.parentId) {
         parents.unshift(parent.parentId);
         parent = this.getNode(parent.parentId);
