@@ -38,25 +38,23 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
 }) {
   const translate = useTranslate();
   const hasResult = model.source.hasResult(resultIndex);
-  let constraints: ResultSetConstraintAction | null = null;
-  if (hasResult) {
-    constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-  }
-  const filterConstraints = constraints?.getFilterConstraints();
   let filterValue = model.source.options?.whereFilter || '';
 
-  if (filterConstraints && filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
-    filterValue = model.source.requestInfo.requestFilter;
+  if (hasResult) {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    if (constraints.getFilterConstraints().length > 0 && model.source.requestInfo.requestFilter) {
+      filterValue = model.source.requestInfo.requestFilter;
+    }
   }
 
   const setValue = useCallback((filterValue: string) => {
-    model.source.options.whereFilter = filterValue;
-    if (constraints && filterConstraints && filterConstraints.length > 0) {
-      constraints.deleteFiltersFromConstraints();
-    }
-  }, [model.source.options, constraints, filterConstraints]);
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-  const props = useObjectRef({ model, resultIndex, filterValue, constraints });
+    model.source.options.whereFilter = filterValue;
+    constraints?.deleteFilters();
+  }, [model.source.options]);
+
+  const props = useObjectRef({ model, resultIndex, filterValue });
 
   const handleApply = useCallback(() => {
     const { model, resultIndex } = props;
@@ -67,16 +65,16 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   }, []);
 
   const resetFilter = useCallback(() => {
-    const { model, resultIndex, constraints } = props;
+    const { model, resultIndex } = props;
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
 
-    setValue('');
+    constraints.deleteDataFilters();
 
     const applyNeeded = !!model.requestInfo.requestFilter;
     if (applyNeeded) {
-      constraints?.deleteFiltersFromConstraints();
       model.refresh();
     }
   }, []);

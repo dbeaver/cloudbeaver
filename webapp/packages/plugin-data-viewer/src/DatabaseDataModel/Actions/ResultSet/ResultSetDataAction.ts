@@ -34,4 +34,14 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
 
     return this.result.data.columns[columnIndex];
   }
+
+  getColumnOperations(columnIndex: number) {
+    const column = this.getColumn(columnIndex);
+    if (!column) {
+      return [];
+    }
+
+    return column.supportedOperations
+      .filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+  }
 }

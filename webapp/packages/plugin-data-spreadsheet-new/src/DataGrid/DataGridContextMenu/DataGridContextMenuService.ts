@@ -44,7 +44,7 @@ export class DataGridContextMenuService {
       menuId: this.getMenuToken(),
       contextType: DataGridContextMenuService.cellContext,
       data: { model, resultIndex, row, column },
-    });
+    }, this.getMenuToken());
   }
 
   openMenu(
@@ -52,7 +52,7 @@ export class DataGridContextMenuService {
     resultIndex: number,
     row: number,
     column: number
-  ) {
+  ): void {
     this.onRootMenuOpen.execute({ model, resultIndex, row, column });
   }
 

@@ -40,13 +40,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   }
 
   isNull(value: any): boolean {
-    if (value !== null) {
-      if (typeof value === 'object' && 'value' in value) {
-        return value.value === null;
-      }
-      return false;
-    }
-    return true;
+    return this.get(value) === null;
   }
 
   get(value: any): any {
@@ -54,7 +48,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
       if ('text' in value) {
         return value.text;
       } else if ('value' in value) {
-        if (typeof value.value === 'object') {
+        if (value.value !== null && typeof value.value === 'object') {
           return JSON.stringify(value.value);
         }
         return value.value;

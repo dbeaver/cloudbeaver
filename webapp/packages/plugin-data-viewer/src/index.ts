@@ -26,6 +26,7 @@ export * from './DatabaseDataModel/IDatabaseDataResult';
 export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseExecutionContext';
 export * from './DatabaseDataModel/IDatabaseResultSet';
+export * from './DatabaseDataModel/Order';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';

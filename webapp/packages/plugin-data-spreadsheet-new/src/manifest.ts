@@ -9,8 +9,8 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
+import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
-import { DataGridContextMenuSortingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSortingService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { LocaleService } from './LocaleService';
 import { SpreadsheetBootstrap } from './SpreadsheetBootstrap';
@@ -22,7 +22,7 @@ export const manifest: PluginManifest = {
     DataGridSettingsService,
     LocaleService,
     DataGridContextMenuService,
-    DataGridContextMenuSortingService,
+    DataGridContextMenuOrderService,
     DataGridContextMenuFilterService,
   ],
 };

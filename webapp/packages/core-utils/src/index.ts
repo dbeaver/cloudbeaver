@@ -10,7 +10,7 @@ export * from './isPropertiesEqual';
 export * from './isValuesEqual';
 export * from './md5';
 export * from './TextTools';
-export * from './Clipboard/copyToClipboard';
+export * from './copyToClipboard';
 export * from './declensionOfNumber';
 export * from './replaceMiddle';
 
@@ -19,6 +19,3 @@ export * from './Promises/Deferred';
 export * from './Promises/deferPromise';
 export * from './Promises/PromiseExecutor';
 export * from './Promises/PromiseCancelledError';
-
-export * from './Clipboard/ClipboardService';
-export * from './Clipboard/ClipboardBootstrap';

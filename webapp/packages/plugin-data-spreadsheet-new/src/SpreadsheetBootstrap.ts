@@ -12,7 +12,7 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
-import { DataGridContextMenuSortingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSortingService';
+import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
@@ -21,7 +21,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
     private dataPresentationService: DataPresentationService,
     private dataGridSettingsService: DataGridSettingsService,
-    private dataGridContextMenuSortingService: DataGridContextMenuSortingService,
+    private dataGridContextMenuSortingService: DataGridContextMenuOrderService,
     private dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {

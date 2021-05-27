@@ -10,24 +10,20 @@ import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-
-export enum ESortMode {
-  'asc' = 'asc',
-  'desc' = 'desc'
-}
-
-export type SortMode = ESortMode | null;
+import type { Order } from '../Order';
 
 export interface IDatabaseDataConstraintAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  deleteAllConstraints: () => void;
-  deleteFilter: (columnName: string) => void;
-  deleteFiltersFromConstraints: () => void;
-  deleteSortingFromConstraints: () => void;
-  setFilter: (columnName: string, operator: string, value?: any) => void;
-  setSortMode: (columnName: string, sortMode: SortMode, multiple: boolean) => void;
-  getFilter: (columnName: string) => void;
-  getSortMode: (columnName: string) => SortMode;
+  setFilter: (attribute: string, operator: string, value?: any) => void;
+  setOrder: (attribute: string, order: Order, multiple: boolean) => void;
+  deleteAll: () => void;
+  deleteFilter: (attribute: string) => void;
+  deleteFilters: () => void;
+  deleteOrder: (attribute: string) => void;
+  deleteOrders: () => void;
+  deleteDataFilters: () => void;
+  get: (attribute: string) => SqlDataFilterConstraint | undefined;
+  getOrder: (attribute: string) => Order;
   getFilterConstraints: () => SqlDataFilterConstraint[];
-  getSortingConstraints: () => SqlDataFilterConstraint[];
+  getOrderConstraints: () => SqlDataFilterConstraint[];
 }

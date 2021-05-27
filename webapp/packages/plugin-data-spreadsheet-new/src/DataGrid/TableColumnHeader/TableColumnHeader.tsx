@@ -16,7 +16,7 @@ import { ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { SortButton } from './SortButton';
+import { OrderButton } from './OrderButton';
 
 const headerStyles = css`
   table-header {
@@ -78,7 +78,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
         <name>{columnName}</name>
       </shrink-container>
       {sortable && column?.name && (
-        <SortButton model={model} resultIndex={resultIndex} columnName={column.name} />
+        <OrderButton model={model} resultIndex={resultIndex} columnName={column.name} />
       )}
     </table-header>
   );

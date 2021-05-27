@@ -11,8 +11,9 @@ import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } f
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataOptions } from '../../IDatabaseDataOptions';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
+import { EOrder, Order } from '../../Order';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { ESortMode, IDatabaseDataConstraintAction, SortMode } from '../IDatabaseDataConstraintAction';
+import type { IDatabaseDataConstraintAction } from '../IDatabaseDataConstraintAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
 
 export const IS_NULL_ID = 'IS_NULL';
@@ -23,13 +24,13 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   implements IDatabaseDataConstraintAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  private deleteConstraint(columnName: string) {
+  private deleteConstraint(attribute: string) {
     if (!this.source.options) {
       return;
     }
 
     this.source.options.constraints = this.source.options.constraints
-      .filter(constraint => constraint.attribute !== columnName);
+      .filter(constraint => constraint.attribute !== attribute);
   }
 
   private reorderConstraints() {
@@ -41,7 +42,24 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       .map((constaint, idx) => ({ ...constaint, orderPosition: idx }));
   }
 
-  deleteAllConstraints(): void {
+  private deleteEmptyConstraint(attribute: string) {
+    const constraint = this.get(attribute);
+
+    if (constraint && !isFilterConstraint(constraint) && !isOrderConstraint(constraint)) {
+      this.deleteConstraint(attribute);
+      this.reorderConstraints();
+    }
+  }
+
+  get(attribute: string): SqlDataFilterConstraint | undefined {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    return this.source.options.constraints.find(constaint => constaint.attribute === attribute);
+  }
+
+  deleteAll(): void {
     if (!this.source.options) {
       return;
     }
@@ -49,26 +67,84 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     this.source.options.constraints = [];
   }
 
-  setFilter(columnName: string, operator: string, value?: any): void {
+  deleteFilter(attribute: string): void {
+    const constraint = this.get(attribute);
+    if (constraint) {
+      deleteLogicalOperationFromConstraint(constraint);
+      this.deleteEmptyConstraint(attribute);
+    }
+  }
+
+  deleteFilters(): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
 
-    const currentConstraint = this.source.options.constraints.find(constaint => constaint.attribute === columnName);
+    const newConstraints: SqlDataFilterConstraint[] = [];
+
+    for (const constraint of this.source.options.constraints) {
+      deleteLogicalOperationFromConstraint(constraint);
+      if (isOrderConstraint(constraint)) {
+        newConstraints.push({ ...constraint, orderPosition: newConstraints.length });
+      }
+    }
+
+    this.source.options.constraints = newConstraints;
+  }
+
+  deleteOrders(): void {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    const newConstraints: SqlDataFilterConstraint[] = [];
+
+    for (const constraint of this.source.options.constraints) {
+      deleteOrderFromConstraint(constraint);
+      if (isFilterConstraint(constraint)) {
+        newConstraints.push({ ...constraint, orderPosition: newConstraints.length });
+      }
+    }
+
+    this.source.options.constraints = newConstraints;
+  }
+
+  deleteOrder(attribute: string): void {
+    const constraint = this.get(attribute);
+    if (constraint) {
+      deleteOrderFromConstraint(constraint);
+      this.deleteEmptyConstraint(attribute);
+    }
+  }
+
+  deleteDataFilters(): void {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    this.deleteFilters();
+    this.source.options.whereFilter = '';
+  }
+
+  setFilter(attribute: string, operator: string, value?: any): void {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    const currentConstraint = this.get(attribute);
 
     if (currentConstraint) {
       currentConstraint.operator = operator;
       if (value !== undefined) {
         currentConstraint.value = value;
-      }
-      if (currentConstraint.value !== undefined && value === undefined) {
+      } else if (currentConstraint.value !== undefined) {
         delete currentConstraint.value;
       }
       return;
     }
 
     const constraint: SqlDataFilterConstraint = {
-      attribute: columnName,
+      attribute,
       operator,
       orderPosition: this.source.options.constraints.length,
     };
@@ -80,126 +156,51 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     this.source.options.constraints.push(constraint);
   }
 
-  deleteFilter(columnName: string): void {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    const currentConstraint = this.source.options.constraints.find(constaint => constaint.attribute === columnName);
-
-    if (!currentConstraint) {
-      return;
-    }
-
-    if (isConstraintContainsSorting(currentConstraint)) {
-      deleteFilterFromConstraint(currentConstraint);
-    } else {
-      this.deleteConstraint(columnName);
-      this.reorderConstraints();
-    }
-  }
-
-  getFilter(columnName: string): SqlDataFilterConstraint | null {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    const currentConstraint = this.source.options.constraints.find(constaint => constaint.attribute === columnName);
-
-    if (!currentConstraint || (currentConstraint && !isConstraintContainsFilter(currentConstraint))) {
-      return null;
-    }
-
-    return currentConstraint;
-  }
-
   getFilterConstraints(): SqlDataFilterConstraint[] {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
 
-    return this.source.options.constraints.filter(isConstraintContainsFilter);
+    return this.source.options.constraints.filter(isFilterConstraint);
   }
 
-  deleteFiltersFromConstraints(): void {
+  getOrderConstraints(): SqlDataFilterConstraint[] {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
 
-    let reorderNeeded = false;
-
-    this.source.options.constraints = this.source.options.constraints.reduce((acc: SqlDataFilterConstraint[], curr) => {
-      if (isConstraintContainsSorting(curr)) {
-        deleteFilterFromConstraint(curr);
-        return [...acc, curr];
-      }
-      reorderNeeded = true;
-      return acc;
-    }, []);
-
-    if (reorderNeeded) {
-      this.reorderConstraints();
-    }
+    return this.source.options.constraints.filter(isOrderConstraint);
   }
 
-  deleteSortingFromConstraints(): void {
+  setOrder(attribute: string, order: Order, multiple: boolean): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
 
-    let reorderNeeded = false;
-
-    this.source.options.constraints = this.source.options.constraints.reduce((acc: SqlDataFilterConstraint[], curr) => {
-      if (isConstraintContainsFilter(curr)) {
-        deleteSortingFromConstraint(curr);
-        return [...acc, curr];
-      }
-      reorderNeeded = true;
-      return acc;
-    }, []);
-
-    if (reorderNeeded) {
-      this.reorderConstraints();
-    }
-  }
-
-  getSortingConstraints(): SqlDataFilterConstraint[] {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    return this.source.options.constraints.filter(isConstraintContainsSorting);
-  }
-
-  setSortMode(columnName: string, sortMode: SortMode, multiple: boolean): void {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    const resetSortMode = sortMode === null;
+    const resetOrder = order === null;
 
     if (!multiple) {
-      this.deleteSortingFromConstraints();
+      this.deleteOrders();
     }
 
-    const currentConstraint = this.source.options.constraints.find(constraint => constraint.attribute === columnName);
+    const currentConstraint = this.get(attribute);
 
     if (!currentConstraint) {
-      if (!resetSortMode) {
+      if (!resetOrder) {
         this.source.options.constraints.push({
-          attribute: columnName,
+          attribute,
           orderPosition: this.source.options.constraints.length,
-          orderAsc: sortMode === ESortMode.asc,
+          orderAsc: order === EOrder.asc,
         });
       }
       return;
     }
 
-    if (!resetSortMode) {
-      currentConstraint.orderAsc = sortMode === ESortMode.asc;
+    if (!resetOrder) {
+      currentConstraint.orderAsc = order === EOrder.asc;
     } else {
-      if (isConstraintContainsFilter(currentConstraint)) {
-        deleteSortingFromConstraint(currentConstraint);
+      if (isFilterConstraint(currentConstraint)) {
+        deleteOrderFromConstraint(currentConstraint);
       } else {
         this.deleteConstraint(currentConstraint.attribute);
         this.reorderConstraints();
@@ -207,42 +208,38 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
   }
 
-  getSortMode(columnName: string): SortMode {
+  getOrder(attribute: string): Order {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
 
-    const currentConstraint = this.source.options.constraints.find(constraint => constraint.attribute === columnName);
+    const currentConstraint = this.get(attribute);
 
-    if (!currentConstraint || (currentConstraint && !isConstraintContainsSorting(currentConstraint))) {
+    if (!currentConstraint || !isOrderConstraint(currentConstraint)) {
       return null;
     }
 
-    return currentConstraint.orderAsc ? ESortMode.asc : ESortMode.desc;
+    return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 }
 
-export function supportedOperationsFilter(operation: DataTypeLogicalOperation): boolean {
-  return operation.argumentCount === 1 || operation.argumentCount === 0;
-}
-
-export function operationsWithNullFilter(operation: DataTypeLogicalOperation): boolean {
+export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {
   return operation.id === IS_NULL_ID || operation.id === IS_NOT_NULL_ID;
 }
 
-export function getNextSortMode(sortMode: SortMode): SortMode {
-  switch (sortMode) {
-    case ESortMode.asc:
-      return ESortMode.desc;
-    case ESortMode.desc:
+export function getNextOrder(order: Order): Order {
+  switch (order) {
+    case EOrder.asc:
+      return EOrder.desc;
+    case EOrder.desc:
       return null;
     default:
-      return ESortMode.asc;
+      return EOrder.asc;
   }
 }
 
-export function getOperationWrappedValue(value: any, operationId: string): string {
-  let result = value;
+export function wrapOperationArgument(operationId: string, argument: any): string {
+  let result = argument;
   if (operationId === 'LIKE') {
     result = `%${result} %`;
   }
@@ -252,20 +249,20 @@ export function getOperationWrappedValue(value: any, operationId: string): strin
   return result;
 }
 
-function isConstraintContainsFilter(constraint: SqlDataFilterConstraint) {
+export function isFilterConstraint(constraint: SqlDataFilterConstraint): boolean {
   return constraint.operator !== undefined;
 }
 
-function isConstraintContainsSorting(constraint: SqlDataFilterConstraint) {
+function isOrderConstraint(constraint: SqlDataFilterConstraint) {
   return constraint.orderAsc !== undefined;
 }
 
-function deleteSortingFromConstraint(constraint: SqlDataFilterConstraint) {
+function deleteOrderFromConstraint(constraint: SqlDataFilterConstraint) {
   delete constraint.orderAsc;
   return constraint;
 }
 
-function deleteFilterFromConstraint(constraint: SqlDataFilterConstraint) {
+function deleteLogicalOperationFromConstraint(constraint: SqlDataFilterConstraint) {
   delete constraint.operator;
   delete constraint.value;
   return constraint;

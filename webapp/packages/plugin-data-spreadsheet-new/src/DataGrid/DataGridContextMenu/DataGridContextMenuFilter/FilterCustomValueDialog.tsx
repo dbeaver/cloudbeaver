@@ -14,7 +14,7 @@ import { Button, InputFieldNew } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ClipboardService } from '@cloudbeaver/core-utils';
+import { ClipboardService } from '@cloudbeaver/core-ui';
 
 const styles = css`
   CommonDialogWrapper {
@@ -48,7 +48,6 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [value, setValue] = useState<string | number>(payload.defaultValue);
-    const handleChange = useCallback((value: string | number) => setValue(value), []);
     const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
     const translate = useTranslate();
 
@@ -77,7 +76,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
             <Button type="button" mod={['outlined']} onClick={rejectDialog}>
               {translate('ui_processing_cancel')}
             </Button>
-            {clipboardService.clipboardAvailable && (
+            {clipboardService.clipboardAvailable && clipboardService.state !== 'denied' && (
               <Button type="button" mod={['outlined']} onClick={getValueFromClipboard}>
                 {translate('ui_clipboard')}
               </Button>
@@ -90,7 +89,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
           ref={inputRef}
           name='customValue'
           value={value}
-          onChange={handleChange}
+          onChange={setValue}
         >
           {payload.inputTitle}
         </InputFieldNew>

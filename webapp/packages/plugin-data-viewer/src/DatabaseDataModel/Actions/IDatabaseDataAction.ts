@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import type { DataTypeLogicalOperation, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
@@ -16,4 +16,5 @@ export interface IDatabaseResultDataAction<TKey, TResult extends IDatabaseDataRe
   extends IDatabaseDataAction<any, TResult> {
   getCellValue: (cell: IResultSetElementKey) => any;
   getColumn: (columnIndex: number) => SqlResultColumn | undefined;
+  getColumnOperations: (columnIndex: number) => DataTypeLogicalOperation[];
 }
