@@ -41,4 +41,6 @@ export type MenuTriggerProps = PropsWithChildren<{
   style?: Style[];
   placement?: MenuInitialState['placement'];
   modal?: boolean;
+  visible?: boolean;
+  onVisibleSwitch?: (visible: boolean) => void;
 }> & Omit<ButtonHTMLAttributes<any>, 'style'>;
