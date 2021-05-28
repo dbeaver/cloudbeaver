@@ -40,19 +40,19 @@ const styles = css`
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseDataResult>;
   resultIndex: number;
-  columnName: string;
+  attribute: string;
   className?: string;
 }
 
 export const OrderButton: React.FC<Props> = observer(function OrderButtton({
   model,
   resultIndex,
-  columnName,
+  attribute,
   className,
 }) {
   const translate = useTranslate();
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-  const currentOrder = constraints.getOrder(columnName);
+  const currentOrder = constraints.getOrder(attribute);
   const loading = model.isLoading();
 
   let icon = 'sort-arrow-unknown';
@@ -69,7 +69,7 @@ export const OrderButton: React.FC<Props> = observer(function OrderButtton({
     }
 
     const nextOrder = getNextOrder(currentOrder);
-    constraints.setOrder(columnName, nextOrder, e.ctrlKey || e.metaKey);
+    constraints.setOrder(attribute, nextOrder, e.ctrlKey || e.metaKey);
     model.refresh();
   };
 
