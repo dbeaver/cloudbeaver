@@ -2326,6 +2326,7 @@ export const GetSqlExecuteTaskResultsDocument = `
           position
           precision
           readOnly
+          readOnlyStatus
           scale
           typeName
         }

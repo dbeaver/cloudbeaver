@@ -118,6 +118,9 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
     isIndexColumnInRange(columnsRange: Array<Column<any[], any>>) {
       return columnsRange.some(column => this.isIndexColumn(column.key));
     },
+    isReadOnly() {
+      return this.dataColumns.every(column => column.readOnly);
+    },
     getColumnKeyFromColumnIndex(columnIndex: number) {
       return Number(this.columns[columnIndex].key);
     },
