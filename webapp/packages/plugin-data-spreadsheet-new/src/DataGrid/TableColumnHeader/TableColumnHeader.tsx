@@ -100,8 +100,8 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {sortable && column?.name && (
-        <OrderButton model={model} resultIndex={resultIndex} columnName={column.name} />
+      {sortable && column?.label && (
+        <OrderButton model={model} resultIndex={resultIndex} attribute={column.label} />
       )}
     </table-header>
   );

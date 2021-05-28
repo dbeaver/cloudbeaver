@@ -23,40 +23,17 @@ export class DataGridContextMenuOrderService {
     return DataGridContextMenuOrderService.menuOrderToken;
   }
 
-  private getColumnName(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
-    const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    return data.getColumn(columnIndex)?.name;
-  }
-
   private async changeOrder(
     model: IDatabaseDataModel<any>,
     resultIndex: number,
     columnIndex: number,
     order: Order
   ) {
-    const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
+    const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    const columnLabel = data.getColumn(columnIndex)?.label || '';
 
-    constraints.setOrder(columnName, order, true);
-    await model.refresh();
-  }
-
-  private getOrder(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
-    const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-
-    return constraints.getOrder(columnName);
-  }
-
-  private getSortingConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    return constraints.getOrderConstraints();
-  }
-
-  private async removeSortingFromConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-
-    constraints.deleteOrders();
+    constraints.setOrder(columnLabel, order, true);
     await model.refresh();
   }
 
@@ -86,10 +63,14 @@ export class DataGridContextMenuOrderService {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.asc);
         },
         type: 'radio',
-        isChecked: context => this.getOrder(
-          context.data.model,
-          context.data.resultIndex,
-          context.data.column) === EOrder.asc,
+        isChecked: context => {
+          const { model, resultIndex, column } = context.data;
+          const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+          const columnLabel = data.getColumn(column)?.label || '';
+
+          return constraints.getOrder(columnLabel) === EOrder.asc;
+        },
         title: 'ASC',
       }
     );
@@ -105,10 +86,14 @@ export class DataGridContextMenuOrderService {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.desc);
         },
         type: 'radio',
-        isChecked: context => this.getOrder(
-          context.data.model,
-          context.data.resultIndex,
-          context.data.column) === EOrder.desc,
+        isChecked: context => {
+          const { model, resultIndex, column } = context.data;
+          const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+          const columnLabel = data.getColumn(column)?.label || '';
+
+          return constraints.getOrder(columnLabel) === EOrder.desc;
+        },
         title: 'DESC',
       }
     );
@@ -124,10 +109,14 @@ export class DataGridContextMenuOrderService {
           await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, null);
         },
         type: 'radio',
-        isChecked: context => this.getOrder(
-          context.data.model,
-          context.data.resultIndex,
-          context.data.column) === null,
+        isChecked: context => {
+          const { model, resultIndex, column } = context.data;
+          const data = model.source.getAction(resultIndex, ResultSetDataAction);
+          const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+          const columnLabel = data.getColumn(column)?.label || '';
+
+          return constraints.getOrder(columnLabel) === null;
+        },
         title: 'data_grid_table_disable_sorting',
       }
     );
@@ -139,12 +128,14 @@ export class DataGridContextMenuOrderService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden: context => {
-          const sortingConstraints = this.getSortingConstraints(context.data.model, context.data.resultIndex);
-          return sortingConstraints.length === 0;
+          const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+          return constraints.getOrderConstraints().length < 2;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.removeSortingFromConstraints(context.data.model, context.data.resultIndex);
+          const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+          constraints.deleteOrders();
+          await context.data.model.refresh();
         },
         title: 'data_grid_table_disable_all_sorting',
       }
