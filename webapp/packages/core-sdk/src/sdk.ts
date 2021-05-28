@@ -65,6 +65,7 @@ export interface Query {
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
   sqlDialectInfo?: Maybe<SqlDialectInfo>;
   sqlListContexts?: Maybe<Array<Maybe<SqlContextInfo>>>;
+  sqlSupportedOperations: DataTypeLogicalOperation[];
   templateConnections: ConnectionInfo[];
   updateConnectionConfiguration: ConnectionInfo;
   userConnections: ConnectionInfo[];
@@ -245,6 +246,13 @@ export interface QuerySqlDialectInfoArgs {
 
 export interface QuerySqlListContextsArgs {
   connectionId: Scalars['ID'];
+}
+
+export interface QuerySqlSupportedOperationsArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  attributeIndex: Scalars['Int'];
 }
 
 export interface QueryUpdateConnectionConfigurationArgs {
@@ -810,6 +818,7 @@ export interface SqlResultColumn {
   precision?: Maybe<Scalars['Int']>;
   readOnly: Scalars['Boolean'];
   readOnlyStatus?: Maybe<Scalars['String']>;
+  supportedOperations: DataTypeLogicalOperation[];
 }
 
 export interface DatabaseDocument {
@@ -836,13 +845,20 @@ export interface SqlQueryResults {
 
 export interface SqlExecuteInfo {
   statusMessage?: Maybe<Scalars['String']>;
-  duration?: Maybe<Scalars['Int']>;
+  duration: Scalars['Int'];
+  filterText?: Maybe<Scalars['String']>;
   results: SqlQueryResults[];
 }
 
 export interface SqlResultRow {
   data: Array<Maybe<Scalars['Object']>>;
   updateValues?: Maybe<Scalars['Object']>;
+}
+
+export interface DataTypeLogicalOperation {
+  id: Scalars['ID'];
+  expression: Scalars['String'];
+  argumentCount?: Maybe<Scalars['Int']>;
 }
 
 export enum AdminSubjectType {
@@ -1423,12 +1439,15 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 
 export interface GetSqlExecuteTaskResultsMutation {
   result: (
-    Pick<SqlExecuteInfo, 'duration' | 'statusMessage'>
+    Pick<SqlExecuteInfo, 'duration' | 'statusMessage' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'title' | 'updateRowCount' | 'sourceQuery' | 'dataFormat'>
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
-        & { columns?: Maybe<Array<Maybe<Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>>>> }
+        & { columns?: Maybe<Array<Maybe<(
+          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>
+          & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
+        )>>>; }
       )>; }
     )>; }
   );
@@ -1444,7 +1463,7 @@ export type UpdateResultsDataMutationVariables = Exact<{
 
 export interface UpdateResultsDataMutation {
   result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration'>
+    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
@@ -1463,7 +1482,7 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
 
 export interface UpdateResultsDataBatchMutation {
   result?: Maybe<(
-    Pick<SqlExecuteInfo, 'duration'>
+    Pick<SqlExecuteInfo, 'duration' | 'filterText'>
     & { results: Array<(
       Pick<SqlQueryResults, 'updateRowCount'>
       & { resultSet?: Maybe<Pick<SqlResultSet, 'id' | 'rows'>> }
@@ -2308,6 +2327,7 @@ export const GetSqlExecuteTaskResultsDocument = `
   result: asyncSqlExecuteResults(taskId: $taskId) {
     duration
     statusMessage
+    filterText
     results {
       title
       updateRowCount
@@ -2329,6 +2349,11 @@ export const GetSqlExecuteTaskResultsDocument = `
           readOnlyStatus
           scale
           typeName
+          supportedOperations {
+            id
+            expression
+            argumentCount
+          }
         }
         rows
         hasMoreData
@@ -2347,6 +2372,7 @@ export const UpdateResultsDataDocument = `
     updateValues: $values
   ) {
     duration
+    filterText
     results {
       updateRowCount
       resultSet {
@@ -2368,6 +2394,7 @@ export const UpdateResultsDataBatchDocument = `
     addedRows: $addedRows
   ) {
     duration
+    filterText
     results {
       updateRowCount
       resultSet {

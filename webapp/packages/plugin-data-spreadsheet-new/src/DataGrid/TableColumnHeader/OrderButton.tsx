@@ -11,10 +11,10 @@ import styled, { css, use } from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ESortMode, getNextSortMode, IDatabaseDataModel, IDatabaseDataResult, ResultSetSortAction } from '@cloudbeaver/plugin-data-viewer';
+import { EOrder, getNextOrder, IDatabaseDataModel, IDatabaseDataResult, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
 const styles = css`
-  sort-button {
+  order-button {
     margin-left: 4px;
     display: flex;
     padding: 2px 4px;
@@ -25,13 +25,13 @@ const styles = css`
     box-sizing: border-box;
     cursor: pointer;
   }
-  sort-button > IconOrImage {
-    width: 8px;
+  order-button > IconOrImage {
+    width: 12px;
   }
-  sort-button:hover > IconOrImage {
-    width: 9px;
+  order-button:hover > IconOrImage {
+    width: 13px;
   }
-  sort-button[|disabled] {
+  order-button[|disabled] {
     opacity: 0.7;
     cursor: default;
   }
@@ -44,22 +44,22 @@ interface Props {
   className?: string;
 }
 
-export const SortButton: React.FC<Props> = observer(function SortButtton({
+export const OrderButton: React.FC<Props> = observer(function OrderButtton({
   model,
   resultIndex,
   columnName,
   className,
 }) {
   const translate = useTranslate();
-  const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
-  const currentSortMode = sorting.getSortMode(columnName);
+  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+  const currentOrder = constraints.getOrder(columnName);
   const loading = model.isLoading();
 
-  let icon = '/icons/sort_unknown.png';
-  if (currentSortMode === ESortMode.asc) {
-    icon = '/icons/sort_increase.png';
-  } else if (currentSortMode === ESortMode.desc) {
-    icon = '/icons/sort_decrease.png';
+  let icon = 'sort-arrow-unknown';
+  if (currentOrder === EOrder.asc) {
+    icon = 'sort-arrow-up';
+  } else if (currentOrder === EOrder.desc) {
+    icon = 'sort-arrow-down';
   }
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -68,20 +68,20 @@ export const SortButton: React.FC<Props> = observer(function SortButtton({
       return;
     }
 
-    const nextSortMode = getNextSortMode(currentSortMode);
-    sorting.setSortMode(columnName, nextSortMode, e.ctrlKey || e.metaKey);
+    const nextOrder = getNextOrder(currentOrder);
+    constraints.setOrder(columnName, nextOrder, e.ctrlKey || e.metaKey);
     model.refresh();
   };
 
   return styled(styles)(
-    <sort-button
+    <order-button
       as='div'
       title={translate('data_grid_table_tooltip_column_header_sort')}
       className={className}
       onClick={handleSort}
       {...use({ disabled: loading })}
     >
-      <IconOrImage icon={icon} />
-    </sort-button>
+      <IconOrImage icon={icon} viewBox='0 0 16 16' />
+    </order-button>
   );
 });

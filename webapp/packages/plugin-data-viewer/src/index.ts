@@ -6,10 +6,11 @@ export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
-export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSortAction';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 export * from './DatabaseDataModel/Actions/DatabaseDataActionDecorator';
 export * from './DatabaseDataModel/Actions/IDatabaseDataFormatAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
+export * from './DatabaseDataModel/Actions/IDatabaseDataConstraintAction';
 export * from './DatabaseDataModel/DatabaseDataAction';
 export * from './DatabaseDataModel/DatabaseDataActions';
 export * from './DatabaseDataModel/DatabaseDataEditor';
@@ -25,6 +26,7 @@ export * from './DatabaseDataModel/IDatabaseDataResult';
 export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseExecutionContext';
 export * from './DatabaseDataModel/IDatabaseResultSet';
+export * from './DatabaseDataModel/Order';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';

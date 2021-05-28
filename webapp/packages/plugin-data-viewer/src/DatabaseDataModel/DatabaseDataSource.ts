@@ -19,7 +19,7 @@ import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDa
 import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataSource<TOptions, TResult> {
+  implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -73,6 +73,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.requestInfo = {
       requestDuration: 0,
       requestMessage: '',
+      requestFilter: '',
       source: null,
     };
     this.error = null;

@@ -7,22 +7,20 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService } from '@cloudbeaver/core-dialogs';
-import { ESortMode, getNextSortMode, IDatabaseDataModel, ResultSetDataAction, ResultSetSortAction, SortMode } from '@cloudbeaver/plugin-data-viewer';
+import { EOrder, IDatabaseDataModel, ResultSetConstraintAction, ResultSetDataAction, Order } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
-export class DataGridContextMenuSortingService {
-  private static menuSortingToken = 'menuSorting';
+export class DataGridContextMenuOrderService {
+  private static menuOrderToken = 'menuOrder';
 
   constructor(
     private dataGridContextMenuService: DataGridContextMenuService,
-    private contextMenuService: ContextMenuService,
   ) { }
 
-  getMenuSortingToken(): string {
-    return DataGridContextMenuSortingService.menuSortingToken;
+  getMenuOrderToken(): string {
+    return DataGridContextMenuOrderService.menuOrderToken;
   }
 
   private getColumnName(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
@@ -30,43 +28,43 @@ export class DataGridContextMenuSortingService {
     return data.getColumn(columnIndex)?.name;
   }
 
-  private async changeSortMode(
+  private async changeOrder(
     model: IDatabaseDataModel<any>,
     resultIndex: number,
     columnIndex: number,
-    sortMode: SortMode
+    order: Order
   ) {
     const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    sorting.setSortMode(columnName, sortMode, true);
+    constraints.setOrder(columnName, order, true);
     await model.refresh();
   }
 
-  private getSortMode(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
+  private getOrder(model: IDatabaseDataModel<any>, resultIndex: number, columnIndex: number) {
     const columnName = this.getColumnName(model, resultIndex, columnIndex)!;
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    return sorting.getSortMode(columnName);
+    return constraints.getOrder(columnName);
   }
 
   private getSortingConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
-    return sorting.getSortingConstraints();
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    return constraints.getOrderConstraints();
   }
 
-  private async removeSortingConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
-    const sorting = model.source.getAction(resultIndex, ResultSetSortAction);
+  private async removeSortingFromConstraints(model: IDatabaseDataModel<any>, resultIndex: number) {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-    sorting.removeSortingConstraints();
+    constraints.deleteOrders();
     await model.refresh();
   }
 
   register(): void {
     this.dataGridContextMenuService.add(
-      this.contextMenuService.getRootMenuToken(),
+      this.dataGridContextMenuService.getMenuToken(),
       {
-        id: this.getMenuSortingToken(),
+        id: this.getMenuOrderToken(),
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
@@ -77,7 +75,7 @@ export class DataGridContextMenuSortingService {
       }
     );
     this.dataGridContextMenuService.add(
-      this.getMenuSortingToken(),
+      this.getMenuOrderToken(),
       {
         id: 'asc',
         isPresent(context) {
@@ -85,18 +83,18 @@ export class DataGridContextMenuSortingService {
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeSortMode(context.data.model, context.data.resultIndex, context.data.column, ESortMode.asc);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.asc);
         },
         type: 'radio',
-        isChecked: context => this.getSortMode(
+        isChecked: context => this.getOrder(
           context.data.model,
           context.data.resultIndex,
-          context.data.column) === ESortMode.asc,
+          context.data.column) === EOrder.asc,
         title: 'ASC',
       }
     );
     this.dataGridContextMenuService.add(
-      this.getMenuSortingToken(),
+      this.getMenuOrderToken(),
       {
         id: 'desc',
         isPresent(context) {
@@ -104,29 +102,29 @@ export class DataGridContextMenuSortingService {
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeSortMode(context.data.model, context.data.resultIndex, context.data.column, ESortMode.desc);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, EOrder.desc);
         },
         type: 'radio',
-        isChecked: context => this.getSortMode(
+        isChecked: context => this.getOrder(
           context.data.model,
           context.data.resultIndex,
-          context.data.column) === ESortMode.desc,
+          context.data.column) === EOrder.desc,
         title: 'DESC',
       }
     );
     this.dataGridContextMenuService.add(
-      this.getMenuSortingToken(),
+      this.getMenuOrderToken(),
       {
-        id: 'disableSorting',
+        id: 'disableOrder',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.changeSortMode(context.data.model, context.data.resultIndex, context.data.column, null);
+          await this.changeOrder(context.data.model, context.data.resultIndex, context.data.column, null);
         },
         type: 'radio',
-        isChecked: context => this.getSortMode(
+        isChecked: context => this.getOrder(
           context.data.model,
           context.data.resultIndex,
           context.data.column) === null,
@@ -134,16 +132,19 @@ export class DataGridContextMenuSortingService {
       }
     );
     this.dataGridContextMenuService.add(
-      this.getMenuSortingToken(),
+      this.getMenuOrderToken(),
       {
-        id: 'disableAllSorting',
-        isPresent: context => {
+        id: 'disableOrders',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden: context => {
           const sortingConstraints = this.getSortingConstraints(context.data.model, context.data.resultIndex);
-          return context.contextType === DataGridContextMenuService.cellContext && sortingConstraints.length > 1;
+          return sortingConstraints.length === 0;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
-          await this.removeSortingConstraints(context.data.model, context.data.resultIndex);
+          await this.removeSortingFromConstraints(context.data.model, context.data.resultIndex);
         },
         title: 'data_grid_table_disable_all_sorting',
       }

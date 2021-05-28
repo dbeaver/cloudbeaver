@@ -53,7 +53,11 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
 
   return styled(cellMenuStyles)(
     <cell-menu as='div' onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
-      <MenuTrigger panel={panel} onVisibleSwitch={onStateSwitch}>
+      <MenuTrigger
+        panel={panel}
+        onClick={() => dataGridContextMenuService.openMenu(model, resultIndex, row, column)}
+        onVisibleSwitch={onStateSwitch}
+      >
         <Icon name="snack" viewBox="0 0 16 10" />
       </MenuTrigger>
     </cell-menu>

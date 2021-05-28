@@ -15,6 +15,7 @@ mutation updateResultsData(
         updateValues: $values
     ) {
         duration
+        filterText
         results {
             updateRowCount
             resultSet {

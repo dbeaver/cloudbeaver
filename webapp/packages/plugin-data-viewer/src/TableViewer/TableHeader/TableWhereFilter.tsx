@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
@@ -15,6 +15,7 @@ import { PlaceholderComponent, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
 const styles = composes(
@@ -36,29 +37,44 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   resultIndex,
 }) {
   const translate = useTranslate();
-  const [filterValue, setValue] = useState(() => model.source.options?.whereFilter || '');
+  const hasResult = model.source.hasResult(resultIndex);
+  let filterValue = model.source.options?.whereFilter || '';
+
+  if (hasResult) {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    if (constraints.getFilterConstraints().length > 0 && model.source.requestInfo.requestFilter) {
+      filterValue = model.source.requestInfo.requestFilter;
+    }
+  }
+
+  const setValue = useCallback((filterValue: string) => {
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+
+    model.source.options.whereFilter = filterValue;
+    constraints?.deleteFilters();
+  }, [model.source.options]);
+
   const props = useObjectRef({ model, resultIndex, filterValue });
 
   const handleApply = useCallback(() => {
-    const { model, resultIndex, filterValue } = props;
+    const { model, resultIndex } = props;
     if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
-    model.source.options!.whereFilter = filterValue;
     model.refresh();
   }, []);
 
   const resetFilter = useCallback(() => {
-    const { model, resultIndex, filterValue } = props;
+    const { model, resultIndex } = props;
+    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
     if (model.isLoading() || model.isDisabled(resultIndex)) {
       return;
     }
-    const applyNeeded = model.source.options?.whereFilter === filterValue;
 
-    setValue('');
+    constraints.deleteDataFilters();
 
+    const applyNeeded = !!model.requestInfo.requestFilter;
     if (applyNeeded) {
-      model.source.options!.whereFilter = '';
       model.refresh();
     }
   }, []);

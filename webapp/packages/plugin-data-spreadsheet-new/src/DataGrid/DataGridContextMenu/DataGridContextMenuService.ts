@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridCellMenuContext {
@@ -19,12 +20,15 @@ export interface IDataGridCellMenuContext {
 
 @injectable()
 export class DataGridContextMenuService {
+  onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
   static cellContext = 'data-grid-cell-context-menu';
   private static menuToken = 'dataGridCell';
 
   constructor(
     private contextMenuService: ContextMenuService,
-  ) { }
+  ) {
+    this.onRootMenuOpen = new Executor();
+  }
 
   getMenuToken(): string {
     return DataGridContextMenuService.menuToken;
@@ -40,7 +44,16 @@ export class DataGridContextMenuService {
       menuId: this.getMenuToken(),
       contextType: DataGridContextMenuService.cellContext,
       data: { model, resultIndex, row, column },
-    });
+    }, this.getMenuToken());
+  }
+
+  openMenu(
+    model: IDatabaseDataModel<any>,
+    resultIndex: number,
+    row: number,
+    column: number
+  ): void {
+    this.onRootMenuOpen.execute({ model, resultIndex, row, column });
   }
 
   add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {

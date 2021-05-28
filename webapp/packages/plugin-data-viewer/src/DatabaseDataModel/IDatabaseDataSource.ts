@@ -17,6 +17,7 @@ import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 export interface IRequestInfo {
   readonly requestDuration: number;
   readonly requestMessage: string;
+  readonly requestFilter: string;
   readonly source: string | null;
 }
 

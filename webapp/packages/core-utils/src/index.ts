@@ -12,6 +12,7 @@ export * from './md5';
 export * from './TextTools';
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
+export * from './replaceMiddle';
 
 export * from './Promises/CancellablePromise';
 export * from './Promises/Deferred';
