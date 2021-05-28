@@ -51,6 +51,7 @@ export class DataExportMenuService {
           return context.contextType === NavigationTreeContextMenuService.nodeContextType
             && context.data.objectFeatures.includes(EObjectFeature.dataContainer);
         },
+        isHidden: () => this.dataExportSettingsService.settings.getValue('disabled'),
         order: 2,
         title: 'data_transfer_dialog_export',
         onClick: context => {
