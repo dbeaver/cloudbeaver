@@ -32,6 +32,7 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
 
   useEffect(() => {
     if (!reference.current) {
+      state.mouseEnter = false;
       return;
     }
 
@@ -57,10 +58,11 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
     element.addEventListener('mouseleave', mouseOutHandler);
 
     return () => {
+      state.mouseEnter = false;
       element.removeEventListener('mouseenter', mouseOverHandler);
       element.removeEventListener('mouseleave', mouseOutHandler);
     };
-  });
+  }, []);
 
   return { state, reference };
 }

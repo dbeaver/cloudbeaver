@@ -24,14 +24,16 @@ interface Props {
   resultIndex: number;
   row: number;
   column: number;
+  onStateSwitch?: (state: boolean) => void;
 }
 
-export const CellMenu = observer(function TreeNodeMenu({
+export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   model,
   resultIndex,
   row,
   column,
-}: Props) {
+  onStateSwitch,
+}) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
 
   const { panel, hidden } = useMemo(
@@ -50,8 +52,8 @@ export const CellMenu = observer(function TreeNodeMenu({
   }
 
   return styled(cellMenuStyles)(
-    <cell-menu as='div' onClick={e => e.stopPropagation()}>
-      <MenuTrigger panel={panel}>
+    <cell-menu as='div' onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
+      <MenuTrigger panel={panel} onVisibleSwitch={onStateSwitch}>
         <Icon name="snack" viewBox="0 0 16 10" />
       </MenuTrigger>
     </cell-menu>

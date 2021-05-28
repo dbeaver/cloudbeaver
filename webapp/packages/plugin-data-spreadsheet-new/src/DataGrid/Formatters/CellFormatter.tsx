@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled from 'reshadow';
 
@@ -35,6 +35,7 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
   const rawValue = row[column.key];
   const classes = getClasses(rawValue);
+  const [menuVisible, setMenuVisible] = useState(false);
   const value = formatter?.toString(rawValue) ?? String(rawValue);
 
   const handleClose = useCallback(() => {
@@ -68,8 +69,14 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
       <cell-formatter title={value} className={`cell-formatter ${classes}`}>
         {value}
       </cell-formatter>
-      {(isCellSelected || cellContext?.mouse.state.mouseEnter) && context && (
-        <CellMenu model={context.model} resultIndex={context.resultIndex} row={rowIdx} column={Number(column.key)} />
+      {(isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible) && context && (
+        <CellMenu
+          model={context.model}
+          resultIndex={context.resultIndex}
+          row={rowIdx}
+          column={Number(column.key)}
+          onStateSwitch={setMenuVisible}
+        />
       )}
     </>
   );

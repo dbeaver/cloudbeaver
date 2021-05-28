@@ -8,7 +8,7 @@
 
 import { observer, useObserver } from 'mobx-react-lite';
 import {
-  forwardRef, Ref, useCallback
+  forwardRef, Ref, useCallback, useEffect
 } from 'react';
 import {
   MenuButton,
@@ -16,6 +16,7 @@ import {
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useStyles, Style } from '@cloudbeaver/core-theming';
 
 import type {
@@ -32,10 +33,17 @@ export const MenuTrigger: React.FC<MenuTriggerProps> = function MenuTrigger({
   children,
   style = [],
   placement,
+  visible,
+  onVisibleSwitch,
   modal,
   ...props
 }) {
-  const menu = useMenuState({ modal, placement });
+  const propsRef = useObjectRef({ onVisibleSwitch, visible }, { onVisibleSwitch });
+  const menu = useMenuState({ modal, placement, visible });
+
+  useEffect(() => {
+    propsRef.onVisibleSwitch?.(menu.visible);
+  }, [menu.visible]);
 
   return styled(useStyles(menuPanelStyles, ...style))(
     <>
