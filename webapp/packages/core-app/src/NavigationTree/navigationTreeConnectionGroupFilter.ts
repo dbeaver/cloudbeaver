@@ -8,13 +8,12 @@
 
 import { ConnectionInfoResource, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from '../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../shared/NodesManager/EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from '../shared/NodesManager/NavNodeInfoResource';
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
-import type { IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
+import type { IElementsTreeFilter } from './useElementsTree';
 
 export const NAVIGATION_TREE_CONNECTION_GROUPS = {
   unsorted: 'nav-tree://connection-group/unsorted',

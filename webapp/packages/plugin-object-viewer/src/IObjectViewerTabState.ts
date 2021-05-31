@@ -9,6 +9,8 @@
 export interface IObjectViewerTabState {
   tableId?: string;
   connectionId: string | undefined;
+  error: boolean;
+  childrenError: boolean;
   objectId: string;
   parentId: string;
   parents: string[];

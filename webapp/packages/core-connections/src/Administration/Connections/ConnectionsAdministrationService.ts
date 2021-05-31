@@ -61,12 +61,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onActivate: this.loadConnections.bind(this),
-      onDeActivate: async (configuration: boolean, outside: boolean) => {
-        if (outside) {
-          this.connectionsResource.cleanNewFlags();
-          await this.connectionInfoResource.refreshUserConnections();
-        }
-      },
+      onDeActivate: this.refreshUserConnections.bind(this),
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
     this.connectionDetailsPlaceholder.add(Template, 1);
@@ -74,6 +69,13 @@ export class ConnectionsAdministrationService extends Bootstrap {
   }
 
   load(): void | Promise<void> { }
+
+  private async refreshUserConnections(configuration: boolean, outside: boolean): Promise<void> {
+    if (outside) {
+      this.connectionsResource.cleanNewFlags();
+      await this.connectionInfoResource.refreshUserConnections();
+    }
+  }
 
   private async activateCreateMethod(param: string | null) {
     if (!param) {

@@ -126,6 +126,11 @@ export abstract class CachedResource<
     return this.loading;
   }
 
+  getException(param: TParam): Error | null {
+    param = this.transformParam(param);
+    return this.metadata.get(param as unknown as TKey).exception;
+  }
+
   isOutdated(param: TParam): boolean {
     param = this.transformParam(param);
     return this.metadata.get(param as unknown as TKey).outdated;

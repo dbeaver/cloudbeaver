@@ -23,11 +23,6 @@ import { NavTreeResource } from '../shared/NodesManager/NavTreeResource';
 import { NodeManagerUtils } from '../shared/NodesManager/NodeManagerUtils';
 import type { ITreeNodeState } from './useElementsTree';
 
-export interface INavigationNodeMetadata {
-  selected: boolean;
-  expanded: boolean;
-}
-
 export interface INavigationNodeSelectionData {
   id: string;
   selected: boolean;
