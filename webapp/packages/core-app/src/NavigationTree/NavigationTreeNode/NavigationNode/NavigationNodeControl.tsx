@@ -37,6 +37,8 @@ const styles = composes(
     }
     status {
       position: absolute;
+      opacity: 0;
+      transition: opacity 0.3s ease;
       bottom: 0;
       right: 0;
       box-sizing: border-box;
@@ -44,6 +46,10 @@ const styles = composes(
       height: 8px;
       border-radius: 50%;      
       border: 1px solid;
+
+      &[|connected] {
+        opacity: 1;
+      }
     }    
     portal {
       box-sizing: border-box;
@@ -79,7 +85,7 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
     <TreeNodeControl onClick={onClickHandler}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
-        {connected && <status />}
+        <status {...use({ connected })} />
       </TreeNodeIcon>
       <TreeNodeName>{node.name}</TreeNodeName>
       <portal>
