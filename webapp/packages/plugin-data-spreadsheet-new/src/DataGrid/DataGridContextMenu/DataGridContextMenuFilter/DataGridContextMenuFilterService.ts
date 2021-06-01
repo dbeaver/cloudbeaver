@@ -122,6 +122,29 @@ export class DataGridContextMenuFilterService {
       }
     );
     this.dataGridContextMenuService.add(
+      this.dataGridContextMenuService.getMenuToken(),
+      {
+        id: 'deleteFiltersAndOrders',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+          return constraints.orderConstraints.length === 0 && constraints.filterConstraints.length === 0;
+        },
+        order: 2,
+        title: 'data_grid_table_delete_filters_and_orders',
+        icon: '/icons/erase.png',
+        onClick: async context => {
+          const { model, resultIndex } = context.data;
+          const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+
+          constraints.deleteData();
+          await model.refresh();
+        },
+      }
+    );
+    this.dataGridContextMenuService.add(
       this.getMenuFilterToken(),
       {
         id: 'clipboardValue',
@@ -216,7 +239,6 @@ export class DataGridContextMenuFilterService {
         order: 2,
         title: 'data_grid_table_filter_custom_value',
         icon: '/icons/filter_custom.png',
-        separator: true,
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'customValuePanel',
           menuItemsGetter: context => {
@@ -312,7 +334,6 @@ export class DataGridContextMenuFilterService {
         },
         order: 4,
         icon: '/icons/filter_value.png',
-        separator: true,
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.column)?.label || '';
@@ -368,9 +389,8 @@ export class DataGridContextMenuFilterService {
         isHidden: context => {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-          const filterConstraints = constraints.getFilterConstraints();
 
-          return filterConstraints.length === 0 && !model.requestInfo.requestFilter;
+          return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         },
         order: 6,
         title: 'data_grid_table_filter_reset_all_filters',
@@ -379,26 +399,6 @@ export class DataGridContextMenuFilterService {
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
           constraints.deleteDataFilters();
-          await model.refresh();
-        },
-      }
-    );
-    this.dataGridContextMenuService.add(
-      this.getMenuFilterToken(),
-      {
-        id: 'deleteFiltersAndSorting',
-        isPresent(context) {
-          return context.contextType === DataGridContextMenuService.cellContext;
-        },
-        order: 7,
-        title: 'data_grid_table_delete_filters_and_sorting',
-        icon: '/icons/erase.png',
-        onClick: async context => {
-          const { model, resultIndex } = context.data;
-          const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-
-          constraints.deleteAll();
-          model.source.options.whereFilter = '';
           await model.refresh();
         },
       }

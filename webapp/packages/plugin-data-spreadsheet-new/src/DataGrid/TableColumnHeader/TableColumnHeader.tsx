@@ -12,7 +12,7 @@ import type { HeaderRendererProps } from 'react-data-grid';
 import styled, { css } from 'reshadow';
 
 import { StaticImage } from '@cloudbeaver/core-blocks';
-import { composes, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
@@ -20,49 +20,45 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext';
 import { OrderButton } from './OrderButton';
 
-const headerStyles = composes(
-  css`
-    status {
-      composes: theme-border-color-surface from global;
-    }
-`,
-  css`
-    table-header {
-      display: flex;
-      align-items: center;
-      align-content: center;
-      width: 100%;
-      cursor: pointer;
-    }
-    shrink-container {
-      display: flex;
-      align-items: center;
-      flex: 1 1 auto;
-      overflow: hidden;
-    }
-    icon {
-      display: flex;
-      position: relative;
-    }
-    StaticImage {
-      height: 16px;
-    }
-    name {
-      margin-left: 8px;
-      font-weight: 400;
-      flex-grow: 1;
-    }
-    status {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #e28835;
-      border: 1px solid;
-    }
-`);
+const headerStyles = css`
+  table-header {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    cursor: pointer;
+  }
+  shrink-container {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+  icon {
+    display: flex;
+    position: relative;
+  }
+  StaticImage {
+    height: 16px;
+  }
+  name {
+    margin-left: 8px;
+    font-weight: 400;
+    flex-grow: 1;
+  }
+  status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid;
+  }
+  OrderButton {
+    margin-left: 4px;
+  }
+`;
 
 export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(function TableColumnHeader({
   column: calculatedColumn,
@@ -96,7 +92,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
       <shrink-container title={columnTooltip}>
         <icon>
           <StaticImage icon={column?.icon} />
-          {readOnly && <status />}
+          {readOnly && <status className='rdg-table-header__status' />}
         </icon>
         <name>{columnName}</name>
       </shrink-container>

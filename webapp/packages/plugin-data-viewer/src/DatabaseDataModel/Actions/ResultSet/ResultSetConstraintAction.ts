@@ -6,10 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataOptions } from '../../IDatabaseDataOptions';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { EOrder, Order } from '../../Order';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
@@ -23,6 +26,30 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
+
+  get orderConstraints(): SqlDataFilterConstraint[] {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    return this.source.options.constraints.filter(isOrderConstraint);
+  }
+
+  get filterConstraints(): SqlDataFilterConstraint[] {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    return this.source.options.constraints.filter(isFilterConstraint);
+  }
+
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
+    super(source, result);
+    makeObservable(this, {
+      orderConstraints: computed,
+      filterConstraints: computed,
+    });
+  }
 
   private deleteConstraint(attribute: string) {
     if (!this.source.options) {
@@ -126,6 +153,15 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     this.source.options.whereFilter = '';
   }
 
+  deleteData(): void {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    this.deleteAll();
+    this.source.options.whereFilter = '';
+  }
+
   setFilter(attribute: string, operator: string, value?: any): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
@@ -154,22 +190,6 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     this.source.options.constraints.push(constraint);
-  }
-
-  getFilterConstraints(): SqlDataFilterConstraint[] {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    return this.source.options.constraints.filter(isFilterConstraint);
-  }
-
-  getOrderConstraints(): SqlDataFilterConstraint[] {
-    if (!this.source.options) {
-      throw new Error('Options must be provided');
-    }
-
-    return this.source.options.constraints.filter(isOrderConstraint);
   }
 
   setOrder(attribute: string, order: Order, multiple: boolean): void {
@@ -253,7 +273,7 @@ export function isFilterConstraint(constraint: SqlDataFilterConstraint): boolean
   return constraint.operator !== undefined;
 }
 
-function isOrderConstraint(constraint: SqlDataFilterConstraint) {
+export function isOrderConstraint(constraint: SqlDataFilterConstraint): boolean {
   return constraint.orderAsc !== undefined;
 }
 

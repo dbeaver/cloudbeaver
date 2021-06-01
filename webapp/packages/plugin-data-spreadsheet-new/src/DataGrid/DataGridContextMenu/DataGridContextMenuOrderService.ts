@@ -46,8 +46,8 @@ export class DataGridContextMenuOrderService {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         order: 0,
-        title: 'data_grid_table_sorting',
-        icon: '/icons/sorting.png',
+        title: 'data_grid_table_order',
+        icon: 'order-arrow-unknown',
         isPanel: true,
       }
     );
@@ -117,7 +117,7 @@ export class DataGridContextMenuOrderService {
 
           return constraints.getOrder(columnLabel) === null;
         },
-        title: 'data_grid_table_disable_sorting',
+        title: 'data_grid_table_disable_order',
       }
     );
     this.dataGridContextMenuService.add(
@@ -129,7 +129,7 @@ export class DataGridContextMenuOrderService {
         },
         isHidden: context => {
           const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
-          return constraints.getOrderConstraints().length < 2;
+          return constraints.orderConstraints.length < 2;
         },
         isDisabled: context => context.data.model.isLoading(),
         onClick: async context => {
@@ -137,7 +137,7 @@ export class DataGridContextMenuOrderService {
           constraints.deleteOrders();
           await context.data.model.refresh();
         },
-        title: 'data_grid_table_disable_all_sorting',
+        title: 'data_grid_table_disable_all_orders',
       }
     );
   }
