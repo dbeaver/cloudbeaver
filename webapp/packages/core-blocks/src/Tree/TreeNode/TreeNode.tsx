@@ -42,14 +42,11 @@ export const TreeNode: React.FC<Props> = memo(function TreeNode({
   const handlersRef = useObjectRef(handlers);
 
   async function processAction(action: () => Promise<void>) {
-    const timeout = setTimeout(() => {
-      nodeContext.processing = true;
-    }, 250);
+    nodeContext.processing = true;
 
     try {
       await action();
     } finally {
-      clearTimeout(timeout);
       nodeContext.processing = false;
     }
   }

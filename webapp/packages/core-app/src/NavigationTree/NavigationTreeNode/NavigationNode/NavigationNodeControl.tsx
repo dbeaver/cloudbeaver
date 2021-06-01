@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -18,6 +18,7 @@ import { composes, useStyles } from '@cloudbeaver/core-theming';
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
 import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
 const styles = composes(
@@ -27,6 +28,14 @@ const styles = composes(
     }
   `,
   css`
+    TreeNodeControl {
+      opacity: 1;
+      transition: opacity 0.2s ease;
+
+      &[|outdated] {
+        opacity: 0.5;
+      }
+    }
     TreeNodeControl:hover > portal, 
     TreeNodeControl:global([aria-selected=true]) > portal,
     portal:focus-within {
@@ -67,6 +76,8 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   node,
 }) {
   const context = useContext(TreeNodeContext);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const outdated = navNodeInfoResource.isOutdated(node.id) && !context?.loading;
   const connectionInfoResource = useService(ConnectionInfoResource);
 
   let connected = false;
@@ -82,7 +93,7 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   }, [context]);
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl onClick={onClickHandler}>
+    <TreeNodeControl onClick={onClickHandler} {...use({ outdated })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
         <status {...use({ connected })} />
