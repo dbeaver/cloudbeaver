@@ -2,25 +2,6 @@
 # yarn lockfile v1
 
 
-"@ag-grid-community/core@^25.0.1", "@ag-grid-community/core@~25.0.0":
-  version "25.0.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-25.0.1.tgz#a96fa7cd52683384d684322654fc59fb36cc76f2"
-  integrity sha512-dvDFM+/qsnGdTtNLp0mYlSZRUMGItKXbfUMnboCQXmRc/RZkssiiqLrZCTrOK9svfSh1Ayzv3+QSbGsEh7TyZA==
-
-"@ag-grid-community/infinite-row-model@^25.0.1":
-  version "25.0.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/infinite-row-model/-/infinite-row-model-25.0.1.tgz#be1e921ad39d6d5c355c803852f94b36520ea905"
-  integrity sha512-x1B3xPqmFAUI8Y0PHZqEN65WgKdD+g610UYNpYKMtEoqqCCRYDig5pvsV+HSKfPIichYsVV/w8IJ4cTguxLzew==
-  dependencies:
-    "@ag-grid-community/core" "~25.0.0"
-
-"@ag-grid-community/react@^25.0.1":
-  version "25.0.1"
-  resolved "https://registry.yarnpkg.com/@ag-grid-community/react/-/react-25.0.1.tgz#a242139987963a074277201f49ad83638b189704"
-  integrity sha512-DLHESbyJAKizICwiszR4pwXrYRz/V/uPTSP/WNeIl1P+adH4zzRcO51IHwQkbIvfXps2Ou8HabpRGTbxLjlMnA==
-  dependencies:
-    prop-types "^15.6.2"
-
 "@ardatan/aggregate-error@0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@ardatan/aggregate-error/-/aggregate-error-0.0.1.tgz#1403ac5de10d8ca689fc1f65844c27179ae1d44f"
