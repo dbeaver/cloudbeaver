@@ -202,13 +202,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
     async expand(node: NavNode, state: boolean) {
       const treeNodeState = this.state.get(node.id);
-      treeNodeState.expanded = state;
 
-      if (state) {
-        await loadTree(node.id);
+      try {
+        if (state) {
+          state = await navTreeService.loadNestedNodes(node.id);
+        }
+
+        await options.onExpand?.(node, state);
+        treeNodeState.expanded = state;
+
+        if (state) {
+          await loadTree(node.id);
+        }
+      } catch {
+        treeNodeState.expanded = false;
       }
-
-      await options.onExpand?.(node, state);
     },
     async select(node: NavNode, multiple: boolean, nested: boolean) {
       if (options.customSelect) {
