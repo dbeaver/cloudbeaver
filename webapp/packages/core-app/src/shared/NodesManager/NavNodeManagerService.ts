@@ -342,28 +342,27 @@ export class NavNodeManagerService extends Bootstrap {
       return;
     }
 
-    // const count = ResourceKeyUtils.count(key);
-
     await this.navTree.load(ROOT_NODE_PATH);
 
     runInAction(() => {
       ResourceKeyUtils.forEach(key, async key => {
         const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-        this.navTree.markTreeOutdated(nodeId);
 
         if (this.navTree.has(nodeId)) {
           const connectionInfo = this.connectionInfo.get(key);
 
           if (!connectionInfo?.connected) {
             this.removeTree(nodeId);
+          } else {
+            this.navTree.markTreeOutdated(nodeId);
           }
         }
 
-        // if (count > 1) {
-        this.navNodeInfoResource.markOutdated(nodeId);
-      // } else {
-      // await this.navNodeInfoResource.refresh(nodeId);
-      // }
+        const nodeInfo = this.navNodeInfoResource.get(nodeId);
+
+        if (nodeInfo) {
+          this.navTree.markOutdated(nodeInfo.parentId);
+        }
       });
     });
   }

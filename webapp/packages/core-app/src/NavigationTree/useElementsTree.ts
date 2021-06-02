@@ -239,6 +239,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
   }, undefined, { root: observable.ref, renderers: observable.ref });
 
   useExecutor({
+    executor: navNodeInfoResource.onDataOutdated,
+    handlers: [function refreshRoot() {
+      loadTree(options.root);
+    }],
+  });
+  useExecutor({
     executor: navTreeResource.onNodeRefresh,
     handlers: [loadTree],
   });

@@ -11,13 +11,11 @@ import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
-import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
 import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
@@ -78,15 +76,8 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   const context = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const outdated = navNodeInfoResource.isOutdated(node.id) && !context?.loading;
-  const connectionInfoResource = useService(ConnectionInfoResource);
 
-  let connected = false;
-
-  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
-    const connectionInfo = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(node.id));
-
-    connected = !!connectionInfo?.connected;
-  }
+  const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     context?.select(event.ctrlKey || event.metaKey);
