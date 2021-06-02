@@ -34,7 +34,6 @@ export * from './TableViewer/ValuePanel/DataValuePanelService';
 
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
-export * from './TableViewer/TableViewerModel';
 export * from './TableViewer/DataModelWrapper';
 
 export * from './TableViewer/TableDataModel/TableColumn';
