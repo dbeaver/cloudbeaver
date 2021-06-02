@@ -26,5 +26,4 @@ export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps<any, IDa
       )}
     </ComplexLoader>
   );
-}
-;
+};
