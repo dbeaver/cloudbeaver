@@ -53,7 +53,17 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             .dataFetcher("deleteUser",
                 env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")))
             .dataFetcher("createRole",
-                env -> getService(env).createRole(getWebSession(env), env.getArgument("roleId")))
+                env -> getService(env).createRole(
+                    getWebSession(env),
+                    env.getArgument("roleId"),
+                    env.getArgument("roleName"),
+                    env.getArgument("description")))
+            .dataFetcher("updateRole",
+                env -> getService(env).createRole(
+                    getWebSession(env),
+                    env.getArgument("roleId"),
+                    env.getArgument("roleName"),
+                    env.getArgument("description")))
             .dataFetcher("deleteRole",
                 env -> getService(env).deleteRole(getWebSession(env), env.getArgument("roleId")))
 

@@ -34,6 +34,7 @@ type AdminUserInfo {
 type AdminRoleInfo {
     roleId: ID!
     roleName: String
+    description: String
 
     rolePermissions: [ID]!
 }
@@ -75,7 +76,8 @@ extend type Query {
     createUser(userId: ID!): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
-    createRole(roleId: ID!): AdminRoleInfo!
+    createRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!
+    updateRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!
     deleteRole(roleId: ID!): Boolean
 
     grantUserRole(userId: ID!, roleId: ID!): Boolean
