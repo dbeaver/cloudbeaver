@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -43,6 +44,7 @@ public class WebSQLUtils {
     private static final Log log = Log.getLog(WebSQLUtils.class);
 
     public static final int BINARY_PREVIEW_LENGTH = 255;
+    public static final int BINARY_MAX_LENGTH = 1 * 1024 * 1024;
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
@@ -127,10 +129,17 @@ public class WebSQLUtils {
             map.put("binary", true);
             byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
             if (binaryValue != null) {
-                if (binaryValue.length > BINARY_PREVIEW_LENGTH) {
-                    binaryValue = Arrays.copyOf(binaryValue, BINARY_PREVIEW_LENGTH);
+                byte[] previewValue = binaryValue;
+                if (previewValue.length > BINARY_PREVIEW_LENGTH) {
+                    previewValue = Arrays.copyOf(previewValue, BINARY_PREVIEW_LENGTH);
                 }
                 map.put("text", GeneralUtils.convertToString(binaryValue, 0, binaryValue.length));
+
+                byte[] inlineValue = binaryValue;
+                if (inlineValue.length > BINARY_MAX_LENGTH) {
+                    inlineValue = Arrays.copyOf(inlineValue, BINARY_PREVIEW_LENGTH);
+                }
+                map.put("binary", Base64.encode(inlineValue));
             } else {
                 map.put("text", null);
             }
