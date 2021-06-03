@@ -310,6 +310,7 @@ export class ObjectViewerTabService {
         const folderId = tab.handlerState.folderId;
 
         if (children.length === 0 || !NodeManagerUtils.isDatabaseObject(folderId)) {
+          await this.dbObjectService.loadChildren(tab.handlerState.objectId, resourceKeyList(children));
           return;
         }
         const folderChildren = await this.navNodeManagerService.loadTree(folderId);
