@@ -6,4 +6,5 @@ export default [
   ['data_viewer_statistics_updated_rows', 'Updated Rows:'],
   ['data_viewer_presentation_value_title', 'Value'],
   ['data_viewer_presentation_value_text_title', 'Text'],
+  ['data_viewer_presentation_value_image_title', 'Image'],
 ];

@@ -12,6 +12,7 @@ import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
+import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
@@ -25,6 +26,20 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     }
 
     return this.result.data.rows?.[cell.row]?.[cell.column];
+  }
+
+  getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
+    const value = this.getCellValue(cell);
+
+    if (
+      value !== null
+      && typeof value === 'object'
+      && '$type' in value
+      && value.$type === 'content'
+    ) {
+      return value;
+    }
+    return null;
   }
 
   getColumn(columnIndex: number) {
