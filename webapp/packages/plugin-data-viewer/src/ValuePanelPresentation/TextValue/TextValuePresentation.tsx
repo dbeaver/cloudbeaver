@@ -36,6 +36,7 @@ const styles = composes(
     container {
       display: flex;
       flex-direction: column;
+      overflow: auto;
       flex: 1;
     }
     content-type {
@@ -53,7 +54,7 @@ const styles = composes(
       overflow: auto;
     }
     TabList {
-      overflow: hidden;
+      overflow: auto;
       border-radius: 16px;
 
       & Tab {
