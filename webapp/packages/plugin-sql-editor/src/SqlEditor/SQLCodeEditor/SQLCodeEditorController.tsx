@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./codemirror.meta.d.ts" />
+/// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
 import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
-import 'codemirror/addon/hint/show-hint';
-import 'codemirror/mode/meta';
 import { observable, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
@@ -30,7 +28,7 @@ const COMMON_EDITOR_CONFIGURATION: EditorConfiguration = {
 };
 
 @injectable()
-export class CodeEditorController {
+export class SQLCodeEditorController {
   private dialect?: SqlDialectInfo;
   private editor?: Editor;
 

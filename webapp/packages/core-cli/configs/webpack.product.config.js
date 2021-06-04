@@ -31,7 +31,9 @@ const excludedFromVendor = [
   'graphlib',
   '@emotion',
   'svg-tag-names',
-  'html-tags'
+  'html-tags',
+  'codemirror',
+  'react-codemirror2'
 ]
 
 const timestampVersion = withTimestamp(package.version)

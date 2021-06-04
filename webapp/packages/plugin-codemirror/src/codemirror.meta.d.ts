@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import * as CodeMirror from 'codemirror';
+import type * as CodeMirror from 'codemirror';
 
 declare module 'codemirror' {
   interface ModeInfo {

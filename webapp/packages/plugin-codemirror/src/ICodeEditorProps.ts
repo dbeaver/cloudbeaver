@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import * as CodeMirror from 'codemirror';
+import type { IControlledCodeMirror } from 'react-codemirror2';
 
-declare module 'codemirror' {
-  const hint: Record<string, HintFunction | AsyncHintFunction>;
+export interface ICodeEditorProps extends IControlledCodeMirror {
+  readonly?: boolean;
 }

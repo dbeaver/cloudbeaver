@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { CodeEditor } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
 import { DdlViewerController } from './DdlViewerController';
 
@@ -21,7 +21,7 @@ const styles = css`
     overflow: auto;
     composes: theme-typography--body1 from global;
   }
-  CodeEditor {
+  SQLCodeEditorLoader {
     height: 100%;
   }
 `;
@@ -40,9 +40,9 @@ const DdlViewerTabPanel = observer(function DdlViewerTabPanel(props: DdlViewerTa
   }
 
   return styled(styles)(
-    <wrapper as="div">
+    <wrapper>
       {controller.metadata && (
-        <CodeEditor
+        <SQLCodeEditorLoader
           value={controller.metadata}
           dialect={controller.dialect}
           readonly
