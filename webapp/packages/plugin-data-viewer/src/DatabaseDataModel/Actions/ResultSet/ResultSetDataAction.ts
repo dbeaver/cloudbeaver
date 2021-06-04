@@ -14,6 +14,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetElementKey } from './IResultSetElementKey';
+import { isResultSetContentValue } from './isResultSetContentValue';
 
 @databaseDataAction()
 export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
@@ -31,14 +32,10 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
   getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
     const value = this.getCellValue(cell);
 
-    if (
-      value !== null
-      && typeof value === 'object'
-      && '$type' in value
-      && value.$type === 'content'
-    ) {
+    if (isResultSetContentValue(value)) {
       return value;
     }
+
     return null;
   }
 

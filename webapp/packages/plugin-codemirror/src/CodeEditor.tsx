@@ -10,6 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import styled, { use } from 'reshadow';
 
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/htmlembedded/htmlembedded';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/meta';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/lib/codemirror.css';

@@ -14,6 +14,7 @@ import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
+import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
@@ -50,6 +51,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   const inputRef = useRef<HTMLInputElement>(null);
   const [elementRef, setElementRef] = useState<HTMLDivElement | null>(null);
   const [popperRef, setPopperRef] = useState<HTMLDivElement | null>(null);
+  const formatter = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
   const popper = usePopper(elementRef, popperRef, {
     placement: 'right',
   });
@@ -85,7 +87,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
     }
   });
 
-  const value = row[column.key];
+  const value = formatter?.get(row[column.key]);
   const numericCell = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number';
 
   const handleSave = () => {
