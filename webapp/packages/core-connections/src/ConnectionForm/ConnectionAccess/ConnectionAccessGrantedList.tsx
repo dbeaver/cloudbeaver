@@ -69,7 +69,9 @@ export const ConnectionAccessGrantedList: React.FC<Props> = observer(function Co
   const translate = useTranslate();
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const subjectsSelected = useMemo(() => computed(() => Array.from(selectedSubjects.values()).some(Boolean)), []);
+  const subjectsSelected = useMemo(() => computed(
+    () => Array.from(selectedSubjects.values()).some(Boolean)
+  ), [selectedSubjects]);
 
   const revoke = useCallback(() => {
     const subjectsToRevoke = [];
