@@ -19,7 +19,7 @@ import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDa
 import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataSource<TOptions, TResult> {
+implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -164,7 +164,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
     this.supportedDataFormats = dataFormats;
-    this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
+
+    if (!this.supportedDataFormats.includes(this.dataFormat)) {
+      this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
+    }
     return this;
   }
 

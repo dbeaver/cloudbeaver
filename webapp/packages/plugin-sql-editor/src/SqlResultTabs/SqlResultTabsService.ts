@@ -93,8 +93,6 @@ export class SqlResultTabsService {
     model
       .setAccess(connectionInfo.readOnly ? DatabaseDataAccessMode.Readonly : DatabaseDataAccessMode.Default);
 
-    const lastDataFormat = source.dataFormat;
-
     source.setOptions({
       tabId: tabId,
       query: sqlQueryParams.query,
@@ -104,10 +102,6 @@ export class SqlResultTabsService {
     })
       .setExecutionContext(sqlQueryParams)
       .setSupportedDataFormats(connectionInfo.supportedDataFormats);
-
-    if (connectionInfo.supportedDataFormats.includes(lastDataFormat)) {
-      source.setDataFormat(lastDataFormat);
-    }
 
     for (let [i, length] = [0, 1]; i < length; i++) {
       let resultTab = editorState.resultTabs.find(
