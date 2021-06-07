@@ -9,37 +9,40 @@
 import { useObjectRef, useTabState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminSubjectType } from '@cloudbeaver/core-sdk';
+import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
-import type { IConnectionFormState } from '../IConnectionFormProps';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
 interface IConnectionAccessState {
   state: IConnectionAccessTabState;
-  select: (subjectId: string, value: boolean) => void;
+  revoke: (subjectIds: string[]) => void;
+  grant: (subjectIds: string[]) => void;
+  edit: () => void;
   load: () => Promise<void>;
 }
 
-export function useConnectionAccessState(formState: IConnectionFormState): IConnectionAccessState {
+export function useConnectionAccessState(connection: DatabaseConnectionFragment | undefined): IConnectionAccessState {
   const connectionsResource = useService(ConnectionsResource);
   const notificationService = useService(NotificationService);
   const state = useTabState<IConnectionAccessTabState>();
 
-  const select = (subjectId: string, value: boolean): void => {
-    if (!value) {
-      const index = state.grantedSubjects.findIndex(subject => subject.subjectId === subjectId);
-      if (index > -1) {
-        state.grantedSubjects.splice(index, 1);
-      }
-      return;
-    }
+  const edit = () => {
+    state.editing = !state.editing;
+  };
 
-    state.grantedSubjects.push({
-      connectionId: '',
-      subjectId,
-      subjectType: AdminSubjectType.User,
-    });
+  const revoke = (subjectIds: string[]): void => {
+    const newGrantedSubjects = [];
+    for (const subjectId of state.grantedSubjects) {
+      if (!subjectIds.includes(subjectId)) {
+        newGrantedSubjects.push(subjectId);
+      }
+    }
+    state.grantedSubjects = newGrantedSubjects;
+  };
+
+  const grant = (subjectIds: string[]): void => {
+    state.grantedSubjects.push(...subjectIds);
   };
 
   const load = async () => {
@@ -50,13 +53,12 @@ export function useConnectionAccessState(formState: IConnectionFormState): IConn
     try {
       state.loading = true;
 
-      if (formState.info) {
-        state.grantedSubjects = await connectionsResource.loadAccessSubjects(formState.info.id);
+      if (connection) {
+        const grantedSubjects = await connectionsResource.loadAccessSubjects(connection.id);
+        state.grantedSubjects = grantedSubjects.map(subject => subject.subjectId);
+        state.initialGrantedSubjects = state.grantedSubjects.slice();
       }
 
-      for (const subject of state.grantedSubjects) {
-        state.selectedSubjects.set(subject.subjectId, true);
-      }
       state.loaded = true;
     } catch (exception) {
       notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
@@ -64,5 +66,5 @@ export function useConnectionAccessState(formState: IConnectionFormState): IConn
     state.loading = false;
   };
 
-  return useObjectRef({ state, select, load });
+  return useObjectRef({ state, revoke, grant, edit, load });
 }
