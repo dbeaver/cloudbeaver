@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { ITab } from '@cloudbeaver/core-app';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { TableViewer } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultDataTab, ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -22,14 +23,37 @@ const style = css`
   }
 `;
 
+interface ISQLResultPanelState {
+  presentationId: string;
+  lastPresentationId: string;
+  valuePresentationId: string | null;
+  setPresentation: (id: string) => void;
+  setValuePresentation: (id: string | null) => void;
+}
+
 interface SqlResultPanelProps {
   tab: ITab<ISqlEditorTabState>;
   panelInit: IResultDataTab;
 }
 
 export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit }: SqlResultPanelProps) {
-  const [presentationId, setPresentation] = useState('');
-  const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
+  const state = useObjectRef<ISQLResultPanelState>({
+    presentationId: '',
+    lastPresentationId: '',
+    valuePresentationId: null,
+
+    setPresentation(id: string) {
+      this.presentationId = id;
+    },
+
+    setValuePresentation(id: string | null) {
+      this.valuePresentationId = id;
+    },
+  }, {}, {
+    presentationId: observable,
+    valuePresentationId: observable,
+  }, ['setValuePresentation', 'valuePresentationId']);
+
   const group = tab.handlerState.queryTabGroups.find(group => group.groupId === panelInit.groupId)!;
 
   return styled(style)(
@@ -37,10 +61,10 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
       <TableViewer
         tableId={group.modelId}
         resultIndex={panelInit.indexInResultSet}
-        presentationId={presentationId}
-        valuePresentationId={valuePresentationId}
-        onPresentationChange={setPresentation}
-        onValuePresentationChange={setValuePresentation}
+        presentationId={state.presentationId}
+        valuePresentationId={state.valuePresentationId}
+        onPresentationChange={state.setPresentation}
+        onValuePresentationChange={state.setValuePresentation}
       />
     </result-panel>
   );
