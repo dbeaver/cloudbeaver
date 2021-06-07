@@ -7,9 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { useState } from 'react';
+import styled, { css, use } from 'reshadow';
 
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { Button, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { getMIME } from '@cloudbeaver/core-utils';
 
@@ -23,6 +25,29 @@ const styles = css`
     margin: auto;
     max-width: 100%;
     max-height: 100%;
+    object-fit: contain;
+
+    &[|stretch] {
+      margin: unset;
+    }
+  }
+
+  container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  tools {
+    display: flex;
+    flex: 0;
+    justify-content: flex-end;
+    padding-bottom: 16px;
+  }
+
+  image {
+    flex: 1;
+    display: flex;
   }
 `;
 
@@ -30,6 +55,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   model,
   resultIndex,
 }) {
+  const translate = useTranslate();
+  const [stretch, setStretch] = useState(false);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
   const selectedCells = selection.getSelectedElements();
@@ -50,6 +77,14 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   }
 
   return styled(useStyles(styles))(
-    <img src={src} />
+    <container>
+      <tools>
+        <Button disabled={stretch} onClick={() => setStretch(true)}>{translate('data_viewer_presentation_value_image_fit')}</Button>
+        <Button disabled={!stretch} onClick={() => setStretch(false)}>{translate('data_viewer_presentation_value_image_original_size')}</Button>
+      </tools>
+      <image>
+        <img src={src} {...use({ stretch })} />
+      </image>
+    </container>
   );
 });
