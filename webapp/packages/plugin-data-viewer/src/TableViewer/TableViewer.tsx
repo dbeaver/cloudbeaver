@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
@@ -115,6 +115,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
   const dataModel = tableViewerStorageService.get(tableId);
   const result = dataModel?.getResult(resultIndex);
   const loading = dataModel?.isLoading() ?? true;
+  const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
   const handlePresentationChange = useCallback((id: string) => {
     const presentation = dataPresentationService.get(id);
@@ -141,11 +142,21 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
     }
   }
 
+  useEffect(() => {
+    if (!presentationId || !dataModel) {
+      return;
+    }
+
+    const presentation = dataPresentationService.get(presentationId);
+
+    if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
+      onPresentationChange(dataFormat);
+    }
+  }, [dataFormat]);
+
   if (!dataModel) {
     return <Loader />;
   }
-
-  const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
   const presentation = dataPresentationService.getSupported(
     DataPresentationType.main,
@@ -190,10 +201,10 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
           resultIndex={resultIndex}
           onPresentationChange={handlePresentationChange}
         />
-        <table-data as='div'>
+        <table-data>
           <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
             <Pane>
-              <pane-content as='div'>
+              <pane-content>
                 <TableGrid
                   model={dataModel}
                   dataFormat={dataFormat}
@@ -204,7 +215,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
             </Pane>
             {valuePanelDisplayed && <ResizerControls />}
             <Pane main>
-              <pane-content as='div'>
+              <pane-content>
                 {resultExist && (
                   <TableToolsPanel
                     model={dataModel}
