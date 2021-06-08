@@ -12,7 +12,5 @@ import { Row } from 'react-data-grid';
 import { CellRenderer } from '../CellRenderer/CellRenderer';
 
 export const RowRenderer: React.FC<RowRendererProps<any>> = function RowRenderer(props) {
-  return (
-    <Row cellRenderer={CellRenderer} {...props} />
-  );
+  return <Row cellRenderer={CellRenderer} {...props} />;
 };

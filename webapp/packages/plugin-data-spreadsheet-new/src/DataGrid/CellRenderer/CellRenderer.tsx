@@ -40,7 +40,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     classes.push('rdg-cell-custom-editing');
   }
 
-  if (editor?.isCellEdited(rowIdx, Number(column.key))) {
+  if (!tableDataContext?.isIndexColumn(column.key) && editor?.isCellEdited(rowIdx, Number(column.key))) {
     classes.push('rdg-cell-custom-edited');
   }
 

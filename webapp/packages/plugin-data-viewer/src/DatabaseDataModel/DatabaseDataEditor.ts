@@ -292,8 +292,11 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
   }
 
   private compareCellValue(valueA: any, valueB: any) {
+    valueA = valueA ?? '';
+    valueB = valueB ?? '';
+
     if (typeof valueA === 'number' || typeof valueB === 'number') {
-      return Number(valueA) === Number(valueB);
+      return String(valueA) === String(valueB);
     }
 
     if (isResultSetContentValue(valueA) && isResultSetContentValue(valueB)) {

@@ -87,22 +87,9 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
     }
   });
 
-  const value = formatter?.get(row[column.key]);
-  const numericCell = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number';
+  const value = formatter?.getText(row[column.key]) ?? '';
 
-  const handleSave = () => {
-    if (numericCell) {
-      const editor = dataGridContext.model.source.getEditor(dataGridContext.resultIndex);
-      let value = editor.getCell(rowIdx, Number(column.key));
-
-      if (typeof value === 'string') {
-        value = value.replace(',', '.');
-      }
-
-      editor.setCell(rowIdx, Number(column.key), Number(value));
-    }
-    onClose(false);
-  };
+  const handleSave = () => onClose(false);
   const handleReject = () => {
     dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
       .revertCell(rowIdx, Number(column.key));

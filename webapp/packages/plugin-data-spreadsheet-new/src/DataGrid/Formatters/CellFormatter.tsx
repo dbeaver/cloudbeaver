@@ -36,7 +36,7 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
   const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
   const classes = getClasses(rawValue);
   const [menuVisible, setMenuVisible] = useState(false);
-  const value = formatter?.toString(rawValue) ?? String(rawValue);
+  const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
 
   const handleClose = useCallback(() => {
     editingContext?.closeEditor({ idx: column.idx, rowIdx });

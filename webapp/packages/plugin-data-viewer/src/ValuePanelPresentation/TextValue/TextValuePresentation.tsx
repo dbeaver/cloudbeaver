@@ -89,14 +89,14 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     currentContentType: observable,
     lastContentType: observable,
   }, ['setContentType', 'setDefaultContentType']);
+
   const result = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
 
   const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
 
-  let value: any;
-  let stringValue: string | undefined;
+  let stringValue = '';
   let contentType = 'text/plain';
   let firstSelectedCell: Required<IResultSetElementKey> | undefined;
   let readonly = true;
@@ -106,11 +106,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     firstSelectedCell = selectedCells[0] || focusCell;
 
-    value = model.source
+    const value = model.source
       .getEditor(resultIndex)
       .getCell(firstSelectedCell.row, firstSelectedCell.column);
 
-    stringValue = format.getText(format.get(value));
+    stringValue = format.getText(value) ?? '';
     readonly = format.isReadOnly(firstSelectedCell);
 
     if (isResultSetContentValue(value)) {
@@ -159,7 +159,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       {useCodeEditor ? (
         <CodeEditorLoader
           readonly={readonly}
-          value={stringValue || ''}
+          value={stringValue}
           options={{
             mode: state.currentContentType,
             theme: 'material',
@@ -175,7 +175,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           name="value"
           rows={3}
           value={stringValue}
-          disabled={stringValue === undefined}
           readOnly={readonly}
           embedded
           onChange={handleChange}

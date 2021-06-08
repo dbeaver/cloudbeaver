@@ -16,6 +16,8 @@ import type { IResultSetElementKey } from './IResultSetElementKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 
+export type IResultSetValue = string | number | Record<string, string | number | Record<string, any> | null> | null;
+
 @databaseDataAction()
 export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
@@ -45,11 +47,11 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     return columnReadonly || cellReadonly;
   }
 
-  isNull(value: any): boolean {
+  isNull(value: IResultSetValue): boolean {
     return this.get(value) === null;
   }
 
-  get(value: any): any {
+  get(value: IResultSetValue): IResultSetValue {
     if (value !== null && typeof value === 'object') {
       if ('text' in value) {
         return value.text;
@@ -62,16 +64,22 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     return value;
   }
 
-  getText(value: any): string {
+  getText(value: IResultSetValue): string | null {
+    value = this.get(value);
+
     if (value !== null && typeof value === 'object') {
       return JSON.stringify(value);
+    }
+
+    if (typeof value === 'number') {
+      return String(value);
     }
 
     return value;
   }
 
-  toString(value: any): string {
-    value = this.getText(this.get(value));
+  toDisplayString(value: IResultSetValue): string {
+    value = this.getText(value);
 
     if (typeof value === 'string' && value.length > 1000) {
       return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
