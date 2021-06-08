@@ -166,7 +166,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             lineNumbers: true,
             indentWithTabs: true,
             smartIndent: true,
-            lineWrapping: true,
+            lineWrapping: false,
           }}
           onBeforeChange={(editor, data, value) => handleChange(value)}
         />
