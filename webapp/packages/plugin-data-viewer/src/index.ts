@@ -2,6 +2,10 @@ import { manifest } from './manifest';
 
 export default manifest;
 
+export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
+export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';
+export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
+export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';

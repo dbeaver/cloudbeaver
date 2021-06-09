@@ -11,7 +11,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export interface IDatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
   readonly requestInfo: IRequestInfo;
