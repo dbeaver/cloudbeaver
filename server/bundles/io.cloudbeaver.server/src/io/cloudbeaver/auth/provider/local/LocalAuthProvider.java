@@ -77,4 +77,30 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
         return SecurityUtils.makeDigest(password);
     }
 
+    public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
+        String userName = webSession.getUser().getUserId();
+
+        WebAuthProviderDescriptor authProvider = WebServiceRegistry.getInstance().getAuthProvider(PROVIDER_ID);
+        Map<String, Object> storedCredentials = CBApplication.getInstance().getSecurityController().getUserCredentials(userName, authProvider);
+        if (storedCredentials == null) {
+            throw new DBException("Invalid user name or password");
+        }
+        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
+        if (CommonUtils.isEmpty(storedPasswordHash)) {
+            throw new DBException("User has no password (login restricted)");
+        }
+
+        if (CommonUtils.isEmpty(oldPassword)) {
+            throw new DBException("No user password provided");
+        }
+        String clientPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, oldPassword);
+        if (!storedPasswordHash.equals(clientPasswordHash)) {
+            throw new DBException("Invalid user name or password");
+        }
+
+        storedCredentials.put(CRED_PASSWORD, clientPasswordHash);
+        CBApplication.getInstance().getSecurityController().setUserCredentials(userName, authProvider, storedCredentials);
+        return true;
+    }
+
 }
