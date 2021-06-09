@@ -93,7 +93,7 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
         if (CommonUtils.isEmpty(oldPassword)) {
             throw new DBException("No user password provided");
         }
-        String clientPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, oldPassword);
+        String clientPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
         if (!storedPasswordHash.equals(clientPasswordHash)) {
             throw new DBException("Invalid user name or password");
         }
