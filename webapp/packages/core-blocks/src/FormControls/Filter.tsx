@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -64,13 +63,7 @@ const innerInputStyle = css`
   }
 `;
 
-export interface IFilterState {
-  filterValue: string;
-}
-
-interface Props {
-  state?: IFilterState;
-  onFilter?: (filter: string) => void;
+interface BaseProps {
   toggleMode?: boolean;
   onToggle?: (status: boolean) => void;
   placeholder?: string;
@@ -78,8 +71,24 @@ interface Props {
   className?: string;
 }
 
-export const Filter: React.FC<Props> = observer(function Filter({
+type ControlledProps = BaseProps & {
+  name?: string;
+  value?: string;
+  state?: never;
+  onFilter?: (value: string, name?: string) => void;
+};
+
+type ObjectsProps<TKey extends keyof TState, TState> = BaseProps & {
+  name: TKey;
+  state: TState;
+  onFilter?: (value: TState[TKey], name: TKey) => void;
+  value?: never;
+};
+
+export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observer(function Filter({
   state,
+  name,
+  value: valueControlled,
   onFilter,
   toggleMode,
   onToggle,
@@ -89,26 +98,34 @@ export const Filter: React.FC<Props> = observer(function Filter({
 }) {
   const [inputRef] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
-  const [filterState] = useState<IFilterState>(() => state || observable({ filterValue: '' }));
 
-  const filter = useCallback((value: string) => {
-    filterState.filterValue = value;
-    if (onFilter) {
-      onFilter(value);
+  const filter = useCallback((value: string | number, name?: string) => {
+    value = String(value).trim();
+
+    if (state && name) {
+      state[name] = value;
     }
-  }, [onFilter, filterState]);
+
+    if (onFilter) {
+      onFilter(value, name);
+    }
+  }, [onFilter, state]);
 
   const toggle = useCallback(() => {
-    setToggled(prev => {
-      if (prev) {
-        filter('');
-      }
-      if (onToggle) {
-        onToggle(!prev);
-      }
-      return !prev;
-    });
-  }, [onToggle, filter]);
+    if (!toggleMode) {
+      return;
+    }
+
+    if (toggled) {
+      filter('');
+    }
+
+    setToggled(!toggled);
+
+    if (onToggle) {
+      onToggle(!toggled);
+    }
+  }, [toggleMode, toggled, onToggle, filter]);
 
   const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' || event.keyCode === 13) {
@@ -131,7 +148,11 @@ export const Filter: React.FC<Props> = observer(function Filter({
     }
   }, [toggled, toggleMode, inputRef]);
 
-  useEffect(() => () => { filter(''); }, []);
+  let value: any = valueControlled;
+
+  if (state && name !== undefined && name in state) {
+    value = state[name];
+  }
 
   return styled(useStyles(styles, toggleMode && toggleModeButtonStyle))(
     <filter-container
@@ -145,15 +166,16 @@ export const Filter: React.FC<Props> = observer(function Filter({
         style={innerInputStyle}
         placeholder={placeholder}
         disabled={disabled}
-        value={filterState.filterValue}
+        name={name}
+        value={value}
         onKeyDown={onKeyDown}
-        onChange={value => filter(String(value).trim())}
+        onChange={filter}
         {...use({ toggled })}
       />
       <IconButton
         name='search'
         disabled={disabled}
-        onClick={toggleMode ? toggle : undefined}
+        onClick={toggle}
         {...use({ toggled })}
       />
     </filter-container>

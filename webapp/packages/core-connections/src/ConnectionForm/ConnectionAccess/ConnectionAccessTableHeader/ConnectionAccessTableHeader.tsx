@@ -9,12 +9,16 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Filter, IFilterState } from '@cloudbeaver/core-blocks';
+import { Filter } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+export interface IFilterState {
+  filterValue: string;
+}
+
 interface Props {
-  filter: IFilterState;
+  filterState: IFilterState;
   disabled: boolean;
   className?: string;
 }
@@ -29,7 +33,6 @@ const styles = composes(
     buttons {
       display: flex;
       gap: 16px;
-      grid-gap: 16px;
     }
     header {
       overflow: hidden;
@@ -41,17 +44,21 @@ const styles = composes(
       justify-content: space-between;
       padding: 16px;
       gap: 16px;
-      grid-gap: 16px;
       border-bottom: 1px solid;
     }
   `
 );
 
-export const ConnectionAccessTableHeader: React.FC<Props> = observer(function ConnectionAccessTableHeader({ filter, disabled, className, children }) {
+export const ConnectionAccessTableHeader: React.FC<Props> = observer(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <header className={className}>
-      <Filter disabled={disabled} placeholder={translate('connections_connection_access_filter_placeholder')} state={filter} />
+      <Filter
+        disabled={disabled}
+        placeholder={translate('connections_connection_access_filter_placeholder')}
+        name='filterValue'
+        state={filterState}
+      />
       <buttons>
         {children}
       </buttons>

@@ -23,7 +23,7 @@ import {
   Group,
   IconOrImage,
 } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { isCloudConnection } from '../../Administration/ConnectionsResource';
@@ -57,7 +57,7 @@ const styles = css`
 `;
 
 interface IInfoItem {
-  text: string;
+  text: TLocalizationToken;
   icon: string;
 }
 
@@ -81,23 +81,30 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.grantedSubjects.includes(user.userId))
-  ), [state.grantedSubjects, users.resource.values]);
+  ), [state.grantedSubjects, users.resource]);
 
   const grantedRoles = useMemo(() => computed(() => roles.resource.values
     .filter(role => state.grantedSubjects.includes(role.roleId))
-  ), [state.grantedSubjects, roles.resource.values]);
+  ), [state.grantedSubjects, roles.resource]);
 
   const { selected } = useTab(tabId, load);
   const loading = users.isLoading() || roles.isLoading() || state.loading;
   const cloud = formState.info ? isCloudConnection(formState.info) : false;
   const disabled = loading || !state.loaded || formState.disabled || cloud;
-  const infoItem: IInfoItem = {
-    text: translate('connections_connection_access_save_reminder'),
-    icon: '/icons/info_icon.svg',
-  };
+  let infoItem: IInfoItem | null = null;
+
+  if (unsaved) {
+    infoItem = {
+      text: 'connections_connection_access_save_reminder',
+      icon: '/icons/info_icon.svg',
+    };
+  }
 
   if (cloud) {
-    infoItem.text = translate('connections_connection_access_cloud_placeholder');
+    infoItem = {
+      text: 'connections_connection_access_cloud_placeholder',
+      icon: '/icons/info_icon.svg',
+    };
   }
 
   if (!selected) {
@@ -114,10 +121,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
             </Group>
           ) : (
             <>
-              {(unsaved || cloud) && (
+              {infoItem && (
                 <info-item>
                   <IconOrImage icon={infoItem.icon} />
-                  {infoItem.text}
+                  {translate(infoItem.text)}
                 </info-item>
               )}
               <ConnectionAccessGrantedList

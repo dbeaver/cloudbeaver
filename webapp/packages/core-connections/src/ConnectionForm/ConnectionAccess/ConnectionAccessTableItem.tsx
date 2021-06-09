@@ -10,13 +10,14 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
+import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 
 interface Props {
   id: any;
   name: string;
   icon: string;
   disabled: boolean;
-  iconTooltip?: string;
+  iconTooltip?: TLocalizationToken;
   description?: string;
   className?: string;
 }
@@ -31,6 +32,7 @@ const style = css`
 export const ConnectionAccessTableItem: React.FC<Props> = observer(function ConnectionAccessTableItem({
   id, name, description, icon, iconTooltip, disabled, className,
 }) {
+  const translate = useTranslate();
   return styled(style)(
     <TableItem
       item={id}
@@ -41,7 +43,7 @@ export const ConnectionAccessTableItem: React.FC<Props> = observer(function Conn
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue><StaticImage icon={icon} title={iconTooltip} /></TableColumnValue>
+      <TableColumnValue><StaticImage icon={icon} title={translate(iconTooltip)} /></TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue>{description}</TableColumnValue>
     </TableItem>

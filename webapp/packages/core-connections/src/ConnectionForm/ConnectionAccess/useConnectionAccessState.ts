@@ -32,13 +32,7 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
   };
 
   const revoke = (subjectIds: string[]): void => {
-    const newGrantedSubjects = [];
-    for (const subjectId of state.grantedSubjects) {
-      if (!subjectIds.includes(subjectId)) {
-        newGrantedSubjects.push(subjectId);
-      }
-    }
-    state.grantedSubjects = newGrantedSubjects;
+    state.grantedSubjects = state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
   };
 
   const grant = (subjectIds: string[]): void => {

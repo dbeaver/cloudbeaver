@@ -19,14 +19,13 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   Button,
-  IFilterState,
   useObjectRef
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminRoleInfo, AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionAccessTableHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
+import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableitem';
 import { getFilteredRoles, getFilteredUsers } from './getFilteredSubjects';
@@ -42,9 +41,6 @@ const styles = composes(
       height: 100%;
       position: relative;
       overflow: auto !important;
-    }
-    Table {
-      flex: 1;
     }
   `
 );
@@ -69,35 +65,27 @@ export const ConnectionAccessList: React.FC<Props> = observer(function Connectio
   const translate = useTranslate();
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const subjectsSelected = useMemo(() => computed(
-    () => Array.from(selectedSubjects.values()).some(Boolean)
+  const selectedList = useMemo(() => computed(
+    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
   ), [selectedSubjects]);
 
   const grant = useCallback(() => {
-    const subjectsToGrant = [];
-
-    for (const [subject, value] of selectedSubjects) {
-      if (value) {
-        subjectsToGrant.push(subject);
-      }
-    }
-
-    props.onGrant(subjectsToGrant);
+    props.onGrant(selectedList.get());
     selectedSubjects.clear();
   }, []);
 
   const roles = useMemo(() => computed(() => getFilteredRoles(
     roleList, filterState.filterValue
-  )), [filterState.filterValue, roleList]);
+  )), [filterState, roleList]);
 
   const users = useMemo(() => computed(() => getFilteredUsers(
     userList, filterState.filterValue
-  )), [filterState.filterValue, userList]);
+  )), [filterState, userList]);
 
   return styled(style)(
     <Group box medium>
-      <ConnectionAccessTableHeader filter={filterState} disabled={disabled}>
-        <Button disabled={disabled || !subjectsSelected.get()} mod={['raised']} onClick={grant}>{translate('connections_connection_access_grant')}</Button>
+      <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
+        <Button disabled={disabled || !selectedList.get().length} mod={['raised']} onClick={grant}>{translate('connections_connection_access_grant')}</Button>
       </ConnectionAccessTableHeader>
       <Table selectedItems={selectedSubjects}>
         <ConnectionAccessTableInnerHeader />
@@ -116,7 +104,7 @@ export const ConnectionAccessList: React.FC<Props> = observer(function Connectio
               name={role.roleName || ''}
               description={role.description}
               icon='/icons/role.svg'
-              iconTooltip={translate('connections_connection_access_role_tooltip')}
+              iconTooltip='connections_connection_access_role_tooltip'
               disabled={disabled || grantedSubjects.includes(role.roleId)}
             />
           ))}

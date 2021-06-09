@@ -19,14 +19,13 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   Button,
-  IFilterState,
   useObjectRef
 } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminRoleInfo, AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
-import { ConnectionAccessTableHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
+import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableitem';
 import { getFilteredRoles, getFilteredUsers } from './getFilteredSubjects';
@@ -42,9 +41,6 @@ const styles = composes(
       height: 100%;
       position: relative;
       overflow: auto !important;
-    }
-    Table {
-      flex: 1;
     }
   `
 );
@@ -69,43 +65,36 @@ export const ConnectionAccessGrantedList: React.FC<Props> = observer(function Co
   const translate = useTranslate();
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
-  const subjectsSelected = useMemo(() => computed(
-    () => Array.from(selectedSubjects.values()).some(Boolean)
+  const selectedList = useMemo(() => computed(
+    () => Array.from(selectedSubjects.entries()).filter(([key, value]) => value).map(([key]) => key)
   ), [selectedSubjects]);
 
   const revoke = useCallback(() => {
-    const subjectsToRevoke = [];
-    for (const [subject, value] of selectedSubjects) {
-      if (value) {
-        subjectsToRevoke.push(subject);
-      }
-    }
-
-    props.onRevoke(subjectsToRevoke);
+    props.onRevoke(selectedList.get());
     selectedSubjects.clear();
   }, []);
 
   const roles = useMemo(() => computed(() => getFilteredRoles(
     grantedRoles, filterState.filterValue
-  )), [filterState.filterValue, grantedRoles]);
+  )), [filterState, grantedRoles]);
 
   const users = useMemo(() => computed(() => getFilteredUsers(
     grantedUsers, filterState.filterValue
-  )), [filterState.filterValue, grantedUsers]);
+  )), [filterState, grantedUsers]);
 
-  let tableInfoText: string = translate('connections_connection_access_admin_info');
+  let tableInfoText: TLocalizationToken = 'connections_connection_access_admin_info';
   if (!roles.get().length && !users.get().length) {
     if (filterState.filterValue) {
-      tableInfoText = translate('connections_connection_access_filter_no_result');
+      tableInfoText = 'connections_connection_access_filter_no_result';
     } else {
-      tableInfoText = translate('connections_connection_access_empty_table_placeholder');
+      tableInfoText = 'connections_connection_access_empty_table_placeholder';
     }
   }
 
   return styled(style)(
     <Group box medium>
-      <ConnectionAccessTableHeader filter={filterState} disabled={disabled}>
-        <Button disabled={disabled || !subjectsSelected.get()} mod={['outlined']} onClick={revoke}>{translate('connections_connection_access_revoke')}</Button>
+      <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
+        <Button disabled={disabled || !selectedList.get().length} mod={['outlined']} onClick={revoke}>{translate('connections_connection_access_revoke')}</Button>
         <Button disabled={disabled} mod={['raised']} onClick={props.onEdit}>{translate('connections_connection_access_edit')}</Button>
       </ConnectionAccessTableHeader>
       <Table selectedItems={selectedSubjects}>
@@ -113,7 +102,7 @@ export const ConnectionAccessGrantedList: React.FC<Props> = observer(function Co
         <TableBody>
           <TableItem item='tableInfo'>
             <TableColumnValue colSpan={5}>
-              {tableInfoText}
+              {translate(tableInfoText)}
             </TableColumnValue>
           </TableItem>
           {roles.get().map(role => (
