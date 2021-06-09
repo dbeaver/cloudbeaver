@@ -11,7 +11,7 @@ import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
-export type DatabaseDataEditorActionsData<TKey> = {
+export type DatabaseDataSelectActionsData<TKey> = {
   type: 'select';
   resultId: string;
   key: TKey;
@@ -23,12 +23,11 @@ export type DatabaseDataEditorActionsData<TKey> = {
 
 export interface IDatabaseDataSelectAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  readonly actions: IExecutor<DatabaseDataEditorActionsData<TKey>>;
+  readonly actions: IExecutor<DatabaseDataSelectActionsData<TKey>>;
   isSelected: () => boolean;
   isElementSelected: (key: TKey) => boolean;
   getFocusedElement: () => TKey | null;
   getSelectedElements: () => TKey[];
-  getRowSelection: (row: number) => number[];
   set: (key: TKey, selected: boolean) => void;
   focus: (key: TKey | null) => void;
   clear: () => void;
