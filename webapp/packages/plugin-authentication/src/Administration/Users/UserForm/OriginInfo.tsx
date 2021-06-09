@@ -7,13 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useTab, ObjectPropertyInfoForm, FormBox, FormBoxElement, FormGroup, Loader, useTabState, ExceptionMessage } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useTab, Loader, useTabState, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoFormNew, Group } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { useStyles } from '@cloudbeaver/core-theming';
 import { AuthenticationProvider } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
@@ -30,6 +32,7 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   tabId,
   user,
 }) {
+  const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const userInfoService = useService(UserInfoResource);
@@ -87,49 +90,56 @@ export const OriginInfo: TabContainerPanelComponent<IUserFormProps> = observer(f
   }
 
   if (state.loading) {
-    return (
-      <FormBox>
-        <Loader key="static" />
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <Loader key="static" />
+        </Group>
+      </ColoredContainer>
     );
   }
 
   if (state.exception) {
-    return (
-      <FormBox>
-        <ExceptionMessage exception={state.exception} onRetry={load} />
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <ExceptionMessage exception={state.exception} onRetry={load} />
+        </Group>
+      </ColoredContainer>
     );
   }
 
   if (!authorized) {
-    return (
-      <FormBox>
-        <AuthenticationProvider origin={origin} onAuthenticate={load} />
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <AuthenticationProvider origin={origin} onAuthenticate={load} />
+        </Group>
+      </ColoredContainer>
     );
   }
 
   if (!origin || (state.loaded && state.properties.length === 0)) {
-    return (
-      <FormBox>
-        <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
-      </FormBox>
+    return styled(style)(
+      <ColoredContainer parent>
+        <Group large>
+          <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
+        </Group>
+      </ColoredContainer>
     );
   }
 
-  return (
-    <FormBox>
-      <FormBoxElement>
-        <FormGroup><br /></FormGroup>
-        <ObjectPropertyInfoForm
+  return styled(style)(
+    <ColoredContainer parent>
+      <Group gap large>
+        <ObjectPropertyInfoFormNew
           properties={state.properties}
           state={state.state}
-          editable={false}
+          readOnly
+          small
           autoHide
         />
-      </FormBoxElement>
-      <Loader key="overlay" loading={state.loading} overlay />
-    </FormBox>
+      </Group>
+    </ColoredContainer>
   );
 });

@@ -23,7 +23,7 @@ type Props = React.PropsWithChildren<{
   expand?: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
-}>;
+}> & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
 
 export const TableColumnValue = observer(function TableColumnValue({
   align,
@@ -34,6 +34,7 @@ export const TableColumnValue = observer(function TableColumnValue({
   className,
   onClick,
   onDoubleClick,
+  ...rest
 }: Props) {
   const styles = useStyles();
   const tableContext = useContext(TableContext);
@@ -72,6 +73,7 @@ export const TableColumnValue = observer(function TableColumnValue({
       {...use({ centerContent })}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
+      {...rest}
     >
       {flex && <td-flex as='div' className={className}>{children}</td-flex>}
       {!flex && children}
