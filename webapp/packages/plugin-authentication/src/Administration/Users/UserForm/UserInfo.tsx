@@ -8,9 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
+import styled from 'reshadow';
 
-import { FieldCheckbox, FormBox, FormBoxElement, FormGroup, InputField, InputGroup, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckboxNew, Group, GroupTitle, InputFieldNew, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { useStyles } from '@cloudbeaver/core-theming';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IUserFormProps } from './UserFormService';
 
@@ -20,94 +23,72 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
 }) {
   const translate = useTranslate();
 
-  const handleLoginChange = useCallback(
-    (value: string) => { controller.credentials.login = value; },
-    []
-  );
-  const handlePasswordChange = useCallback(
-    (value: string) => { controller.credentials.password = value; },
-    []
-  );
-  const handlePasswordRepeatChange = useCallback(
-    (value: string) => { controller.credentials.passwordRepeat = value; },
-    []
-  );
   const handleRoleChange = useCallback(
     (roleId: string, value: boolean) => { controller.credentials.roles.set(roleId, value); },
     []
   );
 
-  return (
-    <FormBox>
-      <FormBoxElement>
-        <FormGroup>
-          <InputGroup>{translate('authentication_user_credentials')}</InputGroup>
-        </FormGroup>
-        <FormGroup>
-          <InputField
-            type='text'
-            name='login'
-            value={controller.credentials.login}
-            disabled={controller.isSaving}
-            readOnly={editing}
-            mod='surface'
-            required
-            onChange={handleLoginChange}
-          >
-            {translate('authentication_user_name')}
-          </InputField>
-        </FormGroup>
+  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+    <ColoredContainer parent gap overflow>
+      <Group medium gap>
+        <GroupTitle>{translate('authentication_user_credentials')}</GroupTitle>
+        <InputFieldNew
+          type='text'
+          name='login'
+          state={controller.credentials}
+          disabled={controller.isSaving}
+          readOnly={editing}
+          mod='surface'
+          large
+          required
+        >
+          {translate('authentication_user_name')}
+        </InputFieldNew>
         {controller.local && (
           <>
-            <FormGroup>
-              <InputField
-                type='password'
-                name='password'
-                autoComplete='new-password'
-                placeholder={editing ? '••••••' : ''}
-                value={controller.credentials.password}
-                disabled={controller.isSaving}
-                mod='surface'
-                required
-                onChange={handlePasswordChange}
-              >
-                {translate('authentication_user_password')}
-              </InputField>
-            </FormGroup>
-            <FormGroup>
-              <InputField
-                type='password'
-                name='password_repeat'
-                placeholder={editing ? '••••••' : ''}
-                value={controller.credentials.passwordRepeat}
-                disabled={controller.isSaving}
-                mod='surface'
-                required
-                onChange={handlePasswordRepeatChange}
-              >
-                {translate('authentication_user_password_repeat')}
-              </InputField>
-            </FormGroup>
+            <InputFieldNew
+              type='password'
+              name='password'
+              state={controller.credentials}
+              autoComplete='new-password'
+              placeholder={editing ? '••••••' : ''}
+              disabled={controller.isSaving}
+              mod='surface'
+              small
+              required
+            >
+              {translate('authentication_user_password')}
+            </InputFieldNew>
+            <InputFieldNew
+              type='password'
+              name='passwordRepeat'
+              state={controller.credentials}
+              placeholder={editing ? '••••••' : ''}
+              disabled={controller.isSaving}
+              mod='surface'
+              small
+              required
+            >
+              {translate('authentication_user_password_repeat')}
+            </InputFieldNew>
           </>
         )}
-      </FormBoxElement>
-      <FormBoxElement>
-        <FormGroup>
-          <InputGroup>{translate('authentication_user_role')}</InputGroup>
-        </FormGroup>
-        {controller.roles.map((role, i) => (
-          <FormGroup key={role.roleId}>
-            <FieldCheckbox
-              id={role.roleId}
-              name='role'
-              label={role.roleName || role.roleId}
-              checked={!!controller.credentials.roles.get(role.roleId)}
-              disabled={controller.isSaving}
-              onChange={checked => handleRoleChange(role.roleId, checked)}
-            />
-          </FormGroup>
+      </Group>
+      <Group medium gap>
+        <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
+        {controller.roles.map(role => (
+          <FieldCheckboxNew
+            key={role.roleId}
+            id={uuid()}
+            name='role'
+            checked={!!controller.credentials.roles.get(role.roleId)}
+            disabled={controller.isSaving}
+            onChange={checked => handleRoleChange(role.roleId, checked)}
+          >
+            {role.roleName || role.roleId}
+          </FieldCheckboxNew>
         ))}
-      </FormBoxElement>
-    </FormBox>
+      </Group>
+    </ColoredContainer>
   );
 });

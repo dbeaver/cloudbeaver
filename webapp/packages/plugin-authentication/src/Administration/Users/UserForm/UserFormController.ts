@@ -12,11 +12,17 @@ import { isLocalUser, RolesResource, UsersResource } from '@cloudbeaver/core-aut
 import { DatabaseConnection, ConnectionsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import {
   GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, AdminRoleInfo
 } from '@cloudbeaver/core-sdk';
+
+interface IStatusMessage {
+  status: ENotificationType;
+  message: TLocalizationToken;
+}
 
 interface IUserCredentials {
   login: string;
@@ -33,6 +39,7 @@ export class UserFormController implements IInitializableController, IDestructib
   isSaving: boolean;
   isLoading: boolean;
   credentials: IUserCredentials;
+  statusMessage: IStatusMessage | null;
 
   get connections(): DatabaseConnection[] {
     return Array.from(this.connectionsResource.data.values());
@@ -50,7 +57,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   readonly error: GQLErrorCatcher;
 
-  private isDistructed: boolean;
+  private isDestructed: boolean;
   private connectionAccessChanged: boolean;
   private connectionAccessLoaded: boolean;
   private collapse!: () => void;
@@ -70,6 +77,7 @@ export class UserFormController implements IInitializableController, IDestructib
       isSaving: observable,
       isLoading: observable,
       credentials: observable,
+      statusMessage: observable,
       connections: computed,
       roles: computed,
     });
@@ -85,9 +93,10 @@ export class UserFormController implements IInitializableController, IDestructib
       roles: new Map(),
     };
     this.error = new GQLErrorCatcher();
-    this.isDistructed = false;
+    this.isDestructed = false;
     this.connectionAccessChanged = false;
     this.connectionAccessLoaded = false;
+    this.statusMessage = null;
   }
 
   init(): void { }
@@ -103,7 +112,7 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   destruct(): void {
-    this.isDistructed = true;
+    this.isDestructed = true;
   }
 
   save = async () => {
@@ -134,14 +143,18 @@ export class UserFormController implements IInitializableController, IDestructib
         await this.usersResource.refresh(this.user.userId);
         this.notificationService.logSuccess({ title: 'authentication_administration_user_updated' });
       }
+      this.error.clear();
+      this.statusMessage = null;
     } catch (exception) {
-      if (!this.error.catch(exception) || this.isDistructed) {
-        if (!this.editing) {
-          this.notificationService.logException(exception, 'Error creating new user');
-        } else {
-          this.notificationService.logException(exception, 'Error saving user');
-        }
+      this.error.catch(exception);
+      const title = this.editing ? 'authentication_administration_user_update_failed' : 'authentication_administration_user_create_failed';
+
+      if (this.isDestructed) {
+        this.notificationService.logException(exception, title);
+        return;
       }
+
+      this.setStatusMessage(this.error.responseMessage || exception.message || title, ENotificationType.Error);
     } finally {
       this.isSaving = false;
     }
@@ -174,47 +187,49 @@ export class UserFormController implements IInitializableController, IDestructib
       }
       this.connectionAccessLoaded = true;
     } catch (exception) {
-      this.notificationService.logException(exception, 'authentication_administration_user_connections_access_load_fail');
+      this.setStatusMessage('authentication_administration_user_connections_access_load_fail', ENotificationType.Error);
     }
     await this.loadConnections();
     this.isLoading = false;
   };
 
+  private setStatusMessage(message: TLocalizationToken, status: ENotificationType) {
+    this.statusMessage = {
+      message,
+      status,
+    };
+  }
+
   private validate() {
     if (!this.editing) {
       if (!this.credentials.login.trim()) {
-        this.notificationService.logError({ title: 'authentication_user_login_not_set' });
+        this.setStatusMessage('authentication_user_login_not_set', ENotificationType.Error);
         return;
       }
 
       if (this.rolesResource.has(this.credentials.login)) {
-        this.notificationService.logError({ title: 'authentication_user_login_cant_be_used' });
+        this.setStatusMessage('authentication_user_login_cant_be_used', ENotificationType.Error);
         return;
       }
 
       if (this.usersResource.has(this.credentials.login)) {
-        this.notificationService.logError({ title: 'authentication_user_login_already_exists' });
+        this.setStatusMessage('authentication_user_login_already_exists', ENotificationType.Error);
         return;
       }
     }
 
     if (!this.isRoleSelected()) {
-      this.notificationService.logError({ title: 'authentication_user_role_not_set' });
+      this.setStatusMessage('authentication_user_role_not_set', ENotificationType.Error);
       return;
     }
 
     if (!this.credentials.password && !this.editing) {
-      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
-      return;
-    }
-
-    if (!this.credentials.password && !this.editing) {
-      this.notificationService.logError({ title: 'authentication_user_password_not_set' });
+      this.setStatusMessage('authentication_user_password_not_set', ENotificationType.Error);
       return;
     }
 
     if (this.credentials.password !== this.credentials.passwordRepeat) {
-      this.notificationService.logError({ title: 'authentication_user_passwords_not_match' });
+      this.setStatusMessage('authentication_user_passwords_not_match', ENotificationType.Error);
       return;
     }
 
@@ -222,8 +237,7 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private isRoleSelected() {
-    return Array.from(this.credentials.roles.values())
-      .some(Boolean);
+    return Array.from(this.credentials.roles.values()).some(Boolean);
   }
 
   private async updateRoles() {
@@ -288,7 +302,7 @@ export class UserFormController implements IInitializableController, IDestructib
       await this.dbDriverResource.loadAll();
       await this.connectionsResource.loadAll();
     } catch (exception) {
-      this.notificationService.logException(exception, 'authentication_administration_user_connections_access_connections_load_fail');
+      this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }
   }
 }

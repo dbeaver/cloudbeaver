@@ -123,6 +123,7 @@ export * from './FormControls/Textarea';
 export * from './FormControls/TextareaNew';
 export * from './Link';
 export * from './ErrorMessage';
+export * from './StatusMessage';
 export * from './ExceptionMessage';
 export * from './IconButton';
 export * from './IconOrImage';

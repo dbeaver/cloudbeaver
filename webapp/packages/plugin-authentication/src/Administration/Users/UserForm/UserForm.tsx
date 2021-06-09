@@ -11,9 +11,8 @@ import styled, { css } from 'reshadow';
 
 import {
   TabsState, TabList,
-  Loader, SubmittingForm,
-  ErrorMessage, Button,
-  useFocus, BORDER_TAB_STYLES, TabPanelList
+  Loader, SubmittingForm, Button,
+  useFocus, TabPanelList, UNDERLINE_TAB_STYLES, StatusMessage
 } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
@@ -23,32 +22,28 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { UserFormController } from './UserFormController';
 import { UserFormService } from './UserFormService';
 
-const tabStyles = composes(
+const tabsStyles = css`
+  TabList {
+    position: relative;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  Tab {
+    height: 46px!important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
+  }
+`;
+
+const formStyles = composes(
   css`
-    Tab {
-      composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    }
-  `
-);
-
-const styles = composes(
-  css`
-    TabList {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-
     FormBox {
       composes: theme-background-secondary theme-text-on-secondary from global;
     }
-
     content-box {
-      composes: theme-background-secondary theme-border-color-background from global;
+      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
     }
-  `,
+`,
   css`
     box {
       display: flex;
@@ -57,43 +52,53 @@ const styles = composes(
       height: 100%;
       overflow: auto;
     }
-
     content-box {
       display: flex;
       flex: 1;
       flex-direction: column;
       overflow: auto;
     }
-
     SubmittingForm {
       flex: 1;
+      overflow: auto;
       display: flex;
       flex-direction: column;
     }
+`);
 
-    ErrorMessage {
-      position: sticky;
-      bottom: 0;
-      padding: 8px 24px;
+const topBarStyles = composes(
+  css`
+    connection-top-bar {
+      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     }
-
-    fill {
-      flex: 1;
-    }
-
-    SubmittingForm {
+  `,
+  css`
+    connection-top-bar {
       position: relative;
-      min-height: 320px;
-      max-height: 500px;
-    }
+      display: flex;
+      padding-top: 16px;
 
-    Button:not(:first-child) {
-      margin-right: 24px;
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-bottom: solid 2px;
+        border-color: inherit;
+      }
     }
-
-    layout-grid {
+    connection-top-bar-tabs {
+      overflow: hidden;
       flex: 1;
-      width: 100%;
+    }
+    StatusMessage {
+      padding: 0 16px;
+    }
+    connection-top-bar-actions {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
     }
   `
 );
@@ -109,7 +114,8 @@ export const UserForm = observer(function UserForm({
   editing = false,
   onCancel,
 }: Props) {
-  const tabsStyles = [tabStyles, BORDER_TAB_STYLES];
+  const style = [tabsStyles, UNDERLINE_TAB_STYLES];
+  const styles = useStyles(style, topBarStyles, formStyles);
   const translate = useTranslate();
   const service = useService(UserFormService);
   const controller = useController(UserFormController);
@@ -117,40 +123,42 @@ export const UserForm = observer(function UserForm({
 
   controller.update(user, editing, onCancel);
 
-  return styled(useStyles(styles, tabsStyles))(
+  return styled(useStyles(styles))(
     <TabsState container={service.tabsContainer} user={user} controller={controller} editing={editing}>
-      <box as='div'>
-        <TabList style={tabsStyles}>
-          <fill as="div" />
-          <Button
-            type="button"
-            disabled={controller.isSaving}
-            mod={['outlined']}
-            onClick={onCancel}
-          >
-            {translate('ui_processing_cancel')}
-          </Button>
-          <Button
-            type="button"
-            disabled={controller.isSaving}
-            mod={['unelevated']}
-            onClick={controller.save}
-          >
-            {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
-          </Button>
-        </TabList>
-        <content-box as='div'>
+      <box>
+        <connection-top-bar>
+          <connection-top-bar-tabs>
+            <StatusMessage
+              status={controller.statusMessage?.status}
+              message={controller.statusMessage?.message}
+              onShowDetails={controller.error.hasDetails ? controller.showDetails : undefined}
+            />
+            <TabList style={style} />
+          </connection-top-bar-tabs>
+          <connection-top-bar-actions>
+            <Button
+              type="button"
+              disabled={controller.isSaving}
+              mod={['outlined']}
+              onClick={onCancel}
+            >
+              {translate('ui_processing_cancel')}
+            </Button>
+            <Button
+              type="button"
+              disabled={controller.isSaving}
+              mod={['unelevated']}
+              onClick={controller.save}
+            >
+              {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+            </Button>
+          </connection-top-bar-actions>
+        </connection-top-bar>
+        <content-box>
           <SubmittingForm ref={focusedRef} onSubmit={controller.save}>
-            <TabPanelList style={tabsStyles} />
+            <TabPanelList style={style} />
             <Loader loading={controller.isLoading} overlay />
           </SubmittingForm>
-          {controller.error.responseMessage && (
-            <ErrorMessage
-              text={controller.error.responseMessage}
-              hasDetails={controller.error.hasDetails}
-              onShowDetails={controller.showDetails}
-            />
-          )}
         </content-box>
       </box>
     </TabsState>

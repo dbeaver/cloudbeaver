@@ -27,6 +27,7 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'info',
       name: 'authentication_administration_user_info',
+      title: 'authentication_administration_user_info',
       order: 1,
       panel: () => UserInfo,
     });
@@ -40,6 +41,7 @@ export class UserFormBaseBootstrap extends Bootstrap {
     this.userFormService.tabsContainer.add({
       key: 'connections_access',
       name: 'authentication_administration_user_connections_access',
+      title: 'authentication_administration_user_connections_access',
       order: 3,
       panel: () => ConnectionAccess,
       onOpen: ({ props }) => props.controller.loadConnectionsAccess(),
