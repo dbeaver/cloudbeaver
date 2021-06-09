@@ -68,6 +68,7 @@ export interface Query {
   sqlSupportedOperations: DataTypeLogicalOperation[];
   templateConnections: ConnectionInfo[];
   updateConnectionConfiguration: ConnectionInfo;
+  updateRole: AdminRoleInfo;
   userConnections: ConnectionInfo[];
 }
 
@@ -108,6 +109,8 @@ export interface QueryCreateConnectionConfigurationArgs {
 
 export interface QueryCreateRoleArgs {
   roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
 }
 
 export interface QueryCreateUserArgs {
@@ -258,6 +261,12 @@ export interface QuerySqlSupportedOperationsArgs {
 export interface QueryUpdateConnectionConfigurationArgs {
   id: Scalars['ID'];
   config: ConnectionConfig;
+}
+
+export interface QueryUpdateRoleArgs {
+  roleId: Scalars['ID'];
+  roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
 }
 
 export interface QueryUserConnectionsArgs {
@@ -893,6 +902,7 @@ export interface AdminUserInfo {
 export interface AdminRoleInfo {
   roleId: Scalars['ID'];
   roleName?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
   rolePermissions: Array<Maybe<Scalars['ID']>>;
 }
 
@@ -1042,7 +1052,7 @@ export type GetRolesListQueryVariables = Exact<{
   roleId?: Maybe<Scalars['ID']>;
 }>;
 
-export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName'>>> }
+export interface GetRolesListQuery { roles: Array<Maybe<Pick<AdminRoleInfo, 'roleId' | 'roleName' | 'description'>>> }
 
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId?: Maybe<Scalars['ID']>;
@@ -1445,7 +1455,7 @@ export interface GetSqlExecuteTaskResultsMutation {
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
         & { columns?: Maybe<Array<Maybe<(
-          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'scale' | 'typeName'>
+          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'readOnlyStatus' | 'scale' | 'typeName'>
           & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
         )>>>; }
       )>; }
@@ -1923,6 +1933,7 @@ export const GetRolesListDocument = `
   roles: listRoles(roleId: $roleId) {
     roleId
     roleName
+    description
   }
 }
     `;
