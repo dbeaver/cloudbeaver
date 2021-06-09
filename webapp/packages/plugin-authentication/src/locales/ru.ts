@@ -11,8 +11,6 @@ export default [
   ['authentication_administration_user_connections_access_granted_role', 'Роль:'],
   ['authentication_administration_user_connections_access_granted_directly', 'Напрямую'],
   ['authentication_administration_user_connections_access_granted_unmanaged', 'Неуправляемый'],
-  ['authentication_administration_user_connections_access_cloud_placeholder', 'Облачные подключения видны всем пользователям. Вы можете настроить доступ в "Консоль Управления AWS".'],
-  ['authentication_administration_user_connections_access_admin_placeholder', 'Администраторы видят все подключения.'],
   ['authentication_administration_user_connections_empty', 'Нет доступных коннекшенов'],
   ['authentication_administration_user_origin_empty', 'Дополнительная информация не доступна'],
   ['authentication_administration_user_info', 'Общее'],

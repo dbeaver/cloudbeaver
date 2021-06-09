@@ -57,7 +57,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   readonly error: GQLErrorCatcher;
 
-  private isDistructed: boolean;
+  private isDestructed: boolean;
   private connectionAccessChanged: boolean;
   private connectionAccessLoaded: boolean;
   private collapse!: () => void;
@@ -93,7 +93,7 @@ export class UserFormController implements IInitializableController, IDestructib
       roles: new Map(),
     };
     this.error = new GQLErrorCatcher();
-    this.isDistructed = false;
+    this.isDestructed = false;
     this.connectionAccessChanged = false;
     this.connectionAccessLoaded = false;
     this.statusMessage = null;
@@ -112,7 +112,7 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   destruct(): void {
-    this.isDistructed = true;
+    this.isDestructed = true;
   }
 
   save = async () => {
@@ -146,25 +146,15 @@ export class UserFormController implements IInitializableController, IDestructib
       this.error.clear();
       this.statusMessage = null;
     } catch (exception) {
-      if (this.error.catch(exception)) {
-        this.setStatusMessage(this.error.responseMessage || '', ENotificationType.Error);
+      this.error.catch(exception);
+      const title = this.editing ? 'authentication_administration_user_update_failed' : 'authentication_administration_user_create_failed';
+
+      if (this.isDestructed) {
+        this.notificationService.logException(exception, title);
         return;
       }
 
-      if (this.isDistructed) {
-        if (this.editing) {
-          this.notificationService.logException(exception, 'authentication_administration_user_update_failed');
-        } else {
-          this.notificationService.logException(exception, 'authentication_administration_user_create_failed');
-        }
-        return;
-      }
-
-      if (this.editing) {
-        this.setStatusMessage('authentication_administration_user_update_failed', ENotificationType.Error);
-      } else {
-        this.setStatusMessage('authentication_administration_user_create_failed', ENotificationType.Error);
-      }
+      this.setStatusMessage(this.error.responseMessage || exception.message || title, ENotificationType.Error);
     } finally {
       this.isSaving = false;
     }

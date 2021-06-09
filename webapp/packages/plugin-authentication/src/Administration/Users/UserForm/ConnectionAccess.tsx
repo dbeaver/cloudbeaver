@@ -77,7 +77,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
       <ColoredContainer parent>
         <Group keepSize large>
           <TextPlaceholder>
-            {translate('authentication_administration_user_connections_access_admin_placeholder')}
+            {translate('connections_connection_access_admin_info')}
           </TextPlaceholder>
         </Group>
       </ColoredContainer>
@@ -99,7 +99,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
             {cloudExists && (
               <TableItem item='cloudInfo'>
                 <TableColumnValue colSpan={5}>
-                  {translate('authentication_administration_user_connections_access_cloud_placeholder')}
+                  {translate('connections_connection_access_cloud_placeholder')}
                 </TableColumnValue>
               </TableItem>
             )}

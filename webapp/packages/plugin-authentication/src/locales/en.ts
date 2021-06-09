@@ -13,8 +13,6 @@ export default [
   ['authentication_administration_user_connections_access_granted_role', 'Role:'],
   ['authentication_administration_user_connections_access_granted_directly', 'Directly'],
   ['authentication_administration_user_connections_access_granted_unmanaged', 'Unmanaged'],
-  ['authentication_administration_user_connections_access_cloud_placeholder', 'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".'],
-  ['authentication_administration_user_connections_access_admin_placeholder', 'Administrators see all connections.'],
   ['authentication_administration_user_connections_empty', 'No available connections'],
   ['authentication_administration_user_origin_empty', 'No available details'],
   ['authentication_administration_user_info', 'Info'],
