@@ -48,4 +48,6 @@ public interface DBWServiceAuth extends DBWService {
     @WebAction(requirePermissions = {})
     WebAuthProviderInfo[] getAuthProviders();
 
+    @WebAction()
+    boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException;
 }
