@@ -9,7 +9,6 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { ConnectionsResource } from '../../Administration/ConnectionsResource';
@@ -57,10 +56,11 @@ export class ConnectionAccessTabService extends Bootstrap {
 
   private stateGetter(context: IConnectionFormProps): MetadataValueGetter<string, IConnectionAccessTabState> {
     return () => ({
-      selectedSubjects: new Map(),
       loading: false,
       loaded: false,
+      editing: false,
       grantedSubjects: [],
+      initialGrantedSubjects: [],
     });
   }
 
@@ -93,8 +93,9 @@ export class ConnectionAccessTabService extends Bootstrap {
     if (changed) {
       await this.connectionsResource.setAccessSubjects(
         config.connectionId,
-        state.grantedSubjects.map(subject => subject.subjectId)
+        state.grantedSubjects
       );
+      state.initialGrantedSubjects = state.grantedSubjects.slice();
     }
   }
 
@@ -125,12 +126,12 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
   }
 
-  private async isChanged(connectionId: string, next: AdminConnectionGrantInfo[]): Promise<boolean> {
+  private async isChanged(connectionId: string, next: string[]): Promise<boolean> {
     const current = await this.connectionsResource.loadAccessSubjects(connectionId);
     if (current.length !== next.length) {
       return true;
     }
 
-    return current.some(value => !next.some(subject => subject.subjectId === value.subjectId));
+    return current.some(value => !next.some(subjectId => subjectId === value.subjectId));
   }
 }
