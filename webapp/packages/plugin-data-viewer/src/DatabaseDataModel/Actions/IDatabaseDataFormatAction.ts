@@ -15,5 +15,5 @@ export interface IDatabaseDataFormatAction<TKey, TResult extends IDatabaseDataRe
   get: (value: any) => any;
   getText: (value: any) => string | null;
   isNull: (value: any) => boolean;
-  toString: (value: any) => string;
+  toDisplayString: (value: any) => string;
 }

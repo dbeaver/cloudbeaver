@@ -15,7 +15,7 @@ import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { DatabaseDataEditorActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
+import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
 
 @databaseDataAction()
@@ -23,7 +23,7 @@ export class ResultSetSelectAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataSelectAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  readonly actions: IExecutor<DatabaseDataEditorActionsData<IResultSetElementKey>>;
+  readonly actions: IExecutor<DatabaseDataSelectActionsData<IResultSetElementKey>>;
   readonly selectedElements: Map<number, number[]>;
 
   private focusedElement: IResultSetElementKey | null;

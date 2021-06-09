@@ -9,9 +9,5 @@
 import type { FormatterProps } from 'react-data-grid';
 
 export const IndexFormatter: React.FC<FormatterProps> = function IndexFormatter({ rowIdx }) {
-  return (
-    <index-formatter as='div'>
-      {rowIdx + 1}
-    </index-formatter>
-  );
+  return <div>{rowIdx + 1}</div>;
 };

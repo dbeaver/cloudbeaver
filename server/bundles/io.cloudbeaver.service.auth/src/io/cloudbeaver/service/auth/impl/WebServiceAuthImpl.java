@@ -248,4 +248,16 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             .toArray(WebAuthProviderInfo[]::new);
     }
 
+    @Override
+    public boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("User must be logged in");
+        }
+        try {
+            return LocalAuthProvider.changeUserPassword(webSession, oldPassword, newPassword);
+        } catch (DBException e) {
+            throw new DBWebException("Error changing user password", e);
+        }
+    }
+
 }

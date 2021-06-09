@@ -90,7 +90,7 @@ export class DataGridContextMenuFilterService {
         },
         titleGetter() {
           const val = typeof value === 'function' ? value() : value;
-          const stringifyValue = format.toString(val);
+          const stringifyValue = format.toDisplayString(val);
           const wrappedValue = wrapOperationArgument(operation.id, stringifyValue);
           const clippeddValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
           return `${columnLabel} ${operation.expression} ${clippeddValue}`;
@@ -244,7 +244,7 @@ export class DataGridContextMenuFilterService {
                   icon: '/icons/filter_custom.png',
                   onClick: async () => {
                     const isNull = format.isNull(cellValue);
-                    const stringifyCellValue = format.toString(cellValue);
+                    const stringifyCellValue = format.toDisplayString(cellValue);
                     const customValue = await this.commonDialogService.open(
                       FilterCustomValueDialog,
                       {
