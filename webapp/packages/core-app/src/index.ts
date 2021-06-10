@@ -6,6 +6,7 @@ export * from './TopNavBar/SettingsMenu/SettingsMenuService';
 export * from './TopNavBar/ConnectionSchemaManager/ConnectionSchemaManagerService';
 export * from './TopNavBar/TopNavBarService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';
+export * from './TopNavBar/shared/topMenuStyles';
 export * from './shared/NodesManager/ConnectionDialogsService';
 export * from './shared/NodesManager/extensions/IObjectCatalogProvider';
 export * from './shared/NodesManager/extensions/IObjectCatalogSetter';

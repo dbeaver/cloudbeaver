@@ -16,7 +16,8 @@ import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
-import { UserInfo } from './UserInfo';
+import { UserMenu } from './UserMenu/UserMenu';
+import { UserMenuService } from './UserMenu/UserMenuService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -28,6 +29,7 @@ export class PluginBootstrap extends Bootstrap {
     private settingsMenuService: SettingsMenuService,
     private topNavService: TopNavService,
     private administrationTopAppBarService: AdministrationTopAppBarService,
+    private userMenuService: UserMenuService,
     private readonly serverConfigurationService: ServerConfigurationService
   ) {
     super();
@@ -55,9 +57,9 @@ export class PluginBootstrap extends Bootstrap {
         onClick: this.authenticationService.logout.bind(this.authenticationService),
       }
     );
-
-    this.topNavService.placeholder.add(UserInfo, 4);
-    this.administrationTopAppBarService.placeholder.add(UserInfo, 4);
+    this.userMenuService.register();
+    this.topNavService.placeholder.add(UserMenu, 4);
+    this.administrationTopAppBarService.placeholder.add(UserMenu, 4);
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
   }
 

@@ -19,6 +19,7 @@ export interface Scalars {
 export interface Query {
   activeUser?: Maybe<UserInfo>;
   allConnections: ConnectionInfo[];
+  authChangeLocalPassword: Scalars['Boolean'];
   authLogin: UserAuthToken;
   authLogout?: Maybe<Scalars['Boolean']>;
   authModels: DatabaseAuthModel[];
@@ -74,6 +75,11 @@ export interface Query {
 
 export interface QueryAllConnectionsArgs {
   id?: Maybe<Scalars['ID']>;
+}
+
+export interface QueryAuthChangeLocalPasswordArgs {
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
 }
 
 export interface QueryAuthLoginArgs {
@@ -996,6 +1002,13 @@ export type AsyncTaskCancelMutationVariables = Exact<{
 
 export interface AsyncTaskCancelMutation { result: Mutation['asyncTaskCancel'] }
 
+export type AuthChangeLocalPasswordQueryVariables = Exact<{
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+export type AuthChangeLocalPasswordQuery = Pick<Query, 'authChangeLocalPassword'>;
+
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
   credentials: Scalars['Object'];
@@ -1856,6 +1869,11 @@ export const AsyncTaskCancelDocument = `
   result: asyncTaskCancel(id: $taskId)
 }
     `;
+export const AuthChangeLocalPasswordDocument = `
+    query authChangeLocalPassword($oldPassword: String!, $newPassword: String!) {
+  authChangeLocalPassword(oldPassword: $oldPassword, newPassword: $newPassword)
+}
+    `;
 export const AuthLoginDocument = `
     query authLogin($provider: ID!, $credentials: Object!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
   authToken: authLogin(
@@ -2639,6 +2657,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables): Promise<AsyncTaskCancelMutation> {
       return withWrapper(() => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables));
+    },
+    authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables): Promise<AuthChangeLocalPasswordQuery> {
+      return withWrapper(() => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables));
     },
     authLogin(variables: AuthLoginQueryVariables): Promise<AuthLoginQuery> {
       return withWrapper(() => client.request<AuthLoginQuery>(AuthLoginDocument, variables));

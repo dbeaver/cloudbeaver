@@ -25,6 +25,8 @@ export default [
   ['authentication_administration_user_create_failed', 'Не удалось создать пользователя'],
   ['authentication_user_name', 'Имя'],
   ['authentication_user_credentials', 'Учетные данные'],
+  ['authentication_user_old_password', 'Старый пароль'],
+  ['authentication_user_new_password', 'Новый пароль'],
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],
   ['authentication_user_role', 'Роль'],
@@ -34,4 +36,8 @@ export default [
   ['authentication_user_passwords_not_match', 'Пароли не совпадают'],
   ['authentication_user_login_already_exists', 'Пользователь с таким именем уже существует'],
   ['authentication_user_login_cant_be_used', 'Данное имя нельзя использовать'],
+  ['authentication_user_password_change_dialog_title', 'Изменение пароля (локального)'],
+  ['authentication_user_password_change_menu_title', 'Изменить локальный пароль'],
+  ['authentication_user_password_change_success', 'Пароль успешно изменен'],
+  ['authentication_user_password_change_dialog_submit', 'Изменить'],
 ];
