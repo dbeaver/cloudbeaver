@@ -21,6 +21,7 @@ import { GQLError, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ChangeUserPasswordDialogFooter } from './ChangeUserPasswordDialogFooter';
+import { UsersResource } from '@cloudbeaver/core-authentication';
 
 const styles = composes(
   css`
@@ -37,9 +38,6 @@ const styles = composes(
     }
 `);
 
-interface IPayload {
-  change: (oldPassword: string, newPassword: string) => Promise<void>;
-}
 
 interface IState {
   oldPassword: string;
@@ -50,13 +48,14 @@ interface IState {
   submitting: boolean;
 }
 
-export const ChangeUserPasswordDialog: DialogComponent<IPayload, null> = observer(
+export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
   function ChangeUserPasswordDialog({
     payload,
     resolveDialog,
     rejectDialog,
-  }: DialogComponentProps<IPayload, null>) {
+  }: DialogComponentProps<null, null>) {
     const [focusedRef] = useFocus<HTMLInputElement>({});
+    const usersResource = useService(UsersResource)
     const commonDialogService = useService(CommonDialogService);
     const notificationService = useService(NotificationService);
     const style = useStyles(styles, BASE_CONTAINERS_STYLES);
@@ -82,7 +81,7 @@ export const ChangeUserPasswordDialog: DialogComponent<IPayload, null> = observe
 
       try {
         state.submitting = true;
-        await payload.change(state.oldPassword, state.newPassword);
+        await usersResource.updateLocalPassword(state.oldPassword, state.newPassword);
         notificationService.logSuccess({ title: 'authentication_user_password_change_success' });
         resolveDialog();
       } catch (exeption) {
@@ -92,7 +91,7 @@ export const ChangeUserPasswordDialog: DialogComponent<IPayload, null> = observe
       } finally {
         state.submitting = false;
       }
-    }, [state, payload, resolveDialog, notificationService]);
+    }, [state, resolveDialog, notificationService, usersResource]);
 
     useEffect(() => {
       focusedRef.current?.focus();

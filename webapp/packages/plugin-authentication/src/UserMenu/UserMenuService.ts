@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AuthInfoService, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
+import { AuthInfoService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, IComputedMenuItemOptions, IMenuPanel, StaticMenu } from '@cloudbeaver/core-dialogs';
 
@@ -25,7 +25,6 @@ export class UserMenuService {
   constructor(
     private authInfoService: AuthInfoService,
     private commonDialogService: CommonDialogService,
-    private usersResource: UsersResource,
   ) { }
 
   register(): void {
@@ -38,11 +37,7 @@ export class UserMenuService {
         isHidden: () => !this.authInfoService.userInfo?.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID),
         title: 'authentication_user_password_change_menu_title',
         onClick: async () => {
-          await this.commonDialogService.open(ChangeUserPasswordDialog, {
-            change: (oldPassword: string, newPassword: string) => this.usersResource.updateLocalPassword(
-              oldPassword, newPassword
-            ),
-          });
+          await this.commonDialogService.open(ChangeUserPasswordDialog, null);
         },
       }
     );
