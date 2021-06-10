@@ -16,11 +16,12 @@ import { EOrder, getNextOrder, IDatabaseDataModel, IDatabaseDataResult, ResultSe
 const styles = css`
   order-button {
     display: flex;
-    padding: 2px 4px;
     flex-direction: column;
     align-content: center;
     align-items: center;
+    justify-content: center;
     height: 20px;
+    width: 20px;
     box-sizing: border-box;
     cursor: pointer;
   }
@@ -62,7 +63,6 @@ export const OrderButton: React.FC<Props> = observer(function OrderButtton({
   }
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
     if (loading) {
       return;
     }

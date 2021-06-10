@@ -88,8 +88,8 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   };
 
   return styled(useStyles(headerStyles))(
-    <table-header as='div' onClick={handleColumnSelection}>
-      <shrink-container title={columnTooltip}>
+    <table-header>
+      <shrink-container as='div' title={columnTooltip} onClick={handleColumnSelection}>
         <icon>
           <StaticImage icon={column?.icon} />
           {readOnly && <readonly-status className='rdg-table-header__readonly-status' />}
