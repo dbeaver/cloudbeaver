@@ -46,7 +46,7 @@ const headerStyles = css`
     font-weight: 400;
     flex-grow: 1;
   }
-  status {
+  readonly-status {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -92,7 +92,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
       <shrink-container title={columnTooltip}>
         <icon>
           <StaticImage icon={column?.icon} />
-          {readOnly && <status className='rdg-table-header__status' />}
+          {readOnly && <readonly-status className='rdg-table-header__readonly-status' />}
         </icon>
         <name>{columnName}</name>
       </shrink-container>

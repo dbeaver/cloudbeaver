@@ -32,7 +32,7 @@ $edited-color: #ff99006b;
     .cb-react-grid-theme {
       @include mdc-theme-prop(color, on-surface, false);
 
-      .rdg-table-header__status {
+      .rdg-table-header__readonly-status {
         background-color: #e28835;
         @include mdc-theme-prop(border-color, surface, false);
       }
