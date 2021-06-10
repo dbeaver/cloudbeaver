@@ -145,6 +145,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
+  async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
+    await this.graphQLService.sdk.authChangeLocalPassword({
+      oldPassword: this.authProviderService.hashValue(oldPassword),
+      newPassword: this.authProviderService.hashValue(newPassword),
+    });
+  }
+
   async delete(key: ResourceKey<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
