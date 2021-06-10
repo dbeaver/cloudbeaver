@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { uuid, MetadataMap, EDeferredState } from '@cloudbeaver/core-utils';
-import { DatabaseDataAccessMode, DataModelWrapper, fetchingSettings, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataAccessMode, DataModelWrapper, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type {
   IQueryTabGroup, ISqlEditorTabState, ISqlQueryParams, IResultDataTab
@@ -127,7 +127,8 @@ export class SqlResultTabsService {
 
         try {
           await model
-            .setSlice(0, fetchingSettings.fetchDefault)
+            .setCountGain()
+            .setSlice(0)
             .requestData();
 
           length = model.source.results.length;

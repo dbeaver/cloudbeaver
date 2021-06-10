@@ -93,6 +93,14 @@ export abstract class CachedMapResource<
     });
   }
 
+  getException(key: TKey): Error | null;
+  getException(key: ResourceKeyList<TKey>): Array<Error | null>;
+  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null;
+  getException(key: ResourceKey<TKey>): Array<Error | null>| Error | null {
+    key = this.transformParam(key);
+    return ResourceKeyUtils.map(key, key => this.metadata.get(key).exception);
+  }
+
   isOutdated(key: ResourceKey<TKey>): boolean {
     key = this.transformParam(key);
     return ResourceKeyUtils.some(key, key => this.metadata.get(key).outdated);

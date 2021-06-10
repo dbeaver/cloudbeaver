@@ -48,7 +48,7 @@ function copyGridSelectedDataToClipboard(
 
       if (colIndexes.includes(columnIdx)) {
         const cell = editor.getCell(rowIdx, columnIdx);
-        const cellValue = format.get(cell);
+        const cellValue = format.getText(cell);
         rowCellsValues.push(cellValue ?? '');
       } else {
         rowCellsValues.push('');

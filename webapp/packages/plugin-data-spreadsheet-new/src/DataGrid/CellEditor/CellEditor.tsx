@@ -14,6 +14,7 @@ import { usePopper } from 'react-popper';
 import styled, { css } from 'reshadow';
 
 import { InlineEditor } from '@cloudbeaver/core-app';
+import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
@@ -50,6 +51,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
   const inputRef = useRef<HTMLInputElement>(null);
   const [elementRef, setElementRef] = useState<HTMLDivElement | null>(null);
   const [popperRef, setPopperRef] = useState<HTMLDivElement | null>(null);
+  const formatter = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);
   const popper = usePopper(elementRef, popperRef, {
     placement: 'right',
   });
@@ -85,22 +87,9 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
     }
   });
 
-  const value = row[column.key];
-  const numericCell = typeof tableDataContext?.getCellValue(rowIdx, column.key) === 'number';
+  const value = formatter?.getText(row[column.key]) ?? '';
 
-  const handleSave = () => {
-    if (numericCell) {
-      const editor = dataGridContext.model.source.getEditor(dataGridContext.resultIndex);
-      let value = editor.getCell(rowIdx, Number(column.key));
-
-      if (typeof value === 'string') {
-        value = value.replace(',', '.');
-      }
-
-      editor.setCell(rowIdx, Number(column.key), Number(value));
-    }
-    onClose(false);
-  };
+  const handleSave = () => onClose(false);
   const handleReject = () => {
     dataGridContext.model.source.getEditor(dataGridContext.resultIndex)
       .revertCell(rowIdx, Number(column.key));

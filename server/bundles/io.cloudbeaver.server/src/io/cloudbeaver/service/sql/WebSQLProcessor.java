@@ -385,6 +385,7 @@ public class WebSQLProcessor {
                                 for (int i = 0; i < updateAttributes.length; i++) {
                                     DBDAttributeBinding updateAttribute = updateAttributes[i];
                                     Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
+                                    cellRawValue = WebSQLUtils.makePlainCellValue(cellRawValue);
                                     Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
                                     rowValues[i] = realCellValue;
                                     finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);

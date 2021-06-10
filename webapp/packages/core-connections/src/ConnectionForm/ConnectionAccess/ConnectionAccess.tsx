@@ -6,18 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  Table,
-  TableHeader,
-  TableColumnHeader,
-  TableBody,
-  TableItem,
-  TableColumnValue,
-  TableItemSelect,
   TextPlaceholder,
   Loader,
   useTab,
@@ -25,43 +20,56 @@ import {
   useMapResource,
   BASE_CONTAINERS_STYLES,
   ColoredContainer,
-  Group
+  Group,
+  IconOrImage,
 } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, composes } from '@cloudbeaver/core-theming';
+import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import { useStyles } from '@cloudbeaver/core-theming';
 
+import { isCloudConnection } from '../../Administration/ConnectionsResource';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
+import { ConnectionAccessList } from './ConnectionAccessList';
 import { useConnectionAccessState } from './useConnectionAccessState';
 
-const styles = composes(
-  css`
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-  `,
-  css`
-    ColoredContainer {
-      flex: 1;
-      overflow: auto;
-    }
-    Group {
-      max-height: 100%;
-      position: relative;
-      overflow: auto !important;
-    }
-    Table {
-      flex: 1;
-    }
-  `
-);
+const styles = css`
+  ColoredContainer {
+    flex: 1;
+    overflow: auto;
+  }
+  Group {
+    max-height: 100%;
+    position: relative;
+    overflow: auto !important;
+  }
+  info-item {
+    display: flex;
+    align-items: center;
+  }
+  IconOrImage {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+  }
+  Loader {
+    z-index: 2;
+  }
+`;
+
+interface IInfoItem {
+  text: TLocalizationToken;
+  icon: string;
+}
 
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({
   tabId,
   state: formState,
 }) {
-  const { state, load, select } = useConnectionAccessState(formState);
+  const { state, edit, grant, revoke, load } = useConnectionAccessState(formState.info);
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
+  const unsaved = state.initialGrantedSubjects.length !== state.grantedSubjects.length
+   || state.initialGrantedSubjects.some(subject => !state.grantedSubjects.includes(subject));
 
   const users = useMapResource(UsersResource, null, {
     onLoad: resource => resource.loadAll(),
@@ -71,56 +79,74 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     onLoad: resource => resource.loadAll(),
   });
 
+  const grantedUsers = useMemo(() => computed(() => users.resource.values
+    .filter(user => state.grantedSubjects.includes(user.userId))
+  ), [state.grantedSubjects, users.resource]);
+
+  const grantedRoles = useMemo(() => computed(() => roles.resource.values
+    .filter(role => state.grantedSubjects.includes(role.roleId))
+  ), [state.grantedSubjects, roles.resource]);
+
   const { selected } = useTab(tabId, load);
   const loading = users.isLoading() || roles.isLoading() || state.loading;
-  const disabled = loading || !state.loaded || formState.disabled;
+  const cloud = formState.info ? isCloudConnection(formState.info) : false;
+  const disabled = loading || !state.loaded || formState.disabled || cloud;
+  let infoItem: IInfoItem | null = null;
+
+  if (unsaved) {
+    infoItem = {
+      text: 'connections_connection_access_save_reminder',
+      icon: '/icons/info_icon.svg',
+    };
+  }
+
+  if (cloud) {
+    infoItem = {
+      text: 'connections_connection_access_cloud_placeholder',
+      icon: '/icons/info_icon.svg',
+    };
+  }
 
   if (!selected) {
     return null;
   }
 
-  if (users.resource.values.length === 0 && roles.resource.values.length) {
-    return styled(style)(
-      <ColoredContainer parent>
-        <Group keepSize large>
-          <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
-        </Group>
-      </ColoredContainer>
-    );
-  }
-
   return styled(style)(
-    <ColoredContainer parent>
-      <Group box keepSize large>
-        <Table selectedItems={state.selectedSubjects} onSelect={select}>
-          <TableHeader>
-            <TableColumnHeader min />
-            <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-            <TableColumnHeader />
-          </TableHeader>
-          <TableBody>
-            {roles.resource.values.map(role => (
-              <TableItem key={role.roleId} item={role.roleId} selectDisabled={disabled}>
-                <TableColumnValue centerContent flex>
-                  <TableItemSelect disabled={disabled} />
-                </TableColumnValue>
-                <TableColumnValue>{role.roleName}</TableColumnValue>
-                <TableColumnValue />
-              </TableItem>
-            ))}
-            {users.resource.values.map(user => (
-              <TableItem key={user.userId} item={user.userId} selectDisabled={disabled}>
-                <TableColumnValue centerContent flex>
-                  <TableItemSelect disabled={disabled} />
-                </TableColumnValue>
-                <TableColumnValue>{user.userId}</TableColumnValue>
-                <TableColumnValue />
-              </TableItem>
-            ))}
-          </TableBody>
-        </Table>
-        <Loader key="overlay" loading={loading} overlay />
-      </Group>
-    </ColoredContainer>
+    <Loader state={[users, roles, state]}>
+      {() => styled(style)(
+        <ColoredContainer parent gap>
+          {!users.resource.values.length && !roles.resource.values.length ? (
+            <Group keepSize large>
+              <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
+            </Group>
+          ) : (
+            <>
+              {infoItem && (
+                <info-item>
+                  <IconOrImage icon={infoItem.icon} />
+                  {translate(infoItem.text)}
+                </info-item>
+              )}
+              <ConnectionAccessGrantedList
+                grantedUsers={grantedUsers.get()}
+                grantedRoles={grantedRoles.get()}
+                disabled={disabled}
+                onEdit={edit}
+                onRevoke={revoke}
+              />
+              {state.editing && (
+                <ConnectionAccessList
+                  userList={users.resource.values}
+                  roleList={roles.resource.values}
+                  grantedSubjects={state.grantedSubjects}
+                  disabled={disabled}
+                  onGrant={grant}
+                />
+              )}
+            </>
+          )}
+        </ColoredContainer>
+      )}
+    </Loader>
   );
 });

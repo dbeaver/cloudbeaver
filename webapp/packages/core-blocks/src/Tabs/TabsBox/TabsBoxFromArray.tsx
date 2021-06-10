@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { useStyles, Style } from '@cloudbeaver/core-theming';
 
-import { Tab } from '../Tab';
+import { Tab } from '../Tab/Tab';
 import { TabPanel } from '../TabPanel';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsBox } from './TabsBox';

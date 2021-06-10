@@ -6,4 +6,11 @@ export default [
   ['data_viewer_statistics_updated_rows', 'Updated Rows:'],
   ['data_viewer_presentation_value_title', 'Value'],
   ['data_viewer_presentation_value_text_title', 'Text'],
+  ['data_viewer_presentation_value_text_plain_title', 'Text'],
+  ['data_viewer_presentation_value_text_html_title', 'HTML'],
+  ['data_viewer_presentation_value_text_xml_title', 'XML'],
+  ['data_viewer_presentation_value_text_json_title', 'JSON'],
+  ['data_viewer_presentation_value_image_title', 'Image'],
+  ['data_viewer_presentation_value_image_fit', 'Fit Window'],
+  ['data_viewer_presentation_value_image_original_size', 'Original Size'],
 ];

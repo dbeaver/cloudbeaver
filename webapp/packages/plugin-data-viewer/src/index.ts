@@ -2,6 +2,11 @@ import { manifest } from './manifest';
 
 export default manifest;
 
+export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
+export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';
+export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
+export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -34,7 +39,6 @@ export * from './TableViewer/ValuePanel/DataValuePanelService';
 
 export * from './TableViewer/TableViewer';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
-export * from './TableViewer/TableViewerModel';
 export * from './TableViewer/DataModelWrapper';
 
 export * from './TableViewer/TableDataModel/TableColumn';

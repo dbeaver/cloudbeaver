@@ -69,6 +69,10 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
     }
   }
 
+  if (tab.handlerState.error) {
+    return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
+  }
+
   if (!isLoaded() || (!isOutdated() && isLoading())) {
     return <Loader />;
   }

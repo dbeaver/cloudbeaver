@@ -20,7 +20,12 @@ export const UsersDrawerItem: React.FC<AdministrationItemDrawerProps> = function
   disabled,
 }) {
   return styled(useStyles(...style))(
-    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
+    <Tab
+      tabId={item.name}
+      disabled={disabled}
+      title='authentication_administration_item'
+      onOpen={() => onSelect(item.name)}
+    >
       <TabIcon icon='/icons/account.svg' />
       <TabTitle><Translate token='authentication_administration_item' /></TabTitle>
     </Tab>

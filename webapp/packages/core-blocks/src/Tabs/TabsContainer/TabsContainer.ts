@@ -37,6 +37,10 @@ implements ITabsContainer<TProps, TOptions> {
     this.currentTabId = null;
   }
 
+  has(tabId: string): boolean {
+    return this.tabInfoMap.has(tabId);
+  }
+
   select(tabId: string | null, props: TProps): void {
     if (tabId === null) {
       this.currentTabId = tabId;

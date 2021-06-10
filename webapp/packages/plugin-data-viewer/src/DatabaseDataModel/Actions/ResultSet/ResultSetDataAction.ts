@@ -11,12 +11,14 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseResultDataAction } from '../IDatabaseDataAction';
+import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
+import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetElementKey } from './IResultSetElementKey';
+import { isResultSetContentValue } from './isResultSetContentValue';
 
 @databaseDataAction()
 export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseResultDataAction<IResultSetElementKey, IDatabaseResultSet> {
+  implements IDatabaseDataResultAction<IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
   getCellValue(cell: IResultSetElementKey): any {
@@ -25,6 +27,16 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     }
 
     return this.result.data.rows?.[cell.row]?.[cell.column];
+  }
+
+  getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
+    const value = this.getCellValue(cell);
+
+    if (isResultSetContentValue(value)) {
+      return value;
+    }
+
+    return null;
   }
 
   getColumn(columnIndex: number) {

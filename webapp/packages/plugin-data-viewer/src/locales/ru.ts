@@ -3,4 +3,7 @@ export default [
   ['data_viewer_nodata_message', 'Нет данных для отображения'],
   ['data_viewer_presentation_value_title', 'Значение'],
   ['data_viewer_presentation_value_text_title', 'Текст'],
+  ['data_viewer_presentation_value_image_title', 'Изображение'],
+  ['data_viewer_presentation_value_image_fit', 'Растянуть'],
+  ['data_viewer_presentation_value_image_original_size', 'Оригинальный размер'],
 ];

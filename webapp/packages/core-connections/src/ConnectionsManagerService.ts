@@ -167,7 +167,6 @@ export class ConnectionsManagerService {
   }
 
   private async afterConnectionClose(id: string) {
-    // this.navNodeManagerService.removeTree(id);
     this.onCloseConnection.next(id);
   }
 

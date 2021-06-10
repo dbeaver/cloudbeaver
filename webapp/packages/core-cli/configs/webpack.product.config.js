@@ -10,7 +10,31 @@ const { getAssets, withTimestamp } = require('./webpack.product.utils');
 
 const main = resolve('src/index.ts')
 const outputDir = resolve('lib')
-const package = require(resolve('package.json'));
+const package = require(resolve('package.json'))
+
+const excludedFromVendor = [
+  'react-data-grid',
+  'leaflet',
+  'react-leaflet',
+  'wellknown',
+  'jquery',
+  'joint',
+  'backbone',
+  'lodash',
+  'canvg',
+  'sanitize-html',
+  'react-sanitized-html',
+  'dagre',
+  'svg-pathdata',
+  '@emotion',
+  'stackblur-canvas',
+  'graphlib',
+  '@emotion',
+  'svg-tag-names',
+  'html-tags',
+  'codemirror',
+  'react-codemirror2'
+]
 
 const timestampVersion = withTimestamp(package.version)
 
@@ -31,7 +55,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       cacheGroups: {
         vendor: {
           // TODO: we need another way to detect libraries to exclude
-          test: /[\\/]node_modules[\\/](?!(leaflet|react-leaflet|wellknown|react-data-grid))(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          test: `[/]node_modules[\/](?!(${excludedFromVendor.join('|')}))(.[a-zA-Z0-9.\-_]+)[/]`,
           name: 'vendors',
           chunks: 'all',
         },

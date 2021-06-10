@@ -464,6 +464,28 @@ class CBSecurityController implements DBWSecurityController {
     }
 
     @Override
+    public void updateRole(WebRole role) throws DBCException {
+        if (!isSubjectExists(role.getRoleId())) {
+            throw new DBCException("Role '" + role.getRoleId() + "' doesn't exists");
+        }
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                createAuthSubject(dbCon, role.getRoleId(), SUBJECT_ROLE);
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "UPDATE CB_ROLE SET ROLE_NAME=?,ROLE_DESCRIPTION=? WHERE ROLE_ID=?")) {
+                    dbStat.setString(1, CommonUtils.notEmpty(role.getName()));
+                    dbStat.setString(2, CommonUtils.notEmpty(role.getDescription()));
+                    dbStat.setString(3, role.getRoleId());
+                    dbStat.execute();
+                }
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error updating role info in database", e);
+        }
+    }
+
+    @Override
     public void deleteRole(String roleId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {

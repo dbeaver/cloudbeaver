@@ -12,7 +12,7 @@ import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 import type { Order } from '../Order';
 
-export interface IDatabaseDataConstraintAction<TKey, TResult extends IDatabaseDataResult>
+export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
   readonly filterConstraints: SqlDataFilterConstraint[];
   readonly orderConstraints: SqlDataFilterConstraint[];

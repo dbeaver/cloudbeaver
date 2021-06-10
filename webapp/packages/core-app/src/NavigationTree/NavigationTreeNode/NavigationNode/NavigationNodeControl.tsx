@@ -8,16 +8,15 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { NavNode } from '../../../shared/NodesManager/EntityTypes';
 import { EObjectFeature } from '../../../shared/NodesManager/EObjectFeature';
-import { NodeManagerUtils } from '../../../shared/NodesManager/NodeManagerUtils';
+import { NavNodeInfoResource } from '../../../shared/NodesManager/NavNodeInfoResource';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 
 const styles = composes(
@@ -27,6 +26,14 @@ const styles = composes(
     }
   `,
   css`
+    TreeNodeControl {
+      opacity: 1;
+      transition: opacity 0.2s ease;
+
+      &[|outdated] {
+        opacity: 0.5;
+      }
+    }
     TreeNodeControl:hover > portal, 
     TreeNodeControl:global([aria-selected=true]) > portal,
     portal:focus-within {
@@ -37,6 +44,8 @@ const styles = composes(
     }
     status {
       position: absolute;
+      opacity: 0;
+      transition: opacity 0.3s ease;
       bottom: 0;
       right: 0;
       box-sizing: border-box;
@@ -44,6 +53,10 @@ const styles = composes(
       height: 8px;
       border-radius: 50%;      
       border: 1px solid;
+
+      &[|connected] {
+        opacity: 1;
+      }
     }    
     portal {
       box-sizing: border-box;
@@ -61,25 +74,20 @@ export const NavigationNodeControl: React.FC<Props> = observer(function Navigati
   node,
 }) {
   const context = useContext(TreeNodeContext);
-  const connectionInfoResource = useService(ConnectionInfoResource);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const outdated = navNodeInfoResource.isOutdated(node.id) && !context?.loading;
 
-  let connected = false;
-
-  if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
-    const connectionInfo = connectionInfoResource.get(NodeManagerUtils.connectionNodeIdToConnectionId(node.id));
-
-    connected = !!connectionInfo?.connected;
-  }
+  const connected = node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
 
   const onClickHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     context?.select(event.ctrlKey || event.metaKey);
   }, [context]);
 
   return styled(useStyles(TREE_NODE_STYLES, styles))(
-    <TreeNodeControl onClick={onClickHandler}>
+    <TreeNodeControl onClick={onClickHandler} {...use({ outdated })}>
       <TreeNodeExpand />
       <TreeNodeIcon icon={node.icon}>
-        {connected && <status />}
+        <status {...use({ connected })} />
       </TreeNodeIcon>
       <TreeNodeName>{node.name}</TreeNodeName>
       <portal>

@@ -17,14 +17,13 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { EOrder, Order } from '../../Order';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataConstraintAction } from '../IDatabaseDataConstraintAction';
-import type { IResultSetElementKey } from './IResultSetElementKey';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
 @databaseDataAction()
 export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IResultSetElementKey, IDatabaseResultSet> {
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
   get orderConstraints(): SqlDataFilterConstraint[] {

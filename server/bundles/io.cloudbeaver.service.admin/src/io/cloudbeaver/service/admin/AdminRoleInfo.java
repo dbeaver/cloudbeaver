@@ -40,6 +40,10 @@ public class AdminRoleInfo {
         return role.getName();
     }
 
+    public String getDescription() {
+        return role.getDescription();
+    }
+
     public List<String> getRolePermissions() {
         return rolePermissions;
     }

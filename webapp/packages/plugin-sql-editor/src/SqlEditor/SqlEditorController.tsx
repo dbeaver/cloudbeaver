@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./codemirror.hint.d.ts" />
 
-import {
-  hint, EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
+import type {
+  EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
 } from 'codemirror';
 import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -155,34 +153,36 @@ export class SqlEditorController implements IInitializableController {
   }
 
   private getHandleAutocomplete(): AsyncHintFunction {
-    const handleAutocomplete: AsyncHintFunction = (editor, callback) => {
+    const handleAutocomplete: AsyncHintFunction = async (editor, callback) => {
       if (!this.tab.handlerState.connectionId || !this.tab.handlerState.contextId) {
-        this.editor?.showHint({ hint: hint.sql }); // we show default sql-hint
+        const { hint } = await import('codemirror/addon/hint/sql-hint' as any);
+
+        this.editor?.showHint({ hint }); // we show default sql-hint
         return;
       }
       const cursor = editor.getCursor('from');
       const cursorPosition = getAbsolutePosition(editor, cursor);
       const [from, to] = getWordRange(editor, cursor);
 
-      this.sqlEditorService
+      const proposals = await this.sqlEditorService
         .getAutocomplete(
           this.tab.handlerState.connectionId,
           this.tab.handlerState.contextId,
           this.tab.handlerState.query,
           cursorPosition
-        )
-        .then(proposals => {
-          if (!proposals) {
-            return;
-          }
-          callback({
-            from,
-            to,
-            list: proposals.map(({ displayString, replacementString }) => ({
-              text: replacementString || '', displayText: displayString || '',
-            })),
-          });
-        });
+        );
+
+      if (!proposals) {
+        return;
+      }
+
+      callback({
+        from,
+        to,
+        list: proposals.map(({ displayString, replacementString }) => ({
+          text: replacementString || '', displayText: displayString || '',
+        })),
+      });
     };
     // tell CodeMirror that it is async func
     handleAutocomplete.async = true;

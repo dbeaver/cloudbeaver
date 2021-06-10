@@ -14,8 +14,8 @@ import { useTab } from '@cloudbeaver/core-app';
 import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
-import { CodeEditor } from './CodeEditor/CodeEditor';
-import type { CodeEditorController } from './CodeEditor/CodeEditorController';
+import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
+import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlEditorController } from './SqlEditorController';
 
 type SqlEditorProps = PropsWithChildren<{
@@ -51,14 +51,14 @@ const styles = css`
     cursor: pointer;
   }
 
-  CodeEditor {
+  SQLCodeEditorLoader {
     flex: 1;
   }
 `;
 
 export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
   const tab = useTab(tabId);
-  const editor = useRef<CodeEditorController>(null);
+  const editor = useRef<SQLCodeEditorController>(null);
   const baseTab = useBaseTab(tabId);
   const controller = useController(SqlEditorController, tab);
 
@@ -88,7 +88,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
         >
           <StaticImage
             icon="/icons/sql_exec.png"
-            title="Execute SQL Statement (Ctrl+Enter)"
+            title="Execute SQL Statement (Ctrl + Enter)"
           />
         </button>
         <button
@@ -98,11 +98,11 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
         >
           <StaticImage
             icon="/icons/sql_exec_new.png"
-            title="Execute SQL in new tab (Ctrl+\\)(Shift+Ctrl+Enter)"
+            title="Execute SQL in new tab (Ctrl + \\)(Shift + Ctrl + Enter)"
           />
         </button>
       </actions>
-      <CodeEditor
+      <SQLCodeEditorLoader
         ref={editor}
         bindings={controller.bindings}
         dialect={controller.dialect}

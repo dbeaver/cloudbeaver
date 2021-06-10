@@ -25,6 +25,13 @@ export class ObjectInfoTabService {
       return null;
     }
 
-    return new TabEntity(ObjectInfoTabModel);
+    return new TabEntity(new ObjectInfoTabModel(
+      () => {
+        const node = this.navNodeManagerService.getNode(navNodeId);
+        if (node) {
+          this.navNodeManagerService.navToNode(node.id, node.parentId, 'infoTab');
+        }
+      }
+    ));
   }
 }

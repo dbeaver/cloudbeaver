@@ -19,5 +19,5 @@ export class ObjectInfoTabModel implements ITab {
 
   panel = ObjectInfoTab;
 
-  onActivate = () => {};
+  constructor(public onActivate: () => void) { }
 }

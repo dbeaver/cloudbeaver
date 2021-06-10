@@ -10,15 +10,15 @@ import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { TabProps } from '../Tab/TabProps';
 
-export interface ITabData<T = Record<string, any>> {
+export interface ITabData<T = void> {
   tabId: string;
   props: T;
 }
 
-export type TabContainerTabComponent<TProps = Record<string, any>> = React.FC<TabProps & TProps>;
-export type TabContainerPanelComponent<TProps = Record<string, any>> = React.FC<{ tabId: string } & TProps>;
+export type TabContainerTabComponent<TProps = void> = React.FC<TabProps & TProps>;
+export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string } & TProps>;
 
-export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
+export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, any> = never> {
   key: string;
   name?: string;
   title?: string;
@@ -39,15 +39,16 @@ export interface ITabInfoOptions<TProps = Record<string, any>, TOptions extends 
 }
 
 export interface ITabInfo<
-  TProps = Record<string, any>,
+  TProps = void,
   TOptions extends Record<string, any> = never
 > extends ITabInfoOptions<TProps, TOptions> {
   order: number;
 }
 
-export interface ITabsContainer<TProps = Record<string, any>, TOptions extends Record<string, any> = never> {
+export interface ITabsContainer<TProps = void, TOptions extends Record<string, any> = never> {
   readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
   readonly selectedId: string | null;
+  has: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
   getTabState: <T>(
     state: MetadataMap<string, any>,

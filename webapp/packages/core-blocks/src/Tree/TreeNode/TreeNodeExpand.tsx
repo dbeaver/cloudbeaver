@@ -13,6 +13,7 @@ import { css } from 'reshadow';
 
 import { Icon, Loader } from '@cloudbeaver/core-blocks';
 
+import { useStateDelay } from '../../useStateDelay';
 import { TreeNodeContext } from './TreeNodeContext';
 
 const styles = css`
@@ -52,7 +53,7 @@ export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand(
     event.preventDefault();
   };
 
-  const loading = context.loading || context.processing;
+  const loading = useStateDelay(context.loading || context.processing, 300);
 
   return styled(styles)(
     <arrow className={className} onClick={handleExpand} onDoubleClick={preventDoubleClick}>

@@ -28,7 +28,7 @@ const styles = composes(
     user-create {
       display: flex;
       flex-direction: column;
-      height: 500px;
+      height: 540px;
       overflow: hidden;
     }
 
@@ -39,11 +39,6 @@ const styles = composes(
       align-items: center;
       display: flex;
       font-weight: 400;
-      flex: auto 0 0;
-    }
-
-    user-create-footer {
-      padding-bottom: 48px;
       flex: auto 0 0;
     }
 
@@ -67,12 +62,11 @@ export const CreateUser: React.FC<Props> = function CreateUser({
   onCancel,
 }) {
   return styled(useStyles(styles))(
-    <user-create as='div'>
-      <title-bar as='div'><Translate token='authentication_administration_user_connections_user_add' /></title-bar>
-      <user-create-content as='div'>
+    <user-create>
+      <title-bar><Translate token='authentication_administration_user_connections_user_add' /></title-bar>
+      <user-create-content>
         <UserForm user={user} onCancel={onCancel} />
       </user-create-content>
-      <user-create-footer as='div' />
     </user-create>
   );
 };

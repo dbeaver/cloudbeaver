@@ -7,14 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  TextPlaceholder, TabsBox, TabPanel, useFocus
+  TextPlaceholder, TabsBox, TabPanel, useFocus, useExecutor
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 import { useActiveView } from '@cloudbeaver/core-view';
 
@@ -40,6 +41,7 @@ const styles = composes(
 const stylesArray = [styles];
 
 export const NavigationTabsBar = observer(function NavigationTabsBar() {
+  const sessionDataResource = useService(SessionDataResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
@@ -51,6 +53,18 @@ export const NavigationTabsBar = observer(function NavigationTabsBar() {
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
+
+  async function restoreTabs() {
+    await navigation.unloadTabs();
+    await navigation.restoreTabs();
+  }
+
+  useExecutor({
+    executor: sessionDataResource.onDataUpdate,
+    postHandlers: [restoreTabs],
+  });
+
+  useEffect(() => { restoreTabs(); }, []);
 
   if (navigation.tabIdList.length === 0) {
     return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;

@@ -78,4 +78,6 @@ extend type Query {
 
     authProviders: [AuthProviderInfo!]!
 
+    authChangeLocalPassword(oldPassword: String!, newPassword: String!): Boolean!
+
 }

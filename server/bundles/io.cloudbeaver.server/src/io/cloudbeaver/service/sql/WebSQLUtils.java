@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -43,6 +44,17 @@ public class WebSQLUtils {
     private static final Log log = Log.getLog(WebSQLUtils.class);
 
     public static final int BINARY_PREVIEW_LENGTH = 255;
+    public static final int BINARY_MAX_LENGTH = 1 * 1024 * 1024;
+
+    public static final String VALUE_TYPE_ATTR = "$type";
+
+    public static final String VALUE_TYPE_COLLECTION = "collection";
+    public static final String VALUE_TYPE_MAP = "map";
+    public static final String VALUE_TYPE_DOCUMENT = "document";
+    public static final String VALUE_TYPE_CONTENT = "content";
+    public static final String VALUE_TYPE_GEOMETRY = "geometry";
+    public static final String ATTR_TEXT = "text";
+    public static final String ATTR_BINARY = "binary";
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
@@ -75,7 +87,7 @@ public class WebSQLUtils {
                 items[i] = makeWebCellValue(session, collection.getComponentType(), collection.getItem(i), dataFormat);
             }
 
-            Map<String, Object> map = createMapOfType("collection");
+            Map<String, Object> map = createMapOfType(VALUE_TYPE_COLLECTION);
             map.put("value", items);
             return map;
         } else if (value instanceof DBDComposite) {
@@ -85,7 +97,7 @@ public class WebSQLUtils {
                 struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
             }
 
-            Map<String, Object> map = createMapOfType("map");
+            Map<String, Object> map = createMapOfType(VALUE_TYPE_MAP);
             map.put("value", struct);
             return map;
         }
@@ -95,7 +107,7 @@ public class WebSQLUtils {
     @NotNull
     private static Map<String, Object> createMapOfType(String type) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("$type", type);
+        map.put(VALUE_TYPE_ATTR, type);
         return map;
     }
 
@@ -109,7 +121,7 @@ public class WebSQLUtils {
             throw new DBCException("Error serializing document", e);
         }
 
-        Map<String, Object> map = createMapOfType("document");
+        Map<String, Object> map = createMapOfType(VALUE_TYPE_DOCUMENT);
         map.put("id", CommonUtils.toString(document.getDocumentId()));
         map.put("contentType", document.getDocumentContentType());
         map.put("properties", Collections.emptyMap());
@@ -119,20 +131,27 @@ public class WebSQLUtils {
 
     private static Object serializeContentValue(WebSession session, DBDContent value) throws DBCException {
 
-        Map<String, Object> map = createMapOfType("content");
+        Map<String, Object> map = createMapOfType(VALUE_TYPE_CONTENT);
         if (ContentUtils.isTextContent(value)) {
             String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
-            map.put("text", stringValue);
+            map.put(ATTR_TEXT, stringValue);
         } else {
-            map.put("binary", true);
+            map.put(ATTR_BINARY, true);
             byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
             if (binaryValue != null) {
-                if (binaryValue.length > BINARY_PREVIEW_LENGTH) {
-                    binaryValue = Arrays.copyOf(binaryValue, BINARY_PREVIEW_LENGTH);
+                byte[] previewValue = binaryValue;
+                if (previewValue.length > BINARY_PREVIEW_LENGTH) {
+                    previewValue = Arrays.copyOf(previewValue, BINARY_PREVIEW_LENGTH);
                 }
-                map.put("text", GeneralUtils.convertToString(binaryValue, 0, binaryValue.length));
+                map.put(ATTR_TEXT, GeneralUtils.convertToString(binaryValue, 0, binaryValue.length));
+
+                byte[] inlineValue = binaryValue;
+                if (inlineValue.length > BINARY_MAX_LENGTH) {
+                    inlineValue = Arrays.copyOf(inlineValue, BINARY_PREVIEW_LENGTH);
+                }
+                map.put(ATTR_BINARY, Base64.encode(inlineValue));
             } else {
-                map.put("text", null);
+                map.put(ATTR_TEXT, null);
             }
         }
         map.put("contentType", value.getContentType());
@@ -141,9 +160,9 @@ public class WebSQLUtils {
     }
 
     private static Object serializeGeometryValue(DBGeometry value) {
-        Map<String, Object> map = createMapOfType("geometry");
+        Map<String, Object> map = createMapOfType(VALUE_TYPE_GEOMETRY);
         map.put("srid", value.getSRID());
-        map.put("text", value.toString());
+        map.put(ATTR_TEXT, value.toString());
         map.put("properties", value.getProperties());
 
         DBGeometry xValue = GisTransformUtils.transformToSRID(value, GisConstants.SRID_4326);
@@ -153,4 +172,23 @@ public class WebSQLUtils {
         return map;
     }
 
+    public static Object makePlainCellValue(Object value) throws DBCException {
+        if (value instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) value;
+            Object typeAttr = map.get(VALUE_TYPE_ATTR);
+            if (typeAttr instanceof String) {
+                switch ((String)typeAttr) {
+                    case VALUE_TYPE_CONTENT:
+                        if (map.get(ATTR_BINARY) != null) {
+                            throw new DBCException("Binary content edit is not supported yet");
+                        }
+                        value = map.get(ATTR_TEXT);
+                        break;
+                    default:
+                        throw new DBCException("Type '" + typeAttr + "' edit is not supported yet");
+                }
+            }
+        }
+        return value;
+    }
 }

@@ -23,6 +23,7 @@ export interface IDatabaseDataActionClass<
 export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> {
   readonly source: IDatabaseDataSource<TOptions, TResult>;
   result: TResult;
+  resultIndex: number;
   updateResult: (result: TResult) => void;
   getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionClass<TOptions, TResult, T>

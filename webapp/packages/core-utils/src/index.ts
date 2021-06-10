@@ -5,6 +5,7 @@ export * from './OrderedMap';
 export * from './parseJSONFlat';
 export * from './uuid_';
 export * from './generateFileName';
+export * from './getMIME';
 export * from './isArraysEqual';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';

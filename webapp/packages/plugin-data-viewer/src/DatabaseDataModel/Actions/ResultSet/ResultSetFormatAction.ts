@@ -13,6 +13,10 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetElementKey } from './IResultSetElementKey';
+import { isResultSetContentValue } from './isResultSetContentValue';
+import { ResultSetDataAction } from './ResultSetDataAction';
+
+export type IResultSetValue = string | number | Record<string, string | number | Record<string, any> | null> | null;
 
 @databaseDataAction()
 export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
@@ -23,44 +27,59 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     let columnReadonly = false;
     let cellReadonly = false;
 
-    if (key.column !== undefined && this.result.data?.columns) {
-      columnReadonly = this.result.data.columns[key.column].readOnly;
+    const data = this.getAction(ResultSetDataAction);
+
+    if (key.column !== undefined) {
+      columnReadonly = data.getColumn(key.column)?.readOnly || false;
     }
 
-    if (key.row !== undefined && key.column !== undefined && this.result.data?.rows) {
-      const value = this.result.data.rows[key.row][key.column];
-      cellReadonly = this.isValueReadonly(value);
+    const value = data.getCellValue(key);
+
+    if (isResultSetContentValue(value)) {
+      cellReadonly = (
+        value.binary !== undefined
+        || value.contentLength !== value.text?.length
+      );
+    } else if (value !== null && typeof value === 'object') {
+      cellReadonly = true;
     }
 
     return columnReadonly || cellReadonly;
   }
 
-  isValueReadonly(value: any): boolean {
-    return value !== null && typeof value === 'object';
-  }
-
-  isNull(value: any): boolean {
+  isNull(value: IResultSetValue): boolean {
     return this.get(value) === null;
   }
 
-  get(value: any): any {
+  get(value: IResultSetValue): IResultSetValue {
     if (value !== null && typeof value === 'object') {
       if ('text' in value) {
         return value.text;
       } else if ('value' in value) {
-        if (value.value !== null && typeof value.value === 'object') {
-          return JSON.stringify(value.value);
-        }
         return value.value;
       }
-      return JSON.stringify(value);
+      return value;
     }
 
     return value;
   }
 
-  toString(value: any): string {
+  getText(value: IResultSetValue): string | null {
     value = this.get(value);
+
+    if (value !== null && typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    if (typeof value === 'number') {
+      return String(value);
+    }
+
+    return value;
+  }
+
+  toDisplayString(value: IResultSetValue): string {
+    value = this.getText(value);
 
     if (typeof value === 'string' && value.length > 1000) {
       return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');

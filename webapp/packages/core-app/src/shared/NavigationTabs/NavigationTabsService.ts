@@ -13,7 +13,6 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import type { IActiveView } from '@cloudbeaver/core-view';
 
@@ -69,8 +68,7 @@ export class NavigationTabsService {
     private autoSaveService: LocalStorageSaveService,
     private userInfoResource: UserInfoResource,
     private administrationScreenService: AdministrationScreenService,
-    sessionDataResource: SessionDataResource,
-    appAuthService: AppAuthService
+    private appAuthService: AppAuthService
   ) {
     makeObservable<NavigationTabsService, 'unloadTabs'>(this, {
       handlers: observable,
@@ -121,14 +119,6 @@ export class NavigationTabsService {
         return map;
       }
     );
-
-    sessionDataResource.onDataUpdate
-      .addHandler(() => this.unloadTabs())
-      .addPostHandler(async () => {
-        if (appAuthService.authenticated) {
-          await this.restoreTabs();
-        }
-      });
   }
 
   openTab(tab: ITab, isSelected?: boolean): void {
@@ -256,7 +246,7 @@ export class NavigationTabsService {
     }
   }
 
-  private async unloadTabs() {
+  async unloadTabs(): Promise<void> {
     if (this.administrationScreenService.publicDisabled) {
       return;
     }
@@ -271,8 +261,12 @@ export class NavigationTabsService {
   }
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others
-  private async restoreTabs(): Promise<void> {
+  async restoreTabs(): Promise<void> {
     if (this.administrationScreenService.publicDisabled) {
+      return;
+    }
+
+    if (!this.appAuthService.authenticated) {
       return;
     }
 

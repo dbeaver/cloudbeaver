@@ -47,10 +47,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
   readonly onConnectionCreate: IExecutor<Connection>;
   readonly onConnectionClose: IExecutor<Connection>;
 
-  /**
-   * @deprecated Should be refactored according new SessionDataResource
-   */
-  readonly onSessionUpdate: IExecutor<Connection[]>;
   private sessionUpdate: boolean;
   constructor(
     private graphQLService: GraphQLService,
@@ -69,7 +65,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
 
     this.onConnectionCreate = new Executor();
     this.onConnectionClose = new Executor();
-    this.onSessionUpdate = new Executor();
     this.sessionUpdate = false;
 
     // in case when session was refreshed all data depended on connection info
@@ -111,8 +106,6 @@ export class ConnectionInfoResource extends CachedMapResource<string, Connection
         });
 
         await this.addList(connections);
-
-        await this.onSessionUpdate.execute(connections);
       });
     } finally {
       this.sessionUpdate = false;

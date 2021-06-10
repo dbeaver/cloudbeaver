@@ -33,10 +33,10 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
   const context = useContext(DataGridContext);
   const editingContext = useContext(EditingContext);
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
-  const rawValue = row[column.key];
+  const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
   const classes = getClasses(rawValue);
   const [menuVisible, setMenuVisible] = useState(false);
-  const value = formatter?.toString(rawValue) ?? String(rawValue);
+  const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
 
   const handleClose = useCallback(() => {
     editingContext?.closeEditor({ idx: column.idx, rowIdx });

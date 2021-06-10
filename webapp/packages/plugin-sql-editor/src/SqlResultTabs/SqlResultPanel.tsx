@@ -33,7 +33,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, panelInit 
   const group = tab.handlerState.queryTabGroups.find(group => group.groupId === panelInit.groupId)!;
 
   return styled(style)(
-    <result-panel as="div">
+    <result-panel>
       <TableViewer
         tableId={group.modelId}
         resultIndex={panelInit.indexInResultSet}
