@@ -97,9 +97,9 @@ public class LocalAuthProvider implements DBWAuthProvider<LocalAuthSession> {
             throw new DBException("Invalid user name or password");
         }
 
-        String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
+        //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
-        storedCredentials.put(CRED_PASSWORD, newPasswordHash);
+        storedCredentials.put(CRED_PASSWORD, newPassword);
         CBApplication.getInstance().getSecurityController().setUserCredentials(userName, authProvider, storedCredentials);
         return true;
     }
