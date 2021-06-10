@@ -27,7 +27,7 @@ import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
-import { ConnectionAccessTableItem } from './ConnectionAccessTableitem';
+import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';
 import { getFilteredRoles, getFilteredUsers } from './getFilteredSubjects';
 
 const styles = composes(
