@@ -30,7 +30,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <ColoredContainer parent gap overflow>
-      <Group medium gap>
+      <Group small gap vertical>
         <GroupTitle>{translate('authentication_user_credentials')}</GroupTitle>
         <InputFieldNew
           type='text'
@@ -39,7 +39,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           disabled={controller.isSaving}
           readOnly={editing}
           mod='surface'
-          large
+          tiny
           required
         >
           {translate('authentication_user_name')}
@@ -54,7 +54,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               placeholder={editing ? '••••••' : ''}
               disabled={controller.isSaving}
               mod='surface'
-              small
+              tiny
               required
             >
               {translate('authentication_user_password')}
@@ -66,7 +66,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               placeholder={editing ? '••••••' : ''}
               disabled={controller.isSaving}
               mod='surface'
-              small
+              tiny
               required
             >
               {translate('authentication_user_password_repeat')}
@@ -74,7 +74,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           </>
         )}
       </Group>
-      <Group medium gap>
+      <Group small gap>
         <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
         {controller.roles.map(role => (
           <FieldCheckboxNew

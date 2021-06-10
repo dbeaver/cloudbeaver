@@ -32,9 +32,6 @@ const styles = composes(
     }
   `,
   css`
-    TableColumnHeader {
-      border-top: solid 1px;
-    }
     StaticImage {
       display: flex;
       width: 24px;
@@ -97,7 +94,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
           </TableHeader>
           <TableBody>
             {cloudExists && (
-              <TableItem item='cloudInfo'>
+              <TableItem item='cloudInfo' selectDisabled>
                 <TableColumnValue colSpan={5}>
                   {translate('connections_connection_access_cloud_placeholder')}
                 </TableColumnValue>

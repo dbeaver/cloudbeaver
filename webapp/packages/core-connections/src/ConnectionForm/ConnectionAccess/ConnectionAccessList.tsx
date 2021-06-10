@@ -91,7 +91,7 @@ export const ConnectionAccessList: React.FC<Props> = observer(function Connectio
         <ConnectionAccessTableInnerHeader />
         <TableBody>
           {!roles.get().length && !users.get().length && filterState.filterValue && (
-            <TableItem item='tableInfo'>
+            <TableItem item='tableInfo' selectDisabled>
               <TableColumnValue colSpan={5}>
                 {translate('connections_connection_access_filter_no_result')}
               </TableColumnValue>

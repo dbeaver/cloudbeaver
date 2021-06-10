@@ -100,7 +100,7 @@ export const ConnectionAccessGrantedList: React.FC<Props> = observer(function Co
       <Table selectedItems={selectedSubjects}>
         <ConnectionAccessTableInnerHeader />
         <TableBody>
-          <TableItem item='tableInfo'>
+          <TableItem item='tableInfo' selectDisabled>
             <TableColumnValue colSpan={5}>
               {translate(tableInfoText)}
             </TableColumnValue>
