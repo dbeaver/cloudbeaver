@@ -48,6 +48,7 @@ const styles = css`
   image {
     flex: 1;
     display: flex;
+    overflow: auto;
   }
 `;
 
