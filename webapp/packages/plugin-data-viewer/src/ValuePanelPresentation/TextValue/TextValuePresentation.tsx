@@ -41,7 +41,7 @@ const styles = composes(
     }
     content-type {
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       flex: 0;
       padding: 0 8px;
       padding-bottom: 16px;
