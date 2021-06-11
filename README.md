@@ -22,7 +22,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### CloudBeaver 21.0.3 - 2021-06-11
+### CloudBeaver 21.0.3 - 2021-06-11
 
 - Filtering and Ordering from the context menu were added for the data editor .
 - Read-only columns and result sets were marked in the data editor. 
