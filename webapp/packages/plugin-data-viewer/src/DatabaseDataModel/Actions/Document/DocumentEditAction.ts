@@ -70,7 +70,7 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
 
     if (edited) {
       edited.data = value;
-      this.removeUnchanged(key);
+      this.set(key, edited);
       return;
     }
 
