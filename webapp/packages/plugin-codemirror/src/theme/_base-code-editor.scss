@@ -75,6 +75,10 @@
       border-left: 1px solid $cursor;
     }
 
+    .cm-s-material .CodeMirror-scrollbar-filler {
+      @include mdc-theme-prop(background, secondary, false);
+    }
+
     .cm-s-material :global(div).CodeMirror-selected {
       background: rgba(128, 203, 196, 0.2);
     }
