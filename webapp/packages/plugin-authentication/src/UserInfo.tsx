@@ -42,17 +42,11 @@ export const UserInfo = observer(function UserInfo() {
   const userMenuService = useService(UserMenuService);
   const authInfoService = useService(AuthInfoService);
   const style = useStyles(styles, userMenuStyles);
+  const panel = userMenuService.getMenu();
 
-  const { panel, hidden } = useMemo(
-    () => {
-      const panel = userMenuService.getMenu();
-      const hidden = computed(() => !panel.menuItems.length
-        || panel.menuItems.every(item => item.isHidden));
-
-      return { panel, hidden };
-    },
-    [userMenuService]
-  );
+  const hidden = useMemo(() => computed(
+    () => !panel.menuItems.length || panel.menuItems.every(item => item.isHidden)
+  ), [panel]);
 
   if (!authInfoService.userInfo) {
     return null;
