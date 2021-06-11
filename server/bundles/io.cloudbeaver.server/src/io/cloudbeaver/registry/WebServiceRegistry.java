@@ -17,16 +17,15 @@
 package io.cloudbeaver.registry;
 
 import io.cloudbeaver.service.DBWServiceBinding;
+import io.cloudbeaver.service.sql.DBWValueSerializer;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.registry.RegistryConstants;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WebServiceRegistry {
 
@@ -50,6 +49,7 @@ public class WebServiceRegistry {
     private DBWServiceBinding[] webServiceInstances;
 
     private final Map<String, WebAuthProviderDescriptor> authProviders = new LinkedHashMap<>();
+    private final Map<String, WebValueSerializerDescriptor> valueSerializers = new HashMap<>();
 
     private WebServiceRegistry() {
     }
@@ -90,6 +90,15 @@ public class WebServiceRegistry {
             }
         }
         webServiceInstances = instances.toArray(new DBWServiceBinding[0]);
+
+        {
+            IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(WebValueSerializerDescriptor.EXTENSION_ID);
+            for (IConfigurationElement ext : extConfigs) {
+                WebValueSerializerDescriptor descriptor = new WebValueSerializerDescriptor(ext);
+                valueSerializers.put(descriptor.getValueType(), descriptor);
+            }
+        }
+
     }
 
     public List<WebServiceDescriptor> getWebServices() {
@@ -123,6 +132,19 @@ public class WebServiceRegistry {
 
     public WebAuthProviderDescriptor getAuthProvider(String id) {
         return authProviders.get(id);
+    }
+
+    public DBWValueSerializer<?> createValueSerializer(String valueType) {
+        WebValueSerializerDescriptor descriptor = valueSerializers.get(valueType);
+        if (descriptor == null) {
+            return null;
+        }
+        try {
+            return descriptor.createInstance();
+        } catch (DBException e) {
+            log.error("Error creating value '" + valueType + "' serializer", e);
+            return null;
+        }
     }
 
 }

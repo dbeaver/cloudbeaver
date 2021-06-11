@@ -17,11 +17,13 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
@@ -42,19 +44,6 @@ import java.util.*;
 public class WebSQLUtils {
 
     private static final Log log = Log.getLog(WebSQLUtils.class);
-
-    public static final int BINARY_PREVIEW_LENGTH = 255;
-    public static final int BINARY_MAX_LENGTH = 1 * 1024 * 1024;
-
-    public static final String VALUE_TYPE_ATTR = "$type";
-
-    public static final String VALUE_TYPE_COLLECTION = "collection";
-    public static final String VALUE_TYPE_MAP = "map";
-    public static final String VALUE_TYPE_DOCUMENT = "document";
-    public static final String VALUE_TYPE_CONTENT = "content";
-    public static final String VALUE_TYPE_GEOMETRY = "geometry";
-    public static final String ATTR_TEXT = "text";
-    public static final String ATTR_BINARY = "binary";
 
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
@@ -87,7 +76,7 @@ public class WebSQLUtils {
                 items[i] = makeWebCellValue(session, collection.getComponentType(), collection.getItem(i), dataFormat);
             }
 
-            Map<String, Object> map = createMapOfType(VALUE_TYPE_COLLECTION);
+            Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_COLLECTION);
             map.put("value", items);
             return map;
         } else if (value instanceof DBDComposite) {
@@ -97,7 +86,7 @@ public class WebSQLUtils {
                 struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
             }
 
-            Map<String, Object> map = createMapOfType(VALUE_TYPE_MAP);
+            Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_MAP);
             map.put("value", struct);
             return map;
         }
@@ -107,7 +96,7 @@ public class WebSQLUtils {
     @NotNull
     private static Map<String, Object> createMapOfType(String type) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put(VALUE_TYPE_ATTR, type);
+        map.put(WebSQLConstants.VALUE_TYPE_ATTR, type);
         return map;
     }
 
@@ -121,37 +110,37 @@ public class WebSQLUtils {
             throw new DBCException("Error serializing document", e);
         }
 
-        Map<String, Object> map = createMapOfType(VALUE_TYPE_DOCUMENT);
+        Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_DOCUMENT);
         map.put("id", CommonUtils.toString(document.getDocumentId()));
         map.put("contentType", document.getDocumentContentType());
         map.put("properties", Collections.emptyMap());
-        map.put("data", documentData);
+        map.put(WebSQLConstants.ATTR_DATA, documentData);
         return map;
     }
 
     private static Object serializeContentValue(WebSession session, DBDContent value) throws DBCException {
 
-        Map<String, Object> map = createMapOfType(VALUE_TYPE_CONTENT);
+        Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_CONTENT);
         if (ContentUtils.isTextContent(value)) {
             String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
-            map.put(ATTR_TEXT, stringValue);
+            map.put(WebSQLConstants.ATTR_TEXT, stringValue);
         } else {
-            map.put(ATTR_BINARY, true);
+            map.put(WebSQLConstants.ATTR_BINARY, true);
             byte[] binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), value);
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
-                if (previewValue.length > BINARY_PREVIEW_LENGTH) {
-                    previewValue = Arrays.copyOf(previewValue, BINARY_PREVIEW_LENGTH);
+                if (previewValue.length > WebSQLConstants.BINARY_PREVIEW_LENGTH) {
+                    previewValue = Arrays.copyOf(previewValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
                 }
-                map.put(ATTR_TEXT, GeneralUtils.convertToString(binaryValue, 0, binaryValue.length));
+                map.put(WebSQLConstants.ATTR_TEXT, GeneralUtils.convertToString(previewValue, 0, previewValue.length));
 
                 byte[] inlineValue = binaryValue;
-                if (inlineValue.length > BINARY_MAX_LENGTH) {
-                    inlineValue = Arrays.copyOf(inlineValue, BINARY_PREVIEW_LENGTH);
+                if (inlineValue.length > WebSQLConstants.BINARY_MAX_LENGTH) {
+                    inlineValue = Arrays.copyOf(inlineValue, WebSQLConstants.BINARY_PREVIEW_LENGTH);
                 }
-                map.put(ATTR_BINARY, Base64.encode(inlineValue));
+                map.put(WebSQLConstants.ATTR_BINARY, Base64.encode(inlineValue));
             } else {
-                map.put(ATTR_TEXT, null);
+                map.put(WebSQLConstants.ATTR_TEXT, null);
             }
         }
         map.put("contentType", value.getContentType());
@@ -160,9 +149,9 @@ public class WebSQLUtils {
     }
 
     private static Object serializeGeometryValue(DBGeometry value) {
-        Map<String, Object> map = createMapOfType(VALUE_TYPE_GEOMETRY);
+        Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_GEOMETRY);
         map.put("srid", value.getSRID());
-        map.put(ATTR_TEXT, value.toString());
+        map.put(WebSQLConstants.ATTR_TEXT, value.toString());
         map.put("properties", value.getProperties());
 
         DBGeometry xValue = GisTransformUtils.transformToSRID(value, GisConstants.SRID_4326);
@@ -172,20 +161,26 @@ public class WebSQLUtils {
         return map;
     }
 
-    public static Object makePlainCellValue(Object value) throws DBCException {
+    public static Object makePlainCellValue(DBCSession session, DBSTypedObject attribute, Object value) throws DBCException {
         if (value instanceof Map) {
             Map<String, Object> map = (Map<String, Object>) value;
-            Object typeAttr = map.get(VALUE_TYPE_ATTR);
+            Object typeAttr = map.get(WebSQLConstants.VALUE_TYPE_ATTR);
             if (typeAttr instanceof String) {
                 switch ((String)typeAttr) {
-                    case VALUE_TYPE_CONTENT:
-                        if (map.get(ATTR_BINARY) != null) {
+                    case WebSQLConstants.VALUE_TYPE_CONTENT: {
+                        if (map.get(WebSQLConstants.ATTR_BINARY) != null) {
                             throw new DBCException("Binary content edit is not supported yet");
                         }
-                        value = map.get(ATTR_TEXT);
+                        value = map.get(WebSQLConstants.ATTR_TEXT);
                         break;
-                    default:
-                        throw new DBCException("Type '" + typeAttr + "' edit is not supported yet");
+                    }
+                    default: {
+                        DBWValueSerializer<?> valueSerializer = WebServiceRegistry.getInstance().createValueSerializer((String) typeAttr);
+                        if (valueSerializer == null) {
+                            throw new DBCException("Value type '" + typeAttr + "' edit is not supported yet");
+                        }
+                        value = valueSerializer.deserializeValue(session, attribute, map);
+                    }
                 }
             }
         }
