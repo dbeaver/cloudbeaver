@@ -407,6 +407,7 @@ public class WebSQLProcessor {
                                         rowValues[updateAttributes.length + i] = document;
                                     } else {
                                         Object cellValueRaw = row.getData().get(keyAttribute.getOrdinalPosition());
+                                        cellValueRaw = WebSQLUtils.makePlainCellValue(session, keyAttribute, cellValueRaw);
                                         rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(session, keyAttribute, cellValueRaw, false, true);
                                     }
                                 }
