@@ -24,7 +24,6 @@ import { userMenuStyles } from './UserMenu/userMenuStyles';
 const styles = css`
   user {
     height: 100%;
-    padding: 0 16px;
     display: flex;
     align-items: center;
   }
@@ -59,26 +58,13 @@ export const UserInfo = observer(function UserInfo() {
     return null;
   }
 
-  const userName = authInfoService.userInfo.displayName || authInfoService.userInfo.userId;
-
-  if (hidden.get()) {
-    return styled(style)(
-      <user>
-        <user-icon>
-          <IconOrImage icon='user' viewBox='0 0 28 28' />
-        </user-icon>
-        <user-name>{userName}</user-name>
-      </user>
-    );
-  }
-
   return styled(style)(
-    <MenuTrigger panel={panel} style={[topMenuStyles]}>
+    <MenuTrigger panel={panel} style={[topMenuStyles]} disabled={hidden.get()}>
       <user>
         <user-icon>
           <IconOrImage icon='user' viewBox='0 0 28 28' />
         </user-icon>
-        <user-name>{userName}</user-name>
+        <user-name>{authInfoService.userInfo.displayName || authInfoService.userInfo.userId}</user-name>
       </user>
     </MenuTrigger>
   );
