@@ -42,7 +42,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
 
   if (hasResult) {
     const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
-    if (constraints.getFilterConstraints().length > 0 && model.source.requestInfo.requestFilter) {
+    if (constraints.filterConstraints.length > 0 && model.source.requestInfo.requestFilter) {
       filterValue = model.source.requestInfo.requestFilter;
     }
   }
