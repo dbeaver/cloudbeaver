@@ -39,7 +39,7 @@ export default [
   ['connections_connection_access_grant', 'Grant'],
   ['connections_connection_access_edit', 'Edit'],
   ['connections_connection_access_cloud_placeholder', 'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".'],
-  ['connections_connection_access_empty_table_placeholder', 'There are no items yet. Press edit button to grant role or user.'],
+  ['connections_connection_access_empty_table_placeholder', 'There are no items yet. Press Edit button to grant role or user.'],
   ['connections_connection_access_filter_placeholder', 'Search for user or role name'],
   ['connections_connection_access_filter_no_result', 'No results have been found.'],
   ['connections_connection_access_admin_info', 'Administators see all connections.'],
