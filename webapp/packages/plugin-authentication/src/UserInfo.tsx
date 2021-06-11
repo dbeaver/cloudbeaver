@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { topMenuStyles } from '@cloudbeaver/core-app';
@@ -42,17 +44,41 @@ export const UserInfo = observer(function UserInfo() {
   const authInfoService = useService(AuthInfoService);
   const style = useStyles(styles, userMenuStyles);
 
+  const { panel, hidden } = useMemo(
+    () => {
+      const panel = userMenuService.getMenu();
+      const hidden = computed(() => !panel.menuItems.length
+        || panel.menuItems.every(item => item.isHidden));
+
+      return { panel, hidden };
+    },
+    [userMenuService]
+  );
+
   if (!authInfoService.userInfo) {
     return null;
   }
 
-  return styled(style)(
-    <MenuTrigger panel={userMenuService.getMenu()} style={[topMenuStyles]}>
+  const userName = authInfoService.userInfo.displayName || authInfoService.userInfo.userId;
+
+  if (hidden.get()) {
+    return styled(style)(
       <user>
         <user-icon>
           <IconOrImage icon='user' viewBox='0 0 28 28' />
         </user-icon>
-        <user-name>{authInfoService.userInfo.displayName || authInfoService.userInfo.userId}</user-name>
+        <user-name>{userName}</user-name>
+      </user>
+    );
+  }
+
+  return styled(style)(
+    <MenuTrigger panel={panel} style={[topMenuStyles]}>
+      <user>
+        <user-icon>
+          <IconOrImage icon='user' viewBox='0 0 28 28' />
+        </user-icon>
+        <user-name>{userName}</user-name>
       </user>
     </MenuTrigger>
   );
