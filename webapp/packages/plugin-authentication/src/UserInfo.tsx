@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { topMenuStyles } from '@cloudbeaver/core-app';
@@ -22,7 +24,6 @@ import { userMenuStyles } from './UserMenu/userMenuStyles';
 const styles = css`
   user {
     height: 100%;
-    padding: 0 16px;
     display: flex;
     align-items: center;
   }
@@ -41,13 +42,18 @@ export const UserInfo = observer(function UserInfo() {
   const userMenuService = useService(UserMenuService);
   const authInfoService = useService(AuthInfoService);
   const style = useStyles(styles, userMenuStyles);
+  const panel = userMenuService.getMenu();
+
+  const hidden = useMemo(() => computed(
+    () => !panel.menuItems.length || panel.menuItems.every(item => item.isHidden)
+  ), [panel]);
 
   if (!authInfoService.userInfo) {
     return null;
   }
 
   return styled(style)(
-    <MenuTrigger panel={userMenuService.getMenu()} style={[topMenuStyles]}>
+    <MenuTrigger panel={panel} style={[topMenuStyles]} disabled={hidden.get()}>
       <user>
         <user-icon>
           <IconOrImage icon='user' viewBox='0 0 28 28' />
