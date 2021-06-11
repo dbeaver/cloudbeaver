@@ -39,6 +39,10 @@ export class AuthProviderService {
     return provider.get();
   }
 
+  hashValue(value: string): string {
+    return md5(value).toUpperCase();
+  }
+
   async processCredentials(providerId: string, credentials: Record<string, any>): Promise<Record<string, any>> {
     const provider = await this.authProvidersResource.load(providerId);
 
@@ -49,9 +53,7 @@ export class AuthProviderService {
     const credentialsProcessed = { ...credentials };
     for (const parameter of provider.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed) {
-        const md5Hash = md5(credentialsProcessed[parameter.id])
-          .toUpperCase();
-        credentialsProcessed[parameter.id] = md5Hash;
+        credentialsProcessed[parameter.id] = this.hashValue(credentialsProcessed[parameter.id]);
       }
     }
 
@@ -59,7 +61,7 @@ export class AuthProviderService {
   }
 }
 
-interface IAuthProviderContext{
+interface IAuthProviderContext {
   get: () => boolean;
   auth: () => void;
 }

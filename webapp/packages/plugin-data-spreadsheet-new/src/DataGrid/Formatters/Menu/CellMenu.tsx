@@ -14,6 +14,7 @@ import styled from 'reshadow';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
+import { useStyles } from '@cloudbeaver/core-theming';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
@@ -35,6 +36,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   onStateSwitch,
 }) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
+  const style = useStyles(cellMenuStyles);
 
   const { panel, hidden } = useMemo(
     () => {
@@ -51,10 +53,11 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
     return null;
   }
 
-  return styled(cellMenuStyles)(
+  return styled(style)(
     <cell-menu as='div' onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
       <MenuTrigger
         panel={panel}
+        style={[cellMenuStyles]}
         onClick={() => dataGridContextMenuService.openMenu(model, resultIndex, row, column)}
         onVisibleSwitch={onStateSwitch}
       >

@@ -28,4 +28,5 @@ export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResu
   getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
     action: IDatabaseDataActionClass<TOptions, TResult, T>
   ) => T;
+  dispose: () => void;
 }

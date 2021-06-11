@@ -25,7 +25,8 @@ const styles = css`
     width: 10px;
     position: absolute;
     right: 2px;
-    top: 2px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 `;
 

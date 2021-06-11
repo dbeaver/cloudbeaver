@@ -8,23 +8,31 @@
 
 import { css } from 'reshadow';
 
-export const cellMenuStyles = css`
-  cell-menu {
-    flex: 0 0 auto;
-    padding-left: 8px;
-  }
-  MenuTrigger {
-    padding: 0;
-    height: 16px;
+import { composes } from '@cloudbeaver/core-theming';
 
-    &:before {
-      display: none;
+export const cellMenuStyles = composes(
+  css`
+    IconOrImage {
+      composes: theme-text-primary from global;
     }
+`,
+  css`
+    cell-menu {
+      flex: 0 0 auto;
+      padding-left: 8px;
+    }
+    MenuTrigger {
+      padding: 0;
+      height: 16px;
 
-    & Icon {
-      cursor: pointer;
-      width: 16px;
-      height: 10px; 
+      &:before {
+        display: none;
+      }
+
+      & Icon {
+        cursor: pointer;
+        width: 16px;
+        height: 10px; 
+      }
     }
-  }
-`;
+`);

@@ -169,7 +169,7 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
                 className={`cb-react-grid-theme ${className}`}
                 columns={tableData.columns}
                 defaultColumnOptions={{
-                  minWidth: 60,
+                  minWidth: 50,
                   resizable: true,
                   formatter: CellFormatter,
                 }}

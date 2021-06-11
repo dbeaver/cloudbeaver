@@ -56,6 +56,9 @@ implements IDatabaseDataActions<TOptions, TResult> {
       const result = results.find(result => result.id === key);
 
       if (!result) {
+        for (const action of actions.values()) {
+          action.dispose();
+        }
         this.actions.delete(key);
       } else {
         for (const action of actions.values()) {

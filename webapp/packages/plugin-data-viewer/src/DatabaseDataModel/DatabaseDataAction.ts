@@ -34,4 +34,6 @@ implements IDatabaseDataAction<TOptions, TResult> {
   ): T {
     return this.source.actions.get(this.result, action);
   }
+
+  dispose(): void {}
 }

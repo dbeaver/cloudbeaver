@@ -14,6 +14,8 @@ import type { Order } from '../Order';
 
 export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
+  readonly filterConstraints: SqlDataFilterConstraint[];
+  readonly orderConstraints: SqlDataFilterConstraint[];
   setFilter: (attribute: string, operator: string, value?: any) => void;
   setOrder: (attribute: string, order: Order, multiple: boolean) => void;
   deleteAll: () => void;
@@ -22,8 +24,7 @@ export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResu
   deleteOrder: (attribute: string) => void;
   deleteOrders: () => void;
   deleteDataFilters: () => void;
+  deleteData: () => void;
   get: (attribute: string) => SqlDataFilterConstraint | undefined;
   getOrder: (attribute: string) => Order;
-  getFilterConstraints: () => SqlDataFilterConstraint[];
-  getOrderConstraints: () => SqlDataFilterConstraint[];
 }

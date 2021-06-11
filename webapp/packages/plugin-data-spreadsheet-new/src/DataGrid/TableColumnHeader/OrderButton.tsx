@@ -15,13 +15,13 @@ import { EOrder, getNextOrder, IDatabaseDataModel, IDatabaseDataResult, ResultSe
 
 const styles = css`
   order-button {
-    margin-left: 4px;
     display: flex;
-    padding: 2px 4px;
     flex-direction: column;
     align-content: center;
     align-items: center;
-    min-width: 20px;
+    justify-content: center;
+    height: 20px;
+    width: 20px;
     box-sizing: border-box;
     cursor: pointer;
   }
@@ -55,15 +55,14 @@ export const OrderButton: React.FC<Props> = observer(function OrderButtton({
   const currentOrder = constraints.getOrder(attribute);
   const loading = model.isLoading();
 
-  let icon = 'sort-arrow-unknown';
+  let icon = 'order-arrow-unknown';
   if (currentOrder === EOrder.asc) {
-    icon = 'sort-arrow-up';
+    icon = 'order-arrow-up';
   } else if (currentOrder === EOrder.desc) {
-    icon = 'sort-arrow-down';
+    icon = 'order-arrow-down';
   }
 
   const handleSort = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
     if (loading) {
       return;
     }
@@ -76,12 +75,16 @@ export const OrderButton: React.FC<Props> = observer(function OrderButtton({
   return styled(styles)(
     <order-button
       as='div'
-      title={translate('data_grid_table_tooltip_column_header_sort')}
+      title={translate('data_grid_table_tooltip_column_header_order')}
       className={className}
       onClick={handleSort}
       {...use({ disabled: loading })}
     >
-      <IconOrImage icon={icon} viewBox='0 0 16 16' />
+      <IconOrImage
+        icon={icon}
+        viewBox='0 0 16 16'
+        className={currentOrder === null ? 'rdg-table-header__order-button_unordered' : undefined}
+      />
     </order-button>
   );
 });

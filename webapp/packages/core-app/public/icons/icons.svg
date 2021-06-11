@@ -177,13 +177,13 @@
     </g>
   </symbol>
 
-  <symbol id="sort-arrow-up" viewBox="0 0 16 16">
+  <symbol id="order-arrow-up" viewBox="0 0 16 16">
       <path fill="#338ECC" fill-rule="evenodd" d="M1 7l7-6 7 6h-5v8H6V7H1z" clip-rule="evenodd"/>
   </symbol>
-  <symbol id="sort-arrow-down" viewBox="0 0 16 16">
+  <symbol id="order-arrow-down" viewBox="0 0 16 16">
       <path fill="#338ECC" fill-rule="evenodd" d="M15 9l-7 6-7-6h5V1h4v8h5z" clip-rule="evenodd"/>
   </symbol>
-   <symbol id="sort-arrow-unknown" viewBox="0 0 16 16">
-      <path fill="#C4C4C4" fill-rule="evenodd" d="M11.5 2L8 6h2.333v8h2.334V6H15l-3.5-4zm-7 12L8 10H5.667V2H3.333v8H1l3.5 4z" clip-rule="evenodd"/>
+   <symbol id="order-arrow-unknown" viewBox="0 0 16 16">
+      <path fill="currentColor" fill-rule="evenodd" d="M11.5 2L8 6h2.333v8h2.334V6H15l-3.5-4zm-7 12L8 10H5.667V2H3.333v8H1l3.5 4z" clip-rule="evenodd"/>
   </symbol>
 </svg>

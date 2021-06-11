@@ -32,6 +32,15 @@ $edited-color: #ff99006b;
     .cb-react-grid-theme {
       @include mdc-theme-prop(color, on-surface, false);
 
+      .rdg-table-header__readonly-status {
+        background-color: #e28835;
+        @include mdc-theme-prop(border-color, surface, false);
+      }
+
+      .rdg-table-header__order-button_unordered {
+        color: #c4c4c4;
+      }
+
       .rdg-header-row {
         @include mdc-theme-prop(background-color, surface, false);
       }
