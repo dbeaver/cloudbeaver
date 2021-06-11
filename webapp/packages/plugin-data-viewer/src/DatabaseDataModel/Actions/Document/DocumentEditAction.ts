@@ -11,6 +11,7 @@ import { makeObservable, observable } from 'mobx';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
+import type { IDatabaseDataEditorActionsData } from '../../IDatabaseDataEditor';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
@@ -29,10 +30,14 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.editedElements = new Map();
+    this.resetEditedElements = this.resetEditedElements.bind(this);
 
     makeObservable(this, {
       editedElements: observable,
     });
+
+    // TODO: remove
+    this.source.editor?.actions.addHandler(this.resetEditedElements);
   }
 
   isEdited(): boolean {
@@ -40,6 +45,10 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
   }
 
   isElementEdited(key: IDocumentElementKey): boolean {
+    if (!this.editedElements.has(key.index)) {
+      return false;
+    }
+
     const value = this.getAction(DocumentDataAction).get(key.index);
 
     return !this.compare(value, this.get(key));
@@ -93,6 +102,17 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
 
   clear(): void {
     this.editedElements.clear();
+  }
+
+  dispose(): void {
+    // TODO: remove
+    this.source.editor?.actions.removeHandler(this.resetEditedElements);
+  }
+
+  private resetEditedElements(action: IDatabaseDataEditorActionsData) {
+    if (action.resultId === this.result.id && action.type === 'cancel') {
+      this.editedElements.delete(action.row);
+    }
   }
 
   private removeUnchanged(key: IDocumentElementKey) {
