@@ -27,10 +27,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDDataFilter;
-import org.jkiss.dbeaver.model.data.DBDDocument;
-import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
@@ -386,7 +383,11 @@ public class WebSQLProcessor {
                                     DBDAttributeBinding updateAttribute = updateAttributes[i];
                                     Object cellRawValue = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                                     cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
-                                    Object realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                    Object realCellValue = cellRawValue;
+                                    // In some cases we already have final value here
+                                    if (!(realCellValue instanceof DBDValue)) {
+                                        realCellValue = updateAttribute.getValueHandler().getValueFromObject(session, updateAttribute, cellRawValue, false, true);
+                                    }
                                     rowValues[i] = realCellValue;
                                     finalRow[updateAttribute.getOrdinalPosition()] = WebSQLUtils.makeWebCellValue(webSession, null, realCellValue, dataFormat);
                                 }
@@ -394,15 +395,25 @@ public class WebSQLProcessor {
                                     DBDAttributeBinding keyAttribute = keyAttributes[i];
                                     if (keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator) {
                                         // Document reference
+                                        DBDDocument document = null;
                                         Map<String, Object> keyMap = new LinkedHashMap<>();
                                         DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
                                         for (int j = 0; j < attributes.length; j++) {
                                             DBDAttributeBinding attr = attributes[j];
-                                            keyMap.put(attr.getName(), row.getData().get(j));
+                                            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData().get(j));
+                                            if (plainValue instanceof DBDDocument) {
+                                                // FIXME: Hack for DynamoDB. We pass entire document as a key
+                                                // FIXME: Let's just return it back for now
+                                                document = (DBDDocument) plainValue;
+                                                break;
+                                            }
+                                            keyMap.put(attr.getName(), plainValue);
                                         }
-                                        DBDDocument document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
                                         if (document == null) {
-                                            throw new DBCException("Error finding document by key " + keyMap);
+                                            document = ((DBSDocumentLocator) dataContainer).findDocument(session.getProgressMonitor(), keyMap);
+                                            if (document == null) {
+                                                throw new DBCException("Error finding document by key " + keyMap);
+                                            }
                                         }
                                         rowValues[updateAttributes.length + i] = document;
                                     } else {
