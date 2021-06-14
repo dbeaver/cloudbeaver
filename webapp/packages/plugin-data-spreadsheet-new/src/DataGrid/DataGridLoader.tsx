@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 interface Props {
@@ -17,10 +17,10 @@ interface Props {
   className?: string;
 }
 
-async function loader() {
+const loader = createComplexLoader(async function loader() {
   const { DataGridTable } = await import('./DataGridTable');
   return { DataGridTable };
-}
+});
 
 export const DataGridLoader: React.FC<Props> = observer(function DataGridLoader({
   tableModel, resultIndex, className,

@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 
-async function loader() {
+const loader = createComplexLoader(async function loader() {
   const { ReactSanitizedHTML } = await import('./ReactSanitizedHTML');
   return { ReactSanitizedHTML };
-}
+});
 
 interface Props {
   html: string;

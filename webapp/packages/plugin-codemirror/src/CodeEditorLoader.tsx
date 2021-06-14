@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 
 import type { ICodeEditorProps } from './ICodeEditorProps';
 
-async function loader() {
+const loader = createComplexLoader(async function loader() {
   const { CodeEditor } = await import('./CodeEditor');
   return { CodeEditor };
-}
+});
 
 export const CodeEditorLoader: React.FC<ICodeEditorProps> = function CodeEditorLoader(props) {
   return (
