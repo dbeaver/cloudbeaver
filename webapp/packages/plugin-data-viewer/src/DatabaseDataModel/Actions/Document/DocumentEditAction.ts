@@ -8,6 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
@@ -15,7 +16,7 @@ import type { IDatabaseDataEditorActionsData } from '../../IDatabaseDataEditor';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataEditAction } from '../IDatabaseDataEditAction';
+import type { IDatabaseDataEditAction, IDatabaseDataEditActionData } from '../IDatabaseDataEditAction';
 import { DocumentDataAction } from './DocumentDataAction';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 import type { IDocumentElementKey } from './IDocumentElementKey';
@@ -25,12 +26,14 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
   implements IDatabaseDataEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Document;
 
+  readonly action: IExecutor<IDatabaseDataEditActionData<IDocumentElementKey, IDatabaseDataDocument>>;
   readonly editedElements: Map<number, IDatabaseDataDocument>;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
     super(source, result);
     this.editedElements = new Map();
     this.resetEditedElements = this.resetEditedElements.bind(this);
+    this.action = new Executor();
 
     makeObservable(this, {
       editedElements: observable,
@@ -54,8 +57,27 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
     return !this.compare(value, this.get(key));
   }
 
-  set(key: IDocumentElementKey, value: IDatabaseDataDocument): void {
+  set(key: IDocumentElementKey, value: IDatabaseDataDocument, prevValue?: IDatabaseDataDocument): void {
+    if (!prevValue) {
+      prevValue = this.get(key);
+
+      if (!prevValue) {
+        prevValue = this.getAction(DocumentDataAction)
+          .get(key.index);
+      }
+    }
+
     this.editedElements.set(key.index, value);
+
+    this.action.execute({
+      type: 'edit',
+      resultId: this.result.id,
+      value: {
+        key: key,
+        prevValue,
+        value,
+      },
+    });
 
     // TODO: remove
     this.source
@@ -66,25 +88,25 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
   }
 
   setData(key: IDocumentElementKey, value: string): void {
-    const edited = this.editedElements.get(key.index);
+    let previousValue = this.get(key);
 
-    if (edited) {
-      edited.data = value;
-      this.set(key, edited);
-      return;
+    if (!previousValue) {
+      previousValue = this.getAction(DocumentDataAction)
+        .get(key.index);
     }
 
-    const sourceValue = this.getAction(DocumentDataAction)
-      .get(key.index);
-
-    if (!sourceValue) {
+    if (!previousValue) {
       throw new Error('Source value not found');
     }
 
-    this.set(key, {
-      ...sourceValue,
-      data: value,
-    });
+    this.set(
+      key,
+      {
+        ...previousValue,
+        data: value,
+      },
+      previousValue
+    );
   }
 
   get(key: IDocumentElementKey): IDatabaseDataDocument | undefined {
@@ -94,6 +116,12 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
   revert(key: IDocumentElementKey): void {
     this.editedElements.delete(key.index);
 
+    this.action.execute({
+      type: 'revert',
+      resultId: this.result.id,
+      value: { key: key },
+    });
+
     // TODO: remove
     this.source
       .getEditor(this.resultIndex)
@@ -102,16 +130,21 @@ export class DocumentEditAction extends DatabaseDataAction<any, IDatabaseResultS
 
   clear(): void {
     this.editedElements.clear();
+    this.action.execute({
+      type: 'revert',
+      resultId: this.result.id,
+    });
   }
 
   dispose(): void {
+    this.clear();
     // TODO: remove
     this.source.editor?.actions.removeHandler(this.resetEditedElements);
   }
 
   private resetEditedElements(action: IDatabaseDataEditorActionsData) {
     if (action.resultId === this.result.id && action.type === 'cancel') {
-      this.editedElements.delete(action.row);
+      this.revert({ index: action.row });
     }
   }
 
