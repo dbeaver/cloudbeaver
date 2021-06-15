@@ -8,15 +8,15 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 
 import type { ISQLCodeEditorProps } from './ISQLCodeEditorProps';
 import type { SQLCodeEditorController } from './SQLCodeEditorController';
 
-async function loader() {
+const loader = createComplexLoader(async function loader() {
   const { SQLCodeEditor } = await import('./SQLCodeEditor');
   return { SQLCodeEditor };
-}
+});
 
 export const SQLCodeEditorLoader = observer<ISQLCodeEditorProps, SQLCodeEditorController>(function SQLCodeEditorLoader(props, ref) {
   return (

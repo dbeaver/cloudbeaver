@@ -11,25 +11,35 @@ import { useState, useEffect } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-export interface ComplexLoaderProps<T> {
+interface IComplexLoaderData<T> {
+  promise: Promise<T> | undefined;
+  data: T | undefined;
+  error: Error | undefined;
   loader: () => Promise<T>;
+}
+
+export interface ComplexLoaderProps<T> {
+  loader: IComplexLoaderData<T>;
   placeholder: React.ReactElement;
   keepLoading?: boolean;
   children: (content: T) => JSX.Element;
 }
 
 export const ComplexLoader: React.FC<ComplexLoaderProps<any>> = function ComplexLoader(props) {
-  const [content, setContent] = useState<unknown | null>(null);
+  const [content, setContent] = useState<unknown | null>(props.loader.data);
   const notificationService = useService(NotificationService);
 
   useEffect(() => {
     let unmounted = false;
+
     if (!content) {
       props
+        .loader
         .loader()
         .then(value => !unmounted && setContent(value))
         .catch(exception => !unmounted && notificationService.logException(exception, 'Can\'t load resource'));
     }
+
     return () => {
       unmounted = true;
     };
@@ -41,3 +51,35 @@ export const ComplexLoader: React.FC<ComplexLoaderProps<any>> = function Complex
 
   return props.children(content);
 };
+
+export function createComplexLoader<T>(loader: () => Promise<T>): IComplexLoaderData<T> {
+  return {
+    promise: undefined,
+    data: undefined,
+    error: undefined,
+    async loader() {
+      if (this.data !== undefined) {
+        return this.data;
+      }
+
+      if (this.error) {
+        throw this.error;
+      }
+
+      if (this.promise) {
+        return await this.promise;
+      }
+
+      this.promise = loader();
+
+      try {
+        this.data = await this.promise;
+        return this.data;
+      } catch (exception) {
+        this.error = exception;
+
+        throw exception;
+      }
+    },
+  };
+}
