@@ -502,7 +502,7 @@ public class WebSQLProcessor {
             throw new DBWebException("Error explaining execution plan", e);
         }
 
-        return new WebSQLExecutionPlan(dbcPlan[0]);
+        return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
     }
 
     ////////////////////////////////////////////////
