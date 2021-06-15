@@ -29,6 +29,9 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
+import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
+import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -38,6 +41,7 @@ import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -458,6 +462,51 @@ public class WebSQLProcessor {
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
         return result;
     }
+
+    ////////////////////////////////////////////////
+    // ExecutionPlan
+
+    @NotNull
+    public WebSQLExecutionPlan explainExecutionPlan(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @NotNull Map<String, Object> configuration) throws DBWebException {
+
+        DBCQueryPlanner planner;
+        DBCExecutionContext executionContext = getExecutionContext();
+        if (executionContext != null) {
+            DBPDataSource dataSource = executionContext.getDataSource();
+            planner = GeneralUtils.adapt(dataSource, DBCQueryPlanner.class);
+        } else {
+            throw new DBWebException("Not connected to data source");
+        }
+
+        if (planner == null) {
+            throw new DBWebException("Datasource '" + executionContext.getDataSource() + "' doesn't support execution plan");
+        }
+
+        DBCPlan[] dbcPlan = new DBCPlan[1];
+
+        try {
+            DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+                try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Execute SQL")) {
+                    DBCQueryPlannerConfiguration planConfig = new DBCQueryPlannerConfiguration();
+                    planConfig.getParameters().putAll(configuration);
+                    dbcPlan[0] = planner.planQueryExecution(session, sql, planConfig);
+                } catch (DBException e) {
+                    throw new InvocationTargetException(e);
+                }
+            });
+        } catch (DBException e) {
+            throw new DBWebException("Error explaining execution plan", e);
+        }
+
+        return new WebSQLExecutionPlan(dbcPlan[0]);
+    }
+
+    ////////////////////////////////////////////////
+    // Misc
 
     private void checkRowIdentifier(WebSQLResultsInfo resultsInfo, DBDRowIdentifier rowIdentifier) throws DBWebException {
         if (rowIdentifier == null || !rowIdentifier.isValidIdentifier()) {

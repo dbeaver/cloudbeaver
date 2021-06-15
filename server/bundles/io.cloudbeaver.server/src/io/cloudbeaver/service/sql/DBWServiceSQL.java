@@ -89,4 +89,14 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlExplainExecutionPlan(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @NotNull Map<String, Object> options) throws DBException;
+
+    @WebAction
+    WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
 }

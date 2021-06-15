@@ -3,30 +3,32 @@
 ####################################################
 
 type SQLDialectInfo {
-    name: String
+    name: String!
 
-    dataTypes: [ String ]
-    functions: [ String ]
-    reservedWords: [ String ]
-    quoteStrings: [ [ String ] ]
-    singleLineComments: [ String ]
-    multiLineComments: [ [ String ] ]
+    dataTypes: [ String ]!
+    functions: [ String ]!
+    reservedWords: [ String ]!
+    quoteStrings: [ [ String ] ]!
+    singleLineComments: [ String ]!
+    multiLineComments: [ [ String ] ]!
 
     catalogSeparator: String
     structSeparator: String
     scriptDelimiter: String
 
+    supportsExplainExecutionPlan: Boolean!
+
 }
 
 type SQLCompletionProposal {
-    displayString: String
-    type: String
+    displayString: String!
+    type: String!
     score: Int
 
-    replacementString: String
-    replacementOffset: Int
-    replacementLength: Int
-    cursorPosition: Int
+    replacementString: String!
+    replacementOffset: Int!
+    replacementLength: Int!
+    cursorPosition: Int!
 
     icon: String
     nodePath: String
@@ -136,6 +138,30 @@ type DataTypeLogicalOperation {
     argumentCount: Int
 }
 
+####################################################
+# SQL Executio plan
+####################################################
+
+type SQLExecutionPlan {
+    query: String!
+    nodes: [SQLExecutionPlanNode!]!
+}
+
+type SQLExecutionPlanNode {
+    kind: String!
+    name: String
+    type: String!
+    condition: String
+    description: String
+    properties: [ObjectPropertyInfo!]!
+
+    nested: [SQLExecutionPlanNode!]!
+}
+
+####################################################
+# Query and Mutation
+####################################################
+
 extend type Query {
 
     sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
@@ -210,5 +236,17 @@ extend type Mutation {
 
     # Returns SQLExecuteInfo
     asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
+
+
+    # Read data from table
+    asyncSqlExplainExecutionPlan(
+        connectionId: ID!,
+        contextId: ID!,
+        query: String!,
+        configuration: Object!
+    ): AsyncTaskInfo!
+
+    # Returns SQLExecutionPlan
+    asyncSqlExplainExecutionPlanResult(taskId: ID!): SQLExecutionPlan !
 
 }

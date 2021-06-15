@@ -211,5 +211,36 @@ public class WebServiceSQL implements DBWServiceSQL {
         return null;
     }
 
+    ////////////////////////////////////////////////////
+    // Explain plan
 
+    @Override
+    public WebAsyncTaskInfo asyncSqlExplainExecutionPlan(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @NotNull Map<String, Object> configuration) throws DBException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                try {
+                    monitor.beginTask("Explain execution plan", 1);
+                    monitor.subTask("Explain query [" + sql + "] execution plan");
+                    WebSQLExecutionPlan executeResults = contextInfo.getProcessor().explainExecutionPlan(monitor, contextInfo, sql, configuration);
+                    this.result = "";
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL query execution plan explain", runnable);
+    }
+
+    @Override
+    public WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
+        if (taskStatus != null) {
+            return (WebSQLExecutionPlan) taskStatus.getExtendedResult();
+        }
+        return null;
+    }
 }
