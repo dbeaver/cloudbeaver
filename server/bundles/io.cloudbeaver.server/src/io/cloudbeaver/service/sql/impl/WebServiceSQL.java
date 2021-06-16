@@ -223,7 +223,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor.beginTask("Explain execution plan", 1);
                     monitor.subTask("Explain query [" + sql + "] execution plan");
                     WebSQLExecutionPlan executeResults = contextInfo.getProcessor().explainExecutionPlan(monitor, contextInfo, sql, configuration);
-                    this.result = "";
+                    this.result = "Execution plan explain has been scheduled";
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
