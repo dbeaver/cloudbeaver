@@ -23,10 +23,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * WebSQLExecutionPlanNode.
@@ -37,10 +35,22 @@ public class WebSQLExecutionPlanNode {
 
     private final WebSession webSession;
     private final DBCPlanNode node;
+    private final String id;
+    private final String parentId;
 
-    public WebSQLExecutionPlanNode(WebSession webSession, DBCPlanNode node) {
+    public WebSQLExecutionPlanNode(WebSession webSession, DBCPlanNode node, String id, String parentId) {
         this.webSession = webSession;
         this.node = node;
+        this.id = id;
+        this.parentId = parentId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getParentId() {
+        return parentId;
     }
 
     public String getKind() {
@@ -70,17 +80,6 @@ public class WebSQLExecutionPlanNode {
         return Arrays.stream(propertyCollector.getProperties())
             .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
             .map(p -> new WebPropertyInfo(webSession, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
-    }
-
-    public WebSQLExecutionPlanNode[] getNested() {
-        Collection<? extends DBCPlanNode> nestedNodes = node.getNested();
-        if (CommonUtils.isEmpty(nestedNodes)) {
-            return null;
-        }
-        return nestedNodes
-            .stream()
-            .map(node1 -> new WebSQLExecutionPlanNode(webSession, node1))
-            .toArray(WebSQLExecutionPlanNode[]::new);
     }
 
 }

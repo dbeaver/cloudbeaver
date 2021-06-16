@@ -19,9 +19,9 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * WebSQLExecutionPlan.
@@ -44,10 +44,28 @@ public class WebSQLExecutionPlan {
 
     public WebSQLExecutionPlanNode[] getNodes() {
         Map<String, Object> options = new LinkedHashMap<>();
-        return plan.getPlanNodes(options)
-            .stream()
-            .map(node -> new WebSQLExecutionPlanNode(webSession, node))
-            .toArray(WebSQLExecutionPlanNode[]::new);
+        Map<DBCPlanNode, String> idMap = new IdentityHashMap<>();
+
+        List<WebSQLExecutionPlanNode> result = new ArrayList<>();
+
+        for (DBCPlanNode node : plan.getPlanNodes(options)) {
+            addNodeWithNested(result, null, node, idMap);
+        }
+
+        return result.toArray(new WebSQLExecutionPlanNode[0]);
+    }
+
+    private void addNodeWithNested(List<WebSQLExecutionPlanNode> result, DBCPlanNode parentNode, DBCPlanNode node, Map<DBCPlanNode, String> idMap) {
+        String parentId = idMap.get(parentNode);
+        String nodeId = String.valueOf(idMap.size());
+        idMap.put(node, nodeId);
+        result.add(new WebSQLExecutionPlanNode(webSession, node, nodeId, parentId));
+        Collection<? extends DBCPlanNode> nested = node.getNested();
+        if (nested != null) {
+            for (DBCPlanNode nn : nested) {
+                addNodeWithNested(result, node, nn, idMap);
+            }
+        }
     }
 
 }

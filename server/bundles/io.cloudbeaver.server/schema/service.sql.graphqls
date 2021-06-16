@@ -148,14 +148,15 @@ type SQLExecutionPlan {
 }
 
 type SQLExecutionPlanNode {
+    id: ID!
+    parentId: ID
+
     kind: String!
     name: String
     type: String!
     condition: String
     description: String
     properties: [ObjectPropertyInfo!]!
-
-    nested: [SQLExecutionPlanNode!]!
 }
 
 ####################################################
