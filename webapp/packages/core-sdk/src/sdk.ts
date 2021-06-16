@@ -283,6 +283,8 @@ export interface Mutation {
   asyncReadDataFromContainer: AsyncTaskInfo;
   asyncSqlExecuteQuery: AsyncTaskInfo;
   asyncSqlExecuteResults: SqlExecuteInfo;
+  asyncSqlExplainExecutionPlan: AsyncTaskInfo;
+  asyncSqlExplainExecutionPlanResult: SqlExecutionPlan;
   asyncTaskCancel?: Maybe<Scalars['Boolean']>;
   asyncTaskInfo: AsyncTaskInfo;
   /** @deprecated Field no longer supported */
@@ -329,6 +331,17 @@ export interface MutationAsyncSqlExecuteQueryArgs {
 }
 
 export interface MutationAsyncSqlExecuteResultsArgs {
+  taskId: Scalars['ID'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanResultArgs {
   taskId: Scalars['ID'];
 }
 
@@ -772,26 +785,27 @@ export interface DatabaseStructContainers {
 }
 
 export interface SqlDialectInfo {
-  name?: Maybe<Scalars['String']>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
-  functions?: Maybe<Array<Maybe<Scalars['String']>>>;
-  reservedWords?: Maybe<Array<Maybe<Scalars['String']>>>;
-  quoteStrings?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  singleLineComments?: Maybe<Array<Maybe<Scalars['String']>>>;
-  multiLineComments?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
+  name: Scalars['String'];
+  dataTypes: Array<Maybe<Scalars['String']>>;
+  functions: Array<Maybe<Scalars['String']>>;
+  reservedWords: Array<Maybe<Scalars['String']>>;
+  quoteStrings: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
+  singleLineComments: Array<Maybe<Scalars['String']>>;
+  multiLineComments: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
   catalogSeparator?: Maybe<Scalars['String']>;
   structSeparator?: Maybe<Scalars['String']>;
   scriptDelimiter?: Maybe<Scalars['String']>;
+  supportsExplainExecutionPlan: Scalars['Boolean'];
 }
 
 export interface SqlCompletionProposal {
-  displayString?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  displayString: Scalars['String'];
+  type: Scalars['String'];
   score?: Maybe<Scalars['Int']>;
-  replacementString?: Maybe<Scalars['String']>;
-  replacementOffset?: Maybe<Scalars['Int']>;
-  replacementLength?: Maybe<Scalars['Int']>;
-  cursorPosition?: Maybe<Scalars['Int']>;
+  replacementString: Scalars['String'];
+  replacementOffset: Scalars['Int'];
+  replacementLength: Scalars['Int'];
+  cursorPosition: Scalars['Int'];
   icon?: Maybe<Scalars['String']>;
   nodePath?: Maybe<Scalars['String']>;
 }
@@ -874,6 +888,22 @@ export interface DataTypeLogicalOperation {
   id: Scalars['ID'];
   expression: Scalars['String'];
   argumentCount?: Maybe<Scalars['Int']>;
+}
+
+export interface SqlExecutionPlan {
+  query: Scalars['String'];
+  nodes: SqlExecutionPlanNode[];
+}
+
+export interface SqlExecutionPlanNode {
+  id: Scalars['ID'];
+  parentId?: Maybe<Scalars['ID']>;
+  kind: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  condition?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  properties: ObjectPropertyInfo[];
 }
 
 export enum AdminSubjectType {
@@ -1399,6 +1429,11 @@ export type ObjectOriginInfoFragment = (
   & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> }
 );
 
+export type SqlExecutionPlanNodeFragment = (
+  Pick<SqlExecutionPlanNode, 'kind' | 'name' | 'type' | 'condition' | 'description'>
+  & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
+);
+
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1456,6 +1491,20 @@ export interface AsyncSqlExecuteQueryMutation {
   );
 }
 
+export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}>;
+
+export interface AsyncSqlExplainExecutionPlanMutation {
+  taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  );
+}
+
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
@@ -1472,6 +1521,20 @@ export interface GetSqlExecuteTaskResultsMutation {
           & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
         )>>>; }
       )>; }
+    )>; }
+  );
+}
+
+export type GetSqlExecutionPlanResultMutationVariables = Exact<{
+  taskId: Scalars['ID'];
+}>;
+
+export interface GetSqlExecutionPlanResultMutation {
+  result: (
+    Pick<SqlExecutionPlan, 'query'>
+    & { nodes: Array<(
+      Pick<SqlExecutionPlanNode, 'id' | 'parentId' | 'kind' | 'name' | 'type' | 'condition' | 'description'>
+      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
     )>; }
   );
 }
@@ -1580,7 +1643,7 @@ export type QuerySqlDialectInfoQueryVariables = Exact<{
   connectionId: Scalars['ID'];
 }>;
 
-export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter'>> }
+export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter' | 'supportsExplainExecutionPlan'>> }
 
 export type ConfigureServerQueryVariables = Exact<{
   configuration: ServerConfigInput;
@@ -1842,6 +1905,25 @@ export const NavNodeInfoFragmentDoc = `
   }
 }
     ${NavNodePropertiesFragmentDoc}`;
+export const SqlExecutionPlanNodeFragmentDoc = `
+    fragment SQLExecutionPlanNode on SQLExecutionPlanNode {
+  kind
+  name
+  type
+  condition
+  description
+  properties {
+    id
+    category
+    dataType
+    description
+    displayName
+    features
+    value
+    order
+  }
+}
+    `;
 export const SessionStateFragmentDoc = `
     fragment SessionState on SessionInfo {
   createTime
@@ -2351,6 +2433,27 @@ export const AsyncSqlExecuteQueryDocument = `
   }
 }
     `;
+export const AsyncSqlExplainExecutionPlanDocument = `
+    mutation asyncSqlExplainExecutionPlan($connectionId: ID!, $contextId: ID!, $query: String!, $configuration: Object!) {
+  taskInfo: asyncSqlExplainExecutionPlan(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+    configuration: $configuration
+  ) {
+    id
+    name
+    running
+    status
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+    taskResult
+  }
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
@@ -2386,6 +2489,32 @@ export const GetSqlExecuteTaskResultsDocument = `
         }
         rows
         hasMoreData
+      }
+    }
+  }
+}
+    `;
+export const GetSqlExecutionPlanResultDocument = `
+    mutation getSqlExecutionPlanResult($taskId: ID!) {
+  result: asyncSqlExplainExecutionPlanResult(taskId: $taskId) {
+    query
+    nodes {
+      id
+      parentId
+      kind
+      name
+      type
+      condition
+      description
+      properties {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+        order
       }
     }
   }
@@ -2520,6 +2649,7 @@ export const QuerySqlDialectInfoDocument = `
     catalogSeparator
     structSeparator
     scriptDelimiter
+    supportsExplainExecutionPlan
   }
 }
     `;
@@ -2799,8 +2929,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
       return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
     },
+    asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables): Promise<AsyncSqlExplainExecutionPlanMutation> {
+      return withWrapper(() => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables));
+    },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
+    },
+    getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables): Promise<GetSqlExecutionPlanResultMutation> {
+      return withWrapper(() => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables));
     },
     updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
       return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));

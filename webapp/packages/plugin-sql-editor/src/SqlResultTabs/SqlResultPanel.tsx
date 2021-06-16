@@ -44,7 +44,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, id }: SqlR
   if (executionPlanTab) {
     return styled(style)(
       <result-panel>
-        {/* TODO: ex-plan add panel */}
+        <div>{executionPlanTab.query}</div>
       </result-panel>
     );
   }

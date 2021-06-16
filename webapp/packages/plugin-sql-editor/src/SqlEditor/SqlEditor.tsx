@@ -79,8 +79,8 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
   }
 
   return styled(styles)(
-    <sql-editor as="div" className={className}>
-      <actions as="div">
+    <sql-editor className={className}>
+      <actions>
         <button
           disabled={controller.isActionsDisabled}
           onMouseDown={preventFocus}
@@ -100,6 +100,13 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
             icon="/icons/sql_exec_new.png"
             title="Execute SQL in new tab (Ctrl + \\)(Shift + Ctrl + Enter)"
           />
+        </button>
+        <button
+          disabled={!controller.dialect?.supportsExplainExecutionPlan}
+          onMouseDown={preventFocus}
+          onClick={controller.handleExecutionPlan}
+        >
+          plan
         </button>
       </actions>
       <SQLCodeEditorLoader

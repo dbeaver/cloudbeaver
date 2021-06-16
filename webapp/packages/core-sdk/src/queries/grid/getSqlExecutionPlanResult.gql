@@ -1,0 +1,28 @@
+mutation getSqlExecutionPlanResult(
+    $taskId: ID!
+) {
+    result: asyncSqlExplainExecutionPlanResult(
+        taskId: $taskId
+    ) {
+        query
+        nodes {
+          id
+          parentId
+          kind
+          name
+          type
+          condition
+          description
+          properties {
+            id
+            category
+            dataType
+            description
+            displayName
+            features
+            value
+            order
+          }
+        }
+    }
+}

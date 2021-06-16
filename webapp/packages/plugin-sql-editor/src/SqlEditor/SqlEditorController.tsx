@@ -19,6 +19,7 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
+import { SqlExecutionPlanService } from '../SqlResultTabs/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
@@ -51,6 +52,14 @@ export class SqlEditorController implements IInitializableController {
       this.tab.handlerState,
       await this.getExecutingQuery(),
       true
+    );
+  };
+
+  handleExecutionPlan = async (): Promise<void> => {
+    this.sqlExecutionPlanService.executeExecutionPlan(
+      this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
+      this.tab.handlerState,
+      await this.getExecutingQuery(),
     );
   };
 
@@ -96,7 +105,8 @@ export class SqlEditorController implements IInitializableController {
     private sqlResultTabsService: SqlResultTabsService,
     private sqlQueryService: SqlQueryService,
     private sqlDialectInfoService: SqlDialectInfoService,
-    private sqlEditorService: SqlEditorService
+    private sqlEditorService: SqlEditorService,
+    private sqlExecutionPlanService: SqlExecutionPlanService,
   ) {
     makeObservable(this, {
       dialect: computed,
