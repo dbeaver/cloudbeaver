@@ -8,45 +8,41 @@
 
 import { computed, observable, makeObservable } from 'mobx';
 
-import { EDeferredState } from '@cloudbeaver/core-utils';
-
-import type { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
+import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
 export class SqlExecutionState {
   constructor() {
-    makeObservable<SqlExecutionState, 'currentlyExecutingQuery'>(this, {
-      isSqlExecuting: computed,
+    makeObservable<SqlExecutionState, 'executionTask'>(this, {
+      isExecuting: computed,
       canCancel: computed,
-      currentlyExecutingQuery: observable,
+      executionTask: observable.ref,
     });
   }
 
-  get isSqlExecuting(): boolean {
-    return this.currentlyExecutingQuery ? this.currentlyExecutingQuery.isInProgress : false;
+  get isExecuting(): boolean {
+    return this.executionTask ? this.executionTask.isInProgress : false;
   }
 
   get canCancel(): boolean {
-    return this.currentlyExecutingQuery ? this.currentlyExecutingQuery.getState() === EDeferredState.PENDING : false;
+    return this.executionTask ? this.executionTask.getState() === EDeferredState.PENDING : false;
   }
 
-  cancelSQlExecuting = () => {
-    if (this.currentlyExecutingQuery) {
-      this.currentlyExecutingQuery.cancel();
+  cancelTask = () => {
+    if (this.executionTask) {
+      this.executionTask.cancel();
     }
   };
 
-  private currentlyExecutingQuery: SQLQueryExecutionProcess | null = null;
+  private executionTask: Deferred<any> | null = null;
 
-  async setCurrentlyExecutingQuery(queryExecutionProcess: SQLQueryExecutionProcess): Promise<void> {
-    if (this.currentlyExecutingQuery) {
+  setExecutionTask(executionTask: Deferred<any>): void {
+    if (this.executionTask) {
       throw new Error('Simultaneous execution of several queries is forbidden');
     }
-    this.currentlyExecutingQuery = queryExecutionProcess;
+    this.executionTask = executionTask;
 
-    try {
-      await queryExecutionProcess.promise;
-    } finally {
-      this.currentlyExecutingQuery = null;
-    }
+    executionTask.promise.finally(() => {
+      this.executionTask = null;
+    });
   }
 }

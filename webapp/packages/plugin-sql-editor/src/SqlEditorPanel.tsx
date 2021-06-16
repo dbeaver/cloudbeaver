@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import type { TabHandlerPanelProps } from '@cloudbeaver/core-app';
+import type { TabHandlerPanelComponent } from '@cloudbeaver/core-app';
 import {
   splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles
 } from '@cloudbeaver/core-blocks';
@@ -28,7 +28,7 @@ const viewerStyles = css`
   }
 `;
 
-export function SqlEditorPanel({ tab }: TabHandlerPanelProps<ISqlEditorTabState>) {
+export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = function SqlEditorPanel({ tab }) {
   return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
     <Split split="horizontal" sticky={30}>
       <Pane>
@@ -40,4 +40,4 @@ export function SqlEditorPanel({ tab }: TabHandlerPanelProps<ISqlEditorTabState>
       </Pane>
     </Split>
   );
-}
+};

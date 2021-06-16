@@ -8,37 +8,47 @@
 
 import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
-export interface ISqlQueryParams extends IDatabaseExecutionContext {
+export interface ISqlQueryParams {
   query: string;
+  executionContext: IDatabaseExecutionContext;
 }
 
-export interface IResultExecutionInfo {
-  resultTabId: string; // to store tableView in tableViewStore
-  indexInResultSet: number;
-  sqlQueryParams: ISqlQueryParams;
-}
-
-export interface IResultDataTab {
-  resultTabId: string; // to store tableView in tableViewStore
+export interface IResultTab {
+  tabId: string;
   // when query return several results they all have one groupId
   // new group id generates every time you execute query in new tab
   groupId: string;
-  order: number;
   indexInResultSet: number;
-  name: string;
 }
 
-export interface IQueryTabGroup {
+export interface IResultGroup {
   groupId: string;
   modelId: string;
   sqlQueryParams: ISqlQueryParams;
   order: number;
 }
 
-export interface ISqlEditorTabState extends Partial<IDatabaseExecutionContext> {
+export interface ISqlEditorResultTab {
+  id: string;
+  order: number;
+  name: string;
+  icon: string;
+}
+
+export interface IExecutionPlanTab {
+  tabId: string;
+  query: string;
+  executionContext: IDatabaseExecutionContext;
+  options?: Record<string, any>;
+}
+
+export interface ISqlEditorTabState {
   order: number;
   query: string;
-  currentResultTabId?: string;
-  queryTabGroups: IQueryTabGroup[];
-  resultTabs: IResultDataTab[];
+  executionContext?: IDatabaseExecutionContext;
+  currentTabId?: string;
+  tabs: ISqlEditorResultTab[];
+  resultGroups: IResultGroup[];
+  resultTabs: IResultTab[];
+  executionPlanTabs: IExecutionPlanTab[]; // TODO: ex-plan store addition info for tab
 }

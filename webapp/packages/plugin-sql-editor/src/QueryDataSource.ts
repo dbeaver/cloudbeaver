@@ -13,11 +13,10 @@ import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 import { DatabaseDataEditor, DatabaseDataSource, IDatabaseDataOptions, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
+import type { SqlExecutionState } from './SqlExecutionState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
-import type { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
-  tabId: string;
   query: string;
 }
 
@@ -31,7 +30,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   constructor(
     private graphQLService: GraphQLService,
     private notificationService: NotificationService,
-    private sqlResultTabsService: SqlResultTabsService
+    private sqlExecutionState: SqlExecutionState
   ) {
     super();
 
@@ -147,11 +146,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       return prevResults;
     }
     const limit = this.count;
-    const sqlExecutionContext = this.sqlResultTabsService.getTabExecutionContext(this.options.tabId);
 
     this.queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
 
-    sqlExecutionContext.setCurrentlyExecutingQuery(this.queryExecutionProcess);
+    this.sqlExecutionState.setExecutionTask(this.queryExecutionProcess);
 
     try {
       await this.queryExecutionProcess.start(
