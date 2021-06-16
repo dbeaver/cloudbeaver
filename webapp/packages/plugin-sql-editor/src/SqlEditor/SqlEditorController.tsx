@@ -19,39 +19,42 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
+import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
   get dialect(): SqlDialectInfo | undefined {
-    if (!this.tab.handlerState.connectionId) {
+    if (!this.tab.handlerState.executionContext) {
       return undefined;
     }
 
-    return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.connectionId);
+    return this.sqlDialectInfoService.getDialectInfo(this.tab.handlerState.executionContext.connectionId);
   }
 
   get isActionsDisabled(): boolean {
-    return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isSqlExecuting;
+    return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isExecuting;
   }
 
-  handleExecute = async () => {
-    this.sqlResultTabsService.executeEditorQuery(
-      this.tab.id,
+  handleExecute = async (): Promise<void> => {
+    this.sqlQueryService.executeEditorQuery(
+      this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
       this.tab.handlerState,
       await this.getExecutingQuery(),
       false
     );
   };
 
-  handleExecuteNewTab = async () => {
-    this.sqlResultTabsService.executeEditorQuery(
-      this.tab.id,
+  handleExecuteNewTab = async (): Promise<void> => {
+    this.sqlQueryService.executeEditorQuery(
+      this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
       this.tab.handlerState,
       await this.getExecutingQuery(),
       true
     );
   };
+
+  // TODO: ex-plan add action for execution plan
 
   readonly options: EditorConfiguration = {
     theme: 'material',
@@ -82,7 +85,7 @@ export class SqlEditorController implements IInitializableController {
     editorDidMount: this.handleEditorConfigure.bind(this),
   };
 
-  get value() {
+  get value(): string {
     return this.tab.handlerState.query;
   }
 
@@ -91,6 +94,7 @@ export class SqlEditorController implements IInitializableController {
 
   constructor(
     private sqlResultTabsService: SqlResultTabsService,
+    private sqlQueryService: SqlQueryService,
     private sqlDialectInfoService: SqlDialectInfoService,
     private sqlEditorService: SqlEditorService
   ) {
@@ -114,11 +118,11 @@ export class SqlEditorController implements IInitializableController {
   }
 
   private async loadDialect(): Promise<SqlDialectInfo | undefined> {
-    if (!this.tab.handlerState.connectionId) {
+    if (!this.tab.handlerState.executionContext) {
       return undefined;
     }
 
-    return await this.sqlDialectInfoService.loadSqlDialectInfo(this.tab.handlerState.connectionId);
+    return await this.sqlDialectInfoService.loadSqlDialectInfo(this.tab.handlerState.executionContext.connectionId);
   }
 
   private async getExecutingQuery(): Promise<string> {
@@ -154,7 +158,7 @@ export class SqlEditorController implements IInitializableController {
 
   private getHandleAutocomplete(): AsyncHintFunction {
     const handleAutocomplete: AsyncHintFunction = async (editor, callback) => {
-      if (!this.tab.handlerState.connectionId || !this.tab.handlerState.contextId) {
+      if (!this.tab.handlerState.executionContext) {
         const { hint } = await import('codemirror/addon/hint/sql-hint' as any);
 
         this.editor?.showHint({ hint }); // we show default sql-hint
@@ -166,8 +170,8 @@ export class SqlEditorController implements IInitializableController {
 
       const proposals = await this.sqlEditorService
         .getAutocomplete(
-          this.tab.handlerState.connectionId,
-          this.tab.handlerState.contextId,
+          this.tab.handlerState.executionContext.connectionId,
+          this.tab.handlerState.executionContext.contextId,
           this.tab.handlerState.query,
           cursorPosition
         );

@@ -43,12 +43,16 @@ export class SqlEditorService {
   }
 
   async initEditorConnection(state: ISqlEditorTabState): Promise<IDatabaseExecutionContext | undefined> {
-    if (!state.connectionId) {
-      console.error('executeEditorQuery connectionId is not provided');
+    if (!state.executionContext) {
+      console.error('executeEditorQuery executionContext is not provided');
       return;
     }
 
-    const context = await this.initContext(state.connectionId, state.objectCatalogId, state.objectSchemaId);
+    const context = await this.initContext(
+      state.executionContext.connectionId,
+      state.executionContext.objectCatalogId,
+      state.executionContext.objectSchemaId
+    );
 
     if (!context) {
       return;
@@ -80,19 +84,15 @@ export class SqlEditorService {
     }
   }
 
-  async destroySqlContext(connectionId?: string, contextId?: string): Promise<void> {
-    if (!connectionId) {
-      return;
-    }
-
-    const connection = this.connectionInfoResource.get(connectionId);
-    if (!connection?.connected || !contextId) {
+  async destroySqlContext(context: IDatabaseExecutionContext): Promise<void> {
+    const connection = this.connectionInfoResource.get(context.connectionId);
+    if (!connection?.connected) {
       return;
     }
     try {
-      await this.gql.sdk.sqlContextDestroy({ connectionId, contextId });
+      await this.gql.sdk.sqlContextDestroy(context);
     } catch (exception) {
-      this.notificationService.logException(exception, `Failed to destroy SQL-context ${contextId}`, '', true);
+      this.notificationService.logException(exception, `Failed to destroy SQL-context ${context.contextId}`, '', true);
     }
   }
 
