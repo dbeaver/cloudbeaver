@@ -38,6 +38,7 @@ public class CBConstants {
     public static final String PARAM_SERVER_PORT = "serverPort";
     public static final String PARAM_SERVER_NAME = "serverName";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
+    public static final String PARAM_SERVER_URL = "serverURL";
     public static final String PARAM_ROOT_URI = "rootURI";
     public static final String PARAM_SERVICES_URI = "serviceURI";
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
@@ -69,6 +70,7 @@ public class CBConstants {
 
     public static final String VAR_CB_LOCAL_HOST_ADDR = "CB_LOCAL_HOST_ADDR";
 
+    public static final String DEFAULT_SERVER_ADDR = "localhost";
 
     public static final String VAR_HOST_DOCKER_INTERNAL = "host.docker.internal";
 

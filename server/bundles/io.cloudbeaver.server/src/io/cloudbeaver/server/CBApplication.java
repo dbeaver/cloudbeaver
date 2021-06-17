@@ -74,6 +74,7 @@ public class CBApplication extends BaseApplicationImpl {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
+    private String serverURL;
     private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
@@ -101,6 +102,10 @@ public class CBApplication extends BaseApplicationImpl {
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
     public CBApplication() {
+    }
+
+    public String getServerURL() {
+        return serverURL;
     }
 
     public int getServerPort() {
@@ -403,6 +408,12 @@ public class CBApplication extends BaseApplicationImpl {
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
+            if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
+                serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
+            } else if (serverURL == null) {
+                serverURL = "http://" + InetAddress.getLocalHost().getHostName() + ":" + serverPort;
+            }
+
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
             contentRoot = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
