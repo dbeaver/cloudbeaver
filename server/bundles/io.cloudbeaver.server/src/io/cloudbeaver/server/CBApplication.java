@@ -658,6 +658,9 @@ public class CBApplication extends BaseApplicationImpl {
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
                     }
+                    if (!CommonUtils.isEmpty(appConfig.getAuthConfiguration())) {
+                        JSONUtils.serializeProperties(json, "authConfiguration", appConfig.getAuthConfiguration());
+                    }
 
                     json.endObject();
                 }
