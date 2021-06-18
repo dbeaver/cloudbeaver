@@ -25,7 +25,8 @@ type TopMenuItemProps = Omit<ButtonHTMLAttributes<any>, 'style'> & {
 
 export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [], ...props }: TopMenuItemProps) {
   const translate = useTranslate();
-  const styles = useStyles(!menuItem.panel ? [] : [...style, topMenuStyles]);
+  style = [...style, topMenuStyles];
+  const styles = useStyles(!menuItem.panel ? [] : style);
 
   if (!menuItem.panel) {
     return (
@@ -44,12 +45,13 @@ export const TopMenuItem = observer(function TopMenuItem({ menuItem, style = [],
       {...props}
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
-      style={[...style, topMenuStyles]}
+      style={style}
       placement="bottom-end"
+      modal
       onClick={() => menuItem.onClick?.()}
     >
       {menuItem.icon && (
-        <menu-trigger-icon as="div">
+        <menu-trigger-icon>
           <IconOrImage icon={menuItem.icon} />
         </menu-trigger-icon>
       )}

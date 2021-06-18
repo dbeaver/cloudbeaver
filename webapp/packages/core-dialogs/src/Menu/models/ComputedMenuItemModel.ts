@@ -26,6 +26,7 @@ export class ComputedMenuItemModel implements IMenuItem {
   panel?: IMenuPanel;
   type?: MenuItemType;
   separator?: boolean;
+  keepMenuOpen?: boolean;
   rtl?: boolean;
 
   get title(): TLocalizationToken {
@@ -73,6 +74,7 @@ export class ComputedMenuItemModel implements IMenuItem {
 
     this.id = options.id;
     this.type = options.type;
+    this.keepMenuOpen = options.keepMenuOpen;
     this.separator = options.separator;
     this.rtl = options.rtl;
     this.panel = options.panel;
