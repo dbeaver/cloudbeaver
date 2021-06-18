@@ -419,6 +419,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
             CBApplication.getInstance().finishConfiguration(
                 config.getServerName(),
+                config.getServerURL(),
                 adminName,
                 adminPassword,
                 authInfoList,

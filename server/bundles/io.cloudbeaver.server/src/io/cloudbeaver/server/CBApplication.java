@@ -533,6 +533,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     public synchronized void finishConfiguration(
         @NotNull String newServerName,
+        @NotNull String newServerURL,
         @NotNull String adminName,
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
@@ -549,7 +550,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
+        saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
         if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
@@ -572,7 +573,7 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     public synchronized void flushConfiguration() throws DBException {
-        saveRuntimeConfig(serverName, maxSessionIdleTime, appConfiguration);
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration);
     }
 
 
@@ -594,7 +595,7 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
 
         File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
@@ -610,6 +611,9 @@ public class CBApplication extends BaseApplicationImpl {
                     json.beginObject();
                     if (!CommonUtils.isEmpty(newServerName)) {
                         JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
+                    }
+                    if (!CommonUtils.isEmpty(newServerURL)) {
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
                     }
                     if (sessionExpireTime > 0) {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
