@@ -28,7 +28,7 @@ type SQLCompletionProposal {
     replacementString: String!
     replacementOffset: Int!
     replacementLength: Int!
-    cursorPosition: Int!
+    cursorPosition: Int
 
     icon: String
     nodePath: String
