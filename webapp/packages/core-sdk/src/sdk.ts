@@ -283,6 +283,8 @@ export interface Mutation {
   asyncReadDataFromContainer: AsyncTaskInfo;
   asyncSqlExecuteQuery: AsyncTaskInfo;
   asyncSqlExecuteResults: SqlExecuteInfo;
+  asyncSqlExplainExecutionPlan: AsyncTaskInfo;
+  asyncSqlExplainExecutionPlanResult: SqlExecutionPlan;
   asyncTaskCancel?: Maybe<Scalars['Boolean']>;
   asyncTaskInfo: AsyncTaskInfo;
   /** @deprecated Field no longer supported */
@@ -329,6 +331,17 @@ export interface MutationAsyncSqlExecuteQueryArgs {
 }
 
 export interface MutationAsyncSqlExecuteResultsArgs {
+  taskId: Scalars['ID'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanArgs {
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}
+
+export interface MutationAsyncSqlExplainExecutionPlanResultArgs {
   taskId: Scalars['ID'];
 }
 
@@ -503,6 +516,7 @@ export interface ServerConfig {
   name: Scalars['String'];
   version: Scalars['String'];
   workspaceId: Scalars['ID'];
+  serverURL: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
@@ -772,26 +786,27 @@ export interface DatabaseStructContainers {
 }
 
 export interface SqlDialectInfo {
-  name?: Maybe<Scalars['String']>;
-  dataTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
-  functions?: Maybe<Array<Maybe<Scalars['String']>>>;
-  reservedWords?: Maybe<Array<Maybe<Scalars['String']>>>;
-  quoteStrings?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
-  singleLineComments?: Maybe<Array<Maybe<Scalars['String']>>>;
-  multiLineComments?: Maybe<Array<Maybe<Array<Maybe<Scalars['String']>>>>>;
+  name: Scalars['String'];
+  dataTypes: Array<Maybe<Scalars['String']>>;
+  functions: Array<Maybe<Scalars['String']>>;
+  reservedWords: Array<Maybe<Scalars['String']>>;
+  quoteStrings: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
+  singleLineComments: Array<Maybe<Scalars['String']>>;
+  multiLineComments: Array<Maybe<Array<Maybe<Scalars['String']>>>>;
   catalogSeparator?: Maybe<Scalars['String']>;
   structSeparator?: Maybe<Scalars['String']>;
   scriptDelimiter?: Maybe<Scalars['String']>;
+  supportsExplainExecutionPlan: Scalars['Boolean'];
 }
 
 export interface SqlCompletionProposal {
-  displayString?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  displayString: Scalars['String'];
+  type: Scalars['String'];
   score?: Maybe<Scalars['Int']>;
-  replacementString?: Maybe<Scalars['String']>;
-  replacementOffset?: Maybe<Scalars['Int']>;
-  replacementLength?: Maybe<Scalars['Int']>;
-  cursorPosition?: Maybe<Scalars['Int']>;
+  replacementString: Scalars['String'];
+  replacementOffset: Scalars['Int'];
+  replacementLength: Scalars['Int'];
+  cursorPosition: Scalars['Int'];
   icon?: Maybe<Scalars['String']>;
   nodePath?: Maybe<Scalars['String']>;
 }
@@ -876,6 +891,22 @@ export interface DataTypeLogicalOperation {
   argumentCount?: Maybe<Scalars['Int']>;
 }
 
+export interface SqlExecutionPlan {
+  query: Scalars['String'];
+  nodes: SqlExecutionPlanNode[];
+}
+
+export interface SqlExecutionPlanNode {
+  id: Scalars['ID'];
+  parentId?: Maybe<Scalars['ID']>;
+  kind: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  condition?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  properties: ObjectPropertyInfo[];
+}
+
 export enum AdminSubjectType {
   User = 'user',
   Role = 'role'
@@ -922,6 +953,7 @@ export interface AdminPermissionInfo {
 
 export interface ServerConfigInput {
   serverName?: Maybe<Scalars['String']>;
+  serverURL?: Maybe<Scalars['String']>;
   adminName?: Maybe<Scalars['String']>;
   adminPassword?: Maybe<Scalars['String']>;
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
@@ -1580,7 +1612,7 @@ export type QuerySqlDialectInfoQueryVariables = Exact<{
   connectionId: Scalars['ID'];
 }>;
 
-export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter'>> }
+export interface QuerySqlDialectInfoQuery { dialect?: Maybe<Pick<SqlDialectInfo, 'name' | 'dataTypes' | 'functions' | 'reservedWords' | 'quoteStrings' | 'singleLineComments' | 'multiLineComments' | 'catalogSeparator' | 'structSeparator' | 'scriptDelimiter' | 'supportsExplainExecutionPlan'>> }
 
 export type ConfigureServerQueryVariables = Exact<{
   configuration: ServerConfigInput;
@@ -1615,7 +1647,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -2520,6 +2552,7 @@ export const QuerySqlDialectInfoDocument = `
     catalogSeparator
     structSeparator
     scriptDelimiter
+    supportsExplainExecutionPlan
   }
 }
     `;
@@ -2561,6 +2594,7 @@ export const ServerConfigDocument = `
     name
     version
     workspaceId
+    serverURL
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
