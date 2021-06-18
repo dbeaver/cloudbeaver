@@ -18,6 +18,8 @@ export default [
 
   ['administration_configuration_wizard_configuration_server_info', 'Server Information'],
   ['administration_configuration_wizard_configuration_server_name', 'Server Name'],
+  ['administration_configuration_wizard_configuration_server_url', 'Server URL'],
+  ['administration_configuration_wizard_configuration_server_url_description', 'Global access server url'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_title', 'Unsaved settings'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_message', 'Settings can be saved on Server configuration page'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', 'Open'],

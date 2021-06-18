@@ -101,6 +101,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   isChecked?: () => boolean;
   type?: MenuItemType;
   separator?: boolean;
+  keepMenuOpen?: boolean;
   iconGetter?: () => string | undefined;
 
   constructor(private options: IContextMenuItem<T>,
@@ -112,6 +113,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
     this.icon = options.icon;
     this.type = options.type;
     this.separator = options.separator;
+    this.keepMenuOpen = options.keepMenuOpen;
     this.iconGetter = options.iconGetter;
 
     this.id = `${options.id}-${context.contextId!}`;

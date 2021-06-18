@@ -88,7 +88,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
           continue;
         }
 
-        const loaded = await navTreeService.loadNestedNodes(child);
+        const loaded = await navTreeService.loadNestedNodes(child, false);
 
         if (!loaded) {
           const node = navNodeInfoResource.get(child);
@@ -205,7 +205,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       try {
         if (state) {
-          state = await navTreeService.loadNestedNodes(node.id);
+          state = await navTreeService.loadNestedNodes(node.id, true);
         }
 
         await options.onExpand?.(node, state);

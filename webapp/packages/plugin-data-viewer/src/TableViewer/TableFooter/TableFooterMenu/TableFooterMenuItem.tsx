@@ -86,6 +86,7 @@ export const TableFooterMenuItem = observer(function TableFooterMenuItem({
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
       style={[tableFooterMenuStyles]}
+      modal
     >
       {menuItem.icon && (
         <menu-trigger-icon>

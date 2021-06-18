@@ -26,6 +26,7 @@ export interface IMenuItemOptions {
   tooltipGetter?: () => TLocalizationToken | undefined;
   order?: number;
   isPanel?: boolean;
+  keepMenuOpen?: boolean;
   panel?: IMenuPanel;
   type?: MenuItemType;
   separator?: boolean;

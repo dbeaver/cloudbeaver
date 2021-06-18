@@ -53,7 +53,7 @@ export const UserInfo = observer(function UserInfo() {
   }
 
   return styled(style)(
-    <MenuTrigger panel={panel} style={[topMenuStyles]} disabled={hidden.get()}>
+    <MenuTrigger panel={panel} style={[topMenuStyles]} disabled={hidden.get()} modal>
       <user>
         <user-icon>
           <IconOrImage icon='user' viewBox='0 0 28 28' />

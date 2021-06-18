@@ -3,6 +3,7 @@ query serverConfig {
     name
     version
     workspaceId
+    serverURL
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

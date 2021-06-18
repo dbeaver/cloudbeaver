@@ -31,7 +31,7 @@ export const MainMenu = observer(function MainMenu() {
   const mainMenuService = useService(MainMenuService);
 
   return styled(styles)(
-    <menu-wrapper as="div">
+    <menu-wrapper>
       {mainMenuService.getMainMenu().map((topItem, i) => (
         <TopMenuItem key={i} menuItem={topItem} />
       ))}
