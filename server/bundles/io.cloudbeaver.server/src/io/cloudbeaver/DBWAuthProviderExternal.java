@@ -46,6 +46,17 @@ public interface DBWAuthProviderExternal<AUTH_SESSION extends DBASession> extend
     ) throws DBException;
 
     /**
+     * Returns new identifying credentials which can be used to find/create user in database
+     */
+    @NotNull
+    Map<String, Object> authFederatedUser(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        @NotNull String faProvider,
+        @NotNull Map<String, Object> faParameters // Passed federated auth parameters (e.g. assertion ID, session token, etc)
+    ) throws DBException;
+
+    /**
      * Validates that external user may be associated with local user
      * @param userCredentials credentials from authExternalUser
      * @return new user ID. If activeUser is not null then it must be the same as activeUser ID.
