@@ -99,6 +99,7 @@ export * from './FormControls/Filter';
 export * from './Containers/BASE_CONTAINERS_STYLES';
 export * from './Containers/Container';
 export * from './Containers/Group';
+export * from './Containers/GroupClose';
 export * from './Containers/GroupItem';
 export * from './Containers/GroupTitle';
 export * from './Containers/ColoredContainer';

@@ -7,9 +7,7 @@
  */
 
 import { forwardRef } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Icon } from '../Icon';
 import { filterContainerFakeProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
 
@@ -17,35 +15,15 @@ interface Props extends IContainerProps {
   form?: boolean;
   center?: boolean;
   box?: boolean;
-  onClose?: () => void;
 }
-
-const style = css`
-  close {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    display: flex;
-    position: absolute;
-    right: 24px;
-    margin-right: 0 !important;
-  }
-`;
 
 export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group({
   form,
   center,
   box,
-  children,
-  onClose,
   ...rest
 }, ref) {
   const divProps = filterContainerFakeProps(rest);
 
-  return styled(style)(
-    <div ref={ref} {...divProps}>
-      {onClose && <close><Icon name="cross" viewBox="0 0 16 16" onClick={onClose} /></close>}
-      {children}
-    </div>
-  );
+  return <div ref={ref} {...divProps} />;
 });
