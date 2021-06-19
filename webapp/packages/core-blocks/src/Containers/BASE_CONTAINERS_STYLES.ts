@@ -24,6 +24,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       display: flex;
       flex-direction: row;
       align-content: baseline;
+      position: relative;
 
       &[vertical] {
         flex-direction: column;

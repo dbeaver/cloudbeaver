@@ -20,8 +20,8 @@ import styled, { css, use } from 'reshadow';
 
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
+import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
-import { Icon } from '../Icons/Icon';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 

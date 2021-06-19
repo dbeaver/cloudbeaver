@@ -12,7 +12,7 @@ import styled, { use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Icon } from '../Icons/Icon';
+import { Icon } from '../Icon';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 

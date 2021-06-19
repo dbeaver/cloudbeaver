@@ -1,5 +1,5 @@
 export * from './ComplexLoader';
-export * from './Icons';
+export * from './Icon';
 
 export * from './ItemList/ItemList';
 export * from './ItemList/ItemListSearch';
