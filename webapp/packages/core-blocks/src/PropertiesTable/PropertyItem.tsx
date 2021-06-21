@@ -15,7 +15,7 @@ import styled, { css, use } from 'reshadow';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
-import { Icon } from '../Icons';
+import { Icon } from '../Icon';
 import type { IProperty } from './IProperty';
 import { PropertyValueSelector } from './PropertyValueSelector';
 

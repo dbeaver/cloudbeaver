@@ -74,6 +74,7 @@ public class CBApplication extends BaseApplicationImpl {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
+    private String serverURL;
     private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
@@ -101,6 +102,10 @@ public class CBApplication extends BaseApplicationImpl {
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
     public CBApplication() {
+    }
+
+    public String getServerURL() {
+        return serverURL;
     }
 
     public int getServerPort() {
@@ -403,6 +408,12 @@ public class CBApplication extends BaseApplicationImpl {
 
             Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
             serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
+            if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
+                serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
+            } else if (serverURL == null) {
+                serverURL = "http://" + InetAddress.getLocalHost().getHostName() + ":" + serverPort;
+            }
+
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
             contentRoot = getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
@@ -522,6 +533,7 @@ public class CBApplication extends BaseApplicationImpl {
 
     public synchronized void finishConfiguration(
         @NotNull String newServerName,
+        @NotNull String newServerURL,
         @NotNull String adminName,
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
@@ -538,7 +550,7 @@ public class CBApplication extends BaseApplicationImpl {
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, sessionExpireTime, appConfig);
+        saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig);
 
         // Grant permissions to predefined connections
         if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
@@ -561,7 +573,7 @@ public class CBApplication extends BaseApplicationImpl {
     }
 
     public synchronized void flushConfiguration() throws DBException {
-        saveRuntimeConfig(serverName, maxSessionIdleTime, appConfiguration);
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration);
     }
 
 
@@ -583,7 +595,7 @@ public class CBApplication extends BaseApplicationImpl {
         }
     }
 
-    private void saveRuntimeConfig(String newServerName, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+    private void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
 
         File runtimeConfigFile = getRuntimeAppConfigFile();
         try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigFile), StandardCharsets.UTF_8)) {
@@ -599,6 +611,9 @@ public class CBApplication extends BaseApplicationImpl {
                     json.beginObject();
                     if (!CommonUtils.isEmpty(newServerName)) {
                         JSONUtils.field(json, CBConstants.PARAM_SERVER_NAME, newServerName);
+                    }
+                    if (!CommonUtils.isEmpty(newServerURL)) {
+                        JSONUtils.field(json, CBConstants.PARAM_SERVER_URL, newServerURL);
                     }
                     if (sessionExpireTime > 0) {
                         JSONUtils.field(json, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
@@ -642,6 +657,9 @@ public class CBApplication extends BaseApplicationImpl {
 
                     if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                         JSONUtils.serializeProperties(json, "plugins", appConfig.getPlugins());
+                    }
+                    if (!CommonUtils.isEmpty(appConfig.getAuthConfiguration())) {
+                        JSONUtils.serializeProperties(json, "authConfiguration", appConfig.getAuthConfiguration());
                     }
 
                     json.endObject();

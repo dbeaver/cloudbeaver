@@ -51,7 +51,7 @@ interface Props extends ButtonHTMLAttributes<any> {
 
 export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
   return styled(useStyles(styles))(
-    <button {...rest}>
+    <button type='button' {...rest}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {children && <button-label>{children}</button-label>}
     </button>

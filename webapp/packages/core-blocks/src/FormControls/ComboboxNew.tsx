@@ -21,8 +21,8 @@ import styled, { css, use } from 'reshadow';
 import { useStyles, composes } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
-import { Icon } from '../Icons/Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 

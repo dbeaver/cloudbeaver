@@ -50,6 +50,7 @@ type AdminPermissionInfo {
 
 input ServerConfigInput {
     serverName: String
+    serverURL: String
 
     adminName: String
     adminPassword: String

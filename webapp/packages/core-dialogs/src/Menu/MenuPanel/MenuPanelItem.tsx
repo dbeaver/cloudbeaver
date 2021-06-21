@@ -44,16 +44,16 @@ export const MenuPanelItem: React.FC<MenuPanelItemProps> = function MenuPanelIte
   }
 
   return styled(useStyles(menuPanelStyles, style))(
-    <menu-panel-item as="div" {...use({ separator })}>
-      <menu-item-content as='div'>
+    <menu-panel-item {...use({ separator })}>
+      <menu-item-content>
         {icon ? (
           <IconOrImage icon={icon} />
         ) : control}
       </menu-item-content>
-      <menu-item-text as="div">
+      <menu-item-text>
         <Translate token={title} />
       </menu-item-text>
-      <menu-item-content as='div'>
+      <menu-item-content>
         {panel && <Icon name="arrow" viewBox="0 0 16 16" />}
       </menu-item-content>
     </menu-panel-item>

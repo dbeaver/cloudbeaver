@@ -28,6 +28,22 @@ export class SessionResource extends CachedDataResource<SessionState | null, voi
     this.sync(serverConfiguration);
   }
 
+  async refreshSilent(): Promise<void> {
+    const { session } = await this.graphQLService.sdk.openSession();
+
+    this.data = session;
+  }
+
+  async changeLanguage(locale: string): Promise<void> {
+    await this.performUpdate(undefined, undefined, async () => {
+      await this.graphQLService.sdk.changeSessionLanguage({ locale });
+
+      if (this.data) {
+        this.data.locale = locale;
+      }
+    });
+  }
+
   protected async loader(): Promise<SessionState> {
     const { session } = await this.graphQLService.sdk.openSession();
 

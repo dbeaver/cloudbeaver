@@ -45,7 +45,7 @@ export const TreeNodeMenu = observer(function TreeNodeMenu({
   }
 
   return styled(treeNodeMenuStyles)(
-    <MenuTrigger panel={menuPanel} {...use({ selected })}>
+    <MenuTrigger panel={menuPanel} {...use({ selected })} modal>
       <Icon name="snack" viewBox="0 0 16 10" />
     </MenuTrigger>
   );

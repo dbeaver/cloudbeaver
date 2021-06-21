@@ -18,7 +18,6 @@ import { VirtualFolderTabMixin } from './VirtualFolderTabMixin';
 const style = css`
   tab-wrapper {
     position: relative;
-    display: flex;
     width: 100%;
     flex: 1 0 auto;
   }
@@ -32,7 +31,7 @@ export const VirtualFolderTab = observer(function VirtualFolderTab() {
   }
 
   return styled(style)(
-    <tab-wrapper as="div">
+    <tab-wrapper>
       <ObjectChildrenPropertyTable nodeIds={folderMixin.getChildrenId()} />
     </tab-wrapper>
   );

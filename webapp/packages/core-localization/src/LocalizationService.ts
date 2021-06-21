@@ -10,8 +10,8 @@ import { action, observable, makeObservable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SessionService, ServerService } from '@cloudbeaver/core-root';
-import { GraphQLService, ServerLanguage } from '@cloudbeaver/core-sdk';
+import { ServerService, SessionResource, SessionDataResource } from '@cloudbeaver/core-root';
+import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import type { ILocaleProvider } from './ILocaleProvider';
@@ -37,9 +37,9 @@ export class LocalizationService extends Bootstrap {
 
   constructor(
     private notificationService: NotificationService,
-    private sessionService: SessionService,
+    private sessionResource: SessionResource,
+    sessionDataResource: SessionDataResource,
     private serverService: ServerService,
-    private graphQLService: GraphQLService,
     private settingsService: SettingsService
   ) {
     super();
@@ -49,6 +49,8 @@ export class LocalizationService extends Bootstrap {
       localeMap: observable.shallow,
       setCurrentLocale: action,
     });
+
+    sessionDataResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
   }
 
   addProvider(provider: ILocaleProvider): void {
@@ -78,20 +80,12 @@ export class LocalizationService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
+    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
   }
 
   async load(): Promise<void> {
-    const session = await this.sessionService.session.load();
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
-
-    if (!session) {
-      return;
-    }
-
-    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // overwrite default value with settings
-    this.setCurrentLocale(session.locale); // session language wins
-
-    await this.setLocale(this.getCurrentLanguage());
+    await this.loadLocaleAsync(this.settings.language);
   }
 
   getCurrentLanguage(): string {
@@ -102,10 +96,16 @@ export class LocalizationService extends Bootstrap {
     if (key === this.settings.language) {
       return;
     }
-    const response = await this.graphQLService.sdk.changeSessionLanguage({ locale: key });
-    this.setLocale(key);
-    if (response.changeSessionLanguage) {
-      window.location.reload();
+    await this.sessionResource.changeLanguage(key);
+    // window.location.reload();
+  }
+
+  private async syncLanguage() {
+    await this.sessionResource.refreshSilent(); // TODO: remove
+    const session = this.sessionResource.data;
+
+    if (session) {
+      await this.setLocale(session.locale);
     }
   }
 
@@ -126,13 +126,15 @@ export class LocalizationService extends Bootstrap {
     const config = await this.serverService.config.load();
 
     if (!config) {
-      throw new Error('Cant\'t get server settings');
+      throw new Error('Can\'t get server settings');
     }
 
     if (!config.supportedLanguages.some(lang => lang.isoCode === key)) {
       this.setCurrentLocale(config!.supportedLanguages[0]!.isoCode);
       throw new Error(`Language '${key}' is not supported`);
     }
+
+    this.setCurrentLocale(key);
     await this.loadLocaleAsync(key);
   }
 

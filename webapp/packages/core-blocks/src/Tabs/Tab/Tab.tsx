@@ -14,7 +14,7 @@ import styled from 'reshadow';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { Icon } from '../../Icons';
+import { Icon } from '../../Icon';
 import { TabContext } from '../TabContext';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';

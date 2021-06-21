@@ -8,7 +8,7 @@
 
 import { useMemo } from 'react';
 
-import { Icon } from './Icons';
+import { Icon } from './Icon';
 import { StaticImage } from './StaticImage';
 
 export interface IconOrImageProps {

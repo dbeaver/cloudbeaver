@@ -41,7 +41,9 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
         handlersRef.onMouseEnter(event);
       }
 
-      state.mouseEnter = true;
+      if (!state.mouseEnter) {
+        state.mouseEnter = true;
+      }
     };
 
     const mouseOutHandler = (event: MouseEvent) => {
@@ -49,7 +51,9 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
         handlersRef.onMouseLeave(event);
       }
 
-      state.mouseEnter = false;
+      if (state.mouseEnter) {
+        state.mouseEnter = false;
+      }
     };
 
     const element = reference.current;

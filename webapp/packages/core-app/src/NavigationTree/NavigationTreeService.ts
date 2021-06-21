@@ -8,7 +8,7 @@
 
 import { action, makeObservable } from 'mobx';
 
-import { ConnectionAuthService } from '@cloudbeaver/core-connections';
+import { ConnectionAuthService, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -37,6 +37,7 @@ export class NavigationTreeService {
     private navNodeManagerService: NavNodeManagerService,
     private notificationService: NotificationService,
     private connectionAuthService: ConnectionAuthService,
+    private connectionInfoResource: ConnectionInfoResource,
     private navNodeExtensionsService: NavNodeExtensionsService,
     private navTreeResource: NavTreeResource
   ) {
@@ -61,10 +62,22 @@ export class NavigationTreeService {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 
-  async loadNestedNodes(id = ROOT_NODE_PATH): Promise<boolean> {
+  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
     try {
-      if (this.isConnectionNode(id) && !(await this.tryInitConnection(id))) {
-        return false;
+      if (this.isConnectionNode(id)) {
+        const connection = await this.connectionInfoResource.load(
+          NodeManagerUtils.connectionNodeIdToConnectionId(id)
+        );
+
+        if (!connection.connected && !tryConnect) {
+          return false;
+        }
+
+        const connected = await this.tryInitConnection(id);
+
+        if (!connected) {
+          return false;
+        }
       }
       await this.navNodeManagerService.loadTree(id);
       return true;

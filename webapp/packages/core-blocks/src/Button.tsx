@@ -13,7 +13,7 @@ import { use } from 'reshadow';
 
 import { useStyles, composes, ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { Icon } from './Icons';
+import { Icon } from './Icon';
 import { Loader } from './Loader/Loader';
 import { useObjectRef } from './useObjectRef';
 

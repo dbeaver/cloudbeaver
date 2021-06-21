@@ -24,6 +24,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       display: flex;
       flex-direction: row;
       align-content: baseline;
+      position: relative;
 
       &[vertical] {
         flex-direction: column;
@@ -129,5 +130,15 @@ export const BASE_CONTAINERS_STYLES = composes(
       margin: 0;
       text-transform: uppercase;
       opacity: 0.9;
-    }  
+    }
+
+    GroupClose {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      display: flex;
+      position: absolute;
+      right: 24px;
+      margin-right: 0 !important;
+    }
   `);

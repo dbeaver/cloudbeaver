@@ -12,7 +12,7 @@ import { composes } from '@cloudbeaver/core-theming';
 
 export const topMenuStyles = composes(
   css`
-    Menu {
+    menu-box {
       composes: theme-text-on-primary from global;
     }
     
@@ -21,7 +21,7 @@ export const topMenuStyles = composes(
     }
   `,
   css`
-    Menu {
+    menu-box {
       background-color: #338ecc!important;
     }
     MenuTrigger {
@@ -55,7 +55,9 @@ export const topMenuStyles = composes(
         background: #236ea0;
       }
     }
-    MenuItem {
+    MenuItem,
+    MenuItemCheckbox,
+    MenuItemRadio {
       &:hover, &:global([aria-expanded="true"]) {
         background: #236ea0;
       }

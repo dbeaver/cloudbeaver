@@ -516,6 +516,7 @@ export interface ServerConfig {
   name: Scalars['String'];
   version: Scalars['String'];
   workspaceId: Scalars['ID'];
+  serverURL: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
@@ -952,6 +953,7 @@ export interface AdminPermissionInfo {
 
 export interface ServerConfigInput {
   serverName?: Maybe<Scalars['String']>;
+  serverURL?: Maybe<Scalars['String']>;
   adminName?: Maybe<Scalars['String']>;
   adminPassword?: Maybe<Scalars['String']>;
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
@@ -1678,7 +1680,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -2691,6 +2693,7 @@ export const ServerConfigDocument = `
     name
     version
     workspaceId
+    serverURL
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

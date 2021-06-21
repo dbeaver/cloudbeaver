@@ -58,6 +58,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
       <MenuTrigger
         panel={panel}
         style={[cellMenuStyles]}
+        modal
         onClick={() => dataGridContextMenuService.openMenu(model, resultIndex, row, column)}
         onVisibleSwitch={onStateSwitch}
       >

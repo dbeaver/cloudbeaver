@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { Icon } from '../Icons';
+import { Icon } from '../Icon';
 
 interface Props {
   className?: string;

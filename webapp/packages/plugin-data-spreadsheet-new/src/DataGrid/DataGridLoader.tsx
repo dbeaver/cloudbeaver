@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observer } from 'mobx-react-lite';
-
 import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
@@ -22,7 +20,7 @@ const loader = createComplexLoader(async function loader() {
   return { DataGridTable };
 });
 
-export const DataGridLoader: React.FC<Props> = observer(function DataGridLoader({
+export const DataGridLoader: React.FC<Props> = function DataGridLoader({
   tableModel, resultIndex, className,
 }) {
   return (
@@ -35,4 +33,4 @@ export const DataGridLoader: React.FC<Props> = observer(function DataGridLoader(
       )}
     </ComplexLoader>
   );
-});
+};
