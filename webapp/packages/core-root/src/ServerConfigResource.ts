@@ -130,31 +130,34 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     }
   }
 
-  async saveDefaultNavigatorSettings(): Promise<void> {
+  async save(skipConfigUpdate = false): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
+      if (this.isNavigatorSettingsChanged()) {
+        await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
 
-      if (this.data) {
-        this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
-      } else {
+        if (this.data) {
+          this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
+        } else {
+          this.data = await this.loader();
+        }
+      }
+
+      if (this.isChanged() && !skipConfigUpdate) {
+        await this.graphQLService.sdk.configureServer({
+          configuration: this.update,
+        });
         this.data = await this.loader();
       }
-    }, () => !this.isNavigatorSettingsChanged());
+    }, () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate));
   }
 
-  async save(onlyRestart = false): Promise<void> {
+  async finishConfiguration(onlyRestart = false): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.configureServer({
-        configuration: (onlyRestart && !this.isChanged()) ? {} : this.update,
+        configuration: !this.isChanged() && onlyRestart ? {} : this.update,
       });
-
       this.data = await this.loader();
     }, () => !this.isChanged() && !onlyRestart);
-  }
-
-  async saveAllData(): Promise<void> {
-    await this.saveDefaultNavigatorSettings();
-    await this.save();
   }
 
   protected async loader(): Promise<ServerConfig> {
