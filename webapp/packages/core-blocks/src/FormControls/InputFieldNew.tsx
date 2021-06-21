@@ -10,43 +10,45 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { IconOrImage } from '../IconOrImage';
+import { Icon } from '../Icons/Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-const INPUT_FIELD_STYLES = css`
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-  input-container {
-    position: relative;
-  }
-  IconOrImage {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    &[|disabled] {
-      cursor: auto;
-      opacity: 0.8;
+const INPUT_FIELD_STYLES = composes(
+  css`
+    Icon {
+      composes: theme-text-primary from global;
     }
-  }
-  input:not(:only-child) {
-    padding-right: 32px !important;
-  }
-`;
+`,
+  css`
+    field-label {
+      display: block;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
+    }
+    field-label:not(:empty) {
+      padding-bottom: 10px;
+    }
+    input-container {
+      position: relative;
+    }
+    Icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+    input:not(:only-child) {
+      padding-right: 32px !important;
+    }
+`);
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
@@ -104,13 +106,6 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
 
-  const revealPassword = useCallback(() => {
-    if (rest.disabled) {
-      return;
-    }
-    setPasswordRevealed(prev => !prev);
-  }, [rest.disabled]);
-
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = mapValue?.(event.target.value) ?? event.target.value;
 
@@ -139,6 +134,8 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     value = mapState(value);
   }
 
+  const showRevealPasswordButton = rest.type === 'password' && !rest.disabled && !rest.readOnly;
+
   return styled(styles)(
     <field className={className} {...use({ small, medium, large })}>
       <field-label title={rest.title}>{children}{required && ' *'}</field-label>
@@ -154,16 +151,16 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
           {...use({ mod })}
           required={required}
         />
-        {rest.type === 'password' && (
-          <IconOrImage
-            icon={passwordRevealed ? '/icons/password_hide.svg' : '/icons/password_show.svg'}
-            onClick={revealPassword}
-            {...use({ disabled: rest.disabled })}
+        {showRevealPasswordButton && (
+          <Icon
+            name={passwordRevealed ? 'password-hide' : 'password-show'}
+            viewBox='0 0 16 16'
+            onClick={() => setPasswordRevealed(!passwordRevealed)}
           />
         )}
       </input-container>
       {description && (
-        <field-description as='div'>
+        <field-description>
           {description}
         </field-description>
       )}
