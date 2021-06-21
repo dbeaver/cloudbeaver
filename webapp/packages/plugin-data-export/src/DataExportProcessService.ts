@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import path from 'path';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, DataTransferParameters, EnvironmentService } from '@cloudbeaver/core-sdk';
@@ -83,7 +85,7 @@ export class DataExportProcessService {
     if (!dataFileId) {
       return;
     }
-    return `${this.environmentService.staticEndpoint}/data/${dataFileId}`;
+    return path.join(this.environmentService.staticEndpoint, '/data/', dataFileId);
   }
 
   async exportData(

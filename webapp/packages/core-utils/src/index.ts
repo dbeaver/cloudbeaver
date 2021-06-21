@@ -1,4 +1,3 @@
-export * from './BuildVersion';
 export * from './flat';
 export * from './MetadataMap';
 export * from './OrderedMap';
@@ -6,6 +5,7 @@ export * from './parseJSONFlat';
 export * from './uuid_';
 export * from './generateFileName';
 export * from './getMIME';
+export * from './GlobalConstants';
 export * from './isArraysEqual';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';

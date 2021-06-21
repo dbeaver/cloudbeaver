@@ -110,6 +110,9 @@ module.exports = (env, argv) => {
         'react-dom': 'preact/compat',
         'react-dom$': 'preact/compat',
       },
+      fallback: {
+        path: require.resolve("path-browserify"),
+      }
     },
     resolveLoader: {
       modules: nodeModules,
