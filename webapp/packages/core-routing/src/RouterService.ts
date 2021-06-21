@@ -15,6 +15,7 @@ import type { DoneFn } from 'router5/dist/types/base';
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 export type RouterState = State;
 
@@ -77,6 +78,7 @@ export class RouterService extends Bootstrap {
   private configure() {
     this.router.usePlugin(browserPlugin({
       useHash: true,
+      base: GlobalConstants.rootURI,
     }));
 
     this.router.subscribe(this.onRouteChange.bind(this));
