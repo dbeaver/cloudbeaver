@@ -25,7 +25,7 @@ export default [
   ['authentication_administration_user_create_failed', 'Не удалось создать пользователя'],
   ['authentication_user_name', 'Имя'],
   ['authentication_user_credentials', 'Учетные данные'],
-  ['authentication_user_old_password', 'Старый пароль'],
+  ['authentication_user_current_password', 'Текущий пароль'],
   ['authentication_user_new_password', 'Новый пароль'],
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],

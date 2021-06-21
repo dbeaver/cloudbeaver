@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -29,6 +29,9 @@ const fieldCheckboxStyles = css`
     user-select: none;
     padding-left: 10px;
     line-height: 16px;
+    &[|disabled] {
+      cursor: auto;
+    }
   }
 `;
 
@@ -46,7 +49,14 @@ export const FieldCheckboxNew: CheckboxType = function FieldCheckboxNew({
   return styled(styles)(
     <field className={className} as="div">
       <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
-      <field-label htmlFor={rest.id || rest.name} title={rest.title} as="label">{children}</field-label>
+      <field-label
+        htmlFor={rest.id || rest.name}
+        title={rest.title}
+        as="label"
+        {...use({ disabled: rest.disabled })}
+      >
+        {children}
+      </field-label>
     </field>
   );
 };

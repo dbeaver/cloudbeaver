@@ -7,12 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { IconOrImage } from '../IconOrImage';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
@@ -25,6 +26,25 @@ const INPUT_FIELD_STYLES = css`
   }
   field-label:not(:empty) {
     padding-bottom: 10px;
+  }
+  input-container {
+    position: relative;
+  }
+  IconOrImage {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    &[|disabled] {
+      cursor: auto;
+      opacity: 0.8;
+    }
+  }
+  input:not(:only-child) {
+    padding-right: 32px !important;
   }
 `;
 
@@ -80,8 +100,16 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   onChange,
   ...rest
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
+  const [passwordRevealed, setPasswordRevealed] = useState(false);
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
+
+  const revealPassword = useCallback(() => {
+    if (rest.disabled) {
+      return;
+    }
+    setPasswordRevealed(prev => !prev);
+  }, [rest.disabled]);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = mapValue?.(event.target.value) ?? event.target.value;
@@ -112,18 +140,28 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   }
 
   return styled(styles)(
-    <field as="div" className={className} {...use({ small, medium, large })}>
-      <field-label as='label' title={rest.title}>{children}{required && ' *'}</field-label>
-      <input
-        ref={ref}
-        role='new'
-        {...rest}
-        name={name}
-        value={value ?? ''}
-        onChange={handleChange}
-        {...use({ mod })}
-        required={required}
-      />
+    <field className={className} {...use({ small, medium, large })}>
+      <field-label title={rest.title}>{children}{required && ' *'}</field-label>
+      <input-container>
+        <input
+          ref={ref}
+          role='new'
+          {...rest}
+          type={passwordRevealed ? 'text' : rest.type}
+          name={name}
+          value={value ?? ''}
+          onChange={handleChange}
+          {...use({ mod })}
+          required={required}
+        />
+        {rest.type === 'password' && (
+          <IconOrImage
+            icon={passwordRevealed ? '/icons/password_hide.svg' : '/icons/password_show.svg'}
+            onClick={revealPassword}
+            {...use({ disabled: rest.disabled })}
+          />
+        )}
+      </input-container>
       {description && (
         <field-description as='div'>
           {description}
