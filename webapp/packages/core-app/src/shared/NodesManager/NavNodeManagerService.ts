@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
-
 import {
   ConnectionAuthService, Connection, ConnectionInfoResource
 } from '@cloudbeaver/core-connections';
@@ -17,9 +15,7 @@ import { IExecutor, Executor, IExecutionContextProvider } from '@cloudbeaver/cor
 import {
   PermissionsService, EPermission, ServerService
 } from '@cloudbeaver/core-root';
-import {
-  resourceKeyList, ResourceKey, ResourceKeyUtils
-} from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { ENodeFeature } from './ENodeFeature';
@@ -116,11 +112,7 @@ export class NavNodeManagerService extends Bootstrap {
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  register(): void {
-    this.connectionInfo.onItemAdd.addHandler(this.connectionUpdateHandler.bind(this));
-    this.connectionInfo.onItemDelete.addHandler(this.connectionRemoveHandler.bind(this));
-    this.connectionInfo.onConnectionCreate.addHandler(this.connectionCreateHandler.bind(this));
-  }
+  register(): void { }
 
   load(): void {}
 
@@ -319,67 +311,6 @@ export class NavNodeManagerService extends Bootstrap {
       loadParents,
     };
   };
-
-  private async connectionCreateHandler(connection: Connection) {
-    const enabled = await this.isNavTreeEnabled();
-    if (!enabled) {
-      return;
-    }
-
-    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connection.id);
-    this.navTree.markTreeOutdated(nodeId);
-
-    const tree = await this.navTree.load(ROOT_NODE_PATH);
-
-    if (!tree.includes(nodeId)) {
-      await this.navTree.refresh(ROOT_NODE_PATH);
-    }
-  }
-
-  private async connectionUpdateHandler(key: ResourceKey<string>) {
-    const enabled = await this.isNavTreeEnabled();
-    if (!enabled) {
-      return;
-    }
-
-    await this.navTree.load(ROOT_NODE_PATH);
-
-    runInAction(() => {
-      ResourceKeyUtils.forEach(key, async key => {
-        const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-
-        if (this.navTree.has(nodeId)) {
-          const connectionInfo = this.connectionInfo.get(key);
-
-          if (!connectionInfo?.connected) {
-            this.removeTree(nodeId);
-          } else {
-            this.navTree.markTreeOutdated(nodeId);
-          }
-        }
-
-        const nodeInfo = this.navNodeInfoResource.get(nodeId);
-
-        if (nodeInfo) {
-          this.navTree.markOutdated(nodeInfo.parentId);
-        }
-      });
-    });
-  }
-
-  private connectionRemoveHandler(key: ResourceKey<string>) {
-    runInAction(() => {
-      ResourceKeyUtils.forEach(key, key => {
-        const navNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
-
-        const node = this.getNode(navNodeId);
-        if (!node) {
-          return;
-        }
-        this.navTree.deleteInNode(node.parentId, [navNodeId]);
-      });
-    });
-  }
 
   private async navigateHandler(
     data: INodeNavigationData,

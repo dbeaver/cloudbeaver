@@ -46,6 +46,7 @@ export interface ResourceKeyUtils {
   every: <TKey>(key: ResourceKey<TKey>, predicate: (key: TKey, index: number) => boolean) => boolean;
   map: MapFnc;
   includes: <TKey>(first: ResourceKey<TKey>, second: ResourceKey<TKey>) => boolean;
+  exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKey<TKey>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -141,6 +142,14 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     }
 
     return param === key;
+  },
+
+  exclude<TKey>(param: ResourceKeyList<TKey>, key: ResourceKey<TKey>): ResourceKey<TKey> {
+    if (isResourceKeyList(key)) {
+      return resourceKeyList(param.list.filter(param => !key.list.includes(param)), param.mark);
+    }
+
+    return resourceKeyList(param.list.filter(param => param !== key), param.mark);
   },
 };
 
