@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
+import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -21,7 +22,7 @@ import { isControlPresented } from './isControlPresented';
 const INPUT_FIELD_STYLES = composes(
   css`
     Icon {
-      composes: theme-text-primary from global;
+      composes: theme-text-on-secondary from global;
     }
 `,
   css`
@@ -36,11 +37,12 @@ const INPUT_FIELD_STYLES = composes(
     input-container {
       position: relative;
     }
-    Icon {
+    icon-container {
       position: absolute;
       right: 8px;
       top: 50%;
       transform: translateY(-50%);
+      display: flex;
       width: 24px;
       height: 24px;
       cursor: pointer;
@@ -107,6 +109,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   ...rest
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
   const [passwordRevealed, setPasswordRevealed] = useState(false);
+  const translate = useTranslate();
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
 
@@ -164,11 +167,15 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
           required={required}
         />
         {showRevealPasswordButton && (
-          <Icon
-            name={passwordRevealed ? 'password-hide' : 'password-show'}
-            viewBox='0 0 16 16'
+          <icon-container
+            title={translate('ui_reveal_password')}
             onClick={revealPassword}
-          />
+          >
+            <Icon
+              name={passwordRevealed ? 'password-hide' : 'password-show'}
+              viewBox='0 0 16 16'
+            />
+          </icon-container>
         )}
       </input-container>
       {description && (
