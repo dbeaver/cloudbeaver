@@ -84,15 +84,16 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     return (
       this.update.serverName !== this.data.name
-    || this.update.sessionExpireTime !== this.data.sessionExpireTime
+      || this.update.serverURL !== this.data.serverURL
+      || this.update.sessionExpireTime !== this.data.sessionExpireTime
 
-    || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
+      || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
 
-    || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
-    || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
+      || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
+      || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
 
-    || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
-    || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
+      || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
+      || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
     );
   }
 
@@ -172,6 +173,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     Object.assign(this.navigatorSettingsUpdate, serverConfig.defaultNavigatorSettings);
 
     this.update.serverName = serverConfig.name;
+    this.update.serverURL = serverConfig.serverURL;
     this.update.sessionExpireTime = serverConfig.sessionExpireTime;
 
     this.update.adminName = undefined;
