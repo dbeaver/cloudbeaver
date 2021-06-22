@@ -48,7 +48,7 @@ export default [
   ['administration_configuration_wizard_configuration_anonymous_access', 'Allow anonymous access'],
   ['administration_configuration_wizard_configuration_anonymous_access_description', 'Allows to work with CloudBeaver without user authentication'],
   ['administration_configuration_wizard_configuration_authentication_group', 'Authentication settings'],
-  ['administration_configuration_wizard_configuration_authentication_provider', 'Authentication Source'],
+  ['administration_configuration_wizard_configuration_services', 'Services'],
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
 ];

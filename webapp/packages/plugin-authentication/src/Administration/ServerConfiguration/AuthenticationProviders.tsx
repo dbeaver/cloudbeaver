@@ -31,8 +31,9 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     throw new Error('Form state should be provided');
   }
 
-  const localExists = providers.resource.has(AUTH_PROVIDER_LOCAL_ID);
-  const externalAuthentication = providers.data.length === 1 && !localExists;
+  const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
+  const services = providers.resource.values.filter(provider => provider.id !== AUTH_PROVIDER_LOCAL_ID);
+  const externalAuthentication = providers.data.length === 1 && localProvider === undefined;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
 
   useExecutor({
@@ -63,34 +64,52 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         >
           {translate('administration_configuration_wizard_configuration_anonymous_access')}
         </SwitchNew>
-        <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_provider')}</GroupTitle>
         <Loader state={providers}>
-          {() => styled(styles)(
-            <>
-              {providers.data.map(provider => provider && (
-                <SwitchNew
-                  key={provider.id}
-                  value={provider.id}
-                  name="enabledAuthProviders"
-                  state={serverConfig}
-                  description={provider.description}
-                  mod={['primary']}
-                  small
-                  autoHide
-                >
-                  {provider.label}
-                </SwitchNew>
-              ))}
-            </>
+          {() => localProvider && styled(styles)(
+            <SwitchNew
+              key={localProvider.id}
+              value={localProvider.id}
+              name="enabledAuthProviders"
+              state={serverConfig}
+              description={localProvider.description}
+              mod={['primary']}
+              small
+              autoHide
+            >
+              {localProvider.label}
+            </SwitchNew>
           )}
         </Loader>
       </Group>
-      {configurationWizard && localExists ? (
+      {configurationWizard && localProvider && (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />
-      ) : (
-        <Container medium />
       )}
-      <Container medium />
+      {services.length > 0 ? (
+        <Group key='services' form gap medium>
+          <GroupTitle>{translate('administration_configuration_wizard_configuration_services')}</GroupTitle>
+          <Loader state={providers}>
+            {() => styled(styles)(
+              <>
+                {services.map(provider => (
+                  <SwitchNew
+                    key={provider.id}
+                    value={provider.id}
+                    name="enabledAuthProviders"
+                    state={serverConfig}
+                    description={provider.description}
+                    mod={['primary']}
+                    small
+                    autoHide
+                  >
+                    {provider.label}
+                  </SwitchNew>
+                ))}
+              </>
+            )}
+          </Loader>
+        </Group>
+      ) : <Container medium />}
+      {!(configurationWizard && localProvider) && <Container medium />}
     </Container>
   );
 });
