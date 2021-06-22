@@ -14,7 +14,7 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { Icon } from '../Icons/Icon';
+import { Icon } from '../Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
