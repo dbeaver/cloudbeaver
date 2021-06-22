@@ -33,7 +33,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         state={state.serverConfig}
         mod='surface'
         required
-        tiny
+        medium
       >
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputFieldNew>
@@ -44,7 +44,7 @@ export const ServerConfigurationInfoForm: React.FC<Props> = observer(function Se
         state={state.serverConfig}
         mod='surface'
         required
-        tiny
+        medium
       >
         {translate('administration_configuration_wizard_configuration_server_url')}
       </InputFieldNew>
