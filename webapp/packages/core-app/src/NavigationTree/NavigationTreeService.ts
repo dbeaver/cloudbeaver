@@ -79,7 +79,7 @@ export class NavigationTreeService {
           return false;
         }
       }
-      await this.navNodeManagerService.loadTree(id);
+      await this.navTreeResource.load(id);
       return true;
     } catch (exception) {
       this.notificationService.logException(exception);
