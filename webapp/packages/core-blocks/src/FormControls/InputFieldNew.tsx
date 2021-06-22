@@ -45,6 +45,10 @@ const INPUT_FIELD_STYLES = composes(
       height: 24px;
       cursor: pointer;
     }
+    input[disabled] + Icon {
+      cursor: auto;
+      opacity: 0.8;
+    }
     input:not(:only-child) {
       padding-right: 32px !important;
     }
@@ -106,6 +110,14 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
 
+  const revealPassword = useCallback(() => {
+    if (rest.disabled) {
+      return;
+    }
+
+    setPasswordRevealed(prev => !prev);
+  }, [rest.disabled]);
+
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = mapValue?.(event.target.value) ?? event.target.value;
 
@@ -134,7 +146,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     value = mapState(value);
   }
 
-  const showRevealPasswordButton = rest.type === 'password' && !rest.disabled && !rest.readOnly;
+  const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
 
   return styled(styles)(
     <field className={className} {...use({ small, medium, large })}>
@@ -155,7 +167,7 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
           <Icon
             name={passwordRevealed ? 'password-hide' : 'password-show'}
             viewBox='0 0 16 16'
-            onClick={() => setPasswordRevealed(!passwordRevealed)}
+            onClick={revealPassword}
           />
         )}
       </input-container>
