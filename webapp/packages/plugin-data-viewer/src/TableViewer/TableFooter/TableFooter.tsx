@@ -55,7 +55,6 @@ const tableFooterStyles = composes(
       width: 24px;
       display: block;
     }
-    reload,
     count,
     TableFooterMenu {
       margin-left: 16px;
