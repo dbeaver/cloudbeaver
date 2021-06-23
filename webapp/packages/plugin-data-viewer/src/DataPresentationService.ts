@@ -12,6 +12,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
+import type { IDataTableActions } from './TableViewer/IDataTableActions';
 
 export interface IDataPresentationProps<
   TOptions = any,
@@ -19,6 +20,7 @@ export interface IDataPresentationProps<
 > {
   dataFormat: ResultDataFormat;
   model: IDatabaseDataModel<TOptions, TResult>;
+  actions: IDataTableActions;
   resultIndex: number;
   className?: string;
 }

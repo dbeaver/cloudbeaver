@@ -73,6 +73,7 @@ export class DataGridContextMenuFilterService {
     context: IMenuContext<IDataGridCellMenuContext>,
     value: any | (() => any),
     icon: string,
+    isHidden?: (context: IMenuContext<IDataGridCellMenuContext>) => boolean,
   ): Array<IContextMenuItem<IDataGridCellMenuContext>> {
     const { model, resultIndex, column } = context.data;
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -87,6 +88,9 @@ export class DataGridContextMenuFilterService {
         isPresent: () => true,
         isDisabled(context) {
           return context.data.model.isLoading();
+        },
+        isHidden(context) {
+          return isHidden?.(context) ?? false;
         },
         titleGetter() {
           const val = typeof value === 'function' ? value() : value;
@@ -115,7 +119,7 @@ export class DataGridContextMenuFilterService {
           return context.data.model.isDisabled(context.data.resultIndex)
             || context.data.model.source.results.length > 1;
         },
-        order: 1,
+        order: 2,
         title: 'data_grid_table_filter',
         icon: '/icons/filter.png',
         isPanel: true,
@@ -132,7 +136,7 @@ export class DataGridContextMenuFilterService {
           const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
           return constraints.orderConstraints.length === 0 && constraints.filterConstraints.length === 0;
         },
-        order: 2,
+        order: 3,
         title: 'data_grid_table_delete_filters_and_orders',
         icon: '/icons/erase.png',
         onClick: async context => {
@@ -171,10 +175,19 @@ export class DataGridContextMenuFilterService {
               return [];
             }
 
-            if (this.clipboardService.state === 'prompt') {
-              return [{
+            const valueGetter = () => this.clipboardService.clipboardValue || '';
+            const items = this.getGeneralizedMenuItems(
+              context,
+              valueGetter,
+              '/icons/filter_clipboard.png',
+              () => this.clipboardService.state === 'prompt'
+            );
+
+            return [
+              {
                 id: 'permission',
                 isPresent: () => true,
+                isHidden: () => this.clipboardService.state !== 'prompt',
                 isDisabled(context) {
                   return context.data.model.isLoading();
                 },
@@ -183,12 +196,9 @@ export class DataGridContextMenuFilterService {
                 onClick: async () => {
                   await this.clipboardService.read();
                 },
-              }];
-            }
-
-            const valueGetter = () => this.clipboardService.clipboardValue || '';
-            const items = this.getGeneralizedMenuItems(context, valueGetter, '/icons/filter_clipboard.png');
-            return items;
+              },
+              ...items,
+            ];
           },
         }),
       }

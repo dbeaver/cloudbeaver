@@ -26,7 +26,6 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
   const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
-  const dataGridApi = dataGridContext?.getDataGridApi();
   const mouse = useMouse<HTMLDivElement>({});
 
   const classes: string[] = [];
@@ -45,6 +44,8 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }
 
   const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const dataGridApi = dataGridContext?.getDataGridApi();
+
     if (dataGridApi) {
       dataGridApi.selectCell({ idx: column.idx, rowIdx });
     }
@@ -58,7 +59,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
       event.shiftKey,
       true
     );
-  }, [column, rowIdx, selectionContext]);
+  }, [column, rowIdx, dataGridContext, selectionContext]);
 
   const handleMouseUp = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!dataGridContext?.isGridInFocus()) {

@@ -45,7 +45,7 @@ export class DataGridContextMenuOrderService {
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
-        order: 0,
+        order: 1,
         title: 'data_grid_table_order',
         icon: 'order-arrow-unknown',
         isPanel: true,

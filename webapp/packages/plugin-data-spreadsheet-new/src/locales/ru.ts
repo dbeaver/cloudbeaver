@@ -1,5 +1,6 @@
 export default [
   ['data_grid_table_order', 'Сортировка'],
+  ['data_grid_table_open_value_panel', 'Показать в панели значений'],
   ['data_grid_table_filter', 'Фильтры'],
   ['data_grid_table_filter_cell_value', 'Значение ячейки'],
   ['data_grid_table_filter_custom_value', 'Произвольный'],

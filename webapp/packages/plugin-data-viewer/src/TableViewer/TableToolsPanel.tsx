@@ -16,9 +16,11 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
+import type { IDataTableActions } from './IDataTableActions';
 
 type TableGridProps = PropsWithChildren<{
   model: IDatabaseDataModel<any, any>;
+  actions: IDataTableActions;
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions | null;
   resultIndex: number;
@@ -33,6 +35,7 @@ const styles = css`
 
 export const TableToolsPanel = observer(function TableToolsPanel({
   model,
+  actions,
   dataFormat,
   presentation,
   resultIndex,
@@ -57,6 +60,6 @@ export const TableToolsPanel = observer(function TableToolsPanel({
   }
 
   return styled(styles)(
-    <Presentation dataFormat={dataFormat} model={model} resultIndex={resultIndex} />
+    <Presentation dataFormat={dataFormat} model={model} actions={actions} resultIndex={resultIndex} />
   );
 });

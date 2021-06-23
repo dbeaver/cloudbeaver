@@ -9,10 +9,11 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridCellMenuContext {
   model: IDatabaseDataModel<any>;
+  actions: IDataTableActions;
   resultIndex: number;
   row: number;
   column: number;
@@ -36,6 +37,7 @@ export class DataGridContextMenuService {
 
   constructMenuWithContext(
     model: IDatabaseDataModel<any>,
+    actions: IDataTableActions,
     resultIndex: number,
     row: number,
     column: number
@@ -43,17 +45,18 @@ export class DataGridContextMenuService {
     return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>({
       menuId: this.getMenuToken(),
       contextType: DataGridContextMenuService.cellContext,
-      data: { model, resultIndex, row, column },
+      data: { model, actions, resultIndex, row, column },
     }, this.getMenuToken());
   }
 
   openMenu(
     model: IDatabaseDataModel<any>,
+    actions: IDataTableActions,
     resultIndex: number,
     row: number,
     column: number
   ): void {
-    this.onRootMenuOpen.execute({ model, resultIndex, row, column });
+    this.onRootMenuOpen.execute({ model, actions, resultIndex, row, column });
   }
 
   add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {
