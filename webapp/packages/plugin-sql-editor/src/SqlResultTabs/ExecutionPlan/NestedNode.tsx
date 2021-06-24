@@ -10,7 +10,6 @@ import { useCallback, useContext, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TableItem, TableColumnValue } from '@cloudbeaver/core-blocks';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ExecutionPlanTreeContext, IExecutionPlanNode } from './ExecutionPlanTreeContext';
@@ -49,14 +48,6 @@ export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, cl
     throw new Error('Tree context must be provided');
   }
 
-  const getValue = useCallback((property: ObjectPropertyInfo | undefined) => {
-    if (!property || !treeContext.columns.find(column => column.id === property.id)) {
-      return '';
-    }
-
-    return getPropertyValue(property);
-  }, [treeContext.columns]);
-
   const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
     event.stopPropagation();
     setExpanded(prev => !prev);
@@ -69,7 +60,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, cl
       <TableItem key={`${node.id}_${depth}`} className={className} item={node.id}>
         {treeContext.columns.map((column, idx) => {
           const property = node.properties.find(property => property.id === column.id);
-          const value = getValue(property);
+          const value = property ? getPropertyValue(property) : '';
           return (
             <TableColumnValue key={`${property?.id}_${depth}`} title={value}>
               <control>

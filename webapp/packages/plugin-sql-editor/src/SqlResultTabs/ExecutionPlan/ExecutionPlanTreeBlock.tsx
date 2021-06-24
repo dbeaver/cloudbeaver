@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Split, Pane, ResizerControls, splitStyles } from '@cloudbeaver/core-blocks';
+import { TextareaNew } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ExecutionPlanTree } from './ExecutionPlanTree';
-import { ExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
-import { QueryPanel } from './QueryPanel';
 
 const styles = composes(
   css`
@@ -52,7 +50,14 @@ export const ExecutionPlanTreeBlock: React.FC<Props> = function ExecutionPlanTre
       </Pane>
       <ResizerControls />
       <Pane main>
-        <QueryPanel query={query} />
+        <TextareaNew
+          className={className}
+          name='value'
+          rows={3}
+          value={query}
+          readOnly
+          embedded
+        />
       </Pane>
     </Split>
   );
