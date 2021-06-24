@@ -7,29 +7,21 @@
  */
 
 import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
-
-interface Props {
-  tableModel: IDatabaseDataModel<any, any>;
-  resultIndex: number;
-  className?: string;
-}
+import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 const loader = createComplexLoader(async function loader() {
   const { DataGridTable } = await import('./DataGridTable');
   return { DataGridTable };
 });
 
-export const DataGridLoader: React.FC<Props> = function DataGridLoader({
-  tableModel, resultIndex, className,
-}) {
+export const DataGridLoader: React.FC<IDataPresentationProps> = function DataGridLoader(props) {
   return (
     <ComplexLoader
       loader={loader}
       placeholder={<Loader />}
     >
       {({ DataGridTable }) => (
-        <DataGridTable model={tableModel} resultIndex={resultIndex} className={className} />
+        <DataGridTable {...props} />
       )}
     </ComplexLoader>
   );

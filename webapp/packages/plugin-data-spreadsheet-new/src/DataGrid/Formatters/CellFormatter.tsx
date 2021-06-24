@@ -72,6 +72,7 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
       {(isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible) && context && (
         <CellMenu
           model={context.model}
+          actions={context.actions}
           resultIndex={context.resultIndex}
           row={rowIdx}
           column={Number(column.key)}

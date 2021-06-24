@@ -15,24 +15,28 @@ import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { useStyles } from '@cloudbeaver/core-theming';
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
 import { cellMenuStyles } from './cellMenuStyles';
 
 interface Props {
   model: IDatabaseDataModel<any>;
+  actions: IDataTableActions;
   resultIndex: number;
   row: number;
   column: number;
+  onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
 }
 
 export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   model,
+  actions,
   resultIndex,
   row,
   column,
+  onClick,
   onStateSwitch,
 }) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
@@ -40,7 +44,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
 
   const { panel, hidden } = useMemo(
     () => {
-      const panel = dataGridContextMenuService.constructMenuWithContext(model, resultIndex, row, column);
+      const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, resultIndex, row, column);
       const hidden = computed(() => !panel.menuItems.length
         || panel.menuItems.every(item => item.isHidden));
 
@@ -48,6 +52,11 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
     },
     [column, row]
   );
+
+  function handleClick() {
+    dataGridContextMenuService.openMenu(model, actions, resultIndex, row, column);
+    onClick?.();
+  }
 
   if (hidden.get()) {
     return null;
@@ -59,7 +68,7 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
         panel={panel}
         style={[cellMenuStyles]}
         modal
-        onClick={() => dataGridContextMenuService.openMenu(model, resultIndex, row, column)}
+        onClick={handleClick}
         onVisibleSwitch={onStateSwitch}
       >
         <Icon name="snack" viewBox="0 0 16 10" />

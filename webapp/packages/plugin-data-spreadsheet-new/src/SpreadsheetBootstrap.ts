@@ -13,6 +13,7 @@ import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
+import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
 import { SpreadsheetGrid } from './SpreadsheetGrid';
 
@@ -23,6 +24,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private dataGridSettingsService: DataGridSettingsService,
     private dataGridContextMenuSortingService: DataGridContextMenuOrderService,
     private dataGridContextMenuFilterService: DataGridContextMenuFilterService,
+    private dataGridContextMenuService: DataGridContextMenuService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
     super();
@@ -40,6 +42,25 @@ export class SpreadsheetBootstrap extends Bootstrap {
     });
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();
+
+    this.dataGridContextMenuService.add(
+      this.dataGridContextMenuService.getMenuToken(),
+      {
+        id: 'view_value_panel',
+        isPresent(context) {
+          return context.contextType === DataGridContextMenuService.cellContext;
+        },
+        isHidden(context) {
+          return typeof context.data.actions.valuePresentationId === 'string';
+        },
+        order: 0.5,
+        title: 'data_grid_table_open_value_panel',
+        icon: '/icons/text_value_presentation.png',
+        onClick(context) {
+          context.data.actions.setValuePresentation('');
+        },
+      }
+    );
   }
 
   load(): void | Promise<void> { }

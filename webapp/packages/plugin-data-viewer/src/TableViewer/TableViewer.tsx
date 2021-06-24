@@ -6,16 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
+import type { IDataTableActionsPrivate } from './IDataTableActions';
 import { TableError } from './TableError';
 import { TableFooter } from './TableFooter/TableFooter';
 import { TableGrid } from './TableGrid';
@@ -117,30 +119,66 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
   const loading = dataModel?.isLoading() ?? true;
   const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
 
-  const handlePresentationChange = useCallback((id: string) => {
-    const presentation = dataPresentationService.get(id);
-    if (presentation) {
-      if (
-        presentation.dataFormat !== undefined
-        && presentation.dataFormat !== dataModel?.source.dataFormat
-      ) {
-        dataModel?.setDataFormat(presentation.dataFormat)
-          .reload();
-      }
-      onPresentationChange(id);
-    }
-  }, [onPresentationChange, dataModel]);
+  const dataTableActions = useObjectRef<IDataTableActionsPrivate>({
+    presentationId,
+    valuePresentationId,
+    dataModel,
+    resultIndex,
+    dataFormat,
+    onPresentationChange,
+    onValuePresentationChange,
 
-  function handleValuePresentationChange(id: string) {
-    if (id === valuePresentationId) {
-      onValuePresentationChange(null);
-      return;
-    }
-    const presentation = dataPresentationService.get(id);
-    if (presentation) {
-      onValuePresentationChange(id);
-    }
-  }
+    setPresentation(id: string) {
+      const presentation = dataPresentationService.get(id);
+
+      if (presentation) {
+        if (
+          presentation.dataFormat !== undefined
+          && presentation.dataFormat !== this.dataModel?.source.dataFormat
+        ) {
+          this.dataModel?.setDataFormat(presentation.dataFormat).reload();
+        }
+        this.onPresentationChange(id);
+      }
+    },
+
+    setValuePresentation(id: string | null) {
+      if (id === this.valuePresentationId || id === null) {
+        this.onValuePresentationChange(null);
+        return;
+      }
+
+      let presentation = dataPresentationService.get(id);
+
+      if (!presentation && this.dataModel) {
+        presentation = dataPresentationService.getSupported(
+          DataPresentationType.toolsPanel,
+          this.dataFormat,
+          undefined,
+          this.dataModel,
+          this.resultIndex
+        ) ?? undefined;
+      }
+
+      if (presentation) {
+        this.onValuePresentationChange(presentation.id);
+      }
+    },
+  }, {
+    presentationId,
+    valuePresentationId,
+    dataModel,
+    resultIndex,
+    dataFormat,
+    onPresentationChange,
+    onValuePresentationChange,
+  }, {
+    presentationId: observable,
+    valuePresentationId: observable,
+    dataFormat: observable,
+    resultIndex: observable,
+    dataModel: observable.ref,
+  }, ['setPresentation', 'setValuePresentation']);
 
   useEffect(() => {
     if (!presentationId || !dataModel) {
@@ -189,9 +227,9 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
   && resultExist;
 
   return styled(styles)(
-    <table-viewer as="div" className={className}>
+    <table-viewer className={className}>
       <TableHeader model={dataModel} resultIndex={resultIndex} />
-      <table-content as='div'>
+      <table-content>
         <TablePresentationBar
           type={DataPresentationType.main}
           presentationId={presentation.id}
@@ -199,7 +237,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
           supportedDataFormat={dataModel.supportedDataFormats}
           model={dataModel}
           resultIndex={resultIndex}
-          onPresentationChange={handlePresentationChange}
+          onPresentationChange={dataTableActions.setPresentation}
         />
         <table-data>
           <Split sticky={30} mode={valuePanelDisplayed ? undefined : 'minimize'} keepRatio>
@@ -207,6 +245,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
               <pane-content>
                 <TableGrid
                   model={dataModel}
+                  actions={dataTableActions}
                   dataFormat={dataFormat}
                   presentation={presentation}
                   resultIndex={resultIndex}
@@ -219,6 +258,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
                 {resultExist && (
                   <TableToolsPanel
                     model={dataModel}
+                    actions={dataTableActions}
                     dataFormat={dataFormat}
                     presentation={valuePresentation}
                     resultIndex={resultIndex}
@@ -242,7 +282,7 @@ export const TableViewer: React.FC<Props> = observer(function TableViewer({
           supportedDataFormat={[dataFormat]}
           model={dataModel}
           resultIndex={resultIndex}
-          onPresentationChange={handleValuePresentationChange}
+          onPresentationChange={dataTableActions.setValuePresentation}
         />
       </table-content>
       <TableFooter model={dataModel} resultIndex={resultIndex} />

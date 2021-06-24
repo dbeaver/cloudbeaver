@@ -10,10 +10,6 @@ import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridLoader } from './DataGrid/DataGridLoader';
 
-export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid({
-  model,
-  className,
-  resultIndex,
-}) {
-  return <DataGridLoader tableModel={model} resultIndex={resultIndex} className={className} />;
+export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid(props) {
+  return <DataGridLoader {...props} />;
 };
