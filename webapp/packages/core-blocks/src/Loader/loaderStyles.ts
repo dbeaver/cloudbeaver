@@ -27,7 +27,7 @@ export const loaderStyles = css`
     height: 40px;
     animation: rotation 2s infinite linear;
 
-    & img {
+    & StaticImage {
       width: 100%;
     }
   }

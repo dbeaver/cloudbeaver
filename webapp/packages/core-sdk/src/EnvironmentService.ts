@@ -6,13 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import path from 'path';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class EnvironmentService {
-  readonly gqlEndpoint = path.join(GlobalConstants.serviceURI, 'gql');
-  readonly staticEndpoint = GlobalConstants.serviceURI;
+  readonly gqlEndpoint = GlobalConstants.absoluteServiceUrl('gql');
 }

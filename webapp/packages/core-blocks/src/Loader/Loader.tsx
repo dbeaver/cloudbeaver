@@ -14,6 +14,7 @@ import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
+import { StaticImage } from '../StaticImage';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
 type LoaderState = {
@@ -115,7 +116,7 @@ export const Loader: React.FC<Props> = observer(function Loader({
 
   return styled(style)(
     <loader as="div" className={className} {...use({ small, fullSize })}>
-      <icon as="div"><img src={spinnerURL} /></icon>
+      <icon as="div"><StaticImage icon={spinnerURL} /></icon>
       {!hideMessage && <message as="div"><Translate token={message || 'ui_processing_loading'} /></message>}
       {onCancel && (
         <actions as='div'>

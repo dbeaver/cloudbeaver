@@ -22,10 +22,26 @@ export const GlobalConstants = {
     if (_ROOT_URI_ === '{ROOT_URI}') {
       return defaultURI;
     }
-    return _ROOT_URI_ ?? defaultURI;
+    return path.join(_ROOT_URI_ ?? defaultURI, '/');
   },
 
   get serviceURI(): string {
     return path.join(this.rootURI, 'api');
+  },
+
+  absoluteRootUrl(...parts: string[]): string {
+    return path.join(this.rootURI, ...parts);
+  },
+
+  absoluteServiceUrl(...parts: string[]): string {
+    return path.join(this.serviceURI, ...parts);
+  },
+
+  absoluteUrl(...parts: string[]): string {
+    if (parts[0].startsWith('platform:')) {
+      return this.absoluteServiceUrl('images', ...parts);
+    }
+
+    return this.absoluteRootUrl(...parts);
   },
 };
