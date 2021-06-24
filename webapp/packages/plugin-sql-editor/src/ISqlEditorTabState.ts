@@ -26,6 +26,7 @@ export interface IResultGroup {
   modelId: string;
   sqlQueryParams: ISqlQueryParams;
   order: number;
+  nameOrder: number;
 }
 
 export interface ISqlEditorResultTab {
@@ -37,8 +38,9 @@ export interface ISqlEditorResultTab {
 
 export interface IExecutionPlanTab {
   tabId: string;
-  query: string;
   executionContext: IDatabaseExecutionContext;
+  query: string;
+  order: number;
   options?: Record<string, any>;
 }
 
@@ -50,5 +52,5 @@ export interface ISqlEditorTabState {
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];
   resultTabs: IResultTab[];
-  executionPlanTabs: IExecutionPlanTab[]; // TODO: ex-plan store addition info for tab
+  executionPlanTabs: IExecutionPlanTab[];
 }

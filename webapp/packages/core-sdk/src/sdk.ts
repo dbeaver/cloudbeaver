@@ -806,7 +806,7 @@ export interface SqlCompletionProposal {
   replacementString: Scalars['String'];
   replacementOffset: Scalars['Int'];
   replacementLength: Scalars['Int'];
-  cursorPosition: Scalars['Int'];
+  cursorPosition?: Maybe<Scalars['Int']>;
   icon?: Maybe<Scalars['String']>;
   nodePath?: Maybe<Scalars['String']>;
 }
@@ -1488,6 +1488,20 @@ export interface AsyncSqlExecuteQueryMutation {
   );
 }
 
+export type AsyncSqlExplainExecutionPlanMutationVariables = Exact<{
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  query: Scalars['String'];
+  configuration: Scalars['Object'];
+}>;
+
+export interface AsyncSqlExplainExecutionPlanMutation {
+  taskInfo: (
+    Pick<AsyncTaskInfo, 'id' | 'name' | 'running' | 'status' | 'taskResult'>
+    & { error?: Maybe<Pick<ServerError, 'message' | 'errorCode' | 'stackTrace'>> }
+  );
+}
+
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
 }>;
@@ -1504,6 +1518,20 @@ export interface GetSqlExecuteTaskResultsMutation {
           & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
         )>>>; }
       )>; }
+    )>; }
+  );
+}
+
+export type GetSqlExecutionPlanResultMutationVariables = Exact<{
+  taskId: Scalars['ID'];
+}>;
+
+export interface GetSqlExecutionPlanResultMutation {
+  result: (
+    Pick<SqlExecutionPlan, 'query'>
+    & { nodes: Array<(
+      Pick<SqlExecutionPlanNode, 'id' | 'parentId' | 'kind' | 'name' | 'type' | 'condition' | 'description'>
+      & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
     )>; }
   );
 }
@@ -2383,6 +2411,27 @@ export const AsyncSqlExecuteQueryDocument = `
   }
 }
     `;
+export const AsyncSqlExplainExecutionPlanDocument = `
+    mutation asyncSqlExplainExecutionPlan($connectionId: ID!, $contextId: ID!, $query: String!, $configuration: Object!) {
+  taskInfo: asyncSqlExplainExecutionPlan(
+    connectionId: $connectionId
+    contextId: $contextId
+    query: $query
+    configuration: $configuration
+  ) {
+    id
+    name
+    running
+    status
+    error {
+      message
+      errorCode
+      stackTrace
+    }
+    taskResult
+  }
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
@@ -2418,6 +2467,32 @@ export const GetSqlExecuteTaskResultsDocument = `
         }
         rows
         hasMoreData
+      }
+    }
+  }
+}
+    `;
+export const GetSqlExecutionPlanResultDocument = `
+    mutation getSqlExecutionPlanResult($taskId: ID!) {
+  result: asyncSqlExplainExecutionPlanResult(taskId: $taskId) {
+    query
+    nodes {
+      id
+      parentId
+      kind
+      name
+      type
+      condition
+      description
+      properties {
+        id
+        category
+        dataType
+        description
+        displayName
+        features
+        value
+        order
       }
     }
   }
@@ -2833,8 +2908,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables): Promise<AsyncSqlExecuteQueryMutation> {
       return withWrapper(() => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables));
     },
+    asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables): Promise<AsyncSqlExplainExecutionPlanMutation> {
+      return withWrapper(() => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables));
+    },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper(() => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables));
+    },
+    getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables): Promise<GetSqlExecutionPlanResultMutation> {
+      return withWrapper(() => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables));
     },
     updateResultsData(variables: UpdateResultsDataMutationVariables): Promise<UpdateResultsDataMutation> {
       return withWrapper(() => client.request<UpdateResultsDataMutation>(UpdateResultsDataDocument, variables));

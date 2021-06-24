@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 import type { ITab } from '@cloudbeaver/core-app';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
 import { SqlResultSetPanel } from './SqlResultSetPanel';
 
 const style = css`
@@ -44,7 +45,7 @@ export const SqlResultPanel = observer(function SqlResultPanel({ tab, id }: SqlR
   if (executionPlanTab) {
     return styled(style)(
       <result-panel>
-        {/* TODO: ex-plan add panel */}
+        <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
       </result-panel>
     );
   }

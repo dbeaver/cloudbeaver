@@ -28,12 +28,16 @@ const styles = composes(
     Tab {
       composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
     }
+    TabIcon {
+      composes: theme-text-surface from global;
+    }
     tabs {
       composes: theme-background-background theme-text-text-primary-on-light from global;
     }
   `,
   css`
     wrapper {
+      overflow: auto;
       display: flex;
       flex: 1;
       height: 100%;
@@ -70,12 +74,12 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         })
     ),
     [tab]
-  );
+  ).get();
 
   const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(tab.id, tabId);
   const handleClose = ({ tabId }: ITabData<any>) => navigatorService.closeEditorResult(tab.id, tabId);
 
-  if (!tab.handlerState.resultGroups.length) {
+  if (!tab.handlerState.tabs.length) {
     return <TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>;
   }
 
@@ -85,7 +89,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
     <wrapper>
       <TabsBox
         currentTabId={currentId}
-        tabs={orderedTabs.get().map(result => (
+        tabs={orderedTabs.map(result => (
           <Tab key={result.id} tabId={result.id} onOpen={handleOpen} onClose={handleClose}>
             <TabIcon icon={result.icon} />
             <TabTitle>{result.name}</TabTitle>
@@ -93,7 +97,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         ))}
         style={[styles]}
       >
-        {orderedTabs.get().map(result => (
+        {orderedTabs.map(result => (
           <TabPanel key={result.id} tabId={result.id}>
             <SqlResultPanel tab={tab} id={result.id} />
           </TabPanel>

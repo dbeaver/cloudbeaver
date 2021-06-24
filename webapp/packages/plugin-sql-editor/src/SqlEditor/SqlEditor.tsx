@@ -11,8 +11,9 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTab } from '@cloudbeaver/core-app';
-import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
+import { Icon, StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-localization';
 
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
 import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
@@ -44,7 +45,7 @@ const styles = css`
     background: none;
   }
   
-  StaticImage {
+  StaticImage, Icon {
     padding: 4px;
     height: 24px;
     width: 24px;
@@ -57,6 +58,7 @@ const styles = css`
 `;
 
 export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
+  const translate = useTranslate();
   const tab = useTab(tabId);
   const editor = useRef<SQLCodeEditorController>(null);
   const baseTab = useBaseTab(tabId);
@@ -79,8 +81,8 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
   }
 
   return styled(styles)(
-    <sql-editor as="div" className={className}>
-      <actions as="div">
+    <sql-editor className={className}>
+      <actions>
         <button
           disabled={controller.isActionsDisabled}
           onMouseDown={preventFocus}
@@ -99,6 +101,17 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
           <StaticImage
             icon="/icons/sql_exec_new.png"
             title="Execute SQL in new tab (Ctrl + \\)(Shift + Ctrl + Enter)"
+          />
+        </button>
+        <button
+          disabled={!controller.dialect?.supportsExplainExecutionPlan || controller.isActionsDisabled}
+          title={translate('sql_editor_execution_plan_button_tooltip')}
+          onMouseDown={preventFocus}
+          onClick={controller.handleExecutionPlan}
+        >
+          <Icon
+            name="execution-plan"
+            viewBox='0 0 32 32'
           />
         </button>
       </actions>

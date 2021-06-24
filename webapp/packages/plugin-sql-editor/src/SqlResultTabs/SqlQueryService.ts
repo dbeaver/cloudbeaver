@@ -131,6 +131,7 @@ export class SqlQueryService {
     tabState: ISqlEditorTabState,
     modelId: string
   ): IResultGroup {
+    const nameOrder = Math.max(1, ...tabState.resultGroups.map(group => group.nameOrder + 1));
     const order = Math.max(0, ...tabState.tabs.map(tab => tab.order + 1));
     const groupId = uuid();
 
@@ -138,6 +139,7 @@ export class SqlQueryService {
       groupId,
       modelId,
       order,
+      nameOrder,
       sqlQueryParams: params,
     });
 
@@ -208,7 +210,7 @@ export class SqlQueryService {
       const tab = state.tabs.find(tab => tab.id === resultTab.tabId);
 
       if (tab) {
-        tab.name = this.getTabNameForOrder(group.order, indexInResultSet, model.source.results.length);
+        tab.name = this.getTabNameForOrder(group.nameOrder, indexInResultSet, model.source.results.length);
       }
     }
   }
@@ -229,13 +231,13 @@ export class SqlQueryService {
 
     state.tabs.push({
       id,
-      name: this.getTabNameForOrder(group.order, indexInResultSet, results),
+      name: this.getTabNameForOrder(group.nameOrder, indexInResultSet, results),
       icon: '/icons/grid.png',
       order: group.order,
     });
   }
 
   private getTabNameForOrder(order: number, indexInResultSet: number, results: number) {
-    return `Result - ${order + 1}` + (results > 1 ? ` (${indexInResultSet + 1})` : '');
+    return `Result - ${order}` + (results > 1 ? ` (${indexInResultSet + 1})` : '');
   }
 }

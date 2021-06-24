@@ -1,0 +1,24 @@
+mutation asyncSqlExplainExecutionPlan(
+    $connectionId: ID!
+    $contextId: ID!
+    $query: String!
+    $configuration: Object!
+) {
+    taskInfo: asyncSqlExplainExecutionPlan(
+        connectionId: $connectionId
+        contextId: $contextId
+        query: $query
+        configuration: $configuration
+    ) {
+        id
+        name
+        running
+        status
+        error {
+            message
+            errorCode
+            stackTrace
+        }
+        taskResult
+    }
+}
