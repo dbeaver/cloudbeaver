@@ -252,7 +252,7 @@ export class SqlEditorTabService extends Bootstrap {
       await this.sqlEditorService.destroySqlContext(editorTab.handlerState.executionContext);
     }
     for (const tab of editorTab.handlerState.tabs) {
-      await this.sqlResultTabsService.removeResultTab(editorTab.handlerState, tab.id);
+      await this.sqlResultTabsService.removeResultTab(editorTab.handlerState, tab.id, editorTab.id);
     }
   }
 }

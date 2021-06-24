@@ -7,4 +7,6 @@ export default [
   ['sql_execution_plan_properties_panel_value', 'Value'],
   ['sql_execution_plan_properties_panel_general', 'General'],
   ['sql_execution_plan_properties_panel_details', 'Details'],
+  ['sql_tab_closing_notification_title', "Tab can't be closed"],
+  ['sql_tab_closing_notification_message', 'Task is executing'],
 ];

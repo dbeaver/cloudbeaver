@@ -129,7 +129,7 @@ export class SqlEditorNavigatorService {
       if (data.type === SQLEditorNavigationAction.select) {
         this.sqlEditorTabService.selectResultTab(tab, data.resultId);
       } else if (data.type === SQLEditorNavigationAction.close) {
-        await this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId);
+        await this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId, data.editorId);
       }
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception) {
