@@ -47,7 +47,7 @@ const INPUT_FIELD_STYLES = composes(
       height: 24px;
       cursor: pointer;
     }
-    input[disabled] + Icon {
+    input[disabled] + icon-container {
       cursor: auto;
       opacity: 0.8;
     }
