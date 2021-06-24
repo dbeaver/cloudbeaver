@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable, toJS } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -119,7 +119,7 @@ export class SqlExecutionPlanService {
     state: ISqlEditorTabState,
   ) {
     if (!state.executionContext) {
-      throw new Error('executeEditorQuery executionContext is not provided');
+      throw new Error('ExecutionContext is not provided');
     }
 
     const id = uuid();
