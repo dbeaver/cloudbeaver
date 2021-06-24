@@ -19,7 +19,7 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
-import { SqlExecutionPlanService } from '../SqlResultTabs/SqlExecutionPlanService';
+import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
@@ -38,6 +38,9 @@ export class SqlEditorController implements IInitializableController {
   }
 
   handleExecute = async (): Promise<void> => {
+    if (this.isActionsDisabled) {
+      return;
+    }
     this.sqlQueryService.executeEditorQuery(
       this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
       this.tab.handlerState,
@@ -47,6 +50,9 @@ export class SqlEditorController implements IInitializableController {
   };
 
   handleExecuteNewTab = async (): Promise<void> => {
+    if (this.isActionsDisabled) {
+      return;
+    }
     this.sqlQueryService.executeEditorQuery(
       this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
       this.tab.handlerState,
@@ -56,14 +62,15 @@ export class SqlEditorController implements IInitializableController {
   };
 
   handleExecutionPlan = async (): Promise<void> => {
+    if (this.isActionsDisabled) {
+      return;
+    }
     this.sqlExecutionPlanService.executeExecutionPlan(
       this.sqlResultTabsService.getTabExecutionContext(this.tab.id),
       this.tab.handlerState,
       await this.getExecutingQuery(),
     );
   };
-
-  // TODO: ex-plan add action for execution plan
 
   readonly options: EditorConfiguration = {
     theme: 'material',
@@ -80,6 +87,7 @@ export class SqlEditorController implements IInitializableController {
       // Execute sql script in new tab
       'Ctrl-\\': () => { this.handleExecuteNewTab(); },
       'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
+      'Shift-Ctrl-E': () => { this.handleExecutionPlan(); },
 
       // Autocomplete
       'Ctrl-Space': this.showHint.bind(this), // classic for windows, linux

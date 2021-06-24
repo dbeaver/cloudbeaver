@@ -806,7 +806,7 @@ export interface SqlCompletionProposal {
   replacementString: Scalars['String'];
   replacementOffset: Scalars['Int'];
   replacementLength: Scalars['Int'];
-  cursorPosition: Scalars['Int'];
+  cursorPosition?: Maybe<Scalars['Int']>;
   icon?: Maybe<Scalars['String']>;
   nodePath?: Maybe<Scalars['String']>;
 }
@@ -1431,11 +1431,6 @@ export type ObjectOriginInfoFragment = (
   & { details?: Maybe<Array<Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'defaultValue' | 'validValues' | 'value' | 'features' | 'order'>>> }
 );
 
-export type SqlExecutionPlanNodeFragment = (
-  Pick<SqlExecutionPlanNode, 'kind' | 'name' | 'type' | 'condition' | 'description'>
-  & { properties: Array<Pick<ObjectPropertyInfo, 'id' | 'category' | 'dataType' | 'description' | 'displayName' | 'features' | 'value' | 'order'>> }
-);
-
 export type SessionStateFragment = Pick<SessionInfo, 'createTime' | 'lastAccessTime' | 'cacheExpired' | 'locale'>;
 
 export type UserConnectionAuthPropertiesFragment = Pick<ObjectPropertyInfo, 'id' | 'displayName' | 'description' | 'category' | 'dataType' | 'value' | 'validValues' | 'defaultValue' | 'features' | 'order'>;
@@ -1907,25 +1902,6 @@ export const NavNodeInfoFragmentDoc = `
   }
 }
     ${NavNodePropertiesFragmentDoc}`;
-export const SqlExecutionPlanNodeFragmentDoc = `
-    fragment SQLExecutionPlanNode on SQLExecutionPlanNode {
-  kind
-  name
-  type
-  condition
-  description
-  properties {
-    id
-    category
-    dataType
-    description
-    displayName
-    features
-    value
-    order
-  }
-}
-    `;
 export const SessionStateFragmentDoc = `
     fragment SessionState on SessionInfo {
   createTime

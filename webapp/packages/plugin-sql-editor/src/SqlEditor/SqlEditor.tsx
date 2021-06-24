@@ -11,7 +11,7 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTab } from '@cloudbeaver/core-app';
-import { StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
+import { Icon, StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
@@ -44,11 +44,15 @@ const styles = css`
     background: none;
   }
   
-  StaticImage {
+  StaticImage, icon-container {
     padding: 4px;
     height: 24px;
     width: 24px;
     cursor: pointer;
+  }
+
+  icon-container {
+    display: flex;
   }
 
   SQLCodeEditorLoader {
@@ -102,11 +106,16 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
           />
         </button>
         <button
-          disabled={!controller.dialect?.supportsExplainExecutionPlan}
+          disabled={!controller.dialect?.supportsExplainExecutionPlan || controller.isActionsDisabled}
           onMouseDown={preventFocus}
           onClick={controller.handleExecutionPlan}
         >
-          plan
+          <icon-container title='Open execution plan'>
+            <Icon
+              name="execution-plan"
+              viewBox='0 0 32 32'
+            />
+          </icon-container>
         </button>
       </actions>
       <SQLCodeEditorLoader

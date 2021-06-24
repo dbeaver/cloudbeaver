@@ -11,6 +11,7 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionState } from '../SqlExecutionState';
+import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from './SqlQueryService';
 
 @injectable()
@@ -19,6 +20,7 @@ export class SqlResultTabsService {
 
   constructor(
     private sqlQueryService: SqlQueryService,
+    private sqlExecutionPlanService: SqlExecutionPlanService
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
@@ -35,7 +37,7 @@ export class SqlResultTabsService {
     }
 
     this.sqlQueryService.removeResultTab(state, tabId);
-    // TODO: ex-plan add removeResultTab for ex-plan
+    this.sqlExecutionPlanService.removeExecutionPlanTab(state, tabId);
 
     if (state.currentTabId === tabId) {
       if (state.tabs.length > 0) {

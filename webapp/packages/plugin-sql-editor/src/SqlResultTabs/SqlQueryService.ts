@@ -131,7 +131,11 @@ export class SqlQueryService {
     tabState: ISqlEditorTabState,
     modelId: string
   ): IResultGroup {
-    const order = Math.max(0, ...tabState.tabs.map(tab => tab.order + 1));
+    const executionPlanIds = tabState.executionPlanTabs.map(tab => tab.tabId);
+    const order = Math.max(0, ...tabState.tabs
+      .filter(tab => !executionPlanIds.includes(tab.id))
+      .map(tab => tab.order + 1)
+    );
     const groupId = uuid();
 
     tabState.resultGroups.push({

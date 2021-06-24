@@ -37,8 +37,8 @@ export interface ISqlEditorResultTab {
 
 export interface IExecutionPlanTab {
   tabId: string;
-  query: string;
   executionContext: IDatabaseExecutionContext;
+  order: number;
   options?: Record<string, any>;
 }
 
@@ -50,5 +50,5 @@ export interface ISqlEditorTabState {
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];
   resultTabs: IResultTab[];
-  executionPlanTabs: IExecutionPlanTab[]; // TODO: ex-plan store addition info for tab
+  executionPlanTabs: IExecutionPlanTab[];
 }

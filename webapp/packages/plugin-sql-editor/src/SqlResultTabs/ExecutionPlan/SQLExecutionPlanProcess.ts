@@ -8,7 +8,7 @@
 
 import type { NotificationService } from '@cloudbeaver/core-events';
 import {
-  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecuteInfo, SqlDataFilter, ResultDataFormat, SqlExecutionPlan
+  AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecutionPlan
 } from '@cloudbeaver/core-sdk';
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState
@@ -35,7 +35,7 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
   ): Promise<void> {
     // start async task
     try {
-      const taskInfo = await this.executeQueryAsync(query, context);
+      const taskInfo = await this.explainExecutionPlanAsync(query, context);
       await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
       if (this.getState() === EDeferredState.CANCELLING) {
@@ -57,7 +57,7 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
       }
       // run the first check immediately because usually the query execution is fast
       try {
-        const taskInfo = await this.getQueryStatusAsync(this.taskId);
+        const taskInfo = await this.getExecutionPlanStatusAsync(this.taskId);
         await this.applyResult(taskInfo);
         if (this.isFinished) {
           return;
@@ -103,7 +103,7 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
     }
   }
 
-  private async executeQueryAsync(
+  private async explainExecutionPlanAsync(
     query: string,
     context: IDatabaseExecutionContext,
   ): Promise<AsyncTaskInfo> {
@@ -116,7 +116,7 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
     return taskInfo;
   }
 
-  private async getQueryStatusAsync(taskId: string): Promise<AsyncTaskInfo> {
+  private async getExecutionPlanStatusAsync(taskId: string): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId, removeOnFinish: false });
     return taskInfo;
   }
