@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -20,7 +21,8 @@ export class SqlResultTabsService {
 
   constructor(
     private sqlQueryService: SqlQueryService,
-    private sqlExecutionPlanService: SqlExecutionPlanService
+    private sqlExecutionPlanService: SqlExecutionPlanService,
+    private notificationService: NotificationService,
   ) {
     this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
   }
@@ -29,7 +31,13 @@ export class SqlResultTabsService {
     return this.tabExecutionContext.get(tabId);
   }
 
-  async removeResultTab(state: ISqlEditorTabState, tabId: string): Promise<void> {
+  async removeResultTab(state: ISqlEditorTabState, tabId: string, editorTabId: string): Promise<void> {
+    const editorTabExecutionContext = this.getTabExecutionContext(editorTabId);
+    if (editorTabExecutionContext.isExecuting || editorTabExecutionContext.isCanceling) {
+      this.notificationService.logInfo({ title: 'sql_tab_closing_notification_title', message: 'sql_tab_closing_notification_message' });
+      return;
+    }
+
     const tab = state.tabs.find(tab => tab.id === tabId);
 
     if (tab) {

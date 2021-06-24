@@ -23,6 +23,10 @@ export class SqlExecutionState {
     return this.executionTask ? this.executionTask.isInProgress : false;
   }
 
+  get isCanceling(): boolean {
+    return this.executionTask ? this.executionTask.getState() === EDeferredState.CANCELLING : false;
+  }
+
   get canCancel(): boolean {
     return this.executionTask ? this.executionTask.getState() === EDeferredState.PENDING : false;
   }
