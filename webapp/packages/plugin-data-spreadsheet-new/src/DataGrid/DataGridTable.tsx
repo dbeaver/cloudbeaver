@@ -14,7 +14,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet, IDataPresentationProps, IDataTableActions, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -30,18 +30,12 @@ import { useGridDragging } from './useGridDragging';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
 import { useTableData } from './useTableData';
 
-interface Props {
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
-  resultIndex: number;
-  className?: string;
-}
-
 function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
   const target = event.target as HTMLDivElement;
   return target.clientHeight + target.scrollTop + 100 > target.scrollHeight;
 }
 
-export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ model, resultIndex, className }) {
+export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResultSet>> = observer(function DataGridTable({ model, actions, resultIndex, className }) {
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const dataGridRef = useRef<DataGridHandle>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -143,12 +137,13 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
 
   const gridContext = useMemo<IDataGridContext>(() => ({
     model,
+    actions,
     columnResize,
     resultIndex,
     isGridInFocus: () => gridContainerRef.current === document.activeElement,
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
-  }), [model, resultIndex, editorRef, dataGridRef]);
+  }), [model, actions, resultIndex, editorRef, dataGridRef]);
 
   return styled(styles)(
     <DataGridContext.Provider value={gridContext}>
@@ -157,7 +152,6 @@ export const DataGridTable: React.FC<Props> = observer(function DataGridTable({ 
           <TableDataContext.Provider value={tableData}>
             <grid-container
               ref={gridContainerRef}
-              as='div'
               className="cb-react-grid-container"
               tabIndex={-1}
               onKeyDown={onKeydownHandler}

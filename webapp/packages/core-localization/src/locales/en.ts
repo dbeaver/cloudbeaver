@@ -31,6 +31,7 @@ export const defaultENLocale = [
   ['ui_copy_to_clipboard_failed_to_copy', 'Failed to copy'],
   ['ui_clipboard_access_denied_title', 'Clipboard access denied'],
   ['ui_clipboard_access_denied_message', 'You need to give access to clipboard to use some of the app features'],
+  ['ui_reveal_password', 'Show or hide password'],
   ['root_permission_denied', 'You have no permissions'],
   ['app_root_session_expired_title', 'Session expired'],
   ['app_root_session_expired_message', 'Session has been expired. Do you want to reload?'],

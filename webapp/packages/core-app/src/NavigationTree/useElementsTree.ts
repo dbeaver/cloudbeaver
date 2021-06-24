@@ -240,13 +240,13 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
-    handlers: [function refreshRoot() {
+    postHandlers: [function refreshRoot() {
       loadTree(options.root);
     }],
   });
   useExecutor({
     executor: navTreeResource.onNodeRefresh,
-    handlers: [loadTree],
+    postHandlers: [loadTree],
   });
 
   useExecutor({

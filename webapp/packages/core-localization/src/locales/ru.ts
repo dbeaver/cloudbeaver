@@ -29,6 +29,7 @@ export const defaultRULocale = [
   ['ui_copy_to_clipboard_failed_to_copy', 'Не удалось скопировать'],
   ['ui_clipboard_access_denied_title', 'Доступ к буферу обмена запрещен'],
   ['ui_clipboard_access_denied_message', 'Чтобы использовать некоторые функции приложения, необходим доступ к буферу обмена'],
+  ['ui_reveal_password', 'Показать или скрыть пароль'],
   ['root_permission_denied', 'Отказано в доступе'],
   ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],

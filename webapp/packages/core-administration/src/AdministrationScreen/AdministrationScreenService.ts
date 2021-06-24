@@ -13,7 +13,7 @@ import { IExecutor, Executor } from '@cloudbeaver/core-executor';
 import { PermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { BuildVersion } from '@cloudbeaver/core-utils';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
@@ -76,7 +76,7 @@ export class AdministrationScreenService {
 
     this.info = {
       workspaceId: '',
-      version: BuildVersion.version || '',
+      version: GlobalConstants.version || '',
       serverVersion: '',
       configurationMode: false,
     };
@@ -154,13 +154,13 @@ export class AdministrationScreenService {
       this.info.workspaceId !== this.serverConfigResource.workspaceId
       || this.info.configurationMode !== this.isConfigurationMode
       || this.info.serverVersion !== this.serverConfigResource.serverVersion
-      || this.info.version !== BuildVersion.version
+      || this.info.version !== GlobalConstants.version
     ) {
       this.clearItemsState();
       this.info.workspaceId = this.serverConfigResource.workspaceId;
       this.info.configurationMode = this.isConfigurationMode;
       this.info.serverVersion = this.serverConfigResource.serverVersion;
-      this.info.version = BuildVersion.version || '';
+      this.info.version = GlobalConstants.version || '';
     }
 
     if (defaultState) {

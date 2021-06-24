@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { IconOrImage, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -40,7 +40,14 @@ const tableFooterStyles = composes(
     reload {
       height: 100%;
       display: flex;
+      cursor: pointer;
       align-items: center;
+      padding: 0 16px;
+
+      & IconOrImage {
+        width: 24px;
+        height: 24px;
+      }
     }
     IconButton {
       position: relative;
@@ -48,7 +55,6 @@ const tableFooterStyles = composes(
       width: 24px;
       display: block;
     }
-    reload,
     count,
     TableFooterMenu {
       margin-left: 16px;
@@ -86,16 +92,12 @@ export const TableFooter = observer(function TableFooter({
     [model]
   );
 
+  const disabled = model.isLoading() || model.isDisabled(resultIndex);
+
   return styled(useStyles(tableFooterStyles))(
     <ToolsPanel>
-      <reload>
-        <IconButton
-          type="button"
-          name='reload'
-          viewBox="0 0 16 16"
-          disabled={model.isLoading() || model.isDisabled(resultIndex)}
-          onClick={() => model.refresh()}
-        />
+      <reload aria-disabled={disabled} onClick={() => model.refresh()}>
+        <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload>
       <count>
         <SubmittingForm onSubmit={handleChange}>
@@ -103,7 +105,7 @@ export const TableFooter = observer(function TableFooter({
             ref={ref}
             type="number"
             value={model.countGain}
-            disabled={model.isLoading() || model.isDisabled(resultIndex)}
+            disabled={disabled}
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
           />

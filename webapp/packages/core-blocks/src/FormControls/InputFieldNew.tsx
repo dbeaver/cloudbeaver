@@ -7,26 +7,54 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { useTranslate } from '@cloudbeaver/core-localization';
+import { ComponentStyle, composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { Icon } from '../Icon';
 import { baseFormControlStylesNew } from './baseFormControlStylesNew';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
 
-const INPUT_FIELD_STYLES = css`
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-`;
+const INPUT_FIELD_STYLES = composes(
+  css`
+    Icon {
+      composes: theme-text-on-secondary from global;
+    }
+`,
+  css`
+    field-label {
+      display: block;
+      composes: theme-typography--body1 from global;
+      font-weight: 500;
+    }
+    field-label:not(:empty) {
+      padding-bottom: 10px;
+    }
+    input-container {
+      position: relative;
+    }
+    icon-container {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+    input[disabled] + Icon {
+      cursor: auto;
+      opacity: 0.8;
+    }
+    input:not(:only-child) {
+      padding-right: 32px !important;
+    }
+`);
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value'> & ILayoutSizeProps & {
   description?: string;
@@ -80,8 +108,18 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
   onChange,
   ...rest
 }: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
+  const [passwordRevealed, setPasswordRevealed] = useState(false);
+  const translate = useTranslate();
   const styles = useStyles(baseFormControlStylesNew, INPUT_FIELD_STYLES, style);
   const context = useContext(FormContext);
+
+  const revealPassword = useCallback(() => {
+    if (rest.disabled) {
+      return;
+    }
+
+    setPasswordRevealed(prev => !prev);
+  }, [rest.disabled]);
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = mapValue?.(event.target.value) ?? event.target.value;
@@ -111,21 +149,37 @@ export const InputFieldNew: InputFieldType = observer(function InputFieldNew({
     value = mapState(value);
   }
 
+  const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
+
   return styled(styles)(
-    <field as="div" className={className} {...use({ small, medium, large })}>
-      <field-label as='label' title={rest.title}>{children}{required && ' *'}</field-label>
-      <input
-        ref={ref}
-        role='new'
-        {...rest}
-        name={name}
-        value={value ?? ''}
-        onChange={handleChange}
-        {...use({ mod })}
-        required={required}
-      />
+    <field className={className} {...use({ small, medium, large })}>
+      <field-label title={rest.title}>{children}{required && ' *'}</field-label>
+      <input-container>
+        <input
+          ref={ref}
+          role='new'
+          {...rest}
+          type={passwordRevealed ? 'text' : rest.type}
+          name={name}
+          value={value ?? ''}
+          onChange={handleChange}
+          {...use({ mod })}
+          required={required}
+        />
+        {showRevealPasswordButton && (
+          <icon-container
+            title={translate('ui_reveal_password')}
+            onClick={revealPassword}
+          >
+            <Icon
+              name={passwordRevealed ? 'password-hide' : 'password-show'}
+              viewBox='0 0 16 16'
+            />
+          </icon-container>
+        )}
+      </input-container>
       {description && (
-        <field-description as='div'>
+        <field-description>
           {description}
         </field-description>
       )}

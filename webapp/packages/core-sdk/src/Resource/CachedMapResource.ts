@@ -147,7 +147,7 @@ export abstract class CachedMapResource<
   markOutdated(key: ResourceKey<TKey>): Promise<void>
   async markOutdated(key?: ResourceKey<TKey>): Promise<void> {
     if (!key) {
-      key = resourceKeyList(Array.from(this.data.keys()));
+      key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
     }
@@ -164,7 +164,7 @@ export abstract class CachedMapResource<
   markUpdated(key: ResourceKey<TKey>): void
   markUpdated(key?: ResourceKey<TKey>): void {
     if (!key) {
-      key = resourceKeyList(Array.from(this.data.keys()));
+      key = resourceKeyList(this.keys);
     } else {
       key = this.transformParam(key);
     }

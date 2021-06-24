@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, Container, ErrorMessage, Group, InputFieldNew, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -21,7 +22,6 @@ import { GQLError, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ChangeUserPasswordDialogFooter } from './ChangeUserPasswordDialogFooter';
-import { UsersResource } from '@cloudbeaver/core-authentication';
 
 const styles = composes(
   css`
@@ -37,7 +37,6 @@ const styles = composes(
       flex: 1;
     }
 `);
-
 
 interface IState {
   oldPassword: string;
@@ -55,7 +54,7 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
     rejectDialog,
   }: DialogComponentProps<null, null>) {
     const [focusedRef] = useFocus<HTMLInputElement>({});
-    const usersResource = useService(UsersResource)
+    const usersResource = useService(UsersResource);
     const commonDialogService = useService(CommonDialogService);
     const notificationService = useService(NotificationService);
     const style = useStyles(styles, BASE_CONTAINERS_STYLES);
@@ -131,7 +130,7 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
                 small
                 required
               >
-                {translate('authentication_user_old_password')}
+                {translate('authentication_user_current_password')}
               </InputFieldNew>
               <InputFieldNew
                 type='password'

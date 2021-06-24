@@ -196,11 +196,10 @@ export class ServerConfigurationService {
     }
 
     try {
-      await this.serverConfigResource.saveDefaultNavigatorSettings();
-      if (!data.configurationWizard || data.finish) {
-        await this.serverConfigResource.save();
-      }
+      await this.serverConfigResource.save(data.configurationWizard);
+
       if (data.configurationWizard && data.finish) {
+        await this.serverConfigResource.finishConfiguration();
         await this.sessionDataResource.refresh();
       }
     } catch (exception) {

@@ -226,7 +226,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   private async connectionUpdateHandler(key: ResourceKey<string>) {
     await this.markOutdated(ROOT_NODE_PATH);
 
-    ResourceKeyUtils.forEach(key, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
       const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(key);
 
       if (this.has(nodeId)) {
@@ -235,14 +235,14 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         if (!connectionInfo?.connected) {
           this.delete(nodeId);
         } else {
-          this.markTreeOutdated(nodeId);
+          await this.markTreeOutdated(nodeId);
         }
       }
 
       const node = this.navNodeInfoResource.get(nodeId);
 
       if (node) {
-        this.markOutdated(node.parentId);
+        await this.markOutdated(node.parentId);
       }
     });
   }

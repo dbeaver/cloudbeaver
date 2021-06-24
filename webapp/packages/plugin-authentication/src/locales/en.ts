@@ -27,7 +27,7 @@ export default [
   ['authentication_administration_user_create_failed', 'Error creating new user'],
   ['authentication_user_name', 'User name'],
   ['authentication_user_credentials', 'Credentials'],
-  ['authentication_user_old_password', 'Old password'],
+  ['authentication_user_current_password', 'Current password'],
   ['authentication_user_new_password', 'New password'],
   ['authentication_user_password', 'User password'],
   ['authentication_user_password_repeat', 'Repeat password'],
@@ -48,7 +48,7 @@ export default [
   ['administration_configuration_wizard_configuration_anonymous_access', 'Allow anonymous access'],
   ['administration_configuration_wizard_configuration_anonymous_access_description', 'Allows to work with CloudBeaver without user authentication'],
   ['administration_configuration_wizard_configuration_authentication_group', 'Authentication settings'],
-  ['administration_configuration_wizard_configuration_authentication_provider', 'Authentication Source'],
+  ['administration_configuration_wizard_configuration_services', 'Services'],
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
   ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
 ];

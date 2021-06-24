@@ -65,6 +65,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public String getRootURI() {
+        return CommonUtils.notEmpty(application.getRootURI());
+    }
+
+    @Property
     public boolean isAnonymousAccessEnabled() {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }

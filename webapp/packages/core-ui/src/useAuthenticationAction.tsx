@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, observable } from 'mobx';
+
 import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -18,11 +20,12 @@ interface IAuthenticationAction {
   auth: () => Promise<void>;
 }
 interface IAuthenticationData extends IAuthenticationAction {
-  onAuthenticate?: () => void;
+  authenticating: boolean;
+  onAuthenticate?: () => Promise<any> | void;
 }
 
 export type Options = {
-  onAuthenticate?: () => void;
+  onAuthenticate?: () => Promise<any> | void;
 } & ({
   origin: ObjectOrigin;
 } | {
@@ -45,19 +48,28 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
   }
 
   return useObjectRef<IAuthenticationData>({
+    authenticating: false,
     type,
     subType,
     onAuthenticate: options.onAuthenticate,
     get authorized() {
-      return userInfoService.hasToken(this.type, this.subType);
+      return !this.authenticating && userInfoService.hasToken(this.type, this.subType);
     },
     async auth() {
-      await authProviderService.requireProvider(this.type, this.subType);
-      this.onAuthenticate?.();
+      this.authenticating = true;
+      try {
+        await authProviderService.requireProvider(this.type, this.subType);
+        await this.onAuthenticate?.();
+      } finally {
+        this.authenticating = false;
+      }
     },
   }, {
     type,
     subType,
     onAuthenticate: options.onAuthenticate,
-  }, undefined, ['auth']);
+  }, {
+    authorized: computed,
+    authenticating: observable,
+  }, ['auth']);
 }

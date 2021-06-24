@@ -1,5 +1,6 @@
 export default [
   ['data_grid_table_order', 'Sorting'],
+  ['data_grid_table_open_value_panel', 'Show in value panel'],
   ['data_grid_table_filter', 'Filters'],
   ['data_grid_table_filter_cell_value', 'Cell value'],
   ['data_grid_table_filter_custom_value', 'Custom'],

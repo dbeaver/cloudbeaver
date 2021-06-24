@@ -59,16 +59,15 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   }
 
   async login(provider: string, credentials: Record<string, string>, link?: boolean): Promise<UserInfo | null> {
-    const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
-
-    const { authToken } = await this.graphQLService.sdk.authLogin({
-      provider,
-      credentials: processedCredentials,
-      linkUser: link,
-      customIncludeOriginDetails: true,
-    });
-
     await this.performUpdate(undefined, undefined, async () => {
+      const processedCredentials = await this.authProviderService.processCredentials(provider, credentials);
+
+      const { authToken } = await this.graphQLService.sdk.authLogin({
+        provider,
+        credentials: processedCredentials,
+        linkUser: link,
+        customIncludeOriginDetails: true,
+      });
       if (this.data === null || link) {
         this.data = await this.loader();
       } else {

@@ -84,15 +84,16 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     return (
       this.update.serverName !== this.data.name
-    || this.update.sessionExpireTime !== this.data.sessionExpireTime
+      || this.update.serverURL !== this.data.serverURL
+      || this.update.sessionExpireTime !== this.data.sessionExpireTime
 
-    || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
+      || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
 
-    || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
-    || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
+      || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
+      || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
 
-    || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
-    || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
+      || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
+      || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
     );
   }
 
@@ -130,31 +131,34 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     }
   }
 
-  async saveDefaultNavigatorSettings(): Promise<void> {
+  async save(skipConfigUpdate = false): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
+      if (this.isNavigatorSettingsChanged()) {
+        await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
 
-      if (this.data) {
-        this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
-      } else {
+        if (this.data) {
+          this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
+        } else {
+          this.data = await this.loader();
+        }
+      }
+
+      if (this.isChanged() && !skipConfigUpdate) {
+        await this.graphQLService.sdk.configureServer({
+          configuration: this.update,
+        });
         this.data = await this.loader();
       }
-    }, () => !this.isNavigatorSettingsChanged());
+    }, () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate));
   }
 
-  async save(onlyRestart = false): Promise<void> {
+  async finishConfiguration(onlyRestart = false): Promise<void> {
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.configureServer({
-        configuration: (onlyRestart && !this.isChanged()) ? {} : this.update,
+        configuration: !this.isChanged() && onlyRestart ? {} : this.update,
       });
-
       this.data = await this.loader();
     }, () => !this.isChanged() && !onlyRestart);
-  }
-
-  async saveAllData(): Promise<void> {
-    await this.saveDefaultNavigatorSettings();
-    await this.save();
   }
 
   protected async loader(): Promise<ServerConfig> {
@@ -169,6 +173,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     Object.assign(this.navigatorSettingsUpdate, serverConfig.defaultNavigatorSettings);
 
     this.update.serverName = serverConfig.name;
+    this.update.serverURL = serverConfig.serverURL;
     this.update.sessionExpireTime = serverConfig.sessionExpireTime;
 
     this.update.adminName = undefined;

@@ -58,6 +58,10 @@ const buttonStyles = composes(
           opacity: 0;
         }
       }
+
+      &[href] {
+        text-decoration: none;
+      }
     }
     
   `
