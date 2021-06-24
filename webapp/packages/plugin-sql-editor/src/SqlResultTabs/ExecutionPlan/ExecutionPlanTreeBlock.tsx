@@ -44,11 +44,6 @@ interface Props {
 
 export const ExecutionPlanTreeBlock: React.FC<Props> = function ExecutionPlanTreeBlock({ className, query }) {
   const style = useStyles(styles, splitStyles);
-  const treeContext = useContext(ExecutionPlanTreeContext);
-
-  if (!treeContext) {
-    throw new Error('Tree context must be provided');
-  }
 
   return styled(style)(
     <Split className={className} sticky={30} split='horizontal' keepRatio>
