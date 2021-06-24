@@ -47,7 +47,7 @@ public class CBJettyServer {
                 servletContextHandler.setResourceBase(application.getContentRoot());
                 String rootURI = application.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
-                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), "/");
+                servletContextHandler.addServlet(new ServletHolder("static", new CBStaticServlet()), "/*");
                 servletContextHandler.addServlet(new ServletHolder("images", new CBImageServlet()), application.getServicesURI() + "images/*");
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener());
