@@ -38,10 +38,11 @@ const styles = composes(
 );
 
 interface Props {
+  query: string;
   className?: string;
 }
 
-export const ExecutionPlanTreeBlock: React.FC<Props> = function ExecutionPlanTreeBlock({ className }) {
+export const ExecutionPlanTreeBlock: React.FC<Props> = function ExecutionPlanTreeBlock({ className, query }) {
   const style = useStyles(styles, splitStyles);
   const treeContext = useContext(ExecutionPlanTreeContext);
 
@@ -56,7 +57,7 @@ export const ExecutionPlanTreeBlock: React.FC<Props> = function ExecutionPlanTre
       </Pane>
       <ResizerControls />
       <Pane main>
-        <QueryPanel />
+        <QueryPanel query={query} />
       </Pane>
     </Split>
   );

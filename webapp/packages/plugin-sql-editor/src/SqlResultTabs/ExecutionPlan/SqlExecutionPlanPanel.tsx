@@ -46,13 +46,14 @@ export const SqlExecutionPlanPanel: React.FC<Props> = observer(function SqlExecu
 }) {
   const style = useStyles(styles, splitStyles);
   const translate = useTranslate();
+  const tabId = executionPlanTab.tabId;
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
-  const data = sqlExecutionPlanService.results.get(executionPlanTab.tabId);
-  const process = sqlExecutionPlanService.processes.get(executionPlanTab.tabId);
+  const executionPlan = sqlExecutionPlanService.results.get(tabId);
+  const process = sqlExecutionPlanService.processes.get(tabId);
 
-  const executionPlanState = useExecutionPlanTreeState(data?.executionPlan.nodes || [], data?.executionPlan.query || '');
-  const loading = process?.isInProgress || !data;
-  const canCancel = process ? process?.getState() === EDeferredState.PENDING : false;
+  const executionPlanState = useExecutionPlanTreeState(executionPlan?.nodes || []);
+  const loading = process?.isInProgress || !executionPlan;
+  const canCancel = process?.getState() === EDeferredState.PENDING ?? false;
 
   const cancelTask = useCallback(() => {
     if (process) {
@@ -75,11 +76,11 @@ export const SqlExecutionPlanPanel: React.FC<Props> = observer(function SqlExecu
 
   return styled(style)(
     <ExecutionPlanTreeContext.Provider value={executionPlanState}>
-      <Split mode={executionPlanState.metadataPanel ? undefined : 'maximize'}>
+      <Split mode={executionPlanState.selectedNode ? undefined : 'maximize'}>
         <Pane main>
-          <ExecutionPlanTreeBlock />
+          <ExecutionPlanTreeBlock query={executionPlanTab.query} />
         </Pane>
-        {executionPlanState.metadataPanel && executionPlanState.selectedNode && (
+        {executionPlanState.selectedNode && (
           <>
             <ResizerControls />
             <Pane>

@@ -7,79 +7,72 @@
  */
 
 import { computed, observable } from 'mobx';
-import { useCallback, useMemo, useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionPlanNode, IExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
 
-interface IState {
-  selectedNode: IExecutionPlanNode | null;
-  metadataPanel: boolean;
-}
-
 export function isVisibleProperty(property: ObjectPropertyInfo): boolean {
   return property.features.includes('viewable');
 }
 
-export function useExecutionPlanTreeState(list: SqlExecutionPlanNode[], query: string): IExecutionPlanTreeContext {
-  const props = useObjectRef({ list, query });
-  const [state] = useState(() => observable<IState>({
-    selectedNode: null,
-    metadataPanel: false,
-  }));
+interface IPrivateExecutionPlanTreeState extends IExecutionPlanTreeContext {
+  list: SqlExecutionPlanNode[];
+}
 
-  const selectNode = useCallback((node: IExecutionPlanNode) => {
-    if (!state.metadataPanel) {
-      state.metadataPanel = true;
-    }
-    state.selectedNode = node;
-  }, [state]);
+export function useExecutionPlanTreeState(list: SqlExecutionPlanNode[]): IExecutionPlanTreeContext {
+  return useObjectRef<IPrivateExecutionPlanTreeState>({
+    list,
+    selectedNodes: new Map(),
+    get columns() {
+      const columns: ObjectPropertyInfo[] = [];
 
-  const columns = useMemo(() => computed(() => {
-    const result: ObjectPropertyInfo[] = [];
-
-    for (const node of props.list) {
-      for (const property of node.properties) {
-        if (property.id && isVisibleProperty(property) && !result.find(column => column.id === property.id)) {
-          result.push(property);
+      for (const node of this.list) {
+        for (const property of node.properties) {
+          if (property.id && isVisibleProperty(property) && !columns.find(column => column.id === property.id)) {
+            columns.push(property);
+          }
         }
       }
-    }
 
-    return result;
-  }), [props.list]).get();
+      return columns;
+    },
+    get nodes() {
+      const map: Map<string, number> = new Map();
 
-  const nodes = useMemo(() => computed(() => {
-    const map: Map<string, number> = new Map();
+      const tree: IExecutionPlanNode[] = this.list
+        .map((node, idx) => {
+          map.set(node.id, idx);
+          return ({ ...node, children: [] });
+        });
 
-    const tree: IExecutionPlanNode[] = props.list
-      .map((node, idx) => {
-        map.set(node.id, idx);
-        return ({ ...node, children: [] });
-      });
+      const nodes: IExecutionPlanNode[] = [];
 
-    const result: IExecutionPlanNode[] = [];
-
-    for (const node of tree) {
-      if (node.parentId) {
-        const parent = map.get(node.parentId)!;
-        tree[parent].children.push(node);
-      } else {
-        result.push(node);
+      for (const node of tree) {
+        if (node.parentId) {
+          const parent = map.get(node.parentId)!;
+          tree[parent].children.push(node);
+        } else {
+          nodes.push(node);
+        }
       }
-    }
 
-    return result;
-  }), [props.list]).get();
-
-  return useObjectRef({
-    columns,
-    nodes,
-    metadataPanel: state.metadataPanel,
-    selectedNode: state.selectedNode,
-    query: props.query,
-    selectNode,
-  });
+      return nodes;
+    },
+    get selectedNode(): SqlExecutionPlanNode | undefined {
+      const nodeId = Array.from(this.selectedNodes.keys())[0];
+      return this.list.find(node => node.id === nodeId);
+    },
+    selectNode(nodeId: string) {
+      this.selectedNodes.clear();
+      this.selectedNodes.set(nodeId, true);
+    },
+  }, { list }, {
+    selectedNodes: observable,
+    list: observable,
+    columns: computed,
+    nodes: computed,
+    selectedNode: computed,
+  }, ['selectNode']);
 }

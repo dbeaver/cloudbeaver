@@ -18,13 +18,9 @@ import { SqlDialectInfoService } from '../../SqlDialectInfoService';
 import type { SqlExecutionState } from '../../SqlExecutionState';
 import { SQLExecutionPlanProcess } from './SQLExecutionPlanProcess';
 
-interface IExecutionPlanData {
-  query: string;
-  executionPlan: SqlExecutionPlan;
-}
 @injectable()
 export class SqlExecutionPlanService {
-  results: Map<string, IExecutionPlanData>;
+  results: Map<string, SqlExecutionPlan>;
   processes: Map<string, SQLExecutionPlanProcess>;
 
   constructor(
@@ -50,28 +46,25 @@ export class SqlExecutionPlanService {
       return;
     }
 
-    const tabId = this.createExecutionPlanTab(editorState);
+    const tabId = this.createExecutionPlanTab(editorState, query);
     const subQuery = await this.getSubQuery(editorState.executionContext.connectionId, query);
     const task = new SQLExecutionPlanProcess(this.graphQLService, this.notificationService);
 
-    this.processes.set(tabId, task);
-    executionState.setExecutionTask(task);
-    editorState.currentTabId = tabId;
-
     try {
+      this.processes.set(tabId, task);
+      executionState.setExecutionTask(task);
+      editorState.currentTabId = tabId;
+
       await task.start(
         subQuery,
         {
-          connectionId: editorState.executionContext?.connectionId,
-          contextId: editorState.executionContext?.contextId,
+          connectionId: editorState.executionContext.connectionId,
+          contextId: editorState.executionContext.contextId,
         }
       );
 
       const executionPlan = await task.promise;
-      this.results.set(tabId, {
-        executionPlan,
-        query,
-      });
+      this.results.set(tabId, executionPlan);
     } catch (exception) {
       const message = task.getState() === EDeferredState.CANCELLED ? 'Execution plan process has been canceled' : undefined;
       this.notificationService.logException(exception, 'Execution plan Error', message);
@@ -90,6 +83,10 @@ export class SqlExecutionPlanService {
   }
 
   private removeTab(state: ISqlEditorTabState, tabId: string) {
+    const tab = state.tabs.find(tab => tab.id === tabId);
+    if (tab) {
+      state.tabs.splice(state.tabs.indexOf(tab), 1);
+    }
     this.removeExecutionPlanTab(state, tabId);
 
     if (state.tabs.length > 0) {
@@ -100,15 +97,10 @@ export class SqlExecutionPlanService {
   }
 
   removeExecutionPlanTab(state: ISqlEditorTabState, tabId: string): void {
-    const tab = state.tabs.find(tab => tab.id === tabId);
     const executionPlanTab = state.executionPlanTabs.find(executionPlanTab => executionPlanTab.tabId === tabId);
 
     if (executionPlanTab) {
       state.executionPlanTabs.splice(state.executionPlanTabs.indexOf(executionPlanTab), 1);
-    }
-
-    if (tab) {
-      state.tabs.splice(state.tabs.indexOf(tab), 1);
     }
 
     this.results.delete(tabId);
@@ -117,13 +109,15 @@ export class SqlExecutionPlanService {
 
   private createExecutionPlanTab(
     state: ISqlEditorTabState,
+    query: string,
   ) {
     if (!state.executionContext) {
       throw new Error('ExecutionContext is not provided');
     }
 
     const id = uuid();
-    const order = Math.max(0, ...state.executionPlanTabs.map(tab => tab.order + 1));
+    const order = Math.max(0, ...state.tabs.map(tab => tab.order + 1));
+    const nameOrder = Math.max(1, ...state.executionPlanTabs.map(tab => tab.order + 1));
 
     state.executionPlanTabs.push({
       tabId: id,
@@ -131,12 +125,13 @@ export class SqlExecutionPlanService {
         connectionId: state.executionContext.connectionId,
         contextId: state.executionContext.contextId,
       },
-      order,
+      query,
+      order: nameOrder,
     });
 
     state.tabs.push({
       id,
-      name: `Execution plan - ${order + 1}`,
+      name: `Execution plan - ${nameOrder}`,
       icon: 'execution-plan-tab',
       order,
     });

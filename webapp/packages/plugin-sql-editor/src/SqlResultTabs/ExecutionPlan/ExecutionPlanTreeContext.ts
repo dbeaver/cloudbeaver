@@ -15,12 +15,11 @@ export interface IExecutionPlanNode extends SqlExecutionPlanNode {
 }
 
 export interface IExecutionPlanTreeContext {
-  query: string;
-  columns: ObjectPropertyInfo[];
-  nodes: IExecutionPlanNode[];
-  selectNode: (node: IExecutionPlanNode) => void;
-  selectedNode: IExecutionPlanNode | null;
-  metadataPanel: boolean;
+  selectedNodes: Map<string, boolean>;
+  readonly columns: ObjectPropertyInfo[];
+  readonly nodes: IExecutionPlanNode[];
+  readonly selectedNode: SqlExecutionPlanNode | undefined;
+  selectNode: (nodeId: string) => void;
 }
 
 export const ExecutionPlanTreeContext = createContext<IExecutionPlanTreeContext | null>(null);

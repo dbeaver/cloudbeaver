@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
-import { useCallback, useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Table, TableHeader, TableColumnHeader, TableBody } from '@cloudbeaver/core-blocks';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
-import { ExecutionPlanTreeContext, IExecutionPlanNode } from './ExecutionPlanTreeContext';
+import { ExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
 import { NestedNode } from './NestedNode';
 
 const styles = composes(
@@ -37,21 +36,13 @@ interface Props {
 
 export const ExecutionPlanTree: React.FC<Props> = function ExecutionPlanTree({ className }) {
   const treeContext = useContext(ExecutionPlanTreeContext);
-  const [selectedNodes] = useState(() => observable(new Map()));
 
   if (!treeContext) {
     throw new Error('Tree context must be provided');
   }
 
-  const selectNode = useCallback((node: IExecutionPlanNode) => {
-    selectedNodes.clear();
-    selectedNodes.set(node, true);
-
-    treeContext.selectNode(node);
-  }, [treeContext, selectedNodes]);
-
   return styled(useStyles(styles))(
-    <Table className={className} selectedItems={selectedNodes} onSelect={selectNode}>
+    <Table className={className} selectedItems={treeContext.selectedNodes} onSelect={treeContext.selectNode}>
       <TableHeader>
         {treeContext.columns.map(property => (
           <TableColumnHeader key={property.id || property.order} title={property.displayName}>

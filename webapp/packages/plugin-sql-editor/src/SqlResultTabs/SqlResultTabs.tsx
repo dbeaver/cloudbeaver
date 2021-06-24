@@ -74,22 +74,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         })
     ),
     [tab]
-  );
-
-  const categorizedTabs = useMemo(() => computed(() => {
-    const resultTabs = [];
-    const executionPlanTabs = [];
-
-    for (const orderedTab of orderedTabs.get()) {
-      const resultTab = tab.handlerState.resultTabs.find(tab => tab.tabId === orderedTab.id);
-      if (resultTab) {
-        resultTabs.push(orderedTab);
-        continue;
-      }
-      executionPlanTabs.push(orderedTab);
-    }
-    return resultTabs.concat(executionPlanTabs);
-  }), [orderedTabs, tab]).get();
+  ).get();
 
   const handleOpen = ({ tabId }: ITabData<any>) => navigatorService.openEditorResult(tab.id, tabId);
   const handleClose = ({ tabId }: ITabData<any>) => navigatorService.closeEditorResult(tab.id, tabId);
@@ -104,7 +89,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
     <wrapper>
       <TabsBox
         currentTabId={currentId}
-        tabs={categorizedTabs.map(result => (
+        tabs={orderedTabs.map(result => (
           <Tab key={result.id} tabId={result.id} onOpen={handleOpen} onClose={handleClose}>
             <TabIcon icon={result.icon} />
             <TabTitle>{result.name}</TabTitle>
@@ -112,7 +97,7 @@ export const SqlResultTabs = observer(function SqlDataResult({ tab }: SqlDataRes
         ))}
         style={[styles]}
       >
-        {categorizedTabs.map(result => (
+        {orderedTabs.map(result => (
           <TabPanel key={result.id} tabId={result.id}>
             <SqlResultPanel tab={tab} id={result.id} />
           </TabPanel>

@@ -26,6 +26,7 @@ export interface IResultGroup {
   modelId: string;
   sqlQueryParams: ISqlQueryParams;
   order: number;
+  nameOrder: number;
 }
 
 export interface ISqlEditorResultTab {
@@ -38,6 +39,7 @@ export interface ISqlEditorResultTab {
 export interface IExecutionPlanTab {
   tabId: string;
   executionContext: IDatabaseExecutionContext;
+  query: string;
   order: number;
   options?: Record<string, any>;
 }

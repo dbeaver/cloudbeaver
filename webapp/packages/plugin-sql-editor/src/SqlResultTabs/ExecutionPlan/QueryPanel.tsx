@@ -13,10 +13,11 @@ import { TextareaNew } from '@cloudbeaver/core-blocks';
 import { ExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
 
 interface Props {
+  query: string;
   className?: string;
 }
 
-export const QueryPanel: React.FC<Props> = function QueryPanel({ className }) {
+export const QueryPanel: React.FC<Props> = function QueryPanel({ className, query }) {
   const treeContext = useContext(ExecutionPlanTreeContext);
 
   if (!treeContext) {
@@ -28,7 +29,7 @@ export const QueryPanel: React.FC<Props> = function QueryPanel({ className }) {
       className={className}
       name='value'
       rows={3}
-      value={treeContext.query}
+      value={query}
       readOnly
       embedded
     />

@@ -20,6 +20,7 @@ import { getPropertyValue } from './getPropertyValue';
 const styles = css`
   TableColumnValue {
     white-space: pre;
+    cursor: pointer;
   }
   expand-container {
     width: 24px;
@@ -65,7 +66,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, cl
 
   return styled(style)(
     <>
-      <TableItem key={`${node.id}_${depth}`} className={className} item={node}>
+      <TableItem key={`${node.id}_${depth}`} className={className} item={node.id}>
         {treeContext.columns.map((column, idx) => {
           const property = node.properties.find(property => property.id === column.id);
           const value = getValue(property);
