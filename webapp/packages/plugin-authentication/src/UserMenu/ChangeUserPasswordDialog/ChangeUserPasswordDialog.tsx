@@ -12,13 +12,12 @@ import { useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Container, ErrorMessage, Group, InputFieldNew, SubmittingForm, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, ErrorMessage, Group, InputFieldNew, SubmittingForm, useErrorDetails, useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLError, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { ChangeUserPasswordDialogFooter } from './ChangeUserPasswordDialogFooter';
@@ -55,20 +54,16 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
   }: DialogComponentProps<null, null>) {
     const [focusedRef] = useFocus<HTMLInputElement>({});
     const usersResource = useService(UsersResource);
-    const commonDialogService = useService(CommonDialogService);
     const notificationService = useService(NotificationService);
     const style = useStyles(styles, BASE_CONTAINERS_STYLES);
     const translate = useTranslate();
     const [state] = useState<IState>(() => observable({
       oldPassword: '', newPassword: '', repeatedPassword: '', error: new GQLErrorCatcher(), customError: '', submitting: false,
     }));
+    const { details: errorDetails, open: openErrorDetails } = useErrorDetails(state.error.exception);
     const formFilled
     = state.newPassword.length > 0 && state.repeatedPassword.length > 0 && state.oldPassword.length > 0;
     const disabled = state.submitting;
-
-    const onShowDetails = useCallback(() => {
-      commonDialogService.open(ErrorDetailsDialog, (state.error.exception as GQLError));
-    }, [commonDialogService, state.error]);
 
     const change = useCallback(async () => {
       state.error.clear();
@@ -106,11 +101,11 @@ export const ChangeUserPasswordDialog: DialogComponent<null, null> = observer(
             onCancel={rejectDialog}
             onChange={change}
           >
-            {(state.error.responseMessage || state.customError) && (
+            {(errorDetails?.message || state.customError) && (
               <ErrorMessage
-                text={state.error.responseMessage || translate(state.customError)}
-                hasDetails={state.error.hasDetails}
-                onShowDetails={onShowDetails}
+                text={errorDetails?.message || translate(state.customError)}
+                hasDetails={errorDetails?.hasDetails}
+                onShowDetails={openErrorDetails}
               />
             )}
           </ChangeUserPasswordDialogFooter>
