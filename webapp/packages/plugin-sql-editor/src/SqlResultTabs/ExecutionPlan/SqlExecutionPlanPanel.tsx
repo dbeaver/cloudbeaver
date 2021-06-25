@@ -31,8 +31,11 @@ const styles = composes(
     }
   `,
   css`
-    Split {
-      height: 100%;
+    Pane:first-child {
+      overflow: hidden;
+    }
+    Pane:last-child {
+      flex: 0 1 450px;
     }
  `
 );
@@ -76,14 +79,14 @@ export const SqlExecutionPlanPanel: React.FC<Props> = observer(function SqlExecu
 
   return styled(style)(
     <ExecutionPlanTreeContext.Provider value={executionPlanState}>
-      <Split mode={executionPlanState.selectedNode ? undefined : 'maximize'}>
-        <Pane main>
+      <Split mode={executionPlanState.selectedNode ? undefined : 'minimize'} sticky={30}>
+        <Pane>
           <ExecutionPlanTreeBlock query={executionPlanTab.query} />
         </Pane>
         {executionPlanState.selectedNode && (
           <>
             <ResizerControls />
-            <Pane>
+            <Pane main>
               <PropertiesPanel properties={executionPlanState.selectedNode.properties} />
             </Pane>
           </>

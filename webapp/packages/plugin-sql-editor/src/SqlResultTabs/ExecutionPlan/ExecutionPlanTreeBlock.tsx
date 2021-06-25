@@ -30,7 +30,10 @@ const styles = composes(
       height: 2px;
     }
     Pane:last-child {
-      flex: 0 0 30%;
+      flex: 0 0 200px;
+    }
+    TextareaNew > :global(textarea) {
+      border: none !important;
     }
   `
 );

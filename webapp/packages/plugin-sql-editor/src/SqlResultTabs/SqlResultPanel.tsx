@@ -19,6 +19,7 @@ const style = css`
   result-panel {
     display: flex;
     flex: 1;
+    overflow: auto;
   }
 `;
 
