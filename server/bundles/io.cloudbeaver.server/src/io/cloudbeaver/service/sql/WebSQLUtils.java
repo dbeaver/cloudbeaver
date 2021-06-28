@@ -35,6 +35,7 @@ import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -48,6 +49,15 @@ public class WebSQLUtils {
     public static Object makeWebCellValue(WebSession session, DBSTypedObject type, Object cellValue, WebDataFormat dataFormat) throws DBCException {
         if (cellValue instanceof Date) {
             return CBConstants.ISO_DATE_FORMAT.format(cellValue);
+        } else if (cellValue instanceof Number) {
+            if (cellValue instanceof Double) {
+                return CommonUtils.niceFormatDouble((Double) cellValue);
+            } else if (cellValue instanceof Float) {
+                return CommonUtils.niceFormatDouble((Float) cellValue);
+            } else if (cellValue instanceof BigDecimal) {
+                return ((BigDecimal) cellValue).toPlainString();
+            }
+            return cellValue.toString();
         }
         if (cellValue instanceof DBDValue) {
             DBDValue dbValue = (DBDValue) cellValue;
