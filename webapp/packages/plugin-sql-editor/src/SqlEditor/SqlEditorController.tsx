@@ -62,7 +62,7 @@ export class SqlEditorController implements IInitializableController {
   };
 
   handleExecutionPlan = async (): Promise<void> => {
-    if (this.isActionsDisabled) {
+    if (this.isActionsDisabled || !this.dialect?.supportsExplainExecutionPlan) {
       return;
     }
     this.sqlExecutionPlanService.executeExecutionPlan(

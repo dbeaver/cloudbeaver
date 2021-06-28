@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TableItem, TableColumnValue } from '@cloudbeaver/core-blocks';
+import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
-import { ExecutionPlanTreeContext, IExecutionPlanNode } from './ExecutionPlanTreeContext';
+import type { IExecutionPlanNode } from './ExecutionPlanTreeContext';
 import { Expand } from './Expand';
 import { getPropertyValue } from './getPropertyValue';
 
@@ -34,19 +35,15 @@ const styles = css`
 `;
 
 interface Props {
+  columns: ObjectPropertyInfo[];
   node: IExecutionPlanNode;
   depth: number;
   className?: string;
 }
 
-export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, className }) {
+export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, depth, className }) {
   const style = useStyles(styles);
-  const treeContext = useContext(ExecutionPlanTreeContext);
   const [expanded, setExpanded] = useState(true);
-
-  if (!treeContext) {
-    throw new Error('Tree context must be provided');
-  }
 
   const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
     event.stopPropagation();
@@ -58,11 +55,11 @@ export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, cl
   return styled(style)(
     <>
       <TableItem key={`${node.id}_${depth}`} className={className} item={node.id}>
-        {treeContext.columns.map((column, idx) => {
+        {columns.map((column, idx) => {
           const property = node.properties.find(property => property.id === column.id);
           const value = property ? getPropertyValue(property) : '';
           return (
-            <TableColumnValue key={`${property?.id}_${depth}`} title={value}>
+            <TableColumnValue key={`${property?.id}_${depth}`} title={value || undefined}>
               <control>
                 {idx === 0 && (
                   <>
@@ -83,6 +80,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ node, depth, cl
       {expanded && node.children.map(child => (
         <NestedNode
           key={child.id}
+          columns={columns}
           node={child}
           depth={depth + 1}
         />

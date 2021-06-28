@@ -85,35 +85,30 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
       <actions>
         <button
           disabled={controller.isActionsDisabled}
+          title={translate('sql_editor_sql_execution_button_tooltip')}
           onMouseDown={preventFocus}
           onClick={controller.handleExecute}
         >
-          <StaticImage
-            icon="/icons/sql_exec.png"
-            title="Execute SQL Statement (Ctrl + Enter)"
-          />
+          <StaticImage icon="/icons/sql_exec.png" />
         </button>
         <button
           disabled={controller.isActionsDisabled}
+          title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
           onMouseDown={preventFocus}
           onClick={controller.handleExecuteNewTab}
         >
-          <StaticImage
-            icon="/icons/sql_exec_new.png"
-            title="Execute SQL in new tab (Ctrl + \\)(Shift + Ctrl + Enter)"
-          />
+          <StaticImage icon="/icons/sql_exec_new.png" />
         </button>
-        <button
-          disabled={!controller.dialect?.supportsExplainExecutionPlan || controller.isActionsDisabled}
-          title={translate('sql_editor_execution_plan_button_tooltip')}
-          onMouseDown={preventFocus}
-          onClick={controller.handleExecutionPlan}
-        >
-          <Icon
-            name="execution-plan"
-            viewBox='0 0 32 32'
-          />
-        </button>
+        {controller.dialect?.supportsExplainExecutionPlan && (
+          <button
+            disabled={controller.isActionsDisabled}
+            title={translate('sql_editor_execution_plan_button_tooltip')}
+            onMouseDown={preventFocus}
+            onClick={controller.handleExecutionPlan}
+          >
+            <Icon name="execution-plan" viewBox='0 0 24 24' />
+          </button>
+        )}
       </actions>
       <SQLCodeEditorLoader
         ref={editor}

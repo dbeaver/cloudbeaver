@@ -39,7 +39,6 @@ export interface ISqlEditorResultTab {
 export interface IExecutionPlanTab {
   tabId: string;
   executionContext: IDatabaseExecutionContext;
-  query: string;
   order: number;
   options?: Record<string, any>;
 }
