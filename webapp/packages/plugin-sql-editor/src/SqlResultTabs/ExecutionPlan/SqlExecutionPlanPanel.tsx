@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Split, Pane, ResizerControls, splitStyles } from '@cloudbeaver/core-blocks';
