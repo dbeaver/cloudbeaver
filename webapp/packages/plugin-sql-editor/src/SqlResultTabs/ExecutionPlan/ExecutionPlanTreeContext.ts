@@ -18,7 +18,6 @@ export interface IExecutionPlanTreeContext {
   selectedNodes: Map<string, boolean>;
   readonly columns: ObjectPropertyInfo[];
   readonly nodes: IExecutionPlanNode[];
-  readonly selectedNode: SqlExecutionPlanNode | undefined;
   selectNode: (nodeId: string) => void;
 }
 

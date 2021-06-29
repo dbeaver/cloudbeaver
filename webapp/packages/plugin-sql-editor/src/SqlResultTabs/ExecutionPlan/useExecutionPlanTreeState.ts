@@ -18,17 +18,21 @@ export function isVisibleProperty(property: ObjectPropertyInfo): boolean {
 }
 
 interface IPrivateExecutionPlanTreeState extends IExecutionPlanTreeContext {
-  list: SqlExecutionPlanNode[];
+  nodeList: SqlExecutionPlanNode[];
+  onNodeSelect: (nodeId: string) => void;
 }
 
-export function useExecutionPlanTreeState(list: SqlExecutionPlanNode[]): IExecutionPlanTreeContext {
+export function useExecutionPlanTreeState(
+  nodeList: SqlExecutionPlanNode[], onNodeSelect: (nodeId: string) => void
+): IExecutionPlanTreeContext {
   return useObjectRef<IPrivateExecutionPlanTreeState>({
-    list,
+    nodeList,
+    onNodeSelect,
     selectedNodes: new Map(),
     get columns() {
       const columns: ObjectPropertyInfo[] = [];
 
-      for (const node of this.list) {
+      for (const node of this.nodeList) {
         for (const property of node.properties) {
           if (property.id && isVisibleProperty(property) && !columns.find(column => column.id === property.id)) {
             columns.push(property);
@@ -41,7 +45,7 @@ export function useExecutionPlanTreeState(list: SqlExecutionPlanNode[]): IExecut
     get nodes() {
       const map: Map<string, number> = new Map();
 
-      const tree: IExecutionPlanNode[] = this.list
+      const tree: IExecutionPlanNode[] = this.nodeList
         .map((node, idx) => {
           map.set(node.id, idx);
           return ({ ...node, children: [] });
@@ -60,19 +64,15 @@ export function useExecutionPlanTreeState(list: SqlExecutionPlanNode[]): IExecut
 
       return nodes;
     },
-    get selectedNode(): SqlExecutionPlanNode | undefined {
-      const nodeId = Array.from(this.selectedNodes.keys())[0];
-      return this.list.find(node => node.id === nodeId);
-    },
     selectNode(nodeId: string) {
       this.selectedNodes.clear();
       this.selectedNodes.set(nodeId, true);
+      this.onNodeSelect(nodeId);
     },
-  }, { list }, {
+  }, { nodeList, onNodeSelect }, {
     selectedNodes: observable,
-    list: observable,
+    nodeList: observable,
     columns: computed,
     nodes: computed,
-    selectedNode: computed,
   }, ['selectNode']);
 }

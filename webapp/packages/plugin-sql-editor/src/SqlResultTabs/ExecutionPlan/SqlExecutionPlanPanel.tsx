@@ -7,22 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Split, Pane, ResizerControls, splitStyles, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Split, Pane, ResizerControls, splitStyles } from '@cloudbeaver/core-blocks';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
-import { ExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
-import { PropertiesPanel } from './PropertiesPanel';
+import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService';
-import { useExecutionPlanTreeState } from './useExecutionPlanTreeState';
 
 const styles = composes(
   css`
@@ -48,50 +45,36 @@ export const SqlExecutionPlanPanel: React.FC<Props> = observer(function SqlExecu
   executionPlanTab,
 }) {
   const style = useStyles(styles, splitStyles);
-  const translate = useTranslate();
-  const tabId = executionPlanTab.tabId;
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
-  const executionPlan = sqlExecutionPlanService.results.get(tabId);
-  const process = sqlExecutionPlanService.processes.get(tabId);
+  const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  const executionPlanState = useExecutionPlanTreeState(executionPlan?.nodes || []);
-  const loading = process?.isInProgress || !executionPlan;
-  const canCancel = process?.getState() === EDeferredState.PENDING ?? false;
-
-  const cancelTask = useCallback(() => {
-    if (process) {
-      process.cancel();
-    }
-  }, [process]);
-
-  if (loading) {
+  if (data?.process.isInProgress || !data?.executionPlan) {
     return (
       <Loader
-        cancelDisabled={!canCancel}
-        onCancel={cancelTask}
+        cancelDisabled={data?.process.getState() !== EDeferredState.PENDING}
+        onCancel={() => data?.process.cancel()}
       />
     );
   }
 
-  if (!executionPlanState.nodes.length || !executionPlanState.columns.length) {
-    return <TextPlaceholder>{translate('sql_execution_plan_placeholder')}</TextPlaceholder>;
-  }
-
   return styled(style)(
-    <ExecutionPlanTreeContext.Provider value={executionPlanState}>
-      <Split mode={executionPlanState.selectedNode ? undefined : 'minimize'} sticky={30}>
-        <Pane>
-          <ExecutionPlanTreeBlock query={executionPlanTab.query} />
-        </Pane>
-        {executionPlanState.selectedNode && (
-          <>
-            <ResizerControls />
-            <Pane main>
-              <PropertiesPanel properties={executionPlanState.selectedNode.properties} />
-            </Pane>
-          </>
-        )}
-      </Split>
-    </ExecutionPlanTreeContext.Provider>
+    <Split mode={selectedNode ? undefined : 'minimize'} sticky={30}>
+      <Pane>
+        <ExecutionPlanTreeBlock
+          nodeList={data.executionPlan.nodes}
+          query={data.executionPlan.query}
+          onNodeSelect={setSelectedNode}
+        />
+      </Pane>
+      {selectedNode && (
+        <>
+          <ResizerControls />
+          <Pane main>
+            <PropertiesPanel selectedNode={selectedNode} nodeList={data.executionPlan.nodes} />
+          </Pane>
+        </>
+      )}
+    </Split>
   );
 });

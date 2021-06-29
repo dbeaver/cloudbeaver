@@ -18,10 +18,14 @@ import { SqlDialectInfoService } from '../../SqlDialectInfoService';
 import type { SqlExecutionState } from '../../SqlExecutionState';
 import { SQLExecutionPlanProcess } from './SQLExecutionPlanProcess';
 
+interface IExecutionPlanData {
+  process: SQLExecutionPlanProcess;
+  executionPlan: SqlExecutionPlan | null;
+}
+
 @injectable()
 export class SqlExecutionPlanService {
-  results: Map<string, SqlExecutionPlan>;
-  processes: Map<string, SQLExecutionPlanProcess>;
+  data: Map<string, IExecutionPlanData>;
 
   constructor(
     private sqlDialectInfoService: SqlDialectInfoService,
@@ -29,11 +33,9 @@ export class SqlExecutionPlanService {
     private notificationService: NotificationService,
   ) {
     makeObservable(this, {
-      results: observable,
-      processes: observable,
+      data: observable,
     });
-    this.results = new Map();
-    this.processes = new Map();
+    this.data = new Map();
   }
 
   async executeExecutionPlan(
@@ -46,12 +48,15 @@ export class SqlExecutionPlanService {
       return;
     }
 
-    const tabId = this.createExecutionPlanTab(editorState, query);
+    const tabId = this.createExecutionPlanTab(editorState);
     const subQuery = await this.getSubQuery(editorState.executionContext.connectionId, query);
     const task = new SQLExecutionPlanProcess(this.graphQLService, this.notificationService);
+    this.data.set(tabId, {
+      process: task,
+      executionPlan: null,
+    });
 
     try {
-      this.processes.set(tabId, task);
       executionState.setExecutionTask(task);
       editorState.currentTabId = tabId;
 
@@ -64,7 +69,10 @@ export class SqlExecutionPlanService {
       );
 
       const executionPlan = await task.promise;
-      this.results.set(tabId, executionPlan);
+      this.data.set(tabId, {
+        process: task,
+        executionPlan,
+      });
     } catch (exception) {
       const message = task.getState() === EDeferredState.CANCELLED ? 'Execution plan process has been canceled' : undefined;
       this.notificationService.logException(exception, 'Execution plan Error', message);
@@ -103,14 +111,10 @@ export class SqlExecutionPlanService {
       state.executionPlanTabs.splice(state.executionPlanTabs.indexOf(executionPlanTab), 1);
     }
 
-    this.results.delete(tabId);
-    this.processes.delete(tabId);
+    this.data.delete(tabId);
   }
 
-  private createExecutionPlanTab(
-    state: ISqlEditorTabState,
-    query: string,
-  ) {
+  private createExecutionPlanTab(state: ISqlEditorTabState) {
     if (!state.executionContext) {
       throw new Error('ExecutionContext is not provided');
     }
@@ -125,7 +129,6 @@ export class SqlExecutionPlanService {
         connectionId: state.executionContext.connectionId,
         contextId: state.executionContext.contextId,
       },
-      query,
       order: nameOrder,
     });
 
