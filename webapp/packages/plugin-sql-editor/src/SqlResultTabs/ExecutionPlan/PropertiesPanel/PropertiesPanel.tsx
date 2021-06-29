@@ -17,7 +17,7 @@ import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import { isVisibleProperty } from '../useExecutionPlanTreeState';
-import { PropertiesPanelItem } from './PropertiesPanelItem';
+import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup';
 
 const styles = composes(
   css`
@@ -83,8 +83,8 @@ export const PropertiesPanel: React.FC<Props> = observer(function PropertiesPane
         </TableColumnHeader>
       </TableHeader>
       <TableBody>
-        <PropertiesPanelItem properties={general} rootTitle={translate('sql_execution_plan_properties_panel_general')} />
-        <PropertiesPanelItem properties={details} rootTitle={translate('sql_execution_plan_properties_panel_details')} />
+        {general.length && <PropertiesPanelItemsGroup properties={general} name={translate('sql_execution_plan_properties_panel_general')} />}
+        {details.length && <PropertiesPanelItemsGroup properties={details} name={translate('sql_execution_plan_properties_panel_details')} />}
       </TableBody>
     </Table>
   );

@@ -34,21 +34,21 @@ const styles = css`
 
 interface Props {
   properties: ObjectPropertyInfo[];
-  rootTitle: string;
+  name: string;
 }
 
-export const PropertiesPanelItem: React.FC<Props> = function PropertiesPanelItem({ properties, rootTitle }) {
+export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPanelItemsGroup({ properties, name }) {
   const [expanded, setExpanded] = useState(true);
 
   return styled(styles)(
     <>
-      <TableItem item={`${rootTitle}_root`} selectDisabled>
-        <TableColumnValue title={rootTitle}>
+      <TableItem item={`${name}_root`} selectDisabled>
+        <TableColumnValue title={name}>
           <control>
             <expand-container>
               <Expand expanded={expanded} onClick={() => setExpanded(!expanded)} />
             </expand-container>
-            {rootTitle}
+            {name}
           </control>
         </TableColumnValue>
         <TableColumnValue />

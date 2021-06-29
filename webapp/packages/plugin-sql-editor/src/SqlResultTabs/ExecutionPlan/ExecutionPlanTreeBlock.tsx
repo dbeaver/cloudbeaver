@@ -64,15 +64,15 @@ export const ExecutionPlanTreeBlock: React.FC<Props> = observer(function Executi
 }) {
   const style = useStyles(styles, splitStyles);
   const translate = useTranslate();
-  const { columns, nodes, selectedNodes, selectNode } = useExecutionPlanTreeState(nodeList, onNodeSelect);
+  const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
   return styled(style)(
     <Split className={className} sticky={30} split='horizontal' keepRatio>
       <Pane>
-        {nodes.length && columns.length ? (
-          <Table selectedItems={selectedNodes} onSelect={selectNode}>
+        {state.nodes.length && state.columns.length ? (
+          <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
             <TableHeader>
-              {columns.map(property => {
+              {state.columns.map(property => {
                 const name = property.displayName;
                 const columnTooltip = `${name} ${property.description ? '(' + property.description + ')' : ''}`;
                 return (
@@ -83,10 +83,10 @@ export const ExecutionPlanTreeBlock: React.FC<Props> = observer(function Executi
               })}
             </TableHeader>
             <TableBody>
-              {nodes.map(node => (
+              {state.nodes.map(node => (
                 <NestedNode
                   key={node.id}
-                  columns={columns}
+                  columns={state.columns}
                   node={node}
                   depth={0}
                 />
