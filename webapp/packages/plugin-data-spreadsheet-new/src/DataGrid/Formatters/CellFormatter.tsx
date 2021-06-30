@@ -14,12 +14,17 @@ import styled from 'reshadow';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { IDataPresentationActions, IResultSetElementKey, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../Editing/EditingContext';
+import { EditingContext, IEditingContext } from '../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
 import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
-import { TableDataContext } from '../TableDataContext';
+import { ITableData, TableDataContext } from '../TableDataContext';
 import { CellMenu } from './Menu/CellMenu';
+
+interface ISpreadsheetActionsPrivate<TKey> extends IDataPresentationActions<TKey>{
+  tableDataContext: ITableData | null;
+  editingContext: IEditingContext | null;
+}
 
 function getClasses(rawValue: any) {
   const classes = [];
@@ -41,19 +46,21 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
   const [menuVisible, setMenuVisible] = useState(false);
   const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
+  const spreadsheetActions = useObjectRef<ISpreadsheetActionsPrivate<IResultSetElementKey>>({
+    tableDataContext,
+    editingContext,
     edit(position) {
       if (position.column === undefined || position.row === undefined) {
         return;
       }
 
-      const idx = tableDataContext?.getColumnIndexFromKey(position.column);
+      const idx = this.tableDataContext?.getColumnIndexFromKey(position.column);
 
       if (idx !== undefined && idx !== null) {
-        editingContext?.edit({ idx, rowIdx: position.row });
+        this.editingContext?.edit({ idx, rowIdx: position.row });
       }
     },
-  });
+  }, { tableDataContext, editingContext });
 
   const handleClose = useCallback(() => {
     editingContext?.closeEditor({ idx: column.idx, rowIdx });
