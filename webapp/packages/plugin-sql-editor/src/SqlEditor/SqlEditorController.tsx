@@ -24,6 +24,8 @@ import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecu
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
+const closeCharacters = /[\s()[\]{};:>,]/;
+
 @injectable()
 export class SqlEditorController implements IInitializableController {
   get dialect(): SqlDialectInfo | undefined {
@@ -154,7 +156,7 @@ export class SqlEditorController implements IInitializableController {
     this.editor.showHint({
       completeSingle: !this.activeSuggest,
       updateOnCursorActivity: !this.activeSuggest,
-      closeCharacters: /[()[]{};:>,]/,
+      closeCharacters,
       hint,
     });
   }
@@ -241,6 +243,18 @@ export class SqlEditorController implements IInitializableController {
 
     editor.on('cursorActivity', () => {
       if (this.activeSuggest) {
+        const cursor = editor.getCursor('from');
+
+        if (cursor.ch) {
+          const line = editor.getLine(cursor.line);
+          const lastChar = line.charAt(cursor.ch - 1);
+
+          if (closeCharacters.test(lastChar)) {
+            editor.closeHint();
+            return;
+          }
+        }
+
         this.showHint();
       }
     });
