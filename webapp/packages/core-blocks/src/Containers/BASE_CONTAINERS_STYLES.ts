@@ -93,6 +93,7 @@ export const BASE_CONTAINERS_STYLES = composes(
       &[keepSize], & > [keepSize] {
         flex-grow: 0;
         flex-basis: 0;
+        flex-basis: auto; /* test for layout */
       }
 
       &[tiny], & > [tiny] {
