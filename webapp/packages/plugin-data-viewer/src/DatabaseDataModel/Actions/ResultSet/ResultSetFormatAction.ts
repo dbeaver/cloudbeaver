@@ -23,16 +23,6 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = ResultDataFormat.Resultset;
 
-  isRequired(key: IResultSetElementKey): boolean {
-    const data = this.getAction(ResultSetDataAction);
-
-    if (key.column !== undefined) {
-      return data.getColumn(key.column)?.required || false;
-    }
-
-    return false;
-  }
-
   isReadOnly(key: IResultSetElementKey): boolean {
     let columnReadonly = false;
     let cellReadonly = false;

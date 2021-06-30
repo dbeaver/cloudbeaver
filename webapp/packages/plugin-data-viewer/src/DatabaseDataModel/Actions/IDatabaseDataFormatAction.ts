@@ -11,7 +11,6 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
 export interface IDatabaseDataFormatAction<TKey, TResult extends IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  isRequired: (key: TKey) => boolean;
   isReadOnly: (key: TKey) => boolean;
   get: (value: any) => any;
   getText: (value: any) => string | null;
