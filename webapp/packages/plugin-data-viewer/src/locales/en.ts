@@ -1,5 +1,10 @@
 export default [
   ['table_header_sql_expression', 'Enter a SQL expression to filter results'],
+  ['data_viewer_tab_title', 'Data'],
+  ['data_viewer_value_edit', 'Edit'],
+  ['data_viewer_value_apply', 'Apply'],
+  ['data_viewer_value_revert', 'Revert'],
+  ['data_viewer_value_revert_title', 'Revert unsaved changes'],
   ['data_viewer_nodata_message', 'No data to show'],
   ['data_viewer_statistics_status', 'Status:'],
   ['data_viewer_statistics_duration', 'Duration:'],

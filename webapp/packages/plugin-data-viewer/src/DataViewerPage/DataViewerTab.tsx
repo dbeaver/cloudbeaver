@@ -12,6 +12,7 @@ import styled from 'reshadow';
 import { NavNodeManagerService } from '@cloudbeaver/core-app';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { Translate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { ObjectPageTabProps } from '@cloudbeaver/plugin-object-viewer';
 
@@ -29,8 +30,8 @@ export const DataViewerTab = observer(function DataViewerTab({
 
   return styled(styles)(
     <Tab tabId={page.key} style={style} onOpen={onSelect}>
-      <TabIcon icon='/icons/grid.png' />
-      <TabTitle>Data</TabTitle>
+      <TabIcon icon='table-icon' />
+      <TabTitle><Translate token='data_viewer_tab_title' /></TabTitle>
     </Tab>
   );
 });

@@ -38,7 +38,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       getPresentationComponent: () => SpreadsheetGrid,
       hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
       title: 'Table',
-      icon: '/icons/grid.png',
+      icon: 'table-icon',
     });
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();

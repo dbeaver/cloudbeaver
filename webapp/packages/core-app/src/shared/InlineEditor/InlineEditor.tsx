@@ -40,7 +40,7 @@ export interface InlineEditorProps {
   onChange: (value: string) => void;
   onSave: () => void;
   onReject?: () => void;
-  onUndo: () => void;
+  onUndo?: () => void;
   className?: string;
 }
 

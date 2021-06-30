@@ -60,8 +60,9 @@ export class TableFooterMenuService {
         return !editor.isEdited();
       },
       order: 2,
-      title: 'ui_processing_cancel',
-      icon: 'table-cancel',
+      title: 'data_viewer_value_revert',
+      tooltip: 'data_viewer_value_revert_title',
+      icon: 'table-revert',
       onClick: context => {
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
         editor.cancelChanges();

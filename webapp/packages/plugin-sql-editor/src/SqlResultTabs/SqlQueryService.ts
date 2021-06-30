@@ -232,7 +232,7 @@ export class SqlQueryService {
     state.tabs.push({
       id,
       name: this.getTabNameForOrder(group.nameOrder, indexInResultSet, results),
-      icon: '/icons/grid.png',
+      icon: 'table-icon',
       order: group.order,
     });
   }
