@@ -174,7 +174,8 @@ extend type Query {
         contextId: ID!,
         query: String!,
         position: Int!,
-        maxResults: Int
+        maxResults: Int,
+        simpleMode: Boolean
     ): [ SQLCompletionProposal ]
 
     sqlSupportedOperations(

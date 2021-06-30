@@ -38,7 +38,12 @@ public interface DBWServiceSQL extends DBWService {
     WebSQLDialectInfo getDialectInfo(@NotNull WebSQLProcessor processor) throws DBWebException;
 
     @WebAction
-    WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException;
+    WebSQLCompletionProposal[] getCompletionProposals(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String query,
+        Integer position,
+        Integer maxResults,
+        Boolean simpleMode) throws DBWebException;
 
     @WebAction
     DBCLogicalOperator[] getSupportedOperations(

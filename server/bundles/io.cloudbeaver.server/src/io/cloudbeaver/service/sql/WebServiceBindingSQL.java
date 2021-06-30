@@ -56,7 +56,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getSQLContext(env),
                     env.getArgument("query"),
                     env.getArgument("position"),
-                    env.getArgument("maxResults")
+                    env.getArgument("maxResults"),
+                    env.getArgument("simpleMode")
                 )
             )
             .dataFetcher("sqlSupportedOperations", env ->

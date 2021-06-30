@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -59,7 +60,13 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    public WebSQLCompletionProposal[] getCompletionProposals(@NotNull WebSQLContextInfo sqlContext, @NotNull String query, Integer position, Integer maxResults) throws DBWebException {
+    public WebSQLCompletionProposal[] getCompletionProposals(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String query,
+        Integer position,
+        Integer maxResults,
+        Boolean simpleMode) throws DBWebException
+    {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
             Document document = new Document();
@@ -70,7 +77,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 document,
                 position == null ? 0 : position,
                 activeQuery,
-                false
+                CommonUtils.getBoolean(simpleMode, false)
             );
             SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
             analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
