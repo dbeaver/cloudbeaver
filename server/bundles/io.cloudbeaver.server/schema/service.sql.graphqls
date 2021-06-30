@@ -82,6 +82,8 @@ type SQLResultColumn {
     scale: Int
     precision: Int
 
+    required: Boolean!
+
     readOnly: Boolean!
     readOnlyStatus: String
 

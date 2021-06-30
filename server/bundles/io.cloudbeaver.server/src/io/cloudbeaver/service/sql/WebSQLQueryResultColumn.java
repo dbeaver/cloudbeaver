@@ -101,6 +101,11 @@ public class WebSQLQueryResultColumn {
     }
 
     @Property
+    public boolean isRequired() {
+        return attrMeta.isRequired();
+    }
+
+    @Property
     public boolean isReadOnly() {
         return DBExecUtils.isAttributeReadOnly(attrMeta);
     }
