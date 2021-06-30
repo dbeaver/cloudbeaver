@@ -24,7 +24,11 @@ export class SettingsSource implements ISettingsSource {
     return this.store.get(key);
   }
 
-  setValue(key: string, value: any) {
+  setValue(key: string, value: any): void {
     this.store.set(key, value);
+  }
+
+  clear(): void {
+    this.store.clear();
   }
 }

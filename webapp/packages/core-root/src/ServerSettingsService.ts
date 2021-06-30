@@ -18,8 +18,4 @@ export class ServerSettingsService extends SettingsSource {
   setSelfValue(key: string, value: string): void {
     super.setValue(key, value);
   }
-
-  clear(): void {
-    this.store.clear();
-  }
 }
