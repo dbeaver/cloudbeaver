@@ -7,7 +7,7 @@
  */
 
 import type {
-  EditorConfiguration, Editor, EditorChange, Position, AsyncHintFunction
+  EditorConfiguration, Editor, EditorChange, Position, Hints, HintFunction
 } from 'codemirror';
 import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -15,6 +15,7 @@ import type { IControlledCodeMirror } from 'react-codemirror2';
 import type { ITab } from '@cloudbeaver/core-app';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
@@ -35,6 +36,67 @@ export class SqlEditorController implements IInitializableController {
 
   get isActionsDisabled(): boolean {
     return this.sqlResultTabsService.getTabExecutionContext(this.tab.id).isExecuting;
+  }
+
+  get value(): string {
+    return this.tab.handlerState.query;
+  }
+
+  get activeSuggest(): boolean {
+    return true;
+  }
+
+  readonly options: EditorConfiguration = {
+    theme: 'material',
+    lineNumbers: true,
+    indentWithTabs: true,
+    smartIndent: true,
+    autofocus: true,
+    lineWrapping: true,
+    showHint: true,
+    extraKeys: {
+      // Execute sql script
+      'Ctrl-Enter': () => { this.handleExecute(); },
+      // Execute sql script in new tab
+      'Ctrl-\\': () => { this.handleExecuteNewTab(); },
+      'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
+      'Shift-Ctrl-E': () => { this.handleExecutionPlan(); },
+
+      // Autocomplete
+      'Ctrl-Space': () => { this.showHint(); }, // classic for windows, linux
+      'Shift-Ctrl-Space': () => { this.showHint(); },
+      'Alt-Space': () => { this.showHint(); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
+    },
+  };
+
+  readonly bindings: Omit<IControlledCodeMirror, 'value'> = {
+    options: this.options,
+    onBeforeChange: this.handleQueryChange.bind(this),
+    editorDidMount: this.handleEditorConfigure.bind(this),
+  };
+
+  private tab!: ITab<ISqlEditorTabState>;
+  private editor?: Editor;
+
+  constructor(
+    private sqlResultTabsService: SqlResultTabsService,
+    private sqlQueryService: SqlQueryService,
+    private sqlDialectInfoService: SqlDialectInfoService,
+    private sqlEditorService: SqlEditorService,
+    private sqlExecutionPlanService: SqlExecutionPlanService,
+  ) {
+    this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
+    this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 30);
+    makeObservable(this, {
+      dialect: computed,
+      isActionsDisabled: computed,
+      value: computed,
+    });
+  }
+
+  init(tab: ITab<ISqlEditorTabState>): void {
+    this.tab = tab;
+    this.loadDialect();
   }
 
   handleExecute = async (): Promise<void> => {
@@ -72,66 +134,28 @@ export class SqlEditorController implements IInitializableController {
     );
   };
 
-  readonly options: EditorConfiguration = {
-    theme: 'material',
-    lineNumbers: true,
-    indentWithTabs: true,
-    smartIndent: true,
-    // matchBrackets: true, unknown property?
-    autofocus: true,
-    lineWrapping: true,
-    showHint: true,
-    extraKeys: {
-      // Execute sql script
-      'Ctrl-Enter': () => { this.handleExecute(); },
-      // Execute sql script in new tab
-      'Ctrl-\\': () => { this.handleExecuteNewTab(); },
-      'Shift-Ctrl-Enter': () => { this.handleExecuteNewTab(); },
-      'Shift-Ctrl-E': () => { this.handleExecutionPlan(); },
+  private async showHint() {
+    if (!this.editor) {
+      return;
+    }
 
-      // Autocomplete
-      'Ctrl-Space': this.showHint.bind(this), // classic for windows, linux
-      'Shift-Ctrl-Space': this.showHint.bind(this),
-      'Alt-Space': this.showHint.bind(this), // workaround for binded 'Ctrl-Space' by input switch in macOS
-    },
-  };
+    if (this.editor.state.completionActive) {
+      (this.editor.state.completionActive).update();
+      return;
+    }
 
-  readonly bindings: Omit<IControlledCodeMirror, 'value'> = {
-    options: this.options,
-    onBeforeChange: this.handleQueryChange.bind(this),
-    editorDidMount: this.handleEditorConfigure.bind(this),
-  };
+    let hint: HintFunction | undefined = this.getHandleAutocomplete;
 
-  get value(): string {
-    return this.tab.handlerState.query;
-  }
+    if (!this.tab.handlerState.executionContext) {
+      await import('codemirror/addon/hint/sql-hint');
+      hint = undefined;
+    }
 
-  private tab!: ITab<ISqlEditorTabState>;
-  private editor?: Editor;
-
-  constructor(
-    private sqlResultTabsService: SqlResultTabsService,
-    private sqlQueryService: SqlQueryService,
-    private sqlDialectInfoService: SqlDialectInfoService,
-    private sqlEditorService: SqlEditorService,
-    private sqlExecutionPlanService: SqlExecutionPlanService,
-  ) {
-    makeObservable(this, {
-      dialect: computed,
-      isActionsDisabled: computed,
-      value: computed,
-    });
-  }
-
-  init(tab: ITab<ISqlEditorTabState>) {
-    this.tab = tab;
-    this.loadDialect();
-  }
-
-  private showHint(editor: Editor) {
-    editor.showHint({
-      completeSingle: true,
-      hint: this.getHandleAutocomplete(),
+    this.editor.showHint({
+      completeSingle: !this.activeSuggest,
+      updateOnCursorActivity: !this.activeSuggest,
+      closeCharacters: /[()[]{};:>,]/,
+      hint,
     });
   }
 
@@ -154,6 +178,7 @@ export class SqlEditorController implements IInitializableController {
 
     const delimiters = [];
     const dialect = await this.loadDialect();
+
     if (dialect?.scriptDelimiter) {
       delimiters.push(dialect.scriptDelimiter);
     }
@@ -174,46 +199,51 @@ export class SqlEditorController implements IInitializableController {
     return this.editor.getRange({ line: begin, ch: 0 }, { line: end, ch: this.editor.getLine(end).length });
   }
 
-  private getHandleAutocomplete(): AsyncHintFunction {
-    const handleAutocomplete: AsyncHintFunction = async (editor, callback) => {
-      if (!this.tab.handlerState.executionContext) {
-        const { hint } = await import('codemirror/addon/hint/sql-hint' as any);
+  private async getHandleAutocomplete(editor: Editor): Promise<Hints | undefined> {
+    if (!this.tab.handlerState.executionContext) {
+      return;
+    }
 
-        this.editor?.showHint({ hint }); // we show default sql-hint
-        return;
-      }
-      const cursor = editor.getCursor('from');
-      const cursorPosition = getAbsolutePosition(editor, cursor);
-      const [from, to] = getWordRange(editor, cursor);
+    const cursor = editor.getCursor('from');
+    const cursorPosition = getAbsolutePosition(editor, cursor);
+    const [from, to, word] = getWordRange(editor, cursor);
 
-      const proposals = await this.sqlEditorService
-        .getAutocomplete(
-          this.tab.handlerState.executionContext.connectionId,
-          this.tab.handlerState.executionContext.contextId,
-          this.tab.handlerState.query,
-          cursorPosition
-        );
+    let proposals = await this.sqlEditorService
+      .getAutocomplete(
+        this.tab.handlerState.executionContext.connectionId,
+        this.tab.handlerState.executionContext.contextId,
+        this.tab.handlerState.query,
+        cursorPosition,
+        undefined,
+        this.activeSuggest
+      );
 
-      if (!proposals) {
-        return;
-      }
+    proposals = proposals?.filter(
+      ({ displayString }) => displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+    );
 
-      callback({
-        from,
-        to,
-        list: proposals.map(({ displayString, replacementString }) => ({
-          text: replacementString || '', displayText: displayString || '',
-        })),
-      });
+    if (!proposals || proposals.length === 0) {
+      return;
+    }
+
+    return {
+      from,
+      to,
+      list: proposals.map(({ displayString, replacementString }) => ({
+        text: replacementString,
+        displayText: displayString,
+      })),
     };
-    // tell CodeMirror that it is async func
-    handleAutocomplete.async = true;
-
-    return handleAutocomplete;
   }
 
   private handleEditorConfigure(editor: Editor) {
     this.editor = editor;
+
+    editor.on('cursorActivity', () => {
+      if (this.activeSuggest) {
+        this.showHint();
+      }
+    });
   }
 
   private findQueryBegin(editor: Editor, delimiters: string[], position: number) {
@@ -258,7 +288,7 @@ function getAbsolutePosition(editor: Editor, position: Position) {
   return editor.getRange({ line: 0, ch: 0 }, position).length;
 }
 
-function getWordRange(editor: Editor, position: Position) {
+function getWordRange(editor: Editor, position: Position): [Position, Position, string] {
   const line = editor.getLine(position.line);
 
   const leftSubstr = line.substr(0, position.ch);
@@ -266,14 +296,17 @@ function getWordRange(editor: Editor, position: Position) {
   const leftWord = /[*\w]+$/.exec(leftSubstr) || [''];
   const rightWord = /^[*\w]+/.exec(rightSubstr) || [''];
 
+  const leftWordPart = leftWord[0];
+  const rightWordPart = rightWord[0];
+
   const from = {
     ...position,
-    ch: position.ch - leftWord[0].length,
+    ch: position.ch - leftWordPart.length,
   };
   const to = {
     ...position,
-    ch: position.ch + rightWord[0].length,
+    ch: position.ch + rightWordPart.length,
   };
 
-  return [from, to];
+  return [from, to, leftWordPart + rightWordPart];
 }

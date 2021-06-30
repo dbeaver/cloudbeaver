@@ -72,18 +72,18 @@ export class SQLCodeEditorController {
     this.dialect = dialect;
 
     if (this.editor) {
-      let keywords: Record<string, boolean> | undefined;
-      let builtin: Record<string, boolean> | undefined;
+      let keywords: string[] | undefined;
+      let builtin: string[] | undefined;
 
       if (this.dialect?.dataTypes) {
-        keywords = this.arrayToMap(this.dialect.dataTypes.map(v => v.toLowerCase()));
+        keywords = this.dialect.dataTypes.map(v => v.toLowerCase());
       }
 
       if (this.dialect?.functions || this.dialect?.reservedWords) {
-        builtin = this.arrayToMap([
+        builtin = [
           ...(this.dialect.functions || []),
           ...(this.dialect.reservedWords || []),
-        ].map(v => v.toLowerCase()));
+        ].map(v => v.toLowerCase());
       }
 
       if (this.bindings.options) {
@@ -91,9 +91,9 @@ export class SQLCodeEditorController {
 
         if (this.dialect) {
           this.bindings.options.mode = {
-            name: name || COMMON_EDITOR_CONFIGURATION.mode,
-            keywords,
-            builtin,
+            name: name || COMMON_EDITOR_CONFIGURATION.mode as string,
+            extra_keywords: keywords,
+            extra_builtins: builtin,
           };
         } else {
           this.bindings.options.mode = name || COMMON_EDITOR_CONFIGURATION.mode;
@@ -108,12 +108,5 @@ export class SQLCodeEditorController {
 
   private handleConfigure(editor: Editor) {
     this.editor = editor;
-  }
-
-  private arrayToMap(array: string[]): { [key: string]: boolean } {
-    return array.reduce((obj, value) => ({
-      ...obj,
-      [value]: true,
-    }), {});
   }
 }

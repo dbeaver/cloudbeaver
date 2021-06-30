@@ -30,13 +30,17 @@ export class SqlEditorService {
     connectionId: string,
     contextId: string,
     query: string,
-    cursor: number
+    cursor: number,
+    maxResults?: number,
+    simple?: boolean,
   ): Promise<QuerySqlCompletionProposalsQuery['sqlCompletionProposals'] | null> {
     const result = await this.gql.sdk.querySqlCompletionProposals({
       connectionId,
       contextId,
       query,
       position: cursor,
+      maxResults,
+      simple,
     });
 
     return result.sqlCompletionProposals;
