@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed } from 'mobx';
 import { observer, useObserver } from 'mobx-react-lite';
 import {
-  forwardRef, Ref, useCallback, useEffect
+  forwardRef, Ref, useCallback, useEffect, useMemo
 } from 'react';
 import {
   MenuButton,
@@ -119,6 +120,14 @@ const MenuPanelElement = observer(function MenuPanelElement({
       onItemClose?.();
     }
   }, [item, menu, onItemClose]);
+
+  const hidden = useMemo(() => computed(
+    () => item.panel?.menuItems.every(item => item.isHidden)
+  ), [item.panel]);
+
+  if (hidden.get()) {
+    return null;
+  }
 
   if (item.panel) {
     return styled(styles)(

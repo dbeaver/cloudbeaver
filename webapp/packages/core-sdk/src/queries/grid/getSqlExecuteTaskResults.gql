@@ -24,6 +24,7 @@ mutation getSqlExecuteTaskResults(
                     name
                     position
                     precision
+                    required
                     readOnly
                     readOnlyStatus
                     scale
