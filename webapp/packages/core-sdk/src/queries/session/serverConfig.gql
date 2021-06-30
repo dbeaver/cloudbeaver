@@ -4,6 +4,7 @@ query serverConfig {
     version
     workspaceId
     serverURL
+    rootURI
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

@@ -3,14 +3,16 @@ query querySqlCompletionProposals(
     $contextId: ID!
     $position: Int!
     $query: String!
+    $simple: Boolean
     $maxResults: Int
 ) {
     sqlCompletionProposals(
         connectionId: $connectionId
         contextId: $contextId
-        maxResults: $maxResults
-        position: $position
         query: $query
+        position: $position
+        maxResults: $maxResults
+        simpleMode: $simple
     ) {
         cursorPosition
         displayString

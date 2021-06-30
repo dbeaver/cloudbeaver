@@ -247,6 +247,7 @@ export interface QuerySqlCompletionProposalsArgs {
   query: Scalars['String'];
   position: Scalars['Int'];
   maxResults?: Maybe<Scalars['Int']>;
+  simpleMode?: Maybe<Scalars['Boolean']>;
 }
 
 export interface QuerySqlDialectInfoArgs {
@@ -517,6 +518,7 @@ export interface ServerConfig {
   version: Scalars['String'];
   workspaceId: Scalars['ID'];
   serverURL: Scalars['String'];
+  rootURI: Scalars['String'];
   anonymousAccessEnabled?: Maybe<Scalars['Boolean']>;
   /** @deprecated Field no longer supported */
   authenticationEnabled?: Maybe<Scalars['Boolean']>;
@@ -1631,6 +1633,7 @@ export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   contextId: Scalars['ID'];
   position: Scalars['Int'];
   query: Scalars['String'];
+  simple?: Maybe<Scalars['Boolean']>;
   maxResults?: Maybe<Scalars['Int']>;
 }>;
 
@@ -1675,7 +1678,7 @@ export type ServerConfigQueryVariables = Exact<{ [key: string]: never }>;
 
 export interface ServerConfigQuery {
   serverConfig: (
-    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
+    Pick<ServerConfig, 'name' | 'version' | 'workspaceId' | 'serverURL' | 'rootURI' | 'productConfiguration' | 'supportsCustomConnections' | 'supportsConnectionBrowser' | 'supportsWorkspaces' | 'sessionExpireTime' | 'anonymousAccessEnabled' | 'adminCredentialsSaveEnabled' | 'publicCredentialsSaveEnabled' | 'licenseRequired' | 'licenseValid' | 'configurationMode' | 'developmentMode' | 'enabledAuthProviders'>
     & { supportedLanguages: Array<Pick<ServerLanguage, 'isoCode' | 'displayName' | 'nativeName'>>; defaultNavigatorSettings: AllNavigatorSettingsFragment; productInfo: Pick<ProductInfo, 'id' | 'version' | 'name' | 'description' | 'buildTime' | 'releaseTime' | 'licenseInfo'> }
   );
 }
@@ -2594,13 +2597,14 @@ export const NavRefreshNodeDocument = `
 }
     `;
 export const QuerySqlCompletionProposalsDocument = `
-    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $maxResults: Int) {
+    query querySqlCompletionProposals($connectionId: ID!, $contextId: ID!, $position: Int!, $query: String!, $simple: Boolean, $maxResults: Int) {
   sqlCompletionProposals(
     connectionId: $connectionId
     contextId: $contextId
-    maxResults: $maxResults
-    position: $position
     query: $query
+    position: $position
+    maxResults: $maxResults
+    simpleMode: $simple
   ) {
     cursorPosition
     displayString
@@ -2670,6 +2674,7 @@ export const ServerConfigDocument = `
     version
     workspaceId
     serverURL
+    rootURI
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
