@@ -1,8 +1,12 @@
+export * from './Promises/CancellablePromise';
+export * from './Promises/deferPromise';
+export * from './Promises/Deferred';
+export * from './Promises/PromiseCancelledError';
+export * from './Promises/PromiseExecutor';
+
+export * from './copyToClipboard';
+export * from './declensionOfNumber';
 export * from './flat';
-export * from './MetadataMap';
-export * from './OrderedMap';
-export * from './parseJSONFlat';
-export * from './uuid_';
 export * from './generateFileName';
 export * from './getMIME';
 export * from './GlobalConstants';
@@ -10,13 +14,10 @@ export * from './isArraysEqual';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';
 export * from './md5';
-export * from './TextTools';
-export * from './copyToClipboard';
-export * from './declensionOfNumber';
+export * from './MetadataMap';
+export * from './OrderedMap';
+export * from './parseJSONFlat';
 export * from './replaceMiddle';
-
-export * from './Promises/CancellablePromise';
-export * from './Promises/Deferred';
-export * from './Promises/deferPromise';
-export * from './Promises/PromiseExecutor';
-export * from './Promises/PromiseCancelledError';
+export * from './TextTools';
+export * from './throttle';
+export * from './uuid_';
