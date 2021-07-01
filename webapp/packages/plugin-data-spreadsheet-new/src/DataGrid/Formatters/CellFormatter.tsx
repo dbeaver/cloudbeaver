@@ -11,12 +11,14 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled from 'reshadow';
 
-import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { IDataPresentationActions, IResultSetElementKey, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
 import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
+import { TableDataContext } from '../TableDataContext';
 import { CellMenu } from './Menu/CellMenu';
 
 function getClasses(rawValue: any) {
@@ -31,12 +33,27 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
   const editorRef = useRef<IEditorRef>(null);
   const cellContext = useContext(CellContext);
   const context = useContext(DataGridContext);
+  const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
   const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
   const classes = getClasses(rawValue);
   const [menuVisible, setMenuVisible] = useState(false);
   const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
+
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
+    edit(position) {
+      if (position.column === undefined || position.row === undefined) {
+        return;
+      }
+
+      const idx = tableDataContext?.getColumnIndexFromKey(position.column);
+
+      if (idx !== undefined && idx !== null) {
+        editingContext?.edit({ idx, rowIdx: position.row });
+      }
+    },
+  });
 
   const handleClose = useCallback(() => {
     editingContext?.closeEditor({ idx: column.idx, rowIdx });
@@ -73,6 +90,7 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
         <CellMenu
           model={context.model}
           actions={context.actions}
+          spreadsheetActions={spreadsheetActions}
           resultIndex={context.resultIndex}
           row={rowIdx}
           column={Number(column.key)}

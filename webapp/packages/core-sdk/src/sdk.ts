@@ -848,6 +848,7 @@ export interface SqlResultColumn {
   maxLength?: Maybe<Scalars['Float']>;
   scale?: Maybe<Scalars['Int']>;
   precision?: Maybe<Scalars['Int']>;
+  required: Scalars['Boolean'];
   readOnly: Scalars['Boolean'];
   readOnlyStatus?: Maybe<Scalars['String']>;
   supportedOperations: DataTypeLogicalOperation[];
@@ -1516,7 +1517,7 @@ export interface GetSqlExecuteTaskResultsMutation {
       & { resultSet?: Maybe<(
         Pick<SqlResultSet, 'id' | 'rows' | 'hasMoreData'>
         & { columns?: Maybe<Array<Maybe<(
-          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'readOnly' | 'readOnlyStatus' | 'scale' | 'typeName'>
+          Pick<SqlResultColumn, 'dataKind' | 'entityName' | 'fullTypeName' | 'icon' | 'label' | 'maxLength' | 'name' | 'position' | 'precision' | 'required' | 'readOnly' | 'readOnlyStatus' | 'scale' | 'typeName'>
           & { supportedOperations: Array<Pick<DataTypeLogicalOperation, 'id' | 'expression' | 'argumentCount'>> }
         )>>>; }
       )>; }
@@ -2458,6 +2459,7 @@ export const GetSqlExecuteTaskResultsDocument = `
           name
           position
           precision
+          required
           readOnly
           readOnlyStatus
           scale

@@ -11,6 +11,7 @@ import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
@@ -24,6 +25,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private dataGridSettingsService: DataGridSettingsService,
     private dataGridContextMenuSortingService: DataGridContextMenuOrderService,
     private dataGridContextMenuFilterService: DataGridContextMenuFilterService,
+    private dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private dataGridContextMenuService: DataGridContextMenuService,
     exceptionsCatcherService: ExceptionsCatcherService
   ) {
@@ -42,6 +44,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     });
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();
+    this.dataGridContextMenuCellEditingService.register();
 
     this.dataGridContextMenuService.add(
       this.dataGridContextMenuService.getMenuToken(),

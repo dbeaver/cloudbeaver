@@ -14,7 +14,7 @@ import styled from 'reshadow';
 
 import { Executor } from '@cloudbeaver/core-executor';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { IDatabaseDataEditorActionsData, IDatabaseDataModel, IDatabaseResultSet, IDataPresentationProps, IDataTableActions, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataEditorActionsData, IDatabaseResultSet, IDataPresentationProps, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';

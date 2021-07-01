@@ -1,4 +1,7 @@
 export default [
+  ['data_grid_table_editing', 'Редактировать'],
+  ['data_grid_table_editing_set_to_null', 'Установить в NULL'],
+  ['data_grid_table_editing_open_inline_editor', 'Открыть встроенный редактор'],
   ['data_grid_table_order', 'Сортировка'],
   ['data_grid_table_open_value_panel', 'Показать в панели значений'],
   ['data_grid_table_filter', 'Фильтры'],
