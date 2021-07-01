@@ -130,7 +130,7 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
     const diff = this.getOrCreateDiff(result, row);
     const prevValue = diff.source[column];
 
-    if (isResultSetContentValue(prevValue)) {
+    if (isResultSetContentValue(prevValue) && value !== null) {
       if ('text' in prevValue) {
         value = {
           ...prevValue,
@@ -292,8 +292,8 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
   }
 
   private compareCellValue(valueA: any, valueB: any) {
-    valueA = valueA ?? '';
-    valueB = valueB ?? '';
+    valueA = valueA === undefined ? '' : valueA;
+    valueB = valueB === undefined ? '' : valueB;
 
     if (typeof valueA === 'number' || typeof valueB === 'number') {
       return String(valueA) === String(valueB);
