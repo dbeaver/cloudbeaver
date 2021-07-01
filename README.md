@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 21.0.5 - 2021-06-30
+- Query execution plan was added.
+- Option to show/hide password in the connection dialog was added.
+- Minor UI fixes and improvements.
+
 ### CloudBeaver 21.0.3 - 2021-06-11
 
 - Filtering and Ordering from the context menu were added for the data editor .
