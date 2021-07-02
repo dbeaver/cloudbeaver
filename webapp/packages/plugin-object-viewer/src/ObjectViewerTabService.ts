@@ -65,6 +65,7 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfo.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
     this.connectionInfo.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
+    this.connectionInfo.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemAdd.addHandler(this.updateTabs.bind(this));
     this.navNodeManagerService.navNodeInfoResource.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
@@ -170,6 +171,18 @@ export class ObjectViewerTabService {
       switchPage,
     };
   };
+
+  private async closeConnectionTabs(key: ResourceKey<string>) {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      const tabs = this.navigationTabsService.findTabs(
+        isObjectViewerTab(tab => tab.handlerState.connectionId === key)
+      );
+
+      for (const tab of tabs) {
+        await this.navigationTabsService.closeTab(tab.id, true);
+      }
+    });
+  }
 
   private async updateConnectionTabs(key: ResourceKey<string>) {
     await ResourceKeyUtils.forEachAsync(key, async key => {
