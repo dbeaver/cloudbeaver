@@ -8,6 +8,7 @@ export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
 export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';

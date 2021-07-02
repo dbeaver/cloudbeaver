@@ -15,7 +15,7 @@ import {
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlEditor } from './SqlEditor';
+import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 
 const viewerStyles = css`
@@ -23,7 +23,7 @@ const viewerStyles = css`
     composes: theme-typography--body2 from global;
     display: flex;
   }
-  SqlEditor {
+  SqlEditorLoader {
     composes: theme-typography--body1 from global;
   }
 `;
@@ -32,7 +32,7 @@ export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = func
   return styled(useStyles(splitStyles, splitHorizontalStyles, viewerStyles))(
     <Split split="horizontal" sticky={30}>
       <Pane>
-        <SqlEditor tabId={tab.id} />
+        <SqlEditorLoader tab={tab} />
       </Pane>
       <ResizerControls />
       <Pane main>

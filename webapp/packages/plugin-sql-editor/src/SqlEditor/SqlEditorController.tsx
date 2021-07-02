@@ -6,8 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type {
-  EditorConfiguration, Editor, EditorChange, Position, Hints, HintFunction
+import {
+  EditorConfiguration,
+  Editor,
+  EditorChange,
+  Position,
+  Hints,
+  HintFunction, on as CodemirrorOn,
+  off as CodemirrorOff,
+  Hint
 } from 'codemirror';
 import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -24,7 +31,7 @@ import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecu
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 
-const closeCharacters = /[\s()[\]{};:>,]/;
+const closeCharacters = /[\s()[\]{};:>,=]/;
 
 @injectable()
 export class SqlEditorController implements IInitializableController {
@@ -79,6 +86,8 @@ export class SqlEditorController implements IInitializableController {
 
   private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
+  private lastHints: Hints | null;
+  private lastCompletion: string | null;
 
   constructor(
     private sqlResultTabsService: SqlResultTabsService,
@@ -87,6 +96,9 @@ export class SqlEditorController implements IInitializableController {
     private sqlEditorService: SqlEditorService,
     private sqlExecutionPlanService: SqlExecutionPlanService,
   ) {
+    this.lastHints = null;
+    this.lastCompletion = null;
+    this.setLastCompletion = this.setLastCompletion.bind(this);
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
     this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 30);
     makeObservable(this, {
@@ -149,7 +161,6 @@ export class SqlEditorController implements IInitializableController {
     let hint: HintFunction | undefined = this.getHandleAutocomplete;
 
     if (!this.tab.handlerState.executionContext) {
-      await import('codemirror/addon/hint/sql-hint');
       hint = undefined;
     }
 
@@ -228,7 +239,7 @@ export class SqlEditorController implements IInitializableController {
       return;
     }
 
-    return {
+    const hints: Hints = {
       from,
       to,
       list: proposals.map(({ displayString, replacementString }) => ({
@@ -236,6 +247,22 @@ export class SqlEditorController implements IInitializableController {
         displayText: displayString,
       })),
     };
+
+    if (this.lastHints) {
+      CodemirrorOff(this.lastHints, 'pick', this.setLastCompletion);
+    }
+
+    this.lastHints = hints;
+    CodemirrorOn(hints, 'pick', this.setLastCompletion);
+
+    return hints;
+  }
+
+  private setLastCompletion(hint: string | Hint): void {
+    if (typeof hint === 'object') {
+      hint = hint.text;
+    }
+    this.lastCompletion = hint;
   }
 
   private handleEditorConfigure(editor: Editor) {
@@ -249,10 +276,14 @@ export class SqlEditorController implements IInitializableController {
           const line = editor.getLine(cursor.line);
           const lastChar = line.charAt(cursor.ch - 1);
 
-          if (closeCharacters.test(lastChar)) {
+          if (closeCharacters.test(lastChar) || (this.lastCompletion && line.endsWith(this.lastCompletion))) {
+            this.lastCompletion = null;
             editor.closeHint();
             return;
           }
+        } else {
+          editor.closeHint();
+          return;
         }
 
         this.showHint();
@@ -307,8 +338,8 @@ function getWordRange(editor: Editor, position: Position): [Position, Position, 
 
   const leftSubstr = line.substr(0, position.ch);
   const rightSubstr = line.substr(position.ch);
-  const leftWord = /[*\w]+$/.exec(leftSubstr) || [''];
-  const rightWord = /^[*\w]+/.exec(rightSubstr) || [''];
+  const leftWord = /[^\s()[\]{};:>,.=]+$/.exec(leftSubstr) || [''];
+  const rightWord = /^[^\s()[\]{};:>,.=]+/.exec(rightSubstr) || [''];
 
   const leftWordPart = leftWord[0];
   const rightWordPart = rightWord[0];

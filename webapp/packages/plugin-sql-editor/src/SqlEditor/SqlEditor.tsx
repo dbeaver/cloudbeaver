@@ -7,23 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { PropsWithChildren, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useTab } from '@cloudbeaver/core-app';
 import { Icon, StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { composes, useStyles } from '@cloudbeaver/core-theming';
 
+import type { ISqlEditorProps } from './ISqlEditorProps';
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
 import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlEditorController } from './SqlEditorController';
-
-type SqlEditorProps = PropsWithChildren<{
-  tabId: string;
-  className?: string;
-}>;
 
 const styles = composes(
   css`
@@ -69,12 +64,11 @@ const styles = composes(
   `
 );
 
-export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
+export const SqlEditor: React.FC<ISqlEditorProps> = observer(function SqlEditor({ tab, className }) {
   const translate = useTranslate();
   const style = useStyles(styles);
-  const tab = useTab(tabId);
   const editor = useRef<SQLCodeEditorController>(null);
-  const baseTab = useBaseTab(tabId);
+  const baseTab = useBaseTab(tab.id);
   const controller = useController(SqlEditorController, tab);
 
   useEffect(() => {
