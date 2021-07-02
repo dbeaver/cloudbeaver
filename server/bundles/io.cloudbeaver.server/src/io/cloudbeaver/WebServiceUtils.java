@@ -71,10 +71,6 @@ public class WebServiceUtils {
         return icon == null ? null : icon.getLocation();
     }
 
-    public static String makeDriverFullId(DBPDriver driver) {
-        return driver.getProviderId() + ":" + driver.getId();
-    }
-
     @NotNull
     public static DBPDriver getDriverById(String id) throws DBWebException {
         int divPos = id.indexOf(':');

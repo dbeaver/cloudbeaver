@@ -74,7 +74,7 @@ public class WebServiceCore implements DBWServiceCore {
     public List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) {
         List<WebDatabaseDriverConfig> result = new ArrayList<>();
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
-            if (driverId == null || driverId.equals(WebServiceUtils.makeDriverFullId(driver))) {
+            if (driverId == null || driverId.equals(driver.getFullId())) {
                 result.add(new WebDatabaseDriverConfig(webSession, driver));
             }
         }

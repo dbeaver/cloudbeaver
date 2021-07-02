@@ -77,7 +77,7 @@ public class WebConnectionInfo {
 
     @Property
     public String getDriverId() {
-        return WebServiceUtils.makeDriverFullId(dataSourceContainer.getDriver());
+        return dataSourceContainer.getDriver().getFullId();
     }
 
     @Property
