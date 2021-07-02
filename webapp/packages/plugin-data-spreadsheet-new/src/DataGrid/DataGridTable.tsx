@@ -169,7 +169,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
                 }}
                 rows={tableData.rows}
                 headerRowHeight={28}
-                rowHeight={24}
+                rowHeight={25}
                 rowRenderer={RowRenderer}
                 onSelectedCellChange={handleFocusChange}
                 onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}

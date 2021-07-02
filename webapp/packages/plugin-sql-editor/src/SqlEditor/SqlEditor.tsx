@@ -14,6 +14,7 @@ import { useTab } from '@cloudbeaver/core-app';
 import { Icon, StaticImage, useTab as useBaseTab } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
+import { composes, useStyles } from '@cloudbeaver/core-theming';
 
 import type { SQLCodeEditorController } from './SQLCodeEditor/SQLCodeEditorController';
 import { SQLCodeEditorLoader } from './SQLCodeEditor/SQLCodeEditorLoader';
@@ -24,41 +25,53 @@ type SqlEditorProps = PropsWithChildren<{
   className?: string;
 }>;
 
-const styles = css`
-  sql-editor {
-    position: relative;
-    z-index: 0;
-    flex: 1 auto;
-    height: 100%;
-    display: flex;
-  }
+const styles = composes(
+  css`
+    button {
+      composes: theme-ripple from global;
+    }
+  `,
+  css`
+    sql-editor {
+      position: relative;
+      z-index: 0;
+      flex: 1 auto;
+      height: 100%;
+      display: flex;
+    }
   
-  actions {
-    width: 32px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    actions {
+      width: 32px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   
-  button {
-    background: none;
-  }
+    button {
+      background: none;
+      padding: 0;
+      margin: 0;
+      height: 32px;
+      cursor: pointer;
+    }
   
-  StaticImage, Icon {
-    padding: 4px;
-    height: 24px;
-    width: 24px;
-    cursor: pointer;
-  }
+    StaticImage, Icon {
+      padding: 4px;
+      height: 24px;
+      width: 24px;
+      cursor: pointer;
+    }
 
-  SQLCodeEditorLoader {
-    flex: 1;
-  }
-`;
+    SQLCodeEditorLoader {
+      flex: 1;
+    }
+  `
+);
 
 export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEditorProps) {
   const translate = useTranslate();
+  const style = useStyles(styles);
   const tab = useTab(tabId);
   const editor = useRef<SQLCodeEditorController>(null);
   const baseTab = useBaseTab(tabId);
@@ -80,7 +93,7 @@ export const SqlEditor = observer(function SqlEditor({ tabId, className }: SqlEd
     event.preventDefault();
   }
 
-  return styled(styles)(
+  return styled(style)(
     <sql-editor className={className}>
       <actions>
         <button
