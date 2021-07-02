@@ -249,6 +249,9 @@ export class SqlEditorTabService extends Bootstrap {
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
     this.tabExecutionState.delete(editorTab.id);
     if (editorTab.handlerState.executionContext) {
+      const context = this.sqlResultTabsService.getTabExecutionContext(editorTab.id);
+      context.cancelTask();
+      this.sqlResultTabsService.removeTabExecutionContext(editorTab.id);
       await this.sqlEditorService.destroySqlContext(editorTab.handlerState.executionContext);
     }
     for (const tab of editorTab.handlerState.tabs) {

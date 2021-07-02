@@ -40,7 +40,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       getPresentationComponent: () => SpreadsheetGrid,
       hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
       title: 'Table',
-      icon: 'table-icon',
+      icon: 'table-icon-sm',
     });
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();

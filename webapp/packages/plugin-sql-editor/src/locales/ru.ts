@@ -9,6 +9,4 @@ export default [
   ['sql_execution_plan_properties_panel_value', 'Значение'],
   ['sql_execution_plan_properties_panel_general', 'Общие'],
   ['sql_execution_plan_properties_panel_details', 'Дополнительные'],
-  ['sql_tab_closing_notification_title', 'Вкладка не может быть закрыта'],
-  ['sql_tab_closing_notification_message', 'Операция выполняется'],
 ];

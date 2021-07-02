@@ -44,7 +44,7 @@ const styles = composes(
       height: 2px;
     }
     Pane:last-child {
-      flex: 0 0 200px;
+      flex: 0 0 150px;
     }
     TextareaNew > :global(textarea) {
       border: none !important;

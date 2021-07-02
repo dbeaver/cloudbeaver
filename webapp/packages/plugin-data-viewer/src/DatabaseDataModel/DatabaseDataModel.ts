@@ -117,4 +117,12 @@ implements IDatabaseDataModel<TOptions, TResult> {
   async requestData(): Promise<void> {
     await this.source.requestData();
   }
+
+  cancel(): Promise<boolean> | boolean {
+    return this.source.cancel();
+  }
+
+  async dispose(): Promise<void> {
+    await this.source.dispose();
+  }
 }

@@ -69,6 +69,13 @@ export class SqlExecutionPlanService {
       );
 
       const executionPlan = await task.promise;
+
+      const tab = editorState.tabs.find(tab => tab.id === tabId);
+
+      if (!tab) { // tab can be closed before we get result
+        return;
+      }
+
       this.data.set(tabId, {
         process: task,
         executionPlan,
@@ -109,6 +116,12 @@ export class SqlExecutionPlanService {
 
     if (executionPlanTab) {
       state.executionPlanTabs.splice(state.executionPlanTabs.indexOf(executionPlanTab), 1);
+    }
+
+    const data = this.data.get(tabId);
+
+    if (data) {
+      data.process.cancel();
     }
 
     this.data.delete(tabId);

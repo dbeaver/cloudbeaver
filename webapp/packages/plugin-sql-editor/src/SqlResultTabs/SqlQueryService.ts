@@ -88,20 +88,19 @@ export class SqlQueryService {
       .setSupportedDataFormats(connectionInfo.supportedDataFormats);
 
     this.createTabsForGroup(editorState, tabGroup, model);
-
-    const mainTab = editorState.resultTabs.find(
-      resultTab => resultTab.groupId === tabGroup.groupId && resultTab.indexInResultSet === 0
-    );
-
-    if (mainTab) {
-      editorState.currentTabId = mainTab.tabId;
-    }
+    this.selectFirstResult(editorState, tabGroup.groupId, true);
 
     try {
       await model
         .setCountGain()
         .setSlice(0)
         .requestData();
+
+      const group = editorState.resultGroups.find(group => group.groupId === tabGroup.groupId);
+
+      if (!group) { // tab can be closed before we get result
+        return;
+      }
 
       this.createTabsForGroup(editorState, tabGroup, model);
 
@@ -116,6 +115,8 @@ export class SqlQueryService {
         .filter(resultTab => !tabsToRemove.includes(resultTab.id));
       editorState.resultTabs = editorState.resultTabs
         .filter(resultTab => !tabsToRemove.includes(resultTab.tabId));
+
+      this.selectFirstResult(editorState, tabGroup.groupId);
     } catch (exception) {
       // remove first panel if execution was cancelled
       if (source.queryExecutionProcess?.getState() === EDeferredState.CANCELLED && isNewTabCreated) {
@@ -176,9 +177,30 @@ export class SqlQueryService {
 
       if (isGroupEmpty) {
         state.resultGroups.splice(state.resultGroups.indexOf(group), 1);
-        // TODO: probably we should cleanup some data before model delete
+
+        // TODO: we need to dispose table model, but don't close execution context, so now we only
+        const model = this.tableViewerStorageService.get(group.modelId);
+        // model?.dispose();
+
+        if (model?.isLoading()) {
+          model.cancel();
+        }
+
         this.tableViewerStorageService.remove(group.modelId);
       }
+    }
+  }
+
+  private selectFirstResult(editorState: ISqlEditorTabState, groupId: string, openNew = false) {
+    const currentTab = editorState.tabs.find(tab => tab.id === editorState.currentTabId);
+
+    const mainTab = editorState.resultTabs.filter(
+      resultTab => resultTab.groupId === groupId
+    )
+      .sort((a, b) => a.indexInResultSet - b.indexInResultSet);
+
+    if (mainTab.length && (!currentTab || openNew)) {
+      editorState.currentTabId = mainTab[0].tabId;
     }
   }
 
