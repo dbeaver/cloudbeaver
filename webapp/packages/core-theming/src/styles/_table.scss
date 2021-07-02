@@ -53,7 +53,7 @@
     &:not([use|noHover]):hover,
     &:not([use|noHover])[use|selected],
     &:not([use|noHover])[use|expanded] {
-      @include stripes-background($mdc-theme-secondary);
+      @include stripes-background($mdc-theme-background);
     }
 
     &[use|disabled] {
