@@ -3,6 +3,7 @@
     <!-- Resource mappings -->
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/db2"/>
+        <resource name="drivers/db2-jt400"/>
         <resource name="drivers/mysql/mysql8"/>
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
@@ -19,6 +20,7 @@
     <!-- Bundles  -->
     <extension point="org.jkiss.dbeaver.product.bundles">
         <bundle id="drivers.db2" label="DB2 drivers"/>
+        <bundle id="drivers.jt400" label="DB2 iSeries drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
         <bundle id="drivers.oracle" label="Oracle drivers"/>
@@ -35,6 +37,7 @@
     <!-- Enabled drivers -->
     <extension point="io.cloudbeaver.driver">
         <driver id="db2:db2"/>
+        <driver id="db2_i:db2_iseries"/>
         <driver id="mysql:mysql8"/>
         <driver id="mysql:mariaDB"/>
         <driver id="oracle:oracle_thin"/>
