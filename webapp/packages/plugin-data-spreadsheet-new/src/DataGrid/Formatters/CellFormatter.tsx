@@ -35,15 +35,14 @@ const styles = css`
   }
 `;
 
-export const CellFormatterWrapper: React.FC<Props> = observer(function CellFormatterWrapper({ className, ...rest }) {
-  const { column, rowIdx, isCellSelected } = rest;
+export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ className, ...rest }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
-  const showCellMenu = !editingContext?.isEditing({ idx: column.idx, rowIdx })
-    && (isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
+  const showCellMenu = !editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx })
+    && (rest.isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
@@ -71,8 +70,8 @@ export const CellFormatterWrapper: React.FC<Props> = observer(function CellForma
             actions={context.actions}
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
-            row={rowIdx}
-            column={Number(column.key)}
+            row={rest.rowIdx}
+            column={Number(rest.column.key)}
             onStateSwitch={setMenuVisible}
           />
         </menu-container>

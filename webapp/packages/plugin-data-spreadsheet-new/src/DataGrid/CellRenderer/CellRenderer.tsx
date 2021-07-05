@@ -21,15 +21,16 @@ import { TableDataContext } from '../TableDataContext';
 import { CellContext, ICellContext } from './CellContext';
 
 export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function CellRenderer(props) {
+  const { rowIdx, column } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
+  const resultColumn = tableDataContext?.getColumnInfo(column.key);
   const editor = dataGridContext?.model.source.getEditor(dataGridContext.resultIndex);
   const mouse = useMouse<HTMLDivElement>({});
 
   const classes: string[] = [];
-  const { rowIdx, column } = props;
 
   if (selectionContext?.isSelected(rowIdx, column.idx)) {
     classes.push('rdg-cell-custom-selected');
@@ -78,7 +79,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }, [column, rowIdx, selectionContext, dataGridContext]);
 
   const handleDoubleClick = useCallback(() => {
-    if (!column.editable) {
+    if (!column.editable || resultColumn?.dataKind?.toLowerCase() === 'boolean') {
       return;
     }
     const format = dataGridContext?.model.source.getAction(dataGridContext.resultIndex, ResultSetFormatAction);

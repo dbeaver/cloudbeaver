@@ -48,7 +48,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
 
   if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
     return (
-      <div className={`text-formatter ${classes}`}>
+      <div className={classes}>
         <CellEditor
           ref={editorRef}
           rowIdx={rowIdx}
@@ -61,7 +61,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
   }
 
   return styled()(
-    <text-formatter title={value} className={`text-formatter ${classes}`}>
+    <text-formatter title={value} className={classes}>
       {value}
     </text-formatter>
   );

@@ -88,6 +88,10 @@ export function useTableData(model: IDatabaseDataModel<any, IDatabaseResultSet>,
       return this.rows[rowIndex][key as number];
     },
     getColumnInfo(key: string | number): SqlResultColumn | undefined {
+      if (this.isIndexColumn(key)) {
+        return;
+      }
+
       return this.dataColumns[Number(key)];
     },
     getDataColumnIndexFromKey(key: string | number) {

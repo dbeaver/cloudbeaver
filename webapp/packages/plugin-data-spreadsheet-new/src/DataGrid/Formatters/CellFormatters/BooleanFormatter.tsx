@@ -17,10 +17,10 @@ import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
 
 const styles = css`
-  value {
+  boolean-formatter {
     cursor: pointer;
   }
-  value[|boolean] {
+  boolean-formatter[|boolean] {
     font-family: monospace;
     white-space: pre;
     line-height: 1;
@@ -55,16 +55,15 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
   }, [resultColumn]);
 
   return styled(styles)(
-    <boolean-formatter as='div' className={`boolean-formatter ${classes}`} onDoubleClick={e => e.stopPropagation()}>
-      <value
-        as='span'
-        title={stringifiedValue}
-        onClick={() => context?.model.source.getEditor(context.resultIndex)
-          .setCell(rowIdx, Number(column.key), getNextValue(rawValue))}
-        {...use({ boolean: rawValue !== null })}
-      >
-        {value}
-      </value>
+    <boolean-formatter
+      className={classes}
+      as='span'
+      title={stringifiedValue}
+      onClick={() => context?.model.source.getEditor(context.resultIndex)
+        .setCell(rowIdx, Number(column.key), getNextValue(rawValue))}
+      {...use({ boolean: rawValue !== null })}
+    >
+      {value}
     </boolean-formatter>
   );
 });
