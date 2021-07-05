@@ -39,6 +39,8 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
+import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
+import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.utils.CommonUtils;
 
@@ -69,16 +71,34 @@ public class WebServiceSQL implements DBWServiceSQL {
     {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
+
             Document document = new Document();
             document.set(query);
-            SQLScriptElement activeQuery = new SQLQuery(dataSource, query);
+
+            WebSQLCompletionContext completionContext = new WebSQLCompletionContext(sqlContext);
+
+            SQLScriptElement activeQuery;
+
+            if (position != null) {
+                SQLParserContext parserContext = new SQLParserContext(
+                    () -> sqlContext.getProcessor().getExecutionContext(),
+                    completionContext.getSyntaxManager(),
+                    completionContext.getRuleManager(),
+                    document);
+                activeQuery = SQLScriptParser.extractActiveQuery(parserContext, position, 0);
+            } else {
+                activeQuery = new SQLQuery(dataSource, query);
+            }
+
+
             SQLCompletionRequest request = new SQLCompletionRequest(
-                new WebSQLCompletionContext(sqlContext),
+                completionContext,
                 document,
                 position == null ? 0 : position,
                 activeQuery,
                 CommonUtils.getBoolean(simpleMode, false)
             );
+
             SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
             analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
             List<SQLCompletionProposalBase> proposals = analyzer.getProposals();

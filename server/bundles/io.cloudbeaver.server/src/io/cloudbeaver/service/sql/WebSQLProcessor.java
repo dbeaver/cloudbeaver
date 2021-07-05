@@ -99,7 +99,7 @@ public class WebSQLProcessor {
         return ruleManager;
     }
 
-    DBCExecutionContext getExecutionContext() {
+    public DBCExecutionContext getExecutionContext() {
         return DBUtils.getDefaultContext(connection.getDataSource(), false);
     }
 
