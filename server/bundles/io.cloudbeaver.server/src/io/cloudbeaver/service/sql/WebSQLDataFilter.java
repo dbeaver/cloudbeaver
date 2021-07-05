@@ -108,7 +108,7 @@ public class WebSQLDataFilter {
                     if (attribute == null) {
                         throw new DBException("Attribute '" + webConstr.getAttribute() + "' not found in '" + DBUtils.getObjectFullName(dataContainer, DBPEvaluationContext.UI) + "'");
                     }
-                    dbConstraint = new DBDAttributeConstraint(attribute, -1);
+                    dbConstraint = new DBDAttributeConstraint(attribute.getName(), -1);
                 } else {
                     dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
                 }
