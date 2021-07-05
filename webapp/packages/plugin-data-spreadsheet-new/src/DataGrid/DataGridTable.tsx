@@ -23,7 +23,7 @@ import { reactGridStyles } from '../styles/styles';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
-import { CellFormatter } from './Formatters/CellFormatter';
+import { CellFormatterWrapper } from './Formatters/CellFormatterWrapper';
 import { RowRenderer } from './RowRenderer/RowRenderer';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
@@ -165,7 +165,7 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
                 defaultColumnOptions={{
                   minWidth: 50,
                   resizable: true,
-                  formatter: CellFormatter,
+                  formatter: CellFormatterWrapper,
                 }}
                 rows={tableData.rows}
                 headerRowHeight={28}

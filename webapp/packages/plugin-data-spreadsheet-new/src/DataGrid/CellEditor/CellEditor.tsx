@@ -78,7 +78,7 @@ export const CellEditor = observer<Pick<EditorProps<any, any>, 'rowIdx' | 'row' 
 
   useLayoutEffect(() => {
     if (elementRef && popperRef) {
-      const size = elementRef.parentElement?.parentElement?.getBoundingClientRect();
+      const size = elementRef.closest('[role="gridcell"]')?.getBoundingClientRect();
 
       if (size) {
         popperRef.style.width = (size.width + 1) + 'px';
