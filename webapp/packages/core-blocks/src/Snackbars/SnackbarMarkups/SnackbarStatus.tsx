@@ -34,7 +34,7 @@ interface SnackbarStatusProps {
 export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarStatus({ status, className }) {
   return styled(SNACKBAR_STATUS_STYLES)(
     status === ENotificationType.Loading ? (
-      <loader-container className={className} as='div'>
+      <loader-container className={className}>
         <Loader fullSize hideMessage />
       </loader-container>
     ) : <NotificationMark className={className} type={status} />);

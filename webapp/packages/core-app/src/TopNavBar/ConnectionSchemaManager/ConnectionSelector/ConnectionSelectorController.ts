@@ -117,6 +117,7 @@ export class ConnectionSelectorController {
       currentConnectionIcon: computed,
       objectContainerSelectionDisabled: computed,
       currentObjectContainerIcon: computed,
+      isObjectContainerSelectorVisible: computed,
     });
 
     this.connectionMenu = new ComputedMenuItemModel({

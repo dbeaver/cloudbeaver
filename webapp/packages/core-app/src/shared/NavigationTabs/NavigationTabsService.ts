@@ -146,13 +146,12 @@ export class NavigationTabsService {
       this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
       this.userTabsState.history.unshift(tabId);
       this.userTabsState.currentId = tabId;
+      this.tabSelectSubject.next(tab);
     }
 
     if (!skipHandlers) {
       await this.callHandlerCallback(tab, handler => handler.onSelect);
     }
-
-    this.tabSelectSubject.next(tab);
   }
 
   async closeTab(tabId: string, skipHandlers?: boolean): Promise<void> {

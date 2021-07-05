@@ -26,7 +26,7 @@ export class LogViewerService {
   }
 
   private log: ILogEntry[] = [];
-  private timeoutTaskId: any = null;
+  private timeoutTaskId: NodeJS.Timeout | null = null;
   private failedRequestsCount = 0;
   private maxFailedRequests = 0;
 
@@ -93,7 +93,7 @@ export class LogViewerService {
       maxEntries: maxLogEntries,
       clearEntries: true,
     });
-    const entries: ILogEntry[] = (log || []).map(item => ({
+    const entries: ILogEntry[] = log.map(item => ({
       ...item,
       id: uuid(),
     }));

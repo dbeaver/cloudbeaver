@@ -21,7 +21,7 @@ export * from './shared/NodesManager/NodeLink';
 export * from './shared/NodesManager/NodeManagerUtils';
 export * from './shared/NavigationTabs/NavigationTabsService';
 export * from './shared/NavigationTabs/TabNavigationContext';
-export * from './shared/ToolsPanel/LogViewer/LogViewerMenuService';
+export * from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
 export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
