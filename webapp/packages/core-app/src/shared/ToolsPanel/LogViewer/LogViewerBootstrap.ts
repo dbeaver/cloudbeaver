@@ -12,7 +12,7 @@ import { EMainMenu, MainMenuService } from '../../../TopNavBar/MainMenu/MainMenu
 import { LogViewerService } from './LogViewerService';
 
 @injectable()
-export class LogViewerMenuService extends Bootstrap {
+export class LogViewerBootstrap extends Bootstrap {
   constructor(
     private mainMenuService: MainMenuService,
     private logViewerService: LogViewerService
@@ -29,13 +29,9 @@ export class LogViewerMenuService extends Bootstrap {
         type: 'checkbox',
         isChecked: () => this.logViewerService.isActive,
         title: 'app_shared_toolsMenu_logViewer',
-        onClick: () => this.toggleLogViewer(),
+        onClick: () => this.logViewerService.toggle(),
       }
     );
-  }
-
-  toggleLogViewer() {
-    this.logViewerService.toggle();
   }
 
   load(): void { }

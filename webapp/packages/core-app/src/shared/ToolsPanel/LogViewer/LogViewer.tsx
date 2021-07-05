@@ -48,7 +48,7 @@ export const LogViewer = observer(function LogViewer() {
   }
 
   return styled(style)(
-    <log-view-wrapper as='div'>
+    <log-view-wrapper>
       <Split mode={logViewerState.selectedItem ? undefined : 'maximize'} keepRatio>
         <Pane main>
           <LogViewerTable

@@ -64,29 +64,33 @@ interface Props {
   className?: string;
 }
 
-export const LogViewerInfoPanel: React.FC<Props> = observer(function LogViewerInfoPanel({ selectedItem, onClose, className }) {
+export const LogViewerInfoPanel: React.FC<Props> = observer(function LogViewerInfoPanel({
+  selectedItem,
+  onClose,
+  className,
+}) {
   const translate = useTranslate();
   const copy = useClipboard();
 
   const typeInfo = `${selectedItem.type} ${selectedItem.time}`;
 
-  const сopyMessage = useCallback(() => {
+  const copyMessage = useCallback(() => {
     copy(`${selectedItem.message}\n\n${selectedItem.stackTrace}`, true);
   }, [copy, selectedItem]);
 
   return styled(styles)(
-    <panel-wrapper as='div' className={className}>
-      <buttons as='div'>
-        <Button mod={['unelevated']} onClick={сopyMessage}>
+    <panel-wrapper className={className}>
+      <buttons>
+        <Button mod={['unelevated']} onClick={copyMessage}>
           {translate('ui_copy_to_clipboard')}
         </Button>
         <Button mod={['outlined']} onClick={onClose}>
           {translate('ui_close')}
         </Button>
       </buttons>
-      <content-wrapper as='div'>
+      <content-wrapper>
         <type as='h2'>{typeInfo}</type>
-        <message as='div' title={selectedItem.message}>{selectedItem.message}</message>
+        <message title={selectedItem.message}>{selectedItem.message}</message>
         <TextareaNew
           name="value"
           rows={3}
