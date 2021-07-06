@@ -77,7 +77,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       throw new Error('Options must be provided');
     }
 
-    return this.source.options.constraints.find(constaint => constaint.attribute === attribute);
+    return this.source.options.constraints.find(constraint => constraint.attribute === attribute);
   }
 
   deleteAll(): void {

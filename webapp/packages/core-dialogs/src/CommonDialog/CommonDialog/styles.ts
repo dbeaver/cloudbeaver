@@ -91,6 +91,7 @@ export const commonDialogBaseStyle = composes(
       min-height: 80px;
       max-width: 748px;
       max-height: 100%;
+      padding-bottom: 24px;
     }
     dialog-body-overflow {
       position: absolute;
