@@ -16,7 +16,8 @@ import type { IResultSetElementKey } from './IResultSetElementKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 
-export type IResultSetValue = string | number | Record<string, string | number | Record<string, any> | null> | null;
+export type IResultSetValue =
+  string | number | boolean | Record<string, string | number | Record<string, any> | null> | null;
 
 @databaseDataAction()
 export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
@@ -71,7 +72,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
       return JSON.stringify(value);
     }
 
-    if (typeof value === 'number') {
+    if (typeof value === 'number' || typeof value === 'boolean') {
       return String(value);
     }
 
