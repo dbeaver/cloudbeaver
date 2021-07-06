@@ -17,6 +17,7 @@ import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetElementKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
@@ -92,6 +93,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
   const result = model.getResult(resultIndex);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
+  const data = model.source.getAction(resultIndex, ResultSetDataAction);
 
   const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
@@ -111,7 +113,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       .getCell(firstSelectedCell.row, firstSelectedCell.column);
 
     stringValue = format.getText(value) ?? '';
-    readonly = format.isReadOnly(firstSelectedCell);
+    readonly = format.isReadOnly(firstSelectedCell)
+      || data.getColumn(firstSelectedCell.column)?.dataKind?.toLowerCase() === 'boolean';
 
     if (isResultSetContentValue(value)) {
       if (value.contentType) {
