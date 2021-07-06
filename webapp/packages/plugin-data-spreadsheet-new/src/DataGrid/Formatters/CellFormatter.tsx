@@ -7,39 +7,42 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import type { FormatterProps } from 'react-data-grid';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { IDataPresentationActions, IResultSetElementKey, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../Editing/EditingContext';
-import { CellEditor, IEditorRef } from '../CellEditor/CellEditor';
 import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
+import { CellFormatterFactory } from './CellFormatterFactory';
 import { CellMenu } from './Menu/CellMenu';
 
-function getClasses(rawValue: any) {
-  const classes = [];
-  if (rawValue === null) {
-    classes.push('cell-null');
-  }
-  return classes.join(' ');
+interface Props extends FormatterProps {
+  className?: string;
 }
 
-export const CellFormatter: React.FC<FormatterProps> = observer(function CellFormatter({ rowIdx, row, column, isCellSelected }) {
-  const editorRef = useRef<IEditorRef>(null);
-  const cellContext = useContext(CellContext);
+const styles = css`
+  formatter-wrapper {
+    flex: 1;
+    display: flex;
+  }
+  formatter-container {
+    flex: 1;
+  }
+`;
+
+export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ className, ...rest }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
+  const cellContext = useContext(CellContext);
   const editingContext = useContext(EditingContext);
-  const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
-  const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
-  const classes = getClasses(rawValue);
   const [menuVisible, setMenuVisible] = useState(false);
-  const value = formatter?.toDisplayString(rawValue) ?? String(rawValue);
+  const showCellMenu = !editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx })
+    && (rest.isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
@@ -55,48 +58,24 @@ export const CellFormatter: React.FC<FormatterProps> = observer(function CellFor
     },
   });
 
-  const handleClose = useCallback(() => {
-    editingContext?.closeEditor({ idx: column.idx, rowIdx });
-  }, [column, rowIdx]);
-
-  useEffect(() => {
-    if (isCellSelected) {
-      if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-        editorRef.current?.focus();
-      }
-    }
-  }, [isCellSelected]);
-
-  if (editingContext?.isEditing({ idx: column.idx, rowIdx })) {
-    return (
-      <div className={`cell-formatter ${classes}`}>
-        <CellEditor
-          ref={editorRef}
-          rowIdx={rowIdx}
-          row={row}
-          column={column}
-          onClose={handleClose}
-        />
-      </div>
-    );
-  }
-
-  return styled()(
-    <>
-      <cell-formatter title={value} className={`cell-formatter ${classes}`}>
-        {value}
-      </cell-formatter>
-      {(isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible) && context && (
-        <CellMenu
-          model={context.model}
-          actions={context.actions}
-          spreadsheetActions={spreadsheetActions}
-          resultIndex={context.resultIndex}
-          row={rowIdx}
-          column={Number(column.key)}
-          onStateSwitch={setMenuVisible}
-        />
+  return styled(styles)(
+    <formatter-wrapper className={className}>
+      <formatter-container>
+        <CellFormatterFactory {...rest} />
+      </formatter-container>
+      {showCellMenu && context && (
+        <menu-container>
+          <CellMenu
+            model={context.model}
+            actions={context.actions}
+            spreadsheetActions={spreadsheetActions}
+            resultIndex={context.resultIndex}
+            row={rest.rowIdx}
+            column={Number(rest.column.key)}
+            onStateSwitch={setMenuVisible}
+          />
+        </menu-container>
       )}
-    </>
+    </formatter-wrapper>
   );
 });
