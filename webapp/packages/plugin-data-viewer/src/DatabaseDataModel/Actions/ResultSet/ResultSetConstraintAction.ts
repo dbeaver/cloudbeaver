@@ -59,22 +59,17 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       .filter(constraint => constraint.attribute !== attribute);
   }
 
-  private reorderConstraints() {
-    if (!this.source.options) {
-      return;
-    }
-
-    this.source.options.constraints = this.source.options.constraints
-      .map((constaint, idx) => ({ ...constaint, orderPosition: idx }));
-  }
-
   private deleteEmptyConstraint(attribute: string) {
     const constraint = this.get(attribute);
 
     if (constraint && !isFilterConstraint(constraint) && !isOrderConstraint(constraint)) {
       this.deleteConstraint(attribute);
-      this.reorderConstraints();
     }
+  }
+
+  private getMaxOrderPosition() {
+    return Math.max(0, ...this.orderConstraints
+      .map(constraint => constraint.orderPosition !== undefined ? constraint.orderPosition + 1 : -1));
   }
 
   get(attribute: string): SqlDataFilterConstraint | undefined {
@@ -111,7 +106,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     for (const constraint of this.source.options.constraints) {
       deleteLogicalOperationFromConstraint(constraint);
       if (isOrderConstraint(constraint)) {
-        newConstraints.push({ ...constraint, orderPosition: newConstraints.length });
+        newConstraints.push(constraint);
       }
     }
 
@@ -128,7 +123,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     for (const constraint of this.source.options.constraints) {
       deleteOrderFromConstraint(constraint);
       if (isFilterConstraint(constraint)) {
-        newConstraints.push({ ...constraint, orderPosition: newConstraints.length });
+        newConstraints.push(constraint);
       }
     }
 
@@ -181,7 +176,6 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     const constraint: SqlDataFilterConstraint = {
       attribute,
       operator,
-      orderPosition: this.source.options.constraints.length,
     };
 
     if (value !== undefined) {
@@ -208,7 +202,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       if (!resetOrder) {
         this.source.options.constraints.push({
           attribute,
-          orderPosition: this.source.options.constraints.length,
+          orderPosition: this.getMaxOrderPosition(),
           orderAsc: order === EOrder.asc,
         });
       }
@@ -216,13 +210,15 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     if (!resetOrder) {
+      if (!isOrderConstraint(currentConstraint)) {
+        currentConstraint.orderPosition = this.getMaxOrderPosition();
+      }
       currentConstraint.orderAsc = order === EOrder.asc;
     } else {
       if (isFilterConstraint(currentConstraint)) {
         deleteOrderFromConstraint(currentConstraint);
       } else {
         this.deleteConstraint(currentConstraint.attribute);
-        this.reorderConstraints();
       }
     }
   }
@@ -278,6 +274,7 @@ export function isOrderConstraint(constraint: SqlDataFilterConstraint): boolean 
 
 function deleteOrderFromConstraint(constraint: SqlDataFilterConstraint) {
   delete constraint.orderAsc;
+  delete constraint.orderPosition;
   return constraint;
 }
 
