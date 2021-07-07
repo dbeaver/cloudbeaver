@@ -15,7 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "react-data-grid": "^7.0.0-canary.30",
+    "react-data-grid": "7.0.0-canary.34",
     "react-popper": "^2.2.5"
   },
   "peerDependencies": {

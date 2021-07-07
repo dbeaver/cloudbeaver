@@ -59,7 +59,7 @@ export function useMapResource<
   const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
   const [exception, setException] = useState<Error | null>(null);
-  let key: TKeyArg = keyObj as TKeyArg;
+  let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as TIncludes;
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
