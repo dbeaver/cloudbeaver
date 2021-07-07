@@ -9,6 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ResultSetDataAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
+import { isBooleanFormatterAvailable } from '../Formatters/CellFormatters/isBooleanFormatterAvailable';
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
@@ -50,13 +51,15 @@ export class DataGridContextMenuCellEditingService {
         },
         isHidden(context) {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
+          const editor = context.data.model.source.getEditor(context.data.resultIndex);
+          const cellValue = editor.getCell(context.data.row, context.data.column);
           const column = data.getColumn(context.data.column);
 
           if (!column) {
             return true;
           }
 
-          return column.dataKind?.toLowerCase() === 'boolean';
+          return isBooleanFormatterAvailable(cellValue, column);
         },
         order: 0,
         title: 'data_grid_table_editing_open_inline_editor',
