@@ -10,7 +10,10 @@ import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
 export function isBooleanFormatter(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
-  return column?.dataKind?.toLowerCase() === 'boolean' && (
-    (typeof cellValue === 'boolean' || (typeof cellValue === 'string' && (cellValue.toLowerCase() === 'false' || cellValue.toLowerCase() === 'true'))) || cellValue === null
-  );
+  return column?.dataKind?.toLowerCase() === 'boolean'
+    && (
+      typeof cellValue === 'boolean'
+      || cellValue === null
+      || (typeof cellValue === 'string' && ['false', 'true'].includes(cellValue.toLowerCase()))
+    );
 }
