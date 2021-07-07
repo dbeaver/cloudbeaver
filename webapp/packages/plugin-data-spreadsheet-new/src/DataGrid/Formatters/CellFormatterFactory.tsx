@@ -15,7 +15,7 @@ import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
-import { isBooleanFormatter } from './CellFormatters/isBooleanFormatter';
+import { isBooleanFormatterAvailable } from './CellFormatters/isBooleanFormatterAvailable';
 import { TextFormatter } from './CellFormatters/TextFormatter';
 
 export const CellFormatterFactory: React.FC<FormatterProps> = function CellFormatterFactory(props) {
@@ -32,7 +32,7 @@ export const CellFormatterFactory: React.FC<FormatterProps> = function CellForma
   if (!isEditing || formatterRef === null) {
     formatterRef.current = TextFormatter;
 
-    if (resultColumn && isBooleanFormatter(rawValue, resultColumn)) {
+    if (resultColumn && isBooleanFormatterAvailable(rawValue, resultColumn)) {
       formatterRef.current = BooleanFormatter;
     }
   }

@@ -9,7 +9,7 @@
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
-export function isBooleanFormatter(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
+export function isBooleanFormatterAvailable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
   return column?.dataKind?.toLowerCase() === 'boolean'
     && (
       typeof cellValue === 'boolean'

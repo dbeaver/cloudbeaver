@@ -17,7 +17,7 @@ import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 import { EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { isBooleanFormatter } from '../Formatters/CellFormatters/isBooleanFormatter';
+import { isBooleanFormatterAvailable } from '../Formatters/CellFormatters/isBooleanFormatterAvailable';
 import { TableDataContext } from '../TableDataContext';
 import { CellContext, ICellContext } from './CellContext';
 
@@ -81,7 +81,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
 
   const handleDoubleClick = useCallback(() => {
     if (!column.editable || (
-      resultColumn && isBooleanFormatter(editor?.getCell(rowIdx, Number(column.key)), resultColumn)
+      resultColumn && isBooleanFormatterAvailable(editor?.getCell(rowIdx, Number(column.key)), resultColumn)
     )) {
       return;
     }
