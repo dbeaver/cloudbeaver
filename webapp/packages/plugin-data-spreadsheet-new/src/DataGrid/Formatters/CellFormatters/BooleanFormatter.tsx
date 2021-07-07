@@ -42,8 +42,9 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
   const formatter = context?.model.source.getAction(context.resultIndex, ResultSetFormatAction);
   const resultColumn = tableDataContext?.getColumnInfo(column.key);
   const rawValue = formatter?.get(row[column.key]) ?? row[column.key];
-  const stringifiedValue = formatter?.toDisplayString(rawValue) ?? String(rawValue);
-  const value = rawValue === null ? stringifiedValue : `[${rawValue ? 'v' : ' '}]`;
+  const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
+  const stringifiedValue = formatter?.toDisplayString(value) ?? String(value);
+  const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
   const classes = getClasses(rawValue);
 
   const getNextValue = useCallback((prev: boolean | null) => {
@@ -60,10 +61,10 @@ export const BooleanFormatter: React.FC<FormatterProps> = observer(function Bool
       as='span'
       title={stringifiedValue}
       onClick={() => context?.model.source.getEditor(context.resultIndex)
-        .setCell(rowIdx, Number(column.key), getNextValue(rawValue))}
-      {...use({ boolean: rawValue !== null })}
+        .setCell(rowIdx, Number(column.key), getNextValue(value))}
+      {...use({ boolean: value !== null })}
     >
-      {value}
+      {valueRepresentation}
     </boolean-formatter>
   );
 });

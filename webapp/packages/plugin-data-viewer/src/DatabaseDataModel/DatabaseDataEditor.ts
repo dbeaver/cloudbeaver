@@ -299,6 +299,10 @@ export class DatabaseDataEditor<TResult extends IDatabaseDataResult> implements 
       return String(valueA) === String(valueB);
     }
 
+    if (typeof valueA === 'boolean' || typeof valueB === 'boolean') {
+      return String(valueA).toLowerCase() === String(valueB).toLowerCase();
+    }
+
     if (isResultSetContentValue(valueA) && isResultSetContentValue(valueB)) {
       if ('text' in valueA && 'text' in valueB) {
         return valueA.text === valueB.text;
