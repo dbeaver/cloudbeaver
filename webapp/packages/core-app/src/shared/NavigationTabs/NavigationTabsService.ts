@@ -289,8 +289,11 @@ export class NavigationTabsService {
       this.closeTab(tabId, true);
     }
 
-    if (this.tabsMap.has(this.userTabsState.currentId)) {
+    const tab = this.tabsMap.get(this.userTabsState.currentId);
+
+    if (tab) {
       this.selectTab(this.userTabsState.currentId);
+      this.tabSelectSubject.next(tab);
     }
   }
 
