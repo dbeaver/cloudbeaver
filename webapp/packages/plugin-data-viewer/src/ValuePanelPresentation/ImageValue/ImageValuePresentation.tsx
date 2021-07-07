@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { Button, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { getMIME, isImageUrl, isValidUrl } from '@cloudbeaver/core-utils';
+import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -74,7 +74,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     if (content?.binary) {
       src = `data:${getMIME(content.binary)};base64,${content.binary}`;
-    } else if (typeof cellValue === 'string' && isValidUrl(cellValue) && isImageUrl(cellValue)) {
+    } else if (typeof cellValue === 'string' && isValidUrl(cellValue) && isImageFormat(cellValue)) {
       src = cellValue;
     }
   }

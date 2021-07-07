@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function isImageUrl(url: string): boolean {
-  return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
+export function isImageFormat(value: string): boolean {
+  return value.match(/\.(jpeg|jpg|gif|png)$/) != null;
 }

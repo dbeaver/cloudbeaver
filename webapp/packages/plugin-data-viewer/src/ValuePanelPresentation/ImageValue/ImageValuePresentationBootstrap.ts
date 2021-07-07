@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { getMIME, isImageUrl, isValidUrl } from '@cloudbeaver/core-utils';
+import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
@@ -67,6 +67,6 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
       return false;
     }
 
-    return isValidUrl(value) && isImageUrl(value);
+    return isValidUrl(value) && isImageFormat(value);
   }
 }
