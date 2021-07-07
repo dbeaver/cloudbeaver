@@ -7,5 +7,5 @@
  */
 
 export function isImageFormat(value: string): boolean {
-  return value.match(/\.(jpeg|jpg|gif|png)$/) != null;
+  return value.match(/\.(jpeg|jpg|gif|png|svg|bmp|ico)$/) != null;
 }

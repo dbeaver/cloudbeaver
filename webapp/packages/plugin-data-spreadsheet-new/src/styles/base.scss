@@ -35,14 +35,22 @@
   }
 
   .text-formatter {
+    display: flex;
+    align-items: center;
+    & a {
+      display: flex;
+      margin-right: 4px;
+    }
+    & svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .text-formatter_value {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    & svg {
-      width: 8px;
-      height: 8px;
-      margin-right: 4px;
-    }
   }
 
   .rdg-cell-editing {
