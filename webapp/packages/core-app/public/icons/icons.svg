@@ -220,4 +220,13 @@
     <path d="M5 2H19.5858L27 9.41421V30H5V2Z" stroke="#338ECC" stroke-width="2" fill="transparent"/>
     <path fill-rule="evenodd" clip-rule="evenodd" d="M19 1L28 10H19V1ZM8 8H13V12H8V8ZM24 22H19V26H24V22ZM19 15H24V19H19V15ZM11.5 13H9.5V25H10H11.5H18V23H11.5V18H18V16H11.5V13Z" fill="#338ECC"/>
   </symbol>
+   <symbol id="external-link" viewBox="0 0 24 24">
+      <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="5" width="18" height="18">
+        <path d="M2 5.50134V22.5682H10.5337H19.0674V5.50134H2Z" fill="white"/>
+      </mask>
+      <g mask="url(#mask0)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.28539 22.5682H16.7817C18.0384 22.5682 19.0674 21.54 19.0674 20.2826V9.658L16.7817 12.2844V20.2826H4.28539V7.78622H12.2843L14.91 5.50134H4.28539C3.01668 5.50134 1.99976 6.52958 1.99976 7.78622V20.2826C1.99976 21.54 3.01668 22.5682 4.28539 22.5682Z" fill="#338ECC"/>
+      </g>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M14.5694 4.2854H18.6718L7.4389 15.5176L9.05061 17.1293L20.2828 5.89635V9.99873H22.5684V1.99977H14.5694V4.2854Z" fill="#338ECC"/>
+  </symbol>
 </svg>

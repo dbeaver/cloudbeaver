@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { getMIME } from '@cloudbeaver/core-utils';
+import { getMIME, isImageUrl, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
@@ -42,7 +42,9 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
         if (selectedCells.length > 0 || focusedElement) {
           const firstSelectedCell = selectedCells[0] || focusedElement;
-          return !this.isImage(data.getContent(firstSelectedCell));
+          const cellValue = data.getCellValue({ column: firstSelectedCell.column, row: firstSelectedCell.row });
+
+          return !(this.isImage(data.getContent(firstSelectedCell)) || this.isImageUrl(cellValue));
         }
 
         return true;
@@ -58,5 +60,13 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     }
 
     return false;
+  }
+
+  private isImageUrl(value: any) {
+    if (typeof value !== 'string') {
+      return false;
+    }
+
+    return isValidUrl(value) && isImageUrl(value);
   }
 }

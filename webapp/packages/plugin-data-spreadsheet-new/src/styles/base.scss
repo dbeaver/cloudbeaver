@@ -34,6 +34,17 @@
     flex-direction: row;
   }
 
+  .text-formatter {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    & svg {
+      width: 8px;
+      height: 8px;
+      margin-right: 4px;
+    }
+  }
+
   .rdg-cell-editing {
     overflow: visible;
     height: 24px;

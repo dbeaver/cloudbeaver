@@ -29,9 +29,11 @@ const styles = css`
   formatter-wrapper {
     flex: 1;
     display: flex;
+    overflow: hidden;
   }
   formatter-container {
     flex: 1;
+    overflow: hidden;
   }
 `;
 
