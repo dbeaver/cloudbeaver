@@ -35,14 +35,16 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
         }
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
-        const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
 
         const selectedCells = selection.getSelectedElements();
         const focusedElement = selection.getFocusedElement();
 
         if (selectedCells.length > 0 || focusedElement) {
+          const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
+          const editor = context.model.source.getEditor(context.resultIndex);
+
           const firstSelectedCell = selectedCells[0] || focusedElement;
-          const cellValue = data.getCellValue({ column: firstSelectedCell.column, row: firstSelectedCell.row });
+          const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
 
           return !(this.isImage(data.getContent(firstSelectedCell)) || this.isImageUrl(cellValue));
         }

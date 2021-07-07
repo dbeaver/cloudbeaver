@@ -59,7 +59,6 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   const translate = useTranslate();
   const [stretch, setStretch] = useState(false);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
 
   const selectedCells = selection.getSelectedElements();
   const focusCell = selection.getFocusedElement();
@@ -67,9 +66,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   let src: string | undefined;
 
   if (selectedCells.length > 0 || focusCell) {
+    const data = model.source.getAction(resultIndex, ResultSetDataAction);
+    const editor = model.source.getEditor(resultIndex);
     const firstSelectedCell = selectedCells[0] || focusCell;
 
-    const cellValue = data.getCellValue({ column: firstSelectedCell.column, row: firstSelectedCell.row });
+    const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
     const content = data.getContent(firstSelectedCell);
 
     if (content?.binary) {
