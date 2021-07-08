@@ -21,3 +21,5 @@ export * from './replaceMiddle';
 export * from './TextTools';
 export * from './throttle';
 export * from './uuid_';
+export * from './isValidUrl';
+export * from './isImageFormat';

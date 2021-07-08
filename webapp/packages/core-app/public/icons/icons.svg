@@ -220,4 +220,13 @@
     <path d="M5 2H19.5858L27 9.41421V30H5V2Z" stroke="#338ECC" stroke-width="2" fill="transparent"/>
     <path fill-rule="evenodd" clip-rule="evenodd" d="M19 1L28 10H19V1ZM8 8H13V12H8V8ZM24 22H19V26H24V22ZM19 15H24V19H19V15ZM11.5 13H9.5V25H10H11.5H18V23H11.5V18H18V16H11.5V13Z" fill="#338ECC"/>
   </symbol>
+   <symbol id="external-link" viewBox="0 0 24 24">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M13.5855 3V4.92469H17.0404L7.58063 14.3851L8.9375 15.7413L18.3973 6.2822V9.73641H20.3219V3H13.5855Z" fill="#338ECC"/>
+      <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="18" height="18">
+        <path d="M11.6611 3H3V20.3222H11.6611H20.3221V3H11.6611Z" fill="white"/>
+      </mask>
+      <g mask="url(#mask0)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.92463 20.3222H18.3975C19.4557 20.3222 20.3222 19.4564 20.3222 18.3975V11.6611H18.3975V18.3975H4.92463V4.92469H11.661V3H4.92463C3.85614 3 2.99994 3.86643 2.99994 4.92469V18.3975C2.99994 19.4564 3.85614 20.3222 4.92463 20.3222Z" fill="#338ECC"/>
+      </g>
+  </symbol>
 </svg>

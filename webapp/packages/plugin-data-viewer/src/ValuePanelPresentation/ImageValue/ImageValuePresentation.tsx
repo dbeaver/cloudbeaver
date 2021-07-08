@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { Button, TabContainerPanelComponent } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { getMIME } from '@cloudbeaver/core-utils';
+import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -66,14 +66,17 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   let src: string | undefined;
 
   if (selectedCells.length > 0 || focusCell) {
+    const data = model.source.getAction(resultIndex, ResultSetDataAction);
+    const editor = model.source.getEditor(resultIndex);
     const firstSelectedCell = selectedCells[0] || focusCell;
 
-    const content = model.source
-      .getAction(resultIndex, ResultSetDataAction)
-      .getContent(firstSelectedCell);
+    const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
+    const content = data.getContent(firstSelectedCell);
 
     if (content?.binary) {
       src = `data:${getMIME(content.binary)};base64,${content.binary}`;
+    } else if (typeof cellValue === 'string' && isValidUrl(cellValue) && isImageFormat(cellValue)) {
+      src = cellValue;
     }
   }
 

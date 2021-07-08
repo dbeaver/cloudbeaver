@@ -11,6 +11,8 @@ import { useCallback, useContext, useEffect, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
 import styled from 'reshadow';
 
+import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { isValidUrl } from '@cloudbeaver/core-utils';
 import { ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext';
@@ -18,7 +20,7 @@ import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
 import { DataGridContext } from '../../DataGridContext';
 
 function getClasses(rawValue: any) {
-  const classes = [];
+  const classes = ['text-formatter'];
   if (rawValue === null) {
     classes.push('cell-null');
   }
@@ -62,7 +64,12 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
 
   return styled()(
     <text-formatter title={value} className={classes}>
-      {value}
+      {typeof rawValue === 'string' && isValidUrl(rawValue) && (
+        <a href={rawValue} target='_blank' rel='noreferrer'>
+          <IconOrImage icon='external-link' viewBox='0 0 24 24' />
+        </a>
+      )}
+      <value className='text-formatter_value'>{value}</value>
     </text-formatter>
   );
 });

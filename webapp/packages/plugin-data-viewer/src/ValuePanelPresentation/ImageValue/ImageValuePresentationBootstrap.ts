@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { getMIME } from '@cloudbeaver/core-utils';
+import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
@@ -35,14 +35,18 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
         }
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
-        const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
 
         const selectedCells = selection.getSelectedElements();
         const focusedElement = selection.getFocusedElement();
 
         if (selectedCells.length > 0 || focusedElement) {
+          const data = context.model.source.getAction(context.resultIndex, ResultSetDataAction);
+          const editor = context.model.source.getEditor(context.resultIndex);
+
           const firstSelectedCell = selectedCells[0] || focusedElement;
-          return !this.isImage(data.getContent(firstSelectedCell));
+          const cellValue = editor.getCell(firstSelectedCell.row, firstSelectedCell.column);
+
+          return !(this.isImage(data.getContent(firstSelectedCell)) || this.isImageUrl(cellValue));
         }
 
         return true;
@@ -58,5 +62,13 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     }
 
     return false;
+  }
+
+  private isImageUrl(value: any) {
+    if (typeof value !== 'string') {
+      return false;
+    }
+
+    return isValidUrl(value) && isImageFormat(value);
   }
 }
