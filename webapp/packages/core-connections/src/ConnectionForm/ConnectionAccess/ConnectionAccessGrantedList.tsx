@@ -38,9 +38,20 @@ const styles = composes(
   `,
   css`
     Group {
-      height: 100%;
       position: relative;
-      overflow: auto !important;
+    }
+    Group, container, table-container {
+      height: 100%;
+    }
+    container {
+      display: flex;
+      flex-direction: column;
+    }
+    ConnectionAccessTableHeader {
+      flex: 0 0 auto;
+    }
+    table-container {
+      overflow: auto;
     }
   `
 );
@@ -92,42 +103,46 @@ export const ConnectionAccessGrantedList: React.FC<Props> = observer(function Co
   }
 
   return styled(style)(
-    <Group box medium>
-      <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
-        <Button disabled={disabled || !selectedList.get().length} mod={['outlined']} onClick={revoke}>{translate('connections_connection_access_revoke')}</Button>
-        <Button disabled={disabled} mod={['raised']} onClick={props.onEdit}>{translate('connections_connection_access_edit')}</Button>
-      </ConnectionAccessTableHeader>
-      <Table selectedItems={selectedSubjects}>
-        <ConnectionAccessTableInnerHeader />
-        <TableBody>
-          <TableItem item='tableInfo' selectDisabled>
-            <TableColumnValue colSpan={5}>
-              {translate(tableInfoText)}
-            </TableColumnValue>
-          </TableItem>
-          {roles.get().map(role => (
-            <ConnectionAccessTableItem
-              key={role.roleId}
-              id={role.roleId}
-              name={role.roleName || ''}
-              description={role.description}
-              icon='/icons/role.svg'
-              iconTooltip={translate('connections_connection_access_role_tooltip')}
-              disabled={disabled}
-            />
-          ))}
-          {users.get().map(user => (
-            <ConnectionAccessTableItem
-              key={user.userId}
-              id={user.userId}
-              name={user.userId}
-              icon='/icons/user.svg'
-              iconTooltip={translate('connections_connection_access_user_tooltip')}
-              disabled={disabled}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <Group box medium overflow>
+      <container>
+        <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
+          <Button disabled={disabled || !selectedList.get().length} mod={['outlined']} onClick={revoke}>{translate('connections_connection_access_revoke')}</Button>
+          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('connections_connection_access_edit')}</Button>
+        </ConnectionAccessTableHeader>
+        <table-container>
+          <Table selectedItems={selectedSubjects}>
+            <ConnectionAccessTableInnerHeader />
+            <TableBody>
+              <TableItem item='tableInfo' selectDisabled>
+                <TableColumnValue colSpan={5}>
+                  {translate(tableInfoText)}
+                </TableColumnValue>
+              </TableItem>
+              {roles.get().map(role => (
+                <ConnectionAccessTableItem
+                  key={role.roleId}
+                  id={role.roleId}
+                  name={role.roleName || ''}
+                  description={role.description}
+                  icon='/icons/role.svg'
+                  iconTooltip={translate('connections_connection_access_role_tooltip')}
+                  disabled={disabled}
+                />
+              ))}
+              {users.get().map(user => (
+                <ConnectionAccessTableItem
+                  key={user.userId}
+                  id={user.userId}
+                  name={user.userId}
+                  icon='/icons/user.svg'
+                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  disabled={disabled}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </table-container>
+      </container>
     </Group>
   );
 });

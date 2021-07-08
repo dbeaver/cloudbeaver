@@ -22,6 +22,7 @@ import {
   ColoredContainer,
   Group,
   IconOrImage,
+  Container,
 } from '@cloudbeaver/core-blocks';
 import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
@@ -35,7 +36,8 @@ import { useConnectionAccessState } from './useConnectionAccessState';
 const styles = css`
   ColoredContainer {
     flex: 1;
-    overflow: auto;
+    height: 100%;
+    box-sizing: border-box;
   }
   Group {
     max-height: 100%;
@@ -45,6 +47,7 @@ const styles = css`
   info-item {
     display: flex;
     align-items: center;
+    flex: 0 0 auto;
   }
   IconOrImage {
     width: 24px;
@@ -114,7 +117,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   return styled(style)(
     <Loader state={[users, roles, state]}>
       {() => styled(style)(
-        <ColoredContainer parent gap>
+        <ColoredContainer parent gap vertical>
           {!users.resource.values.length && !roles.resource.values.length ? (
             <Group keepSize large>
               <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
@@ -127,22 +130,24 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
                   {translate(infoItem.text)}
                 </info-item>
               )}
-              <ConnectionAccessGrantedList
-                grantedUsers={grantedUsers.get()}
-                grantedRoles={grantedRoles.get()}
-                disabled={disabled}
-                onEdit={edit}
-                onRevoke={revoke}
-              />
-              {state.editing && (
-                <ConnectionAccessList
-                  userList={users.resource.values}
-                  roleList={roles.resource.values}
-                  grantedSubjects={state.grantedSubjects}
+              <Container gap overflow>
+                <ConnectionAccessGrantedList
+                  grantedUsers={grantedUsers.get()}
+                  grantedRoles={grantedRoles.get()}
                   disabled={disabled}
-                  onGrant={grant}
+                  onEdit={edit}
+                  onRevoke={revoke}
                 />
-              )}
+                {state.editing && (
+                  <ConnectionAccessList
+                    userList={users.resource.values}
+                    roleList={roles.resource.values}
+                    grantedSubjects={state.grantedSubjects}
+                    disabled={disabled}
+                    onGrant={grant}
+                  />
+                )}
+              </Container>
             </>
           )}
         </ColoredContainer>
