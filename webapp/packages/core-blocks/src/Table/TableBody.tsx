@@ -10,14 +10,14 @@ import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-type Props = React.PropsWithChildren<{
+interface Props {
   className?: string;
-}>;
+}
 
-export function TableBody({ children, className }: Props) {
+export const TableBody: React.FC<Props> = function TableBody({ children, className }) {
   return styled(useStyles())(
     <tbody className={className}>
       {children}
     </tbody>
   );
-}
+};

@@ -8,6 +8,8 @@
 
 import { useContext } from 'react';
 
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+
 import { useExecutor } from '../../useExecutor';
 import { useObjectRef } from '../../useObjectRef';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -47,9 +49,14 @@ export function useTab(
     state,
     getInfo: () => state.getTabInfo(tabId),
     selected: state.state.selectedId === tabId,
-    handleOpen: () => state.open(tabId),
+    handleOpen: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if (EventContext.has(e, EventStopPropagationFlag)) {
+        return;
+      }
+      state.open(tabId);
+    },
     handleClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      e.stopPropagation(); // it's here because close triggers handleOpen too
+      EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
       state.close(tabId);
     },
   });

@@ -65,10 +65,11 @@ const innerInputStyle = css`
 
 interface BaseProps {
   toggleMode?: boolean;
-  onToggle?: (status: boolean) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  onToggle?: (status: boolean) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 type ControlledProps = BaseProps & {
@@ -81,20 +82,21 @@ type ControlledProps = BaseProps & {
 type ObjectsProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
-  onFilter?: (value: TState[TKey], name: TKey) => void;
   value?: never;
+  onFilter?: (value: TState[TKey], name: TKey) => void;
 };
 
 export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observer(function Filter({
   state,
   name,
   value: valueControlled,
-  onFilter,
   toggleMode,
-  onToggle,
   placeholder,
   disabled,
   className,
+  onFilter,
+  onToggle,
+  onKeyDown,
 }) {
   const [inputRef] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
@@ -127,21 +129,6 @@ export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observ
     }
   }, [toggleMode, toggled, onToggle, filter]);
 
-  const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' || event.keyCode === 13) {
-      event.stopPropagation();
-    }
-  }, []);
-
-  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-  };
-
-  const preventPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-  };
-
   useEffect(() => {
     if (toggled && toggleMode) {
       inputRef.current?.focus();
@@ -155,12 +142,7 @@ export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observ
   }
 
   return styled(useStyles(styles, toggleMode && toggleModeButtonStyle))(
-    <filter-container
-      as='div'
-      className={className}
-      onClick={handleClick}
-      onDoubleClick={preventPropagation}
-    >
+    <filter-container className={className}>
       <InputFieldNew
         ref={inputRef}
         style={innerInputStyle}
@@ -168,8 +150,8 @@ export const Filter: React.FC<ControlledProps | ObjectsProps<any, any>> = observ
         disabled={disabled}
         name={name}
         value={value}
-        onKeyDown={onKeyDown}
         onChange={filter}
+        onKeyDown={onKeyDown}
         {...use({ toggled })}
       />
       <IconButton

@@ -17,15 +17,10 @@ export function isVisibleProperty(property: ObjectPropertyInfo): boolean {
   return property.features.includes('viewable');
 }
 
-interface IPrivateExecutionPlanTreeState extends IExecutionPlanTreeContext {
-  nodeList: SqlExecutionPlanNode[];
-  onNodeSelect: (nodeId: string) => void;
-}
-
 export function useExecutionPlanTreeState(
   nodeList: SqlExecutionPlanNode[], onNodeSelect: (nodeId: string) => void
 ): IExecutionPlanTreeContext {
-  return useObjectRef<IPrivateExecutionPlanTreeState>({
+  return useObjectRef({
     nodeList,
     onNodeSelect,
     selectedNodes: new Map(),

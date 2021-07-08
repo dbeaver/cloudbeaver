@@ -9,7 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
+import { EventContext } from '@cloudbeaver/core-events';
+
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
+import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
 
 interface Props {
@@ -34,16 +37,15 @@ export const TreeNodeSelect: React.FC<Props> = observer(function TreeNodeSelect(
   }
 
   const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    event.stopPropagation();
+    EventContext.set(event, EventTreeNodeSelectFlag);
   };
 
-  const preventPropagation = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
+  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    EventContext.set(event, EventTreeNodeSelectFlag);
   };
 
   return (
-    <div className={className} onClick={handleClick} onDoubleClick={preventPropagation}>
+    <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
       <Checkbox
         checked={selected ?? context.selected}
         disabled={disabled}

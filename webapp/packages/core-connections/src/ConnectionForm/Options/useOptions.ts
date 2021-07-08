@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
-
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
@@ -15,16 +13,11 @@ import type { DBDriver } from '../../DBDriverResource';
 import { isJDBCConnection } from '../../isJDBCConnection';
 import type { IConnectionFormState } from '../IConnectionFormProps';
 
-interface IRefObject {
-  prevName: string | null;
-  state: IConnectionFormState;
-}
-
 const MAX_HOST_LENGTH = 20;
 
 export function useOptions(state: IConnectionFormState) {
-  const refObject = useObjectRef<IRefObject>({
-    prevName: null,
+  const refObject = useObjectRef({
+    prevName: null as string | null,
     state,
   }, {
     state,

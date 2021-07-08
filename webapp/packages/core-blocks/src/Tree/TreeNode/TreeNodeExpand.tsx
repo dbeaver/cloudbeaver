@@ -12,8 +12,10 @@ import styled from 'reshadow';
 import { css } from 'reshadow';
 
 import { Icon, Loader } from '@cloudbeaver/core-blocks';
+import { EventContext } from '@cloudbeaver/core-events';
 
 import { useStateDelay } from '../../useStateDelay';
+import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { TreeNodeContext } from './TreeNodeContext';
 
 const styles = css`
@@ -42,21 +44,21 @@ export const TreeNodeExpand: React.FC<Props> = observer(function TreeNodeExpand(
   }
 
   const handleExpand = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+    EventContext.set(event, EventTreeNodeExpandFlag);
+
     if (!context.leaf && !leaf) {
       context.expand();
     }
   };
 
-  const preventDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
+  const handleDbClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    EventContext.set(event, EventTreeNodeExpandFlag);
   };
 
   const loading = useStateDelay(context.loading || context.processing, 300);
 
   return styled(styles)(
-    <arrow className={className} onClick={handleExpand} onDoubleClick={preventDoubleClick}>
+    <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
       {!loading && !context.leaf && !leaf && big && <Icon name="angle" viewBox="0 0 15 8" />}
       {!loading && !context.leaf && !leaf && !big && <Icon name="arrow" viewBox="0 0 16 16" />}

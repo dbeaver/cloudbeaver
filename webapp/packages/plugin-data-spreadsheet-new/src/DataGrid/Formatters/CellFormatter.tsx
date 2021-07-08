@@ -43,7 +43,8 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
   const cellContext = useContext(CellContext);
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
-  const showCellMenu = !editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx })
+  const isEditing = editingContext?.isEditing({ idx: rest.column.idx, rowIdx: rest.rowIdx }) ?? false;
+  const showCellMenu = !isEditing
     && (rest.isCellSelected || cellContext?.mouse.state.mouseEnter || menuVisible);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
@@ -63,7 +64,7 @@ export const CellFormatter: React.FC<Props> = observer(function CellFormatter({ 
   return styled(styles)(
     <formatter-wrapper className={className}>
       <formatter-container>
-        <CellFormatterFactory {...rest} />
+        <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
       {showCellMenu && context && (
         <menu-container>

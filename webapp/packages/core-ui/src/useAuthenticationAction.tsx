@@ -19,10 +19,6 @@ interface IAuthenticationAction {
   authorized: boolean;
   auth: () => Promise<void>;
 }
-interface IAuthenticationData extends IAuthenticationAction {
-  authenticating: boolean;
-  onAuthenticate?: () => Promise<any> | void;
-}
 
 export type Options = {
   onAuthenticate?: () => Promise<any> | void;
@@ -47,7 +43,7 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
     subType = options.subType;
   }
 
-  return useObjectRef<IAuthenticationData>({
+  return useObjectRef({
     authenticating: false,
     type,
     subType,

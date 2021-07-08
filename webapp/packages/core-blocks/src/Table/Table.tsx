@@ -16,17 +16,17 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { useObjectRef } from '../useObjectRef';
 import { TableContext, ITableContext } from './TableContext';
 
-type Props = React.PropsWithChildren<{
+interface Props {
   selectedItems?: Map<any, boolean>;
   expandedItems?: Map<any, boolean>;
   size?: 'big';
   className?: string;
   onSelect?: (item: any, state: boolean) => void;
-}>;
+}
 
-export const Table = observer(function Table({
+export const Table: React.FC<Props> = observer(function Table({
   selectedItems, expandedItems, className, size, children, onSelect,
-}: Props) {
+}) {
   const props = useObjectRef({ onSelect });
 
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));

@@ -23,7 +23,7 @@ interface IEditingOptions {
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
-  const optionsRef = useObjectRef<IEditingOptions>(options);
+  const optionsRef = useObjectRef(options);
   const [editingCells] = useState(() => observable<CellPosition>([]));
 
   const [context] = useState<IEditingContext>({

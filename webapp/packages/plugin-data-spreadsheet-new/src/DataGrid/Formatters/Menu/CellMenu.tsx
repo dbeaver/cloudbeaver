@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 import styled from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
@@ -44,30 +42,29 @@ export const CellMenu: React.FC<Props> = observer(function TreeNodeMenu({
   const dataGridContextMenuService = useService(DataGridContextMenuService);
   const style = useStyles(cellMenuStyles);
 
-  const { panel, hidden } = useMemo(
-    () => {
-      const panel = dataGridContextMenuService.constructMenuWithContext(
-        model, actions, spreadsheetActions, resultIndex, row, column
-      );
-      const hidden = computed(() => !panel.menuItems.length
-        || panel.menuItems.every(item => item.isHidden));
-
-      return { panel, hidden };
-    },
-    [column, row]
+  const panel = dataGridContextMenuService.constructMenuWithContext(
+    model, actions, spreadsheetActions, resultIndex, row, column
   );
+
+  if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
+    return null;
+  }
 
   function handleClick() {
     dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, row, column);
     onClick?.();
   }
 
-  if (hidden.get()) {
-    return null;
+  function stopPropagation(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    event.stopPropagation();
   }
 
   return styled(style)(
-    <cell-menu as='div' onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
+    <cell-menu
+      as='div'
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
+    >
       <MenuTrigger
         panel={panel}
         style={[cellMenuStyles]}

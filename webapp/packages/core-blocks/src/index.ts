@@ -35,6 +35,8 @@ export * from './Split/ResizerControls';
 export * from './Split/Split';
 export * from './Split/useSplit';
 
+export * from './Table/EventTableItemExpandFlag';
+export * from './Table/EventTableItemSelectionFlag';
 export * from './Table/Table';
 export * from './Table/TableBody';
 export * from './Table/TableColumnHeader';
@@ -75,6 +77,8 @@ export * from './Tabs/TabsBox/TabsBoxFromArray';
 export * from './Tabs/VerticalTabs/VerticalTabs';
 export * from './Tabs/VerticalTabs/verticalTabStyles';
 
+export * from './Tree/TreeNode/EventTreeNodeExpandFlag';
+export * from './Tree/TreeNode/EventTreeNodeSelectFlag';
 export * from './Tree/TreeNode/TreeNode';
 export * from './Tree/TreeNode/TreeNodeContext';
 export * from './Tree/TreeNode/TreeNodeControl';

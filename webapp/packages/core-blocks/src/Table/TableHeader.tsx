@@ -10,11 +10,11 @@ import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-theming';
 
-type Props = React.PropsWithChildren<{
+interface Props {
   className?: string;
-}>;
+}
 
-export function TableHeader({ children, className }: Props) {
+export const TableHeader: React.FC<Props> = function TableHeader({ children, className }) {
   return styled(useStyles())(
     <thead className={className}>
       <tr>
@@ -22,4 +22,4 @@ export function TableHeader({ children, className }: Props) {
       </tr>
     </thead>
   );
-}
+};

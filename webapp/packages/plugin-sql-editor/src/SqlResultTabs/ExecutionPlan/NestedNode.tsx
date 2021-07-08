@@ -9,7 +9,8 @@
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TableItem, TableColumnValue } from '@cloudbeaver/core-blocks';
+import { TableItem, TableColumnValue, EventTableItemSelectionFlag } from '@cloudbeaver/core-blocks';
+import { EventContext } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
@@ -46,7 +47,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
   const [expanded, setExpanded] = useState(true);
 
   const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
-    event.stopPropagation();
+    EventContext.set(event, EventTableItemSelectionFlag);
     setExpanded(prev => !prev);
   }, []);
 
