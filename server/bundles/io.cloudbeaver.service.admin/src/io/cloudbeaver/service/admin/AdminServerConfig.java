@@ -35,10 +35,10 @@ public class AdminServerConfig {
     private String adminName;
     private String adminPassword;
 
-    private boolean anonymousAccessEnabled;
-    private boolean customConnectionsEnabled;
-    private boolean publicCredentialsSaveEnabled;
-    private boolean adminCredentialsSaveEnabled;
+    private final boolean anonymousAccessEnabled;
+    private final boolean customConnectionsEnabled;
+    private final boolean publicCredentialsSaveEnabled;
+    private final boolean adminCredentialsSaveEnabled;
     private final List<String> enabledAuthProviders;
 
     private long sessionExpireTime;
