@@ -68,12 +68,6 @@ export class AdministrationScreenService {
     private autoSaveService: LocalStorageSaveService,
     private serverConfigResource: ServerConfigResource
   ) {
-    makeObservable(this, {
-      info: observable,
-      itemState: observable,
-      activeScreen: computed,
-    });
-
     this.info = {
       workspaceId: '',
       version: GlobalConstants.version || '',
@@ -83,6 +77,12 @@ export class AdministrationScreenService {
     this.itemState = new Map();
     this.activationEvent = new Executor();
     this.ensurePermissions = new Executor();
+
+    makeObservable(this, {
+      info: observable,
+      itemState: observable,
+      activeScreen: computed,
+    });
 
     this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
     this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
@@ -150,18 +150,7 @@ export class AdministrationScreenService {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
-    if (
-      this.info.workspaceId !== this.serverConfigResource.workspaceId
-      || this.info.configurationMode !== this.isConfigurationMode
-      || this.info.serverVersion !== this.serverConfigResource.serverVersion
-      || this.info.version !== GlobalConstants.version
-    ) {
-      this.clearItemsState();
-      this.info.workspaceId = this.serverConfigResource.workspaceId;
-      this.info.configurationMode = this.isConfigurationMode;
-      this.info.serverVersion = this.serverConfigResource.serverVersion;
-      this.info.version = GlobalConstants.version || '';
-    }
+    this.validateState();
 
     if (defaultState) {
       if (!this.itemState.has(name) || update) {
@@ -244,6 +233,21 @@ export class AdministrationScreenService {
         screen.item !== fromScreen?.item,
         fromScreen === null
       );
+    }
+  }
+
+  private validateState() {
+    if (
+      this.info.workspaceId !== this.serverConfigResource.workspaceId
+      || this.info.configurationMode !== this.isConfigurationMode
+      || this.info.serverVersion !== this.serverConfigResource.serverVersion
+      || this.info.version !== GlobalConstants.version
+    ) {
+      this.clearItemsState();
+      this.info.workspaceId = this.serverConfigResource.workspaceId;
+      this.info.configurationMode = this.isConfigurationMode;
+      this.info.serverVersion = this.serverConfigResource.serverVersion;
+      this.info.version = GlobalConstants.version || '';
     }
   }
 

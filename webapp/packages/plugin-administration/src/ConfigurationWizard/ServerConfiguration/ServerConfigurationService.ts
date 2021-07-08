@@ -57,6 +57,10 @@ export class ServerConfigurationService {
     private readonly notificationService: NotificationService,
     private readonly sessionDataResource: SessionDataResource
   ) {
+    this.done = false;
+    this.loading = true;
+    this.state = serverConfigStateContext();
+
     makeObservable<ServerConfigurationService, 'done'>(this, {
       state: observable,
       loading: observable,
@@ -65,9 +69,6 @@ export class ServerConfigurationService {
 
     this.routeName = 'configuration';
     this.stateLinked = false;
-    this.done = false;
-    this.loading = true;
-    this.state = serverConfigStateContext();
     this.unSaveNotification = null;
     this.loadConfigTask = new Executor();
     this.prepareConfigTask = new Executor();
@@ -118,7 +119,7 @@ export class ServerConfigurationService {
           'server-configuration',
           () => {
             reset = true;
-            return this.state;
+            return serverConfigStateContext();
           }
         );
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);

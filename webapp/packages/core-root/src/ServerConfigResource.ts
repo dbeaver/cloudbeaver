@@ -23,10 +23,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     private graphQLService: GraphQLService
   ) {
     super(null);
-    makeObservable(this, {
-      update: observable,
-      navigatorSettingsUpdate: observable,
-    });
 
     this.update = {};
     this.navigatorSettingsUpdate = {
@@ -38,6 +34,11 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       showSystemObjects: false,
       showUtilityObjects: false,
     };
+
+    makeObservable(this, {
+      update: observable,
+      navigatorSettingsUpdate: observable,
+    });
   }
 
   get serverVersion(): string {
