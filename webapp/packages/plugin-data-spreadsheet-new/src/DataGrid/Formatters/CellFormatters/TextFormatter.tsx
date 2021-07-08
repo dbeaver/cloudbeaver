@@ -20,7 +20,7 @@ import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
 import { DataGridContext } from '../../DataGridContext';
 
 function getClasses(rawValue: any) {
-  const classes = [];
+  const classes = ['text-formatter'];
   if (rawValue === null) {
     classes.push('cell-null');
   }
@@ -63,7 +63,7 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
   }
 
   return styled()(
-    <text-formatter title={value} className={`text-formatter ${classes}`}>
+    <text-formatter title={value} className={classes}>
       {typeof rawValue === 'string' && isValidUrl(rawValue) && (
         <a href={rawValue} target='_blank' rel='noreferrer'>
           <IconOrImage icon='external-link' viewBox='0 0 24 24' />

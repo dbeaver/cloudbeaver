@@ -39,7 +39,11 @@
     align-items: center;
     & a {
       display: flex;
-      margin-right: 4px;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 24px;
+      margin-right: 8px;
     }
     & svg {
       width: 12px;
