@@ -54,6 +54,9 @@ const styles = composes(
       text-align: left;
       text-decoration: none !important;
     }
+    icon {
+      width: 32px;
+    }
     type {
       width: 80px;
     }
@@ -75,16 +78,17 @@ export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable(
   const style = useStyles(styles);
 
   return styled(style)(
-    <wrapper as='div' className={className}>
-      <buttons as="div">
+    <wrapper className={className}>
+      <buttons>
         <Button mod={['unelevated']} onClick={onClear}>
           {translate('app_log_view_clear_log')}
         </Button>
       </buttons>
-      <table-wrapper as="div">
+      <table-wrapper>
         <table {...use({ expanded: !!selectedItem })}>
           <thead>
             <tr>
+              <icon as='th' />
               <type as='th'>{translate('app_log_view_entry_type')}</type>
               <timestamp as='th'>{translate('app_log_view_entry_timestamp')}</timestamp>
               <message as='th'>{translate('app_log_view_entry_message')}</message>

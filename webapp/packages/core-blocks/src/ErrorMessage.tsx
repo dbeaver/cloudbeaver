@@ -64,7 +64,7 @@ export const ErrorMessage = observer(function ErrorMessage({
 
   return styled(useStyles(styles))(
     <message className={className}>
-      <IconOrImage icon="/icons/error_icon.svg" viewBox='0 0 24 24' />
+      <IconOrImage icon="/icons/error_icon_sm.svg" />
       <message-body title={text}>
         {text}
       </message-body>
