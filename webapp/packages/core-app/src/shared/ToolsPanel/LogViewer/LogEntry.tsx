@@ -77,8 +77,7 @@ export const LogEntry: React.FC<Props> = observer(function LogEntry({
 
   return styled(useStyles(style))(
     <tr className={className} {...use({ selected })}>
-      <td><icon-box>{icon && <IconOrImage icon={icon} />}</icon-box></td>
-      <td>{item.type}</td>
+      <td title={item.type}><icon-box>{icon && <IconOrImage icon={icon} />}</icon-box></td>
       <td>{item.time}</td>
       <td>
         <message-cell>

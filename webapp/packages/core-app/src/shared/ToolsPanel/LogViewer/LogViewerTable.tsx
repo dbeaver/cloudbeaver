@@ -18,7 +18,7 @@ import { LogEntry } from './LogEntry';
 
 const styles = composes(
   css`
-    type, timestamp, message {
+    icon, timestamp, message {
       composes: theme-border-color-background from global;
     }
   `,
@@ -43,7 +43,7 @@ const styles = composes(
     tr {
       border-top: 1px solid;
     }
-    type, timestamp, message {
+    icon, timestamp, message {
       box-sizing: border-box;
       white-space: nowrap;
       padding: 16px;
@@ -56,9 +56,6 @@ const styles = composes(
     }
     icon {
       width: 32px;
-    }
-    type {
-      width: 80px;
     }
     timestamp {
       width: 180px;
@@ -89,7 +86,6 @@ export const LogViewerTable: React.FC<Props> = observer(function LogViewerTable(
           <thead>
             <tr>
               <icon as='th' />
-              <type as='th'>{translate('app_log_view_entry_type')}</type>
               <timestamp as='th'>{translate('app_log_view_entry_timestamp')}</timestamp>
               <message as='th'>{translate('app_log_view_entry_message')}</message>
             </tr>
