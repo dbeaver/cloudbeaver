@@ -13,6 +13,7 @@ import {
   Position,
   Hints,
   HintFunction, on as CodemirrorOn,
+  ShowHintOptions,
   off as CodemirrorOff,
   Hint
 } from 'codemirror';
@@ -72,9 +73,9 @@ export class SqlEditorController implements IInitializableController {
       'Shift-Ctrl-E': () => { this.handleExecutionPlan(); },
 
       // Autocomplete
-      'Ctrl-Space': () => { this.showHint(); }, // classic for windows, linux
-      'Shift-Ctrl-Space': () => { this.showHint(); },
-      'Alt-Space': () => { this.showHint(); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
+      'Ctrl-Space': () => { this.showHint(false); }, // classic for windows, linux
+      'Shift-Ctrl-Space': () => { this.showHint(false); },
+      'Alt-Space': () => { this.showHint(false); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
     },
   };
 
@@ -100,7 +101,7 @@ export class SqlEditorController implements IInitializableController {
     this.lastCompletion = null;
     this.setLastCompletion = this.setLastCompletion.bind(this);
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
-    this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 30);
+    this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
     makeObservable(this, {
       dialect: computed,
       isActionsDisabled: computed,
@@ -148,13 +149,13 @@ export class SqlEditorController implements IInitializableController {
     );
   };
 
-  private async showHint() {
+  private async showHint(activeSuggest: boolean) {
     if (!this.editor) {
       return;
     }
 
     if (this.editor.state.completionActive) {
-      (this.editor.state.completionActive).update();
+      this.editor.state.completionActive.update();
       return;
     }
 
@@ -165,8 +166,8 @@ export class SqlEditorController implements IInitializableController {
     }
 
     this.editor.showHint({
-      completeSingle: !this.activeSuggest,
-      updateOnCursorActivity: !this.activeSuggest,
+      completeSingle: !activeSuggest,
+      updateOnCursorActivity: false,
       closeCharacters,
       hint,
     });
@@ -212,7 +213,7 @@ export class SqlEditorController implements IInitializableController {
     return this.editor.getRange({ line: begin, ch: 0 }, { line: end, ch: this.editor.getLine(end).length });
   }
 
-  private async getHandleAutocomplete(editor: Editor): Promise<Hints | undefined> {
+  private async getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined> {
     if (!this.tab.handlerState.executionContext) {
       return;
     }
@@ -228,7 +229,7 @@ export class SqlEditorController implements IInitializableController {
         this.tab.handlerState.query,
         cursorPosition,
         undefined,
-        this.activeSuggest
+        !options.completeSingle
       );
 
     proposals = proposals?.filter(
@@ -268,27 +269,49 @@ export class SqlEditorController implements IInitializableController {
   private handleEditorConfigure(editor: Editor) {
     this.editor = editor;
 
+    let closedByCursor = false;
+    let cursor: Position | null = null;
+
+    editor.on('changes', () => {
+      if (this.activeSuggest && !editor.state.completionActive && !closedByCursor) {
+        cursor = editor.getCursor('from');
+        this.showHint(true);
+      }
+
+      this.lastCompletion = null;
+      closedByCursor = false;
+    });
+
     editor.on('cursorActivity', () => {
-      if (this.activeSuggest) {
-        const cursor = editor.getCursor('from');
+      closedByCursor = this.closeHint(editor);
 
-        if (cursor.ch) {
-          const line = editor.getLine(cursor.line);
-          const lastChar = line.charAt(cursor.ch - 1);
+      if (editor.state.completionActive) {
+        const newCursor = editor.getCursor('from');
 
-          if (closeCharacters.test(lastChar) || (this.lastCompletion && line.endsWith(this.lastCompletion))) {
-            this.lastCompletion = null;
-            editor.closeHint();
-            return;
-          }
-        } else {
-          editor.closeHint();
-          return;
+        if (newCursor.ch !== cursor?.ch || newCursor.line !== cursor.line) {
+          cursor = newCursor;
+          editor.state.completionActive.update();
         }
-
-        this.showHint();
       }
     });
+  }
+
+  private closeHint(editor: Editor): boolean {
+    const cursor = editor.getCursor('from');
+
+    if (cursor.ch) {
+      const line = editor.getLine(cursor.line);
+      const substr = line.substr(0, cursor.ch);
+
+      if (this.lastCompletion && substr.endsWith(this.lastCompletion)) {
+        editor.closeHint();
+        return true;
+      }
+    } else {
+      editor.closeHint();
+      return true;
+    }
+    return false;
   }
 
   private findQueryBegin(editor: Editor, delimiters: string[], position: number) {
