@@ -9,7 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import type { FormatterProps } from 'react-data-grid';
-import styled from 'reshadow';
 
 import { IconOrImage } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
@@ -24,7 +23,7 @@ function getClasses(rawValue: any) {
   if (rawValue === null) {
     classes.push('cell-null');
   }
-  return classes.join(' ');
+  return classes.join(' '); // performance heavy
 }
 
 export const TextFormatter: React.FC<FormatterProps> = observer(function TextFormatter({ rowIdx, row, column, isCellSelected }) {
@@ -62,14 +61,16 @@ export const TextFormatter: React.FC<FormatterProps> = observer(function TextFor
     );
   }
 
-  return styled()(
-    <text-formatter title={value} className={classes}>
-      {typeof rawValue === 'string' && isValidUrl(rawValue) && (
+  const isUrl = typeof rawValue === 'string' && isValidUrl(rawValue);
+
+  return (
+    <div title={value} className={classes}>
+      {isUrl && (
         <a href={rawValue} target='_blank' rel='noreferrer'>
           <IconOrImage icon='external-link' viewBox='0 0 24 24' />
         </a>
       )}
-      <value className='text-formatter_value'>{value}</value>
-    </text-formatter>
+      <div className='text-formatter_value'>{value}</div>
+    </div>
   );
 });

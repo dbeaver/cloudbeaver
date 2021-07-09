@@ -11,7 +11,7 @@ import { useState } from 'react';
 
 export function useObjectRef<T extends Record<any, any>>(
   init: T & ThisType<T>,
-  update?: T extends Record<any, any> ? Partial<T> & ThisType<T> : never,
+  update?: (T extends Record<any, any> ? Partial<T> & ThisType<T> : never) | null,
   observed?: boolean | AnnotationsMap<T, never>,
   bind?: Array<keyof T>
 ): T {
@@ -29,18 +29,20 @@ export function useObjectRef<T extends Record<any, any>>(
     return init;
   });
 
-  if (update) {
-    Object.assign(ref, update);
+  if (update !== null) {
+    if (update) {
+      Object.assign(ref, update);
 
-    if (bind) {
-      bind = bind.filter(key => key in update);
+      if (bind) {
+        bind = bind.filter(key => key in update);
+      }
+    } else {
+      Object.assign(ref, init);
     }
-  } else {
-    Object.assign(ref, init);
-  }
 
-  if (bind && bind.length > 0) {
-    bindFunctions(ref, bind);
+    if (bind && bind.length > 0) {
+      bindFunctions(ref, bind);
+    }
   }
 
   return ref;

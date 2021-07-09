@@ -60,7 +60,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
     editingContext,
     tableDataContext,
     get immutableRow() {
-      return [...(this.editor?.get(rowIdx) || this.row)];
+      return this.editor?.get(rowIdx) || this.row; // performance heavy
     },
     mouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       if (EventContext.has(event, EventStopPropagationFlag)) {
@@ -146,7 +146,7 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
   }, ['doubleClick', 'mouseUp', 'mouseDown']);
 
   return (
-    <CellContext.Provider value={cellContext}>
+    <CellContext.Provider value={cellContext}>{/** performance super heavy */}
       <Cell
         ref={mouse.reference}
         className={classes.join(' ')}

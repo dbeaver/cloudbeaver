@@ -40,7 +40,7 @@ function copyGridSelectedDataToClipboard(
   const rowsValues: string[] = [];
   for (const [rowIdx, colIndexes] of orderedSelectedCells) {
     const rowCellsValues: string[] = [];
-    for (const column of tableData.columns) {
+    for (const column of tableData.data.columns) {
       const columnIdx = tableData.getDataColumnIndexFromKey(column.key);
       if (columnIdx === null || !selectedColumns.has(columnIdx)) {
         continue;

@@ -28,9 +28,9 @@ export interface IMouseHook<T> {
 export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T> {
   const handlersRef = useObjectRef(options);
   const reference = useRef<T>(null);
-  const [state] = useState(() => observable<IState>({ mouseEnter: false }));
+  const state = useObjectRef({ mouseEnter: false }, null, { mouseEnter: observable.ref });
 
-  useEffect(() => {
+  useEffect(() => { // performance heavy
     if (!reference.current) {
       state.mouseEnter = false;
       return;
@@ -62,7 +62,6 @@ export function useMouse<T extends HTMLElement>(options: IOptions): IMouseHook<T
     element.addEventListener('mouseleave', mouseOutHandler);
 
     return () => {
-      state.mouseEnter = false;
       element.removeEventListener('mouseenter', mouseOverHandler);
       element.removeEventListener('mouseleave', mouseOutHandler);
     };

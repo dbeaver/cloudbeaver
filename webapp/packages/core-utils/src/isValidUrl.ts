@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+const urlPattern = new RegExp('^(https?:\\/\\/)?' // protocol
++ '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
++ '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
++ '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
++ '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
++ '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+
 export function isValidUrl(value: string): boolean {
-  let url;
-
-  try {
-    url = new URL(value);
-  } catch {
-    return false;
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:';
+  return urlPattern.test(value);
 }

@@ -161,13 +161,13 @@ export const DataGridTable: React.FC<IDataPresentationProps<any, IDatabaseResult
               <DataGrid
                 ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
-                columns={tableData.columns}
+                columns={tableData.data.columns}
                 defaultColumnOptions={{
                   minWidth: 50,
                   resizable: true,
                   formatter: CellFormatter,
                 }}
-                rows={tableData.rows}
+                rows={tableData.data.rows}
                 headerRowHeight={28}
                 rowHeight={25}
                 rowRenderer={RowRenderer}
