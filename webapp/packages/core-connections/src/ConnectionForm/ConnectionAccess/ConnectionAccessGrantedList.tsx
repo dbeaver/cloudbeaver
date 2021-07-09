@@ -46,6 +46,7 @@ const styles = composes(
     container {
       display: flex;
       flex-direction: column;
+      width: 100%;
     }
     ConnectionAccessTableHeader {
       flex: 0 0 auto;

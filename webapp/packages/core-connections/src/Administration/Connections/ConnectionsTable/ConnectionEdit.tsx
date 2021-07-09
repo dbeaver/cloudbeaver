@@ -26,6 +26,7 @@ const styles = composes(
   css`
     box {
       box-sizing: border-box;
+      padding-bottom: 24px;
       display: flex;
       flex-direction: column;
       height: 664px;

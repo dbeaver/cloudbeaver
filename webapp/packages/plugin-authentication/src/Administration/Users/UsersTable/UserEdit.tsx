@@ -29,6 +29,7 @@ const styles = composes(
   css`
     box {
       box-sizing: border-box;
+      padding-bottom: 24px;
       min-height: 420px;
       max-height: 520px;
       display: flex;
