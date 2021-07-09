@@ -84,9 +84,9 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
         });
 
         this.requestInfo = {
+          ...this.requestInfo,
           requestDuration: response.result?.duration || 0,
           requestMessage: 'Saved successfully',
-          requestFilter: response.result?.filterText || '',
           source: this.options.query || null,
         };
 
