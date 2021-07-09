@@ -144,9 +144,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         });
 
         this.requestInfo = {
+          ...this.requestInfo,
           requestDuration: response.result?.duration || 0,
           requestMessage: 'Saved successfully',
-          requestFilter: response.result?.filterText || '',
           source: null,
         };
 
