@@ -19,7 +19,7 @@ import {
   BASE_CONTAINERS_STYLES,
   Group,
   Button,
-  useObjectRef
+  useObjectRef,
 } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminRoleInfo, AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
@@ -38,9 +38,21 @@ const styles = composes(
   `,
   css`
     Group {
-      height: 100%;
       position: relative;
-      overflow: auto !important;
+    }
+    Group, container, table-container {
+      height: 100%;
+    }
+    container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    table-container {
+      overflow: auto;
+    }
+    ConnectionAccessTableHeader {
+      flex: 0 0 auto;
     }
   `
 );
@@ -83,43 +95,47 @@ export const ConnectionAccessList: React.FC<Props> = observer(function Connectio
   )), [filterState, userList]);
 
   return styled(style)(
-    <Group box medium>
-      <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
-        <Button disabled={disabled || !selectedList.get().length} mod={['raised']} onClick={grant}>{translate('connections_connection_access_grant')}</Button>
-      </ConnectionAccessTableHeader>
-      <Table selectedItems={selectedSubjects}>
-        <ConnectionAccessTableInnerHeader />
-        <TableBody>
-          {!roles.get().length && !users.get().length && filterState.filterValue && (
-            <TableItem item='tableInfo' selectDisabled>
-              <TableColumnValue colSpan={5}>
-                {translate('connections_connection_access_filter_no_result')}
-              </TableColumnValue>
-            </TableItem>
-          )}
-          {roles.get().map(role => (
-            <ConnectionAccessTableItem
-              key={role.roleId}
-              id={role.roleId}
-              name={role.roleName || ''}
-              description={role.description}
-              icon='/icons/role.svg'
-              iconTooltip='connections_connection_access_role_tooltip'
-              disabled={disabled || grantedSubjects.includes(role.roleId)}
-            />
-          ))}
-          {users.get().map(user => (
-            <ConnectionAccessTableItem
-              key={user.userId}
-              id={user.userId}
-              name={user.userId}
-              icon='/icons/user.svg'
-              iconTooltip={translate('connections_connection_access_user_tooltip')}
-              disabled={disabled || grantedSubjects.includes(user.userId)}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <Group box medium overflow>
+      <container>
+        <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
+          <Button disabled={disabled || !selectedList.get().length} mod={['unelevated']} onClick={grant}>{translate('connections_connection_access_grant')}</Button>
+        </ConnectionAccessTableHeader>
+        <table-container>
+          <Table selectedItems={selectedSubjects}>
+            <ConnectionAccessTableInnerHeader />
+            <TableBody>
+              {!roles.get().length && !users.get().length && filterState.filterValue && (
+                <TableItem item='tableInfo' selectDisabled>
+                  <TableColumnValue colSpan={5}>
+                    {translate('connections_connection_access_filter_no_result')}
+                  </TableColumnValue>
+                </TableItem>
+              )}
+              {roles.get().map(role => (
+                <ConnectionAccessTableItem
+                  key={role.roleId}
+                  id={role.roleId}
+                  name={role.roleName || ''}
+                  description={role.description}
+                  icon='/icons/role.svg'
+                  iconTooltip='connections_connection_access_role_tooltip'
+                  disabled={disabled || grantedSubjects.includes(role.roleId)}
+                />
+              ))}
+              {users.get().map(user => (
+                <ConnectionAccessTableItem
+                  key={user.userId}
+                  id={user.userId}
+                  name={user.userId}
+                  icon='/icons/user.svg'
+                  iconTooltip={translate('connections_connection_access_user_tooltip')}
+                  disabled={disabled || grantedSubjects.includes(user.userId)}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </table-container>
+      </container>
     </Group>
   );
 });
