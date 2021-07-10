@@ -272,31 +272,31 @@ export class SqlEditorController implements IInitializableController {
   private handleEditorConfigure(editor: Editor) {
     this.editor = editor;
 
-    let closedByCursor = false;
     let cursor: Position | null = null;
 
-    const ignoredChanges = ['+delete', 'undo'];
+    const ignoredChanges = ['+delete', 'undo', 'complete'];
 
     editor.on('changes', (cm, changes) => {
       const lastChange = changes[changes.length - 1];
+      const origin = lastChange.origin || '';
+      const change = lastChange.text[0] || '';
+
+      if (
+        ignoredChanges.includes(origin)
+        || closeCharacters.test(change)) {
+        return;
+      }
 
       if (
         this.activeSuggest
         && !editor.state.completionActive
-        && !closedByCursor
-        && (!lastChange.origin || !ignoredChanges.includes(lastChange.origin))
       ) {
         cursor = editor.getCursor('from');
         this.showHint(true);
       }
-
-      this.lastCompletion = null;
-      closedByCursor = false;
     });
 
     editor.on('cursorActivity', () => {
-      closedByCursor = this.closeHint(editor);
-
       if (editor.state.completionActive) {
         const newCursor = editor.getCursor('from');
 
@@ -306,24 +306,6 @@ export class SqlEditorController implements IInitializableController {
         }
       }
     });
-  }
-
-  private closeHint(editor: Editor): boolean {
-    const cursor = editor.getCursor('from');
-
-    if (cursor.ch) {
-      const line = editor.getLine(cursor.line);
-      const substr = line.substr(0, cursor.ch);
-
-      if (this.lastCompletion && substr.endsWith(this.lastCompletion)) {
-        editor.closeHint();
-        return true;
-      }
-    } else {
-      editor.closeHint();
-      return true;
-    }
-    return false;
   }
 
   private findQueryBegin(editor: Editor, delimiters: string[], position: number) {
