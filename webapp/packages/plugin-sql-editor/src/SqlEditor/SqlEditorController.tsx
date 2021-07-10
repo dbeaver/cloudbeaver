@@ -277,9 +277,13 @@ export class SqlEditorController implements IInitializableController {
     const ignoredChanges = ['+delete', 'undo', 'complete'];
 
     editor.on('changes', (cm, changes) => {
+      if (!this.activeSuggest || editor.state.completionActive) {
+        return;
+      }
+
       const lastChange = changes[changes.length - 1];
-      const origin = lastChange.origin || '';
-      const change = lastChange.text[0] || '';
+      const origin = lastChange?.origin || '';
+      const change = lastChange?.text[0] || '';
 
       if (
         ignoredChanges.includes(origin)
@@ -287,13 +291,8 @@ export class SqlEditorController implements IInitializableController {
         return;
       }
 
-      if (
-        this.activeSuggest
-        && !editor.state.completionActive
-      ) {
-        cursor = editor.getCursor('from');
-        this.showHint(true);
-      }
+      cursor = editor.getCursor('from');
+      this.showHint(true);
     });
 
     editor.on('cursorActivity', () => {
