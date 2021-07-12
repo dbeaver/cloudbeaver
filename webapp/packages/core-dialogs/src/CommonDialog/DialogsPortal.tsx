@@ -24,11 +24,11 @@ import { dialogStyles } from './styles';
 export const DialogsPortal = observer(function DialogsPortal() {
   const commonDialogService = useService(CommonDialogService);
   const handleReject = useCallback(
-    (dialog: DialogInternal) => commonDialogService.rejectDialog(dialog),
+    (dialog: DialogInternal<any>) => commonDialogService.rejectDialog(dialog.promise),
     [commonDialogService]
   );
   const handleResolve = useCallback(
-    (dialog: DialogInternal, result: any) => commonDialogService.resolveDialog(dialog, result),
+    (dialog: DialogInternal<any>, result: any) => commonDialogService.resolveDialog(dialog.promise, result),
     [commonDialogService]
   );
 
@@ -48,9 +48,9 @@ export const DialogsPortal = observer(function DialogsPortal() {
 });
 
 interface NestedDialogType {
-  dialog: DialogInternal;
-  resolveDialog: (dialog: DialogInternal, result: any) => void;
-  rejectDialog: (dialog: DialogInternal) => void;
+  dialog: DialogInternal<any>;
+  resolveDialog: (dialog: DialogInternal<any>, result: any) => void;
+  rejectDialog: (dialog: DialogInternal<any>) => void;
   visible: boolean;
 }
 
