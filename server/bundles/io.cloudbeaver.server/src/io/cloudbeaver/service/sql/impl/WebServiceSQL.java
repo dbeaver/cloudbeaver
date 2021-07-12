@@ -20,8 +20,10 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.sql.*;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
@@ -45,6 +47,8 @@ import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +56,28 @@ import java.util.Map;
  * Web service implementation
  */
 public class WebServiceSQL implements DBWServiceSQL {
+
+    @Override
+    public WebSQLContextInfo[] listContexts(@NotNull WebSession session, @Nullable String connectionId, @Nullable String contextId) throws DBWebException {
+        List<WebConnectionInfo> conToRead = new ArrayList<>();
+        if (connectionId != null) {
+            WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, connectionId);
+            conToRead.add(webConnection);
+        } else {
+            conToRead.addAll(session.getConnections());
+        }
+
+        List<WebSQLContextInfo> contexts  = new ArrayList<>();
+        for (WebConnectionInfo con : conToRead) {
+            WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con);
+            WebSQLContextInfo[] conContexts = sqlProcessor.getContexts();
+            contexts.addAll(Arrays.asList(conContexts));
+        }
+        if (contextId != null) {
+            contexts.removeIf(c -> c.getId().equals(contextId));
+        }
+        return contexts.toArray(new WebSQLContextInfo[0]);
+    }
 
     @Override
     @NotNull
