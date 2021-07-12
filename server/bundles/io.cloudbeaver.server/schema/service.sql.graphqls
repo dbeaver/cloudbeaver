@@ -171,7 +171,7 @@ extend type Query {
     sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
 
     # Lists SQL contexts for a connection (optional) or returns the particular context info
-    sqlListContexts( connectionId: ID, contextId: ID ): [ SQLContextInfo ]
+    sqlListContexts( connectionId: ID, contextId: ID ): [ SQLContextInfo ]!
 
     sqlCompletionProposals(
         connectionId: ID!,
