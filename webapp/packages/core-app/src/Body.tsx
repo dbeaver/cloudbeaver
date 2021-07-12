@@ -25,6 +25,7 @@ const bodyStyles = css`
     display: flex;
     padding: 0 !important; /* fix additional padding with modal reakit menu */
     flex-direction: column;
+    overflow: hidden;
   }
 `;
 

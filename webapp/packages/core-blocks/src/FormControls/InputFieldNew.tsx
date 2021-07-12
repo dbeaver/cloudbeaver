@@ -46,6 +46,10 @@ const INPUT_FIELD_STYLES = composes(
       width: 24px;
       height: 24px;
       cursor: pointer;
+      & Icon {
+        width: 100%;
+        height: 100%;
+      }
     }
     input[disabled] + icon-container {
       cursor: auto;
