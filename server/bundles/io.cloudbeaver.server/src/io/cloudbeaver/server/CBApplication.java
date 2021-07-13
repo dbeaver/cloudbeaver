@@ -190,10 +190,6 @@ public class CBApplication extends BaseApplicationImpl {
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
-        if (configurationMode) {
-            // Try to configure automatically
-            performAutoConfiguration();
-        }
         //|| CommonUtils.isEmpty(databaseConfiguration.getUser()) || CommonUtils.isEmpty(databaseConfiguration.getPassword());
 
         // Determine address for local host
@@ -283,6 +279,11 @@ public class CBApplication extends BaseApplicationImpl {
         });
         Runtime.getRuntime().addShutdownHook(shutdownThread);
 
+        if (configurationMode) {
+            // Try to configure automatically
+            performAutoConfiguration(new File(configPath).getParentFile());
+        }
+
         try {
             initializeServer();
         } catch (DBException e) {
@@ -299,9 +300,50 @@ public class CBApplication extends BaseApplicationImpl {
     /**
      * Configures server automatically.
      * Called on startup
+     * @param configPath
      */
-    protected void performAutoConfiguration() {
+    protected void performAutoConfiguration(File configPath) {
+        String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
+        String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
+        String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
+        String autoAdminPassword = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
 
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+            // Try to load from auto config file
+            if (configPath.exists()) {
+                File autoConfigFile = new File(configPath, CBConstants.AUTO_CONFIG_FILE_NAME);
+                if (autoConfigFile.exists()) {
+                    Properties autoProps = new Properties();
+                    try (InputStream is = new FileInputStream(autoConfigFile)) {
+                        autoProps.load(is);
+
+                        autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
+                        autoServerURL = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_URL);
+                        autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
+                        autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
+                    } catch (IOException e) {
+                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'", e);
+                    }
+                }
+            }
+        }
+
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+            log.info("No auto configuration was found. Server must be configured manually");
+            return;
+        }
+        try {
+            finishConfiguration(
+                autoServerName,
+                autoServerURL,
+                autoAdminName,
+                autoAdminPassword,
+                Collections.emptyList(),
+                maxSessionIdleTime,
+                getAppConfiguration());
+        } catch (Exception e) {
+            log.error("Error loading server auto configuration", e);
+        }
     }
 
     protected void initializeServer() throws DBException {
