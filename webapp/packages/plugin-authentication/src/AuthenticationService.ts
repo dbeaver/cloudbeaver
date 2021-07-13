@@ -7,7 +7,6 @@
  */
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppScreenService } from '@cloudbeaver/core-app';
 import { AppAuthService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,7 +22,6 @@ export class AuthenticationService extends Bootstrap {
   private authPromise: Promise<void> | null;
   constructor(
     private screenService: ScreenService,
-    private appScreenService: AppScreenService,
     private appAuthService: AppAuthService,
     private authDialogService: AuthDialogService,
     private userInfoResource: UserInfoResource,
@@ -79,8 +77,8 @@ export class AuthenticationService extends Bootstrap {
       ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
     );
     this.sessionDataResource.beforeLoad.addPostHandler(() => { this.requireAuthentication(); });
+    this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
-    this.appScreenService.activation.addHandler(() => this.requireAuthentication());
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       const userInfo = await this.userInfoResource.load();
       if (userInfo) {
