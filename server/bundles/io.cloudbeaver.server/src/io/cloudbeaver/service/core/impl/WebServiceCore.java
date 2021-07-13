@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -171,13 +172,13 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean touchSession(HttpServletRequest request) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().touchSession(request);
+    public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+        return CBPlatform.getInstance().getSessionManager().touchSession(request, response);
     }
 
     @Override
-    public boolean refreshSessionConnections(HttpServletRequest request) throws DBWebException {
-        WebSession session = CBPlatform.getInstance().getSessionManager().getWebSession(request);
+    public boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+        WebSession session = CBPlatform.getInstance().getSessionManager().getWebSession(request, response);
         if (session == null) {
             return false;
         } else {
@@ -188,7 +189,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public boolean changeSessionLanguage(WebSession webSession, String locale) {
+    public boolean changeSessionLanguage(@NotNull WebSession webSession, String locale) {
         webSession.setLocale(locale);
         return true;
     }

@@ -56,7 +56,9 @@ import org.jkiss.dbeaver.registry.ProjectMetadata;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -74,6 +76,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
     private static final Log log = Log.getLog(WebSession.class);
 
     private static final String ATTR_LOCALE = "locale";
+    private static final String SESSION_TEMP_COOKIE = "cb-session";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
@@ -407,7 +410,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
         }
     }
 
-    synchronized void updateInfo(HttpServletRequest request) {
+    synchronized void updateInfo(HttpServletRequest request, HttpServletResponse response) {
         HttpSession httpSession = request.getSession();
         this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -430,6 +433,12 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
                 addSessionError(e);
                 log.error("Error persisting web session", e);
             }
+        }
+        {
+            Cookie sessionCookie = new Cookie(SESSION_TEMP_COOKIE, String.valueOf(System.currentTimeMillis()));
+            sessionCookie.setMaxAge((int) (CBApplication.getInstance().getMaxSessionIdleTime() / 1000));
+            //sessionCookie.setComment("CB session cookie");
+            response.addCookie(sessionCookie);
         }
     }
 

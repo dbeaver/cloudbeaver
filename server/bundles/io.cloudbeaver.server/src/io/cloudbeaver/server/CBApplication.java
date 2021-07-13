@@ -190,6 +190,10 @@ public class CBApplication extends BaseApplicationImpl {
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+        if (configurationMode) {
+            // Try to configure automatically
+            performAutoConfiguration();
+        }
         //|| CommonUtils.isEmpty(databaseConfiguration.getUser()) || CommonUtils.isEmpty(databaseConfiguration.getPassword());
 
         // Determine address for local host
@@ -290,6 +294,14 @@ public class CBApplication extends BaseApplicationImpl {
         log.debug("Shutdown");
 
         return null;
+    }
+
+    /**
+     * Configures server automatically.
+     * Called on startup
+     */
+    protected void performAutoConfiguration() {
+
     }
 
     protected void initializeServer() throws DBException {

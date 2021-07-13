@@ -26,6 +26,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -75,13 +76,13 @@ public interface DBWServiceCore extends DBWService {
     boolean closeSession(HttpServletRequest request) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    boolean touchSession(HttpServletRequest request) throws DBWebException;
+    boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
     @WebAction(requirePermissions = {})
-    boolean refreshSessionConnections(HttpServletRequest request) throws DBWebException;
+    boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException;
 
     @WebAction
-    boolean changeSessionLanguage(WebSession webSession, String locale) throws DBWebException;
+    boolean changeSessionLanguage(@NotNull WebSession webSession, String locale) throws DBWebException;
 
     ///////////////////////////////////////////
     // Connections
