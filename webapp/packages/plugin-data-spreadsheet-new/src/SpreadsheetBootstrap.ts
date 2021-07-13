@@ -58,7 +58,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
         },
         order: 0.5,
         title: 'data_grid_table_open_value_panel',
-        icon: '/icons/text_value_presentation.png',
+        icon: 'value-panel',
         onClick(context) {
           context.data.actions.setValuePresentation('');
         },
