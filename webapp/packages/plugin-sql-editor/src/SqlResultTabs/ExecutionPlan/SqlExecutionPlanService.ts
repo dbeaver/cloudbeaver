@@ -43,8 +43,12 @@ export class SqlExecutionPlanService {
     editorState: ISqlEditorTabState,
     query: string,
   ): Promise<void> {
+    if (!query.trim()) {
+      return;
+    }
+
     if (!editorState.executionContext) {
-      console.error('executeEditorQuery executionContext is not provided');
+      console.error('executeExecutionPlan executionContext is not provided');
       return;
     }
 
