@@ -438,6 +438,7 @@ public class WebSession implements DBASession, DBAAuthCredentialsProvider, IAdap
             long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
             Cookie sessionCookie = new Cookie(SESSION_TEMP_COOKIE, CBConstants.ISO_DATE_FORMAT.format(new Date(System.currentTimeMillis() + maxSessionIdleTime)));
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
+            sessionCookie.setPath(CBApplication.getInstance().getRootURI());
             //sessionCookie.setComment("CB session cookie");
             response.addCookie(sessionCookie);
         }
