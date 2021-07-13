@@ -26,7 +26,7 @@ export class DataValuePanelBootstrap extends Bootstrap {
       id: 'value-text-presentation',
       type: DataPresentationType.toolsPanel,
       title: 'data_viewer_presentation_value_title',
-      icon: '/icons/text_value_presentation.png',
+      icon: 'value-panel',
       hidden: (
         dataFormat,
         model,
@@ -36,5 +36,5 @@ export class DataValuePanelBootstrap extends Bootstrap {
     });
   }
 
-  load(): void {}
+  load(): void { }
 }

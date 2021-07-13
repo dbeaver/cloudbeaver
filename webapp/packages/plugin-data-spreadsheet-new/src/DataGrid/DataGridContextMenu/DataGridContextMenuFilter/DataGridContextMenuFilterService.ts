@@ -121,7 +121,7 @@ export class DataGridContextMenuFilterService {
         },
         order: 2,
         title: 'data_grid_table_filter',
-        icon: '/icons/filter.png',
+        icon: 'filter',
         isPanel: true,
       }
     );
@@ -138,7 +138,7 @@ export class DataGridContextMenuFilterService {
         },
         order: 3,
         title: 'data_grid_table_delete_filters_and_orders',
-        icon: '/icons/erase.png',
+        icon: 'erase',
         onClick: async context => {
           const { model, resultIndex } = context.data;
           const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
@@ -167,7 +167,7 @@ export class DataGridContextMenuFilterService {
         },
         order: 0,
         title: 'ui_clipboard',
-        icon: '/icons/filter_clipboard.png',
+        icon: 'filter-clipboard',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'clipboardValuePanel',
           menuItemsGetter: context => {
@@ -179,7 +179,7 @@ export class DataGridContextMenuFilterService {
             const items = this.getGeneralizedMenuItems(
               context,
               valueGetter,
-              '/icons/filter_clipboard.png',
+              'filter-clipboard',
               () => this.clipboardService.state === 'prompt'
             );
 
@@ -192,7 +192,7 @@ export class DataGridContextMenuFilterService {
                   return context.data.model.isLoading();
                 },
                 title: 'data_grid_table_context_menu_filter_clipboard_permission',
-                icon: '/icons/permissions.png',
+                icon: 'permission',
                 onClick: async () => {
                   await this.clipboardService.read();
                 },
@@ -220,14 +220,14 @@ export class DataGridContextMenuFilterService {
         },
         order: 1,
         title: 'data_grid_table_filter_cell_value',
-        icon: '/icons/filter_value.png',
+        icon: 'filter',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'cellValuePanel',
           menuItemsGetter: context => {
             const { model, resultIndex, column, row } = context.data;
             const data = model.source.getAction(resultIndex, ResultSetDataAction);
             const cellValue = data.getCellValue({ column, row });
-            const items = this.getGeneralizedMenuItems(context, cellValue, '/icons/filter_value.png');
+            const items = this.getGeneralizedMenuItems(context, cellValue, 'filter');
             return items;
           },
         }),
@@ -248,7 +248,7 @@ export class DataGridContextMenuFilterService {
         },
         order: 2,
         title: 'data_grid_table_filter_custom_value',
-        icon: '/icons/filter_custom.png',
+        icon: 'filter-custom',
         panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
           id: 'customValuePanel',
           menuItemsGetter: context => {
@@ -273,7 +273,7 @@ export class DataGridContextMenuFilterService {
                     return context.data.model.isLoading();
                   },
                   title: title + ' ..',
-                  icon: '/icons/filter_custom.png',
+                  icon: 'filter-custom',
                   onClick: async () => {
                     const isNull = format.isNull(cellValue);
                     const stringifyCellValue = format.toDisplayString(cellValue);
@@ -317,7 +317,7 @@ export class DataGridContextMenuFilterService {
           return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
         },
         order: 3,
-        icon: '/icons/filter_value.png',
+        icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.column)?.label || '';
@@ -343,7 +343,7 @@ export class DataGridContextMenuFilterService {
           return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
         },
         order: 4,
-        icon: '/icons/filter_value.png',
+        icon: 'filter',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.column)?.label || '';
@@ -372,7 +372,7 @@ export class DataGridContextMenuFilterService {
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         },
         order: 5,
-        icon: '/icons/filter_reset.png',
+        icon: 'filter-reset',
         titleGetter: context => {
           const data = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataAction);
           const columnLabel = data.getColumn(context.data.column)?.name || '';
@@ -403,6 +403,7 @@ export class DataGridContextMenuFilterService {
           return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         },
         order: 6,
+        icon: 'filter-reset-all',
         title: 'data_grid_table_filter_reset_all_filters',
         onClick: async context => {
           const { model, resultIndex } = context.data;
