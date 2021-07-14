@@ -44,7 +44,7 @@ export class CommonDialogService {
   dialogs: Array<DialogInternal<any>> = observable([], { deep: false });
 
   // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
-  async open<TPayload, TResult>(
+  open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
     options?: DialogOptions
