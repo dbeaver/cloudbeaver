@@ -69,12 +69,14 @@ public class WebServiceSQL implements DBWServiceSQL {
 
         List<WebSQLContextInfo> contexts  = new ArrayList<>();
         for (WebConnectionInfo con : conToRead) {
-            WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con);
-            WebSQLContextInfo[] conContexts = sqlProcessor.getContexts();
-            contexts.addAll(Arrays.asList(conContexts));
+            WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con, false);
+            if (sqlProcessor != null) {
+                WebSQLContextInfo[] conContexts = sqlProcessor.getContexts();
+                contexts.addAll(Arrays.asList(conContexts));
+            }
         }
         if (contextId != null) {
-            contexts.removeIf(c -> c.getId().equals(contextId));
+            contexts.removeIf(c -> !c.getId().equals(contextId));
         }
         return contexts.toArray(new WebSQLContextInfo[0]);
     }

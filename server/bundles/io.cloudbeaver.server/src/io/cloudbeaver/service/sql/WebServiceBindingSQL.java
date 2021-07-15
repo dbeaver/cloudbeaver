@@ -28,6 +28,7 @@ import io.cloudbeaver.service.sql.impl.WebServiceSQL;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
@@ -159,6 +160,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo);
     }
 
+    @Nullable
+    public static WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo, boolean connect) throws DBWebException {
+        return getSQLConfiguration(connectionInfo.getSession()).getSQLProcessor(connectionInfo, connect);
+    }
+
     @NotNull
     public static WebSQLContextInfo getSQLContext(DataFetchingEnvironment env) throws DBWebException {
         WebSQLProcessor processor = getSQLProcessor(env);
@@ -186,7 +192,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         private final Map<WebConnectionInfo, WebSQLProcessor> processors = new HashMap<>();
 
         WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo) throws DBWebException {
+            return WebServiceBindingSQL.getSQLProcessor(connectionInfo, true);
+        }
+
+        WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo, boolean connect) throws DBWebException {
             if (connectionInfo.getDataSource() == null) {
+                if (!connect) {
+                    return null;
+                }
                 try {
                     connectionInfo.getDataSourceContainer().connect(connectionInfo.getSession().getProgressMonitor(), true, false);
                 } catch (DBException e) {
