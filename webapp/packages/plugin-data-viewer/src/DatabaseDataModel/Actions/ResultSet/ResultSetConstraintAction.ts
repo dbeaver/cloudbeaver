@@ -254,14 +254,11 @@ export function getNextOrder(order: Order): Order {
 }
 
 export function wrapOperationArgument(operationId: string, argument: any): string {
-  let result = argument;
   if (operationId === 'LIKE') {
-    result = `%${result} %`;
+    return `%${argument}%`;
   }
 
-  result = `'${result}'`;
-
-  return result;
+  return argument;
 }
 
 export function isFilterConstraint(constraint: SqlDataFilterConstraint): boolean {

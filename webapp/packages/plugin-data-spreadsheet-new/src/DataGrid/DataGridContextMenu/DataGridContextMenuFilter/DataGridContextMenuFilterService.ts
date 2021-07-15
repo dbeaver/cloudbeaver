@@ -96,13 +96,14 @@ export class DataGridContextMenuFilterService {
           const val = typeof value === 'function' ? value() : value;
           const stringifyValue = format.toDisplayString(val);
           const wrappedValue = wrapOperationArgument(operation.id, stringifyValue);
-          const clippeddValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
-          return `${columnLabel} ${operation.expression} ${clippeddValue}`;
+          const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
+          return `${columnLabel} ${operation.expression} ${clippedValue}`;
         },
         icon,
         onClick: async () => {
           const val = typeof value === 'function' ? value() : value;
-          await this.applyFilter(model, resultIndex, column, operation.id, val);
+          const wrappedValue = wrapOperationArgument(operation.id, val);
+          await this.applyFilter(model, resultIndex, column, operation.id, wrappedValue);
         },
       }));
   }
