@@ -74,8 +74,12 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
       const cookies = getCookies();
 
-      if (!this.sessionExpireService.sessionExpired && cookies[SESSION_COOKIE_NAME]) {
-        await this.sessionResource.refreshSilent();
+      if (!this.sessionExpireService.sessionExpired) {
+        if (cookies[SESSION_COOKIE_NAME]) {
+          await this.sessionResource.refreshSilent();
+        } else {
+          this.sessionExpireService.handleSessionExpired();
+        }
       }
     }
   }
