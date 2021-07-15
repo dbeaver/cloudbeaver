@@ -129,7 +129,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
       for (let i = 0; i < associatedValues.length; i++) {
         const { key, value } = associatedValues[i];
 
-        if (value === null || value === undefined) {
+        if (value === undefined || typeof value === 'object') {
           continue;
         }
 
@@ -184,31 +184,32 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, getAss
         pointToLayer={(_, latlng) => leaflet.circleMarker(latlng, geojsonMarkerOptions)}
         onEachFeature={onEachFeature}
       />
-
-      <LayersControl>
-        <LayersControl.BaseLayer
-          name={translate(baseTiles.street.name)}
-          checked={baseTiles.street.checked}
-        >
-          <TileLayer
-            attribution={baseTiles.street.attribution}
-            url={baseTiles.street.url}
-            maxZoom={baseTiles.street.maxZoom}
-            id={baseTiles.street.id}
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer
-          name={translate(baseTiles.topography.name)}
-          checked={baseTiles.topography.checked}
-        >
-          <TileLayer
-            attribution={baseTiles.topography.attribution}
-            url={baseTiles.topography.url}
-            maxZoom={baseTiles.topography.maxZoom}
-            id={baseTiles.topography.id}
-          />
-        </LayersControl.BaseLayer>
-      </LayersControl>
+      {crs !== leaflet.CRS.Simple && (
+        <LayersControl>
+          <LayersControl.BaseLayer
+            name={translate(baseTiles.street.name)}
+            checked={baseTiles.street.checked}
+          >
+            <TileLayer
+              attribution={baseTiles.street.attribution}
+              url={baseTiles.street.url}
+              maxZoom={baseTiles.street.maxZoom}
+              id={baseTiles.street.id}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer
+            name={translate(baseTiles.topography.name)}
+            checked={baseTiles.topography.checked}
+          >
+            <TileLayer
+              attribution={baseTiles.topography.attribution}
+              url={baseTiles.topography.url}
+              maxZoom={baseTiles.topography.maxZoom}
+              id={baseTiles.topography.id}
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
+      )}
     </MapContainer>
   );
 }
