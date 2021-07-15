@@ -25,6 +25,7 @@ export * from './shared/ToolsPanel/LogViewer/LogViewerBootstrap';
 export * from './shared/ToolsPanel/LogViewer/LogViewerService';
 
 export * from './shared/SessionExpireDialog/SessionExpiredDialogService';
+export * from './shared/SessionExpireWarningDialog/SessionExpireWarningDialogService';
 export * from './NavigationTree/ElementsTree';
 export * from './NavigationTree/TreeContext';
 export * from './NavigationTree/NavigationTreeService';

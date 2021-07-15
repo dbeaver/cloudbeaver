@@ -23,3 +23,4 @@ export * from './throttle';
 export * from './uuid_';
 export * from './isValidUrl';
 export * from './isImageFormat';
+export * from './getCookies';

@@ -35,7 +35,8 @@ import {
   CoreSettingsService,
   AdministrationTopAppBarBootstrapService,
   AppLocaleService,
-  SessionExpiredDialogService
+  SessionExpiredDialogService,
+  SessionExpireWarningDialogService
 } from '@cloudbeaver/core-app';
 import {
   AppAuthService,
@@ -138,6 +139,7 @@ export const coreManifest: PluginManifest = {
     ClipboardService,
     ClipboardBootstrap,
     SessionExpireService,
+    SessionExpireWarningDialogService,
     SessionExpiredDialogService,
     ConnectionsLocaleService,
     ConnectionFormService,
