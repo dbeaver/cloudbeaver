@@ -23,10 +23,8 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Changelog
 
 ### CloudBeaver 21.1.0 - 2021-07-15
+
 Changes since 21.0.0
-
-#### CloudBeaver Community Edition
-
 - Navigation tree:
   - User's and shared connections are divided into different groups.
 - Connection form:
@@ -54,75 +52,6 @@ Changes since 21.0.0
 - It is possible to change the user password from the public part of CloudBeaver.
 - New design for dialogs is implemented.
 - Possibility to export data for users can be configured.
-- A lot of UI fixes, enhancements and improvements are made.
-
-#### CloudBeaver AWS
-
-- Navigation tree:
-  - User's and shared connections are divided into different groups.
-- Connection form:
-  - Read-only connections are marked in the connection form.
-  - It is possible to show and hide password in the connection dialog.
-- Data editor:
-  - New actions are available from the context menu:
-    - filtering
-    - ordering
-    - cell editing.
-  - Support for different formats is added to the Value panel.
-  - Work with links is improved:
-    - Links to the web pages can be opened from the tables
-    - Links to the pictures are automatically transformed to the pictures on the Value panel.
-  - It is possible to edit Boolean values as checkboxes in the tables.
-  - Read-only columns and tables are marked in the result set.
-  - JSON view is editable.
-  - Display of DynamoDB tables is fixed.
-- SQL editor:
-  - Query execution plan is added.
-  - Database logos are displayed in the top menu selector.
-  - Auto-complete for the SQL dialects works automatically.
-- Log viewer:
-  - Detailed information for errors is opened on the panel.
-- Administration part:
-  - Access management for users and connections is improved.
-  - Labels for AWS users are added.
-- It is possible to change the user password from the public part of CloudBeaver.
-- New design for dialogs is implemented.
-- Possibility to export data for users can be configured.
-- A lot of UI fixes, enhancements and improvements are made.
-
-#### CloudBeaver Enterprise Edition
-
-- Navigation tree:
-  - User's and shared connections are divided into different groups.
-- Connection form:
-  - Read-only connections are marked in the connection form.
-  - It is possible to show and hide password in the connection dialog.
-- Data editor:
-  - New actions are available from the context menu:
-    - filtering
-    - ordering
-    - cell editing.
-  - Support for different formats is added to the Value panel.
-  - Work with links is improved:
-    - Links to the web pages can be opened from the tables
-    - Links to the pictures are automatically transformed to the pictures on the Value panel.
-  - It is possible to edit Boolean values as checkboxes in the tables.
-  - Read-only columns and tables are marked in the result set.
-  - JSON view is editable.
-  - Display of DynamoDB tables is fixed.
-- SQL editor:
-  - Query execution plan is added.
-  - Database logos are displayed in the top menu selector.
-  - Auto-complete works by default now.
-- Log viewer:
-  - Detailed information for errors can be opened.
-- Administration part:
-  - Access management for users and connections is improved.
-  - Labels for AWS users are added.
-- It is possible to change the user password from the public part of CloudBeaver.
-- New design for dialogs is implemented.
-- Possibility to export data for users can be configured.
-- Detailed information about user licenses is added.
 - A lot of UI fixes, enhancements and improvements are made.
 
 ### CloudBeaver 21.0.5 - 2021-06-30
