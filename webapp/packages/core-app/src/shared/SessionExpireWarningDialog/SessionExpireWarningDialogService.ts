@@ -8,9 +8,14 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { getCookies } from '@cloudbeaver/core-utils';
 
 import { SessionExpireWarningDialog } from '../SessionExpireWarningDialog/SessionExpireWarningDialog';
+
+const SESSION_COOKIE_NAME = 'cb-session';
+const WARN_IN = 5 * 1000 * 60;
+const POLL_INTERVAL = 1 * 1000 * 60;
 
 @injectable()
 export class SessionExpireWarningDialogService extends Bootstrap {
@@ -19,6 +24,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   constructor(
     private commonDialogService: CommonDialogService,
     private sessionExpireService: SessionExpireService,
+    private serverConfigResource: ServerConfigResource,
     private sessionResource: SessionResource,
   ) {
     super();
@@ -26,25 +32,55 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   }
 
   register(): void {
-    this.sessionExpireService.onSessionExpire.addHandler(this.handleSessionExpired.bind(this));
-    this.sessionExpireService.onSessionExpireWarning.addHandler(this.open.bind(this));
+    this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
   }
 
-  load(): void | Promise<void> { }
+  load(): void {
+    this.startSessionPolling();
+  }
+
+  private startSessionPolling() {
+    const poll = () => {
+      const cookies = getCookies();
+      const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
+      const sessionExpiredTime = cookies[SESSION_COOKIE_NAME];
+
+      if (!sessionExpiredTime) {
+        this.sessionExpireService.handleSessionExpired();
+        return;
+      }
+
+      if (this.sessionExpireService.sessionExpired || !sessionDuration || sessionDuration < WARN_IN) {
+        this.close();
+        return;
+      }
+
+      if (!this.dialogInternalPromise) {
+        const remainingTime = new Date(sessionExpiredTime).getTime() - Date.now();
+        if (remainingTime < WARN_IN) {
+          this.open();
+        }
+      }
+    };
+
+    setInterval(poll, POLL_INTERVAL);
+  }
 
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
       this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, null);
       await this.dialogInternalPromise;
+      this.dialogInternalPromise = null;
 
-      if (this.dialogInternalPromise) {
+      const cookies = getCookies();
+
+      if (!this.sessionExpireService.sessionExpired && cookies[SESSION_COOKIE_NAME]) {
         await this.sessionResource.refreshSilent();
-        this.dialogInternalPromise = null;
       }
     }
   }
 
-  private handleSessionExpired(): void {
+  private close(): void {
     if (this.dialogInternalPromise) {
       this.commonDialogService.rejectDialog(this.dialogInternalPromise);
       this.dialogInternalPromise = null;
