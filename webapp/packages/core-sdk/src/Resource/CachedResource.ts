@@ -258,9 +258,11 @@ export abstract class CachedResource<
 
         return await this.taskWrapper(param, context, update);
       },
-      () => this.markDataLoaded(param, context),
-      () => this.onDataUpdate.execute(param),
-      exception => this.markDataError(exception, param, context));
+      {
+        after: () => this.markDataLoaded(param, context),
+        success: () => this.onDataUpdate.execute(param),
+        error: exception => this.markDataError(exception, param, context),
+      });
   }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
@@ -286,9 +288,11 @@ export abstract class CachedResource<
 
         await this.taskWrapper(param, context, this.loadingTask);
       },
-      () => this.markDataLoaded(param, context),
-      () => this.onDataUpdate.execute(param),
-      exception => this.markDataError(exception, param, context));
+      {
+        after: () => this.markDataLoaded(param, context),
+        success: () => this.onDataUpdate.execute(param),
+        error: exception => this.markDataError(exception, param, context),
+      });
   }
 
   private async loadingTask(param: TParam, context: TContext) {
