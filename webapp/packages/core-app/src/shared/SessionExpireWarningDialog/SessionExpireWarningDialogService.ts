@@ -52,17 +52,15 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
       const remainingTime = new Date(sessionExpiredTime).getTime() - Date.now();
 
-      if (this.sessionExpireService.expired
-        || !sessionDuration
-        || sessionDuration < WARN_IN
-        || (this.dialogInternalPromise && remainingTime > WARN_IN)
-      ) {
+      if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < WARN_IN) {
         this.close();
         return;
       }
 
       if (remainingTime < WARN_IN) {
         this.open();
+      } else {
+        this.close();
       }
     };
 
