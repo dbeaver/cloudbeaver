@@ -39,10 +39,12 @@ export class ConnectionAuthService {
       return connection;
     }
 
-    const state = await this.authProviderService.requireProvider(connection.origin);
+    if (connection.origin) {
+      const state = await this.authProviderService.requireProvider(connection.origin);
 
-    if (!state) {
-      return connection;
+      if (!state) {
+        return connection;
+      }
     }
 
     await this.connectionInfoResource.waitLoad();

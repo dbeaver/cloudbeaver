@@ -103,7 +103,9 @@ export const CellRenderer: React.FC<CellRendererProps<any>> = observer(function 
         return;
       }
 
-      if (!this.column.editable
+      if (
+        !this.column.editable
+        || this.dataGridContext?.model.isDisabled(this.dataGridContext.resultIndex)
         || (
           this.resultColumn
           && isBooleanFormatterAvailable(this.editor?.getCell(this.rowIdx, Number(this.column.key)), this.resultColumn)

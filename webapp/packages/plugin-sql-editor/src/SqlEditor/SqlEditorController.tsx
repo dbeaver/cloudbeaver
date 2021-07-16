@@ -6,16 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
+import type {
   EditorConfiguration,
   Editor,
   EditorChange,
   Position,
   Hints,
-  HintFunction, on as CodemirrorOn,
   ShowHintOptions,
-  off as CodemirrorOff,
-  Hint
+  HintFunction,
 } from 'codemirror';
 import { computed, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
@@ -87,8 +85,6 @@ export class SqlEditorController implements IInitializableController {
 
   private tab!: ITab<ISqlEditorTabState>;
   private editor?: Editor;
-  private lastHints: Hints | null;
-  private lastCompletion: string | null;
 
   constructor(
     private sqlResultTabsService: SqlResultTabsService,
@@ -97,9 +93,6 @@ export class SqlEditorController implements IInitializableController {
     private sqlEditorService: SqlEditorService,
     private sqlExecutionPlanService: SqlExecutionPlanService,
   ) {
-    this.lastHints = null;
-    this.lastCompletion = null;
-    this.setLastCompletion = this.setLastCompletion.bind(this);
     this.getHandleAutocomplete = this.getHandleAutocomplete.bind(this);
     this.getHandleAutocomplete = throttleAsync(this.getHandleAutocomplete, 1000 / 3);
     makeObservable(this, {
@@ -252,21 +245,7 @@ export class SqlEditorController implements IInitializableController {
       })),
     };
 
-    if (this.lastHints) {
-      CodemirrorOff(this.lastHints, 'pick', this.setLastCompletion);
-    }
-
-    this.lastHints = hints;
-    CodemirrorOn(hints, 'pick', this.setLastCompletion);
-
     return hints;
-  }
-
-  private setLastCompletion(hint: string | Hint): void {
-    if (typeof hint === 'object') {
-      hint = hint.text;
-    }
-    this.lastCompletion = hint;
   }
 
   private handleEditorConfigure(editor: Editor) {

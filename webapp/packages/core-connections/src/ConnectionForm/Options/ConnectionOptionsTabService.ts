@@ -323,9 +323,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
   ): Promise<ObjectPropertyInfo[]> {
     const authModel = await this.databaseAuthModelsResource.load(authModelId);
 
-    let properties = authModel?.properties;
+    let properties = authModel.properties;
 
-    if (connectionInfo && connectionInfo.authProperties.length > 0) {
+    if (connectionInfo?.authProperties && connectionInfo.authProperties.length > 0) {
       properties = connectionInfo.authProperties;
     }
 

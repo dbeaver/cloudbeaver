@@ -45,6 +45,9 @@ export class DataGridContextMenuOrderService {
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
+        isHidden(context) {
+          return context.data.model.isDisabled(context.data.resultIndex);
+        },
         order: 1,
         title: 'data_grid_table_order',
         icon: 'order-arrow-unknown',

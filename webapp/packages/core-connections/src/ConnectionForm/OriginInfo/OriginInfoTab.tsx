@@ -22,7 +22,7 @@ export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = obs
 }) {
   return styled(useStyles(style))(
     <Tab {...rest} style={style}>
-      <TabTitle><Translate token={info?.origin.displayName || 'Origin'} /></TabTitle>
+      <TabTitle><Translate token={info?.origin?.displayName || 'Origin'} /></TabTitle>
     </Tab>
   );
 });

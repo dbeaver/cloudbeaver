@@ -34,7 +34,8 @@ export class DataGridContextMenuCellEditingService {
         },
         isHidden(context) {
           const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-          return format.isReadOnly({ column: context.data.column, row: context.data.row });
+          return format.isReadOnly({ column: context.data.column, row: context.data.row })
+            || context.data.model.isDisabled(context.data.resultIndex);
         },
         order: 4,
         title: 'data_grid_table_editing',

@@ -85,7 +85,7 @@ export const TablePresentationBar = observer(function TablePresentationBar({
   }
 
   return styled(style)(
-    <table-left-bar as="div" className={className}>
+    <table-left-bar className={className}>
       <TabsState currentTabId={presentationId} onChange={changePresentation}>
         <TabList {...use({ flexible: type === DataPresentationType.main })}>
           {presentations.map(presentation => (

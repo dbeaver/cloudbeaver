@@ -78,7 +78,7 @@ export const TableColumnHeader: React.FC<HeaderRendererProps<any>> = observer(fu
   const columnName = calculatedColumn.name as string;
 
   // TODO we want to get "sortable" property from SqlResultColumn data
-  const sortable = model.source.results.length === 1;
+  const sortable = model.source.results.length === 1 && !model.source.isDisabled(resultIndex);
   const readOnly = !tableDataContext.isReadOnly() && column?.readOnly;
   const readOnlyStatus = column?.readOnlyStatus ? `(Read-only: ${column.readOnlyStatus})` : '';
   const columnTooltip = `${columnName}${column?.fullTypeName ? ': ' + column.fullTypeName : ''} ${readOnlyStatus}`;

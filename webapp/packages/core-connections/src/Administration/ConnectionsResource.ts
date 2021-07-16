@@ -267,6 +267,9 @@ export function isLocalConnection(connection: DatabaseConnection): boolean {
 }
 
 export function isCloudConnection(connection: DatabaseConnection): boolean {
+  if (!connection.origin) {
+    return false;
+  }
   return connection.origin.type === 'cloud';
 }
 

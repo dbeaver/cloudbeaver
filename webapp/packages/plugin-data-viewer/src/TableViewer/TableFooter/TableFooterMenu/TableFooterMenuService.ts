@@ -34,12 +34,16 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
           return true;
         }
         const editor = context.data.model.source.getEditor(context.data.resultIndex);
 
-        return context.data.model.isLoading() || !editor.isEdited();
+        return !editor.isEdited();
       },
       order: 1,
       title: 'ui_processing_save',
@@ -52,7 +56,11 @@ export class TableFooterMenuService {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },
       isDisabled(context) {
-        if (!context.data.model.source.hasResult(context.data.resultIndex)) {
+        if (
+          context.data.model.isLoading()
+          || context.data.model.isDisabled(context.data.resultIndex)
+          || !context.data.model.source.hasResult(context.data.resultIndex)
+        ) {
           return true;
         }
         const editor = context.data.model.source.getEditor(context.data.resultIndex);

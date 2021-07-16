@@ -36,6 +36,15 @@ export type CachedMapResourceGetter<
   ? Array<CachedResourceValueIncludes<TValue, TIncludes> | undefined>
   : CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
+export type CachedMapResourceLoader<
+  TRealKey extends ResourceKey<TKey>,
+  TKey,
+  TValue,
+  TIncludes
+> = TRealKey extends ResourceKeyList<TKey>
+  ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
+  : CachedResourceValueIncludes<TValue, TIncludes>;
+
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
   includes: string[];
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable } from 'mobx';
+import { observable, makeObservable, computed } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -19,9 +19,14 @@ import { DataModelWrapper } from './DataModelWrapper';
 export class TableViewerStorageService {
   private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
+  get values(): Array<IDatabaseDataModel<any, any>> {
+    return Array.from(this.tableModelMap.values());
+  }
+
   constructor() {
-    makeObservable<TableViewerStorageService, 'tableModelMap'>(this, {
+    makeObservable<this, 'tableModelMap'>(this, {
       tableModelMap: observable,
+      values: computed,
     });
   }
 
