@@ -16,11 +16,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
-  dialog-content {
-    display: flex;
-    height: 150px;
-    justify-content: center;
-    align-items: center;
+  CommonDialogWrapper {
+    width: 400px;
+    min-width: auto;
   }
   controls {
     display: flex;
@@ -29,6 +27,9 @@ const styles = css`
     align-items: center;
     margin: auto;
     justify-content: flex-end;
+  }
+  p {
+    margin: 0;
   }
 `;
 
@@ -43,7 +44,7 @@ export const SessionExpiredDialog = observer(function SessionExpiredDialog({
     <CommonDialogWrapper
       title={title}
       footer={(
-        <controls as="div">
+        <controls>
           <Button
             type="button"
             mod={['unelevated']}
@@ -55,9 +56,7 @@ export const SessionExpiredDialog = observer(function SessionExpiredDialog({
       )}
       onReject={rejectDialog}
     >
-      <dialog-content as="div">
-        <div>{translate('app_root_session_expired_message')}</div>
-      </dialog-content>
+      <p>{translate('app_root_session_expired_message')}</p>
     </CommonDialogWrapper>
   );
 });

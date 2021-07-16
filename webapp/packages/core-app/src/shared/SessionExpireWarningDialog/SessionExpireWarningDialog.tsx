@@ -15,12 +15,9 @@ import { useTranslate } from '@cloudbeaver/core-localization';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 const styles = css`
-  dialog-content {
-    display: flex;
-    height: 150px;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  CommonDialogWrapper {
+    width: 400px;
+    min-width: auto;
   }
   controls {
     display: flex;
@@ -29,6 +26,9 @@ const styles = css`
     align-items: center;
     margin: auto;
     justify-content: flex-end;
+  }
+  p {
+    margin: 0;
   }
 `;
 
@@ -53,9 +53,7 @@ export const SessionExpireWarningDialog = observer(function SessionExpireWarning
       )}
       onReject={rejectDialog}
     >
-      <dialog-content>
-        <div>{translate('app_root_session_expire_warning_message')}</div>
-      </dialog-content>
+      <p>{translate('app_root_session_expire_warning_message')}</p>
     </CommonDialogWrapper>
   );
 });
