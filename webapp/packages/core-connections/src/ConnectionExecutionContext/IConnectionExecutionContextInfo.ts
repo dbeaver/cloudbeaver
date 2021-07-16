@@ -6,9 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IDatabaseExecutionContext {
-  connectionId: string;
-  contextId: string;
-  objectCatalogId?: string;
-  objectSchemaId?: string;
-}
+import type { SqlContextInfo } from '@cloudbeaver/core-sdk';
+
+export interface IConnectionExecutionContextInfo extends SqlContextInfo { }

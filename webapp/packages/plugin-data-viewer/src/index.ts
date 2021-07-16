@@ -30,7 +30,6 @@ export * from './DatabaseDataModel/IDatabaseDataModel';
 export * from './DatabaseDataModel/IDatabaseDataOptions';
 export * from './DatabaseDataModel/IDatabaseDataResult';
 export * from './DatabaseDataModel/IDatabaseDataSource';
-export * from './DatabaseDataModel/IDatabaseExecutionContext';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 export * from './DatabaseDataModel/Order';
 

@@ -6,12 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
-
-export interface ISqlQueryParams {
-  query: string;
-  executionContext: IDatabaseExecutionContext;
-}
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
 export interface IResultTab {
   tabId: string;
@@ -24,9 +19,9 @@ export interface IResultTab {
 export interface IResultGroup {
   groupId: string;
   modelId: string;
-  sqlQueryParams: ISqlQueryParams;
   order: number;
   nameOrder: number;
+  query: string;
 }
 
 export interface ISqlEditorResultTab {
@@ -38,15 +33,15 @@ export interface ISqlEditorResultTab {
 
 export interface IExecutionPlanTab {
   tabId: string;
-  executionContext: IDatabaseExecutionContext;
   order: number;
+  query: string;
   options?: Record<string, any>;
 }
 
 export interface ISqlEditorTabState {
   order: number;
   query: string;
-  executionContext?: IDatabaseExecutionContext;
+  executionContext?: IConnectionExecutionContextInfo;
   currentTabId?: string;
   tabs: ISqlEditorResultTab[];
   resultGroups: IResultGroup[];

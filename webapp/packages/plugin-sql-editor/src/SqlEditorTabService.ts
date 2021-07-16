@@ -17,38 +17,35 @@ import {
   ITabOptions
 } from '@cloudbeaver/core-app';
 import {
-  ConnectionInfoResource,
+  ConnectionExecutionContextResource,
+  ConnectionExecutionContextService,
   connectionProvider,
   connectionSetter,
+  IConnectionExecutionContextInfo,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
-import { SqlExecutionState } from './SqlExecutionState';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
-  readonly tabExecutionState: MetadataMap<string, SqlExecutionState>;
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
 
   constructor(
     private navigationTabsService: NavigationTabsService,
     private notificationService: NotificationService,
     private sqlEditorService: SqlEditorService,
-    private connectionInfo: ConnectionInfoResource,
-    private readonly sqlResultTabsService: SqlResultTabsService
+    private readonly sqlResultTabsService: SqlResultTabsService,
+    private connectionExecutionContextService: ConnectionExecutionContextService,
+    private connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
     super();
-
-    this.tabExecutionState = new MetadataMap(() => new SqlExecutionState());
 
     this.tabHandler = this.navigationTabsService
       .registerTabHandler<ISqlEditorTabState>({
@@ -69,8 +66,8 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   register(): void {
-    this.connectionInfo.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
-    this.connectionInfo.onItemAdd.addHandler(this.handleConnectionUpdate.bind(this));
+    this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
+    this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextUpdate.bind(this));
   }
 
   load(): void {}
@@ -82,7 +79,7 @@ export class SqlEditorTabService extends Bootstrap {
   ): Promise<ITabOptions<ISqlEditorTabState> | null> {
     const executionContext = await this.sqlEditorService.initContext(connectionId, catalogId, schemaId);
 
-    if (!executionContext) {
+    if (!executionContext?.context) {
       return null;
     }
 
@@ -93,7 +90,7 @@ export class SqlEditorTabService extends Bootstrap {
       handlerState: {
         query: '',
         order,
-        executionContext,
+        executionContext: { ...executionContext.context },
         tabs: [],
         resultGroups: [],
         resultTabs: [],
@@ -102,39 +99,25 @@ export class SqlEditorTabService extends Bootstrap {
     };
   }
 
-  selectResultTab(tab: ITab<ISqlEditorTabState>, resultId: string): void {
-    tab.handlerState.currentTabId = resultId;
+  selectResultTab(state: ISqlEditorTabState, resultId: string): void {
+    state.currentTabId = resultId;
   }
 
   resetConnectionInfo(state: ISqlEditorTabState): void {
     state.executionContext = undefined;
   }
 
-  private async handleConnectionUpdate(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
-        isSQLEditorTab(tab => tab.handlerState.executionContext?.connectionId === key)
-      );
-      const connection = this.connectionInfo.get(key);
+  private async handleExecutionContextUpdate() {
+    const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
+      isSQLEditorTab(tab => !!tab.handlerState.executionContext)
+    );
 
-      if (!connection?.connected) {
-        for (const tab of tabs) {
-          this.resetConnectionInfo(tab.handlerState);
-        }
-      }
-    });
-  }
-
-  private async handleConnectionDelete(key: ResourceKey<string>) {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
-        isSQLEditorTab(tab => tab.handlerState.executionContext?.connectionId === key)
-      );
-
-      for (const tab of tabs) {
+    for (const tab of tabs) {
+      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext!.id);
+      if (!executionContext) {
         this.resetConnectionInfo(tab.handlerState);
       }
-    });
+    }
   }
 
   private getFreeEditorId() {
@@ -148,8 +131,9 @@ export class SqlEditorTabService extends Bootstrap {
         || typeof tab.handlerState.order !== 'number'
         || !['undefined', 'object'].includes(typeof tab.handlerState.executionContext)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.connectionId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.contextId)
-        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.objectCatalogId)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.id)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultCatalog)
+        || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.executionContext?.defaultSchema)
         || !['string', 'undefined', 'object'].includes(typeof tab.handlerState.currentTabId)
         || !Array.isArray(tab.handlerState.tabs)
         || !Array.isArray(tab.handlerState.executionPlanTabs)
@@ -160,9 +144,9 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     if (tab.handlerState.executionContext) {
-      const connection = this.connectionInfo.get(tab.handlerState.executionContext.connectionId);
+      const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
 
-      if (!connection?.connected) {
+      if (!executionContext) {
         this.resetConnectionInfo(tab.handlerState);
       }
     }
@@ -181,27 +165,28 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
-    return tab.handlerState.executionContext?.objectCatalogId;
+    return tab.handlerState.executionContext?.defaultCatalog;
   }
 
   private getObjectSchemaId(tab: ITab<ISqlEditorTabState>) {
-    return tab.handlerState.executionContext?.objectSchemaId;
+    return tab.handlerState.executionContext?.defaultSchema;
   }
 
   private async setConnectionId(connectionId: string, tab: ITab<ISqlEditorTabState>) {
     try {
-      const context = await this.sqlEditorService.initContext(connectionId);
+      const executionContext = await this.sqlEditorService.initContext(connectionId);
 
-      if (!context) {
+      if (!executionContext?.context) {
         return false;
       }
 
-      if (tab.handlerState.executionContext) {
-      // when new context created - destroy old one silently
-        await this.sqlEditorService.destroySqlContext(tab.handlerState.executionContext);
+      const previousContext = tab.handlerState.executionContext;
+      tab.handlerState.executionContext = { ...executionContext.context };
+
+      if (previousContext) {
+        await this.destroyContext(previousContext);
       }
 
-      tab.handlerState.executionContext = context;
       return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
@@ -213,13 +198,19 @@ export class SqlEditorTabService extends Bootstrap {
     if (!tab.handlerState.executionContext) {
       return false;
     }
+
+    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
+
+    if (!executionContext) {
+      return false;
+    }
+
     try {
-      await this.sqlEditorService.updateSqlContext(
-        tab.handlerState.executionContext?.connectionId,
-        tab.handlerState.executionContext?.contextId,
-        containerId
+      await executionContext.update(
+        tab.handlerState.executionContext?.id,
+        containerId,
       );
-      tab.handlerState.executionContext.objectCatalogId = containerId;
+      tab.handlerState.executionContext.defaultCatalog = containerId;
       return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
@@ -231,14 +222,19 @@ export class SqlEditorTabService extends Bootstrap {
     if (!tab.handlerState.executionContext) {
       return false;
     }
+
+    const executionContext = this.connectionExecutionContextService.get(tab.handlerState.executionContext.id);
+
+    if (!executionContext) {
+      return false;
+    }
+
     try {
-      await this.sqlEditorService.updateSqlContext(
-        tab.handlerState.executionContext.connectionId,
-        tab.handlerState.executionContext.contextId,
-        tab.handlerState.executionContext.objectCatalogId,
+      await executionContext.update(
+        tab.handlerState.executionContext.defaultCatalog,
         containerId
       );
-      tab.handlerState.executionContext.objectSchemaId = containerId;
+      tab.handlerState.executionContext.defaultSchema = containerId;
       return true;
     } catch (exception) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
@@ -247,15 +243,23 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    this.tabExecutionState.delete(editorTab.id);
     if (editorTab.handlerState.executionContext) {
-      const context = this.sqlResultTabsService.getTabExecutionContext(editorTab.id);
-      context.cancelTask();
-      this.sqlResultTabsService.removeTabExecutionContext(editorTab.id);
-      await this.sqlEditorService.destroySqlContext(editorTab.handlerState.executionContext);
+      await this.destroyContext(editorTab.handlerState.executionContext);
     }
     for (const tab of editorTab.handlerState.tabs) {
-      await this.sqlResultTabsService.removeResultTab(editorTab.handlerState, tab.id, editorTab.id);
+      await this.sqlResultTabsService.removeResultTab(editorTab.handlerState, tab.id);
+    }
+  }
+
+  private async destroyContext(contextInfo: IConnectionExecutionContextInfo) {
+    const executionContext = this.connectionExecutionContextService.get(contextInfo.id);
+
+    if (executionContext) {
+      try {
+        await executionContext.destroy();
+      } catch (exception) {
+        this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.id}`, '', true);
+      }
     }
   }
 }

@@ -192,5 +192,9 @@
       text-decoration: underline;
       color: white !important;
     }
+
+    .cm-s-material .active-query {
+      background-color: $active-query;
+    }
   }
 }

@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import {
   AsyncTaskInfo, GraphQLService, ServerInternalError, SqlExecutionPlan
@@ -13,7 +14,6 @@ import {
 import {
   CancellablePromise, cancellableTimeout, Deferred, EDeferredState
 } from '@cloudbeaver/core-utils';
-import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 const DELAY_BETWEEN_TRIES = 1000;
 
@@ -31,7 +31,7 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
 
   async start(
     query: string,
-    context: IDatabaseExecutionContext,
+    context: IConnectionExecutionContextInfo,
   ): Promise<void> {
     // start async task
     try {
@@ -105,11 +105,11 @@ export class SQLExecutionPlanProcess extends Deferred<SqlExecutionPlan> {
 
   private async explainExecutionPlanAsync(
     query: string,
-    context: IDatabaseExecutionContext,
+    context: IConnectionExecutionContextInfo,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExplainExecutionPlan({
       connectionId: context.connectionId,
-      contextId: context.contextId,
+      contextId: context.id,
       query,
       configuration: {},
     });

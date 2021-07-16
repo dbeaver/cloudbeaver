@@ -50,6 +50,8 @@ import {
 } from '@cloudbeaver/core-authentication';
 import { BlocksLocaleService } from '@cloudbeaver/core-blocks';
 import {
+  ConnectionExecutionContextResource,
+  ConnectionExecutionContextService,
   ConnectionsManagerService,
   ConnectionInfoResource,
   ContainerResource,
@@ -156,6 +158,8 @@ export const coreManifest: PluginManifest = {
     ContainerResource,
     DBDriverResource,
     NetworkHandlerResource,
+    ConnectionExecutionContextResource,
+    ConnectionExecutionContextService,
     ConnectionsManagerService,
     ScreenService,
     AppScreenService,

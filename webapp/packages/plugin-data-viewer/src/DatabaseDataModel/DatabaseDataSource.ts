@@ -8,6 +8,7 @@
 
 import { observable, makeObservable } from 'mobx';
 
+import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataActions } from './DatabaseDataActions';
@@ -16,7 +17,6 @@ import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
-import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
 implements IDatabaseDataSource<TOptions, TResult> {
@@ -31,7 +31,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
-  executionContext: IDatabaseExecutionContext | null;
+  executionContext: IConnectionExecutionContext | null;
   abstract get canCancel(): boolean;
 
   protected disabled: boolean;
@@ -91,7 +91,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this.actions.get(this.results[resultIndex], action);
   }
 
-  abstract cancel(): Promise<boolean> | boolean;
+  abstract cancel(): Promise<void> | void;
 
   hasResult(resultIndex: number): boolean {
     return resultIndex < this.results.length;
@@ -171,7 +171,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
-  setExecutionContext(context: IDatabaseExecutionContext | null): this {
+  setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
     return this;
   }

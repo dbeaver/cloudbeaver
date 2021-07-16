@@ -7,33 +7,19 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlExecutionState } from '../SqlExecutionState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
 import { SqlQueryService } from './SqlQueryService';
 
 @injectable()
 export class SqlResultTabsService {
-  private tabExecutionContext: MetadataMap<string, SqlExecutionState>;
-
   constructor(
     private sqlQueryService: SqlQueryService,
     private sqlExecutionPlanService: SqlExecutionPlanService,
-  ) {
-    this.tabExecutionContext = new MetadataMap(() => new SqlExecutionState());
-  }
+  ) { }
 
-  getTabExecutionContext(tabId: string): SqlExecutionState {
-    return this.tabExecutionContext.get(tabId);
-  }
-
-  removeTabExecutionContext(tabId: string): void {
-    this.tabExecutionContext.delete(tabId);
-  }
-
-  async removeResultTab(state: ISqlEditorTabState, tabId: string, editorTabId: string): Promise<void> {
+  async removeResultTab(state: ISqlEditorTabState, tabId: string): Promise<void> {
     const tab = state.tabs.find(tab => tab.id === tabId);
 
     if (tab) {

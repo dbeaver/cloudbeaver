@@ -9,11 +9,10 @@
 import { observable, makeObservable } from 'mobx';
 
 import type { NotificationService } from '@cloudbeaver/core-events';
+import type { ITask } from '@cloudbeaver/core-executor';
 import type { GraphQLService, SqlExecuteInfo } from '@cloudbeaver/core-sdk';
-import { EDeferredState } from '@cloudbeaver/core-utils';
 import { DatabaseDataEditor, DatabaseDataSource, IDatabaseDataOptions, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
-import type { SqlExecutionState } from './SqlExecutionState';
 import { SQLQueryExecutionProcess } from './SqlResultTabs/SQLQueryExecutionProcess';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
@@ -21,42 +20,40 @@ export interface IDataQueryOptions extends IDatabaseDataOptions {
 }
 
 export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IDatabaseResultSet> {
-  get canCancel(): boolean {
-    return this.queryExecutionProcess?.getState() === EDeferredState.PENDING;
-  }
+  currentTask: ITask<SqlExecuteInfo> | null;
 
-  queryExecutionProcess: SQLQueryExecutionProcess | null;
+  get canCancel(): boolean {
+    return this.currentTask?.cancellable || false;
+  }
 
   constructor(
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService,
-    private sqlExecutionState: SqlExecutionState
+    private notificationService: NotificationService
   ) {
     super();
 
     makeObservable(this, {
-      queryExecutionProcess: observable,
+      currentTask: observable.ref,
     });
 
-    this.queryExecutionProcess = null;
+    this.currentTask = null;
     this.editor = new DatabaseDataEditor();
   }
 
   isDisabled(resultIndex: number): boolean {
-    return !this.getResult(resultIndex)?.data && this.error === null;
+    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
   }
 
-  cancel(): boolean {
-    if (this.queryExecutionProcess) {
-      this.queryExecutionProcess.cancel();
+  async cancel(): Promise<void> {
+    if (this.currentTask) {
+      await this.currentTask.cancel();
     }
-    return false;
   }
 
   async save(
     prevResults: IDatabaseResultSet[]
   ): Promise<IDatabaseResultSet[]> {
-    if (!this.options || !this.executionContext) {
+    if (!this.options || !this.executionContext?.context) {
       return prevResults;
     }
 
@@ -70,7 +67,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
       for (const update of changes) {
         const response = await this.graphQLService.sdk.updateResultsDataBatch({
           connectionId: this.options.connectionId,
-          contextId: this.executionContext.contextId,
+          contextId: this.executionContext.context.id,
           resultsId: update.resultId,
           updatedRows: Array.from(update.diff.values()).map(diff => ({
             data: diff.source,
@@ -142,29 +139,35 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   async request(
     prevResults: IDatabaseResultSet[]
   ): Promise<IDatabaseResultSet[]> {
-    if (!this.options || !this.executionContext) {
+    const options = this.options;
+    const executionContext = this.executionContext;
+    const executionContextInfo = this.executionContext?.context;
+
+    if (!options || !executionContext || !executionContextInfo) {
       return prevResults;
     }
     const limit = this.count;
 
-    this.queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
+    const queryExecutionProcess = new SQLQueryExecutionProcess(this.graphQLService, this.notificationService);
 
-    this.sqlExecutionState.setExecutionTask(this.queryExecutionProcess);
-
-    try {
-      await this.queryExecutionProcess.start(
-        this.options.query,
-        this.executionContext,
+    this.currentTask = executionContext.run(async () => {
+      await queryExecutionProcess.start(
+        options.query,
+        executionContextInfo,
         {
           offset: this.offset,
           limit,
-          constraints: this.options.constraints,
-          where: this.options.whereFilter || undefined,
+          constraints: options.constraints,
+          where: options.whereFilter || undefined,
         },
         this.dataFormat
       );
 
-      const response = await this.queryExecutionProcess.promise;
+      return await queryExecutionProcess.promise;
+    }, () => { queryExecutionProcess.cancel(); });
+
+    try {
+      const response = await this.currentTask;
 
       const results = this.getResults(response, limit);
       this.clearError();
@@ -181,6 +184,6 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
   }
 
   async dispose(): Promise<void> {
-    // TODO: this.queryExecutionProcess maybe should be disposed somehow
+    await this.cancel();
   }
 }

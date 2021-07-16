@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextService, ConnectionsManagerService, IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, QuerySqlCompletionProposalsQuery } from '@cloudbeaver/core-sdk';
-import type { IDatabaseExecutionContext } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
@@ -19,10 +18,10 @@ import { SqlDialectInfoService } from './SqlDialectInfoService';
 export class SqlEditorService {
   constructor(
     private gql: GraphQLService,
-    private connectionInfoResource: ConnectionInfoResource,
     private sqlDialectInfoService: SqlDialectInfoService,
     private connectionsManagerService: ConnectionsManagerService,
     private notificationService: NotificationService,
+    private connectionExecutionContextService: ConnectionExecutionContextService
   ) {
   }
 
@@ -46,7 +45,7 @@ export class SqlEditorService {
     return result.sqlCompletionProposals;
   }
 
-  async initEditorConnection(state: ISqlEditorTabState): Promise<IDatabaseExecutionContext | undefined> {
+  async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
     if (!state.executionContext) {
       console.error('executeEditorQuery executionContext is not provided');
       return;
@@ -54,8 +53,8 @@ export class SqlEditorService {
 
     const context = await this.initContext(
       state.executionContext.connectionId,
-      state.executionContext.objectCatalogId,
-      state.executionContext.objectSchemaId
+      state.executionContext.defaultCatalog,
+      state.executionContext.defaultSchema
     );
 
     if (!context) {
@@ -69,7 +68,7 @@ export class SqlEditorService {
     connectionId?: string,
     catalogId?: string,
     schemaId?: string
-  ): Promise<IDatabaseExecutionContext | null> {
+  ): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionId);
     if (!connection) {
       return null;
@@ -78,7 +77,7 @@ export class SqlEditorService {
     try {
       await this.sqlDialectInfoService.loadSqlDialectInfo(connection.id);
 
-      return await this.createSqlContext(connection.id, catalogId, schemaId);
+      return await this.connectionExecutionContextService.create(connection.id, catalogId, schemaId);
     } catch (exception) {
       this.notificationService.logException(
         exception,
@@ -86,61 +85,5 @@ export class SqlEditorService {
       );
       return null;
     }
-  }
-
-  async destroySqlContext(context: IDatabaseExecutionContext): Promise<void> {
-    const connection = this.connectionInfoResource.get(context.connectionId);
-    if (!connection?.connected) {
-      return;
-    }
-    try {
-      await this.gql.sdk.sqlContextDestroy(context);
-    } catch (exception) {
-      this.notificationService.logException(exception, `Failed to destroy SQL-context ${context.contextId}`, '', true);
-    }
-  }
-
-  /**
-   * Returns context id, context catalog and schema
-   * When try create context without catalog or schema the context is created with default catalog and schema
-   * and response contains its ids.
-   * If in the response there are no catalog or schema it means that database has no catalogs or schemas at all.
-   */
-  async createSqlContext(
-    connectionId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IDatabaseExecutionContext> {
-    const response = await this.gql.sdk.sqlContextCreate({
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    });
-    return {
-      contextId: response.context.id,
-      connectionId,
-      objectCatalogId: response.context.defaultCatalog,
-      objectSchemaId: response.context.defaultSchema,
-    };
-  }
-
-  /**
-   * Update catalog and schema for the exiting sql context in the certain connection
-   */
-  async updateSqlContext(
-    connectionId: string,
-    contextId?: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<void> {
-    if (!contextId) {
-      throw new Error('updateSqlContext contextId not provided');
-    }
-    await this.gql.sdk.sqlContextSetDefaults({
-      connectionId,
-      contextId,
-      defaultCatalog,
-      defaultSchema,
-    });
   }
 }

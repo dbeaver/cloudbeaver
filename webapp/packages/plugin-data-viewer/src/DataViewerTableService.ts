@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
@@ -23,7 +23,8 @@ export class DataViewerTableService {
     private tableViewerStorageService: TableViewerStorageService,
     private connectionInfoResource: ConnectionInfoResource,
     private graphQLService: GraphQLService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private connectionExecutionContextService: ConnectionExecutionContextService,
   ) { }
 
   has(tableId: string): boolean {
@@ -47,7 +48,11 @@ export class DataViewerTableService {
     containerNodePath = ''
   ): Promise<DataModelWrapper> {
     const connectionInfo = await this.connectionInfoResource.load(connectionId);
-    const source = new ContainerDataSource(this.graphQLService, this.notificationService);
+    const source = new ContainerDataSource(
+      this.graphQLService,
+      this.notificationService,
+      this.connectionExecutionContextService
+    );
 
     const dataModel = this.tableViewerStorageService.create(
       source

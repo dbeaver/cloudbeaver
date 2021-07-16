@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataEditor, IDatabaseDataResultEditor } from './IDatabaseDataEditor';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseExecutionContext } from './IDatabaseExecutionContext';
 
 export interface IRequestInfo {
   readonly requestDuration: number;
@@ -38,7 +38,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
-  readonly executionContext: IDatabaseExecutionContext | null;
+  readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
 
   isReadonly: () => boolean;
@@ -63,12 +63,12 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
-  setExecutionContext: (context: IDatabaseExecutionContext | null) => this;
+  setExecutionContext: (context: IConnectionExecutionContext | null) => this;
 
   retry: () => Promise<void>;
   requestData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
-  cancel: () => Promise<boolean> | boolean;
+  cancel: () => Promise<void> | void;
   clearError: () => void;
   dispose: () => Promise<void>;
 }

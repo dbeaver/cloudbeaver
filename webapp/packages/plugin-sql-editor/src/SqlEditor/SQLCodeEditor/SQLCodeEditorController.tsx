@@ -11,6 +11,7 @@
 import { Editor, EditorConfiguration, findModeByName } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
+import 'codemirror/addon/search/searchcursor';
 import { observable, makeObservable } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 

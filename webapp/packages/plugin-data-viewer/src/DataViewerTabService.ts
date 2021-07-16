@@ -6,18 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  NavNodeManagerService,
-  INodeNavigationData,
-  ITab,
-  NodeManagerUtils
-} from '@cloudbeaver/core-app';
+import { NavNodeManagerService, INodeNavigationData, ITab } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import {
-  DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState
-} from '@cloudbeaver/plugin-object-viewer';
+import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
 import { DataPresentationService } from './DataPresentationService';
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
@@ -35,7 +28,7 @@ export class DataViewerTabService {
     private objectViewerTabService: ObjectViewerTabService,
     private dbObjectPageService: DBObjectPageService,
     private notificationService: NotificationService,
-    private dataPresentationService: DataPresentationService
+    private dataPresentationService: DataPresentationService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -70,51 +63,48 @@ export class DataViewerTabService {
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);
       }
-      // if (nodeInfo.childrenId === '') {
-      //   tabInfo.trySwitchHandler(this.tabHandler);
-      // }
     } catch (exception) {
       this.notificationService.logException(exception, 'Data Viewer Error', 'Error in Data Viewer while processing action with database node');
     }
   }
 
   private async handleTabSelect(tab: ITab<IObjectViewerTabState>) {
+    if (tab.handlerState.pageId !== this.page.key) {
+      return;
+    }
+
+    if (!tab.handlerState.connectionId) {
+      return;
+    }
+
     const node = await this.navNodeManagerService.loadNode({
       nodeId: tab.handlerState.objectId,
       parentId: tab.handlerState.parentId,
     });
 
-    if (tab.handlerState.pageId !== this.page.key) {
-      return;
-    }
-
     if (!this.navNodeManagerService.isNodeHasData(node)) {
-      return;
-    }
-
-    if (this.dataViewerTableService.has(tab.id)) {
-      return;
-    }
-
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(tab.handlerState.objectId);
-
-    if (!nodeInfo.connectionId) {
       return;
     }
 
     let model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
 
+    if (tab.handlerState.tableId && model && !model.source.executionContext?.context) {
+      await this.dataViewerTableService.removeTableModel(tab.handlerState.tableId);
+      model = undefined;
+    }
+
     if (!model) {
       model = await this.dataViewerTableService.create(
-        NodeManagerUtils.connectionNodeIdToConnectionId(nodeInfo.connectionId),
+        tab.handlerState.connectionId,
         tab.handlerState.objectId
       );
       tab.handlerState.tableId = model.id;
 
       const pageState = this.page.getState(tab);
+
       if (pageState) {
         const presentation = this.dataPresentationService.get(pageState?.presentationId);
+
         if (presentation?.dataFormat !== undefined) {
           model.setDataFormat(presentation.dataFormat);
         }
@@ -123,7 +113,7 @@ export class DataViewerTabService {
 
     // TODO: used for initial data fetch, but can repeat request each time data tab is selected,
     //       so probably should be refactored and managed by presentation
-    if (model.source.results.length === 0) {
+    if (model.source.error === null && model.source.results.length === 0) {
       model.requestData();
     }
   }
