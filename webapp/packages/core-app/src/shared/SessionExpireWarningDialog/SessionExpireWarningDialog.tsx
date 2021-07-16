@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button } from '@cloudbeaver/core-blocks';
@@ -33,30 +32,28 @@ const styles = css`
   }
 `;
 
-export const SessionExpiredDialog = observer(function SessionExpiredDialog({
+export const SessionExpireWarningDialog = observer(function SessionExpireWarningDialog({
   rejectDialog,
 }: DialogComponentProps<null, null>) {
   const translate = useTranslate();
-  const title = translate('app_root_session_expired_title');
-  const reload = useCallback(() => window.location.reload(), []);
 
   return styled(useStyles(styles))(
     <CommonDialogWrapper
-      title={title}
+      title={translate('app_root_session_expire_warning_title')}
       footer={(
         <controls>
           <Button
             type="button"
             mod={['unelevated']}
-            onClick={reload}
+            onClick={rejectDialog}
           >
-            {translate('app_root_session_expired_reload')}
+            {translate('app_root_session_expire_warning_button')}
           </Button>
         </controls>
       )}
       onReject={rejectDialog}
     >
-      <p>{translate('app_root_session_expired_message')}</p>
+      <p>{translate('app_root_session_expire_warning_message')}</p>
     </CommonDialogWrapper>
   );
 });
