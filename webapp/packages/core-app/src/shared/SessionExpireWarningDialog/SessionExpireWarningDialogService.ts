@@ -46,20 +46,23 @@ export class SessionExpireWarningDialogService extends Bootstrap {
       const sessionExpiredTime = cookies[SESSION_COOKIE_NAME];
 
       if (!sessionExpiredTime) {
-        this.sessionExpireService.handleSessionExpired();
+        this.sessionExpireService.sessionExpired();
         return;
       }
 
-      if (this.sessionExpireService.sessionExpired || !sessionDuration || sessionDuration < WARN_IN) {
+      const remainingTime = new Date(sessionExpiredTime).getTime() - Date.now();
+
+      if (this.sessionExpireService.expired
+        || !sessionDuration
+        || sessionDuration < WARN_IN
+        || (this.dialogInternalPromise && remainingTime > WARN_IN)
+      ) {
         this.close();
         return;
       }
 
-      if (!this.dialogInternalPromise) {
-        const remainingTime = new Date(sessionExpiredTime).getTime() - Date.now();
-        if (remainingTime < WARN_IN) {
-          this.open();
-        }
+      if (remainingTime < WARN_IN) {
+        this.open();
       }
     };
 
@@ -74,11 +77,11 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
       const cookies = getCookies();
 
-      if (!this.sessionExpireService.sessionExpired) {
+      if (!this.sessionExpireService.expired) {
         if (cookies[SESSION_COOKIE_NAME]) {
           await this.sessionResource.refreshSilent();
         } else {
-          this.sessionExpireService.handleSessionExpired();
+          this.sessionExpireService.sessionExpired();
         }
       }
     }
@@ -87,7 +90,6 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   private close(): void {
     if (this.dialogInternalPromise) {
       this.commonDialogService.rejectDialog(this.dialogInternalPromise);
-      this.dialogInternalPromise = null;
     }
   }
 }
