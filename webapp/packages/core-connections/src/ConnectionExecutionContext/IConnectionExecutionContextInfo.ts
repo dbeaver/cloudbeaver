@@ -8,4 +8,6 @@
 
 import type { SqlContextInfo } from '@cloudbeaver/core-sdk';
 
-export interface IConnectionExecutionContextInfo extends SqlContextInfo { }
+export interface IConnectionExecutionContextInfo extends SqlContextInfo {
+  baseId: string;
+}

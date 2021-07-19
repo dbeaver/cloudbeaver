@@ -15,6 +15,7 @@ import {
   ResourceKey,
   ResourceKeyUtils,
   ResourceKeyList,
+  SqlContextInfo,
 } from '@cloudbeaver/core-sdk';
 import { flat, MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -66,7 +67,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
             const connection = this.connectionInfoResource.get(connectionId);
             return context.connectionId === connectionId && !connection?.connected;
           })
-        )).map(context => context.id)
+        )).map(context => context.baseId)
       )
     );
   }
@@ -77,7 +78,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         flat(ResourceKeyUtils.map(
           key,
           connectionId => this.values.filter(context => context.connectionId === connectionId)
-        )).map(context => context.id)
+        )).map(context => context.baseId)
       )
     );
   }
@@ -94,9 +95,11 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         defaultSchema,
       });
 
-      this.updateContexts(context);
+      const baseContext = getBaseContext(context);
 
-      return this.get(context.id)!;
+      this.updateContexts(baseContext);
+
+      return this.get(baseContext.baseId)!;
     });
   }
 
@@ -113,7 +116,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     await this.performUpdate(contextId, [], async () => {
       await this.graphQLService.sdk.executionContextUpdate({
-        contextId,
+        contextId: context.id,
         connectionId: context.connectionId,
         defaultCatalog,
         defaultSchema,
@@ -135,7 +138,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     await this.performUpdate(contextId, [], async () => {
       await this.graphQLService.sdk.executionContextDestroy({
-        contextId,
+        contextId: context.id,
         connectionId: context.connectionId,
       });
     });
@@ -168,12 +171,13 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     const all = ResourceKeyUtils.hasMark(key, ConnectionExecutionContextResource.keyAll.mark);
 
     await ResourceKeyUtils.forEachAsync(key, async contextId => {
+      const context = this.get(contextId);
       const { contexts } = await this.graphQLService.sdk.executionContextList({
-        contextId: all ? undefined : contextId,
+        contextId: all ? undefined : (context?.id ?? contextId),
         // connectionId
       });
 
-      const key = this.updateContexts(...contexts);
+      const key = this.updateContexts(...contexts.map(getBaseContext));
 
       for (const contextId of this.keys) {
         if (!ResourceKeyUtils.includes(key, contextId)) {
@@ -189,11 +193,18 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   private updateContexts(...contexts: IConnectionExecutionContextInfo[]): ResourceKeyList<string> {
-    const key = resourceKeyList(contexts.map(context => context.id));
+    const key = resourceKeyList(contexts.map(context => context.baseId));
 
     const oldContexts = this.get(key);
     this.set(key, oldContexts.map((context, i) => ({ ...context, ...contexts[i] })));
 
     return key;
   }
+}
+
+function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {
+  return {
+    ...context,
+    baseId: `${context.connectionId}_${context.id}`,
+  };
 }

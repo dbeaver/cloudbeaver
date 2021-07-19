@@ -47,6 +47,6 @@ export class ConnectionExecutionContextService {
   ): Promise<ConnectionExecutionContext> {
     const context = await this.connectionExecutionContextResource.create(connectionId, defaultCatalog, defaultSchema);
 
-    return this.contexts.get(context.id);
+    return this.contexts.get(context.baseId);
   }
 }

@@ -51,7 +51,7 @@ export class SqlEditorController implements IInitializableController {
       return true;
     }
 
-    const context = this.connectionExecutionContextService.get(this.tab.handlerState.executionContext.id);
+    const context = this.connectionExecutionContextService.get(this.tab.handlerState.executionContext.baseId);
 
     return context?.executing || false;
   }
