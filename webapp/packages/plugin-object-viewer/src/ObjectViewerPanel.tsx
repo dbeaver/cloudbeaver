@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useChildren, TabHandlerPanelProps } from '@cloudbeaver/core-app';
@@ -43,6 +43,7 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   tab,
 }: TabHandlerPanelProps<IObjectViewerTabState>) {
   const translate = useTranslate();
+  const [connecting, setConnecting] = useState(false);
   const connection = useConnectionInfo(tab.handlerState.connectionId || '');
   const style = useStyles(styles);
   const {
@@ -52,21 +53,24 @@ export const ObjectViewerPanel = observer(function ObjectViewerPanel({
   const pages = dbObjectPagesService.orderedPages;
 
   const handleConnect = useCallback(async () => {
-    await connection.connect();
+    setConnecting(true);
+    try {
+      await connection.connect();
+    } finally {
+      setConnecting(false);
+    }
   }, [connection]);
 
-  if (connection.connectionInfo) {
-    if (connection.isLoading() && !isLoaded()) {
+  if (connection.connectionInfo && !connection.connectionInfo.connected) {
+    if (connecting || connection.isLoading()) {
       return <Loader />;
     }
 
-    if (!connection.connectionInfo.connected) {
-      return (
-        <TextPlaceholder>
-          <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
-        </TextPlaceholder>
-      );
-    }
+    return (
+      <TextPlaceholder>
+        <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
+      </TextPlaceholder>
+    );
   }
 
   if (tab.handlerState.error) {

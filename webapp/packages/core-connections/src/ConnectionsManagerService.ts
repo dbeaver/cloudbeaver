@@ -85,9 +85,9 @@ export class ConnectionsManagerService {
 
   hasAnyConnection(connected?: boolean): boolean {
     if (connected) {
-      return Array.from(this.connectionInfo.data.values()).some(connection => connection.connected);
+      return this.connectionInfo.values.some(connection => connection.connected);
     }
-    return !!Array.from(this.connectionInfo.data.values()).length;
+    return !!this.connectionInfo.values.length;
   }
 
   private connectionContext() {
@@ -103,7 +103,7 @@ export class ConnectionsManagerService {
       if (!this.hasAnyConnection()) {
         return;
       }
-      connectionId = Array.from(this.connectionInfo.data.values())[0].id;
+      connectionId = this.connectionInfo.values[0].id;
     }
 
     try {
@@ -135,7 +135,7 @@ export class ConnectionsManagerService {
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
-      for (const connection of this.connectionInfo.data.values()) {
+      for (const connection of this.connectionInfo.values) {
         await this._closeConnectionAsync(connection);
       }
       notification.close();
