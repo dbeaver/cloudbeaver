@@ -698,8 +698,8 @@ public class CBApplication extends BaseApplicationImpl {
                             JSONUtils.field(json, "mergeEntities", navSettings.isMergeEntities());
                         if (navSettings.isHideFolders() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideFolders())
                             JSONUtils.field(json, "hideFolders", navSettings.isHideFolders());
-                        if (navSettings.isHideSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideSchemas())
-                            JSONUtils.field(json, "hideSchemas", navSettings.isHideSchemas());
+                        if (navSettings.isMergeSchemas() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isMergeSchemas())
+                            JSONUtils.field(json, "hideSchemas", navSettings.isMergeSchemas());
                         if (navSettings.isHideVirtualModel() != CBAppConfig.DEFAULT_VIEW_SETTINGS.isHideVirtualModel())
                             JSONUtils.field(json, "hideVirtualModel", navSettings.isHideVirtualModel());
 
