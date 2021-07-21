@@ -296,7 +296,6 @@ type NavigatorSettings {
     showOnlyEntities: Boolean!
     mergeEntities: Boolean!
     hideFolders: Boolean!
-    hideSchemas: Boolean!
     hideVirtualModel: Boolean!
 }
 
