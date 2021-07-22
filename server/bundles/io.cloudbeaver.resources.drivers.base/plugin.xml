@@ -40,7 +40,7 @@
         <driver id="oracle:oracle_thin"/>
         <driver id="postgresql:postgres-jdbc"/>
         <driver id="jaybird:jaybird"/>
-        <driver id="generic:yandex_clickhouse"/>
+        <driver id="clickhouse:yandex_clickhouse"/>
         <driver id="generic:derby_server"/>
         <driver id="generic:h2_embedded"/>
         <driver id="generic:sqlite_jdbc"/>
