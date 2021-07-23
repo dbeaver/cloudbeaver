@@ -17,8 +17,6 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPEvaluationContext;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
@@ -106,9 +104,10 @@ public class WebSQLDataFilter {
                 if (dataContainer instanceof DBSEntity) {
                     DBSEntityAttribute attribute = ((DBSEntity) dataContainer).getAttribute(monitor, webConstr.getAttribute());
                     if (attribute == null) {
-                        throw new DBException("Attribute '" + webConstr.getAttribute() + "' not found in '" + DBUtils.getObjectFullName(dataContainer, DBPEvaluationContext.UI) + "'");
+                        dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
+                    } else {
+                        dbConstraint = new DBDAttributeConstraint(attribute, -1);
                     }
-                    dbConstraint = new DBDAttributeConstraint(attribute, -1);
                 } else {
                     dbConstraint = new DBDAttributeConstraint(webConstr.getAttribute(), -1);
                 }
